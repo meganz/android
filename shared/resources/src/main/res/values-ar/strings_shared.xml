@@ -72,14 +72,6 @@
     <string name="general_sync_local_filesystem_mismatch">لا يمكن مزامنة الملفات الموجودة في هذا المجلد أو نسخها احتياطيًا. ستحتاج إلى إعادة تمكين المزامنة أو النسخ الاحتياطي من تطبيق الحاسوب المكتبي.</string>
     <!-- Warning message to display when sync has been paused due a low battery level -->
     <string name="general_message_sync_paused_low_battery_level">تم إيقاف المزامنة مؤقتًا، ومستوى البطارية منخفض جدًا. اشحن البطارية لاستئناف المزامنة.</string>
-    <!-- Title for File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_file_sharing">مشاركة ملفات سهلة وآمنة</string>
-    <!-- Description about File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_file_sharing">يمكنك مشاركة الملفات الكبيرة بفضل حجم تراسل المعطيات السخي وضمان الأمان باستخدام الروابط المحمية بكلمة مرور.</string>
-    <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_backup_rewind">لا تفقد البيانات مرة أخرى</string>
-    <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">يمكنك الترجيع لاستعادة الملفات والمجلدات مرة أخرى إلى أي تاريخ يصل إلى 180 يومًا حتى تكون بياناتك مقاومة للحوادث والعبث.</string>
     <!-- Search drop down chips filter type file type -->
     <string name="search_dropdown_chip_filter_type_file_type">النوع</string>
     <!-- Search drop down chips filter type file type images -->
@@ -216,14 +208,6 @@
     <string name="general_size_giga_byte">%1$s</string>
     <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
     <string name="general_free_plan_name">مجاني</string>
-    <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
-    <string name="dialog_onboarding_transfer_quota_free_limited">محدود</string>
-    <!-- Description of the price for Free account. The meaning: this type of account is for free. This string won't be used for name of Free account. -->
-    <string name="dialog_onboarding_free_account_price">مجاني</string>
-    <!-- Continue button on Onboarding dialog, the user will proceed with payment for chosen account. -->
-    <string name="dialog_onboarding_button_continue">تابع</string>
-    <!-- Title of navigation bar on Onboarding dialog. -->
-    <string name="dialog_onboarding_app_bar_title">اختر باقة ميغا MEGA الخاصة بك</string>
     <!-- Header of the Info view field for what is the content of a device/folder -->
     <string name="info_content">المحتويات</string>
     <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
@@ -276,8 +260,6 @@
     <string name="general_giga_byte_standalone">غيغابايت</string>
     <!-- Size unit in terabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
     <string name="general_tera_byte_standalone">تيرابايت</string>
-    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
-    <string name="dialog_onboarding_feature_storage_description">بدءًا من %1$s&#160;%2$s، ابحث عن الملاءمة المثالية لاحتياجات التخزين الخاصة بك.</string>
     <!-- Title of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_title">مساحة تخزين غير كافية</string>
     <!-- Body text of the insufficient storage error dialog -->
@@ -318,12 +300,6 @@
     <string name="file_info_information_snackbar_description_added">تمت إضافة الوصف</string>
     <!-- Description updated snack bar for the file info information screen-->
     <string name="file_info_information_snackbar_description_updated">تم تحديث الوصف</string>
-    <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_title_additional_features">بالإضافة إلى الوصول إلى هذه المزايا الرائعة:</string>
-    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226; ميغا في بي إن &#160;MEGA&#160;VPN \n &#8226;&#160;مكالمات واجتماعات غير مقيدة \n&#8226;&#160;قم بمزامنة المجلدات تلقائيًا على جهازك المحمول \n&#8226;&#160;بدون إعلانات</string>
-    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;ميغا في بي إن &#160;MEGA&#160;VPN \n&#8226;&#160;مكالمات واجتماعات غير مقيدة \n&#8226;&#160;قم بمزامنة المجلدات تلقائيًا على جهازك المحمول</string>
     <!-- Text for the Sync solved issues list empty state -->
     <string name="device_center_sync_solved_issues_empty_state_text">لا توجد مشاكل تم حلها</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
@@ -333,11 +309,9 @@
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">لا يمكن ربط مجلد ترفيعات الكاميرا ومجلد ترفيعات الوسائط الثانوية ببعضهما البعض. اختر مجلدًا مختلفًا.</string>
     <!-- The confirmation Button text of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">حسناً، فهمت ذلك</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">إغلاق</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
     <string name="general_no_picker_warning">لا يحتوي هذا الجهاز على تطبيق لتحديد المجلدات</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;قم بمزامنة المجلدات تلقائيًا على هاتفك المحمول</string>
     <!-- Hidden items -->
     <string name="hidden_items">عناصر مخفية</string>
     <!-- Label to indicate that is a Pro only feature -->
@@ -839,10 +813,6 @@
     <string name="general_drive">السواقة</string>
     <!-- Tab bar title of Syncs tab -->
     <string name="general_syncs">يقوم بالمزامنة</string>
-    <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
-    <string name="transfers_completed_one_read_error_retrying">لا يمكن إكمال الترفيع أو إعادة المحاولة لأن ميغا MEGA لم تعد قادرة على الوصول إلى الملف</string>
-    <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
-    <string name="transfers_completed_some_read_error_retrying">لا يمكن إكمال بعض أو كل الترفيعات الخاصة بك أو إعادة المحاولة لأن ميغا MEGA لم تعد قادرة على الوصول إلى الملفات</string>
     <!-- Title for Offline Folder exposed via SAF -->
     <string name="general_mega_offline">ملفات ميغا MEGA في دون اتصال بالإنترنت</string>
     <!-- Notification content for download final notification. It will inform the user about the location where file/s were downloaded -->
@@ -956,8 +926,6 @@
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">جاري حفظ %1$s إلى السواقة السحابية...</string>
-    <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">سيتم محاسبتك %1$s على الفور ولكن لن يتم تجديد اشتراكك تلقائيًا بعد 12 شهرًا بسبب اللوائح الحكومية. تقع على عاتقك مسؤولية تجديد اشتراكك بعد انتهاء صلاحيته. يمكنك إدارة أو إلغاء اشتراكك في أي وقت عبر الاشتراكات في غوغل بلاي [A]Google&#160;Play[/A]. من خلال ترقية حسابك، فإنك توافق على [B]شروط الخدمة[/B] و [C]سياسة الخصوصية[/C] الخاصين بميغا MEGA.\n&#160;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">جاري الرفع\u2026</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
@@ -1186,8 +1154,6 @@
     <string name="free_plan_card_title">ابدأ مع باقتنا المجانية</string>
     <!-- Description for the Free Plan card -->
     <string name="free_plan_card_description">لا يتعين عليك الالتزام بباقة مدفوعة حتى الآن، توفر باقاتنا المجانية كميات كبيرة من مساحة التخزين و حجم تراسل المعطيات</string>
-    <!-- Feature text for Free Plan storage -->
-    <string name="free_plan_card_storage_feature">20 غيغابايت من مساحة التخزين</string>
     <!-- Feature text for Free Plan transfer quota -->
     <string name="free_plan_card_transfer_feature">حجم تراسل معطيات محدود</string>
     <!-- Button text for Free Plan card -->
@@ -1203,11 +1169,11 @@
     <!-- Description for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_desc">يمكن للأشخاص الذين تشارك العناصر معهم استخدام حصتك لتنزيل الملفات وبثها</string>
     <!-- Title for MEGA VPN feature -->
-    <string name="pro_plan_feature_vpn_title">الوصول إلى في بي إن ميغا MEGA&#160;VPN</string>
+    <string name="pro_plan_feature_vpn_title">MEGA&#160;VPN</string>
     <!-- Description for MEGA VPN feature -->
     <string name="pro_plan_feature_vpn_desc">ابق آمنًا على الإنترنت من خلال في بي إن VPN عالي السرعة الذي يتميز بالسرعة وسهولة الاستخدام</string>
     <!-- Title for MEGA Pass feature -->
-    <string name="pro_plan_feature_pass_title">ميغا باس MEGA&#160;Pass</string>
+    <string name="pro_plan_feature_pass_title">MEGA&#160;Pass</string>
     <!-- Description for MEGA Pass feature -->
     <string name="pro_plan_feature_pass_desc">قم بتنظيم جميع كلمات المرور الخاصة بك واحتفظ بها آمنة مع مدير كلمات المرور الخاص بنا</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
@@ -1220,8 +1186,6 @@
     <string name="pro_plan_benefit_password_protected_links">روابط محمية بكلمة مرور</string>
     <!-- Benefit: Links with expiry dates -->
     <string name="pro_plan_benefit_links_with_expiry_dates">روابط مع تواريخ انتهاء الصلاحية</string>
-    <!-- Benefit: Transfer quota sharing -->
-    <string name="pro_plan_benefit_transfer_quota_sharing">تشارك تراسل المعطيات</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
     <string name="pro_plan_benefit_auto_sync_mobile">قم بمزامنة المجلدات تلقائيًا على جهازك المحمول</string>
     <!-- Benefit: Rewind up to 180 days of deleted data -->
@@ -1242,10 +1206,6 @@
     <string name="choose_account_screen_get_more_with_pro_plan_title">احصل على المزيد مع باقة برو Pro</string>
     <!-- Maybe later button text in the choose account screen-->
     <string name="choose_account_screen_maybe_later_button_text">ربما في وقت لاحق</string>
-    <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_monthly">شهريا</string>
-    <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_yearly">سنويًا</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_label_save_up_to">وفر حتى 16٪ مع الفواتير السنوية</string>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
@@ -1254,8 +1214,6 @@
     <string name="choose_account_screen_transfer_quota_label">%1$s تراسل متاح</string>
     <!-- General month label -->
     <string name="general_month">/شهر</string>
-    <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
-    <string name="choose_account_screen_currency_per_month">%1$s شهرياً</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
     <string name="choose_account_screen_billed_yearly">يتم تحصيل رسوم %1$s سنويًا</string>
     <!-- The snackbar message of unhidden nodes operation -->
@@ -1285,8 +1243,6 @@
     <string name="text_start_mega_vpn_free_trial">%1$s من مساحة التخزين. صالحة بشكل دائم.</string>
     <!-- title of the section for start mega pass free trial in achivements section -->
     <string name="title_start_mega_pass_free_trial">ابدأ تشغيل الفترة التجريبية المجانية لميغا باس MEGA&#160;Pass</string>
-    <!-- Text of the section for start mega pass free trial in achivements section -->
-    <string name="text_start_mega_pass_free_trial">%1$s من مساحة التخزين. صالحة بشكل دائم.</string>
     <!-- Text of the button for install mega vpn in achivements section -->
     <string name="button_text_install_mega_vpn">قم بتثبيت ميغا في بي إن MEGA&#160;VPN</string>
     <!-- Text of the button for install mega pass in achivements section -->
@@ -1568,4 +1524,168 @@
     <string name="sign_up_last_name_text_field_char_limit_exceed_error">لا يمكن أن يتجاوز الاسم الأخير 40 محرفًا</string>
     <!-- Error message when IP has already sent an issue report and needs to wait -->
     <string name="report_issue_too_many_times_error">You’ve already sent an issue report within the last 10 minutes. Please wait before trying again, or contact %1$s for assistance.</string>
+    <!-- The snackbar message for informing the user about the invitation is trying to sent, is already in the received contact requests because the user already invited them. -->
+    <string name="contacts_invite_already_received">This user has already sent you an invitation</string>
+    <!-- The snackbar message for informing the user about the invitations is trying to sent, are already in the received contact requests because the users already invited them. -->
+    <string name="contacts_invites_already_received">All the people you invited have already sent you an invitation</string>
+    <!-- The snackbar message for informing the user about the invitations are correctly sent. -->
+    <string name="contacts_invites_sent">Invitation sent. They’ll appear in Contacts once accepted.</string>
+    <!-- The snackbar message for informing the user about some invitations correctly sent, but not others because they are already in the received contact requests because the users already invited them. -->
+    <plurals name="contacts_invites_sent_but_others_already_received">
+        <item quantity="one">%1$d user invited, but one or more users have already invited you</item>
+        <item quantity="other">%1$d users invited, but one or more users have already invited you</item>
+    </plurals>
+    <!--  Error shown when the user tries to resend the sign up link multiple times at once. -->
+    <string name="resend_signup_link_error">تم إرسال البريد الإلكتروني بالفعل. يرجى الانتظار بضع دقائق قبل المحاولة مرة أخرى.</string>
+    <!-- success message when renaming a node -->
+    <string name="context_correctly_renamed">تمت إعادة تسمية العنصر</string>
+    <!-- Homepage section. -->
+    <string name="general_section_home">الصفحة الرئيسية</string>
+    <!-- Error message when removing public links of nodes. Plural. -->
+    <plurals name="context_link_removal_error">
+        <item quantity="zero">فشل إزالة الرابط، يرجى إعادة المحاولة لاحقاً.</item>
+        <item quantity="one">فشل إزالة الرابط، يرجى إعادة المحاولة لاحقاً.</item>
+        <item quantity="two">فشل في إزالة بعض الروابط. الرجاء معاودة المحاولة في وقت لاحق.</item>
+        <item quantity="few">فشل في إزالة بعض الروابط. الرجاء معاودة المحاولة في وقت لاحق.</item>
+        <item quantity="many">فشل في إزالة بعض الروابط. الرجاء معاودة المحاولة في وقت لاحق.</item>
+        <item quantity="other">فشل في إزالة بعض الروابط. الرجاء معاودة المحاولة في وقت لاحق.</item>
+    </plurals>
+    <!-- Message when some public links were removed successfully. Plural. -->
+    <plurals name="context_link_removal_success">
+        <item quantity="zero">تمت إزالة الرابط</item>
+        <item quantity="one">تمت إزالة الرابط</item>
+        <item quantity="two">تمت إزالة الروابط</item>
+        <item quantity="few">تمت إزالة الروابط</item>
+        <item quantity="many">تمت إزالة الروابط</item>
+        <item quantity="other">تمت إزالة الروابط</item>
+    </plurals>
+    <!-- Warning that appears prior to remove links of files. Plural. -->
+    <plurals name="remove_links_warning_text">
+        <item quantity="zero">لن يكون هذا الرابط متاحاً كمشاركة عامة بعد الآن.</item>
+        <item quantity="one">لن يكون هذا الرابط متاحاً كمشاركة عامة بعد الآن.</item>
+        <item quantity="two">لن تكون هذه الروابط متاحة كمشاركة عامة بعد الآن.</item>
+        <item quantity="few">لن تكون هذه الروابط متاحة كمشاركة عامة بعد الآن.</item>
+        <item quantity="many">لن تكون هذه الروابط متاحة كمشاركة عامة بعد الآن.</item>
+        <item quantity="other">لن تكون هذه الروابط متاحة كمشاركة عامة بعد الآن.</item>
+    </plurals>
+    <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
+    <string name="context_share_correctly_removed">تم حذف المشاركة</string>
+    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">نعم</string>
+    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">كلا</string>
+    <!-- error message when removing access of contact(s) to a selected folder -->
+    <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
+        <item quantity="zero">تعذرت إزالة إذن الوصول لـ %1$d جهة اتصال</item>
+        <item quantity="one">تعذرت إزالة إذن الوصول لـ %1$d جهة اتصال</item>
+        <item quantity="two">تعذرت إزالة إذن الوصول لـ %1$d جهتي اتصال</item>
+        <item quantity="few">تعذرت إزالة إذن الوصول لـ %1$d جهات اتصال</item>
+        <item quantity="many">تعذرت إزالة إذن الوصول لـ %1$d جهة اتصال</item>
+        <item quantity="other">تعذرت إزالة إذن الوصول لـ %1$d جهة اتصال</item>
+    </plurals>
+    <!-- Confirmation before removing the outgoing shares of a folder -->
+    <plurals name="confirmation_remove_outgoing_shares">
+        <item quantity="one">This folder is shared with %1$d contact. Stop sharing?</item>
+        <item quantity="other">This folder is shared with %1$d contacts. Stop sharing?</item>
+    </plurals>
+    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
+    <plurals name="alert_remove_several_shares">
+        <item quantity="zero"></item>
+        <item quantity="one"></item>
+        <item quantity="two"></item>
+        <item quantity="few"></item>
+        <item quantity="many"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
+    <string name="figures_storage_referrals_achievements_text">%1$s extra storage for each invitation, valid for %2$d days</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with permanent valid duration -->
+    <string name="figures_storage_referrals_achievements_text_permanent">%1$s extra storage for each invitation, valid permanently</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to each achievement with dynamic valid duration -->
+    <string name="figures_storage_achievements_text">%1$s extra storage, valid for %2$d days</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to each achievement with permanent valid duration -->
+    <string name="figures_storage_achievements_text_permanent">%1$s extra storage, valid permanently</string>
+    <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with dynamic valid duration -->
+    <string name="figures_storage_achievements_awarded_text">%1$s storage bonus applied, valid for %2$d days</string>
+    <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with permanent valid duration -->
+    <string name="figures_storage_achievements_awarded_text_permanent">%1$s storage bonus applied, valid permanently</string>
+    <!-- info paragraph about the achievement install megasync with dynamic valid duration -->
+    <string name="paragraph_info_achievement_install_desktop_dynamic_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid for %2$s days. The desktop app is available for Windows, macOS and Linux.</string>
+    <!-- info paragraph about the achievement install megasync with permanent valid duration -->
+    <string name="paragraph_info_achievement_install_desktop_permanent_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid permanently. The desktop app is available for Windows, macOS and Linux.</string>
+    <!-- info paragraph about the achievement install mobile app with dynamic valid duration -->
+    <string name="paragraph_info_achievement_install_mobile_app_dynamic_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid for %2$s days. The mobile apps are available for iOS and Android.</string>
+    <!-- info paragraph about the achievement install mobile app with permanent valid duration -->
+    <string name="paragraph_info_achievement_install_mobile_app_permanent_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid permanently. The mobile apps are available for iOS and Android.</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">These are backup folders and can only be shared as read-only</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">This is a backup folder and can only be shared as read-only</string>
+    <!-- Button to confirm the action of restarting one transfer-->
+    <string name="button_permission_info">إغلاق</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">Backup folders are read-only</string>
+    <!-- dialog option continue in alert dialog -->
+    <string name="button_continue">استمرار</string>
+    <!--Dialog title when the user selected is not on the contact list when sharing a node -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">لا يمكن التحقق من جهة الاتصال</string>
+    <!--Dialog description when the user selected is not on the contact list when sharing a node -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">لا يمكنك التحقق من %s لأنه ليس في قائمة جهات الاتصال الخاصة بك. انتظر حتى يقبل دعوتك أولاً.</string>
+    <!-- Answer for confirmation dialog. -->
+    <string name="general_ok">موافق</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="general_leave">غادر</string>
+    <!-- Success message when left shared folders -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
+        <item quantity="zero">تمت مغادرة %1$d ملف مشارك</item>
+        <item quantity="one">تمت مغادرة %1$d ملف مشارك</item>
+        <item quantity="two">تمت مغادرة %1$d ملفين مشاركين</item>
+        <item quantity="few">تمت مغادرة %1$d ملفات مشاركة</item>
+        <item quantity="many">تمت مغادرة %1$d ملفاً مشاركاً</item>
+        <item quantity="other">تمت مغادرة %1$d ملف مشارك</item>
+    </plurals>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
+        <item quantity="zero">تعذرت مغادرة %1$d مجلد مشارك</item>
+        <item quantity="one">تعذرت مغادرة %1$d مجلد مشارك</item>
+        <item quantity="two">تعذرت مغادرة %1$d مجلدين مشاركين</item>
+        <item quantity="few">تعذرت مغادرة %1$d مجلدات مشاركة</item>
+        <item quantity="many">تعذرت مغادرة %1$d مجلد مشارك</item>
+        <item quantity="other">تعذرت مغادرة %1$d مجلد مشارك</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
+        <item quantity="zero">تمت مغادرة %1$d ملف مشارك،&#160;</item>
+        <item quantity="one">تمت مغادرة %1$d ملف مشارك،&#160;</item>
+        <item quantity="two">تمت مغادرة %1$d ملفين مشاركين،&#160;</item>
+        <item quantity="few">تمت مغادرة %1$d ملفات مشاركة،&#160;</item>
+        <item quantity="many">تمت مغادرة %1$d ملفاً مشاركاً،&#160;</item>
+        <item quantity="other">تمت مغادرة %1$d ملف مشارك،&#160;</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
+        <item quantity="zero">تعذرت مغادرة %1$d مجلد مشارك</item>
+        <item quantity="one">تعذرت مغادرة %1$d مجلد مشارك</item>
+        <item quantity="two">تعذرت مغادرة %1$d مجلدين مشاركين</item>
+        <item quantity="few">تعذرت مغادرة %1$d مجلدات مشاركة</item>
+        <item quantity="many">تعذرت مغادرة %1$d مجلد مشارك</item>
+        <item quantity="other">تعذرت مغادرة %1$d مجلد مشارك</item>
+    </plurals>
+    <!-- confirmation message before leaving some incoming shared folders -->
+    <plurals name="confirmation_leave_share_folder">
+        <item quantity="zero">إذا غادرت هذا المجلد، فلن تتمكن من رؤيته مرة أخرى.</item>
+        <item quantity="one">إذا غادرت هذا المجلد، فلن تتمكن من رؤيته مرة أخرى.</item>
+        <item quantity="two">إذا غادرت هذين المجلدين، فلن تتمكن من رؤيتهما مرة أخرى.</item>
+        <item quantity="few">إذا غادرت هذه المجلدات، فلن تتمكن من رؤيتهم مرة أخرى.</item>
+        <item quantity="many">إذا غادرت هذه المجلدات، فلن تتمكن من رؤيتهم مرة أخرى.</item>
+        <item quantity="other">إذا غادرت هذه المجلدات، فلن تتمكن من رؤيتهم مرة أخرى.</item>
+    </plurals>
+    <!-- Title of the dialog to choose permissions when sharing. -->
+    <string name="dialog_select_permissions">أذونات المشاركة</string>
+    <!-- Refers to access rights for a file folder. -->
+    <string name="file_properties_shared_folder_full_access">وصول كامل</string>
+    <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
+    <string name="file_properties_shared_folder_read_only">للقراءة فقط</string>
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
+    <string name="file_properties_shared_folder_read_write">قراءة وكتابة</string>
 </resources>

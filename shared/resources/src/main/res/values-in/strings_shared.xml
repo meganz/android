@@ -72,14 +72,6 @@
     <string name="general_sync_local_filesystem_mismatch">File dalam folder ini tidak dapat disinkronkan atau dicadangkan. Anda harus mengaktifkan kembali sinkronisasi atau cadangan dari aplikasi desktop.</string>
     <!-- Warning message to display when sync has been paused due a low battery level -->
     <string name="general_message_sync_paused_low_battery_level">Sinkronisasi dihentikan sementara, tingkat baterai terlalu rendah. Isi daya baterai untuk melanjutkan sinkronisasi.</string>
-    <!-- Title for File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_file_sharing">Berbagi file yang mudah dan aman</string>
-    <!-- Description about File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_file_sharing">Bagikan file besar berkat kuota transfer yang banyak dan pastikan keamanan dengan tautan yang dilindungi kata sandi.</string>
-    <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_backup_rewind">Jangan pernah kehilangan data lagi</string>
-    <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Putar ulang untuk mengembalikan file dan folder ke tanggal apa pun hingga 180 hari, sehingga data anda tidak mengalami kecelakaan dan rusak.</string>
     <!-- Search drop down chips filter type file type -->
     <string name="search_dropdown_chip_filter_type_file_type">Tipe</string>
     <!-- Search drop down chips filter type file type images -->
@@ -196,14 +188,6 @@
     <string name="general_size_giga_byte">%1$s</string>
     <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
     <string name="general_free_plan_name">Gratis</string>
-    <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
-    <string name="dialog_onboarding_transfer_quota_free_limited">Terbatas</string>
-    <!-- Description of the price for Free account. The meaning: this type of account is for free. This string won't be used for name of Free account. -->
-    <string name="dialog_onboarding_free_account_price">Gratis</string>
-    <!-- Continue button on Onboarding dialog, the user will proceed with payment for chosen account. -->
-    <string name="dialog_onboarding_button_continue">Lanjutkan</string>
-    <!-- Title of navigation bar on Onboarding dialog. -->
-    <string name="dialog_onboarding_app_bar_title">Pilih paket MEGA anda</string>
     <!-- Header of the Info view field for what is the content of a device/folder -->
     <string name="info_content">Memiliki</string>
     <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
@@ -236,8 +220,6 @@
     <string name="general_giga_byte_standalone">GB</string>
     <!-- Size unit in terabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
     <string name="general_tera_byte_standalone">TB</string>
-    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
-    <string name="dialog_onboarding_feature_storage_description">Mulai dari %1$s&#160;%2$s, temukan yang cocok untuk kebutuhan penyimpanan anda.</string>
     <!-- Title of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_title">Ruang penyimpanan tidak mencukupi</string>
     <!-- Body text of the insufficient storage error dialog -->
@@ -278,12 +260,6 @@
     <string name="file_info_information_snackbar_description_added">Deskripsi ditambahkan</string>
     <!-- Description updated snack bar for the file info information screen-->
     <string name="file_info_information_snackbar_description_updated">Deskripsi diperbarui</string>
-    <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_title_additional_features">Ditambah akses ke manfaat besar ini:</string>
-    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Panggilan dan rapat tanpa batas \n&#8226;&#160;Sinkronkan folder di perangkat seluler anda secara otomatis \n&#8226;&#160;Tidak ada iklan</string>
-    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Panggilan dan rapat tanpa batas \n&#8226;&#160;Sinkronkan folder di perangkat seluler anda secara otomatis</string>
     <!-- Text for the Sync solved issues list empty state -->
     <string name="device_center_sync_solved_issues_empty_state_text">Tidak ada masalah yang terpecahkan</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
@@ -293,11 +269,9 @@
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">Folder Unggahan Kamera dan folder unggahan media sekunder tidak dapat dikaitkan satu sama lain. Pilih folder yang berbeda.</string>
     <!-- The confirmation Button text of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">Oke, mengerti</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">Tutup</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
     <string name="general_no_picker_warning">Perangkat ini tidak memiliki aplikasi untuk memilih folder</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;Sinkronkan folder di perangkat seluler anda secara otomatis</string>
     <!-- Hidden items -->
     <string name="hidden_items">Item tersembunyi</string>
     <!-- Label to indicate that is a Pro only feature -->
@@ -774,10 +748,6 @@
     <string name="general_drive">Drive</string>
     <!-- Tab bar title of Syncs tab -->
     <string name="general_syncs">Sinkronisasi</string>
-    <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
-    <string name="transfers_completed_one_read_error_retrying">Unggahan anda tidak dapat diselesaikan atau dicoba lagi, karena MEGA tidak dapat lagi mengakses file</string>
-    <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
-    <string name="transfers_completed_some_read_error_retrying">Beberapa atau semua unggahan anda tidak dapat diselesaikan atau dicoba lagi, karena MEGA tidak dapat lagi mengakses file</string>
     <!-- Title for Offline Folder exposed via SAF -->
     <string name="general_mega_offline">MEGA File Offline</string>
     <!-- Notification content for download final notification. It will inform the user about the location where file/s were downloaded -->
@@ -876,8 +846,6 @@
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">Menyimpan %1$s ke drive Cloud...</string>
-    <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">Anda akan dikenakan biaya %1$s segera tetapi langganan anda tidak akan diperpanjang secara otomatis setelah 12 bulan karena peraturan pemerintah. Ini akan menjadi tanggung jawab anda untuk memperbarui langganan anda setelah habis masa berlakunya. Anda dapat mengelola atau membatalkan langganan kapan saja melalui Langganan di [A]Google&#160;Play[/A]. Dengan memutakhirkan akun anda, Anda menyetujui [B]Ketentuan Layanan[/B] dan [C]Kebijakan Privasi[/C] MEGA.</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">Sedang mengunggah&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
@@ -1106,8 +1074,6 @@
     <string name="free_plan_card_title">Mulailah dengan paket gratis kami</string>
     <!-- Description for the Free Plan card -->
     <string name="free_plan_card_description">Anda belum perlu berkomitmen untuk paket berbayar, paket gratis kami menawarkan jumlah penyimpanan dan kuota transfer yang besar</string>
-    <!-- Feature text for Free Plan storage -->
-    <string name="free_plan_card_storage_feature">Penyimpanan 20 GB</string>
     <!-- Feature text for Free Plan transfer quota -->
     <string name="free_plan_card_transfer_feature">Transfer terbatas</string>
     <!-- Button text for Free Plan card -->
@@ -1123,7 +1089,7 @@
     <!-- Description for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_desc">Orang yang berbagi item dengan anda dapat menggunakan kuota anda untuk mengunduh dan melakukan streaming file</string>
     <!-- Title for MEGA VPN feature -->
-    <string name="pro_plan_feature_vpn_title">Akses ke MEGA&#160;VPN</string>
+    <string name="pro_plan_feature_vpn_title">MEGA&#160;VPN</string>
     <!-- Description for MEGA VPN feature -->
     <string name="pro_plan_feature_vpn_desc">Tetap aman saat online dengan VPN berkecepatan tinggi kami yang cepat dan mudah digunakan</string>
     <!-- Title for MEGA Pass feature -->
@@ -1140,8 +1106,6 @@
     <string name="pro_plan_benefit_password_protected_links">Tautan yang dilindungi kata sandi</string>
     <!-- Benefit: Links with expiry dates -->
     <string name="pro_plan_benefit_links_with_expiry_dates">Tautan dengan tanggal kedaluwarsa</string>
-    <!-- Benefit: Transfer quota sharing -->
-    <string name="pro_plan_benefit_transfer_quota_sharing">Pembagian kuota transfer</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
     <string name="pro_plan_benefit_auto_sync_mobile">Sinkronkan folder di perangkat seluler anda secara otomatis</string>
     <!-- Benefit: Rewind up to 180 days of deleted data -->
@@ -1162,10 +1126,6 @@
     <string name="choose_account_screen_get_more_with_pro_plan_title">Dapatkan lebih banyak dengan paket Pro</string>
     <!-- Maybe later button text in the choose account screen-->
     <string name="choose_account_screen_maybe_later_button_text">Mungkin nanti</string>
-    <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_monthly">Bulanan</string>
-    <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_yearly">Tahunan</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_label_save_up_to">Hemat hingga 16% dengan tagihan tahunan</string>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
@@ -1174,8 +1134,6 @@
     <string name="choose_account_screen_transfer_quota_label">%1$s transfer</string>
     <!-- General month label -->
     <string name="general_month">/bulan</string>
-    <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
-    <string name="choose_account_screen_currency_per_month">%1$s per bulan</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
     <string name="choose_account_screen_billed_yearly">%1$s dibebankan setiap tahun</string>
     <!-- The snackbar message of unhidden nodes operation -->
@@ -1200,8 +1158,6 @@
     <string name="text_start_mega_vpn_free_trial">%1$s penyimpanan. Berlaku secara permanen.</string>
     <!-- title of the section for start mega pass free trial in achivements section -->
     <string name="title_start_mega_pass_free_trial">Mulai MEGA&#160;Lulus uji coba gratis</string>
-    <!-- Text of the section for start mega pass free trial in achivements section -->
-    <string name="text_start_mega_pass_free_trial">%1$s penyimpanan. Berlaku secara permanen.</string>
     <!-- Text of the button for install mega vpn in achivements section -->
     <string name="button_text_install_mega_vpn">Instal MEGA&#160;VPN</string>
     <!-- Text of the button for install mega pass in achivements section -->
@@ -1478,4 +1434,118 @@
     <string name="sign_up_last_name_text_field_char_limit_exceed_error">Nama belakang tidak boleh melebihi 40 karakter</string>
     <!-- Error message when IP has already sent an issue report and needs to wait -->
     <string name="report_issue_too_many_times_error">You’ve already sent an issue report within the last 10 minutes. Please wait before trying again, or contact %1$s for assistance.</string>
+    <!-- The snackbar message for informing the user about the invitation is trying to sent, is already in the received contact requests because the user already invited them. -->
+    <string name="contacts_invite_already_received">This user has already sent you an invitation</string>
+    <!-- The snackbar message for informing the user about the invitations is trying to sent, are already in the received contact requests because the users already invited them. -->
+    <string name="contacts_invites_already_received">All the people you invited have already sent you an invitation</string>
+    <!-- The snackbar message for informing the user about the invitations are correctly sent. -->
+    <string name="contacts_invites_sent">Invitation sent. They’ll appear in Contacts once accepted.</string>
+    <!-- The snackbar message for informing the user about some invitations correctly sent, but not others because they are already in the received contact requests because the users already invited them. -->
+    <plurals name="contacts_invites_sent_but_others_already_received">
+        <item quantity="one">%1$d user invited, but one or more users have already invited you</item>
+        <item quantity="other">%1$d users invited, but one or more users have already invited you</item>
+    </plurals>
+    <!--  Error shown when the user tries to resend the sign up link multiple times at once. -->
+    <string name="resend_signup_link_error">E-mail sudah terkirim. Harap tunggu beberapa menit sebelum mencoba lagi.</string>
+    <!-- success message when renaming a node -->
+    <string name="context_correctly_renamed">Item berganti nama</string>
+    <!-- Homepage section. -->
+    <string name="general_section_home">Beranda</string>
+    <!-- Error message when removing public links of nodes. Plural. -->
+    <plurals name="context_link_removal_error">
+        <item quantity="other">Gagal menghapus beberapa tautan. Silakan coba lagi nanti.</item>
+    </plurals>
+    <!-- Message when some public links were removed successfully. Plural. -->
+    <plurals name="context_link_removal_success">
+        <item quantity="other">Tautan dihapus</item>
+    </plurals>
+    <!-- Warning that appears prior to remove links of files. Plural. -->
+    <plurals name="remove_links_warning_text">
+        <item quantity="other">Tautan ini tidak akan tersedia untuk umum lagi.</item>
+    </plurals>
+    <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
+    <string name="context_share_correctly_removed">Berbagi telah berhasil dihapus</string>
+    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Ya</string>
+    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">Tidak</string>
+    <!-- error message when removing access of contact(s) to a selected folder -->
+    <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
+        <item quantity="other">Tidak dapat menghapus akses untuk %1$d kontak</item>
+    </plurals>
+    <!-- Confirmation before removing the outgoing shares of a folder -->
+    <plurals name="confirmation_remove_outgoing_shares">
+        <item quantity="one">This folder is shared with %1$d contact. Stop sharing?</item>
+        <item quantity="other">This folder is shared with %1$d contacts. Stop sharing?</item>
+    </plurals>
+    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
+    <plurals name="alert_remove_several_shares">
+        <item quantity="other"></item>
+    </plurals>
+    <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
+    <string name="figures_storage_referrals_achievements_text">%1$s extra storage for each invitation, valid for %2$d days</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with permanent valid duration -->
+    <string name="figures_storage_referrals_achievements_text_permanent">%1$s extra storage for each invitation, valid permanently</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to each achievement with dynamic valid duration -->
+    <string name="figures_storage_achievements_text">%1$s extra storage, valid for %2$d days</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to each achievement with permanent valid duration -->
+    <string name="figures_storage_achievements_text_permanent">%1$s extra storage, valid permanently</string>
+    <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with dynamic valid duration -->
+    <string name="figures_storage_achievements_awarded_text">%1$s storage bonus applied, valid for %2$d days</string>
+    <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with permanent valid duration -->
+    <string name="figures_storage_achievements_awarded_text_permanent">%1$s storage bonus applied, valid permanently</string>
+    <!-- info paragraph about the achievement install megasync with dynamic valid duration -->
+    <string name="paragraph_info_achievement_install_desktop_dynamic_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid for %2$s days. The desktop app is available for Windows, macOS and Linux.</string>
+    <!-- info paragraph about the achievement install megasync with permanent valid duration -->
+    <string name="paragraph_info_achievement_install_desktop_permanent_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid permanently. The desktop app is available for Windows, macOS and Linux.</string>
+    <!-- info paragraph about the achievement install mobile app with dynamic valid duration -->
+    <string name="paragraph_info_achievement_install_mobile_app_dynamic_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid for %2$s days. The mobile apps are available for iOS and Android.</string>
+    <!-- info paragraph about the achievement install mobile app with permanent valid duration -->
+    <string name="paragraph_info_achievement_install_mobile_app_permanent_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid permanently. The mobile apps are available for iOS and Android.</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">These are backup folders and can only be shared as read-only</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">This is a backup folder and can only be shared as read-only</string>
+    <!-- Button to confirm the action of restarting one transfer-->
+    <string name="button_permission_info">Tutup</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">Backup folders are read-only</string>
+    <!-- dialog option continue in alert dialog -->
+    <string name="button_continue">Lanjutkan</string>
+    <!--Dialog title when the user selected is not on the contact list when sharing a node -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Tidak dapat memverifikasi kontak</string>
+    <!--Dialog description when the user selected is not on the contact list when sharing a node -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">Anda tidak dapat memverifikasi %s karena mereka tidak ada dalam daftar kontak anda. Tunggu mereka menerima undangan anda terlebih dahulu.</string>
+    <!-- Answer for confirmation dialog. -->
+    <string name="general_ok">Ok</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="general_leave">Tinggalkan</string>
+    <!-- Success message when left shared folders -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
+        <item quantity="other">Meninggalkan %1$d folder berbagi</item>
+    </plurals>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
+        <item quantity="other">Tidak dapat meninggalkan %1$d folder berbagi</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
+        <item quantity="other">Meninggalkan %1$d folder bersama,&#160;</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
+        <item quantity="other">tidak dapat meninggalkan %1$d folder bersama</item>
+    </plurals>
+    <!-- confirmation message before leaving some incoming shared folders -->
+    <plurals name="confirmation_leave_share_folder">
+        <item quantity="other">Jika anda meninggalkan folder ini, anda tidak akan dapat melihatnya lagi.</item>
+    </plurals>
+    <!-- Title of the dialog to choose permissions when sharing. -->
+    <string name="dialog_select_permissions">Izin berbagi</string>
+    <!-- Refers to access rights for a file folder. -->
+    <string name="file_properties_shared_folder_full_access">Akses penuh</string>
+    <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
+    <string name="file_properties_shared_folder_read_only">Hanya-baca</string>
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
+    <string name="file_properties_shared_folder_read_write">Baca dan Tulis</string>
 </resources>

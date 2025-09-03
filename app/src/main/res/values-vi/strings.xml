@@ -1027,10 +1027,6 @@
     <string name="option_to_retry_transfers">Thử lại tất cả các truyền tải</string>
     <!-- Button to confirm the action of restarting one transfer -->
     <string name="button_resume_individual_transfer">Tiếp tục truyền</string>
-    <!-- Dialog to confirm before removing completed transfers -->
-    <string name="confirmation_to_clear_completed_transfers">Dọn các truyền&#160;tải đã hoàn&#160;tất?</string>
-    <!-- Title of the tab section for transfers in progress -->
-    <string name="title_tab_in_progress_transfers">Đang truyền</string>
     <!-- Title of the tab section for completed transfers -->
     <string name="title_tab_completed_transfers">Hoàn tất</string>
     <!-- Text shown in playlist subtitle item when a file is reproducing but it is paused -->
@@ -1043,8 +1039,6 @@
     <string name="transfer_retrying">Đang thử lại</string>
     <!-- Possible state of a transfer. When the transfer was cancelled -->
     <string name="transfer_cancelled">Đã hủy</string>
-    <!-- Possible state of a transfer -->
-    <string name="transfer_unknown">Không xác&#160;định được</string>
     <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
     <string name="upload_service_notification">Đang tải lên tệp tin: %1$d trong tổng %2$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
@@ -1223,10 +1217,6 @@
     <string name="title_properties_contact_notifications_for_chat">Thông báo chat</string>
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Mời bạn bè tham gia và nhận thưởng</string>
-    <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s cho không&#160;gian lưu&#160;trữ cho mỗi lần mời. Hạn dùng là 365&#160;ngày.</string>
-    <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">%1$s vào không gian lưu trữ. Hạn dùng là 365 ngày.</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Phần thưởng đã nhận</string>
     <!-- title of the section for unlocked storage quota -->
@@ -1257,10 +1247,6 @@
     <string name="subtitle_confirmation_invite_friends">Lời&#160;mời đã gửi đi</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Địa&#160;chỉ email không đúng cú&#160;pháp</string>
-    <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">Sau khi cài đặt MEGA trên máy tính, bạn sẽ nhận được thêm %1$s vào không gian lưu trữ, có hạn sử dụng là 365 ngày. MEGA còn có apps dành cho Windows, macOS và đa số các máy Linux distros.</string>
-    <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">Sau khi cài đặt App MEGA cho Di Động, bạn sẽ nhận được thêm %1$s vào không gian lưu trữ, hạn sử dụng là 365 ngày. MEGA còn có ứng dụng di động dành cho iOS và Android.</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">Bạn đã nhận được %1$s không gian lưu trữ từ việc cài ứng dụng MEGA cho máy tính.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
@@ -1614,10 +1600,6 @@
     </plurals>
     <!-- title of the notification for a new incoming contact request -->
     <string name="title_new_contact_request_notification">Lời mời thêm liên lạc mới</string>
-    <!-- Empty state message shown in the screen when there are not any active transfer -->
-    <string name="transfers_empty_new">[B]Không có[/B] [A]Phiên Truyền Tải[/A]</string>
-    <!-- Empty state message shown in the screen when there are not any active transfer -->
-    <string name="completed_transfers_empty_new">[B]Không có[/B] [A]Phiên Truyền Tải[/A]</string>
     <!-- Empty state text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder_new">[A]Thư Mục[/A] [B]Trống[/B]</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
@@ -2058,10 +2040,6 @@
     <string name="message_error_set_title_get_link">Trước khi tạo ra đường liên kết tới cuộc chát này, chủ đề phòng chát cần phải được chọn trước:</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
     <string name="chat_link_copied_clipboard">Đã sao&#160;chép đường liên&#160;kết vào bảng&#160;nhớ&#160;tạm</string>
-    <!-- Label to show the price of each plan in the upgrade account section -->
-    <string name="type_month">[A]Giá từ[/A] %s / [A]tháng[/A] *</string>
-    <!-- the meaning of the asterisk in monthly* and annually* payment -->
-    <string name="upgrade_comment">* Các gói đăng ký dịch vụ tự định kỳ đều có thể hủy bỏ bất cứ khi nào khách hành muốn, trước ngày đầu chu kỳ.</string>
     <!-- Message shown when a call starts. -->
     <string name="call_started_messages">Cuộc gọi đã bắt&#160;đầu</string>
     <!-- Title of the dialog to inform about a SSL error -->
@@ -2070,10 +2048,6 @@
     <string name="ssl_error_dialog_text">MEGA không khởi tạo được kết nối an ninh qua phương thức SSL. Thiết bị bạn đang sử dụng có thể đang dùng mạng Wi-Fi công cộng có yêu cầu một số điều kiện khi kết nối.</string>
     <!-- Text of the empty screen for the notifications section -->
     <string name="context_empty_notifications">[B]Không có [/B][A]thông báo[/A]</string>
-    <!-- Permissions screen title -->
-    <string name="general_setup_mega">Thiết lập MEGA</string>
-    <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA cần sự cho phép của bạn để truy cập các tệp&#160;tin của bạn để tải lên hoặc chia&#160;sẻ với người khác. Các quyền truy&#160;cập tùy chọn khác có thể sẽ cần&#160;thiết để sử&#160;dụng các tính&#160;năng và dịch&#160;vụ mà ứng&#160;dụng này cung&#160;cấp.\n\nNếu bạn chọn không cấp các quyền này, bạn vẫn có thể sử&#160;dụng ứng&#160;dụng, ngoại trừ các chức&#160;năng có yêu&#160;cầu các quyền cụ&#160;thể.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Cho phép truy cập vào hình ảnh, phương tiện số và tệp tin</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -2388,8 +2362,6 @@
     </plurals>
     <!-- Download location label -->
     <string name="download_location">Vị trí tải xuống</string>
-    <!-- Text asking confirmation for download location -->
-    <string name="confirmation_download_location">Luôn lưu các mục tải về vào vị trí này?</string>
     <!-- Action to show any file in its location -->
     <string name="view_in_folder_label">Xem trong thư&#160;mục chứa</string>
     <!-- Title of a screen to browse files -->
@@ -2404,8 +2376,6 @@
     <string name="label_transfer_over_quota">Vượt mức băng thông truyền tải</string>
     <!-- Label indicating storage over quota -->
     <string name="label_storage_over_quota">Vượt mức giới hạn lưu trữ</string>
-    <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
-    <string name="label_get_more_transfer_quota">Tăng hạn mức truyền tải</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
     <string name="warning_node_not_exists_in_cloud">Không có tìm thấy tệp tin trong Ổ&#160;Mây của bạn.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
@@ -2494,8 +2464,6 @@
     <string name="option_cancel_transfer">Hủy truyền&#160;tải</string>
     <!-- Message of a dialog to confirm the action of resume all transfers -->
     <string name="warning_message_resume_transfers">Các truyền tải bị ngừng sẽ được tiếp tục tải lên.</string>
-    <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
-    <string name="progress_size_indicator">%1$d%% trong tổng %2$s</string>
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_enabled">Bản ghi thông tin gỡ lỗi cho tin nhắn chat đã được bật</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
@@ -2562,8 +2530,6 @@
     </plurals>
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Chọn phiên truyền tải</string>
-    <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Không thay đổi được mức độ ưu tiên cho truyền tải “%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Gửi chìa&#160;khóa giải&#160;mã ra riêng</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -2928,8 +2894,6 @@
     <string name="change_setting_action">Thay đổi thiết đặt</string>
     <!-- Subtitle of the settings page where the start screen can be chosen. -->
     <string name="configure_start_screen">Tùy chọn trang mặc định cho màn hình khởi đầu</string>
-    <!-- Homepage section. -->
-    <string name="home_section">Trang Chủ</string>
     <!-- Action button which allows to show the recent activity. -->
     <string name="show_activity_action">Hiện hoạt&#160;động</string>
     <!-- Text informing the recent activity is hidden. -->
@@ -3006,20 +2970,8 @@
     <string name="upload_folder">Tải lên thư mục</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Loại bỏ chức người chủ trì</string>
-    <!-- Title message of existing subscription dialog -->
-    <string name="title_existing_subscription">Mua gói đăng ký dịch vụ mới?</string>
-    <!-- Text of buy new subscription button -->
-    <string name="button_buy_new_subscription">Mua gói đăng ký dịch vụ mới</string>
-    <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
-    <string name="message_subscription_from_android_platform">Bạn đã có một gói đăng ký dịch vụ rồi. Nếu bạn mua một cái khác, bạn sẽ bị tính phí gấp đôi. Để tránh khỏi điều này, hãy hủy đăng ký gói hiện tại bằng cách vào MEGA thông qua %1$s. Tới trang Thư Viện Hướng Dẫn để có thêm chi tiết.</string>
-    <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">Bạn đã có một gói đăng&#160;ký dịch&#160;vụ rồi. Nếu bạn mua một cái khác, bạn sẽ bị tính phí gấp đôi. Để tránh khỏi điều này, hãy hủy đăng&#160;ký gói hiện&#160;tại bằng cách vào MEGA thông qua trang tài&#160;khoản Apple của bạn. Tham&#160;khảo Trung&#160;Tâm Hướng&#160;Dẫn để có thêm chi&#160;tiết.</string>
-    <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
-    <string name="message_subscription_from_other_platform">Bạn đã có đăng ký một gói dịch vụ rồi. Nếu bạn mua một cái khác, bạn sẽ bị tính phí gấp đôi. Để tránh khỏi điều này, hãy hủy đăng ký gói hiện tại bằng cách vào MEGA với trình duyệt web trên máy tính hoặc điện thoại. Tới trang Thư Viện Hướng Dẫn để có thêm chi tiết.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">Đi tới Cài&#160;đặt và cấp quyền cho MEGA truy&#160;cập vào các thiết&#160;bị gần bạn thông qua Bluetooth.</string>
-    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
-    <string name="upgrade_billing_warning">Chúng tôi không tiến hành được việc thanh toán. Nếu quý khách đang sử dụng ứng dụng kép, vui lòng đăng nhập vào MEGA mà không có ứng dụng đó. Còn không, hãy thử nâng cấp thông qua trình duyệt web.</string>
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">Gói đăng ký dịch vụ với %1s</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
@@ -3266,14 +3218,8 @@
     <plurals name="num_folders_num_files_2">
         <item quantity="other">%1$d tệp tin</item>
     </plurals>
-    <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
-    <string name="account_upgrade_storage_label">[A]%1$s[/A] không gian lưu trữ</string>
-    <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
-    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] truyền tải</string>
     <!-- Label of storage in My account section. -->
     <string name="account_storage_label">Lưu trữ</string>
-    <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
-    <string name="account_choose_free_limited_transfer_quota">Băng thông truyền tải [A]bị giới hạn[/A]</string>
     <!-- Name of hots or hosts in the meeting info bottom panel -->
     <plurals name="meeting_call_screen_meeting_info_bottom_panel_name_of_moderators">
         <item quantity="other">Người chủ trì: %s</item>
@@ -4116,38 +4062,12 @@
     <string name="album_import_error_access_description">Đường liên&#160;kết tới album đã bị loại bỏ hoặc album đã bị xóa. Liên&#160;hệ với người đã chia&#160;sẻ đường liên&#160;kết cho bạn.</string>
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">Thoại</string>
-    <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_title_choose_right_plan">Chọn gói phù hợp với bạn</string>
-    <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_monthly">Hàng tháng</string>
-    <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_yearly">Hàng năm</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_label_save_up_to">Tiết kiệm lên đến 16% khi thanh toán thường niên</string>
-    <!-- Description about how much storage user will get for specific plan. The placeholder %1$s will be replaced with storage size (e.g. 20GB or 4TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_storage">[B]Không gian:[/B] [A]%1$s[/A]</string>
-    <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_transfer">[B]Truyền tải:[/B] [A]%1$s[/A]</string>
-    <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/tháng[/B]</string>
-    <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_yearly_price">[A]%1$s[/A]\n[B]%2$s/năm[/B]</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">Khuyên dùng</string>
     <!-- Title of label, which will be shown next to the plan user have already purchased. -->
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">Gói hiện tại</string>
-    <!-- Title of description of features, which are available for users, if they buy plan. -->
-    <string name="account_upgrade_account_description_title_features">Các tính&#160;năng của gói Pro</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;Bảo&#160;vệ đường liên&#160;kết với mật&#160;khẩu</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;Đặt thời&#160;hạn cho đường liên&#160;kết</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;Chia&#160;sẻ lượng truyền&#160;tải</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Tua lại dữ liệu đã xóa trong thời gian lên đến 90 ngày với hạng Pro&#160;Lite và đến 180 ngày với hạng Pro&#160;I, II, và III</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Lên lịch dọn dẹp thùng&#160;rác từ 7 ngày đến 10 năm</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_lite">Mua Pro&#160;Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4188,8 +4108,6 @@
     <string name="album_import_rename_album_description">Một album tên “%1$s” đã tồn tại trong Các Albums của bạn. Nhập tên mới cho album bạn đang muốn lưu lại.</string>
     <!-- Album import enter album name -->
     <string name="album_import_enter_album_name">Điền tên album</string>
-    <!-- Text only shown, when user has current plan as Pro III. The part of string 'pricing page.' is a hyperlink to Mega pricing webpage - https://mega.io/pricing. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pricing_page_link_text">Bạn có thể nâng&#160;cấp gói đăng&#160;ký hiện&#160;tại của mình trong [A]trang bảng giá[/A] của chúng&#160;tôi.</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
     <plurals name="cloud_drive_subtitle_links_access_user">
         <item quantity="other">Bất&#160;kỳ ai có các đường liên&#160;kết này đều có&#160;thể xem và tải&#160;xuống dữ liệu của bạn</item>
@@ -4240,8 +4158,6 @@
     <plurals name="meetings_schedule_meeting_recurrence_several_days_every_number_of_weeks_label">
         <item quantity="other">%1$s và %2$s, mỗi %3$d tuần</item>
     </plurals>
-    <!-- Snackbar, shown on Upgrade Account screen, when user has already recurring subscription and tries to tap on his current plan. -->
-    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">Bạn hiện đang có một đăng&#160;ký định&#160;kỳ cho gói này</string>
     <!-- Album import storage exceeded title -->
     <string name="album_import_storage_exceeded_title">Không thể lưu lại album</string>
     <!-- Album import storage exceeded description -->
@@ -4514,14 +4430,6 @@
     <string name="chat_chatroom_first_message_header_mega_info_text">MEGA bảo&#160;vệ các giao&#160;tiếp của bạn nghiêm&#160;ngặt với mô&#160;hình mã&#160;hóa vô&#160;kiến&#160;thức cung&#160;cấp sự đảm&#160;bảo an&#160;toàn cần&#160;thiết:</string>
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_authenticity_info_text">Hệ&#160;thống đảm&#160;bảo rằng các dữ&#160;liệu nhận được từ người gửi sẽ hiển&#160;thị rõ&#160;ràng, và nội&#160;dung bên trong không bị chế&#160;tác trong quá&#160;trình truyền&#160;tải.</string>
-    <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_get_pro_title">Nhận được nhiều hơn với gói Pro</string>
-    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">Nâng&#160;cấp lên gói Pro và nhận thêm không&#160;gian lưu&#160;trữ và quyền truy&#160;cập vào các tính&#160;năng Pro. Gói có giá từ mức thấp nhất là %1$s một tháng</string>
-    <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_storage">Tính linh&#160;hoạt không&#160;gian tối&#160;ưu</string>
-    <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
-    <string name="dialog_onboarding_button_view_pro_plan">Nâng cấp lên Pro ngay hôm nay</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s hiện đang trình&#160;bày</string>
     <!-- Warning indicating that a participant is sharing the screen-->
@@ -4542,8 +4450,6 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s đã chấm&#160;dứt ghi âm hình</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Kho ảnh</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Không&#160;có quảng&#160;cáo</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
     <string name="meetings_sharing_meeting_link_meeting_invite_subject">Lời mời tham gia cuộc họp MEGA</string>
     <!-- Text when sharing a meeting link indicating that a participant is inviting you to the meeting. The placeholder is to include the full name of the invitation sender -->
@@ -4596,8 +4502,6 @@
     <string name="meetings_muted_all_participants_snackbar_message">Bạn đã tắt tiếng tất&#160;cả các người tham&#160;gia</string>
     <!-- Message of the snackbar displayed when you have been muted. The placeholder is for the name of who muted you -->
     <string name="meetings_muted_by_a_participant_snackbar_message">Bạn đã bị tắt tiếng bởi %s</string>
-    <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_account_description_subscription_title">Chi&#160;tiết gói đăng&#160;ký</string>
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Cho phép truy&#160;cập vào Kho&#160;ảnh của bạn</string>
     <!-- Button text to grant permission in the chat bottom sheet -->
@@ -4652,14 +4556,6 @@
     <string name="meetings_change_sfu_dialog_action_button">Thay đổi</string>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
     <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]Gói miễn&#160;phí của bạn có giới&#160;hạn cuộc họp là 60 phút. Người dùng Pro có thời&#160;lượng cuộc gọi không giới&#160;hạn và có tối&#160;đa 1000 người tham&#160;gia.[/A] [B]Nâng&#160;cấp ngay bây&#160;giờ.[/B]</string>
-    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">Quý khách sẽ phải chi trả %1$s ngay lập tức và gói đăng ký của quý khách sẽ tự động gia hạn sau 1&#160;tháng với giá %2$s mỗi tháng. Tài khoản Google&#160;Play của quý khách sẽ bị tính phí gia hạn trong vòng 24&#160;giờ từ thời điểm kết thúc của mỗi kỳ thanh toán. Để hủy gói đăng ký của mình, quý khách phải tắt tự động gia hạn gói đăng ký MEGA&#160;Pro của mình ít nhất là 24&#160;giờ trước lúc kết thúc thời hạn thanh toán trong trang Gói thuê&#160;bao của [A]Google&#160;Play[/A].\nVới việc nâng cấp tài khoản của mình, quý khách đồng ý với[B]Điều&#160;Khoản Dịch&#160;Vụ[/B] và [C]Chính&#160;Sách Riêng&#160;Tư[/C] của MEGA.</string>
-    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">Quý khách sẽ phải chi trả %1$s ngay lập tức và gói đăng ký của quý khách sẽ tự động gia hạn sau 12&#160;tháng với giá %2$s mỗi năm. Tài khoản Google&#160;Play của quý khách sẽ bị tính phí gia hạn trong vòng 24&#160;giờ từ thời điểm kết thúc của mỗi kỳ thanh toán. Để hủy gói đăng ký của mình, quý khách phải tắt tự động gia hạn gói đăng ký MEGA&#160;Pro của mình ít nhất là 24&#160;giờ trước lúc kết thúc thời hạn thanh toán trong trang Gói thuê&#160;bao của [A]Google&#160;Play[/A].\nVới việc nâng cấp tài khoản của mình, quý khách đồng ý với[B]Điều&#160;Khoản Dịch&#160;Vụ[/B] và [C]Chính&#160;Sách Riêng&#160;Tư[/C] của MEGA.</string>
-    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in monthly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">Quý khách sẽ phải chi trả ngay lập tức và gói đăng ký của quý khách sẽ tự động gia hạn sau 1&#160;tháng. Tài khoản Google&#160;Play của quý khách sẽ bị tính phí gia hạn trong vòng 24&#160;giờ từ thời điểm kết thúc của mỗi kỳ thanh toán. Để hủy gói đăng ký của mình, quý khách phải tắt tự động gia hạn gói đăng ký MEGA&#160;Pro của mình ít nhất là 24&#160;giờ trước lúc kết thúc thời hạn thanh toán trong trang Gói thuê&#160;bao của [A]Google&#160;Play[/A].\nVới việc nâng cấp tài khoản của mình, quý khách đồng ý với[B]Điều&#160;Khoản Dịch&#160;Vụ[/B] và [C]Chính&#160;Sách Riêng&#160;Tư[/C] của MEGA.</string>
-    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in yearly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">Quý khách sẽ phải chi trả ngay lập tức và gói đăng ký của quý khách sẽ tự động gia hạn sau 12&#160;tháng. Tài khoản Google&#160;Play của quý khách sẽ bị tính phí gia hạn trong vòng 24&#160;giờ từ thời điểm kết thúc của mỗi kỳ thanh toán. Để hủy gói đăng ký của mình, quý khách phải tắt tự động gia hạn gói đăng ký MEGA&#160;Pro của mình ít nhất là 24&#160;giờ trước lúc kết thúc thời hạn thanh toán trong trang Gói thuê&#160;bao của [A]Google&#160;Play[/A].\nVới việc nâng cấp tài khoản của mình, quý khách đồng ý với[B]Điều&#160;Khoản Dịch&#160;Vụ[/B] và [C]Chính&#160;Sách Riêng&#160;Tư[/C] của MEGA.</string>
     <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_title">Tài&#160;khoản Doanh&#160;Nghiệp bị vô&#160;hiệu hóa</string>
     <!-- The body of the Dialog shown to a suspended Business Account Sub-User -->
@@ -4668,10 +4564,6 @@
     <string name="account_business_account_deactivated_dialog_admin_body">Tài&#160;khoản Doanh&#160;Nghiệp của bạn đã bị vô&#160;hiệu hóa do thanh&#160;toán không thành&#160;công. Bạn chỉ có thể duyệt xem dữ liệu của mình.\nĐể thanh&#160;toán và kích&#160;hoạt lại gói đăng&#160;ký của bạn, hãy đăng&#160;nhập vào MEGA thông qua trình&#160;duyệt web.</string>
     <!-- The button of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_button">OK, hiểu rồi</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to host call or meetings without any restrictions. -->
-    <string name="account_upgrade_account_description_feature_meetings">&#8226;&#160;Tổ&#160;chức các cuộc gọi và cuộc họp với thời&#160;gian và số lượng người tham&#160;gia không giới&#160;hạn</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to use MEGA VPN product. -->
-    <string name="account_upgrade_account_description_feature_vpn">&#8226;&#160;Giữ an&#160;ninh trực&#160;tuyến với VPN tốc&#160;độ cao của chúng&#160;tôi</string>
     <!-- The body of the Dialog shown to upgrade meeting from the free version -->
     <string name="meetings_in_call_warning_dialog_body">Cần thêm thời gian? Các gói Pro không có giới hạn lượng cuộc gọi.</string>
     <!-- The negative button text of the Dialog shown to upgrade meeting from the free version -->
@@ -4706,8 +4598,6 @@
     <plurals name="hidden_nodes_result_message">
         <item quantity="other">%1$d mục ẩn</item>
     </plurals>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be prioritised when customer support is needed. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_priority_support">&#8226;&#160;Hỗ trợ ưu tiên</string>
     <!-- The title of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_title">Nâng&#160;cấp lên Pro để cuộc gọi không giới&#160;hạn</string>
     <!-- The body of the Upgrade bottom sheet dialog  -->

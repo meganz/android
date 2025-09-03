@@ -72,14 +72,6 @@
     <string name="general_sync_local_filesystem_mismatch">此文件夹中的文件无法同步或备份。您需要从桌面应用程序重新启用同步或备份。</string>
     <!-- Warning message to display when sync has been paused due a low battery level -->
     <string name="general_message_sync_paused_low_battery_level">同步已暂停，电池电量太低。为电池充电以恢复同步。</string>
-    <!-- Title for File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_file_sharing">轻松、安全的文件共享</string>
-    <!-- Description about File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_file_sharing">感谢充足的传输流量共享大文件，并通过受密码保护的链接确保安全。</string>
-    <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_backup_rewind">再也不会丢失数据</string>
-    <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">还原可将文件和文件夹恢复到最多180天以内的任何日期，因此您的数据就不会发生意外和被篡改。</string>
     <!-- Search drop down chips filter type file type -->
     <string name="search_dropdown_chip_filter_type_file_type">类型</string>
     <!-- Search drop down chips filter type file type images -->
@@ -196,14 +188,6 @@
     <string name="general_size_giga_byte">%1$s</string>
     <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
     <string name="general_free_plan_name">免费</string>
-    <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
-    <string name="dialog_onboarding_transfer_quota_free_limited">有限制</string>
-    <!-- Description of the price for Free account. The meaning: this type of account is for free. This string won't be used for name of Free account. -->
-    <string name="dialog_onboarding_free_account_price">免费</string>
-    <!-- Continue button on Onboarding dialog, the user will proceed with payment for chosen account. -->
-    <string name="dialog_onboarding_button_continue">继续</string>
-    <!-- Title of navigation bar on Onboarding dialog. -->
-    <string name="dialog_onboarding_app_bar_title">选择您的MEGA方案</string>
     <!-- Header of the Info view field for what is the content of a device/folder -->
     <string name="info_content">包含</string>
     <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
@@ -236,8 +220,6 @@
     <string name="general_giga_byte_standalone">GB</string>
     <!-- Size unit in terabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
     <string name="general_tera_byte_standalone">TB</string>
-    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
-    <string name="dialog_onboarding_feature_storage_description">从%1$s&#160;%2$s起，找到最适合您存储需求的方案。</string>
     <!-- Title of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_title">存储空间不足</string>
     <!-- Body text of the insufficient storage error dialog -->
@@ -278,12 +260,6 @@
     <string name="file_info_information_snackbar_description_added">已添加描述</string>
     <!-- Description updated snack bar for the file info information screen-->
     <string name="file_info_information_snackbar_description_updated">已更新描述</string>
-    <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_title_additional_features">此外还可获得以下丰厚受益：</string>
-    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN\n&#8226;&#160;无限制的通话和会议\n&#8226;&#160;自动同步移动设备上的文件夹\n&#8226;&#160;无广告</string>
-    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN\n&#8226;&#160;无限制的通话和会议\n&#8226;&#160;自动同步移动设备上的文件夹</string>
     <!-- Text for the Sync solved issues list empty state -->
     <string name="device_center_sync_solved_issues_empty_state_text">没有已解决问题</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
@@ -293,11 +269,9 @@
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">您的相机上传文件夹和辅助媒体上传文件夹不能相互关联。选择不同的文件夹。</string>
     <!-- The confirmation Button text of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">好吧，明白了</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">好的，明白了</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
     <string name="general_no_picker_warning">此设备没有可用于选择文件夹的应用程序</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;自动同步移动设备上的文件夹</string>
     <!-- Hidden items -->
     <string name="hidden_items">隐藏的项目</string>
     <!-- Label to indicate that is a Pro only feature -->
@@ -774,10 +748,6 @@
     <string name="general_drive">云盘</string>
     <!-- Tab bar title of Syncs tab -->
     <string name="general_syncs">同步</string>
-    <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
-    <string name="transfers_completed_one_read_error_retrying">无法完成或重试您的上传，因为MEGA无法再访问该文件</string>
-    <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
-    <string name="transfers_completed_some_read_error_retrying">您的部分或全部上传无法完成或重试，因为MEGA无法再访问这些文件</string>
     <!-- Title for Offline Folder exposed via SAF -->
     <string name="general_mega_offline">MEGA离线文件</string>
     <!-- Notification content for download final notification. It will inform the user about the location where file/s were downloaded -->
@@ -876,8 +846,6 @@
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">正在保存%1$s到云盘...</string>
-    <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">您将被立即收费%1$s，但由于政府规定，您的订阅不会在12个月后自动续订。订阅到期后，您需要自行续订。您可以随时通过[A]Google&#160;Play[/A]的订阅部分中管理或取消您的订阅。升级您的帐户即表示您同意MEGA的[B]服务条款[/B]和[C]隐私政策[/C]。</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">正在上传&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
@@ -1106,8 +1074,6 @@
     <string name="free_plan_card_title">开始使用我们的免费方案</string>
     <!-- Description for the Free Plan card -->
     <string name="free_plan_card_description">您暂时不必购买付费方案，我们的免费计划提供大量的存储和传输配额</string>
-    <!-- Feature text for Free Plan storage -->
-    <string name="free_plan_card_storage_feature">20GB的存储空间</string>
     <!-- Feature text for Free Plan transfer quota -->
     <string name="free_plan_card_transfer_feature">有限的传输</string>
     <!-- Button text for Free Plan card -->
@@ -1140,8 +1106,6 @@
     <string name="pro_plan_benefit_password_protected_links">密码保护链接</string>
     <!-- Benefit: Links with expiry dates -->
     <string name="pro_plan_benefit_links_with_expiry_dates">为链接设置到期日期</string>
-    <!-- Benefit: Transfer quota sharing -->
-    <string name="pro_plan_benefit_transfer_quota_sharing">传输流量共享</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
     <string name="pro_plan_benefit_auto_sync_mobile">自动同步移动设备上的文件夹</string>
     <!-- Benefit: Rewind up to 180 days of deleted data -->
@@ -1162,10 +1126,6 @@
     <string name="choose_account_screen_get_more_with_pro_plan_title">通过Pro方案获得更多权益</string>
     <!-- Maybe later button text in the choose account screen-->
     <string name="choose_account_screen_maybe_later_button_text">稍后</string>
-    <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_monthly">每月</string>
-    <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_yearly">每年</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_label_save_up_to">按年结算最多可节省16%</string>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
@@ -1174,8 +1134,6 @@
     <string name="choose_account_screen_transfer_quota_label">%1$s传输配额</string>
     <!-- General month label -->
     <string name="general_month">/月</string>
-    <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
-    <string name="choose_account_screen_currency_per_month">%1$s/月</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
     <string name="choose_account_screen_billed_yearly">按年收费%1$s</string>
     <!-- The snackbar message of unhidden nodes operation -->
@@ -1200,8 +1158,6 @@
     <string name="text_start_mega_vpn_free_trial">%1$s存储空间。永久有效。</string>
     <!-- title of the section for start mega pass free trial in achivements section -->
     <string name="title_start_mega_pass_free_trial">开始MEGA&#160;Pass的免费试用</string>
-    <!-- Text of the section for start mega pass free trial in achivements section -->
-    <string name="text_start_mega_pass_free_trial">%1$s存储空间。永久有效。</string>
     <!-- Text of the button for install mega vpn in achivements section -->
     <string name="button_text_install_mega_vpn">安装MEGA&#160;VPN</string>
     <!-- Text of the button for install mega pass in achivements section -->
@@ -1478,4 +1434,118 @@
     <string name="sign_up_last_name_text_field_char_limit_exceed_error">姓氏不能超过40个字符</string>
     <!-- Error message when IP has already sent an issue report and needs to wait -->
     <string name="report_issue_too_many_times_error">You’ve already sent an issue report within the last 10 minutes. Please wait before trying again, or contact %1$s for assistance.</string>
+    <!-- The snackbar message for informing the user about the invitation is trying to sent, is already in the received contact requests because the user already invited them. -->
+    <string name="contacts_invite_already_received">This user has already sent you an invitation</string>
+    <!-- The snackbar message for informing the user about the invitations is trying to sent, are already in the received contact requests because the users already invited them. -->
+    <string name="contacts_invites_already_received">All the people you invited have already sent you an invitation</string>
+    <!-- The snackbar message for informing the user about the invitations are correctly sent. -->
+    <string name="contacts_invites_sent">Invitation sent. They’ll appear in Contacts once accepted.</string>
+    <!-- The snackbar message for informing the user about some invitations correctly sent, but not others because they are already in the received contact requests because the users already invited them. -->
+    <plurals name="contacts_invites_sent_but_others_already_received">
+        <item quantity="one">%1$d user invited, but one or more users have already invited you</item>
+        <item quantity="other">%1$d users invited, but one or more users have already invited you</item>
+    </plurals>
+    <!--  Error shown when the user tries to resend the sign up link multiple times at once. -->
+    <string name="resend_signup_link_error">邮件已发送。请等待几分钟后再试。</string>
+    <!-- success message when renaming a node -->
+    <string name="context_correctly_renamed">已重命名项目</string>
+    <!-- Homepage section. -->
+    <string name="general_section_home">主页</string>
+    <!-- Error message when removing public links of nodes. Plural. -->
+    <plurals name="context_link_removal_error">
+        <item quantity="other">链接移除失败。请稍后再试。</item>
+    </plurals>
+    <!-- Message when some public links were removed successfully. Plural. -->
+    <plurals name="context_link_removal_success">
+        <item quantity="other">链接已移除</item>
+    </plurals>
+    <!-- Warning that appears prior to remove links of files. Plural. -->
+    <plurals name="remove_links_warning_text">
+        <item quantity="other">这些链接将不再公开。</item>
+    </plurals>
+    <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
+    <string name="context_share_correctly_removed">共享已移除</string>
+    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">是</string>
+    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">否</string>
+    <!-- error message when removing access of contact(s) to a selected folder -->
+    <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
+        <item quantity="other">无法为%1$d个联系人移除访问权限</item>
+    </plurals>
+    <!-- Confirmation before removing the outgoing shares of a folder -->
+    <plurals name="confirmation_remove_outgoing_shares">
+        <item quantity="one">This folder is shared with %1$d contact. Stop sharing?</item>
+        <item quantity="other">This folder is shared with %1$d contacts. Stop sharing?</item>
+    </plurals>
+    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
+    <plurals name="alert_remove_several_shares">
+        <item quantity="other"></item>
+    </plurals>
+    <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
+    <string name="figures_storage_referrals_achievements_text">%1$s extra storage for each invitation, valid for %2$d days</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with permanent valid duration -->
+    <string name="figures_storage_referrals_achievements_text_permanent">%1$s extra storage for each invitation, valid permanently</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to each achievement with dynamic valid duration -->
+    <string name="figures_storage_achievements_text">%1$s extra storage, valid for %2$d days</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to each achievement with permanent valid duration -->
+    <string name="figures_storage_achievements_text_permanent">%1$s extra storage, valid permanently</string>
+    <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with dynamic valid duration -->
+    <string name="figures_storage_achievements_awarded_text">%1$s storage bonus applied, valid for %2$d days</string>
+    <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with permanent valid duration -->
+    <string name="figures_storage_achievements_awarded_text_permanent">%1$s storage bonus applied, valid permanently</string>
+    <!-- info paragraph about the achievement install megasync with dynamic valid duration -->
+    <string name="paragraph_info_achievement_install_desktop_dynamic_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid for %2$s days. The desktop app is available for Windows, macOS and Linux.</string>
+    <!-- info paragraph about the achievement install megasync with permanent valid duration -->
+    <string name="paragraph_info_achievement_install_desktop_permanent_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid permanently. The desktop app is available for Windows, macOS and Linux.</string>
+    <!-- info paragraph about the achievement install mobile app with dynamic valid duration -->
+    <string name="paragraph_info_achievement_install_mobile_app_dynamic_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid for %2$s days. The mobile apps are available for iOS and Android.</string>
+    <!-- info paragraph about the achievement install mobile app with permanent valid duration -->
+    <string name="paragraph_info_achievement_install_mobile_app_permanent_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid permanently. The mobile apps are available for iOS and Android.</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">These are backup folders and can only be shared as read-only</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">This is a backup folder and can only be shared as read-only</string>
+    <!-- Button to confirm the action of restarting one transfer-->
+    <string name="button_permission_info">好的，明白了</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">Backup folders are read-only</string>
+    <!-- dialog option continue in alert dialog -->
+    <string name="button_continue">继续</string>
+    <!--Dialog title when the user selected is not on the contact list when sharing a node -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">无法验证联系人</string>
+    <!--Dialog description when the user selected is not on the contact list when sharing a node -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">您无法验证%s，因为他们不在您的联系人列表中。请先等待他们接受您的邀请。</string>
+    <!-- Answer for confirmation dialog. -->
+    <string name="general_ok">Ok</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="general_leave">离开</string>
+    <!-- Success message when left shared folders -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
+        <item quantity="other">已离开%1$d个共享文件夹</item>
+    </plurals>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
+        <item quantity="other">无法离开%1$d个共享文件夹</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
+        <item quantity="other">已离开%1$d个共享文件夹，&#160;</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
+        <item quantity="other">无法离开%1$d个共享文件夹</item>
+    </plurals>
+    <!-- confirmation message before leaving some incoming shared folders -->
+    <plurals name="confirmation_leave_share_folder">
+        <item quantity="other">离开这些共享文件夹后，您将无法再次查看。</item>
+    </plurals>
+    <!-- Title of the dialog to choose permissions when sharing. -->
+    <string name="dialog_select_permissions">共享权限</string>
+    <!-- Refers to access rights for a file folder. -->
+    <string name="file_properties_shared_folder_full_access">完全访问</string>
+    <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
+    <string name="file_properties_shared_folder_read_only">只读</string>
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
+    <string name="file_properties_shared_folder_read_write">仅读写</string>
 </resources>

@@ -72,14 +72,6 @@
     <string name="general_sync_local_filesystem_mismatch">Các tệp&#160;tin trong thư&#160;mục này không thể đồng&#160;bộ hóa hoặc sao lưu được. Bạn sẽ cần phải kích&#160;hoạt lại đồng&#160;bộ hoặc sao lưu từ ứng&#160;dụng cho máy&#160;tính.</string>
     <!-- Warning message to display when sync has been paused due a low battery level -->
     <string name="general_message_sync_paused_low_battery_level">Đồng&#160;bộ hóa tạm dừng, mức pin quá thấp. Sạc pin để tiếp&#160;tục đồng&#160;bộ.</string>
-    <!-- Title for File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_file_sharing">Chia&#160;sẻ tệp&#160;tin dễ&#160;dàng và an&#160;toàn</string>
-    <!-- Description about File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_file_sharing">Chia&#160;sẻ các tệp&#160;tin lớn nhờ băng&#160;thông truyền&#160;tải hào&#160;phóng và đảm&#160;bảo bảo&#160;mật với các đường liên&#160;kết được bảo&#160;vệ bằng mật&#160;khẩu.</string>
-    <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_backup_rewind">Không bao&#160;giờ mất dữ&#160;liệu nữa</string>
-    <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Tua lại để khôi&#160;phục lại các tệp&#160;tin và thư&#160;mục về bất kỳ ngày nào trong phạm&#160;vi lên đến 180 ngày, vì vậy dữ&#160;liệu của bạn không bị tai&#160;nạn và chống giả&#160;mạo.</string>
     <!-- Search drop down chips filter type file type -->
     <string name="search_dropdown_chip_filter_type_file_type">Dạng</string>
     <!-- Search drop down chips filter type file type images -->
@@ -196,14 +188,6 @@
     <string name="general_size_giga_byte">%1$s</string>
     <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
     <string name="general_free_plan_name">Miễn phí</string>
-    <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
-    <string name="dialog_onboarding_transfer_quota_free_limited">Bị giới hạn</string>
-    <!-- Description of the price for Free account. The meaning: this type of account is for free. This string won't be used for name of Free account. -->
-    <string name="dialog_onboarding_free_account_price">Miễn phí</string>
-    <!-- Continue button on Onboarding dialog, the user will proceed with payment for chosen account. -->
-    <string name="dialog_onboarding_button_continue">Tiếp tục</string>
-    <!-- Title of navigation bar on Onboarding dialog. -->
-    <string name="dialog_onboarding_app_bar_title">Chọn gói MEGA bạn muốn</string>
     <!-- Header of the Info view field for what is the content of a device/folder -->
     <string name="info_content">Chứa đựng</string>
     <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
@@ -236,8 +220,6 @@
     <string name="general_giga_byte_standalone">GB</string>
     <!-- Size unit in terabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
     <string name="general_tera_byte_standalone">TB</string>
-    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
-    <string name="dialog_onboarding_feature_storage_description">Bắt&#160;đầu với %1$s&#160;%2$s, tìm gói phù&#160;hợp hoàn&#160;hảo cho nhu&#160;cầu lưu&#160;trữ của bạn.</string>
     <!-- Title of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_title">Không&#160;gian lưu&#160;trữ không đủ</string>
     <!-- Body text of the insufficient storage error dialog -->
@@ -278,12 +260,6 @@
     <string name="file_info_information_snackbar_description_added">Mô tả đã được thêm</string>
     <!-- Description updated snack bar for the file info information screen-->
     <string name="file_info_information_snackbar_description_updated">Mô tả được cập nhật</string>
-    <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_title_additional_features">Cộng với quyền truy&#160;cập vào những lợi&#160;ích tuyệt&#160;vời sau:</string>
-    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160; VPN \n&#8226;&#160;Cuộc gọi và họp không bị hạn&#160;chế \n&#8226;&#160;Tự động đồng&#160;bộ các thư&#160;mục trong thiết&#160;bị di&#160;động của bạn \n&#8226;&#160;Không có quảng&#160;cáo</string>
-    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160; VPN \n&#8226;&#160;Cuộc gọi và họp không bị hạn&#160;chế \n&#8226;&#160;Tự động đồng&#160;bộ các thư&#160;mục trong thiết&#160;bị di&#160;động của bạn</string>
     <!-- Text for the Sync solved issues list empty state -->
     <string name="device_center_sync_solved_issues_empty_state_text">Không có vấn&#160;đề đã giải&#160;quyết nào</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
@@ -293,11 +269,9 @@
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">Thư&#160;mục Đăng&#160;tải camêra và thư&#160;mục Đăng&#160;tải phương&#160;tiện bổ&#160;sung của bạn không được phép có liên&#160;quan với nhau. Hãy chọn một thư&#160;mục khác.</string>
     <!-- The confirmation Button text of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">OK, hiểu rồi</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">OK, đã hiểu</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
     <string name="general_no_picker_warning">Thiết&#160;bị này không có ứng&#160;dụng nào để chọn thư&#160;mục</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;Tự động đồng&#160;bộ các thư&#160;mục trên thiết&#160;bị di&#160;động của bạn</string>
     <!-- Hidden items -->
     <string name="hidden_items">Các mục ẩn</string>
     <!-- Label to indicate that is a Pro only feature -->
@@ -774,10 +748,6 @@
     <string name="general_drive">Đĩa</string>
     <!-- Tab bar title of Syncs tab -->
     <string name="general_syncs">Đồng bộ hóa</string>
-    <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
-    <string name="transfers_completed_one_read_error_retrying">Không thể hoàn&#160;tất hoặc thử lại phiên tải lên của bạn vì MEGA không còn có thể truy&#160;cập tệp&#160;tin đó</string>
-    <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
-    <string name="transfers_completed_some_read_error_retrying">Một số hoặc tất cả các phiên tải lên của bạn không thể hoàn tất hoặc thử lại vì MEGA không còn có thể truy&#160;cập các tệp&#160;tin đó</string>
     <!-- Title for Offline Folder exposed via SAF -->
     <string name="general_mega_offline">Các tệp MEGA Ngoại&#160;Tuyến</string>
     <!-- Notification content for download final notification. It will inform the user about the location where file/s were downloaded -->
@@ -876,8 +846,6 @@
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">Đang lưu %1$s vào Ổ&#160;Mây...</string>
-    <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">Bạn sẽ bị tính phí %1$s ngay lập tức nhưng gói đăng ký của bạn sẽ không tự động gia hạn sau 12 tháng do các quy định của chính phủ. Bạn sẽ có trách nhiệm tự gia hạn gói đăng ký của mình sau khi hết hạn. Bạn có thể quản lý hoặc hủy gói đăng ký của mình bất cứ lúc nào tại phần Gói thuê&#160;bao trong cửa&#160;hàng  [A]Google&#160;Play[/A]. Với việc nâng cấp tài khoản của mình, bạn đồng ý với [B]Điều&#160;Khoản Dịch&#160;Vụ[/B] và [C]Chính&#160;Sách Quyền Riêng&#160;Tư[/C] của MEGA.</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">Đang tải lên&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
@@ -1106,8 +1074,6 @@
     <string name="free_plan_card_title">Khởi&#160;đầu với gói miễn&#160;phí của chúng&#160;tôi</string>
     <!-- Description for the Free Plan card -->
     <string name="free_plan_card_description">Bạn không cần phải cam&#160;kết mua gói trả phí. Gói miễn&#160;phí của chúng&#160;tôi có cung&#160;cấp lượng lớn hạn mức lưu&#160;trữ và băng&#160;thông truyền&#160;tải</string>
-    <!-- Feature text for Free Plan storage -->
-    <string name="free_plan_card_storage_feature">20&#160;GB không&#160;gian lưu&#160;trữ</string>
     <!-- Feature text for Free Plan transfer quota -->
     <string name="free_plan_card_transfer_feature">Truyền&#160;tải có giới&#160;hạn</string>
     <!-- Button text for Free Plan card -->
@@ -1140,8 +1106,6 @@
     <string name="pro_plan_benefit_password_protected_links">Bảo&#160;vệ đường liên&#160;kết với mật&#160;khẩu</string>
     <!-- Benefit: Links with expiry dates -->
     <string name="pro_plan_benefit_links_with_expiry_dates">Đặt thời&#160;hạn cho đường liên&#160;kết</string>
-    <!-- Benefit: Transfer quota sharing -->
-    <string name="pro_plan_benefit_transfer_quota_sharing">Chia&#160;sẻ băng&#160;thông truyền&#160;tải</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
     <string name="pro_plan_benefit_auto_sync_mobile">Tự động đồng&#160;bộ các thư&#160;mục trên thiết&#160;bị di&#160;động của bạn</string>
     <!-- Benefit: Rewind up to 180 days of deleted data -->
@@ -1162,10 +1126,6 @@
     <string name="choose_account_screen_get_more_with_pro_plan_title">Nhận được nhiều hơn với gói Pro</string>
     <!-- Maybe later button text in the choose account screen-->
     <string name="choose_account_screen_maybe_later_button_text">Có lẽ để sau</string>
-    <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_monthly">Hàng tháng</string>
-    <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_yearly">Hàng năm</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_label_save_up_to">Tiết kiệm lên đến 16% khi thanh toán thường niên</string>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
@@ -1174,8 +1134,6 @@
     <string name="choose_account_screen_transfer_quota_label">%1$s truyền&#160;tải</string>
     <!-- General month label -->
     <string name="general_month">/tháng</string>
-    <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
-    <string name="choose_account_screen_currency_per_month">%1$s mỗi tháng</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
     <string name="choose_account_screen_billed_yearly">%1$s tính phí hàng năm</string>
     <!-- The snackbar message of unhidden nodes operation -->
@@ -1200,8 +1158,6 @@
     <string name="text_start_mega_vpn_free_trial">%1$s thêm cho lưu trữ. Có hiệu lực vĩnh viễn.</string>
     <!-- title of the section for start mega pass free trial in achivements section -->
     <string name="title_start_mega_pass_free_trial">Bắt&#160;đầu hạn dùng thử MEGA&#160;Pass miễn&#160;phí</string>
-    <!-- Text of the section for start mega pass free trial in achivements section -->
-    <string name="text_start_mega_pass_free_trial">%1$s thêm cho lưu trữ. Có hiệu lực vĩnh viễn.</string>
     <!-- Text of the button for install mega vpn in achivements section -->
     <string name="button_text_install_mega_vpn">Cài MEGA&#160;VPN</string>
     <!-- Text of the button for install mega pass in achivements section -->
@@ -1478,4 +1434,118 @@
     <string name="sign_up_last_name_text_field_char_limit_exceed_error">Họ của tên không được vượt quá 40 ký tự</string>
     <!-- Error message when IP has already sent an issue report and needs to wait -->
     <string name="report_issue_too_many_times_error">You’ve already sent an issue report within the last 10 minutes. Please wait before trying again, or contact %1$s for assistance.</string>
+    <!-- The snackbar message for informing the user about the invitation is trying to sent, is already in the received contact requests because the user already invited them. -->
+    <string name="contacts_invite_already_received">Người này đã có gửi lời mời cho bạn từ trước rồi</string>
+    <!-- The snackbar message for informing the user about the invitations is trying to sent, are already in the received contact requests because the users already invited them. -->
+    <string name="contacts_invites_already_received">All the people you invited have already sent you an invitation</string>
+    <!-- The snackbar message for informing the user about the invitations are correctly sent. -->
+    <string name="contacts_invites_sent">Invitation sent. They’ll appear in Contacts once accepted.</string>
+    <!-- The snackbar message for informing the user about some invitations correctly sent, but not others because they are already in the received contact requests because the users already invited them. -->
+    <plurals name="contacts_invites_sent_but_others_already_received">
+        <item quantity="one">%1$d user invited, but one or more users have already invited you</item>
+        <item quantity="other">%1$d users invited, but one or more users have already invited you</item>
+    </plurals>
+    <!--  Error shown when the user tries to resend the sign up link multiple times at once. -->
+    <string name="resend_signup_link_error">E-mail đã được gửi đi rồi. Xin chờ vài phút trước khi gửi lại cái mới.</string>
+    <!-- success message when renaming a node -->
+    <string name="context_correctly_renamed">Mục đã được đổi tên</string>
+    <!-- Homepage section. -->
+    <string name="general_section_home">Trang Chủ</string>
+    <!-- Error message when removing public links of nodes. Plural. -->
+    <plurals name="context_link_removal_error">
+        <item quantity="other">Một số đường liên kết chưa được xóa thành công. Xin thử lại sau.</item>
+    </plurals>
+    <!-- Message when some public links were removed successfully. Plural. -->
+    <plurals name="context_link_removal_success">
+        <item quantity="other">Các đường liên&#160;kết đã được loại&#160;bỏ</item>
+    </plurals>
+    <!-- Warning that appears prior to remove links of files. Plural. -->
+    <plurals name="remove_links_warning_text">
+        <item quantity="other">Những đường liên kết này sẽ không còn được công khai nữa.</item>
+    </plurals>
+    <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
+    <string name="context_share_correctly_removed">Đã loại&#160;bỏ chia&#160;sẻ</string>
+    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Có</string>
+    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">Không</string>
+    <!-- error message when removing access of contact(s) to a selected folder -->
+    <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
+        <item quantity="other">Đã không&#160;thể loại&#160;bỏ quyền truy&#160;cập của %1$d tên liên&#160;lạc</item>
+    </plurals>
+    <!-- Confirmation before removing the outgoing shares of a folder -->
+    <plurals name="confirmation_remove_outgoing_shares">
+        <item quantity="one">This folder is shared with %1$d contact. Stop sharing?</item>
+        <item quantity="other">This folder is shared with %1$d contacts. Stop sharing?</item>
+    </plurals>
+    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
+    <plurals name="alert_remove_several_shares">
+        <item quantity="other"></item>
+    </plurals>
+    <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
+    <string name="figures_storage_referrals_achievements_text">%1$s extra storage for each invitation, valid for %2$d days</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with permanent valid duration -->
+    <string name="figures_storage_referrals_achievements_text_permanent">%1$s extra storage for each invitation, valid permanently</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to each achievement with dynamic valid duration -->
+    <string name="figures_storage_achievements_text">%1$s extra storage, valid for %2$d days</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to each achievement with permanent valid duration -->
+    <string name="figures_storage_achievements_text_permanent">%1$s extra storage, valid permanently</string>
+    <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with dynamic valid duration -->
+    <string name="figures_storage_achievements_awarded_text">%1$s storage bonus applied, valid for %2$d days</string>
+    <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with permanent valid duration -->
+    <string name="figures_storage_achievements_awarded_text_permanent">%1$s storage bonus applied, valid permanently</string>
+    <!-- info paragraph about the achievement install megasync with dynamic valid duration -->
+    <string name="paragraph_info_achievement_install_desktop_dynamic_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid for %2$s days. The desktop app is available for Windows, macOS and Linux.</string>
+    <!-- info paragraph about the achievement install megasync with permanent valid duration -->
+    <string name="paragraph_info_achievement_install_desktop_permanent_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid permanently. The desktop app is available for Windows, macOS and Linux.</string>
+    <!-- info paragraph about the achievement install mobile app with dynamic valid duration -->
+    <string name="paragraph_info_achievement_install_mobile_app_dynamic_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid for %2$s days. The mobile apps are available for iOS and Android.</string>
+    <!-- info paragraph about the achievement install mobile app with permanent valid duration -->
+    <string name="paragraph_info_achievement_install_mobile_app_permanent_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid permanently. The mobile apps are available for iOS and Android.</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">These are backup folders and can only be shared as read-only</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">This is a backup folder and can only be shared as read-only</string>
+    <!-- Button to confirm the action of restarting one transfer-->
+    <string name="button_permission_info">OK, đã hiểu</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">Backup folders are read-only</string>
+    <!-- dialog option continue in alert dialog -->
+    <string name="button_continue">Tiếp tục</string>
+    <!--Dialog title when the user selected is not on the contact list when sharing a node -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Không&#160;thể xác&#160;thực tên liên&#160;lạc</string>
+    <!--Dialog description when the user selected is not on the contact list when sharing a node -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">Bạn không&#160;thể xác&#160;thực %s vì họ không&#160;có trong sổ liên&#160;lạc của bạn. Hãy chờ đến khi họ chấp&#160;nhận lời&#160;mời của bạn trước.</string>
+    <!-- Answer for confirmation dialog. -->
+    <string name="general_ok">Ok</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="general_leave">Rời khỏi</string>
+    <!-- Success message when left shared folders -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
+        <item quantity="other">Đã rời khỏi %1$d thư&#160;mục chia&#160;sẻ</item>
+    </plurals>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
+        <item quantity="other">Đã không&#160;thể rời khỏi %1$d thư&#160;mục chia&#160;sẻ</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
+        <item quantity="other">Đã rời khỏi %1$d thư&#160;mục chia&#160;sẻ, &#160;</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
+        <item quantity="other">và không&#160;thể rời khỏi %1$d thư&#160;mục chia&#160;sẻ</item>
+    </plurals>
+    <!-- confirmation message before leaving some incoming shared folders -->
+    <plurals name="confirmation_leave_share_folder">
+        <item quantity="other">Nếu bạn quyết định từ bỏ các thư mục này, bạn sẽ không thể truy cập lại được nữa.</item>
+    </plurals>
+    <!-- Title of the dialog to choose permissions when sharing. -->
+    <string name="dialog_select_permissions">Quyền hạn được chia sẻ</string>
+    <!-- Refers to access rights for a file folder. -->
+    <string name="file_properties_shared_folder_full_access">Toàn quyền</string>
+    <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
+    <string name="file_properties_shared_folder_read_only">Chỉ-được-xem</string>
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
+    <string name="file_properties_shared_folder_read_write">Xem và ghi</string>
 </resources>

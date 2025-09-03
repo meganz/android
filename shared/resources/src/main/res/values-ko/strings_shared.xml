@@ -72,14 +72,6 @@
     <string name="general_sync_local_filesystem_mismatch">이 폴더의 파일을 동기화 또는 백업할 수 없습니다. 데스크톱 앱에서 동기화 또는 백업을 다시 활성화 해야 합니다.</string>
     <!-- Warning message to display when sync has been paused due a low battery level -->
     <string name="general_message_sync_paused_low_battery_level">배터리 수준이 너무 낮아서, 동기화가 일시정지 되었습니다. 동기화를 재개하려면 배터리를 충전하세요.</string>
-    <!-- Title for File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_file_sharing">쉽고, 안전한 파일 공유</string>
-    <!-- Description about File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_file_sharing">넉넉한 전송 할당량 덕분에 큰 파일을 공유하고 암호로 공유된 링크로 보안을 보장하세요.</string>
-    <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_backup_rewind">다시는 데이터를 잃지 마세요</string>
-    <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">당신의 데이터가 사고로 인해 변경되는 것을 막을 수 있도록, 파일과 폴더를 최대 180일까지 되돌려서 복원하세요.</string>
     <!-- Search drop down chips filter type file type -->
     <string name="search_dropdown_chip_filter_type_file_type">형식</string>
     <!-- Search drop down chips filter type file type images -->
@@ -196,14 +188,6 @@
     <string name="general_size_giga_byte">%1$s</string>
     <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
     <string name="general_free_plan_name">무료</string>
-    <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
-    <string name="dialog_onboarding_transfer_quota_free_limited">제한됨</string>
-    <!-- Description of the price for Free account. The meaning: this type of account is for free. This string won't be used for name of Free account. -->
-    <string name="dialog_onboarding_free_account_price">무료</string>
-    <!-- Continue button on Onboarding dialog, the user will proceed with payment for chosen account. -->
-    <string name="dialog_onboarding_button_continue">계속</string>
-    <!-- Title of navigation bar on Onboarding dialog. -->
-    <string name="dialog_onboarding_app_bar_title">MEGA 요금제 선택</string>
     <!-- Header of the Info view field for what is the content of a device/folder -->
     <string name="info_content">포함된 항목</string>
     <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
@@ -236,8 +220,6 @@
     <string name="general_giga_byte_standalone">GB</string>
     <!-- Size unit in terabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
     <string name="general_tera_byte_standalone">TB</string>
-    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
-    <string name="dialog_onboarding_feature_storage_description">%1$s%2$s부터 시작하여, 당신의 저장소 수요에 맞는 것을 찾으세요.</string>
     <!-- Title of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_title">저장 공간 부족</string>
     <!-- Body text of the insufficient storage error dialog -->
@@ -278,12 +260,6 @@
     <string name="file_info_information_snackbar_description_added">설명 추가됨</string>
     <!-- Description updated snack bar for the file info information screen-->
     <string name="file_info_information_snackbar_description_updated">설명 수정됨</string>
-    <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_title_additional_features">추가로 이러한 훌륭한 혜택이 있습니다:</string>
-    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN\n&#8226;&#160;무제한 통화와 회의\n&#8226;&#160;휴대 장치의 폴더를 자동으로 동기화\n&#8226;&#160;광고 없음</string>
-    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN\n&#8226;&#160;무제한 통화와 회의\n&#8226;&#160;휴대 장치의 폴더를 자동으로 동기화</string>
     <!-- Text for the Sync solved issues list empty state -->
     <string name="device_center_sync_solved_issues_empty_state_text">해결된 문제 없음</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
@@ -293,11 +269,9 @@
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">카메라 업로드 폴더와 보조 미디어 업로드 폴더는 서로 연관 관계가 있을 수 없습니다. 다른 폴더를 선택하세요.</string>
     <!-- The confirmation Button text of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">알겠습니다</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">닫기</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
     <string name="general_no_picker_warning">이 장치에 폴더를 선택할 앱이 없습니다</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;휴대 장치의 폴더를 자동으로 동기화</string>
     <!-- Hidden items -->
     <string name="hidden_items">숨겨진 항목</string>
     <!-- Label to indicate that is a Pro only feature -->
@@ -774,10 +748,6 @@
     <string name="general_drive">드라이브</string>
     <!-- Tab bar title of Syncs tab -->
     <string name="general_syncs">동기화</string>
-    <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
-    <string name="transfers_completed_one_read_error_retrying">MEGA가 더 이상 파일에 접근할 수 없기 때문에 업로드를 완료하거나 재시도할 수 없습니다</string>
-    <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
-    <string name="transfers_completed_some_read_error_retrying">MEGA가 더 이상 파일에 접근할 수 없기 때문에 일부 또는 모든 업로드를 완료하거나 재시도할 수 없습니다</string>
     <!-- Title for Offline Folder exposed via SAF -->
     <string name="general_mega_offline">MEGA 오프라인 파일</string>
     <!-- Notification content for download final notification. It will inform the user about the location where file/s were downloaded -->
@@ -876,8 +846,6 @@
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">클라우드 드라이브에 %1$s를/을 저장하는 중...</string>
-    <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">즉시 %1$s가/이 청구되지만 정부 규제로 인하여 당신의 구독은 12개월 후 자동으로 갱신되지 않습니다. 기간이 만료된 이후 구독을 갱신하는 것은 당신의 책임입니다. [A]Google&#160;Play[/A]의 구독을 통하여 당신의 구독을 언제든지 관리하거나 취소할 수 있습니다. 당신의 계정을 업그레이드함으로써, 당신은 MEGA의 [B]이용 약관[/B]과 [C]개인정보 처리 방침[/C]에 동의하는 것입니다.</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">업로드 중...</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
@@ -1106,8 +1074,6 @@
     <string name="free_plan_card_title">무료 요금제로 시작하세요</string>
     <!-- Description for the Free Plan card -->
     <string name="free_plan_card_description">아직 유료 요금제를 이용할 필요는 없습니다, 무료 요금제는 넉넉한 양의 저장소와 전송 할당량을 제공합니다.</string>
-    <!-- Feature text for Free Plan storage -->
-    <string name="free_plan_card_storage_feature">20GB 저장소</string>
     <!-- Feature text for Free Plan transfer quota -->
     <string name="free_plan_card_transfer_feature">제한된 전송</string>
     <!-- Button text for Free Plan card -->
@@ -1140,8 +1106,6 @@
     <string name="pro_plan_benefit_password_protected_links">암호로 보호된 링크</string>
     <!-- Benefit: Links with expiry dates -->
     <string name="pro_plan_benefit_links_with_expiry_dates">만료일이 있는 링크</string>
-    <!-- Benefit: Transfer quota sharing -->
-    <string name="pro_plan_benefit_transfer_quota_sharing">전송 할당량 공유</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
     <string name="pro_plan_benefit_auto_sync_mobile">휴대장치의 폴더를 자동으로 동기화</string>
     <!-- Benefit: Rewind up to 180 days of deleted data -->
@@ -1162,10 +1126,6 @@
     <string name="choose_account_screen_get_more_with_pro_plan_title">Pro 요금제로 더 받기</string>
     <!-- Maybe later button text in the choose account screen-->
     <string name="choose_account_screen_maybe_later_button_text">나중에</string>
-    <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_monthly">월간</string>
-    <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_yearly">연간</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_label_save_up_to">연간 결제로 최대 16% 할인 받으세요</string>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
@@ -1174,8 +1134,6 @@
     <string name="choose_account_screen_transfer_quota_label">%1$s 전송</string>
     <!-- General month label -->
     <string name="general_month">/월</string>
-    <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
-    <string name="choose_account_screen_currency_per_month">매달 %1$s</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
     <string name="choose_account_screen_billed_yearly">매년 %1$s 청구</string>
     <!-- The snackbar message of unhidden nodes operation -->
@@ -1200,8 +1158,6 @@
     <string name="text_start_mega_vpn_free_trial">%1$s의 저장소. 영구적으로 유효합니다.</string>
     <!-- title of the section for start mega pass free trial in achivements section -->
     <string name="title_start_mega_pass_free_trial">MEGA&#160;Pass 무료 체험 시작</string>
-    <!-- Text of the section for start mega pass free trial in achivements section -->
-    <string name="text_start_mega_pass_free_trial">%1$s의 저장소. 영구적으로 유효합니다.</string>
     <!-- Text of the button for install mega vpn in achivements section -->
     <string name="button_text_install_mega_vpn">MEGA&#160;VPN 설치</string>
     <!-- Text of the button for install mega pass in achivements section -->
@@ -1429,7 +1385,7 @@
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_last_modified_file_explanation">가장 최근에 업데이트된 파일이 두 위치의 오래된 파일을 대체하게 됩니다</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict</string>
+    <string name="sync_stalled_issue_general_explanation">충돌을 해결하기 위해 이 조치가 적용됩니다</string>
     <!-- Dialog choose option -->
     <string name="general_dialog_choose_button">선택</string>
     <!-- Text label of Apply to all -->
@@ -1478,4 +1434,116 @@
     <string name="sign_up_last_name_text_field_char_limit_exceed_error">성은 40자를 초과할 수 없습니다</string>
     <!-- Error message when IP has already sent an issue report and needs to wait -->
     <string name="report_issue_too_many_times_error">이미 10분 내에 문제 보고를 보낸 적이 있습니다. 다시 시도하기 전에 기다리거나, 도움을 받으려면 %1$s에 연락하세요.</string>
+    <!-- The snackbar message for informing the user about the invitation is trying to sent, is already in the received contact requests because the user already invited them. -->
+    <string name="contacts_invite_already_received">이 이용자는 이미 당신에게 초대장을 보냈습니다</string>
+    <!-- The snackbar message for informing the user about the invitations is trying to sent, are already in the received contact requests because the users already invited them. -->
+    <string name="contacts_invites_already_received">당신이 초대한 모든 사람이 이미 당신에게 초대장을 보냈습니다</string>
+    <!-- The snackbar message for informing the user about the invitations are correctly sent. -->
+    <string name="contacts_invites_sent">초대장이 발송되었습니다. 초대장이 수락되면 연락처에 나타납니다.</string>
+    <!-- The snackbar message for informing the user about some invitations correctly sent, but not others because they are already in the received contact requests because the users already invited them. -->
+    <plurals name="contacts_invites_sent_but_others_already_received">
+        <item quantity="other">이용자 %1$d명이 초대되었으나, 1명 이상의 이용자가 이미 당신을 초대했습니다</item>
+    </plurals>
+    <!--  Error shown when the user tries to resend the sign up link multiple times at once. -->
+    <string name="resend_signup_link_error">이메일이 이미 발송되었습니다. 몇 분 기다린 후 다시 시도하세요.</string>
+    <!-- success message when renaming a node -->
+    <string name="context_correctly_renamed">항목 이름 수정됨</string>
+    <!-- Homepage section. -->
+    <string name="general_section_home">홈</string>
+    <!-- Error message when removing public links of nodes. Plural. -->
+    <plurals name="context_link_removal_error">
+        <item quantity="other">일부 링크의 제거를 실패하였습니다. 나중에 다시 시도하세요.</item>
+    </plurals>
+    <!-- Message when some public links were removed successfully. Plural. -->
+    <plurals name="context_link_removal_success">
+        <item quantity="other">링크 제거됨</item>
+    </plurals>
+    <!-- Warning that appears prior to remove links of files. Plural. -->
+    <plurals name="remove_links_warning_text">
+        <item quantity="other">이 링크들은 더 이상 공개되지 않습니다.</item>
+    </plurals>
+    <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
+    <string name="context_share_correctly_removed">공유 제거됨</string>
+    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">예</string>
+    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">아니오</string>
+    <!-- error message when removing access of contact(s) to a selected folder -->
+    <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
+        <item quantity="other">%1$d개의 연락처에 대한 접근 권한을 제거할 수 없습니다</item>
+    </plurals>
+    <!-- Confirmation before removing the outgoing shares of a folder -->
+    <plurals name="confirmation_remove_outgoing_shares">
+        <item quantity="other">이 폴더는 %1$d개의 연락처와 공유되어 있습니다. 공유를 멈출까요?</item>
+    </plurals>
+    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
+    <plurals name="alert_remove_several_shares">
+        <item quantity="other"></item>
+    </plurals>
+    <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
+    <string name="figures_storage_referrals_achievements_text">초대마다 %1$s의 추가 저장소, %2$d일 동안 유효합니다</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with permanent valid duration -->
+    <string name="figures_storage_referrals_achievements_text_permanent">초대마다 %1$s의 추가 저장소, 평생 유효합니다</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to each achievement with dynamic valid duration -->
+    <string name="figures_storage_achievements_text">%1$s의 추가 저장소, %2$d일 동안 유효합니다</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to each achievement with permanent valid duration -->
+    <string name="figures_storage_achievements_text_permanent">%1$s의 저장소. 평생 유효합니다</string>
+    <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with dynamic valid duration -->
+    <string name="figures_storage_achievements_awarded_text">%1$s의 저장소 보너스가 적용되었으며, %2$d일 동안 유효합니다</string>
+    <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with permanent valid duration -->
+    <string name="figures_storage_achievements_awarded_text_permanent">%1$s의 저장소 보너스 적용되었습니다, 평생 유효합니다</string>
+    <!-- info paragraph about the achievement install megasync with dynamic valid duration -->
+    <string name="paragraph_info_achievement_install_desktop_dynamic_duration">MEGA 데스크톱 앱을 설치하고 %2$s일 동안 유효한 %1$s의 무료 추가 저장 공간을 받으세요. 데스크톱 앱은 Windows, macOS 그리고 Linux에서 이용 가능합니다.</string>
+    <!-- info paragraph about the achievement install megasync with permanent valid duration -->
+    <string name="paragraph_info_achievement_install_desktop_permanent_duration">MEGA 데스크톱 앱을 설치하고 평생 유효한 %1$s의 무료 추가 저장 공간을 받으세요. 데스크톱 앱은 Windows, macOS 그리고 Linux에서 이용 가능합니다.</string>
+    <!-- info paragraph about the achievement install mobile app with dynamic valid duration -->
+    <string name="paragraph_info_achievement_install_mobile_app_dynamic_duration">MEGA 모바일 앱 중 하나를 설치하고 %2$s일 동안 유효한 %1$s의 무료 저장 공간을 받으세요. 모바일 앱은 iOS와 Android에서 이용 가능합니다.</string>
+    <!-- info paragraph about the achievement install mobile app with permanent valid duration -->
+    <string name="paragraph_info_achievement_install_mobile_app_permanent_duration">MEGA 모바일 앱 중 하나를 설치하고 평생 유효한 %1$s의 무료 저장 공간을 받으세요. 모바일 앱은 iOS와 Android에서 이용 가능합니다.</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">이것은 백업 폴더이며 읽기 전용으로만 공유할 수 있습니다</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">이것은 백업 폴더이며 읽기 전용으로만 공유할 수 있습니다</string>
+    <!-- Button to confirm the action of restarting one transfer-->
+    <string name="button_permission_info">닫기</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">백업 폴더는 읽기 전용입니다</string>
+    <!-- dialog option continue in alert dialog -->
+    <string name="button_continue">계속</string>
+    <!--Dialog title when the user selected is not on the contact list when sharing a node -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">연락처를 인증할 수 없습니다</string>
+    <!--Dialog description when the user selected is not on the contact list when sharing a node -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">당신의 연락처 목록에 %s님이 없기 때문에 인증할 수 없습니다. 그들이 초대를 수락할 때까지 기다리세요.</string>
+    <!-- Answer for confirmation dialog. -->
+    <string name="general_ok">Ok</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="general_leave">떠나기</string>
+    <!-- Success message when left shared folders -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
+        <item quantity="other">%1$d개의 공유된 폴더를 나갔습니다</item>
+    </plurals>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
+        <item quantity="other">%1$d개의 공유된 폴더를 나갈 수 없었습니다</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
+        <item quantity="other">%1$d개의 공유된 폴더를 나갔습니다,&#160;</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
+        <item quantity="other">%1$d개의 공유된 폴더를 나갈 수 없었습니다</item>
+    </plurals>
+    <!-- confirmation message before leaving some incoming shared folders -->
+    <plurals name="confirmation_leave_share_folder">
+        <item quantity="other">이 폴더들을 떠나면, 다시는 볼 수 없습니다.</item>
+    </plurals>
+    <!-- Title of the dialog to choose permissions when sharing. -->
+    <string name="dialog_select_permissions">공유 권한</string>
+    <!-- Refers to access rights for a file folder. -->
+    <string name="file_properties_shared_folder_full_access">전체 권한</string>
+    <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
+    <string name="file_properties_shared_folder_read_only">읽기 전용</string>
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
+    <string name="file_properties_shared_folder_read_write">읽기와 쓰기</string>
 </resources>

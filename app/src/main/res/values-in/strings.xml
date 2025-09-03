@@ -1027,10 +1027,6 @@
     <string name="option_to_retry_transfers">Coba lagi semua pemindahan</string>
     <!-- Button to confirm the action of restarting one transfer -->
     <string name="button_resume_individual_transfer">Lanjutkan</string>
-    <!-- Dialog to confirm before removing completed transfers -->
-    <string name="confirmation_to_clear_completed_transfers">Hapus semua transfer?</string>
-    <!-- Title of the tab section for transfers in progress -->
-    <string name="title_tab_in_progress_transfers">Sedang berjalan</string>
     <!-- Title of the tab section for completed transfers -->
     <string name="title_tab_completed_transfers">Selesai</string>
     <!-- Text shown in playlist subtitle item when a file is reproducing but it is paused -->
@@ -1043,8 +1039,6 @@
     <string name="transfer_retrying">Mencoba kembali</string>
     <!-- Possible state of a transfer. When the transfer was cancelled -->
     <string name="transfer_cancelled">Batal</string>
-    <!-- Possible state of a transfer -->
-    <string name="transfer_unknown">Tidak diketahui</string>
     <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
     <string name="upload_service_notification">Mengunggah file: %1$d dari %2$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
@@ -1223,10 +1217,6 @@
     <string name="title_properties_contact_notifications_for_chat">Notifikasi obrolan</string>
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Undang teman dan dapatkan hadiah</string>
-    <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s penyimpanan untuk setiap undangan. Berlaku selama 365 hari.</string>
-    <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">%1$spenyimpanan. Berlaku selama 365 hari.</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Imbalan diterima</string>
     <!-- title of the section for unlocked storage quota -->
@@ -1257,10 +1247,6 @@
     <string name="subtitle_confirmation_invite_friends">Undangan dikirim</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Alamat email salah format</string>
-    <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">Saat anda menginstal aplikasi desktop MEGA, anda mendapatkan %1$sruang penyimpanan gratis, berlaku selama 365 hari. Aplikasi desktop MEGA tersedia untuk Windows, macOS, dan sebagian besar distro Linux.</string>
-    <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">Saat anda menginstal Aplikasi Seluler MEGA, anda mendapatkan %1$s ruang penyimpanan gratis, berlaku selama 365 hari. Kami menyediakan aplikasi seluler untuk iOS dan Android.</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">Anda telah menerima %1$sruang penyimpanan untuk menginstal aplikasi desktop MEGA kami.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
@@ -1614,10 +1600,6 @@
     </plurals>
     <!-- title of the notification for a new incoming contact request -->
     <string name="title_new_contact_request_notification">Permintaan kontak baru</string>
-    <!-- Empty state message shown in the screen when there are not any active transfer -->
-    <string name="transfers_empty_new">[B]Tidak ada yang aktif[/B][A] Transfer[/A]</string>
-    <!-- Empty state message shown in the screen when there are not any active transfer -->
-    <string name="completed_transfers_empty_new">[B]Belum selesai[/B][A] Transfer[/A]</string>
     <!-- Empty state text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder_new">[B]Kosongkan[/B][A] Folder[/A]</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
@@ -2058,10 +2040,6 @@
     <string name="message_error_set_title_get_link">Sebelum anda dapat membuat tautan untuk obrolan ini, anda perlu menetapkan deskripsi:</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
     <string name="chat_link_copied_clipboard">Tautan disalin ke papan klip</string>
-    <!-- Label to show the price of each plan in the upgrade account section -->
-    <string name="type_month">[A]Dari[/A] %s / [A]bulan[/A] *</string>
-    <!-- the meaning of the asterisk in monthly* and annually* payment -->
-    <string name="upgrade_comment">* Langganan berulang dapat dibatalkan kapan saja sebelum tanggal perpanjangan.</string>
     <!-- Message shown when a call starts. -->
     <string name="call_started_messages">Panggilan Dimulai</string>
     <!-- Title of the dialog to inform about a SSL error -->
@@ -2070,10 +2048,6 @@
     <string name="ssl_error_dialog_text">MEGA tidak dapat membuat koneksi aman menggunakan SSL. Anda mungkin berada di jaringan Wi-Fi publik dengan persyaratan tambahan.</string>
     <!-- Text of the empty screen for the notifications section -->
     <string name="context_empty_notifications">[B]Tidak ada [/B][A]notifikasi[/A]</string>
-    <!-- Permissions screen title -->
-    <string name="general_setup_mega">Siapkan MEGA</string>
-    <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA membutuhkan izin anda untuk mengakses file anda untuk mengunggah atau berbagi dengan orang lain. Izin akses opsional lainnya mungkin diperlukan untuk menggunakan fitur dan layanan yang disediakan aplikasi ini.\n\nJika anda memilih untuk tidak memberikan izin ini, anda masih dapat menggunakan aplikasi, kecuali untuk fungsi yang memerlukan izin tertentu.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Izinkan akses ke foto, media, dan file</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -2388,8 +2362,6 @@
     </plurals>
     <!-- Download location label -->
     <string name="download_location">Unduh lokasi</string>
-    <!-- Text asking confirmation for download location -->
-    <string name="confirmation_download_location">Selalu simpan ke lokasi ini?</string>
     <!-- Action to show any file in its location -->
     <string name="view_in_folder_label">Lihat dalam folder</string>
     <!-- Title of a screen to browse files -->
@@ -2404,8 +2376,6 @@
     <string name="label_transfer_over_quota">Kuota transfer telah terlewati</string>
     <!-- Label indicating storage over quota -->
     <string name="label_storage_over_quota">Kuota penyimpanan terlewati</string>
-    <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
-    <string name="label_get_more_transfer_quota">Dapatkan kuota transfer lebih</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
     <string name="warning_node_not_exists_in_cloud">File tidak dapat ditemukan di Cloud drive anda.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
@@ -2494,8 +2464,6 @@
     <string name="option_cancel_transfer">Batalkan transfer</string>
     <!-- Message of a dialog to confirm the action of resume all transfers -->
     <string name="warning_message_resume_transfers">Batalkan jeda transfer untuk melanjutkan unggahan anda.</string>
-    <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
-    <string name="progress_size_indicator">%1$d%% dari %2$s</string>
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_enabled">Info debug untuk pesan obrolan diaktifkan</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
@@ -2562,8 +2530,6 @@
     </plurals>
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Pilih transfer</string>
-    <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Tidak dapat mengubah prioritas transfer “%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Kirim kunci dekripsi secara terpisah</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -2928,8 +2894,6 @@
     <string name="change_setting_action">Ubah pengaturan</string>
     <!-- Subtitle of the settings page where the start screen can be chosen. -->
     <string name="configure_start_screen">Konfigurasikan layar mulai default</string>
-    <!-- Homepage section. -->
-    <string name="home_section">Beranda</string>
     <!-- Action button which allows to show the recent activity. -->
     <string name="show_activity_action">Tampilkan aktivitas</string>
     <!-- Text informing the recent activity is hidden. -->
@@ -3006,20 +2970,8 @@
     <string name="upload_folder">Unggah folder</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Hapus sebagai tuan rumah</string>
-    <!-- Title message of existing subscription dialog -->
-    <string name="title_existing_subscription">Beli langganan baru?</string>
-    <!-- Text of buy new subscription button -->
-    <string name="button_buy_new_subscription">Beli langganan baru</string>
-    <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
-    <string name="message_subscription_from_android_platform">Anda sudah memiliki langganan. Jika anda membeli satu lagi anda akan dikenakan biaya dua kali. Untuk menghindarinya, batalkan langganan anda saat ini melalui %1$s. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
-    <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">Anda sudah berlangganan. Jika anda membeli yang lain, anda akan dikenakan biaya dua kali. Untuk menghindari hal ini, batalkan langganan anda saat ini dari akun Apple anda. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
-    <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
-    <string name="message_subscription_from_other_platform">Anda sudah memiliki langganan. Jika anda membeli satu lagi, anda akan dikenakan biaya dua kali. Untuk menghindarinya, batalkan langganan anda saat ini dengan membuka MEGA di browser web desktop atau seluler. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">Buka Pengaturan untuk memberikan izin MEGA untuk mengakses perangkat terdekat anda menggunakan Bluetooth.</string>
-    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
-    <string name="upgrade_billing_warning">Kami tidak dapat melanjutkan penagihan. Jika anda menggunakan aplikasi ganda, harap pertimbangkan untuk masuk ke MEGA tanpa itu. Jika tidak, coba perbarui melalui browser web anda.</string>
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">Langganan %1s</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
@@ -3266,14 +3218,8 @@
     <plurals name="num_folders_num_files_2">
         <item quantity="other">%1$d berkas</item>
     </plurals>
-    <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
-    <string name="account_upgrade_storage_label">[A]%1$s[/A] penyimpanan</string>
-    <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
-    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] pemindahan</string>
     <!-- Label of storage in My account section. -->
     <string name="account_storage_label">Penyimpanan</string>
-    <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
-    <string name="account_choose_free_limited_transfer_quota">kuota pemindahan [A]Terbatas[/A]</string>
     <!-- Name of hots or hosts in the meeting info bottom panel -->
     <plurals name="meeting_call_screen_meeting_info_bottom_panel_name_of_moderators">
         <item quantity="other">Tuan rumah: %s</item>
@@ -4116,38 +4062,12 @@
     <string name="album_import_error_access_description">Tautan ke album telah dihapus atau album telah dihapus. Hubungi orang yang membagikan tautan dengan anda.</string>
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">Audio</string>
-    <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_title_choose_right_plan">Pilih paket yang tepat untuk anda</string>
-    <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_monthly">Bulanan</string>
-    <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_yearly">Tahunan</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_label_save_up_to">Hemat hingga 16% dengan tagihan tahunan</string>
-    <!-- Description about how much storage user will get for specific plan. The placeholder %1$s will be replaced with storage size (e.g. 20GB or 4TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_storage">[B]Penyimpanan:[/B] [A]%1$s[/A]</string>
-    <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_transfer">[B]Pemindahan:[/B] [A]%1$s[/A]</string>
-    <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/bulan[/B]</string>
-    <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_yearly_price">[A]%1$s[/A]\n[B]%2$s/tahun[/B]</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">Disarankan</string>
     <!-- Title of label, which will be shown next to the plan user have already purchased. -->
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">Rencana saat ini</string>
-    <!-- Title of description of features, which are available for users, if they buy plan. -->
-    <string name="account_upgrade_account_description_title_features">Fitur paket Pro</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;Tautan yang dilindungi kata sandi</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;Tautan dengan tanggal kedaluwarsa</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;Pembagian kuota transfer</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Putar ulang hingga 90 hari data yang dihapus di Pro&#160;Lite dan hingga 180 hari pada Pro&#160;I, II, dan III</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Jadwalkan pembersihan tempat sampah antara 7 hari dan 10 tahun</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_lite">Beli Pro&#160;Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4188,8 +4108,6 @@
     <string name="album_import_rename_album_description">Sebuah album bernama “%1$s” sudah ada di Album anda. Masukkan nama baru untuk album yang anda simpan.</string>
     <!-- Album import enter album name -->
     <string name="album_import_enter_album_name">Masukkan nama album</string>
-    <!-- Text only shown, when user has current plan as Pro III. The part of string 'pricing page.' is a hyperlink to Mega pricing webpage - https://mega.io/pricing. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pricing_page_link_text">Anda dapat meningkatkan langganan anda saat ini di [A]halaman harga[/A] kami.</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
     <plurals name="cloud_drive_subtitle_links_access_user">
         <item quantity="other">Siapa pun yang memiliki tautan ini dapat melihat dan mengunduh data anda</item>
@@ -4240,8 +4158,6 @@
     <plurals name="meetings_schedule_meeting_recurrence_several_days_every_number_of_weeks_label">
         <item quantity="other">%1$s dan %2$s, setiap %3$d minggu</item>
     </plurals>
-    <!-- Snackbar, shown on Upgrade Account screen, when user has already recurring subscription and tries to tap on his current plan. -->
-    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">Anda sudah memiliki langganan berulang untuk paket ini</string>
     <!-- Album import storage exceeded title -->
     <string name="album_import_storage_exceeded_title">Tidak dapat menyimpan album</string>
     <!-- Album import storage exceeded description -->
@@ -4514,14 +4430,6 @@
     <string name="chat_chatroom_first_message_header_mega_info_text">MEGA melindungi komunikasi anda dengan sistem enkripsi tanpa pengetahuan kami yang memberikan jaminan keamanan penting:</string>
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_authenticity_info_text">Sistem memastikan bahwa data yang diterima berasal dari pengirim yang ditampilkan, dan isinya tidak dimanipulasi selama transit.</string>
-    <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_get_pro_title">Dapatkan lebih banyak dengan paket Pro</string>
-    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">Tingkatkan ke paket Pro dan dapatkan lebih banyak penyimpanan dan akses ke fitur Pro. Rencana mulai dari serendah %1$s sebulan.</string>
-    <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_storage">Fleksibilitas penyimpanan terbaik</string>
-    <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
-    <string name="dialog_onboarding_button_view_pro_plan">Tingkatkan ke Pro hari ini</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s sedang mempresentasikan</string>
     <!-- Warning indicating that a participant is sharing the screen-->
@@ -4542,8 +4450,6 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s berhenti merekam</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Galeri</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Iklan&#160;gratis</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
     <string name="meetings_sharing_meeting_link_meeting_invite_subject">Undangan pertemuan MEGA</string>
     <!-- Text when sharing a meeting link indicating that a participant is inviting you to the meeting. The placeholder is to include the full name of the invitation sender -->
@@ -4596,8 +4502,6 @@
     <string name="meetings_muted_all_participants_snackbar_message">Anda telah membisukan semua peserta</string>
     <!-- Message of the snackbar displayed when you have been muted. The placeholder is for the name of who muted you -->
     <string name="meetings_muted_by_a_participant_snackbar_message">Anda telah dibisukan oleh %s</string>
-    <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_account_description_subscription_title">Detail langganan</string>
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Izinkan akses ke Galeri anda</string>
     <!-- Button text to grant permission in the chat bottom sheet -->
@@ -4652,14 +4556,6 @@
     <string name="meetings_change_sfu_dialog_action_button">Ganti</string>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
     <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]Paket gratis anda memiliki batas 60 menit untuk rapat. Pengguna pro memiliki panggilan tak terbatas dan hingga 1000 peserta.[/A] [B]Tingkatkan sekarang.[/B]</string>
-    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">Anda akan dikenakan biaya %1$s segera dan langganan anda akan diperpanjang secara otomatis setelah 1&#160;bulan untuk %2$s per bulan. Akun Google&#160;Play anda akan dikenakan biaya untuk pembaruan dalam waktu 24&#160;jam setelah akhir setiap periode penagihan. Untuk membatalkan langganan anda, anda harus menonaktifkan perpanjangan otomatis langganan MEGA&#160;Pro anda setidaknya 24&#160;jam sebelum akhir periode penagihan anda melalui Langganan di [A]Google&#160;Play[/A].\nDengan memutakhirkan akun anda, anda menyetujui [B]Ketentuan Layanan[/B] dan [C]Kebijakan Privasi[/C] MEGA.</string>
-    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">Anda akan dikenakan biaya %1$s segera dan langganan anda akan diperpanjang secara otomatis setelah 12&#160;bulan untuk %2$s per tahun. Akun Google&#160;Play anda akan dikenakan biaya untuk pembaruan dalam waktu 24&#160;jam setelah akhir setiap periode penagihan. Untuk membatalkan langganan anda, anda harus menonaktifkan perpanjangan otomatis langganan MEGA&#160;Pro anda setidaknya 24&#160;jam sebelum akhir periode penagihan anda melalui Langganan di [A]Google&#160;Play[/A].\nDengan memutakhirkan akun anda, anda menyetujui [B]Ketentuan Layanan[/B] dan [C]Kebijakan Privasi[/C] MEGA.</string>
-    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in monthly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">Anda akan ditagih segera dan langganan anda akan diperpanjang secara otomatis setelah 1&#160;bulan. Akun Google&#160;Play anda akan dikenakan biaya untuk pembaruan dalam waktu 24&#160;jam setelah akhir setiap periode penagihan. Untuk membatalkan langganan anda, anda harus menonaktifkan perpanjangan otomatis langganan MEGA&#160;Pro anda setidaknya 24&#160;jam sebelum akhir periode penagihan anda melalui Langganan di [A]Google&#160;Play[/A].\nDengan memutakhirkan akun anda, anda menyetujui [B]Ketentuan Layanan[/B] dan [C]Kebijakan Privasi[/C] MEGA.</string>
-    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in yearly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">Anda akan ditagih segera dan langganan anda akan diperpanjang secara otomatis setelah 12&#160;bulan. Akun Google&#160;Play anda akan dikenakan biaya untuk pembaruan dalam waktu 24&#160;jam setelah akhir setiap periode penagihan. Untuk membatalkan langganan anda, anda harus menonaktifkan perpanjangan otomatis langganan MEGA&#160;Pro anda setidaknya 24&#160;jam sebelum akhir periode penagihan anda melalui Langganan di [A]Google&#160;Play[/A].\nDengan memutakhirkan akun anda, anda menyetujui [B]Ketentuan Layanan[/B] dan [C]Kebijakan Privasi[/C] MEGA.</string>
     <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_title">Akun bisnis dinonaktifkan</string>
     <!-- The body of the Dialog shown to a suspended Business Account Sub-User -->
@@ -4668,10 +4564,6 @@
     <string name="account_business_account_deactivated_dialog_admin_body">Akun Bisnis anda telah dinonaktifkan karena kegagalan pembayaran. Anda hanya dapat menelusuri data anda.\nUntuk melakukan pembayaran dan mengaktifkan kembali langganan anda, masuk ke MEGA melalui browser.</string>
     <!-- The button of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_button">OK, mengerti</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to host call or meetings without any restrictions. -->
-    <string name="account_upgrade_account_description_feature_meetings">&#8226;&#160;Selenggarakan panggilan dan rapat dengan peserta tak terbatas dan tanpa batasan waktu</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to use MEGA VPN product. -->
-    <string name="account_upgrade_account_description_feature_vpn">&#8226;&#160;Tetap pribadi online dengan VPN berkecepatan tinggi kami</string>
     <!-- The body of the Dialog shown to upgrade meeting from the free version -->
     <string name="meetings_in_call_warning_dialog_body">Butuh lebih banyak waktu? Paket Pro memiliki panggilan tak terbatas.</string>
     <!-- The negative button text of the Dialog shown to upgrade meeting from the free version -->
@@ -4706,8 +4598,6 @@
     <plurals name="hidden_nodes_result_message">
         <item quantity="other">%1$d item tersembunyi</item>
     </plurals>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be prioritised when customer support is needed. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_priority_support">&#8226; &#160; Dukungan prioritas</string>
     <!-- The title of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_title">Tingkatkan ke Pro untuk mendapatkan panggilan tak terbatas</string>
     <!-- The body of the Upgrade bottom sheet dialog  -->

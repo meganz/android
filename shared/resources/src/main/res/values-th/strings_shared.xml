@@ -72,14 +72,6 @@
     <string name="general_sync_local_filesystem_mismatch">ไฟล์ในโฟลเดอร์นี้ไม่สามารถซิงค์หรือสำรองข้อมูลได้ คุณต้องเปิดใช้งานการซิงค์หรือการสำรองข้อมูลใหม่จากแอปบนเดสก์ท็อปก่อน</string>
     <!-- Warning message to display when sync has been paused due a low battery level -->
     <string name="general_message_sync_paused_low_battery_level">การซิงค์ถูกหยุดไว้ชั่วคราว เนื่องจากมีระดับแบตเตอรี่ต่ำ ชาร์จแบตเตอรี่เพื่อดำเนินการซิงค์ต่อ</string>
-    <!-- Title for File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_file_sharing">แชร์ไฟล์ได้ง่าย ปลอดภัย ไร้กังวล</string>
-    <!-- Description about File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_file_sharing">แชร์ไฟล์ใหญ่ ๆ สบายใจด้วยโควต้าการโอนถ่ายที่จุใจ พร้อมทั้งมั่นใจในความปลอดภัยด้วยลิงก์ที่ป้องกันด้วยรหัสผ่าน</string>
-    <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_backup_rewind">ไม่มีพลาดทุกข้อมูลสำคัญของคุณ</string>
-    <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">ย้อนกลับไฟล์และโฟลเดอร์ไปยังวันที่ใดก็ได้ในช่วง 180 วันที่ผ่านมา ช่วยให้ข้อมูลของคุณปลอดภัยจากเหตุไม่คาดคิดและการแก้ไขโดยไม่ได้รับอนุญาต</string>
     <!-- Search drop down chips filter type file type -->
     <string name="search_dropdown_chip_filter_type_file_type">ประเภท</string>
     <!-- Search drop down chips filter type file type images -->
@@ -196,14 +188,6 @@
     <string name="general_size_giga_byte">%1$s</string>
     <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
     <string name="general_free_plan_name">ฟรี</string>
-    <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
-    <string name="dialog_onboarding_transfer_quota_free_limited">ถูกจำกัด</string>
-    <!-- Description of the price for Free account. The meaning: this type of account is for free. This string won't be used for name of Free account. -->
-    <string name="dialog_onboarding_free_account_price">ฟรี</string>
-    <!-- Continue button on Onboarding dialog, the user will proceed with payment for chosen account. -->
-    <string name="dialog_onboarding_button_continue">ดำเนินการต่อ</string>
-    <!-- Title of navigation bar on Onboarding dialog. -->
-    <string name="dialog_onboarding_app_bar_title">เลือกแผน MEGA ของคุณ</string>
     <!-- Header of the Info view field for what is the content of a device/folder -->
     <string name="info_content">จำนวน</string>
     <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
@@ -236,14 +220,12 @@
     <string name="general_giga_byte_standalone">GB</string>
     <!-- Size unit in terabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
     <string name="general_tera_byte_standalone">TB</string>
-    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
-    <string name="dialog_onboarding_feature_storage_description">เริ่มต้นที่ %1$s&#160;%2$s เลือกขนาดพื้นที่เก็บข้อมูลให้เหมาะกับคุณ</string>
     <!-- Title of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_title">พื้นที่จัดเก็บข้อมูลไม่เพียงพอ</string>
     <!-- Body text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_body">โฟลเดอร์นี้มีขนาดใหญ่เกินกว่าพื้นที่เก็บข้อมูล MEGA ของคุณ หากต้องการซิงค์โฟลเดอร์นี้ คุณต้องเพิ่มพื้นที่ว่างในบัญชี MEGA ของคุณ หรืออัปเกรดเป็นแผนที่มีพื้นที่เก็บข้อมูลมากกว่าเดิม</string>
     <!-- Confirm button text of the insufficient storage error dialog -->
-    <string name="sync_error_dialog_insufficient_storage_confirm_button">ดูแผนการ</string>
+    <string name="sync_error_dialog_insufficient_storage_confirm_button">ดูแผนราคา</string>
     <!-- Cancel button text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_cancel_button">ไม่ใช่ตอนนี้</string>
     <!-- Title of the insufficient storage error banner -->
@@ -278,12 +260,6 @@
     <string name="file_info_information_snackbar_description_added">เพิ่มคำอธิบายแล้ว</string>
     <!-- Description updated snack bar for the file info information screen-->
     <string name="file_info_information_snackbar_description_updated">อัปเดตคำอธิบายแล้ว</string>
-    <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_title_additional_features">นอกจากนี้ยังมีสิทธิพิเศษอื่น ๆ เพิ่มเติม เช่น:</string>
-    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;โทรและประชุมได้ไม่จำกัด\n&#8226;&#160;ซิงค์โฟลเดอร์บนอุปกรณ์มือถือของคุณโดยอัตโนมัติ \n&#8226;&#160;ไม่มีโฆษณา</string>
-    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;โทรและประชุมได้ไม่จำกัด\n&#8226;&#160;ซิงค์โฟลเดอร์บนอุปกรณ์มือถือของคุณโดยอัตโนมัติ</string>
     <!-- Text for the Sync solved issues list empty state -->
     <string name="device_center_sync_solved_issues_empty_state_text">ปัญหาทั้งหมดได้รับการแก้ไขแล้ว</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
@@ -293,11 +269,9 @@
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">โฟลเดอร์อัปโหลดจากกล้องของคุณ และการอัปโหลดสื่อจากโฟลเดอร์อื่นไม่สามารถอยู่ในโฟลเดอร์เดียวกันได้ เลือกโฟลเดอร์อื่น</string>
     <!-- The confirmation Button text of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">โอเค เข้าใจแล้ว</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">ปิด</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
     <string name="general_no_picker_warning">อุปกรณ์นี้ไม่มีแอปจัดการไฟล์สำหรับให้เลือกโฟลเดอร์</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;ซิงค์โฟลเดอร์บนอุปกรณ์มือถือของคุณโดยอัตโนมัติ</string>
     <!-- Hidden items -->
     <string name="hidden_items">รายการที่ถูกซ่อน</string>
     <!-- Label to indicate that is a Pro only feature -->
@@ -333,7 +307,7 @@
     <!-- Column header in the feature comparison table -->
     <string name="account_cancel_account_screen_plan_feature">ฟีเจอร์</string>
     <!-- Column header indicating features available with the free plan -->
-    <string name="account_cancel_account_screen_plan_free_plan">Free</string>
+    <string name="account_cancel_account_screen_plan_free_plan">ฟรี</string>
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">พื้นที่เก็บข้อมูล</string>
     <!-- Row label for transfer feature in the comparison table -->
@@ -774,10 +748,6 @@
     <string name="general_drive">ไดร์ฟ</string>
     <!-- Tab bar title of Syncs tab -->
     <string name="general_syncs">ซิงค์</string>
-    <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
-    <string name="transfers_completed_one_read_error_retrying">การอัปโหลดของคุณไม่สามารถดำเนินการต่อหรือลองใหม่อีกครั้งได้ เนื่องจาก MEGA ไม่สามารถเข้าถึงไฟล์ได้อีกต่อไป</string>
-    <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
-    <string name="transfers_completed_some_read_error_retrying">การอัปโหลดไฟล์บางส่วนหรือทั้งหมดของคุณไม่สามารถทำสำเร็จหรือลองใหม่อีกครั้งได้ เนื่องจากแอป MEGA ไม่ได้รับอนุญาตให้เข้าถึงไฟล์เหล่านั้นอีกต่อไป</string>
     <!-- Title for Offline Folder exposed via SAF -->
     <string name="general_mega_offline">ไฟล์ออฟไลน์ MEGA</string>
     <!-- Notification content for download final notification. It will inform the user about the location where file/s were downloaded -->
@@ -876,8 +846,6 @@
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">กำลังบันทึก %1$s ไปยังคลาว์ไดร์ฟ&#8230;</string>
-    <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">ระบบจะเรียกเก็บค่าบริการ %1$s ทันที แต่การสมัครใช้งานของคุณจะไม่ได้รับการต่ออายุโดยอัตโนมัติหลังจาก 12 เดือน เนื่องจากข้อกำหนดของรัฐบาล ผู้ใช้จะต้องดำเนินการต่ออายุการสมัครใช้งานด้วยตนเองเมื่อหมดอายุ ผู้ใช้สามารถจัดการหรือยกเลิกการสมัครใช้งานได้ทุกเมื่อผ่านเมนูการสมัครใช้บริการใน [A]Google&#160;Play[/A] เมื่อผู้ใช้ทำการอัปเกรดบัญชี แสดงว่าผู้ใช้ยอมรับ[B]เงื่อนไขการให้บริการ[/B]และ[C]นโยบายความเป็นส่วนตัว[/C]ของ MEGA</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">กำลังอัปโหลด&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
@@ -1106,8 +1074,6 @@
     <string name="free_plan_card_title">เริ่มต้นใช้งานแผนฟรีของเรา</string>
     <!-- Description for the Free Plan card -->
     <string name="free_plan_card_description">คุณไม่จำเป็นต้องสมัครแผนแบบชำระเงินทันที แผนบริการฟรีของเรามีพื้นที่จัดเก็บและโควตาการถ่ายโอนให้มากมาย</string>
-    <!-- Feature text for Free Plan storage -->
-    <string name="free_plan_card_storage_feature">พื้นที่จัดเก็บ 20 GB</string>
     <!-- Feature text for Free Plan transfer quota -->
     <string name="free_plan_card_transfer_feature">การถ่ายโอนข้อมูลจำกัด</string>
     <!-- Button text for Free Plan card -->
@@ -1123,7 +1089,7 @@
     <!-- Description for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_desc">คนที่คุณแชร์รายการด้วยสามารถใช้โควต้าของคุณเพื่อดาวน์โหลดและสตรีมไฟล์ได้</string>
     <!-- Title for MEGA VPN feature -->
-    <string name="pro_plan_feature_vpn_title">ได้สิทธิ์ใช้งาน MEGA&#160;VPN</string>
+    <string name="pro_plan_feature_vpn_title">MEGA&#160;VPN</string>
     <!-- Description for MEGA VPN feature -->
     <string name="pro_plan_feature_vpn_desc">ปลอดภัยบนออนไลน์ด้วย VPN ความเร็วสูงของเราที่ทั้งเร็วและใช้งานง่าย</string>
     <!-- Title for MEGA Pass feature -->
@@ -1140,8 +1106,6 @@
     <string name="pro_plan_benefit_password_protected_links">ป้องกันลิงก์ด้วยรหัสผ่านได้</string>
     <!-- Benefit: Links with expiry dates -->
     <string name="pro_plan_benefit_links_with_expiry_dates">ตั้งค่าลิงก์ให้หมดอายุได้</string>
-    <!-- Benefit: Transfer quota sharing -->
-    <string name="pro_plan_benefit_transfer_quota_sharing">การแชร์โควต้าการถ่ายโอน</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
     <string name="pro_plan_benefit_auto_sync_mobile">ซิงค์โฟลเดอร์ในอุปกรณ์มือถือของคุณโดยอัตโนมัติ</string>
     <!-- Benefit: Rewind up to 180 days of deleted data -->
@@ -1162,10 +1126,6 @@
     <string name="choose_account_screen_get_more_with_pro_plan_title">รับสิทธิประโยชน์เพิ่มเติมด้วยการอัปเกรดเป็นแผน Pro</string>
     <!-- Maybe later button text in the choose account screen-->
     <string name="choose_account_screen_maybe_later_button_text">ไว้ทีหลัง</string>
-    <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_monthly">รายเดือน</string>
-    <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_yearly">รายปี</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_label_save_up_to">ถ้าเลือกเก็บเงินทุกปี จะประหยัดได้สูงสุดถึง 16%</string>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
@@ -1174,8 +1134,6 @@
     <string name="choose_account_screen_transfer_quota_label">ถ่ายโอนข้อมูล %1$s</string>
     <!-- General month label -->
     <string name="general_month">/เดือน</string>
-    <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
-    <string name="choose_account_screen_currency_per_month">%1$s ต่อเดือน</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
     <string name="choose_account_screen_billed_yearly">%1$s ต่อปี</string>
     <!-- The snackbar message of unhidden nodes operation -->
@@ -1200,8 +1158,6 @@
     <string name="text_start_mega_vpn_free_trial">พื้นที่เก็บข้อมูล %1$s ใช้งานได้ถาวร</string>
     <!-- title of the section for start mega pass free trial in achivements section -->
     <string name="title_start_mega_pass_free_trial">เริ่มทดลองใช้ MEGA&#160;Pass ฟรี</string>
-    <!-- Text of the section for start mega pass free trial in achivements section -->
-    <string name="text_start_mega_pass_free_trial">พื้นที่เก็บข้อมูล %1$s ใช้งานได้ถาวร</string>
     <!-- Text of the button for install mega vpn in achivements section -->
     <string name="button_text_install_mega_vpn">ติดตั้ง MEGA&#160;VPN</string>
     <!-- Text of the button for install mega pass in achivements section -->
@@ -1243,7 +1199,7 @@
     <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
     <string name="transfers_storage_and_transfer_quota_banner_title">รับพื้นที่จัดเก็บและโควตาการถ่ายโอนเพิ่ม</string>
     <!-- Title for help centre -->
-    <string name="general_help_centre">ศูนย์ความช่วยเหลือ</string>
+    <string name="general_help_centre">ศูนย์ช่วยเหลือ</string>
     <!-- Warning informing the transfers queue has been paused -->
     <string name="transfers_all_transfers_paused_warning">หยุดการโอนข้อมูลทั้งหมดชั่วคราวแล้ว</string>
     <!-- Button for resuming the transfers queue -->
@@ -1251,7 +1207,7 @@
     <!-- Sync over quota warning title -->
     <string name="sync_storage_over_quota_warning_title">การซิงค์ถูกหยุดไว้ชั่วคราว เนื่องจากพื้นที่เก็บข้อมูลใน MEGA ของคุณเต็มแล้ว</string>
     <!-- Label for contacts -->
-    <string name="general_section_contacts">ผู้ติดต่อ</string>
+    <string name="general_section_contacts">รายชื่อผู้ติดต่อ</string>
     <!-- Label for achievements -->
     <string name="general_section_achievements">ความสำเร็จ</string>
     <!-- Label for device centre -->
@@ -1321,21 +1277,21 @@
     <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
     <string name="node_option_move_to_rubbish_bin">ย้ายไปที่ถังขยะ</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
-    <string name="file_properties_available_offline">ออฟไลน์</string>
+    <string name="file_properties_available_offline">บันทึกไว้ออฟไลน์</string>
     <!-- Menu item to unselect all the elements of a list -->
     <string name="action_unselect_all">ล้างรายการที่เลือกไว้</string>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
-    <string name="rubbish_bin_bottom_menu_option_delete">ลบอย่างถาวร</string>
+    <string name="rubbish_bin_bottom_menu_option_delete">ลบทิ้งถาวร</string>
     <!-- option to dispute taken down file or folder -->
-    <string name="dispute_takendown_file">ระงับข้อพิพาท</string>
+    <string name="dispute_takendown_file">ยื่นคำโต้แย้งการแจ้งให้ลบเนื้อหา</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
     <string name="title_edit_profile_info">แก้ไข</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
-    <string name="file_properties_favourite">รายการโปรด</string>
+    <string name="file_properties_favourite">เพิ่มในรายการโปรด</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">ข้อมูล</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">ป้ายชื่อ</string>
+    <string name="file_properties_label">ป้ายกำกับ</string>
     <!-- Title alert before leaving a share. -->
     <string name="alert_leave_share">ออกจากโฟลเดอร์</string>
     <!-- Option of the sliding panel to edit the link of a node -->
@@ -1347,13 +1303,13 @@
     <!-- Item menu option to reproduce audio or video in external reproductors -->
     <string name="external_play">เปิดด้วย</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
-    <string name="file_properties_unfavourite">ลบรายการโปรด</string>
+    <string name="file_properties_unfavourite">ลบออกจากรายการโปรด</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_remove_link_menu">เอาลิงก์ออก</string>
     <!-- Menu option to delete one or multiple selected items. -->
     <string name="general_remove">ลบออก</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_clean_shares_menu">ลบแชร์ออก</string>
+    <string name="context_clean_shares_menu">ลบการแชร์ออก</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_rename">เปลี่ยนชื่อ</string>
     <!-- Menu option to restore an item from the Rubbish bin -->
@@ -1385,7 +1341,7 @@
     <!-- Stop Backup confirmation dialog button option 1 text -->
     <string name="sync_stop_backup_confirm_dialog_delete_permanently">ลบโฟลเดอร์ออกจาก MEGA</string>
     <!-- Title of the Camera Uploads complete banner in Photos -->
-    <string name="camera_uploads_banner_complete_title">การอัปโหลดกล้องเสร็จสมบูรณ์</string>
+    <string name="camera_uploads_banner_complete_title">อัปโหลดจากกล้องเสร็จสมบูรณ์</string>
     <!-- Message of the Camera Uploads no full access warning banner in Photos -->
     <string name="camera_uploads_banner_no_full_access_message">เพื่อให้มั่นใจว่าคุณจะไม่พลาดทุกความทรงจำ MEGA ต้องการสิทธิ์เข้าถึงแกลเลอรี่รูปภาพของคุณแบบเต็มที่</string>
     <!-- Message of notice that the zip file format is error -->
@@ -1411,7 +1367,7 @@
     <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
     <string name="intent_not_available_file">คุณอาจไม่ได้ติดตั้งแอปใด ๆ ที่สนับสนุนไฟล์ประเภทนี้</string>
     <!-- Text to inform the user when an error occurs -->
-    <string name="general_text_error">เกิดข้อผิดพลาด กรุณาลองอีกครั้ง</string>
+    <string name="general_text_error">เกิดข้อผิดพลาด ลองใหม่อีกครั้ง</string>
     <!-- Name for a general label which action is "Select or create new folder" -->
     <string name="general_select_create_folder">เลือกหรือสร้างโฟลเดอร์ใหม่</string>
     <!-- Snackbar message when backup is moved to a cloud drive folder -->
@@ -1429,7 +1385,7 @@
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_last_modified_file_explanation">ไฟล์ที่อัปเดตล่าสุดจะมาแทนที่ไฟล์เก่าในทั้งสองตำแหน่ง</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict</string>
+    <string name="sync_stalled_issue_general_explanation">จะใช้การดำเนินการนี้เพื่อแก้ไขข้อขัดแย้ง</string>
     <!-- Dialog choose option -->
     <string name="general_dialog_choose_button">เลือก</string>
     <!-- Text label of Apply to all -->
@@ -1478,4 +1434,117 @@
     <string name="sign_up_last_name_text_field_char_limit_exceed_error">นามสกุลต้องมีความยาวไม่เกิน 40 ตัวอักษร</string>
     <!-- Error message when IP has already sent an issue report and needs to wait -->
     <string name="report_issue_too_many_times_error">คุณเพิ่งส่งรายงานปัญหาไปเมื่อไม่ถึง 10 นาทีที่แล้ว กรุณารออีกสักครู่ก่อนลองใหม่อีกครั้ง หรือติดต่อ %1$s เพื่อรับความช่วยเหลือ</string>
+    <!-- The snackbar message for informing the user about the invitation is trying to sent, is already in the received contact requests because the user already invited them. -->
+    <string name="contacts_invite_already_received">ผู้ใช้งานคนนี้เคยส่งคำเชิญให้คุณแล้ว</string>
+    <!-- The snackbar message for informing the user about the invitations is trying to sent, are already in the received contact requests because the users already invited them. -->
+    <string name="contacts_invites_already_received">ทุกคนที่คุณเชิญได้ส่งคำเชิญให้คุณแล้วทั้งหมด</string>
+    <!-- The snackbar message for informing the user about the invitations are correctly sent. -->
+    <string name="contacts_invites_sent">ส่งคำเชิญแล้ว และรายชื่อจะปรากฏใน ผู้ติดต่อ ของคุณเมื่อพวกเขาตอบรับ</string>
+    <!-- The snackbar message for informing the user about some invitations correctly sent, but not others because they are already in the received contact requests because the users already invited them. -->
+    <plurals name="contacts_invites_sent_but_others_already_received">
+        <item quantity="other">ส่งคำเชิญแล้ว %1$d คน แต่มีบางคนในรายชื่อที่เคยส่งคำเชิญให้คุณแล้ว</item>
+    </plurals>
+    <!--  Error shown when the user tries to resend the sign up link multiple times at once. -->
+    <string name="resend_signup_link_error">ส่งอีเมลไปแล้ว กรุณารอสักครู่ก่อนที่จะลองใหม่อีกครั้ง</string>
+    <!-- success message when renaming a node -->
+    <string name="context_correctly_renamed">เปลี่ยนชื่อรายการแล้ว</string>
+    <!-- Homepage section. -->
+    <string name="general_section_home">หน้าแรก</string>
+    <!-- Error message when removing public links of nodes. Plural. -->
+    <plurals name="context_link_removal_error">
+        <item quantity="other">ไม่สามารถลบลิงก์บางรายการได้ กรุณาลองใหม่อีกครั้งในภายหลัง</item>
+    </plurals>
+    <!-- Message when some public links were removed successfully. Plural. -->
+    <plurals name="context_link_removal_success">
+        <item quantity="other">เอาลิงก์ออกแล้ว</item>
+    </plurals>
+    <!-- Warning that appears prior to remove links of files. Plural. -->
+    <plurals name="remove_links_warning_text">
+        <item quantity="other">ลิงก์เหล่านี้จะไม่มีการเผยแพร่แบบสาธารณะอีกต่อไป</item>
+    </plurals>
+    <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
+    <string name="context_share_correctly_removed">แชร์ได้ถูกลบออกอย่างถูกต้องแล้ว</string>
+    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">ใช่</string>
+    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">ไม่</string>
+    <!-- error message when removing access of contact(s) to a selected folder -->
+    <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
+        <item quantity="other">ไม่สามารถลบผู้ติดต่อ %1$d รายออกจากการเข้าถึงได้</item>
+    </plurals>
+    <!-- Confirmation before removing the outgoing shares of a folder -->
+    <plurals name="confirmation_remove_outgoing_shares">
+        <item quantity="one">This folder is shared with %1$d contact. Stop sharing?</item>
+        <item quantity="other">This folder is shared with %1$d contacts. Stop sharing?</item>
+    </plurals>
+    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
+    <plurals name="alert_remove_several_shares">
+        <item quantity="other"></item>
+    </plurals>
+    <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
+    <string name="figures_storage_referrals_achievements_text">%1$s extra storage for each invitation, valid for %2$d days</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with permanent valid duration -->
+    <string name="figures_storage_referrals_achievements_text_permanent">รับพื้นที่เพิ่ม %1$s สำหรับทุกคำเชิญ ไม่มีวันหมดอายุ</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to each achievement with dynamic valid duration -->
+    <string name="figures_storage_achievements_text">%1$s extra storage, valid for %2$d days</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to each achievement with permanent valid duration -->
+    <string name="figures_storage_achievements_text_permanent">พื้นที่เพิ่ม %1$s ไม่มีวันหมดอายุ</string>
+    <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with dynamic valid duration -->
+    <string name="figures_storage_achievements_awarded_text">%1$s storage bonus applied, valid for %2$d days</string>
+    <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with permanent valid duration -->
+    <string name="figures_storage_achievements_awarded_text_permanent">เพิ่มโบนัสพื้นที่เก็บข้อมูล %1$s ให้แล้ว ไม่มีวันหมดอายุ</string>
+    <!-- info paragraph about the achievement install megasync with dynamic valid duration -->
+    <string name="paragraph_info_achievement_install_desktop_dynamic_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid for %2$s days. The desktop app is available for Windows, macOS and Linux.</string>
+    <!-- info paragraph about the achievement install megasync with permanent valid duration -->
+    <string name="paragraph_info_achievement_install_desktop_permanent_duration">ติดตั้งแอป MEGA สำหรับเดสก์ท็อปเพื่อรับพื้นที่ฟรีเพิ่ม %1$s แบบไม่มีวันหมดอายุ แอปสำหรับเดสก์ท็อปพร้อมให้ใช้งานบน Windows, macOS และ Linux</string>
+    <!-- info paragraph about the achievement install mobile app with dynamic valid duration -->
+    <string name="paragraph_info_achievement_install_mobile_app_dynamic_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid for %2$s days. The mobile apps are available for iOS and Android.</string>
+    <!-- info paragraph about the achievement install mobile app with permanent valid duration -->
+    <string name="paragraph_info_achievement_install_mobile_app_permanent_duration">ติดตั้งแอป MEGA บนมือถือเพื่อรับพื้นที่ฟรีเพิ่ม %1$s แบบไม่มีวันหมดอายุ แอปสำหรับมือถือพร้อมให้ใช้งานบน iOS และ Android</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">These are backup folders and can only be shared as read-only</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">This is a backup folder and can only be shared as read-only</string>
+    <!-- Button to confirm the action of restarting one transfer-->
+    <string name="button_permission_info">ปิด</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">Backup folders are read-only</string>
+    <!-- dialog option continue in alert dialog -->
+    <string name="button_continue">ดำเนินการต่อ</string>
+    <!--Dialog title when the user selected is not on the contact list when sharing a node -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">ไม่สามารถตรวจสอบผู้ติดต่อได้</string>
+    <!--Dialog description when the user selected is not on the contact list when sharing a node -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">คุณไม่สามารถตรวจสอบ %s ได้เนื่องจากไม่ได้อยู่ในรายชื่อผู้ติดต่อของคุณ รอให้พวกเขาตอบรับคำเชิญของคุณก่อน</string>
+    <!-- Answer for confirmation dialog. -->
+    <string name="general_ok">ตกลง</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="general_leave">ออก</string>
+    <!-- Success message when left shared folders -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
+        <item quantity="other">ออกจากโฟลเดอร์ที่แชร์แล้ว %1$d โฟลเดอร์</item>
+    </plurals>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
+        <item quantity="other">มี %1$d โฟลเดอร์ที่ไม่สามารถออกจากโฟลเดอร์ที่แชร์ได้</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
+        <item quantity="other">ออกจากโฟลเดอร์ที่แชร์แล้ว %1$d โฟลเดอร์&#160;</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
+        <item quantity="other">และมีอีก %1$d โฟลเดอร์ที่ไม่สามารถออกจากโฟลเดอร์ที่แชร์ได้</item>
+    </plurals>
+    <!-- confirmation message before leaving some incoming shared folders -->
+    <plurals name="confirmation_leave_share_folder">
+        <item quantity="other">หากคุณออกจากโฟลเดอร์เหล่านี้ คุณจะไม่สามารถมองเห็นได้อีก</item>
+    </plurals>
+    <!-- Title of the dialog to choose permissions when sharing. -->
+    <string name="dialog_select_permissions">แชร์สิทธิ์</string>
+    <!-- Refers to access rights for a file folder. -->
+    <string name="file_properties_shared_folder_full_access">เข้าถึงแบบเต็มที่</string>
+    <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
+    <string name="file_properties_shared_folder_read_only">อ่านอย่างเดียว</string>
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
+    <string name="file_properties_shared_folder_read_write">อ่านและเขียน</string>
 </resources>

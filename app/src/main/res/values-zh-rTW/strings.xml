@@ -1027,10 +1027,6 @@
     <string name="option_to_retry_transfers">重試所有傳輸</string>
     <!-- Button to confirm the action of restarting one transfer -->
     <string name="button_resume_individual_transfer">恢復</string>
-    <!-- Dialog to confirm before removing completed transfers -->
-    <string name="confirmation_to_clear_completed_transfers">要清空所有的傳輸嗎？</string>
-    <!-- Title of the tab section for transfers in progress -->
-    <string name="title_tab_in_progress_transfers">進行中</string>
     <!-- Title of the tab section for completed transfers -->
     <string name="title_tab_completed_transfers">完成</string>
     <!-- Text shown in playlist subtitle item when a file is reproducing but it is paused -->
@@ -1043,8 +1039,6 @@
     <string name="transfer_retrying">重試中</string>
     <!-- Possible state of a transfer. When the transfer was cancelled -->
     <string name="transfer_cancelled">已取消</string>
-    <!-- Possible state of a transfer -->
-    <string name="transfer_unknown">未知</string>
     <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
     <string name="upload_service_notification">正在上傳檔案：%2$d之%1$d個</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
@@ -1223,10 +1217,6 @@
     <string name="title_properties_contact_notifications_for_chat">對話訊息通知</string>
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">邀請朋友以獲得獎勵</string>
-    <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">每個邀請可獲得%1$s儲存空間。有效期為365天。</string>
-    <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">%1$s儲存空間。有效期限365天。</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">已解鎖的獎勵</string>
     <!-- title of the section for unlocked storage quota -->
@@ -1257,10 +1247,6 @@
     <string name="subtitle_confirmation_invite_friends">邀請已發送</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">電子郵件地址格式錯誤</string>
-    <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">當您安裝MEGA桌面應用程式時，您可免費獲得%1$s的儲存空間，有效期為365天。 MEGA桌面應用程式可在Windows、macOS和大多數Linux發行版使用。</string>
-    <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">當您安裝MEGA手機應用程式時，您可以獲得%1$s免費儲存空間，有效期為365天。我們有提供iOS與Android版本的手機應用程式。</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">您已經安裝我們的MEGA桌面應用程式而獲得%1$s儲存空間過了。</string>
     <!-- info paragraph about the completed achievement install mobile app -->
@@ -1614,10 +1600,6 @@
     </plurals>
     <!-- title of the notification for a new incoming contact request -->
     <string name="title_new_contact_request_notification">新的聯絡人邀請</string>
-    <!-- Empty state message shown in the screen when there are not any active transfer -->
-    <string name="transfers_empty_new">[B]沒有進行中[/B]的[A]傳輸[/A]</string>
-    <!-- Empty state message shown in the screen when there are not any active transfer -->
-    <string name="completed_transfers_empty_new">[B]沒有已完成[/B]的[A]傳輸[/A]</string>
     <!-- Empty state text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder_new">[B]空[/B][A]資料夾[/A]</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
@@ -2058,10 +2040,6 @@
     <string name="message_error_set_title_get_link">在您生成對話連結之前，您需要先設定描述：</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
     <string name="chat_link_copied_clipboard">已複製連結到剪貼簿</string>
-    <!-- Label to show the price of each plan in the upgrade account section -->
-    <string name="type_month">[A]自[/A] %s / [A]月[/A] *</string>
-    <!-- the meaning of the asterisk in monthly* and annually* payment -->
-    <string name="upgrade_comment">*在下次自動更新日期前，自動續購可隨時取消。</string>
     <!-- Message shown when a call starts. -->
     <string name="call_started_messages">通話開始</string>
     <!-- Title of the dialog to inform about a SSL error -->
@@ -2070,10 +2048,6 @@
     <string name="ssl_error_dialog_text">MEGA無法使用SSL建立安全的連線。您可能使用具有額外要求的公共Wi-Fi網路。</string>
     <!-- Text of the empty screen for the notifications section -->
     <string name="context_empty_notifications">[B]沒有[/B][A]通知[/A]</string>
-    <!-- Permissions screen title -->
-    <string name="general_setup_mega">設定MEGA</string>
-    <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA需要您的授權才能存取您的檔案以使上傳或與他人共享。使用此應用程式提供的功能和服務可能需要允許其它選擇性的存取權限。\n\n如果您選擇不授予這些權限，您仍然可以使用應用程式，但無法使用需允許特定權限的功能。</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">允許存取相片、媒體與檔案</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -2388,8 +2362,6 @@
     </plurals>
     <!-- Download location label -->
     <string name="download_location">下載位址</string>
-    <!-- Text asking confirmation for download location -->
-    <string name="confirmation_download_location">總是儲存在此位置？</string>
     <!-- Action to show any file in its location -->
     <string name="view_in_folder_label">在資料夾中檢視</string>
     <!-- Title of a screen to browse files -->
@@ -2404,8 +2376,6 @@
     <string name="label_transfer_over_quota">已超出傳輸配額</string>
     <!-- Label indicating storage over quota -->
     <string name="label_storage_over_quota">已超出空間配額</string>
-    <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
-    <string name="label_get_more_transfer_quota">獲取更多傳輸配額</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
     <string name="warning_node_not_exists_in_cloud">在您的雲端硬碟中未找到此檔案。</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
@@ -2494,8 +2464,6 @@
     <string name="option_cancel_transfer">取消傳輸</string>
     <!-- Message of a dialog to confirm the action of resume all transfers -->
     <string name="warning_message_resume_transfers">取消暫停傳輸即可繼續上傳。</string>
-    <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
-    <string name="progress_size_indicator">%2$s之%1$d%%</string>
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_enabled">對話訊息除錯資訊已啟用</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
@@ -2562,8 +2530,6 @@
     </plurals>
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">選擇傳輸</string>
-    <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">無法更改傳輸「%1$s」的優先順序</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">單獨發送解密金鑰</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -2928,8 +2894,6 @@
     <string name="change_setting_action">變更設定</string>
     <!-- Subtitle of the settings page where the start screen can be chosen. -->
     <string name="configure_start_screen">設定預設開始畫面</string>
-    <!-- Homepage section. -->
-    <string name="home_section">首頁</string>
     <!-- Action button which allows to show the recent activity. -->
     <string name="show_activity_action">顯示動態</string>
     <!-- Text informing the recent activity is hidden. -->
@@ -3006,20 +2970,8 @@
     <string name="upload_folder">上傳資料夾</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">移除主持人權限</string>
-    <!-- Title message of existing subscription dialog -->
-    <string name="title_existing_subscription">購買新的訂閱？</string>
-    <!-- Text of buy new subscription button -->
-    <string name="button_buy_new_subscription">購買新的訂閱</string>
-    <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
-    <string name="message_subscription_from_android_platform">您目前已經有一個訂閱。如果再購買，您將被收取兩次費用。為避免重複訂閱，請透過%1$s來取消您目前的訂閱。造訪我們的幫助中心瞭解更多訊息。</string>
-    <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">您目前已經有一個訂閱。如果再購買，您將被收取兩次費用。為避免重複訂閱，請從您的Apple帳戶中取消您目前的訂閱。造訪我們的幫助中心瞭解更多訊息。</string>
-    <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
-    <string name="message_subscription_from_other_platform">您目前已經有一個訂閱。如果再購買，您將被收取兩次費用。為避免重複訂閱，請在電腦版或手機版網頁瀏覽器中登入MEGA來取消您目前的訂閱。造訪我們的幫助中心瞭解更多訊息。</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">前往設定並授予MEGA使用藍牙存取附近裝置的權限。</string>
-    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
-    <string name="upgrade_billing_warning">我們無法處理您的付款。如果您正在使用雙開應用程式，請嘗試不要使用它來登入MEGA。否則請透過網頁瀏覽器進行升級。</string>
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">%1s訂閱</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
@@ -3266,14 +3218,8 @@
     <plurals name="num_folders_num_files_2">
         <item quantity="other">%1$d個檔案</item>
     </plurals>
-    <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
-    <string name="account_upgrade_storage_label">[A]%1$s[/A]儲存空間</string>
-    <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
-    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A]傳輸配額</string>
     <!-- Label of storage in My account section. -->
     <string name="account_storage_label">儲存空間</string>
-    <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
-    <string name="account_choose_free_limited_transfer_quota">[A]有限制的[/A]傳輸配額</string>
     <!-- Name of hots or hosts in the meeting info bottom panel -->
     <plurals name="meeting_call_screen_meeting_info_bottom_panel_name_of_moderators">
         <item quantity="other">主持人：%s</item>
@@ -3379,7 +3325,7 @@
     <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_left_to_add_message">您已經將所有聯絡人加入此對話。如果您想加入更多與會者，請先邀請他們成為您的聯絡人。</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
-    <string name="media_player_video_snackbar_screenshot_saved">截圖已儲存到您裝置的相簿</string>
+    <string name="media_player_video_snackbar_screenshot_saved">截圖已儲存到您裝置的媒體庫</string>
     <!-- Album creation dialog title -->
     <string name="photos_album_creation_dialog_title">輸入相簿名稱</string>
     <!-- Album creation input name placeholder -->
@@ -3415,11 +3361,11 @@
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">每週%s</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_title">相片檢視</string>
+    <string name="settings_media_discovery_view_title">媒體檢視</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_context">以圖像檢視方式開啟僅包含圖片或影片的資料夾。以縮圖檢視方式瀏覽媒體，並按日期篩選。</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">由於此資料夾僅包含圖片和影片，我們已經自動在相簿檢視中將其開啟。您可以透過更沉浸式的外觀享受您的影像內容。您可以在設定中停用此功能。</string>
+    <string name="cloud_drive_media_discovery_banner_context">由於此資料夾僅包含圖片和影片，我們已經自動在媒體檢視中將其開啟。您可以透過更沉浸式的外觀享受您的影像內容。您可以在設定中停用此功能。</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">設定</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4116,38 +4062,12 @@
     <string name="album_import_error_access_description">相簿連結已被移除或相簿已被刪除。請聯繫與您共享連結的人。</string>
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">語音</string>
-    <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_title_choose_right_plan">選擇適合您的方案</string>
-    <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_monthly">每月</string>
-    <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_yearly">每年</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_label_save_up_to">按年計費最多可節省16%</string>
-    <!-- Description about how much storage user will get for specific plan. The placeholder %1$s will be replaced with storage size (e.g. 20GB or 4TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_storage">[B]空間：[/B][A]%1$s[/A]</string>
-    <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_transfer">[B]傳輸：[/B][A]%1$s[/A]</string>
-    <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/月[/B]</string>
-    <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_yearly_price">[A]%1$s[/A]\n[B]%2$s/年[/B]</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">推薦的</string>
     <!-- Title of label, which will be shown next to the plan user have already purchased. -->
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">目前方案</string>
-    <!-- Title of description of features, which are available for users, if they buy plan. -->
-    <string name="account_upgrade_account_description_title_features">Pro方案功能</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;受密碼保護的連結</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;為連結設定到期日期</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;傳輸配額共享</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Lite最多可回溯90天已刪除的資料，Pro&#160;I、II和III最多回溯180天</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;垃圾筒清理排程7天至10年</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_lite">購買Pro&#160;Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4188,8 +4108,6 @@
     <string name="album_import_rename_album_description">您的相簿中已存在名為「%1$s」的相簿。請為您要儲存的相簿輸入一個新名稱。</string>
     <!-- Album import enter album name -->
     <string name="album_import_enter_album_name">輸入相簿名稱</string>
-    <!-- Text only shown, when user has current plan as Pro III. The part of string 'pricing page.' is a hyperlink to Mega pricing webpage - https://mega.io/pricing. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pricing_page_link_text">您可以在我們的[A]定價頁面[/A]升級您目前的訂閱方案。</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
     <plurals name="cloud_drive_subtitle_links_access_user">
         <item quantity="other">任何擁有這些連結的人都可以查看和下載您的資料</item>
@@ -4240,8 +4158,6 @@
     <plurals name="meetings_schedule_meeting_recurrence_several_days_every_number_of_weeks_label">
         <item quantity="other">每%3$d週的%1$s和%2$s</item>
     </plurals>
-    <!-- Snackbar, shown on Upgrade Account screen, when user has already recurring subscription and tries to tap on his current plan. -->
-    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">您已經有此方案的定期訂閱</string>
     <!-- Album import storage exceeded title -->
     <string name="album_import_storage_exceeded_title">無法儲存相簿</string>
     <!-- Album import storage exceeded description -->
@@ -4461,9 +4377,9 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">原始檔</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">子資料夾中的相簿檢視</string>
+    <string name="settings_media_discovery_sub_folder_title">子資料夾中的媒體檢視</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">子資料夾中的圖片和影片也將包含在相簿檢視中。</string>
+    <string name="settings_media_discovery_sub_folder_context">子資料夾中的圖片和影片也將包含在媒體檢視中。</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">沒有搜尋結果</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -4514,14 +4430,6 @@
     <string name="chat_chatroom_first_message_header_mega_info_text">MEGA透過我們的零知識加密系統保護您的通訊，提供必要的安全保障：</string>
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_authenticity_info_text">我們的系統能確保收到的資料是來自所顯示的發送人，且其內容在傳輸過程中不會被篡改。</string>
-    <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_get_pro_title">透過Pro方案獲得更多功能</string>
-    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">升級到Pro方案可獲得更多儲存空間和獲得Pro功能的權限。方案一個月%1$s起。</string>
-    <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_storage">終極的儲存彈性</string>
-    <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
-    <string name="dialog_onboarding_button_view_pro_plan">立即升級到Pro</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s正在展示</string>
     <!-- Warning indicating that a participant is sharing the screen-->
@@ -4542,8 +4450,6 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s已停止錄製</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">相簿</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226; 無&#160;廣告&#160;</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
     <string name="meetings_sharing_meeting_link_meeting_invite_subject">MEGA會議邀請</string>
     <!-- Text when sharing a meeting link indicating that a participant is inviting you to the meeting. The placeholder is to include the full name of the invitation sender -->
@@ -4596,8 +4502,6 @@
     <string name="meetings_muted_all_participants_snackbar_message">您已將所有與會者設為靜音</string>
     <!-- Message of the snackbar displayed when you have been muted. The placeholder is for the name of who muted you -->
     <string name="meetings_muted_by_a_participant_snackbar_message">%s已將您設為靜音</string>
-    <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_account_description_subscription_title">訂閱詳情</string>
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">允許存取您的相簿</string>
     <!-- Button text to grant permission in the chat bottom sheet -->
@@ -4652,14 +4556,6 @@
     <string name="meetings_change_sfu_dialog_action_button">變更</string>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
     <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]您的免費方案有60分鐘的會議時間限制。Pro會員的通話時間不受限制，而且最多可容納1000位與會者。[/A][B]立即升級。[/B]</string>
-    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">您將立即被收取%1$s的費用，而且您的訂閱將在1&#160;個月後自動以每月%2$s續訂。您的Google&#160;Play帳戶將在每個計費週期結束後24&#160;小時內被收取續訂費用。若要取消訂閱，您必須在計費週期結束前至少24&#160;小時透過[A]Google&#160;Play[/A]中的訂閱停用MEGA&#160;Pro訂閱的自動續訂。\n升級您的帳戶即表示您同意MEGA的[B]服務條款[/B]和[C]隱私權政策[/C]。</string>
-    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">您將立即被收取%1$s的費用，而且您的訂閱將在12&#160;個月後自動以每年%2$s續訂。您的Google&#160;Play帳戶將在每個計費週期結束後24&#160;小時內被收取續訂費用。若要取消訂閱，您必須在計費週期結束前至少24&#160;小時透過[A]Google&#160;Play[/A]中的訂閱停用MEGA&#160;Pro訂閱的自動續訂。\n升級您的帳戶即表示您同意MEGA的[B]服務條款[/B]和[C]隱私權政策[/C]。</string>
-    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in monthly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">您將立即被收取費用，而且您的訂閱將在1&#160;個月後自動續訂。您的Google&#160;Play帳戶將在每個計費週期結束後24&#160;小時內被收取續訂費用。若要取消訂閱，您必須在計費週期結束前至少24&#160;小時透過[A]Google&#160;Play[/A]中的訂閱停用MEGA&#160;Pro訂閱的自動續訂。\n升級您的帳戶即表示您同意MEGA的[B]服務條款[/B]和[C]隱私權政策[/C]。</string>
-    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in yearly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">您將立即被收取費用，而且您的訂閱將在12&#160;個月後自動續訂。您的Google&#160;Play帳戶將在每個計費週期結束後24&#160;小時內被收取續訂費用。若要取消訂閱，您必須在計費週期結束前至少24&#160;小時透過[A]Google&#160;Play[/A]中的訂閱停用MEGA&#160;Pro訂閱的自動續訂。\n升級您的帳戶即表示您同意MEGA的[B]服務條款[/B]和[C]隱私權政策[/C]。</string>
     <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_title">商業帳戶已停用</string>
     <!-- The body of the Dialog shown to a suspended Business Account Sub-User -->
@@ -4668,10 +4564,6 @@
     <string name="account_business_account_deactivated_dialog_admin_body">由於付款失敗，您的商業帳戶已停用。您只能瀏覽您的資料。\n若要付款並重新啟用您的訂閱，請透過瀏覽器登入MEGA。</string>
     <!-- The button of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_button">好的，明白了</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to host call or meetings without any restrictions. -->
-    <string name="account_upgrade_account_description_feature_meetings">&#8226;&#160;主持通話和會議，與會人數和通話時間皆無限制。</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to use MEGA VPN product. -->
-    <string name="account_upgrade_account_description_feature_vpn">&#8226;&#160;使用我們的高速VPN保持線上隱私</string>
     <!-- The body of the Dialog shown to upgrade meeting from the free version -->
     <string name="meetings_in_call_warning_dialog_body">需要更多時間嗎？Pro方案的通話不受限制。</string>
     <!-- The negative button text of the Dialog shown to upgrade meeting from the free version -->
@@ -4706,8 +4598,6 @@
     <plurals name="hidden_nodes_result_message">
         <item quantity="other">已隱藏%1$d個項目</item>
     </plurals>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be prioritised when customer support is needed. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_priority_support">&#8226;&#160;優先支援</string>
     <!-- The title of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_title">升級到Pro方案可獲得無限的通話</string>
     <!-- The body of the Upgrade bottom sheet dialog  -->

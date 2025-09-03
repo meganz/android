@@ -604,9 +604,9 @@
     <!-- App means “Application” -->
     <string name="settings_about_app_version">Uygulama sürümü</string>
     <!-- Title of the label where the SDK version is shown -->
-    <string name="settings_about_sdk_version">MEGA SDK Sürümü</string>
+    <string name="settings_about_sdk_version">MEGA SDK sürümü</string>
     <!-- Title of the label where the MEGAchat SDK version is shown -->
-    <string name="settings_about_karere_version">MEGA Chat SDK Sürümü</string>
+    <string name="settings_about_karere_version">MEGA Chat SDK sürümü</string>
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">Kaynak kodunu görüntüle</string>
     <!-- title of the screen that shows the ZIP files -->
@@ -1045,10 +1045,6 @@
     <string name="option_to_retry_transfers">Tüm aktarımları tekrar dene</string>
     <!-- Button to confirm the action of restarting one transfer -->
     <string name="button_resume_individual_transfer">Devam et</string>
-    <!-- Dialog to confirm before removing completed transfers -->
-    <string name="confirmation_to_clear_completed_transfers">Tamamlanmış tüm aktarımlar temizlensin mi?</string>
-    <!-- Title of the tab section for transfers in progress -->
-    <string name="title_tab_in_progress_transfers">Devam edenler</string>
     <!-- Title of the tab section for completed transfers -->
     <string name="title_tab_completed_transfers">Tamamlananlar</string>
     <!-- Text shown in playlist subtitle item when a file is reproducing but it is paused -->
@@ -1061,8 +1057,6 @@
     <string name="transfer_retrying">Tekrar deneniyor</string>
     <!-- Possible state of a transfer. When the transfer was cancelled -->
     <string name="transfer_cancelled">İptal edildi</string>
-    <!-- Possible state of a transfer -->
-    <string name="transfer_unknown">Bilinmiyor</string>
     <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
     <string name="upload_service_notification">%2$d dosyadan %1$d tanesi yükleniyor</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
@@ -1251,10 +1245,6 @@
     <string name="title_properties_contact_notifications_for_chat">Sohbet bildirimleri</string>
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Arkadaşlarınızı davet edin ve ödüller kazanın</string>
-    <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">Her davet için %1$s depolama alanı. 365 gün geçerlidir.</string>
-    <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">%1$s depolama alanı. 365 gün geçerlidir.</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Kilidi açılmış ödüller</string>
     <!-- title of the section for unlocked storage quota -->
@@ -1276,7 +1266,7 @@
     <!-- subtitle of the advanced setting to choose the use of https -->
     <string name="setting_subtitle_use_https_only">Bu seçeneği yalnızca aktarımlarınız başlamazsa etkinleştirin. Normal koşullarda HTTP yeterlidir, çünkü tüm aktarımlar zaten şifrelenmiştir.</string>
     <!-- title of screen to invite friends and get an achievement -->
-    <string name="title_achievement_invite_friends">Nasıl çalışıyor</string>
+    <string name="title_achievement_invite_friends">Nasıl işliyor?</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
     <string name="first_paragraph_achievement_invite_friends">Arkadaşlarınızı ücretsiz bir MEGA hesabı oluşturmaya ve MEGA Mobil Uygulaması’nı yüklemeye davet edin. Her kaydolma ve uygulama yüklemesi için bonus olarak ücretsiz depolama alanı kazanın.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
@@ -1285,10 +1275,6 @@
     <string name="subtitle_confirmation_invite_friends">Davetiye gönderildi</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">E-posta adresi hatalı biçimlendirilmiş</string>
-    <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">MEGA Masaüstü Uygulamasını yüklediğinizde %1$s ücretsiz depolama alanı alırsınız (365 gün geçerli). MEGA Masaüstü Uygulaması Windows, macOS ve çoğu Linux dağıtımı için kullanılabilir.</string>
-    <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">MEGA Mobil Uygulamasını yüklediğinizde %1$s ücretsiz depolama alanı alırsınız (365 gün geçerli). iOS ve Android için mobil uygulamalar sunuyoruz.</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">MEGA Masaüstü Uygulamamızı yüklediğiniz için %1$s depolama alanı aldınız.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
@@ -1437,7 +1423,7 @@
     <!-- Text of the empty screen when there are not elements in Outgoing -->
     <string name="context_empty_outgoing">[B]Giden paylaşımlı klasör [/B][A]yok[/A]</string>
     <!-- Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string -->
-    <string name="context_empty_links">[B]Herkese açık bağlantılar [/B][A]yok[/A][B][/B]</string>
+    <string name="context_empty_links">[B]Herkese açık bağlantı [/B][A]yok[/A][B][/B]</string>
     <!-- Title of the sent requests tab. Capital letters -->
     <string name="tab_sent_requests">Gönderilen istekler</string>
     <!-- Title of the received requests tab. Capital letters -->
@@ -1654,10 +1640,6 @@
     </plurals>
     <!-- title of the notification for a new incoming contact request -->
     <string name="title_new_contact_request_notification">Yeni kişi isteği</string>
-    <!-- Empty state message shown in the screen when there are not any active transfer -->
-    <string name="transfers_empty_new">[B]Aktif aktarım[/B][A] yok[/A]</string>
-    <!-- Empty state message shown in the screen when there are not any active transfer -->
-    <string name="completed_transfers_empty_new">[B]Tamamlanmış aktarım[/B][A] yok[/A]</string>
     <!-- Empty state text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder_new">[B]Klasör[/B][A] boş[/A]</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
@@ -1984,7 +1966,7 @@
     <!-- Subtitle of the historic notification for a new contact -->
     <string name="notification_new_contact">[A]%s [/A][B]artık kişilerinizde.[/B]</string>
     <!-- Subtitle of the historic notification for a new shared folder -->
-    <string name="notification_new_shared_folder">[A]%s[/A] [B]kişisinden paylaşılan yeni klasör. [/B]</string>
+    <string name="notification_new_shared_folder">[A]%s[/A] [B]kişisinden paylaşılan yeni klasör var. [/B]</string>
     <!-- Subtitle of the historic notification for a reminder new contact request -->
     <string name="notification_reminder_contact_request">[A]Hatırlatma: [/A][B]%s [/B][C]kişilerinize eklenmek için size istek gönderdi.[/C]</string>
     <!-- Title of the historic notification for a contact request cancelled -->
@@ -2108,10 +2090,6 @@
     <string name="message_error_set_title_get_link">Bu sohbet için bir bağlantı oluşturmadan önce bir açıklama ayarlamanız gerekir:</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
     <string name="chat_link_copied_clipboard">Bağlantı panoya kopyalandı</string>
-    <!-- Label to show the price of each plan in the upgrade account section -->
-    <string name="type_month">[A]ayda *[/A] %s ile [A]başlayan fiyatlarla[/A]</string>
-    <!-- the meaning of the asterisk in monthly* and annually* payment -->
-    <string name="upgrade_comment">* Yinelenen abonelik, yenileme tarihinden önce herhangi bir zamanda iptal edilebilir.</string>
     <!-- Message shown when a call starts. -->
     <string name="call_started_messages">Arama başladı</string>
     <!-- Title of the dialog to inform about a SSL error -->
@@ -2120,10 +2098,6 @@
     <string name="ssl_error_dialog_text">MEGA, SSL kullanarak güvenli bir bağlantı kuramıyor. Ek gereksinimleri olan halka açık bir Wi-Fi ağında olabilirsiniz.</string>
     <!-- Text of the empty screen for the notifications section -->
     <string name="context_empty_notifications">[B]Bildirim[/B] [A]yok[/A]</string>
-    <!-- Permissions screen title -->
-    <string name="general_setup_mega">MEGA\’yı yapılandır</string>
-    <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA, başkalarıyla yüklemek veya paylaşmak için dosyalarınıza erişmek üzere izninize ihtiyaç duyar. Bu uygulamanın sağladığı özellikleri ve hizmetleri kullanmak için diğer isteğe bağlı erişim izinleri gerekebilir.\n\nBu izinleri vermemeyi seçerseniz belirli izinleri gerektiren işlevler dışında uygulamayı kullanmaya devam edebilirsiniz.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Fotoğraflara, medyaya ve dosyalara erişime izin verin</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -2449,8 +2423,6 @@
     </plurals>
     <!-- Download location label -->
     <string name="download_location">İndirme konumu</string>
-    <!-- Text asking confirmation for download location -->
-    <string name="confirmation_download_location">Her zaman bu konuma kaydedilsin mi?</string>
     <!-- Action to show any file in its location -->
     <string name="view_in_folder_label">Klasörde görüntüle</string>
     <!-- Title of a screen to browse files -->
@@ -2465,8 +2437,6 @@
     <string name="label_transfer_over_quota">Aktarım kotası aşıldı</string>
     <!-- Label indicating storage over quota -->
     <string name="label_storage_over_quota">Depolama kotası aşıldı</string>
-    <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
-    <string name="label_get_more_transfer_quota">Daha fazla aktarım kotası alın</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
     <string name="warning_node_not_exists_in_cloud">Dosya, Bulut depolamanızda bulunamıyor.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
@@ -2557,8 +2527,6 @@
     <string name="option_cancel_transfer">Aktarımı iptal et</string>
     <!-- Message of a dialog to confirm the action of resume all transfers -->
     <string name="warning_message_resume_transfers">Yüklemeye devam etmek için aktarımları duraklatın.</string>
-    <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
-    <string name="progress_size_indicator">%1$d%% / %2$s</string>
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_enabled">Sohbet mesajları için hata ayıklama bilgileri etkinleştirildi</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
@@ -2632,8 +2600,6 @@
     </plurals>
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Aktarımları Seç</string>
-    <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">“%1$s” aktarımının önceliği değiştirilemedi</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Şifre çözme anahtarını ayrı gönder</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3009,8 +2975,6 @@
     <string name="change_setting_action">Ayarı değiştir</string>
     <!-- Subtitle of the settings page where the start screen can be chosen. -->
     <string name="configure_start_screen">Varsayılan başlangıç ekranını yapılandırın</string>
-    <!-- Homepage section. -->
-    <string name="home_section">Ana sayfa</string>
     <!-- Action button which allows to show the recent activity. -->
     <string name="show_activity_action">Etkinliği göster</string>
     <!-- Text informing the recent activity is hidden. -->
@@ -3032,7 +2996,7 @@
     <!-- Title of the dialog warning the user about disable file versioning. -->
     <string name="disable_versioning_label">Dosya sürümlemeyi devre dışı bırak</string>
     <!-- Warning of the dialog informing the user about disable file versioning. -->
-    <string name="disable_versioning_warning">Dosya sürümü oluşturma özelliğimiz, daha yeni sürümlerle değiştirirseniz dosyalarınızın eski kopyalarını saklamamızı sağlar. Dosya sürümünü devre dışı bırakırsanız artık bu korumaya sahip olmazsınız; değiştirdiğinizde eski kopya kaybolacaktır.</string>
+    <string name="disable_versioning_warning">Dosya sürümleme özelliğimiz, daha yeni sürümlerle değiştirirseniz dosyalarınızın eski kopyalarını saklamamızı sağlar. Dosya sürümlemeyi devre dışı bırakırsanız artık bu korumaya sahip olmazsınız; değiştirdiğinizde eski kopya kaybolacaktır.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">%1$s kişisini zaten davet ettiniz</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
@@ -3086,21 +3050,9 @@
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Klasör yükle</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
-    <string name="remove_moderator">Moderatörlükten çıkar</string>
-    <!-- Title message of existing subscription dialog -->
-    <string name="title_existing_subscription">Yeni abonelik mi satın almak istiyorsunuz?</string>
-    <!-- Text of buy new subscription button -->
-    <string name="button_buy_new_subscription">Yeni abonelik satın al</string>
-    <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
-    <string name="message_subscription_from_android_platform">Zaten bir aboneliğiniz var. Başka bir tane satın alırsanız iki kez ücretlendirilirsiniz. Bunu önlemek için mevcut aboneliğinizi %1$s üzerinden iptal edin. Daha fazlasını öğrenmek için Yardım Merkezimizi ziyaret edin.</string>
-    <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">Zaten bir aboneliğiniz var. Başka bir tane satın alırsanız iki kez ücretlendirilirsiniz. Bunu önlemek için mevcut aboneliğinizi Apple hesabınızdan iptal edin. Daha fazlasını öğrenmek için Yardım Merkezimizi ziyaret edin.</string>
-    <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
-    <string name="message_subscription_from_other_platform">Zaten bir aboneliğiniz var. Başka bir tane satın alırsanız iki kez ücretlendirilirsiniz. Bunu önlemek için bir masaüstü veya mobil web tarayıcısında MEGA\’ya giderek mevcut aboneliğinizi iptal edin. Daha fazlasını öğrenmek için Yardım Merkezimizi ziyaret edin.</string>
+    <string name="remove_moderator">Moderatörlükten kaldır</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">MEGA\’nın Bluetooth kullanarak yakındaki cihazlarınıza erişmesine izin vermek için Ayarlar\’a gidin.</string>
-    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
-    <string name="upgrade_billing_warning">Faturalandırmaya devam edemiyoruz. İkili bir uygulama kullanıyorsanız lütfen MEGA\’ya onsuz giriş yapmayı düşünün. Kullanmıyorsanız web tarayıcınız üzerinden yükseltmeyi deneyin.</string>
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">%1s aboneliği</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
@@ -3351,14 +3303,8 @@
         <item quantity="one">%1$d dosya</item>
         <item quantity="other">%1$d dosya</item>
     </plurals>
-    <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
-    <string name="account_upgrade_storage_label">[A]%1$s[/A] depolama</string>
-    <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
-    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] aktarım</string>
     <!-- Label of storage in My account section. -->
     <string name="account_storage_label">Depolama alanı</string>
-    <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
-    <string name="account_choose_free_limited_transfer_quota">[A]Sınırlı[/A] aktarım kotası</string>
     <!-- Name of hots or hosts in the meeting info bottom panel -->
     <plurals name="meeting_call_screen_meeting_info_bottom_panel_name_of_moderators">
         <item quantity="one">Moderatör: %s</item>
@@ -3511,7 +3457,7 @@
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Ayarlar</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
-    <string name="cloud_drive_media_discovery_banner_ok">Tamam, anladım</string>
+    <string name="cloud_drive_media_discovery_banner_ok">Tamam</string>
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">Bu bağlantıya sahip herkes toplantıya katılabilir ve toplantı sohbetini görüntüleyebilir.</string>
     <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
@@ -4308,7 +4254,7 @@
     <!-- Text of setting password to link -->
     <string name="general_set_password">Şifre ayarla</string>
     <!-- Text when link of file gets updated after setting password to copy link again-->
-    <string name="general_link_updated_copy_again">Bağlantı güncellendi. Tekrar kopyalayın.</string>
+    <string name="general_link_updated_copy_again">Bağlantı güncellendi. Yeniden kopyalayın.</string>
     <!-- Album import link label -->
     <string name="album_import_link">Albüm bağlantısı</string>
     <!-- Album import error access title -->
@@ -4317,38 +4263,12 @@
     <string name="album_import_error_access_description">Albümün bağlantısı kaldırıldı veya albüm silindi. Bağlantıyı sizinle paylaşan kişiyle iletişime geçin.</string>
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">Ses</string>
-    <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_title_choose_right_plan">Kendinize uygun olan planı seçin</string>
-    <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_monthly">Aylık</string>
-    <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_yearly">Yıllık</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_label_save_up_to">Yıllık faturalandırma ile %16\’ya varan tasarruf edin</string>
-    <!-- Description about how much storage user will get for specific plan. The placeholder %1$s will be replaced with storage size (e.g. 20GB or 4TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_storage">[B]Depolama:[/B] [A]%1$s[/A]</string>
-    <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_transfer">[B]Aktarım:[/B] [A]%1$s[/A]</string>
-    <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/aylık[/B]</string>
-    <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_yearly_price">[A]%1$s[/A]\n[B]%2$s/yıl[/B]</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">Önerilen</string>
     <!-- Title of label, which will be shown next to the plan user have already purchased. -->
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">Mevcut plan</string>
-    <!-- Title of description of features, which are available for users, if they buy plan. -->
-    <string name="account_upgrade_account_description_title_features">Pro planlarının özellikleri</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;Şifre korumalı bağlantılar</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;Son kullanma tarihli bağlantılar</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;Aktarım kotası paylaşımı</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Lite\’da 90 güne kadar, Pro&#160;I, II ve III\’de ise 180 güne kadar silinen verileri geri sarma</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Çöp kutusunun temizlenmesini 7 gün ila 10 yıl arasında planlama</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_lite">Pro&#160;Lite’ı satın al</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4390,8 +4310,6 @@
     <string name="album_import_rename_album_description">Albümlerinizde “%1$s” adında bir albüm zaten mevcut. Kaydettiğiniz albüm için yeni bir ad girin.</string>
     <!-- Album import enter album name -->
     <string name="album_import_enter_album_name">Bir albüm adı girin</string>
-    <!-- Text only shown, when user has current plan as Pro III. The part of string 'pricing page.' is a hyperlink to Mega pricing webpage - https://mega.io/pricing. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pricing_page_link_text">Mevcut aboneliğinizi [A]fiyatlandırma sayfamızdan[/A] yükseltebilirsiniz.</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
     <plurals name="cloud_drive_subtitle_links_access_user">
         <item quantity="one">Bu bağlantıya sahip herkes verilerinizi görüntüleyebilir ve indirebilir</item>
@@ -4447,8 +4365,6 @@
         <item quantity="one">Her hafta %1$s ve %2$s</item>
         <item quantity="other">Her %3$d haftada bir %1$s ve %2$s</item>
     </plurals>
-    <!-- Snackbar, shown on Upgrade Account screen, when user has already recurring subscription and tries to tap on his current plan. -->
-    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">Bu plan için zaten yinelenen bir aboneliğiniz mevcut</string>
     <!-- Album import storage exceeded title -->
     <string name="album_import_storage_exceeded_title">Albüm kaydedilemiyor</string>
     <!-- Album import storage exceeded description -->
@@ -4733,14 +4649,6 @@
     <string name="chat_chatroom_first_message_header_mega_info_text">MEGA, temel güvenlik güvencelerini sağlayan sıfır bilgi şifrelemesi sistemimizle iletişiminizi korur:</string>
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_authenticity_info_text">Sistem, alınan verilerin gösterilen göndericiden geldiğini ve içeriğinin aktarım sırasında manipüle edilmediğini garanti eder.</string>
-    <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_get_pro_title">Pro planıyla daha fazlasını elde edin</string>
-    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">Bir Pro planına yükselterek daha fazla depolama alanı ve Pro özelliklerine erişim sağlayın. Planlar aylık %1$s gibi düşük bir ücretle başlar.</string>
-    <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_storage">Üstün depolama esnekliği</string>
-    <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
-    <string name="dialog_onboarding_button_view_pro_plan">Bugün Pro\’ya yükseltin</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s sunuyor</string>
     <!-- Warning indicating that a participant is sharing the screen-->
@@ -4750,7 +4658,7 @@
     <!-- Message of the call recording consent dialog -->
     <string name="meetings_call_recording_consent_dialog_message">Aramada kalarak kayıt altına alınmasına izin vermiş olursunuz. Kayıt yalnızca kaydeden kişinin cihazında saklanır.</string>
     <!-- Label for the positive or confirm button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_positive_button">Tamam, anladım</string>
+    <string name="meetings_call_recording_consent_dialog_positive_button">Tamam</string>
     <!-- Label for the negative or cancel button of the call recording consent dialog -->
     <string name="meetings_call_recording_consent_dialog_negative_button">Aramadan ayrıl</string>
     <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
@@ -4761,8 +4669,6 @@
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s kaydı durdurdu</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
     <string name="chat_attach_panel_gallery">Galeri</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Reklamsız&#160;</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
     <string name="meetings_sharing_meeting_link_meeting_invite_subject">MEGA toplantı daveti</string>
     <!-- Text when sharing a meeting link indicating that a participant is inviting you to the meeting. The placeholder is to include the full name of the invitation sender -->
@@ -4817,8 +4723,6 @@
     <string name="meetings_muted_all_participants_snackbar_message">Tüm katılımcıları susturdunuz</string>
     <!-- Message of the snackbar displayed when you have been muted. The placeholder is for the name of who muted you -->
     <string name="meetings_muted_by_a_participant_snackbar_message">%s tarafından susturuldunuz</string>
-    <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_account_description_subscription_title">Abonelik ayrıntıları</string>
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Galerinize erişime izin verin</string>
     <!-- Button text to grant permission in the chat bottom sheet -->
@@ -4875,14 +4779,6 @@
     <string name="meetings_change_sfu_dialog_action_button">Değiştir</string>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
     <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]Ücretsiz planınızda toplantılar için 60 dakikalık bir sınır bulunmaktadır. Pro kullanıcılar sınırsız arama ve 1000\’e kadar katılımcı hakkına sahiptir.[/A] [B]Şimdi yükseltin.[/B]</string>
-    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">Hemen %1$s olarak ücretlendirileceksiniz ve aboneliğiniz 1 ay sonra ayda %2$s karşılığında otomatik olarak yenilenecektir. Her faturalandırma döneminin bitiminden sonraki 24 saat içinde Google&#160;Play hesabınızdan yenileme için ücret tahsil edilecektir. Aboneliğinizi iptal etmek için, faturalandırma döneminizin bitiminden en az 24 saat önce [A]Google&#160;Play[/A] abonelikleriniz aracılığıyla MEGA&#160;Pro aboneliğinizin otomatik yenilemesini devre dışı bırakmanız gerekir.\nHesabınızı yükselterek MEGA’nın [B]Hizmet Şartları[/B] ve [C]Gizlilik Politikası[/C]’nı kabul etmiş olursunuz.</string>
-    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">Hemen %1$s olarak ücretlendirileceksiniz ve aboneliğiniz 12 ay sonra yıllık %2$s karşılığında otomatik olarak yenilenecektir. Her faturalandırma döneminin bitiminden sonraki 24 saat içinde Google&#160;Play hesabınızdan yenileme için ücret tahsil edilecektir. Aboneliğinizi iptal etmek için, faturalandırma döneminizin bitiminden en az 24 saat önce [A]Google&#160;Play[/A] abonelikleriniz aracılığıyla MEGA&#160;Pro aboneliğinizin otomatik yenilemesini devre dışı bırakmanız gerekir.\nHesabınızı yükselterek MEGA’nın [B]Hizmet Şartları[/B] ve [C]Gizlilik Politikası[/C]’nı kabul etmiş olursunuz.</string>
-    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in monthly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">Hemen ücretlendirileceksiniz ve aboneliğiniz 1 ay sonra otomatik olarak yenilenecektir. Her faturalandırma döneminin bitiminden sonraki 24 saat içinde Google&#160;Play hesabınızdan yenileme için ücret tahsil edilecektir. Aboneliğinizi iptal etmek için, faturalandırma döneminizin bitiminden en az 24 saat önce [A]Google&#160;Play[/A] abonelikleriniz aracılığıyla MEGA&#160;Pro aboneliğinizin otomatik yenilemesini devre dışı bırakmanız gerekir.\nHesabınızı yükselterek MEGA’nın [B]Hizmet Şartları[/B] ve [C]Gizlilik Politikası[/C]’nı kabul etmiş olursunuz.</string>
-    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in yearly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">Hemen ücretlendirileceksiniz ve aboneliğiniz 12&#160;ay sonra otomatik olarak yenilenecektir. Google&#160;Play hesabınızdan, her faturalandırma döneminin bitiminden 24&#160;saat içinde yenileme için ücret alınacaktır. Aboneliğinizi iptal etmek için, faturalandırma döneminizin bitiminden en az 24&#160;saat önce [A]Google&#160;Play[/A]\’deki Abonelikler aracılığıyla MEGA&#160;Pro aboneliğinizin otomatik yenilenmesini devre dışı bırakmalısınız.\nHesabınızı yükselterek MEGA’nın [B]Hizmet Şartları[/B]’nı ve [C]Gizlilik Politikası[/C]’nı kabul etmiş olursunuz.</string>
     <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_title">İşletme hesabı devre dışı bırakıldı</string>
     <!-- The body of the Dialog shown to a suspended Business Account Sub-User -->
@@ -4890,11 +4786,7 @@
     <!-- The body of the Dialog shown to a suspended Business Account Administrator -->
     <string name="account_business_account_deactivated_dialog_admin_body">İşletme hesabınız ödeme hatası nedeniyle devre dışı bırakıldı. Yalnızca verilerinize göz atabilirsiniz.\nÖdeme yapmak ve aboneliğinizi yeniden etkinleştirmek için bir tarayıcı aracılığıyla MEGA\’ya giriş yapın.</string>
     <!-- The button of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
-    <string name="account_business_account_deactivated_dialog_button">Tamam, anladım</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to host call or meetings without any restrictions. -->
-    <string name="account_upgrade_account_description_feature_meetings">&#8226;&#160;Sınırsız katılımcıyla ve zaman kısıtlaması olmadan arama ve toplantı düzenleme</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to use MEGA VPN product. -->
-    <string name="account_upgrade_account_description_feature_vpn">&#8226;&#160;Yüksek hızlı VPN\’imizle çevrim içi ortamda gizli kalın</string>
+    <string name="account_business_account_deactivated_dialog_button">Tamam</string>
     <!-- The body of the Dialog shown to upgrade meeting from the free version -->
     <string name="meetings_in_call_warning_dialog_body">Daha fazla zamana mı ihtiyacınız var? Pro planlarında sınırsız arama süresi vardır.</string>
     <!-- The negative button text of the Dialog shown to upgrade meeting from the free version -->
@@ -4925,14 +4817,12 @@
     <!-- Free plan limitation dialogue description for scheduled meeting calls with more than 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Bu arama yalnızca 100 katılımcıyı destekleyebilir. Yöneticiden bu kısıtlamayı kaldırmasını isteyin.</string>
     <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
-    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">Tamam, anladım</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">Tamam</string>
     <!-- The snackbar message of hidden nodes operation -->
     <plurals name="hidden_nodes_result_message">
         <item quantity="one">%1$d öğe gizlendi</item>
         <item quantity="other">%1$d öğe gizlendi</item>
     </plurals>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be prioritised when customer support is needed. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_priority_support">&#8226;&#160;Öncelikli destek</string>
     <!-- The title of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_title">Sınırsız arama süresi için Pro\’ya yükseltin</string>
     <!-- The body of the Upgrade bottom sheet dialog  -->

@@ -72,22 +72,14 @@
     <string name="general_sync_local_filesystem_mismatch">Bu klasördeki dosyalar senkronize edilemez veya yedeklenemez. Senkronizasyonu veya yedeklemeyi masaüstü uygulamasından yeniden etkinleştirmeniz gerekecek.</string>
     <!-- Warning message to display when sync has been paused due a low battery level -->
     <string name="general_message_sync_paused_low_battery_level">Pil seviyesi çok düşük olduğu için senkronizasyon duraklatıldı. Senkronizasyona devam etmek için pili şarj edin.</string>
-    <!-- Title for File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_file_sharing">Kolay, güvenli dosya paylaşımı</string>
-    <!-- Description about File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_file_sharing">Cömert bir aktarım kotası sayesinde büyük dosyaları paylaşın ve şifre korumalı bağlantılarla güvenliği sağlayın.</string>
-    <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_backup_rewind">Bir daha asla veri kaybetmeyin</string>
-    <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Dosyaları ve klasörleri 180 güne kadar herhangi bir tarihe geri yüklemek için Geri Sarma\’yı kullanın, böylece verileriniz kazalara ve kurcalamalara karşı korumalı olur.</string>
     <!-- Search drop down chips filter type file type -->
     <string name="search_dropdown_chip_filter_type_file_type">Tür</string>
     <!-- Search drop down chips filter type file type images -->
-    <string name="search_dropdown_chip_filter_type_file_type_images">Görüntüler</string>
+    <string name="search_dropdown_chip_filter_type_file_type_images">Resimler</string>
     <!-- Search drop down chips filter type file type videos -->
     <string name="search_dropdown_chip_filter_type_file_type_video">Video</string>
     <!-- Search drop down chips filter type file type audio -->
-    <string name="search_dropdown_chip_filter_type_file_type_audio">Ses</string>
+    <string name="search_dropdown_chip_filter_type_file_type_audio">Sesler</string>
     <!-- Search drop down chips filter type file type documents -->
     <string name="search_dropdown_chip_filter_type_file_type_documents">Belgeler</string>
     <!-- Search drop down chips filter type file type pdf -->
@@ -200,14 +192,6 @@
     <string name="general_size_giga_byte">%1$s</string>
     <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
     <string name="general_free_plan_name">Ücretsiz</string>
-    <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
-    <string name="dialog_onboarding_transfer_quota_free_limited">Sınırlı</string>
-    <!-- Description of the price for Free account. The meaning: this type of account is for free. This string won't be used for name of Free account. -->
-    <string name="dialog_onboarding_free_account_price">Ücretsiz</string>
-    <!-- Continue button on Onboarding dialog, the user will proceed with payment for chosen account. -->
-    <string name="dialog_onboarding_button_continue">Devam et</string>
-    <!-- Title of navigation bar on Onboarding dialog. -->
-    <string name="dialog_onboarding_app_bar_title">MEGA planınızı seçin</string>
     <!-- Header of the Info view field for what is the content of a device/folder -->
     <string name="info_content">İçerik</string>
     <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
@@ -244,8 +228,6 @@
     <string name="general_giga_byte_standalone">GB</string>
     <!-- Size unit in terabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
     <string name="general_tera_byte_standalone">TB</string>
-    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
-    <string name="dialog_onboarding_feature_storage_description">%1$s&#160;%2$s\’den başlayan depolama alanlarıyla ihtiyaçlarınız için mükemmel olanı bulun.</string>
     <!-- Title of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_title">Yetersiz depolama alanı</string>
     <!-- Body text of the insufficient storage error dialog -->
@@ -286,12 +268,6 @@
     <string name="file_info_information_snackbar_description_added">Açıklama eklendi</string>
     <!-- Description updated snack bar for the file info information screen-->
     <string name="file_info_information_snackbar_description_updated">Açıklama güncellendi</string>
-    <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_title_additional_features">Ayrıca şu harika avantajlara erişin:</string>
-    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Sınırsız arama ve toplantı \n&#8226;&#160;Mobil cihazınızdaki klasörleri otomatik olarak senkronize edin \n&#8226;&#160;Reklam yok</string>
-    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Sınırsız arama ve toplantı \n&#8226;&#160;Mobil cihazınızdaki klasörleri otomatik olarak senkronize edin</string>
     <!-- Text for the Sync solved issues list empty state -->
     <string name="device_center_sync_solved_issues_empty_state_text">Çözülmüş sorun yok</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
@@ -301,11 +277,9 @@
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">Kamera yüklemeleri klasörünüz ve ikincil medya yüklemeleri klasörünüz birbiriyle ilişkili olamaz. Lütfen farklı bir klasör seçin.</string>
     <!-- The confirmation Button text of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">Tamam, anladım</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">Tamam</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
     <string name="general_no_picker_warning">Bu cihazda klasör seçmek için bir uygulama yok</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;Mobil cihazınızdaki klasörleri otomatik olarak senkronize etme</string>
     <!-- Hidden items -->
     <string name="hidden_items">Gizli öğeler</string>
     <!-- Label to indicate that is a Pro only feature -->
@@ -345,13 +319,13 @@
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">Depolama</string>
     <!-- Row label for transfer feature in the comparison table -->
-    <string name="account_cancel_account_screen_plan_transfer">Aktarım</string>
+    <string name="account_cancel_account_screen_plan_transfer">Aktar</string>
     <!-- Transfer limit in the free plan -->
     <string name="account_cancel_account_screen_plan_free_limited_transfer">Sınırlı</string>
     <!-- Feature indicating password protection for links, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_password_protected_links">Şifre korumalı bağlantılar</string>
     <!-- Feature indicating expiry dates for links, available in the pro plan -->
-    <string name="account_cancel_account_screen_plan_links_with_expiry_dates">Son kullanma tarihi olan bağlantılar</string>
+    <string name="account_cancel_account_screen_plan_links_with_expiry_dates">Son kullanma tarihli bağlantılar</string>
     <!-- Feature indicating transfer sharing, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_transfer_sharing">Aktarım paylaşımı</string>
     <!-- Row label for rewind feature in the comparison table -->
@@ -383,11 +357,11 @@
     <!-- Hidden item -->
     <string name="hidden_item">Gizli öğe</string>
     <!-- Share hidden item link description -->
-    <string name="share_hidden_item_link_description">Bu öğe gizli olarak ayarlanmıştır. Öğeyi paylaştığınızda, bağlantıya sahip herkes onu görebilir. Bulut depolamanızda hala gizli kalacaktır.</string>
+    <string name="share_hidden_item_link_description">Bu öğe gizli olarak ayarlanmıştır. Öğeyi paylaştığınızda, bağlantıya sahip olan herkes onu görebilecektir. Bulut depolamanızda gizli kalmaya devam edecektir.</string>
     <!-- Share hidden item links description -->
-    <string name="share_hidden_item_links_description">Bu öğelerden biri veya birkaçı gizli olarak ayarlanmıştır. Gizli öğeleri paylaştığınızda, bağlantıya sahip herkes onları görebilir. Öğeler bulut depolamanızda gizli kalmaya devam edecektir.</string>
+    <string name="share_hidden_item_links_description">Bu öğelerden biri veya birkaçı gizli olarak ayarlanmıştır. Gizli öğeleri paylaştığınızda, bağlantıya sahip olan herkes onları görebilecektir. Öğeler Bulut depolamanızda gizli kalmaya devam edecektir.</string>
     <!-- Title shown when cancelling the subscription -->
-    <string name="account_cancellation_instructions_cancel_subscription_title">Aboneliği iptal et</string>
+    <string name="account_cancellation_instructions_cancel_subscription_title">Abonelikleri iptal et</string>
     <!-- Title shown when reactivating the subscription -->
     <string name="account_cancellation_instructions_reactivate_subscription_title">Aboneliği yeniden etkinleştir</string>
     <!-- Title shown when cancelling the current plan in the instructions screen, informing the user about the account is not managed by google -->
@@ -451,13 +425,13 @@
     <!-- Dialog cancel option -->
     <string name="general_dialog_cancel_button">İptal</string>
     <!-- Create new folder dialog error message shown when the user tries to an empty folder name -->
-    <string name="create_new_folder_dialog_error_message_empty_folder_name">Bir klasör adı girin</string>
+    <string name="create_new_folder_dialog_error_message_empty_folder_name">Bir klasör ismi girin</string>
     <!-- Create new folder dialog error message shown when folder cannot be created because there is already one with the same name -->
     <string name="create_new_folder_dialog_error_existing_folder">Aynı ada sahip bir klasör zaten mevcut</string>
     <!-- Error message when the user writes a character not allowed for naming a file or folder -->
     <string name="general_invalid_characters_defined">Şu karakterlere izin verilmez: %1$s</string>
     <!-- Sync settings section title-->
-    <string name="settings_section_sync">Senkronizasyon</string>
+    <string name="settings_section_sync">Senkronize et</string>
     <!-- Transfers scanning folders dialog title when the app is creating the needed folders -->
     <string name="transfers_scanning_folders_dialog_creating_folders_title">Klasörler oluşturuluyor&#8230;</string>
     <!-- Transfers scanning folders dialog title when the app is starting transfers but some files still needs to be added to the queue  -->
@@ -500,7 +474,7 @@
     <!--Subtitle text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_subtitle">Tüm mesajlarınız, grup sohbetleriniz ve aramalarınız sıfır bilgi şifrelemesiyle korunur. [A]Daha fazlasını öğrenin[/A]</string>
     <!-- Label of the action button of inviting a friend from contact screen -->
-    <string name="chat_recent_invite_friend">Arkadaşını davet et</string>
+    <string name="chat_recent_invite_friend">Bir arkadaşını davet et</string>
     <!-- Title Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat_title">Arkadaşlarınızı güvenle davet edin</string>
     <!-- Subtitle Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
@@ -508,9 +482,9 @@
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
     <string name="invite_contacts_action_label">Davet et</string>
     <!-- Share hidden folder description -->
-    <string name="share_hidden_folder_description">Bu klasörde gizli öğeler var. Klasörü paylaşmak, gizli öğelerin paylaştığınız kişiler tarafından görülebileceği anlamına gelir. Öğeler bulut depolamanızda gizli kalmaya devam edecektir.</string>
+    <string name="share_hidden_folder_description">Bu klasörde gizli öğeler var. Klasörü paylaşmak, gizli öğelerin paylaştığınız kişiler tarafından görülebileceği anlamına gelir. Öğeler Bulut depolamanızda gizli kalmaya devam edecektir.</string>
     <!-- Share hidden folders description -->
-    <string name="share_hidden_folders_description">Bu klasörlerden birinde veya daha fazlasında gizli öğeler var. Klasörleri paylaşmak, gizli öğelerin paylaştığınız kişiler tarafından görülebileceği anlamına gelir. Öğeler bulut depolamanızda gizli kalmaya devam edecektir.</string>
+    <string name="share_hidden_folders_description">Bu klasörlerden birinde veya daha fazlasında gizli öğeler var. Klasörleri paylaşmak, gizli öğelerin paylaştığınız kişiler tarafından görülebileceği anlamına gelir. Öğeler Bulut depolamanızda gizli kalmaya devam edecektir.</string>
     <!-- Title shown at the top of the survey screen when cancelling the subscription -->
     <string name="account_cancel_subscription_survey_title">Ayrıldığınızı gördüğümüze üzüldük! Aboneliğinizi neden iptal ettiğinizi bize söyleyebilir misiniz?</string>
     <!-- Message explaining the immediate effect of subscription cancellation -->
@@ -536,11 +510,11 @@
     <!-- Option in the survey indicating that the plan was needed temporarily -->
     <string name="account_cancel_subscription_survey_option_temporary_use">Bu plana geçici olarak ihtiyacım vardı ve artık kullanmıyorum</string>
     <!-- Option in the survey for other reasons, with a prompt to provide details -->
-    <string name="account_cancel_subscription_survey_option_other">Diğer (lütfen ayrıntı belirtin)</string>
+    <string name="account_cancel_subscription_survey_option_other">Diğer (lütfen ayrıntıları belirtin)</string>
     <!-- Checkbox allowing MEGA to contact the user for further discussion -->
     <string name="account_cancel_subscription_survey_allow_contact">MEGA\’nın bu konu hakkında daha fazla görüşmek için benimle iletişime geçmesine izin veriyorum</string>
     <!-- Button label to cancel the subscription -->
-    <string name="account_cancel_subscription_survey_cancel_button">Aboneliği iptal et</string>
+    <string name="account_cancel_subscription_survey_cancel_button">Abonelikleri iptal et</string>
     <!-- Button label to not cancel the subscription -->
     <string name="account_cancel_subscription_survey_do_not_cancel_button">İptal etme</string>
     <!-- Video recently watched title of the video section  -->
@@ -560,7 +534,7 @@
     <!-- The Document Scanning Error Type for generic errors during Document Scanning -->
     <string name="document_scanning_error_type_generic_error">Belge tarayıcısını açarken bir sorun yaşıyoruz. Lütfen uygulamayı kapatıp yeniden açın ve tekrar deneyin.</string>
     <!-- The confirmation Button text of the Document Scanning Error Dialog -->
-    <string name="document_scanning_error_dialog_confirm_button">Tamam, anladım.</string>
+    <string name="document_scanning_error_dialog_confirm_button">Tamam</string>
     <!--Title text to start a meeting from Meeting screen empty view-->
     <string name="meeting_recent_list_empty_title">Aramalarınızı koruyun</string>
     <!--Subtitle text from Meeting screen empty view-->
@@ -606,15 +580,15 @@
     <!-- Title for the inline warning banner when storage is almost full -->
     <string name="account_storage_over_quota_inline_warning_banner_title">Depolama alanınız neredeyse doldu</string>
     <!-- Title for the inline error banner when storage is full -->
-    <string name="account_storage_over_quota_inline_error_banner_title">Depolama alanınız doldu</string>
+    <string name="account_storage_over_quota_inline_error_banner_title">Depolama alanınız dolu</string>
     <!-- Error Message indicating the user needs to upgrade now to get more storage -->
-    <string name="account_storage_over_quota_inline_error_banner_message">Veri yüklemeye devam etmek için daha fazla depolama alanı almak üzere yükseltme yapın.</string>
+    <string name="account_storage_over_quota_inline_error_banner_message">Veri yüklemeye devam etmek için daha fazla depolama alanı elde etmek üzere şimdi yükseltin.</string>
     <!-- Warning Message indicating the user needs to upgrade to get more storage -->
-    <string name="account_storage_over_quota_inline_warning_banner_message">Veri yüklemeye devam etmek için daha fazla depolama alanı almak üzere yükseltme yapın.</string>
+    <string name="account_storage_over_quota_inline_warning_banner_message">Veri yüklemeye devam etmek için, daha fazla depolama alanı elde etmek üzere yükseltin.</string>
     <!-- Label for the upgrade action link -->
     <string name="account_storage_over_quota_inline_error_banner_upgrade_link">Şimdi yükselt</string>
     <!-- Hidden nodes sharing albums -->
-    <string name="hidden_nodes_sharing_albums">Bu albümlerden birinde veya daha fazlasında gizli öğeler var. Albümleri paylaşmak, gizli öğelerin paylaştığınız kişiler tarafından görülebileceği anlamına gelir. Öğeler bulut depolamanızda gizli kalmaya devam edecektir.</string>
+    <string name="hidden_nodes_sharing_albums">Bu albümlerden birinde veya daha fazlasında gizli öğeler var. Albümleri paylaşmak, gizli öğelerin paylaştığınız kişiler tarafından görülebileceği anlamına gelir. Öğeler Bulut depolamanızda gizli kalmaya devam edecektir.</string>
     <!-- Backup title for toolbar when inside new backup screen -->
     <string name="sync_add_new_backup_toolbar_title">Yedekleme</string>
     <!-- Text for the header of the screen to add a new backup folder -->
@@ -787,10 +761,6 @@
     <string name="general_drive">Depolama</string>
     <!-- Tab bar title of Syncs tab -->
     <string name="general_syncs">Senkronizasyonlar</string>
-    <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
-    <string name="transfers_completed_one_read_error_retrying">MEGA artık dosyaya erişemediği için yüklemeniz tamamlanamıyor veya yeniden denelenemiyor</string>
-    <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
-    <string name="transfers_completed_some_read_error_retrying">MEGA artık dosyalara erişemediği için yüklemelerinizin bir kısmı veya tamamı tamamlanamıyor veya yeniden denelenemiyor</string>
     <!-- Title for Offline Folder exposed via SAF -->
     <string name="general_mega_offline">MEGA Çevrim dışı dosyalar</string>
     <!-- Notification content for download final notification. It will inform the user about the location where file/s were downloaded -->
@@ -804,7 +774,7 @@
     <!-- Notification content for download final notification in case of a single file downloaded to preview. -->
     <string name="transfers_notification_title_preview_download">“%1$s” ön izlemeye hazır</string>
     <!-- Notification action for download final notification. It will open a dialog with installed apps which can open the file -->
-    <string name="transfers_notification_preview_action">Ön izle</string>
+    <string name="transfers_notification_preview_action">Ön izleme</string>
     <!-- Title for the OS dialog shown with available apps to open a file -->
     <string name="open_with_os_dialog_title">“%1$s” dosyasını şununla aç</string>
     <!-- The Scan Confirmation screen error message shown when the new filename does not contain the file extension that was selected -->
@@ -870,7 +840,7 @@
     <!-- Name of the Camera uploads feature -->
     <string name="general_camera_uploads">Kamera yüklemeleri</string>
     <!-- Name of the Camera uploads feature -->
-    <string name="general_media_uploads">Medya yüklemeleri</string>
+    <string name="general_media_uploads">Medya Yüklemeleri</string>
     <!-- Generic settings label text -->
     <string name="general_settings">Ayarlar</string>
     <!-- Ad settings label in the cookie settings page -->
@@ -892,8 +862,6 @@
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">%1$s bulut depolamaya kaydediliyor&#8230;</string>
-    <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">Hemen %1$s tutarında ücretlendirileceksiniz ancak aboneliğiniz resmi düzenlemeler nedeniyle 12 ay sonra otomatik olarak yenilenmeyecektir. Aboneliğinizin süresi dolduktan sonra yenilemek sizin sorumluluğunuzdadır. Aboneliğinizi istediğiniz zaman [A]Google&#160;Play[/A] Abonelikleri üzerinden yönetebilir veya iptal edebilirsiniz. Hesabınızı yükselterek, MEGA\’nın [B]Hizmet Şartları[/B]\’nı ve [C]Gizlilik Politikası[/C]\’nı kabul etmiş olursunuz.</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">Yükleniyor&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
@@ -901,7 +869,7 @@
     <!-- The name of the Device or Folder Status which signifies that it is inactive -->
     <string name="device_center_list_view_item_status_inactive">Etkin Değil</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
-    <string name="device_center_list_view_item_status_attention_needed">Dikkat gerekiyor</string>
+    <string name="device_center_list_view_item_status_attention_needed">İlgi gerekli</string>
     <!--General Unable to log in-->
     <string name="general_unable_to_login">Giriş yapılamıyor</string>
     <!--General check inbox-->
@@ -913,11 +881,11 @@
     <!-- Message displayed when email is successfully resent -->
     <string name="general_email_resend_success_message">E-posta gönderildi</string>
     <!--General Request Network Failed text-->
-    <string name="general_request_failed_message">Bir hata oluştu, lütfen tekrar deneyin</string>
+    <string name="general_request_failed_message">Bir hata oluştu, tekrar deneyin.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">MEGA hesabınız tekrarlanan telif hakkı ihlali iddiaları nedeniyle askıya alındı. Bu, hesabınıza veya içindeki verilere erişemeyeceğiniz anlamına gelir.\nKarşı bildirimde nasıl bulunulacağı hakkında daha fazla bilgi için lütfen e-posta gelen kutunuzu kontrol edin.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">MEGA hesabınız tekrarlanan telif hakkı ihlali iddiaları nedeniyle askıya alındı. Bu, hesabınıza veya içindeki verilere erişemeyeceğiniz anlamına gelir.\nKarşı bildiriminin nasıl gönderileceği hakkında daha fazlasını öğrenmek için e-posta gelen kutunuzu kontrol edin.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Hesabınız MEGA Hizmet Şartları\’nın ihlali nedeniyle feshedildi.\nDepolanan verilerinize yeniden erişemeyecek veya yeni bir MEGA hesabına kaydolma yetkiniz olmayacaktır.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Hesabınız MEGA Hizmet Şartları\’nın ihlali nedeniyle feshedildi.\nSaklanan verilerinize yeniden erişemeyecek veya yeni bir MEGA hesabına kaydolma yetkiniz olmayacaktır.</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
     <string name="error_business_disabled">Hesabınız yöneticiniz tarafından devre dışı bırakıldı. Daha fazla ayrıntı için lütfen İşletme hesabı yöneticinizle iletişime geçin.</string>
     <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
@@ -939,7 +907,7 @@
     <!-- Text for the "Don’t cancel" button in the cancel registration dialog -->
     <string name="email_confirmation_dialog_cancel_registration_dismiss_button">İptal etme</string>
     <!-- First message header paragraph in note to self chat -->
-    <string name="chat_note_to_self_chat_first_message_header_paragraph">Resimler, önemli bilgiler veya harika fikirler için özel bir alan. Her zaman senkronize edilir ve sıfır bilgi şifrelemesi ile korunur.</string>
+    <string name="chat_note_to_self_chat_first_message_header_paragraph">Resimler, önemli bilgiler veya harika fikirler için özel bir alan. Her zaman senkronize edilir ve sıfır bilgi şifrelemesiyle korunur.</string>
     <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
     <string name="general_sync_notification_low_battery_title">Düşük pil nedeniyle senkronizasyon duraklatıldı</string>
     <!-- Text of the notification displayed when Syncs are paused due to low battery conditions -->
@@ -965,7 +933,7 @@
     <!--Change Email Address page content text to ask user to enter a new email address -->
     <string name="change_email_address_content">Yeni e-posta adresinizi girin, e-posta onayını bu yeni e-posta adresine göndereceğiz.</string>
     <!--Error message to be shown when account already existed-->
-    <string name="sign_up_account_existed_error_message">Bu e-posta adresiyle zaten bir MEGA hesabı açılmış</string>
+    <string name="sign_up_account_existed_error_message">Bu e-posta adresiyle zaten bir MEGA hesabına kaydolunmuş</string>
     <!--General update text-->
     <string name="general_update">Güncelle</string>
     <!-- Message displayed when email address is successfully updated -->
@@ -981,7 +949,7 @@
     <!--Sign Up page message to be shown when password is less than 8 characters-->
     <string name="sign_up_password_min_character_error_message">En az 8 karakter içermelidir</string>
     <!--Sign Up page message to be shown when confirm password is not same as password-->
-    <string name="sign_up_confirm_password_not_match_error_message">Şifreler eşleşmiyor. Lütfen kontrol edip tekrar deneyin.</string>
+    <string name="sign_up_confirm_password_not_match_error_message">Şifreler eşleşmiyor. Kontrol edip tekrar deneyin.</string>
     <!--Sign Up page message to be shown when password is considered medium-->
     <string name="sign_up_password_medium_password_warning_message">Şifrenizi tahmin etmek kolay. Daha güçlü bir karakter kombinasyonu denemenizi öneririz.</string>
     <!--Message to be shown when password is considered weak -->
@@ -1031,7 +999,7 @@
     <!-- USP Carousel page 3 description-->
     <string name="carousel_page_description_slide_3">Geniş depolama alanı ve dosyalarınızı aktarmanın, paylaşmanın ve düzenlemenin kolay yolları sayesinde, seçtiğiniz her şey için MEGA\’yı güvenle kullanabilirsiniz</string>
     <!-- USP Carousel page 4 title-->
-    <string name="carousel_page_title_slide_4">Özel olarak konuşun</string>
+    <string name="carousel_page_title_slide_4">Özel olarak söyleyin</string>
     <!-- USP Carousel page 4 description-->
     <string name="carousel_page_description_slide_4">Arkadaşlarınız ve ailenizle sohbet edin, fotoğraf veya hassas bilgileri paylaşın, görüntülü arama yapın ve toplantılar planlayın. Güvenlik ve gizlilik garantilidir.</string>
     <!-- Create account label-->
@@ -1039,17 +1007,17 @@
     <!-- The new feature hidden nodes feature -->
     <string name="hidden_nodes_new_feature">Yeni özellik: Gizli dosyalar ve klasörler</string>
     <!-- Hidden nodes: hide files and folders feature -->
-    <string name="hidden_nodes_title_hide_files_folders_feature">Önemli dosya ve klasörleri gizleme</string>
+    <string name="hidden_nodes_title_hide_files_folders_feature">Önemli dosyaları ve klasörleri gizle</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">Önemli dosya ve klasörleri gizleyin. Gizlilik için hassas dosya ve klasörleri gizleyebilirsiniz. Bunları yalnızca siz, tek tek veya menüden gizli öğeleri geçici olarak göstererek açığa çıkarabilirsiniz.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">Gizlilik için hassas dosyaları ve klasörleri gizleyebilirsiniz. Bunları yalnızca siz, tek tek veya menüden gizli öğeleri geçici olarak görüntüleyerek ortaya çıkarabilirsiniz.</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">Zaman çizelgesinden hariç tutulur</string>
+    <string name="hidden_nodes_title_control_visibility">Zaman Akışından hariç tut</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Gizli öğeler yalnızca Bulut depolama alanı aracılığıyla erişilebilir ve Fotoğraflarınızda, Albümlerinizde veya Son etkinliklerinizde görünmez.</string>
+    <string name="hidden_nodes_description_control_visibility">Gizli öğelere yalnızca Bulut depolama üzerinden erişilebilir ve Fotoğraflarınızda, Albümlerinizde veya Son etkinliklerinizde görünmez.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">Gözden uzak</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Gizli dosyaların ne zaman görünür olacağına siz karar verin. Gizli öğeleri geçici olarak göstermek için yeni bir ayar bulunmaktadır.</string>
+    <string name="hidden_nodes_description_visible_shared_files">Gizli dosyaların ne zaman görüneceğine siz karar verirsiniz. Gizli öğeleri geçici olarak göstermek için yeni bir ayar bulunmaktadır.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Fotoğraflarınızı her zaman güvende tutun</string>
     <!--Camera backup permission screen description-->
@@ -1073,7 +1041,7 @@
     <!-- Text of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
     <string name="general_sync_warning_lost_wifi_text">Devam etmek için Wi-Fi\’ye yeniden bağlanın.</string>
     <!-- Subtitle of link unavailable reasons, shown in folder and file link screen -->
-    <string name="general_link_unavailable_subtitle">Bu, aşağıdaki nedenlerden dolayı olabilir:</string>
+    <string name="general_link_unavailable_subtitle">Bu durum, şu nedenlerden kaynaklanıyor olabilir:</string>
     <!-- Bullet point shown when link is unavailable due to invalid URL -->
     <string name="general_link_unavailable_invalid_url">Geçersiz URL - erişmeye çalıştığınız bağlantı mevcut değil</string>
     <!-- Bullet point shown when link is unavailable due to expiration -->
@@ -1103,9 +1071,9 @@
     <!-- Tooltip description for transfer section play action -->
     <string name="transfers_section_action_pause">Duraklat</string>
     <!-- Possible state of a transfer. When the transfer was cancelled -->
-    <string name="transfers_section_cancelled">İptal Edildi</string>
+    <string name="transfers_section_cancelled">İptal edildi</string>
     <!-- Title of the tab section for active transfers -->
-    <string name="transfers_section_tab_title_active_transfers">Etkin</string>
+    <string name="transfers_section_tab_title_active_transfers">Aktif</string>
     <!-- Title of the tab section for failed transfers -->
     <string name="transfers_section_tab_title_failed_transfers">Başarısız</string>
     <!--Text for showing the empty state when there are no transfers. The [A][/A] format marks are to put the text in a different color and style.-->
@@ -1122,8 +1090,6 @@
     <string name="free_plan_card_title">Ücretsiz planımızı kullanmaya başlayın</string>
     <!-- Description for the Free Plan card -->
     <string name="free_plan_card_description">Henüz ücretli bir plana bağlı kalmak zorunda değilsiniz; ücretsiz planımız cömert miktarda depolama ve aktarım kotası sunar</string>
-    <!-- Feature text for Free Plan storage -->
-    <string name="free_plan_card_storage_feature">20 GB depolama</string>
     <!-- Feature text for Free Plan transfer quota -->
     <string name="free_plan_card_transfer_feature">Sınırlı aktarım</string>
     <!-- Button text for Free Plan card -->
@@ -1155,9 +1121,7 @@
     <!-- Benefit: Password-protected links -->
     <string name="pro_plan_benefit_password_protected_links">Şifre korumalı bağlantılar</string>
     <!-- Benefit: Links with expiry dates -->
-    <string name="pro_plan_benefit_links_with_expiry_dates">Son kullanma tarihi olan bağlantılar</string>
-    <!-- Benefit: Transfer quota sharing -->
-    <string name="pro_plan_benefit_transfer_quota_sharing">Transfer kotası paylaşımı</string>
+    <string name="pro_plan_benefit_links_with_expiry_dates">Son kullanma tarihli bağlantılar</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
     <string name="pro_plan_benefit_auto_sync_mobile">Mobil cihazınızdaki klasörleri otomatik olarak senkronize etme</string>
     <!-- Benefit: Rewind up to 180 days of deleted data -->
@@ -1169,19 +1133,15 @@
     <!-- Benefit: Priority support -->
     <string name="pro_plan_benefit_priority_support">Öncelikli destek</string>
     <!-- Subscription page information section title at the bottom of the page-->
-    <string name="choose_account_screen_subscription_information_title">Abonelik detayları</string>
+    <string name="choose_account_screen_subscription_information_title">Abonelik ayrıntıları</string>
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
     <string name="choose_account_screen_subscription_information_description">Abonelikler, seçilen ilk dönemle aynı süredeki ardışık abonelik dönemleri için otomatik olarak yinelenir.\n\nPlan aboneliğinizi istediğiniz zaman, ancak bir sonraki abonelik ödemenizin vadesinden en geç 24 saat önce iptal edebilirsiniz. [A]Ayarlarınızdan aboneliğinizi nasıl yöneteceğinizi öğrenin[/A].</string>
     <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
     <string name="choose_account_screen_terms_and_policies_link_text">[A]Hizmet Şartları[/A] ve [B]Gizlilik Politikası[/B]</string>
     <!-- Get more with Pro plan title in choose account screen-->
-    <string name="choose_account_screen_get_more_with_pro_plan_title">Pro planıyla daha fazlasını elde edin</string>
+    <string name="choose_account_screen_get_more_with_pro_plan_title">Bir Pro planıyla daha fazlasını elde edin</string>
     <!-- Maybe later button text in the choose account screen-->
     <string name="choose_account_screen_maybe_later_button_text">Belki daha sonra</string>
-    <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_monthly">Aylık</string>
-    <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_yearly">Yıllık</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_label_save_up_to">Yıllık faturalandırma ile %16\’ya varan tasarruf edin</string>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
@@ -1190,8 +1150,6 @@
     <string name="choose_account_screen_transfer_quota_label">%1$s aktarım</string>
     <!-- General month label -->
     <string name="general_month">/aylık</string>
-    <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
-    <string name="choose_account_screen_currency_per_month">%1$s / Ay</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
     <string name="choose_account_screen_billed_yearly">Yıllık %1$s faturalandırılır</string>
     <!-- The snackbar message of unhidden nodes operation -->
@@ -1217,14 +1175,12 @@
     <string name="text_start_mega_vpn_free_trial">%1$s depolama alanı. Kalıcı olarak geçerlidir.</string>
     <!-- title of the section for start mega pass free trial in achivements section -->
     <string name="title_start_mega_pass_free_trial">MEGA&#160;Pass ücretsiz denemesini başlatın</string>
-    <!-- Text of the section for start mega pass free trial in achivements section -->
-    <string name="text_start_mega_pass_free_trial">%1$s depolama alanı. Kalıcı olarak geçerlidir.</string>
     <!-- Text of the button for install mega vpn in achivements section -->
     <string name="button_text_install_mega_vpn">MEGA&#160;VPN\’i yükleyin</string>
     <!-- Text of the button for install mega pass in achivements section -->
     <string name="button_text_install_mega_pass">MEGA&#160;Pass\’i yükleyin</string>
     <!-- title of how it works for mega vpn free trial in achivements section -->
-    <string name="title_how_it_works_free_trial">Nasıl çalışıyor</string>
+    <string name="title_how_it_works_free_trial">Nasıl işliyor?</string>
     <!-- text of how it works for mega vpn free trial in achivements section -->
     <string name="text_how_it_works_mega_vpn_free_trial">MEGA&#160;VPN uygulamasını yükleyin, MEGA hesabınızla giriş yapın ve ücretsiz denemenizi başlatın. Ücretsiz denemenize başladıktan sonra bonus depolama alanınız otomatik olarak eklenir.</string>
     <!-- text of how it works for mega pass free trial in achivements section -->
@@ -1314,7 +1270,7 @@
     <!-- Message shown when uploading edited image as a new file -->
     <string name="photo_editor_upload_message">Düzenlemeler yeni dosya olarak yükleniyor</string>
     <!-- Dialog title asking user to discard changes -->
-    <string name="general_dialog_title_discard_changes">Değişiklikler iptal edilsin mi?</string>
+    <string name="general_dialog_title_discard_changes">Değişiklikler silinsin mi?</string>
     <!-- Dialog title asking user to disable camera uploads -->
     <string name="settings_camera_uploads_disable_warning">Kamera yüklemeleri kapatılsın mı?</string>
     <!-- Sync settings change message prefix -->
@@ -1324,7 +1280,7 @@
     <!--Message of playback position dialog that is displayed when audio has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
     <string name="audio_playback_position_dialog_message">“%1$s”, %2$s\’den devam edecektir.</string>
     <!--Resume of playback position dialog for playing audio from the playback position history. -->
-    <string name="audio_playback_position_dialog_resume_button">Devam ettir</string>
+    <string name="audio_playback_position_dialog_resume_button">Devam et</string>
     <!--Resume of playback position dialog for playing audio from beginning. -->
     <string name="audio_playback_position_dialog_restart_button">Yeniden başlat</string>
     <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
@@ -1364,7 +1320,7 @@
     <!-- Item menu option to reproduce audio or video in external reproductors -->
     <string name="external_play">Şununla aç</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
-    <string name="file_properties_unfavourite">Favoriden kaldır</string>
+    <string name="file_properties_unfavourite">Favorilerden kaldır</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_remove_link_menu">Bağlantıyı kaldır</string>
     <!-- Menu option to delete one or multiple selected items. -->
@@ -1374,7 +1330,7 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_rename">Yeniden adlandır</string>
     <!-- Menu option to restore an item from the Rubbish bin -->
-    <string name="context_restore">Kurtar</string>
+    <string name="context_restore">Geri yükle</string>
     <!-- Menu item to select all the elements of a list -->
     <string name="action_select_all">Tümünü seç</string>
     <!-- send cancel subscriptions dialog -->
@@ -1392,13 +1348,13 @@
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">%s kişisini doğrula</string>
     <!-- Title of the section Versions for files -->
-    <string name="title_section_versions">Sürüm sayısı</string>
+    <string name="title_section_versions">Sürümler</string>
     <!-- Action to show any file in its location -->
     <string name="view_in_folder_label">Klasörde görüntüle</string>
     <!-- Stop Backup confirmation dialog delete explanation -->
     <string name="sync_stop_backup_confirm_dialog_delete_explanation">Veya klasörü MEGA\’dan silin. Cihazınızdan silinmez. Bu işlem geri alınamaz.</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
-    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Klasörü, Bulut depolamaya taşı</string>
+    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Klasörü Bulut depolamaya taşı</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
     <string name="sync_stop_backup_confirm_dialog_delete_permanently">Klasörü MEGA\’dan sil</string>
     <!-- Title of the Camera Uploads complete banner in Photos -->
@@ -1446,7 +1402,7 @@
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_last_modified_file_explanation">En son güncellenen dosya, her iki konumdaki daha eski olanın yerini alacaktır.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict</string>
+    <string name="sync_stalled_issue_general_explanation">Bu işlem, çakışmayı çözmek için uygulanacaktır</string>
     <!-- Dialog choose option -->
     <string name="general_dialog_choose_button">Seç</string>
     <!-- Text label of Apply to all -->
@@ -1456,7 +1412,7 @@
     <!-- Sync message when multiple issues resolved -->
     <string name="sync_stalled_issues_resolved">Sorunlar çözüldü</string>
     <!-- Text of the empty playlist in Video Section -->
-    <string name="video_section_playlists_video_empty">Devam et</string>
+    <string name="video_section_playlists_video_empty">Boşalt</string>
     <!-- Text of video count of playlist in Video Section -->
     <plurals name="video_section_playlists_video_count">
         <item quantity="one">%1$d video</item>
@@ -1496,4 +1452,128 @@
     <string name="sign_up_last_name_text_field_char_limit_exceed_error">Soyad, 40 karakteri geçemez</string>
     <!-- Error message when IP has already sent an issue report and needs to wait -->
     <string name="report_issue_too_many_times_error">Son 10 dakika içinde zaten bir sorun raporu gönderdiniz. Tekrar denemeden önce lütfen bekleyin veya yardım için %1$s ile iletişime geçin.</string>
+    <!-- The snackbar message for informing the user about the invitation is trying to sent, is already in the received contact requests because the user already invited them. -->
+    <string name="contacts_invite_already_received">Bu kullanıcı zaten size bir davet gönderdi</string>
+    <!-- The snackbar message for informing the user about the invitations is trying to sent, are already in the received contact requests because the users already invited them. -->
+    <string name="contacts_invites_already_received">Davet ettiğiniz tüm kişiler zaten size bir davet gönderdi</string>
+    <!-- The snackbar message for informing the user about the invitations are correctly sent. -->
+    <string name="contacts_invites_sent">Davet gönderildi. Kabul edildiklerinde kişilerinizde görünecekler.</string>
+    <!-- The snackbar message for informing the user about some invitations correctly sent, but not others because they are already in the received contact requests because the users already invited them. -->
+    <plurals name="contacts_invites_sent_but_others_already_received">
+        <item quantity="one">%1$d kullanıcı davet edildi, ancak bir veya daha fazla kullanıcı zaten sizi davet etti</item>
+        <item quantity="other">%1$d kullanıcı davet edildi, ancak bir veya daha fazla kullanıcı zaten sizi davet etti</item>
+    </plurals>
+    <!--  Error shown when the user tries to resend the sign up link multiple times at once. -->
+    <string name="resend_signup_link_error">E-posta zaten gönderildi. Tekrar denemeden önce lütfen birkaç dakika bekleyin.</string>
+    <!-- success message when renaming a node -->
+    <string name="context_correctly_renamed">Öğe yeniden adlandırıldı</string>
+    <!-- Homepage section. -->
+    <string name="general_section_home">Ana Sayfa</string>
+    <!-- Error message when removing public links of nodes. Plural. -->
+    <plurals name="context_link_removal_error">
+        <item quantity="one">Bağlantı kaldırma başarısız oldu. Lütfen daha sonra tekrar deneyin.</item>
+        <item quantity="other">Bazı bağlantılar kaldırılamadı. Lütfen daha sonra tekrar deneyin.</item>
+    </plurals>
+    <!-- Message when some public links were removed successfully. Plural. -->
+    <plurals name="context_link_removal_success">
+        <item quantity="one">Bağlantı kaldırıldı</item>
+        <item quantity="other">Bağlantılar kaldırıldı</item>
+    </plurals>
+    <!-- Warning that appears prior to remove links of files. Plural. -->
+    <plurals name="remove_links_warning_text">
+        <item quantity="one">Bu bağlantı artık herkese açık olmayacak.</item>
+        <item quantity="other">Bu bağlantılar artık herkese açık olmayacak.</item>
+    </plurals>
+    <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
+    <string name="context_share_correctly_removed">Paylaşım kaldırıldı</string>
+    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Evet</string>
+    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">Hayır</string>
+    <!-- error message when removing access of contact(s) to a selected folder -->
+    <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
+        <item quantity="one">%1$d kişinin erişimi kaldırılamadı</item>
+        <item quantity="other">%1$d kişinin erişimi kaldırılamadı</item>
+    </plurals>
+    <!-- Confirmation before removing the outgoing shares of a folder -->
+    <plurals name="confirmation_remove_outgoing_shares">
+        <item quantity="one">Bu klasör, %1$d kişiyle paylaşılıyor. Paylaşım durdurulsun mu?</item>
+        <item quantity="other">Bu klasör, %1$d kişiyle paylaşılıyor. Paylaşım durdurulsun mu?</item>
+    </plurals>
+    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
+    <plurals name="alert_remove_several_shares">
+        <item quantity="one"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
+    <string name="figures_storage_referrals_achievements_text">Her davet için %1$s ek depolama alanı, %2$d gün boyunca geçerlidir</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with permanent valid duration -->
+    <string name="figures_storage_referrals_achievements_text_permanent">Her davet için, kalıcı olarak geçerli %1$s ek depolama alanı</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to each achievement with dynamic valid duration -->
+    <string name="figures_storage_achievements_text">%1$s ek depolama alanı, %2$d gün boyunca geçerlidir</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to each achievement with permanent valid duration -->
+    <string name="figures_storage_achievements_text_permanent">Kalıcı olarak geçerli, %1$s ek depolama alanı</string>
+    <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with dynamic valid duration -->
+    <string name="figures_storage_achievements_awarded_text">%1$s depolama bonusu uygulandı, %2$d gün boyunca geçerlidir</string>
+    <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with permanent valid duration -->
+    <string name="figures_storage_achievements_awarded_text_permanent">Kalıcı olarak geçerli, %1$s depolama bonusu uygulandı</string>
+    <!-- info paragraph about the achievement install megasync with dynamic valid duration -->
+    <string name="paragraph_info_achievement_install_desktop_dynamic_duration">MEGA masaüstü uygulamasını kurun ve %1$s ücretsiz ek depolama alanı kazanın. Bu alan, %2$s gün boyunca geçerlidir. Masaüstü uygulaması Windows, macOS ve Linux için mevcuttur.</string>
+    <!-- info paragraph about the achievement install megasync with permanent valid duration -->
+    <string name="paragraph_info_achievement_install_desktop_permanent_duration">MEGA masaüstü uygulamasını yükleyerek kalıcı olarak geçerli, %1$s boyutunda ek depolama alanı kazanın. Masaüstü uygulaması Windows, macOS ve Linux için mevcuttur.</string>
+    <!-- info paragraph about the achievement install mobile app with dynamic valid duration -->
+    <string name="paragraph_info_achievement_install_mobile_app_dynamic_duration">MEGA mobil uygulamalarından birini kurun ve %1$s ücretsiz ek depolama alanı kazanın. Bu alan, %2$s gün boyunca geçerlidir. Mobil uygulamalar iOS ve Android için mevcuttur.</string>
+    <!-- info paragraph about the achievement install mobile app with permanent valid duration -->
+    <string name="paragraph_info_achievement_install_mobile_app_permanent_duration">MEGA mobil uygulamalarından birini yükleyerek kalıcı olarak geçerli, %1$s boyutunda ek depolama alanı kazanın. Mobil uygulamalar iOS ve Android için mevcuttur.</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">Bunlar yedekleme klasörleridir ve yalnızca salt okunur olarak paylaşılabilir</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">Bu bir yedekleme klasörüdür ve yalnızca salt okunur olarak paylaşılabilir</string>
+    <!-- Button to confirm the action of restarting one transfer-->
+    <string name="button_permission_info">Tamam</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">Yedekleme klasörleri salt okunurdur</string>
+    <!-- dialog option continue in alert dialog -->
+    <string name="button_continue">Devam et</string>
+    <!--Dialog title when the user selected is not on the contact list when sharing a node -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Kişi doğrulanamıyor</string>
+    <!--Dialog description when the user selected is not on the contact list when sharing a node -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">%s kişisi, kişiler listenizde olmadığı için doğrulanamıyor. Önce davetinizi kabul etmelerini bekleyin.</string>
+    <!-- Answer for confirmation dialog. -->
+    <string name="general_ok">Tamam</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="general_leave">Ayrıl</string>
+    <!-- Success message when left shared folders -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
+        <item quantity="one">%1$d paylaşılan klasörden ayrıldınız</item>
+        <item quantity="other">%1$d paylaşılan klasörden ayrıldınız</item>
+    </plurals>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
+        <item quantity="one">%1$d paylaşılan klasörden ayrılamadınız</item>
+        <item quantity="other">%1$d paylaşılan klasörden ayrılamadınız</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
+        <item quantity="one">%1$d paylaşılan klasörden ayrıldınız,&#160;</item>
+        <item quantity="other">%1$d paylaşılan klasörden ayrıldınız,&#160;</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
+        <item quantity="one">%1$d paylaşılan klasörden ayrılamadınız</item>
+        <item quantity="other">%1$d paylaşılan klasörden ayrılamadınız</item>
+    </plurals>
+    <!-- confirmation message before leaving some incoming shared folders -->
+    <plurals name="confirmation_leave_share_folder">
+        <item quantity="one">Klasörden ayrılırsanız bir daha göremezsiniz.</item>
+        <item quantity="other">Bu klasörlerden ayrılırsanız bir daha göremezsiniz.</item>
+    </plurals>
+    <!-- Title of the dialog to choose permissions when sharing. -->
+    <string name="dialog_select_permissions">Paylaşım izinleri</string>
+    <!-- Refers to access rights for a file folder. -->
+    <string name="file_properties_shared_folder_full_access">Tam erişim</string>
+    <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
+    <string name="file_properties_shared_folder_read_only">Salt okunur</string>
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
+    <string name="file_properties_shared_folder_read_write">Okuma ve yazma</string>
 </resources>
