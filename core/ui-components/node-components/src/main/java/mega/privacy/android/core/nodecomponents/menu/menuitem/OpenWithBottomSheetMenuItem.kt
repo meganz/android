@@ -3,13 +3,14 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.menu.menuaction.OpenWithMenuAction
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
@@ -24,7 +25,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunnin
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
-import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -47,9 +48,6 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
     private val httpServerStartUseCase: MegaApiHttpServerStartUseCase,
     private val httpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
     private val getStreamingUriStringForNode: GetStreamingUriStringForNode,
-    // Todo provide snackbar
-    //private val snackBarHandler: SnackBarHandler,
-    @ApplicationContext private val context: Context,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
@@ -65,67 +63,80 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         handler: BottomSheetClickHandler,
     ): () -> Unit = {
-        if (node is TypedFileNode) {
-            handler.coroutineScope.launch {
-                withContext(NonCancellable) {
+
+        fun defaultOpenWithAction() {
+            handler.actionHandler(menuAction, node)
+        }
+
+        handler.coroutineScope.launch {
+            withContext(NonCancellable) {
+                if (node is TypedFileNode) {
                     val file = getLocalFile(node)
                     if (node.type is AudioFileTypeInfo || node.type is VideoFileTypeInfo) {
                         openAudioOrVideoFiles(
-                            file,
-                            node,
-                            handler.navigationHandler,
-                            handler.coroutineScope
+                            context = handler.context,
+                            snackbarHandler = handler.snackbarHandler,
+                            localFile = file,
+                            node = node,
+                            parentCoroutineScope = handler.coroutineScope,
+                            openWithAction = ::defaultOpenWithAction
                         )
                     } else {
                         file?.let {
                             openNotStreamableFiles(
-                                handler.navigationHandler,
-                                it,
-                                node.type,
-                                handler.coroutineScope
+                                context = handler.context,
+                                snackbarHandler = handler.snackbarHandler,
+                                localFile = it,
+                                fileTypeInfo = node.type,
+                                parentCoroutineScope = handler.coroutineScope
                             )
-                        } ?: handler.actionHandler(menuAction, node)
+                        } ?: run {
+                            defaultOpenWithAction()
+                        }
                     }
+                } else {
+                    Timber.e("Cannot do the operation open with: Node is not a FileNode")
                 }
             }
-        } else {
-            Timber.Forest.e("Cannot do the operation open with: Node is not a FileNode")
         }
-        handler.onDismiss()
     }
 
     private suspend fun openAudioOrVideoFiles(
+        context: Context,
+        snackbarHandler: (SnackbarAttributes) -> Unit,
         localFile: File?,
         node: TypedFileNode,
-        navigationHandler: NavigationHandler,
         parentCoroutineScope: CoroutineScope,
+        openWithAction: () -> Unit,
     ) {
-        val fileUri = getAudioOrVideoFileUri(localFile, node)
+        val fileUri = getAudioOrVideoFileUri(context, localFile, node)
         Intent(Intent.ACTION_VIEW).apply {
             if (fileUri != null) {
                 setDataAndType(Uri.parse(fileUri), node.type.mimeType)
             } else {
-                // Todo provide snackbar
-                // snackBarHandler.postSnackbarMessage(R.string.error_open_file_with)
+                snackbarHandler(
+                    SnackbarAttributes(context.getString(sharedResR.string.error_open_file_with))
+                )
             }
             if (resolveActivity(context.packageManager) != null) {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 parentCoroutineScope.ensureActive()
-                //navController.context.startActivity(this)
+                context.startActivity(this)
             } else if (localFile == null) {
                 parentCoroutineScope.ensureActive()
-                // Todo: navigationHandler
-                //navController.navigate(cannotOpenFileDialog)
+                openWithAction()
             } else {
-                // Todo provide snackbar
-                // snackBarHandler.postSnackbarMessage(R.string.intent_not_available_file)
+                snackbarHandler(
+                    SnackbarAttributes(context.getString(sharedResR.string.intent_not_available_file))
+                )
             }
         }
     }
 
     private suspend fun openNotStreamableFiles(
-        navigationHandler: NavigationHandler,
+        context: Context,
+        snackbarHandler: (SnackbarAttributes) -> Unit,
         localFile: File?,
         fileTypeInfo: FileTypeInfo,
         parentCoroutineScope: CoroutineScope,
@@ -140,20 +151,22 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
                 if (resolveActivity(context.packageManager) != null) {
                     flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                     parentCoroutineScope.ensureActive()
-                    // Todo NavigationHandler
-                    //navController.context.startActivity(this@apply)
+                    context.startActivity(this)
                 } else {
-                    // Todo provide snackbar
-                    // snackBarHandler.postSnackbarMessage(R.string.intent_not_available)
+                    snackbarHandler(
+                        SnackbarAttributes(context.getString(sharedResR.string.intent_not_available))
+                    )
                 }
             } ?: run {
-                // Todo provide snackbar
-                // snackBarHandler.postSnackbarMessage(R.string.general_text_error)
+                snackbarHandler(
+                    SnackbarAttributes(context.getString(R.string.general_text_error))
+                )
             }
         }
     }
 
     private suspend fun getAudioOrVideoFileUri(
+        context: Context,
         localFile: File?,
         node: TypedFileNode,
     ): String? = localFile?.let {
@@ -188,9 +201,4 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
         .getOrDefault(0)
 
     override val groupId = 5
-
-    companion object {
-        // Todo duplicate to the one in mega.privacy.android.app.presentation.search.navigation.CannotOpenFileDialogNavigation.kt
-        private const val cannotOpenFileDialog = "search/cannotOpenFileDialog"
-    }
 }

@@ -77,7 +77,10 @@ fun NodeOptionsBottomSheetRoute(
     EventEffect(
         event = nodeOptionActionState.downloadEvent,
         onConsumed = nodeOptionsActionViewModel::markDownloadEventConsumed,
-        action = onTransfer
+        action = {
+            onTransfer(it)
+            onDismiss()
+        }
     )
 
     EventEffect(

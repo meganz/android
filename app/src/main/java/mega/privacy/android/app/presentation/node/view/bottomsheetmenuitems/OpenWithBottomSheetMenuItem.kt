@@ -10,13 +10,12 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.R
+import mega.android.core.ui.model.menu.MenuAction
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.app.presentation.node.model.menuaction.OpenWithMenuAction
 import mega.privacy.android.app.presentation.search.navigation.cannotOpenFileDialog
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.app.utils.Constants
-import mega.android.core.ui.model.menu.MenuAction
-import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -28,6 +27,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunnin
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
+import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -106,7 +106,7 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
             if (fileUri != null) {
                 setDataAndType(Uri.parse(fileUri), node.type.mimeType)
             } else {
-                snackBarHandler.postSnackbarMessage(R.string.error_open_file_with)
+                snackBarHandler.postSnackbarMessage(sharedResR.string.error_open_file_with)
             }
             if (resolveActivity(context.packageManager) != null) {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -117,7 +117,7 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
                 parentCoroutineScope.ensureActive()
                 navController.navigate(cannotOpenFileDialog)
             } else {
-                snackBarHandler.postSnackbarMessage(R.string.intent_not_available_file)
+                snackBarHandler.postSnackbarMessage(sharedResR.string.intent_not_available_file)
             }
         }
     }
@@ -140,9 +140,9 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
                     parentCoroutineScope.ensureActive()
                     navController.context.startActivity(this@apply)
                 } else {
-                    snackBarHandler.postSnackbarMessage(R.string.intent_not_available)
+                    snackBarHandler.postSnackbarMessage(sharedResR.string.intent_not_available)
                 }
-            } ?: snackBarHandler.postSnackbarMessage(R.string.general_text_error)
+            } ?: snackBarHandler.postSnackbarMessage(sharedResR.string.general_text_error)
         }
     }
 
