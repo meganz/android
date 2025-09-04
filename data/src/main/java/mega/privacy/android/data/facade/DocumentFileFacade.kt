@@ -73,8 +73,8 @@ class DocumentFileFacade @Inject constructor(
         val file = uri.takeIf { (uri.scheme == "file") }?.path?.let { File(it) }
         return when {
             file?.exists() == true -> DocumentFile.fromFile(file)
-            DocumentsContract.isTreeUri(uri) -> fromTreeUri(uri)
-            else -> fromSingleUri(uri)
+            DocumentsContract.isTreeUri(uri) -> fromTreeUri(uri).takeIf { it?.exists() == true }
+            else -> fromSingleUri(uri).takeIf { it?.exists() == true }
         }
     }
 
