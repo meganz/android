@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
@@ -50,6 +49,7 @@ import mega.privacy.android.icon.pack.R as IconR
 import mega.privacy.android.legacy.core.ui.controls.tooltips.LegacyMegaTooltip
 import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedWithoutBackgroundMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyColumn
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedClickableText
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
@@ -100,7 +100,6 @@ fun ChatListView(
     onScheduleMeeting: () -> Unit = {},
     onShowNextTooltip: (MeetingTooltipItem) -> Unit = {},
 ) {
-
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -163,10 +162,11 @@ private fun ListView(
     var showTooltip = tooltip == MeetingTooltipItem.RECURRING_OR_PENDING
             || tooltip == MeetingTooltipItem.RECURRING || tooltip == MeetingTooltipItem.PENDING
 
-    LazyColumn(
+    FastScrollLazyColumn(
         state = listState,
+        totalItems = items.size,
         modifier = modifier
-            .testTag("chat_room_list:list")
+            .testTag("chat_room_list:list"),
     ) {
         itemsIndexed(
             items = items,

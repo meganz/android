@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.videosection.view.playlist
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
@@ -10,7 +8,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
@@ -39,6 +36,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
@@ -48,15 +47,18 @@ import mega.privacy.android.app.presentation.videosection.view.VideoSectionLoadi
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyColumn
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.VideoPlaylistCreationButtonPressedEvent
 
 @Composable
@@ -260,10 +262,12 @@ internal fun VideoPlaylistsView(
                 )
 
                 else -> {
-                    LazyColumn(state = lazyListState, modifier = modifier) {
-                        item(
-                            key = "header"
-                        ) {
+                    FastScrollLazyColumn(
+                        state = lazyListState,
+                        totalItems = items.size,
+                        modifier = modifier.semantics { testTagsAsResourceId = true },
+                    ) {
+                        item(key = "header") {
                             HeaderViewItem(
                                 modifier = Modifier.padding(
                                     vertical = 10.dp,

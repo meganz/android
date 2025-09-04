@@ -63,7 +63,7 @@ fun FastScrollLazyVerticalGrid(
     userScrollEnabled: Boolean = true,
     content: LazyGridScope.() -> Unit,
 ) {
-    Box(modifier = modifier) {
+    Box {
         LazyVerticalGrid(
             columns = columns,
             modifier = modifier.testTag(LAZY_GRID_TAG),

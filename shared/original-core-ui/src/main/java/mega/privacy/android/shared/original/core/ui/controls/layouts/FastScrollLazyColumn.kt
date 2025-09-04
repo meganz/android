@@ -64,7 +64,7 @@ fun FastScrollLazyColumn(
     userScrollEnabled: Boolean = true,
     content: LazyListScope.() -> Unit,
 ) {
-    Box(modifier = modifier) {
+    Box {
         LazyColumn(
             modifier = modifier.testTag(LAZY_COLUMN_TAG),
             state = state,

@@ -76,7 +76,7 @@ fun <T : TypedNode> NodeGridView(
         columns = GridCells.Fixed(spanCount),
         totalItems = nodeUIItems.size,
         modifier = modifier
-            .padding(horizontal = 4.dp)
+            .padding(horizontal = 8.dp)
             .semantics { testTagsAsResourceId = true },
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),

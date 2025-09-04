@@ -1,13 +1,11 @@
 package mega.privacy.android.feature.sync.ui.megapicker
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -32,10 +30,12 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.extension.getIcon
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.legacy.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyColumn
 import mega.privacy.android.shared.original.core.ui.controls.skeleton.ListItemLoadingSkeleton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -55,7 +55,11 @@ internal fun MegaFolderPickerView(
     isLoading: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    LazyColumn(state = listState, modifier = modifier) {
+    FastScrollLazyColumn(
+        state = listState,
+        totalItems = nodesList?.size ?: 0,
+        modifier = modifier
+    ) {
         when {
             nodesList == null || isLoading -> {
                 item(key = "loading state") {
@@ -87,7 +91,8 @@ internal fun MegaFolderPickerView(
                         showChangeViewType = showChangeViewType
                     )
                 }
-                items(count = nodesList.size,
+                items(
+                    count = nodesList.size,
                     key = {
                         nodesList[it].node.id.longValue
                     }) {

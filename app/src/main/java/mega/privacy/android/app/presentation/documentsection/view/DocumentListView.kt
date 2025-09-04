@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.documentsection.view
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
@@ -25,6 +24,7 @@ import mega.privacy.android.icon.pack.R
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyColumn
 import mega.privacy.android.shared.original.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -44,7 +44,11 @@ internal fun DocumentListView(
     isSelectionMode: Boolean,
     onLongClick: (item: DocumentUiEntity, index: Int) -> Unit = { _, _ -> },
 ) {
-    LazyColumn(state = lazyListState, modifier = modifier) {
+    FastScrollLazyColumn(
+        state = lazyListState,
+        totalItems = items.size,
+        modifier = modifier,
+    ) {
         item(
             key = "header"
         ) {

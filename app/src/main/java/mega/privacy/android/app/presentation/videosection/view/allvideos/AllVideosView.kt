@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetValue
@@ -36,6 +35,7 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
+import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyColumn
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -56,7 +56,6 @@ import nz.mega.sdk.MegaNode
 @Composable
 internal fun AllVideosView(
     items: List<VideoUIEntity>,
-    highlightText: String = "",
     shouldApplySensitiveMode: Boolean,
     progressBarShowing: Boolean,
     searchMode: Boolean,
@@ -75,6 +74,7 @@ internal fun AllVideosView(
     clearAddToPlaylistsTitles: () -> Unit,
     retryActionCallback: () -> Unit,
     onLongClick: ((item: VideoUIEntity, index: Int) -> Unit) = { _, _ -> },
+    highlightText: String = ""
 ) {
     val coroutineScope = rememberCoroutineScope()
     val locationModalSheetState = rememberModalBottomSheetState(
@@ -184,9 +184,11 @@ internal fun AllVideosView(
                 )
 
                 else -> {
-                    LazyColumn(
+                    FastScrollLazyColumn(
                         state = lazyListState,
-                        modifier = Modifier.testTag(VIDEOS_LIST_TEST_TAG)
+                        totalItems = items.size,
+                        modifier = modifier
+                            .testTag(VIDEOS_LIST_TEST_TAG),
                     ) {
                         item(
                             key = "header"

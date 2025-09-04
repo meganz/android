@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.audiosection.view
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
@@ -11,6 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
@@ -20,6 +21,7 @@ import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.icon.pack.R
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
+import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyColumn
 import mega.privacy.android.shared.original.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import nz.mega.sdk.MegaNode
@@ -38,7 +40,11 @@ internal fun AudioListView(
     inSelectionMode: Boolean = false,
     onLongClick: ((item: AudioUiEntity, index: Int) -> Unit) = { _, _ -> },
 ) {
-    LazyColumn(state = lazyListState, modifier = modifier) {
+    FastScrollLazyColumn(
+        state = lazyListState,
+        totalItems = items.size,
+        modifier = modifier.semantics { testTagsAsResourceId = true },
+    ) {
         item(
             key = "header"
         ) {
