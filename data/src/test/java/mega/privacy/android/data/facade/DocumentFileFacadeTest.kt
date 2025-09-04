@@ -74,7 +74,9 @@ class DocumentFileFacadeTest {
                             on { this.scheme } doReturn "content"
                             on { this.path } doReturn testUri
                         }
-                        val expected = mock<DocumentFile>()
+                        val expected = mock<DocumentFile>() {
+                            on { exists() } doReturn true
+                        }
 
                         whenever(Uri.parse(testUri)).thenReturn(uri)
                         whenever(DocumentsContract.isTreeUri(uri)) doReturn true
@@ -98,7 +100,9 @@ class DocumentFileFacadeTest {
                         on { this.scheme } doReturn "content"
                         on { this.path } doReturn testUri
                     }
-                    val expected = mock<DocumentFile>()
+                    val expected = mock<DocumentFile>() {
+                        on { exists() } doReturn true
+                    }
 
                     whenever(Uri.parse(testUri)).thenReturn(uri)
                     whenever(DocumentsContract.isTreeUri(uri)) doReturn false
