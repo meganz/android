@@ -9,6 +9,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -23,9 +24,12 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
@@ -337,5 +341,29 @@ internal class PasscodeRepositoryImplTest {
         underTest.setPasscodeType(null)
 
         verify(passcodeStoreGateway).setBiometricsEnabled(false)
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    internal fun `test that the configuration change status is successfully set`(
+        isConfigurationChanged: Boolean,
+    ) = runTest {
+        underTest.setConfigurationChangedStatus(isConfigurationChanged)
+
+        verify(passcodeStoreGateway).setConfigurationChangedStatus(isConfigurationChanged = isConfigurationChanged)
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    internal fun `test that the correct configuration change status is emitted`(
+        isConfigurationChanged: Boolean,
+    ) = runTest {
+        whenever(passcodeStoreGateway.monitorConfigurationChangedStatus()) doReturn flowOf(
+            isConfigurationChanged
+        )
+
+        underTest.monitorConfigurationChangedStatus().test {
+            assertThat(expectMostRecentItem()).isEqualTo(isConfigurationChanged)
+        }
     }
 }

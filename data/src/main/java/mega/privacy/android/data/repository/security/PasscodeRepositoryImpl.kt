@@ -115,11 +115,12 @@ internal class PasscodeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun setLastOrientation(orientation: Int) = withContext(ioDispatcher) {
-        passcodeStoreGateway.setOrientation(orientation)
-    }
+    override suspend fun setConfigurationChangedStatus(isConfigurationChanged: Boolean) =
+        withContext(ioDispatcher) {
+            passcodeStoreGateway.setConfigurationChangedStatus(isConfigurationChanged = isConfigurationChanged)
+        }
 
-    override fun monitorLastOrientation() = passcodeStoreGateway.monitorOrientation()
-        .map { it?.toIntOrNull() }
-        .flowOn(ioDispatcher)
+    override fun monitorConfigurationChangedStatus() =
+        passcodeStoreGateway.monitorConfigurationChangedStatus()
+            .flowOn(ioDispatcher)
 }

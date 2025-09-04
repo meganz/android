@@ -19,6 +19,9 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.NullSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -247,29 +250,23 @@ internal class PasscodeDataStoreTest {
         verifyBlocking(encryptData) { invoke(null) }
     }
 
-    @Test
-    internal fun `test that orientation is encrypted`() = runTest {
-        val input = 1
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    internal fun `test that configuration change status is encrypted`(isConfigurationChanged: Boolean) =
+        runTest {
+            underTest.setConfigurationChangedStatus(isConfigurationChanged = isConfigurationChanged)
 
-        underTest.setOrientation(input)
-
-        verifyBlocking(encryptData) { invoke(input.toString()) }
-    }
-
-    @Test
-    internal fun `test that orientation is decrypted`() = runTest {
-        val expected = 2.toString()
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected) }
-
-        underTest.monitorOrientation().test {
-            assertThat(awaitItem()).isEqualTo(expected)
+            verifyBlocking(encryptData) { invoke(isConfigurationChanged.toString()) }
         }
-    }
 
-    @Test
-    internal fun `test that null orientation is encrypted as null`() = runTest {
-        underTest.setOrientation(null)
+    @ParameterizedTest
+    @ValueSource(strings = ["true", "false"])
+    @NullSource
+    internal fun `test that configuration change status is decrypted`(value: String?) = runTest {
+        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(value) }
 
-        verifyBlocking(encryptData) { invoke(null) }
+        underTest.monitorConfigurationChangedStatus().test {
+            assertThat(expectMostRecentItem()).isEqualTo(value?.toBooleanStrictOrNull() ?: false)
+        }
     }
 }

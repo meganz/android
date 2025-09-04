@@ -113,16 +113,16 @@ interface PasscodeRepository {
     suspend fun setPasscodeType(passcodeType: PasscodeType?)
 
     /**
-     * Set last orientation
+     * Set configuration change status
      *
-     * @param orientation
+     * @param isConfigurationChanged
      */
-    suspend fun setLastOrientation(orientation: Int)
+    suspend fun setConfigurationChangedStatus(isConfigurationChanged: Boolean)
 
     /**
-     * Monitor last orientation
+     * Monitor configuration change status
      *
-     * @return flow of the latest orientation
+     * @return configuration change status as a flow
      */
-    fun monitorLastOrientation(): Flow<Int?>
+    fun monitorConfigurationChangedStatus(): Flow<Boolean>
 }

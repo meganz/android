@@ -121,16 +121,16 @@ interface PasscodeStoreGateway {
     fun monitorBiometricEnabledState(): Flow<Boolean?>
 
     /**
-     * Set last orientation
+     * Set configuration change status
      *
-     * @param orientation
+     * @param isConfigurationChanged
      */
-    suspend fun setOrientation(orientation: Int?)
+    suspend fun setConfigurationChangedStatus(isConfigurationChanged: Boolean)
 
     /**
-     * Monitor orientation
+     * Monitor configuration change status
      *
-     * @return orientation as a flow
+     * @return configuration change status as a flow
      */
-    fun monitorOrientation(): Flow<String?>
+    fun monitorConfigurationChangedStatus(): Flow<Boolean>
 }

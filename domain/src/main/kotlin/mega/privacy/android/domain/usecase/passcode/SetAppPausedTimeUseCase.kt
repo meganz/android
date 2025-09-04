@@ -21,12 +21,12 @@ class SetAppPausedTimeUseCase @Inject constructor(
      */
     suspend operator fun invoke(
         currentTime: Long,
-        orientation: Int,
+        isConfigurationChanged: Boolean,
     ) {
         val locked = monitorPasscodeLockStateUseCase().firstOrNull() ?: false
         if (!locked) {
             passcodeRepository.setLastPausedTime(currentTime)
-            passcodeRepository.setLastOrientation(orientation)
+            passcodeRepository.setConfigurationChangedStatus(isConfigurationChanged = isConfigurationChanged)
         }
     }
 }

@@ -35,14 +35,14 @@ internal class UpdatePasscodeStateUseCaseTest {
             passcodeRepository.stub {
                 on { monitorPasscodeTimeOut() }.thenReturn(hotFlow(PasscodeTimeout.Immediate))
                 on { monitorIsPasscodeEnabled() }.thenReturn(hotFlow(true))
-                on { monitorLastOrientation() }.thenReturn(hotFlow(null))
+                on { monitorConfigurationChangedStatus() }.thenReturn(hotFlow(false))
                 onBlocking { getLastPausedTime() }.thenReturn(33L)
             }
 
-            underTest(34L, 1)
+            underTest(34L)
 
-        verify(passcodeRepository).setLocked(true)
-    }
+            verify(passcodeRepository).setLocked(true)
+        }
 
     @Test
     internal fun `test that nothing is set if the passcode is not enabled`() = runTest {
@@ -50,10 +50,10 @@ internal class UpdatePasscodeStateUseCaseTest {
         passcodeRepository.stub {
             on { monitorPasscodeTimeOut() }.thenReturn(hotFlow(PasscodeTimeout.Immediate))
             on { monitorIsPasscodeEnabled() }.thenReturn(hotFlow(false))
-            on { monitorLastOrientation() }.thenReturn(hotFlow(null))
+            on { monitorConfigurationChangedStatus() }.thenReturn(hotFlow(false))
         }
 
-        underTest(12L, 1)
+        underTest(12L)
 
         verify(passcodeRepository, never()).setLocked(any())
     }
@@ -70,10 +70,10 @@ internal class UpdatePasscodeStateUseCaseTest {
                 on { monitorPasscodeTimeOut() }.thenReturn(hotFlow(PasscodeTimeout.TimeSpan(timeout)))
                 on { monitorIsPasscodeEnabled() }.thenReturn(hotFlow(true))
                 onBlocking { getLastPausedTime() }.thenReturn(lastLockedTime)
-                on { monitorLastOrientation() }.thenReturn(hotFlow(null))
+                on { monitorConfigurationChangedStatus() }.thenReturn(hotFlow(false))
             }
 
-            underTest.invoke(resumedTime, 1)
+            underTest.invoke(resumedTime)
 
             verify(passcodeRepository).setLocked(true)
         }
@@ -89,10 +89,10 @@ internal class UpdatePasscodeStateUseCaseTest {
             on { monitorPasscodeTimeOut() }.thenReturn(hotFlow(PasscodeTimeout.TimeSpan(timeout)))
             on { monitorIsPasscodeEnabled() }.thenReturn(hotFlow(true))
             onBlocking { getLastPausedTime() }.thenReturn(lastLockedTime)
-            on { monitorLastOrientation() }.thenReturn(hotFlow(null))
+            on { monitorConfigurationChangedStatus() }.thenReturn(hotFlow(false))
         }
 
-        underTest.invoke(resumedTime, 1)
+        underTest.invoke(resumedTime)
 
         verify(passcodeRepository, never()).setLocked(any())
     }
@@ -109,31 +109,30 @@ internal class UpdatePasscodeStateUseCaseTest {
                 on { monitorPasscodeTimeOut() }.thenReturn(hotFlow(PasscodeTimeout.TimeSpan(timeout)))
                 on { monitorIsPasscodeEnabled() }.thenReturn(hotFlow(true))
                 onBlocking { getLastPausedTime() }.thenReturn(lastLockedTime)
-                on { monitorLastOrientation() }.thenReturn(hotFlow(null))
+                on { monitorConfigurationChangedStatus() }.thenReturn(hotFlow(false))
             }
 
-            underTest.invoke(resumedTime, 1)
+            underTest.invoke(resumedTime)
 
             verify(passcodeRepository, never()).setLocked(true)
-    }
+        }
 
     @Test
-    internal fun `test that lock state is not set to locked on orientation change`() = runTest {
+    internal fun `test that lock state is not set to locked on configuration change`() = runTest {
         Mockito.clearInvocations(passcodeRepository)
-        val orientationChangeGracePeriod = UpdatePasscodeStateUseCase.ROTATION_GRACE_MILLISECONDS
+        val orientationChangeGracePeriod =
+            UpdatePasscodeStateUseCase.CONFIGURATION_CHANGE_GRACE_MILLISECONDS
         val lastLockedTime = 1L
         val resumedTime = lastLockedTime + orientationChangeGracePeriod / 2
-        val originalOrientation = 2
-        val newOrientation = 1
 
         passcodeRepository.stub {
             on { monitorPasscodeTimeOut() }.thenReturn(hotFlow(PasscodeTimeout.Immediate))
             on { monitorIsPasscodeEnabled() }.thenReturn(hotFlow(true))
             onBlocking { getLastPausedTime() }.thenReturn(lastLockedTime)
-            on { monitorLastOrientation() }.thenReturn(hotFlow(originalOrientation))
+            on { monitorConfigurationChangedStatus() }.thenReturn(hotFlow(true))
         }
 
-        underTest.invoke(resumedTime, newOrientation)
+        underTest.invoke(resumedTime)
 
         verify(passcodeRepository, never()).setLocked(true)
     }

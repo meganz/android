@@ -90,7 +90,9 @@ class PasscodeProcessLifecycleOwner private constructor() {
             Timber.d("Process lifecycle event: STARTED \n ${getStateString(activity)}")
             activity?.let {
                 observer?.onStart(
-                    PasscodeProcessLifeCycleEventData(it.resources.configuration.orientation)
+                    data = PasscodeProcessLifeCycleEventData(
+                        isConfigurationChanged = activity.isChangingConfigurations
+                    )
                 )
             }
         }
@@ -110,7 +112,9 @@ class PasscodeProcessLifecycleOwner private constructor() {
             Timber.d("Process lifecycle event: STOPPED \n ${getStateString(activity)}")
             activity?.let {
                 observer?.onStop(
-                    PasscodeProcessLifeCycleEventData(it.resources.configuration.orientation)
+                    data = PasscodeProcessLifeCycleEventData(
+                        isConfigurationChanged = activity.isChangingConfigurations
+                    )
                 )
             }
         }
@@ -131,7 +135,8 @@ class PasscodeProcessLifecycleOwner private constructor() {
                 // callback added in onCreate(). By adding our own activity registered callback in
                 // onActivityPreCreated(), we get our callbacks first while still having the
                 // right relative order compared to the Activity's onStart()/onResume() callbacks.
-                Api29Impl.registerActivityLifecycleCallbacks(activity,
+                Api29Impl.registerActivityLifecycleCallbacks(
+                    activity,
                     object : EmptyCallbacks() {
                         override fun onActivityPostStarted(activity: Activity) {
                             activityStarted(activity)
@@ -186,7 +191,7 @@ interface PasscodeProcessLifeCycleObserver {
 }
 
 data class PasscodeProcessLifeCycleEventData(
-    val orientation: Int,
+    val isConfigurationChanged: Boolean,
 )
 
 

@@ -55,7 +55,7 @@ internal class PasscodeDataStore(
     private val passcodeLastBackgroundKey = stringPreferencesKey("passcodeLastBackgroundKey")
     private val passcodeTypeKey = stringPreferencesKey("passcodeTypeKey")
     private val biometricsEnabledKey = stringPreferencesKey("biometricsEnabledKey")
-    private val orientationKey = stringPreferencesKey("orientation")
+    private val configurationChangeKey = stringPreferencesKey("configurationChangeKey")
 
     override fun monitorFailedAttempts() =
         getPreferenceFlow().monitor(failedAttemptsKey)
@@ -164,19 +164,18 @@ internal class PasscodeDataStore(
         getPreferenceFlow().monitor(biometricsEnabledKey)
             .map { decryptData(it)?.toBooleanStrictOrNull() }
 
-    override suspend fun setOrientation(orientation: Int?) {
-        val encryptedValue = encryptData(orientation?.toString())
+    override suspend fun setConfigurationChangedStatus(isConfigurationChanged: Boolean) {
+        val encryptedValue = encryptData(isConfigurationChanged.toString())
         editPreferences {
             if (encryptedValue == null) {
-                it.remove(orientationKey)
+                it.remove(configurationChangeKey)
             } else {
-                it[orientationKey] = encryptedValue
+                it[configurationChangeKey] = encryptedValue
             }
         }
     }
 
-    override fun monitorOrientation() =
-        getPreferenceFlow().monitor(orientationKey)
-            .map { decryptData(it) }
-
+    override fun monitorConfigurationChangedStatus() =
+        getPreferenceFlow().monitor(configurationChangeKey)
+            .map { decryptData(it)?.toBooleanStrictOrNull() ?: false }
 }

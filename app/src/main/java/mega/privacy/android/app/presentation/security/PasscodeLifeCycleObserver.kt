@@ -25,14 +25,19 @@ class PasscodeLifeCycleObserver @Inject constructor(
     override fun onStart(data: PasscodeProcessLifeCycleEventData) {
         scope.get().launch {
             Timber.d("App started")
-            updatePasscodeStateUseCase.get()(System.currentTimeMillis(), data.orientation)
+            updatePasscodeStateUseCase.get()(
+                currentTime = System.currentTimeMillis()
+            )
         }
     }
 
     override fun onStop(data: PasscodeProcessLifeCycleEventData) {
         scope.get().launch {
             Timber.d("App paused")
-            setAppPausedTimeUseCase.get()(System.currentTimeMillis(), data.orientation)
+            setAppPausedTimeUseCase.get()(
+                currentTime = System.currentTimeMillis(),
+                isConfigurationChanged = data.isConfigurationChanged
+            )
         }
     }
 }

@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.passcode
 
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import mega.privacy.android.domain.entity.passcode.PasscodeTimeout
 import mega.privacy.android.domain.repository.security.PasscodeRepository
@@ -18,18 +19,15 @@ class UpdatePasscodeStateUseCase @Inject constructor(
      *
      * @param currentTime
      */
-    suspend operator fun invoke(
-        currentTime: Long,
-        orientation: Int,
-    ) {
+    suspend operator fun invoke(currentTime: Long) {
         if (passcodeRepository.monitorIsPasscodeEnabled().firstOrNull() != true) return
-        val lastOrientation = passcodeRepository.monitorLastOrientation().firstOrNull() ?: orientation
+        val isConfigurationChanged = passcodeRepository.monitorConfigurationChangedStatus().first()
 
         when (val timeOut = passcodeRepository.monitorPasscodeTimeOut().firstOrNull()) {
             PasscodeTimeout.Immediate -> {
-                if (lastOrientation != orientation) checkTimeSpan(
+                if (isConfigurationChanged) checkTimeSpan(
                     currentTime,
-                    ROTATION_GRACE_MILLISECONDS
+                    CONFIGURATION_CHANGE_GRACE_MILLISECONDS
                 ) else passcodeRepository.setLocked(true)
             }
 
@@ -64,6 +62,6 @@ class UpdatePasscodeStateUseCase @Inject constructor(
     ) = lastPaused != null && currentTime - lastPaused >= timeOutMilliseconds
 
     companion object {
-        internal const val ROTATION_GRACE_MILLISECONDS: Long = 700
+        internal const val CONFIGURATION_CHANGE_GRACE_MILLISECONDS: Long = 700
     }
 }
