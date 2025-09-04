@@ -168,6 +168,9 @@ fun NodeListViewItem(
             .alpha(1f.takeIf { !isSensitive } ?: 0.5f)
             .conditional(isHighlighted) {
                 background(DSTokens.colors.background.surface2)
+            }
+            .conditional(isSelected) {
+                background(DSTokens.colors.background.surface1)
             },
         contentPadding = PaddingValues(
             horizontal = DSTokens.spacings.s4,

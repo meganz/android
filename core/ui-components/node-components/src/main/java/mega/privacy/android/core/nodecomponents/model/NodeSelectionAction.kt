@@ -2,11 +2,13 @@ package mega.privacy.android.core.nodecomponents.model
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.model.TopAppBarAction
+import mega.android.core.ui.modifiers.infiniteRotation
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -20,11 +22,25 @@ sealed interface NodeSelectionAction : TopAppBarAction {
         override val testTag: String = "node_selection_action:select_all"
 
         @Composable
-        override fun getDescription() = "Select all" // TODO: Use string resource
+        override fun getDescription() = stringResource(sharedR.string.action_select_all)
 
         @Composable
         override fun getIconPainter() =
             rememberVectorPainter(IconPack.Medium.Thin.Outline.CheckStack)
+    }
+
+    data object Selecting : TopAppBarAction {
+        override val testTag: String = "node_selection_action:selecting"
+
+        @Composable
+        override fun getDescription() = stringResource(sharedR.string.general_selecting)
+
+        @Composable
+        override fun getIconPainter() =
+            rememberVectorPainter(IconPack.Medium.Thin.Outline.LoaderGrad)
+
+        override val modifier: Modifier
+            get() = Modifier.infiniteRotation()
     }
 
     data object Download : NodeSelectionActionString(

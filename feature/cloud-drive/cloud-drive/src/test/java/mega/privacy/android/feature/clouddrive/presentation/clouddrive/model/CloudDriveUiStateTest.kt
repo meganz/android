@@ -5,6 +5,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -164,7 +165,7 @@ class CloudDriveUiStateTest {
 
         val state = CloudDriveUiState(
             items = items,
-            isNodesLoading = false,
+            nodesLoadingState = NodesLoadingState.FullyLoaded,
             isHiddenNodeSettingsLoading = false,
             showHiddenNodes = false,
             isHiddenNodesEnabled = true
@@ -182,7 +183,7 @@ class CloudDriveUiStateTest {
 
         val state = CloudDriveUiState(
             items = items,
-            isNodesLoading = true,
+            nodesLoadingState = NodesLoadingState.Loading,
             isHiddenNodeSettingsLoading = false,
             showHiddenNodes = false,
             isHiddenNodesEnabled = true
@@ -200,7 +201,7 @@ class CloudDriveUiStateTest {
 
         val state = CloudDriveUiState(
             items = items,
-            isNodesLoading = false,
+            nodesLoadingState = NodesLoadingState.FullyLoaded,
             isHiddenNodeSettingsLoading = false,
             showHiddenNodes = false,
             isHiddenNodesEnabled = true
@@ -254,7 +255,7 @@ class CloudDriveUiStateTest {
 
         val state = CloudDriveUiState(
             items = items,
-            isNodesLoading = false,
+            nodesLoadingState = NodesLoadingState.FullyLoaded,
             isHiddenNodeSettingsLoading = false,
             showHiddenNodes = false,
             isHiddenNodesEnabled = true
@@ -273,7 +274,7 @@ class CloudDriveUiStateTest {
     fun `test that edge case with empty items list works correctly`() {
         val state = CloudDriveUiState(
             items = emptyList(),
-            isNodesLoading = false,
+            nodesLoadingState = NodesLoadingState.FullyLoaded,
             isHiddenNodeSettingsLoading = false,
             showHiddenNodes = false,
             isHiddenNodesEnabled = true

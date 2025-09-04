@@ -1252,7 +1252,7 @@ internal class NodeRepositoryImpl @Inject constructor(
         nodeId: NodeId,
         order: SortOrder?,
         initialBatchSize: Int,
-    ): Flow<List<UnTypedNode>> = flow {
+    ): Flow<Pair<List<UnTypedNode>, Boolean>> = flow {
         val token = cancelTokenProvider.getOrCreateCancelToken()
         val filter = megaSearchFilterMapper(parentHandle = nodeId)
         val offlineItems = getAllOfflineNodeHandle()
@@ -1271,7 +1271,7 @@ internal class NodeRepositoryImpl @Inject constructor(
                     offline = offlineItems[megaNode.handle.toString()]
                 )
             }
-        emit(initialNodes)
+        emit(initialNodes to (allChildren.size > initialBatchSize))
 
         // If there are more nodes, process them and emit the complete list
         if (allChildren.size > initialBatchSize) {
@@ -1284,8 +1284,8 @@ internal class NodeRepositoryImpl @Inject constructor(
                         offline = offlineItems[megaNode.handle.toString()]
                     )
                 }
-            // Second emit: Complete list (initial + remaining)
-            emit(initialNodes + remainingNodes)
+            // Second emit: Complete list (initial + remaining) with hasMore = false
+            emit(initialNodes + remainingNodes to false)
         }
     }.flowOn(ioDispatcher)
 }

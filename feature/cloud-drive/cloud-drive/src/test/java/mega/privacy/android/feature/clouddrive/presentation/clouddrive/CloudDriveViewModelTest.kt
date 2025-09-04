@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -42,6 +43,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -77,9 +79,12 @@ class CloudDriveViewModelTest {
     private val folderNodeHandle = 123L
     private val folderNodeId = NodeId(folderNodeHandle)
 
+    private lateinit var testScheduler: TestCoroutineScheduler
+
     @Before
     fun setUp() {
-        Dispatchers.setMain(StandardTestDispatcher())
+        testScheduler = TestCoroutineScheduler()
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
     }
 
     @After
@@ -126,8 +131,54 @@ class CloudDriveViewModelTest {
         whenever(getNodeNameByIdUseCase(eq(folderNodeId))).thenReturn("Test folder")
         whenever(getFileBrowserNodeChildrenUseCase(folderNodeHandle)).thenReturn(items)
 
-        // Setup the new chunked use case to return a flow with the items
-        whenever(getNodesByIdInChunkUseCase.invoke(folderNodeId)).thenReturn(flowOf(items))
+        // Setup the new chunked use case to return a flow with the items and hasMore flag
+        whenever(getNodesByIdInChunkUseCase.invoke(folderNodeId)).thenReturn(
+            flowOf(
+                Pair(
+                    items,
+                    false
+                )
+            )
+        )
+
+        val nodeUiItems = items.map { node ->
+            NodeUiItem(
+                node = node,
+                isSelected = false
+            )
+        }
+        whenever(
+            nodeUiItemMapper(
+                nodeList = items,
+                existingItems = emptyList(),
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                isPublicNodes = false,
+                showPublicLinkCreationTime = false,
+                highlightedNodeId = null,
+                highlightedNames = null,
+                isContactVerificationOn = false,
+            )
+        ).thenReturn(nodeUiItems)
+        whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorNodeUpdatesByIdUseCase(folderNodeId)).thenReturn(flowOf())
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
+    }
+
+    private suspend fun setupTestDataWithPartialLoad(items: List<TypedNode>) {
+        whenever(getNodeNameByIdUseCase(eq(folderNodeId))).thenReturn("Test folder")
+        whenever(getFileBrowserNodeChildrenUseCase(folderNodeHandle)).thenReturn(items)
+
+        // Setup the new chunked use case to return a flow with the items and hasMore = true (partial load)
+        whenever(getNodesByIdInChunkUseCase.invoke(folderNodeId)).thenReturn(
+            flowOf(
+                Pair(
+                    items,
+                    true
+                )
+            )
+        )
 
         val nodeUiItems = items.map { node ->
             NodeUiItem(
@@ -162,7 +213,7 @@ class CloudDriveViewModelTest {
         underTest.uiState.test {
             val initialState = awaitItem()
             assertThat(initialState.currentFolderId).isEqualTo(folderNodeId)
-            assertThat(initialState.isNodesLoading).isTrue()
+            assertThat(initialState.nodesLoadingState).isEqualTo(NodesLoadingState.Loading)
             assertThat(initialState.isHiddenNodeSettingsLoading).isTrue()
             assertThat(initialState.isLoading).isTrue()
             assertThat(initialState.items).isEmpty()
@@ -221,7 +272,12 @@ class CloudDriveViewModelTest {
 
             // Ensure that getFileBrowserNodeChildrenUseCase is mocked for the node update scenario
             // This will be called when getNodeUiItems() is invoked during the node update
-            whenever(getFileBrowserNodeChildrenUseCase(folderNodeHandle)).thenReturn(listOf(node1, node2))
+            whenever(getFileBrowserNodeChildrenUseCase(folderNodeHandle)).thenReturn(
+                listOf(
+                    node1,
+                    node2
+                )
+            )
 
             // Ensure that nodeUiItemMapper is mocked for the node update scenario
             val updatedNodeUiItems = listOf(
@@ -249,10 +305,10 @@ class CloudDriveViewModelTest {
             // Wait for initial loading to complete
             underTest.uiState.test {
                 val initialState = awaitItem()
-                assertThat(initialState.isNodesLoading).isTrue()
+                assertThat(initialState.nodesLoadingState).isEqualTo(NodesLoadingState.Loading)
 
                 val loadedState = awaitItem()
-                assertThat(loadedState.isNodesLoading).isFalse()
+                assertThat(loadedState.nodesLoadingState).isEqualTo(NodesLoadingState.FullyLoaded)
                 assertThat(loadedState.items).hasSize(2)
 
                 // Wait for hidden nodes loading to complete
@@ -377,7 +433,7 @@ class CloudDriveViewModelTest {
             awaitItem()
             val loadedState = awaitItem()
 
-            assertThat(loadedState.isNodesLoading).isFalse()
+            assertThat(loadedState.nodesLoadingState).isEqualTo(NodesLoadingState.FullyLoaded)
             assertThat(loadedState.isLoading).isTrue() // Still true because hidden node settings are still loading
             assertThat(loadedState.items).hasSize(2)
             assertThat(loadedState.items[0].node.id).isEqualTo(NodeId(1L))
@@ -467,30 +523,6 @@ class CloudDriveViewModelTest {
         }
     }
 
-    @Test
-    fun `test that SelectAllItems action selects all items in state`() = runTest {
-        val node1 = mock<TypedNode> {
-            on { id } doReturn NodeId(1L)
-        }
-        val node2 = mock<TypedNode> {
-            on { id } doReturn NodeId(2L)
-        }
-
-        setupTestData(listOf(node1, node2))
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem()
-            val loadedState = awaitItem()
-
-            underTest.processAction(CloudDriveAction.SelectAllItems)
-            val updatedState = awaitItem()
-
-            assertThat(updatedState.isInSelectionMode).isTrue()
-            assertThat(updatedState.items[0].isSelected).isTrue()
-            assertThat(updatedState.items[1].isSelected).isTrue()
-        }
-    }
 
     @Test
     fun `test that DeselectAllItems action deselects all items in state`() = runTest {
@@ -504,20 +536,24 @@ class CloudDriveViewModelTest {
         setupTestData(listOf(node1, node2))
         val underTest = createViewModel()
 
-        underTest.uiState.test {
-            awaitItem()
-            val loadedState = awaitItem()
+        // Wait for initial loading to complete
+        testScheduler.advanceUntilIdle()
 
-            underTest.processAction(CloudDriveAction.SelectAllItems)
-            awaitItem()
+        // Verify initial state
+        val loadedState = underTest.uiState.value
+        assertThat(loadedState.nodesLoadingState).isEqualTo(NodesLoadingState.FullyLoaded)
 
-            underTest.processAction(CloudDriveAction.DeselectAllItems)
-            val updatedState = awaitItem()
+        underTest.processAction(CloudDriveAction.SelectAllItems)
+        testScheduler.advanceUntilIdle()
 
-            assertThat(updatedState.isInSelectionMode).isFalse()
-            assertThat(updatedState.items[0].isSelected).isFalse()
-            assertThat(updatedState.items[1].isSelected).isFalse()
-        }
+        underTest.processAction(CloudDriveAction.DeselectAllItems)
+        testScheduler.advanceUntilIdle()
+
+        val updatedState = underTest.uiState.value
+        assertThat(updatedState.isInSelectionMode).isFalse()
+        assertThat(updatedState.isSelecting).isFalse()
+        assertThat(updatedState.items[0].isSelected).isFalse()
+        assertThat(updatedState.items[1].isSelected).isFalse()
     }
 
     @Test
@@ -555,6 +591,145 @@ class CloudDriveViewModelTest {
             assertThat(loadedState.items).isEmpty()
         }
     }
+
+    @Test
+    fun `test that SelectAllItems selects all items when nodes are fully loaded`() = runTest {
+        val node1 = mock<TypedNode> {
+            on { id } doReturn NodeId(1L)
+        }
+        val node2 = mock<TypedNode> {
+            on { id } doReturn NodeId(2L)
+        }
+
+        setupTestData(listOf(node1, node2))
+        val underTest = createViewModel()
+
+        // Wait for initial loading to complete
+        testScheduler.advanceUntilIdle()
+
+        // Verify we're in fully loaded state
+        val fullyLoadedState = underTest.uiState.value
+        assertThat(fullyLoadedState.nodesLoadingState).isEqualTo(NodesLoadingState.FullyLoaded)
+
+        underTest.processAction(CloudDriveAction.SelectAllItems)
+        // Advance the coroutine to let it execute
+        testScheduler.advanceUntilIdle()
+
+        val stateAfterSelectAll = underTest.uiState.value
+        // Verify that isSelecting is false and all items are selected
+        assertThat(stateAfterSelectAll.isSelecting).isFalse()
+        assertThat(stateAfterSelectAll.isInSelectionMode).isTrue()
+        assertThat(stateAfterSelectAll.items[0].isSelected).isTrue()
+        assertThat(stateAfterSelectAll.items[1].isSelected).isTrue()
+    }
+
+    @Test
+    fun `test that SelectAllItems sets isSelecting to true when nodes are partially loaded`() =
+        runTest {
+            val node1 = mock<TypedNode> {
+                on { id } doReturn NodeId(1L)
+            }
+            val node2 = mock<TypedNode> {
+                on { id } doReturn NodeId(2L)
+            }
+
+            // Setup test data with hasMore = true to simulate partially loaded state
+            setupTestDataWithPartialLoad(listOf(node1, node2))
+            val underTest = createViewModel()
+
+            // Wait for initial loading to complete
+            testScheduler.advanceUntilIdle()
+
+            // Verify we're in partially loaded state
+            val partiallyLoadedState = underTest.uiState.value
+            assertThat(partiallyLoadedState.nodesLoadingState).isEqualTo(NodesLoadingState.PartiallyLoaded)
+
+            underTest.processAction(CloudDriveAction.SelectAllItems)
+            // Advance the coroutine to let it execute
+            testScheduler.advanceUntilIdle()
+
+            val stateAfterSelectAll = underTest.uiState.value
+            // Verify that isSelecting is true because nodes are not fully loaded and selection is pending
+            assertThat(stateAfterSelectAll.isSelecting).isTrue()
+            assertThat(stateAfterSelectAll.isInSelectionMode).isTrue()
+            assertThat(stateAfterSelectAll.items[0].isSelected).isTrue()
+            assertThat(stateAfterSelectAll.items[1].isSelected).isTrue()
+        }
+
+    @Test
+    fun `test that DeselectAllItems sets isSelecting to false`() = runTest {
+        val node1 = mock<TypedNode> {
+            on { id } doReturn NodeId(1L)
+        }
+        val node2 = mock<TypedNode> {
+            on { id } doReturn NodeId(2L)
+        }
+
+        setupTestData(listOf(node1, node2))
+        val underTest = createViewModel()
+
+        // Wait for initial loading to complete
+        testScheduler.advanceUntilIdle()
+
+        // Verify initial state
+        val loadedState = underTest.uiState.value
+        assertThat(loadedState.nodesLoadingState).isEqualTo(NodesLoadingState.FullyLoaded)
+
+        // First select all items
+        underTest.processAction(CloudDriveAction.SelectAllItems)
+        testScheduler.advanceUntilIdle()
+
+        // Then deselect all items
+        underTest.processAction(CloudDriveAction.DeselectAllItems)
+        testScheduler.advanceUntilIdle()
+
+        val updatedState = underTest.uiState.value
+        assertThat(updatedState.isInSelectionMode).isFalse()
+        assertThat(updatedState.isSelecting).isFalse()
+        assertThat(updatedState.items[0].isSelected).isFalse()
+        assertThat(updatedState.items[1].isSelected).isFalse()
+    }
+
+    @Test
+    fun `test that DeselectAllItems cancels pending selection job`() = runTest {
+        val node1 = mock<TypedNode> {
+            on { id } doReturn NodeId(1L)
+        }
+        val node2 = mock<TypedNode> {
+            on { id } doReturn NodeId(2L)
+        }
+
+        // Setup test data with hasMore = true to simulate partially loaded state
+        setupTestDataWithPartialLoad(listOf(node1, node2))
+        val underTest = createViewModel()
+
+        // Wait for initial loading to complete
+        testScheduler.advanceUntilIdle()
+
+        // Verify we're in partially loaded state
+        val partiallyLoadedState = underTest.uiState.value
+        assertThat(partiallyLoadedState.nodesLoadingState).isEqualTo(NodesLoadingState.PartiallyLoaded)
+
+        // Trigger select all while partially loaded
+        underTest.processAction(CloudDriveAction.SelectAllItems)
+        testScheduler.advanceUntilIdle()
+
+        val stateAfterSelectAll = underTest.uiState.value
+        // Verify isSelecting is true
+        assertThat(stateAfterSelectAll.isSelecting).isTrue()
+
+        // Now deselect all items - this should cancel the pending selection job
+        underTest.processAction(CloudDriveAction.DeselectAllItems)
+        testScheduler.advanceUntilIdle()
+
+        val stateAfterDeselect = underTest.uiState.value
+        // Verify isSelecting is false and items are not selected
+        assertThat(stateAfterDeselect.isSelecting).isFalse()
+        assertThat(stateAfterDeselect.isInSelectionMode).isFalse()
+        assertThat(stateAfterDeselect.items[0].isSelected).isFalse()
+        assertThat(stateAfterDeselect.items[1].isSelected).isFalse()
+    }
+
 
     @Test
     fun `test that toggleItemSelection removes item from selection when already selected`() =
@@ -832,7 +1007,7 @@ class CloudDriveViewModelTest {
 
             // When feature flag is disabled, hidden node settings loading should remain true
             // because the hidden node monitoring is never started
-            assertThat(finalState.isNodesLoading).isFalse()
+            assertThat(finalState.nodesLoadingState).isEqualTo(NodesLoadingState.FullyLoaded)
             assertThat(finalState.isHiddenNodeSettingsLoading).isFalse()
             assertThat(finalState.isLoading).isFalse()
             assertThat(finalState.showHiddenNodes).isFalse()
@@ -859,7 +1034,7 @@ class CloudDriveViewModelTest {
                 awaitItem() // State after nodes are loaded
                 val finalState = awaitItem() // State after hidden node settings are loaded
 
-                assertThat(finalState.isNodesLoading).isFalse()
+                assertThat(finalState.nodesLoadingState).isEqualTo(NodesLoadingState.FullyLoaded)
                 assertThat(finalState.isHiddenNodeSettingsLoading).isFalse()
                 assertThat(finalState.isLoading).isFalse()
                 assertThat(finalState.showHiddenNodes).isTrue()
@@ -1352,7 +1527,14 @@ class CloudDriveViewModelTest {
         whenever(getNodeByIdUseCase(eq(rootNodeId))).thenReturn(rootNode)
         whenever(getFileBrowserNodeChildrenUseCase(rootNodeId.longValue)).thenReturn(emptyList())
         // Setup the new chunked use case for root node
-        whenever(getNodesByIdInChunkUseCase.invoke(rootNodeId)).thenReturn(flowOf(emptyList()))
+        whenever(getNodesByIdInChunkUseCase.invoke(rootNodeId)).thenReturn(
+            flowOf(
+                Pair(
+                    emptyList<TypedNode>(),
+                    false
+                )
+            )
+        )
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
         whenever(monitorNodeUpdatesByIdUseCase(any())).thenReturn(flowOf())
@@ -1368,7 +1550,14 @@ class CloudDriveViewModelTest {
         setupTestData(emptyList())
         whenever(getRootNodeIdUseCase()).thenReturn(null)
         whenever(getNodeByIdUseCase(eq(NodeId(-1L)))).thenReturn(null)
-        whenever(getNodesByIdInChunkUseCase(NodeId(-1L))).thenReturn(flowOf(emptyList()))
+        whenever(getNodesByIdInChunkUseCase(NodeId(-1L))).thenReturn(
+            flowOf(
+                Pair(
+                    emptyList<TypedNode>(),
+                    false
+                )
+            )
+        )
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
         whenever(monitorNodeUpdatesByIdUseCase(any())).thenReturn(flowOf())
@@ -1386,7 +1575,14 @@ class CloudDriveViewModelTest {
         whenever(getRootNodeIdUseCase()).thenReturn(null)
         whenever(getNodeByIdUseCase(eq(NodeId(-1L)))).thenReturn(null)
         whenever(getFileBrowserNodeChildrenUseCase(-1L)).thenReturn(emptyList())
-        whenever(getNodesByIdInChunkUseCase(NodeId(-1L))).thenReturn(flowOf(emptyList()))
+        whenever(getNodesByIdInChunkUseCase(NodeId(-1L))).thenReturn(
+            flowOf(
+                Pair(
+                    emptyList<TypedNode>(),
+                    false
+                )
+            )
+        )
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
         whenever(monitorNodeUpdatesByIdUseCase(any())).thenReturn(flowOf())
@@ -1426,7 +1622,14 @@ class CloudDriveViewModelTest {
             whenever(getNodeByIdUseCase(eq(rootNodeId))).thenReturn(rootNode)
             whenever(getFileBrowserNodeChildrenUseCase(rootNodeId.longValue)).thenReturn(emptyList())
             // Setup the new chunked use case for root node
-            whenever(getNodesByIdInChunkUseCase.invoke(rootNodeId)).thenReturn(flowOf(emptyList()))
+            whenever(getNodesByIdInChunkUseCase.invoke(rootNodeId)).thenReturn(
+                flowOf(
+                    Pair(
+                        emptyList<TypedNode>(),
+                        false
+                    )
+                )
+            )
             whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
             whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
             whenever(monitorNodeUpdatesByIdUseCase(any())).thenReturn(flowOf())
@@ -1457,7 +1660,7 @@ class CloudDriveViewModelTest {
         underTest.uiState.test {
             awaitItem() // Initial state
             val loadedState = awaitItem() // State after nodes are loaded
-            assertThat(loadedState.isNodesLoading).isFalse()
+            assertThat(loadedState.nodesLoadingState).isEqualTo(NodesLoadingState.FullyLoaded)
             assertThat(loadedState.items).hasSize(1)
         }
 
@@ -1492,7 +1695,7 @@ class CloudDriveViewModelTest {
                 // Initial state
                 val initialState = awaitItem()
                 assertThat(initialState.isLoading).isTrue()
-                assertThat(initialState.isNodesLoading).isTrue()
+                assertThat(initialState.nodesLoadingState).isEqualTo(NodesLoadingState.Loading)
                 assertThat(initialState.isHiddenNodeSettingsLoading).isTrue()
                 assertThat(initialState.items).isEmpty()
 
@@ -1500,7 +1703,7 @@ class CloudDriveViewModelTest {
                 val firstState = awaitItem()
 
                 // Nodes are loaded but hidden node settings are still loading
-                assertThat(firstState.isNodesLoading).isFalse()
+                assertThat(firstState.nodesLoadingState).isEqualTo(NodesLoadingState.FullyLoaded)
                 assertThat(firstState.isHiddenNodeSettingsLoading).isTrue() // Still loading
                 assertThat(firstState.isLoading).isTrue() // Still loading because hidden node settings are loading
                 assertThat(firstState.items).hasSize(2)
@@ -1510,7 +1713,7 @@ class CloudDriveViewModelTest {
 
                 // Second emission: hidden node flags loaded (first values from flows)
                 val secondState = awaitItem()
-                assertThat(secondState.isNodesLoading).isFalse() // Should remain false
+                assertThat(secondState.nodesLoadingState).isEqualTo(NodesLoadingState.FullyLoaded) // Should remain fully loaded
                 assertThat(secondState.isHiddenNodeSettingsLoading).isFalse() // Now loaded
                 assertThat(secondState.isLoading).isFalse() // No longer loading
                 assertThat(secondState.items).hasSize(2) // Should remain the same
@@ -1519,7 +1722,7 @@ class CloudDriveViewModelTest {
 
                 // Third emission: hidden node flags updated (second values from flows)
                 val thirdState = awaitItem()
-                assertThat(thirdState.isNodesLoading).isFalse() // Should remain false
+                assertThat(thirdState.nodesLoadingState).isEqualTo(NodesLoadingState.FullyLoaded) // Should remain fully loaded
                 assertThat(thirdState.isHiddenNodeSettingsLoading).isFalse() // Should remain false
                 assertThat(thirdState.isLoading).isFalse() // Should remain false
                 assertThat(thirdState.items).hasSize(2) // Should remain the same
@@ -1528,7 +1731,7 @@ class CloudDriveViewModelTest {
 
                 // Fourth emission: hidden node flags updated again (third values from flows)
                 val fourthState = awaitItem()
-                assertThat(fourthState.isNodesLoading).isFalse() // Should remain false
+                assertThat(fourthState.nodesLoadingState).isEqualTo(NodesLoadingState.FullyLoaded) // Should remain fully loaded
                 assertThat(fourthState.isHiddenNodeSettingsLoading).isFalse() // Should remain false
                 assertThat(fourthState.isLoading).isFalse() // Should remain false
                 assertThat(fourthState.items).hasSize(2) // Should remain the same
@@ -1630,7 +1833,7 @@ class CloudDriveViewModelTest {
             underTest.uiState.test {
                 // Initial state
                 val initialState = awaitItem()
-                assertThat(initialState.isNodesLoading).isTrue()
+                assertThat(initialState.nodesLoadingState).isEqualTo(NodesLoadingState.Loading)
                 assertThat(initialState.isHiddenNodeSettingsLoading).isTrue()
                 assertThat(initialState.isLoading).isTrue()
                 assertThat(initialState.items).isEmpty()
@@ -1639,7 +1842,7 @@ class CloudDriveViewModelTest {
 
                 // Final state: items loaded, hidden node flags remain default
                 val finalState = awaitItem()
-                assertThat(finalState.isNodesLoading).isFalse()
+                assertThat(finalState.nodesLoadingState).isEqualTo(NodesLoadingState.FullyLoaded)
                 assertThat(finalState.isHiddenNodeSettingsLoading).isFalse()
                 assertThat(finalState.isLoading).isFalse() // Still true because hidden node settings are still loading
                 assertThat(finalState.items).hasSize(1)
@@ -1664,7 +1867,7 @@ class CloudDriveViewModelTest {
         underTest.uiState.test {
             // Initial state
             val initialState = awaitItem()
-            assertThat(initialState.isNodesLoading).isTrue()
+            assertThat(initialState.nodesLoadingState).isEqualTo(NodesLoadingState.Loading)
             assertThat(initialState.isHiddenNodeSettingsLoading).isTrue()
             assertThat(initialState.isLoading).isTrue()
             assertThat(initialState.items).isEmpty()
@@ -1673,7 +1876,7 @@ class CloudDriveViewModelTest {
 
             // Final state: items loaded, hidden node flags remain default (feature disabled path)
             val finalState = awaitItem()
-            assertThat(finalState.isNodesLoading).isFalse()
+            assertThat(finalState.nodesLoadingState).isEqualTo(NodesLoadingState.FullyLoaded)
             assertThat(finalState.isHiddenNodeSettingsLoading).isFalse()
             assertThat(finalState.isLoading).isFalse() // Still true because hidden node settings are still loading
             assertThat(finalState.items).hasSize(1)

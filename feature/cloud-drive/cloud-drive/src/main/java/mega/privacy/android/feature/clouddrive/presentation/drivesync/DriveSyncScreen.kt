@@ -37,6 +37,7 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriv
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveViewModel
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.DeselectAllItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.SelectAllItems
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
 import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetViewM3
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
@@ -59,10 +60,10 @@ internal fun DriveSyncScreen(
     onNavigateToFolder: (NodeId, String?) -> Unit,
     onCreatedNewFolder: (NodeId) -> Unit,
     setNavigationItemVisibility: (Boolean) -> Unit,
-    viewModel: DriveSyncViewModel = hiltViewModel(),
-    cloudDriveViewModel: CloudDriveViewModel = hiltViewModel(),
     onTransfer: (TransferTriggerEvent) -> Unit,
     onRenameNode: (NodeId) -> Unit,
+    viewModel: DriveSyncViewModel = hiltViewModel(),
+    cloudDriveViewModel: CloudDriveViewModel = hiltViewModel(),
 ) {
     val cloudDriveUiState by cloudDriveViewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -83,6 +84,7 @@ internal fun DriveSyncScreen(
             if (cloudDriveUiState.isInSelectionMode) {
                 NodeSelectionModeAppBar(
                     count = cloudDriveUiState.selectedItemsCount,
+                    isSelecting = cloudDriveUiState.nodesLoadingState != NodesLoadingState.FullyLoaded,
                     onSelectAllClicked = { cloudDriveViewModel.processAction(SelectAllItems) },
                     onCancelSelectionClicked = { cloudDriveViewModel.processAction(DeselectAllItems) }
                 )

@@ -7,12 +7,15 @@ import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
@@ -40,6 +43,7 @@ import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -73,6 +77,7 @@ class CloudDriveViewModel @Inject constructor(
         )
     )
     internal val uiState = _uiState.asStateFlow()
+    private var nodeMultiSelectionJob: Job? = null
 
     init {
         monitorViewType()
@@ -108,18 +113,22 @@ class CloudDriveViewModel @Inject constructor(
                 folderId
             }
             getNodesByIdInChunkUseCase(folderOrRootNodeId)
-                .collect {
+                .collect { (nodes, hasMore) ->
                     val nodeUiItems = nodeUiItemMapper(
-                        nodeList = it,
+                        nodeList = nodes,
                         nodeSourceType = nodeSourceType,
                         highlightedNodeId = highlightedNodeId,
                         highlightedNames = highlightedNodeNames,
                         existingItems = uiState.value.items,
                     )
+                    val loadingState = when {
+                        hasMore -> NodesLoadingState.PartiallyLoaded
+                        else -> NodesLoadingState.FullyLoaded
+                    }
                     _uiState.update { state ->
                         state.copy(
                             items = nodeUiItems,
-                            isNodesLoading = false,
+                            nodesLoadingState = loadingState,
                             currentFolderId = folderOrRootNodeId
                         )
                     }
@@ -179,11 +188,12 @@ class CloudDriveViewModel @Inject constructor(
                     }
                 } else {
                     // If nodes are currently loading, ignore updates
-                    if (!uiState.value.isNodesLoading) {
+                    if (uiState.value.nodesLoadingState == NodesLoadingState.FullyLoaded) {
                         val nodeUiItems = getNodeUiItems()
                         _uiState.update { state ->
                             state.copy(
                                 items = nodeUiItems,
+                                nodesLoadingState = NodesLoadingState.FullyLoaded
                             )
                         }
                     }
@@ -297,15 +307,24 @@ class CloudDriveViewModel @Inject constructor(
         _uiState.update { state ->
             state.copy(items = updatedItems)
         }
+
+        // Cancel any ongoing multi-selection job if user manually deselects all items
+        if (!uiState.value.isInSelectionMode) {
+            nodeMultiSelectionJob?.cancel()
+        }
     }
 
     /**
      * Deselect all items and reset selection state
      */
     private fun deselectAllItems() {
+        nodeMultiSelectionJob?.cancel()
         val updatedItems = uiState.value.items.map { it.copy(isSelected = false) }
         _uiState.update { state ->
-            state.copy(items = updatedItems)
+            state.copy(
+                items = updatedItems,
+                isSelecting = false
+            )
         }
     }
 
@@ -313,9 +332,36 @@ class CloudDriveViewModel @Inject constructor(
      * Select all items
      */
     private fun selectAllItems() {
+        nodeMultiSelectionJob?.cancel()
+        nodeMultiSelectionJob = viewModelScope.launch {
+            runCatching {
+                // Select all items that are already loaded
+                performAllItemSelection()
+                // If nodes are still loading, wait until fully loaded then select all
+                if (uiState.value.nodesLoadingState != NodesLoadingState.FullyLoaded) {
+                    _uiState.update { state ->
+                        state.copy(isSelecting = true)
+                    }
+                    uiState.first { it.nodesLoadingState == NodesLoadingState.FullyLoaded }
+                    if (isActive) {
+                        performAllItemSelection()
+                    }
+                }
+            }.onFailure {
+                _uiState.update { state ->
+                    state.copy(isSelecting = false)
+                }
+            }
+        }
+    }
+
+    private fun performAllItemSelection() {
         val updatedItems = uiState.value.items.map { it.copy(isSelected = true) }
         _uiState.update { state ->
-            state.copy(items = updatedItems)
+            state.copy(
+                items = updatedItems,
+                isSelecting = false
+            )
         }
     }
 

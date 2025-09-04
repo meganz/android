@@ -67,6 +67,7 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineInfoImageVe
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineKey02ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineLink01ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineLinkOff01ImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineLoaderGradImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineLockImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineLockKeyholeCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineLogOut02ImageVector
@@ -313,6 +314,9 @@ public object IconPack : IconPackInterface {
 
                 override val LinkOff01: ImageVector by lazy {
                         createMediumThinOutlineLinkOff01ImageVector() }
+
+                override val LoaderGrad: ImageVector by lazy {
+                        createMediumThinOutlineLoaderGradImageVector() }
 
                 override val Lock: ImageVector by lazy { createMediumThinOutlineLockImageVector() }
 

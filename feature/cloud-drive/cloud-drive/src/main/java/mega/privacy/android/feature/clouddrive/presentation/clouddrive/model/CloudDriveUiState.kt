@@ -15,7 +15,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 /**
  * UI state for Cloud Drive
  * @param title Name of the folder
- * @property isNodesLoading True if nodes are loading
+ * @property nodesLoadingState Current state of node loading
  * @property currentFolderId The current folder id being displayed
  * @property isCloudDriveRoot True if the current folder is the root of the Cloud Drive
  * @property items List of nodes in the current folder
@@ -26,10 +26,11 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property showHiddenNodes True if hidden nodes should be shown forcefully based on user settings
  * @property isHiddenNodesEnabled True if user is eligible for hidden nodes feature
  * @property isHiddenNodesOnboarded True if the user has been onboarded to hidden nodes feature, show onboarding screen based on it
+ * @property isSelecting True if nodes are being selected
  */
 data class CloudDriveUiState(
     val title: LocalizedText = LocalizedText.Literal(""),
-    val isNodesLoading: Boolean = true,
+    val nodesLoadingState: NodesLoadingState = NodesLoadingState.Loading,
     val isHiddenNodeSettingsLoading: Boolean = true,
     val currentFolderId: NodeId = NodeId(-1L),
     val isCloudDriveRoot: Boolean = false,
@@ -43,12 +44,13 @@ data class CloudDriveUiState(
     val isHiddenNodesOnboarded: Boolean = true,
     val gmsDocumentScanner: GmsDocumentScanner? = null,
     val documentScanningError: DocumentScanningError? = null,
+    val isSelecting: Boolean = false,
 ) {
 
     /**
      * True if nodes or hidden node settings are loading
      */
-    val isLoading = isNodesLoading || isHiddenNodeSettingsLoading
+    val isLoading = nodesLoadingState == NodesLoadingState.Loading || isHiddenNodeSettingsLoading
 
     /**
      * Count of visible items based on hidden nodes settings
@@ -96,4 +98,13 @@ data class CloudDriveUiState(
      */
     val selectedNodeIds: List<NodeId>
         get() = items.mapNotNull { if (it.isSelected) it.node.id else null }
+}
+
+/**
+ * Sealed interface representing the different states of progressive node loading
+ */
+sealed interface NodesLoadingState {
+    object Loading : NodesLoadingState
+    object PartiallyLoaded : NodesLoadingState
+    object FullyLoaded : NodesLoadingState
 }

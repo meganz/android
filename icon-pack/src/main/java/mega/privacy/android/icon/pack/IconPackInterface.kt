@@ -207,6 +207,7 @@ interface IconPackInterface {
                 val ArrowsUpDownCircle: ImageVector
                 val CloudOff: ImageVector
                 val ArrowUpCircle: ImageVector
+                val LoaderGrad: ImageVector
             }
 
             /**
