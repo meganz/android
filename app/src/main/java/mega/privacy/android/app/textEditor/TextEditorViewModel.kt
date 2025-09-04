@@ -67,6 +67,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.document.DocumentEntity
+import mega.privacy.android.domain.entity.node.FileNameCollision
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -95,6 +96,7 @@ import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
+import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionRenameNameUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiAndroid
@@ -152,6 +154,8 @@ class TextEditorViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val crashReporter: CrashReporter,
+    // Use existing use case for smart filename generation
+    private val getNodeNameCollisionRenameNameUseCase: GetNodeNameCollisionRenameNameUseCase,
 ) : ViewModel() {
 
     companion object {
@@ -644,59 +648,50 @@ class TextEditorViewModel @Inject constructor(
             return
         }
 
-        val tempFile = CacheFolderManager.buildTempFile(fileName.value)
-        if (tempFile == null) {
-            Timber.e("Cannot get temporal file.")
-            return
-        }
-
-        val fileWriter = FileWriter(tempFile.absolutePath)
-        val out = BufferedWriter(fileWriter)
-        out.write(pagination.value?.getEditedText() ?: "")
-        out.close()
-
-        if (!isFileAvailable(tempFile)) {
-            Timber.e("Cannot manage temporal file.")
-            return
-        }
-
-        val parentHandle = if (mode.value == TextEditorMode.Create.value && getNode() == null) {
-            megaApi.rootNode?.handle
-        } else if (mode.value == TextEditorMode.Create.value) {
-            getNode()?.handle
-        } else {
-            getNode()?.parentHandle
-        }
-
-        if (parentHandle == null) {
-            Timber.e("Parent handle not valid.")
-            return
-        }
-
-        if (mode.value == TextEditorMode.Edit.value) {
-            uploadFile(fromHome, tempFile, parentHandle)
-            return
-        }
-
         viewModelScope.launch {
-            runCatching {
-                checkFileNameCollisionsUseCase(
-                    files = listOf(tempFile.let {
-                        DocumentEntity(
-                            name = it.name,
-                            size = it.length(),
-                            lastModified = it.lastModified(),
-                            uri = UriPath(it.toUri().toString()),
-                        )
-                    }),
-                    parentNodeId = NodeId(parentHandle)
+            try {
+                // Generate unique filename using existing collision handling
+                val originalFileName = fileName.value ?: "untitled.txt"
+                val parentHandle = getParentHandle() ?: return@launch
+
+                // Create a FileNameCollision object to use with the existing use case
+                val nameCollision = FileNameCollision(
+                    collisionHandle = 0L, // Not relevant for our use case
+                    name = originalFileName,
+                    size = 0L, // Not relevant for our use case
+                    lastModified = System.currentTimeMillis(),
+                    parentHandle = parentHandle,
+                    path = UriPath("") // Not relevant for our use case
                 )
-            }.onSuccess { fileCollisions ->
-                fileCollisions.firstOrNull()?.let {
-                    collision.value = it
-                } ?: uploadFile(fromHome, tempFile, parentHandle)
-            }.onFailure {
-                Timber.e(it, "Cannot check name collisions")
+
+                val uniqueFileName = getNodeNameCollisionRenameNameUseCase(nameCollision)
+
+                // Create temp file with unique name
+                val tempFile = CacheFolderManager.buildTempFile(uniqueFileName)
+                if (tempFile == null) {
+                    Timber.e("Cannot get temporal file.")
+                    return@launch
+                }
+
+                // Write content to temp file
+                writeContentToTempFile(tempFile)
+
+                if (!isFileAvailable(tempFile)) {
+                    Timber.e("Cannot manage temporal file.")
+                    return@launch
+                }
+
+                // Handle upload based on mode
+                if (mode.value == TextEditorMode.Edit.value) {
+                    uploadFile(fromHome, tempFile, parentHandle)
+                } else {
+                    // For create mode, check collisions before upload
+                    checkCollisionsAndUpload(fromHome, tempFile, parentHandle)
+                }
+
+            } catch (e: Exception) {
+                Timber.e(e, "Error in saveFile")
+                throwable.value = e
             }
         }
     }
@@ -724,6 +719,58 @@ class TextEditorViewModel @Inject constructor(
                     )
                 )
             )
+        }
+    }
+
+    /**
+     * Gets the parent handle for the file operation
+     */
+    private fun getParentHandle(): Long? {
+        return if (mode.value == TextEditorMode.Create.value && getNode() == null) {
+            megaApi.rootNode?.handle
+        } else if (mode.value == TextEditorMode.Create.value) {
+            getNode()?.handle
+        } else {
+            getNode()?.parentHandle
+        }
+    }
+
+    /**
+     * Writes content to a temporary file
+     */
+    private suspend fun writeContentToTempFile(tempFile: File) {
+        withContext(ioDispatcher) {
+            val fileWriter = FileWriter(tempFile.absolutePath)
+            val out = BufferedWriter(fileWriter)
+            out.write(pagination.value?.getEditedText() ?: "")
+            out.close()
+        }
+    }
+
+    /**
+     * Checks for collisions and uploads the file if no conflicts exist
+     */
+    private fun checkCollisionsAndUpload(fromHome: Boolean, tempFile: File, parentHandle: Long) {
+        viewModelScope.launch {
+            runCatching {
+                checkFileNameCollisionsUseCase(
+                    files = listOf(
+                        DocumentEntity(
+                            name = tempFile.name,
+                            size = tempFile.length(),
+                            lastModified = tempFile.lastModified(),
+                            uri = UriPath(tempFile.toUri().toString()),
+                        )
+                    ),
+                    parentNodeId = NodeId(parentHandle)
+                )
+            }.onSuccess { fileCollisions ->
+                fileCollisions.firstOrNull()?.let {
+                    collision.value = it
+                } ?: uploadFile(fromHome, tempFile, parentHandle)
+            }.onFailure {
+                Timber.e(it, "Cannot check name collisions")
+            }
         }
     }
 

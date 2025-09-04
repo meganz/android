@@ -1,6 +1,7 @@
 package mega.privacy.android.app.textEditor
 
 import android.content.Intent
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -16,7 +17,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.FileUtil
@@ -29,8 +30,11 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
@@ -42,6 +46,7 @@ import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActio
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
+import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionRenameNameUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -103,6 +108,10 @@ internal class TextEditorViewModelTest {
     private val downloadNodeUseCase = mock<DownloadNodeUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
 
+    // New mocks for smart filename generation
+    private val getNodeNameCollisionRenameNameUseCase =
+        mock<GetNodeNameCollisionRenameNameUseCase>()
+
     @BeforeEach
     fun setUp() {
         underTest = TextEditorViewModel(
@@ -127,7 +136,8 @@ internal class TextEditorViewModelTest {
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             savedStateHandle = savedStateHandle,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
-            crashReporter = mock()
+            crashReporter = mock(),
+            getNodeNameCollisionRenameNameUseCase = getNodeNameCollisionRenameNameUseCase
         )
     }
 
@@ -140,6 +150,7 @@ internal class TextEditorViewModelTest {
             getCacheFileUseCase,
             downloadNodeUseCase,
             getNodeByIdUseCase,
+            getNodeNameCollisionRenameNameUseCase,
         )
     }
 
@@ -495,6 +506,204 @@ internal class TextEditorViewModelTest {
         arrayOf("file.txt", false),
         arrayOf(null, false),
     )
+
+    @Test
+    fun `test that getNode returns correct node for Edit mode`() = runTest {
+        // Given
+        val testIntent = createTestIntent(handle = 456L)
+        underTest.setInitialValues(testIntent, mock())
+
+        val mockFileNode = createMockFileNode()
+        val mockTypedNode = createMockTypedNode()
+
+        whenever(getNodeByIdUseCase(NodeId(456L))).thenReturn(mockTypedNode)
+        whenever(megaApi.getNodeByHandle(456L)).thenReturn(mockFileNode)
+        setupTextEditorData(mockFileNode)
+
+        // When
+        val node = underTest.getNode()
+
+        // Then
+        assertThat(node).isNotNull()
+        assertThat(node?.handle).isEqualTo(456L)
+        assertThat(node?.parentHandle).isEqualTo(123L)
+        assertThat(node?.name).isEqualTo("test.txt")
+    }
+
+    @Test
+    fun `test that getNodeAccess returns correct access level`() = runTest {
+        // Given
+        val testIntent = createTestIntent(handle = 456L)
+        underTest.setInitialValues(testIntent, mock())
+
+        val mockFileNode = createMockFileNode()
+        val mockTypedNode = createMockTypedNode()
+
+        whenever(getNodeByIdUseCase(NodeId(456L))).thenReturn(mockTypedNode)
+        whenever(megaApi.getNodeByHandle(456L)).thenReturn(mockFileNode)
+        whenever(megaApi.getAccess(mockFileNode)).thenReturn(1) // Full access
+        setupTextEditorData(mockFileNode)
+
+        // When
+        val accessLevel = underTest.getNodeAccess()
+
+        // Then
+        assertThat(accessLevel).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that getNodeAccess returns correct access level for different permissions`() =
+        runTest {
+            // Given
+            val testIntent = createTestIntent(handle = 789L)
+            underTest.setInitialValues(testIntent, mock())
+
+            val mockFileNode = createMockFileNode(handle = 789L, parentHandle = 456L)
+            val mockTypedNode = createMockTypedNode(789L)
+
+            whenever(getNodeByIdUseCase(NodeId(789L))).thenReturn(mockTypedNode)
+            whenever(megaApi.getNodeByHandle(789L)).thenReturn(mockFileNode)
+            whenever(megaApi.getAccess(mockFileNode)).thenReturn(0) // Read-only access
+            setupTextEditorData(mockFileNode)
+
+            // When
+            val accessLevel = underTest.getNodeAccess()
+
+            // Then
+            assertThat(accessLevel).isEqualTo(0)
+        }
+
+    @Test
+    fun `test that isFileEdited returns true when text has been modified`() = runTest {
+        // Given
+        val testIntent = createTestIntent()
+        underTest.setInitialValues(testIntent, mock())
+        setupPagination("Original content")
+
+        // When
+        underTest.setEditedText("Modified content")
+
+        // Then
+        assertThat(underTest.isFileEdited()).isTrue()
+    }
+
+    @Test
+    fun `test that isFileEdited returns false when text has not been modified`() = runTest {
+        // Given
+        val testIntent = createTestIntent()
+        underTest.setInitialValues(testIntent, mock())
+        setupPagination("Original content")
+
+        // When - don't modify the text
+
+        // Then
+        assertThat(underTest.isFileEdited()).isFalse()
+    }
+
+    @Test
+    fun `test that isFileEdited returns false when pagination is null`() = runTest {
+        // Given
+        val testIntent = createTestIntent()
+        underTest.setInitialValues(testIntent, mock())
+        // Don't set up pagination - leave it null
+
+        // When & Then
+        assertThat(underTest.isFileEdited()).isFalse()
+    }
+
+    @Test
+    fun `test that saveFile handles errors gracefully`() = runTest {
+        // Given
+        val testIntent = createTestIntent()
+        underTest.setInitialValues(testIntent, mock())
+
+        // Mock API to return null for rootNode property (error case)
+        doReturn(null).whenever(megaApi).rootNode
+
+        // When
+        underTest.saveFile(fromHome = false)
+
+        // Then
+        // Verify that no transfer event is triggered due to early return
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.transferEvent).isNotInstanceOf(StateEventWithContentTriggered::class.java)
+        }
+    }
+
+    @Test
+    fun `test that setEditMode correctly sets Edit mode`() = runTest {
+        // Given
+        val testIntent = createTestIntent()
+        underTest.setInitialValues(testIntent, mock())
+
+        // When
+        underTest.setEditMode()
+
+        // Then
+        assertThat(underTest.isEditMode()).isTrue()
+        assertThat(underTest.isViewMode()).isFalse()
+        assertThat(underTest.isCreateMode()).isFalse()
+    }
+
+    @Test
+    fun `test that setEditedText updates pagination correctly`() = runTest {
+        // Given
+        val testIntent = createTestIntent()
+        underTest.setInitialValues(testIntent, mock())
+        setupPagination("Original content")
+
+        // When
+        val newText = "Updated content with changes"
+        underTest.setEditedText(newText)
+
+        // Then
+        val currentText = underTest.getCurrentText()
+        assertThat(currentText).isEqualTo(newText)
+        assertThat(underTest.isFileEdited()).isTrue()
+    }
+
+    // Helper methods to reduce duplication and improve maintainability
+    private fun createTestIntent(
+        fileName: String = "test.txt",
+        mode: TextEditorMode = TextEditorMode.Edit,
+        handle: Long? = null,
+    ): Intent = Intent().apply {
+        putExtra(INTENT_EXTRA_KEY_FILE_NAME, fileName)
+        putExtra(MODE, mode.value)
+        handle?.let { putExtra(INTENT_EXTRA_KEY_HANDLE, it) }
+    }
+
+    private fun createMockFileNode(
+        handle: Long = 456L,
+        parentHandle: Long = 123L,
+        name: String = "test.txt",
+    ): MegaNode = mock<MegaNode>().apply {
+        whenever(this.handle).thenReturn(handle)
+        whenever(this.parentHandle).thenReturn(parentHandle)
+        whenever(this.name).thenReturn(name)
+    }
+
+    private fun createMockTypedNode(nodeId: Long = 456L): TypedNode = mock<TypedNode>().apply {
+        whenever(this.id).thenReturn(NodeId(nodeId))
+    }
+
+    private fun setupTextEditorData(node: MegaNode) {
+        val textEditorData = TextEditorData(node = node)
+        val textEditorDataField = TextEditorViewModel::class.java.getDeclaredField("textEditorData")
+        textEditorDataField.isAccessible = true
+        val textEditorDataLiveData =
+            textEditorDataField.get(underTest) as MutableLiveData<TextEditorData>
+        textEditorDataLiveData.value = textEditorData
+    }
+
+    private fun setupPagination(content: String = "Original content") {
+        val pagination = Pagination(content)
+        val paginationField = TextEditorViewModel::class.java.getDeclaredField("pagination")
+        paginationField.isAccessible = true
+        val paginationLiveData = paginationField.get(underTest) as MutableLiveData<Pagination>
+        paginationLiveData.value = pagination
+    }
 
     companion object {
         @JvmField
