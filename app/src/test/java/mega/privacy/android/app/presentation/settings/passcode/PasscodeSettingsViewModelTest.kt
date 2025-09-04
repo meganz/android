@@ -3,11 +3,11 @@ package mega.privacy.android.app.presentation.settings.passcode
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.presentation.settings.passcode.mapper.TimeoutOptionMapper
-import mega.privacy.android.app.presentation.settings.passcode.model.TimeoutOption
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.passcode.PasscodeTimeout
 import mega.privacy.android.domain.entity.passcode.PasscodeType
@@ -21,20 +21,20 @@ import mega.privacy.android.domain.usecase.passcode.SetPasscodeTimeoutUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class PasscodeSettingsViewModelTest {
     private lateinit var underTest: PasscodeSettingsViewModel
 
     private val monitorPasscodeLockPreferenceUseCase = mock<MonitorPasscodeLockPreferenceUseCase>()
     private val monitorPasscodeTypeUseCase = mock<MonitorPasscodeTypeUseCase>()
     private val monitorPasscodeTimeOutUseCase = mock<MonitorPasscodeTimeOutUseCase>()
-    private val timeoutOptionMapper = mock<TimeoutOptionMapper>()
+    private val timeoutOptionMapper = TimeoutOptionMapper()
     private val disablePasscodeUseCase = mock<DisablePasscodeUseCase>()
     private val disableBiometricPasscodeUseCase = mock<DisableBiometricPasscodeUseCase>()
     private val enableBiometricsUseCase = mock<EnableBiometricsUseCase>()
@@ -104,10 +104,9 @@ class PasscodeSettingsViewModelTest {
 
     @Test
     fun `test that passcode timeout option is returned`() = runTest {
-        val expected = TimeoutOption.Immediate
-        timeoutOptionMapper.stub {
-            on { invoke(any()) } doReturn expected
-        }
+        val input = PasscodeTimeout.TimeSpan(120000)
+        val expected = timeoutOptionMapper(input)
+        stubFlows(timeOut = input)
 
         initUnderTest()
 
@@ -161,6 +160,30 @@ class PasscodeSettingsViewModelTest {
         underTest.onPasscodeEnabled()
 
         verify(setPasscodeTimeoutUseCase).invoke(PasscodeTimeout.DEFAULT)
+    }
+
+    @Test
+    fun `test that timeout is cleared when passcode is disabled`() = runTest {
+        val lockFlow = MutableStateFlow(true)
+        monitorPasscodeLockPreferenceUseCase.stub {
+            on { invoke() } doReturn lockFlow
+        }
+        monitorPasscodeTypeUseCase.stub {
+            on { invoke() } doReturn PasscodeType.Password.asHotFlow()
+        }
+        monitorPasscodeTimeOutUseCase.stub {
+            on { invoke() } doReturn PasscodeTimeout.Immediate.asHotFlow()
+        }
+
+        initUnderTest()
+
+        underTest.state.test {
+            assertThat(awaitItem().timeout).isNotNull()
+            lockFlow.emit(false)
+            assertThat(awaitItem().timeout).isNull()
+        }
+
+
     }
 
     private fun stubFlows(

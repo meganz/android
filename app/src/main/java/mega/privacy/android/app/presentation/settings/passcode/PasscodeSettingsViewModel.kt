@@ -53,7 +53,12 @@ class PasscodeSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 merge(monitorPasscodeLockPreferenceUseCase().mapLatest { enabled ->
-                    { state: PasscodeSettingsUIState -> state.copy(isEnabled = enabled) }
+                    { state: PasscodeSettingsUIState ->
+                        state.copy(
+                            isEnabled = enabled,
+                            timeout = if (!enabled) null else state.timeout
+                        )
+                    }
                 }, monitorPasscodeTypeUseCase().mapLatest { type ->
                     { state: PasscodeSettingsUIState -> state.copy(isBiometricsEnabled = type is PasscodeType.Biometric) }
                 }, monitorPasscodeTimeOutUseCase().filterNotNull().mapLatest { timeout ->
