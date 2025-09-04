@@ -3233,7 +3233,13 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     this@ManagerActivity.isFirstNavigationLevel = false
                     var titleId = -1
                     when (homepageScreen) {
-                        HomepageScreen.FAVOURITES -> titleId = R.string.favourites_category_title
+                        HomepageScreen.FAVOURITES -> {
+                            // Don't override title if we're in a FavouriteFolderFragment (subfolder)
+                            if (favouriteFolderFragment == null) {
+                                titleId = R.string.favourites_category_title
+                            }
+                        }
+
                         HomepageScreen.DOCUMENTS -> titleId = R.string.section_documents
                         HomepageScreen.AUDIO -> titleId = R.string.upload_to_audio
                         HomepageScreen.RECENT_BUCKET -> {
