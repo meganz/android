@@ -34,8 +34,6 @@ fun AdsContainer(
     modifier: Modifier = Modifier,
     isLoggedInUser: Boolean = true,
     viewModel: AdsContainerViewModel = hiltViewModel(),
-    onAdLoaded: () -> Unit = {},
-    onAdFailedToLoad: () -> Unit = {},
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val currentLifecycleState by lifecycleOwner.lifecycle.currentStateAsState()
@@ -60,7 +58,7 @@ fun AdsContainer(
 
                         override fun onAdFailedToLoad(adError: LoadAdError) {
                             Timber.w("Ad failed to load: ${adError.message} (${adError.code})")
-                            onAdFailedToLoad()
+                            viewModel.setAdsLoaded(false)
                         }
 
                         override fun onAdImpression() {
@@ -69,8 +67,8 @@ fun AdsContainer(
 
                         override fun onAdLoaded() {
                             Timber.i("Ad loaded")
+                            viewModel.setAdsLoaded(true)
                             adLoaded = true
-                            onAdLoaded()
                         }
 
                         override fun onAdOpened() {

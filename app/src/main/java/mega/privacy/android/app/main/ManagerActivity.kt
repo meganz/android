@@ -36,7 +36,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.ModalBottomSheetDefaults
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
@@ -98,6 +98,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -130,6 +131,7 @@ import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListene
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.main.ads.AdsContainer
+import mega.privacy.android.app.main.ads.AdsContainerViewModel
 import mega.privacy.android.app.main.bottomsheets.HomeFabOptionsBottomSheet
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.ClearRubbishBinDialogFragment
@@ -366,6 +368,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     private val syncMonitorViewModel: SyncMonitorViewModel by viewModels()
     private val syncPromotionViewModel: SyncPromotionViewModel by viewModels()
     val sharesViewModel: SharesViewModel by viewModels()
+    private val adsContainerViewModel: AdsContainerViewModel by viewModels()
 
     /**
      * [MegaNavigator]
@@ -883,13 +886,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             findViewById<LinearLayout>(R.id.bottom_navigation_container).minimumHeight =
                 insets.bottom
             // Adjust the ads container height to add system bar insets bottom padding
-            adsContainerView.updateLayoutParams<LinearLayout.LayoutParams> {
-                height = resources.getDimensionPixelSize(
-                    R.dimen.ads_web_view_container_height
-                ) + insets.bottom
-            }
-            adsContainerView.updatePadding(bottom = insets.bottom)
-            bottomNavigationView.updatePadding(bottom = if (adsContainerView.isVisible) 0 else insets.bottom)
+            adsContainerView.updatePadding(bottom = if (adsContainerViewModel.isAdsLoaded()) insets.bottom else 0)
+            bottomNavigationView.updatePadding(bottom = if (adsContainerViewModel.isAdsLoaded()) 0 else insets.bottom)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             window.isNavigationBarContrastEnforced = false
@@ -2494,24 +2492,24 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     }
 
     private fun setupAdsView() {
+        collectFlow(adsContainerViewModel.isAdsLoaded.filterNotNull()) {
+            if (it) {
+                handleShowingAds()
+            } else {
+                hideAdsView()
+                showBNVImmediate()
+                showHideBottomNavigationView(hide = false)
+                updateHomepageFabPosition()
+            }
+        }
         adsContainerView.setContent {
             val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val request by googleAdsManager.request.collectAsStateWithLifecycle()
             OriginalTheme(isDark = themeMode.isDarkMode()) {
                 AdsContainer(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxWidth(),
                     request = request,
-                    onAdLoaded = {
-                        handleShowingAds()
-                    },
-                    onAdFailedToLoad = {
-                        if (adsContainerView.isVisible) {
-                            hideAdsView()
-                            showBNVImmediate()
-                            showHideBottomNavigationView(hide = false)
-                            updateHomepageFabPosition()
-                        }
-                    },
+                    viewModel = adsContainerViewModel,
                 )
             }
         }
@@ -2526,12 +2524,10 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
     private fun showAdsView() {
         adsContainerView.isVisible = true
-        bottomNavigationView.updatePadding(bottom = 0)
     }
 
     fun hideAdsView() {
         adsContainerView.isVisible = false
-        systemBarInsets?.bottom?.let { bottomNavigationView.updatePadding(bottom = it) }
     }
 
     override fun onResume() {
@@ -4059,7 +4055,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
         )
         val height =
-            if (adsContainerView.isVisible) resources.getDimensionPixelSize(R.dimen.ads_web_view_and_bottom_navigation_view_height)
+            if (adsContainerViewModel.isAdsLoaded()) resources.getDimensionPixelSize(R.dimen.ads_web_view_and_bottom_navigation_view_height)
             else resources.getDimensionPixelSize(R.dimen.bottom_navigation_view_height)
         params.setMargins(0, 0, 0, height)
         fragmentLayout.layoutParams = params
@@ -6651,7 +6647,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
-            val height = if (adsContainerView.isVisible)
+            val height = if (adsContainerViewModel.isAdsLoaded())
                 resources.getDimensionPixelSize(R.dimen.ads_web_view_and_bottom_navigation_view_height)
             else
                 resources.getDimensionPixelSize(R.dimen.bottom_navigation_view_height)
@@ -6659,7 +6655,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             if (hide && visibility == View.VISIBLE) {
                 updateMiniAudioPlayerVisibility(false)
                 val bottom =
-                    if (adsContainerView.isVisible) resources.getDimensionPixelSize(R.dimen.ads_web_view_container_height) else 0
+                    if (adsContainerViewModel.isAdsLoaded()) resources.getDimensionPixelSize(R.dimen.ads_web_view_container_height) else 0
                 params.setMargins(0, 0, 0, bottom)
                 fragmentLayout.layoutParams = params
                 animate().translationY(height.toFloat())
