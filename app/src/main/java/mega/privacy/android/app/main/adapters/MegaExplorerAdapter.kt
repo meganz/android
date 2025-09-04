@@ -19,6 +19,7 @@ import androidx.core.util.forEach
 import androidx.core.view.isVisible
 import androidx.core.view.setMargins
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil3.dispose
@@ -26,6 +27,10 @@ import coil3.load
 import coil3.request.crossfade
 import coil3.request.transformations
 import coil3.transform.RoundedCornersTransformation
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
@@ -54,6 +59,7 @@ import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.MegaNodeUtil.getFileInfo
 import mega.privacy.android.app.utils.MegaNodeUtil.getFolderIcon
 import mega.privacy.android.app.utils.MegaNodeUtil.getNumberOfFolders
+import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils.getVideoDuration
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.scaleWidthPx
@@ -79,6 +85,7 @@ class MegaExplorerAdapter(
     private val selectFile: Boolean,
     private val sortByViewModel: SortByHeaderViewModel,
     private val megaApi: MegaApiAndroid,
+    private var ioDispatcher: CoroutineDispatcher,
 ) : RecyclerView.Adapter<MegaExplorerAdapter.ViewHolderExplorer>(), SectionTitleProvider,
     RotatableAdapter {
 
@@ -90,6 +97,11 @@ class MegaExplorerAdapter(
     var parentHandle: Long = INVALID_HANDLE
 
     private val selectedItems: SparseBooleanArray = SparseBooleanArray()
+
+    /**
+     * Manage jobs for request folder info
+     */
+    private val jobs = mutableMapOf<Int, Job>()
 
     /**
      * Whether multiple selected
@@ -515,6 +527,23 @@ class MegaExplorerAdapter(
         }
     }
 
+    override fun onViewRecycled(holder: ViewHolderExplorer) {
+        super.onViewRecycled(holder)
+        if (holder is ViewHolderListExplorer) {
+            // Cancel job when holder recycled
+            jobs[holder.itemView.hashCode()]?.cancel()
+        }
+    }
+
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        // Cancel and clear all jobs
+        jobs.values.forEach { it.cancel() }
+        jobs.clear()
+    }
+
+
     /**
      * The open class for explorer view holder
      */
@@ -548,6 +577,9 @@ class MegaExplorerAdapter(
          */
         fun bind(position: Int, node: MegaNode) {
             with(binding) {
+                // Cancel job if exist
+                jobs[itemView.hashCode()]?.cancel()
+
                 val isHiddenNode =
                     !node.isInShare && accountDetail?.levelDetail?.accountType?.isPaid == true &&
                             (node.isMarkedSensitive || megaApi.isSensitiveInherited(node))
@@ -568,12 +600,31 @@ class MegaExplorerAdapter(
                     itemView.setOnClickListener(::clickItem)
                     binding.fileExplorerFilename.setOnClickListener { itemView.performClick() }
                     binding.fileExplorerPermissions.isVisible = false
-                    binding.fileExplorerFilesize.text = getMegaNodeFolderInfo(node, context)
-                    imageView.load(getFolderIcon(node, DrawerItem.CLOUD_DRIVE)) {
-                        if (isHiddenNode) {
-                            transformations(BlurTransformation(context, radius = 16f))
+                    binding.fileExplorerFilesize.text = ""
+                    imageView.load(mega.privacy.android.icon.pack.R.drawable.ic_folder_medium_solid)
+
+                    val currentHandle = node.handle
+                    val job = fragment.lifecycleScope.launch {
+                        val (numChildFolders, numChildFiles, folderIconRes) = withContext(ioDispatcher) {
+                            val numChildFolders = megaApi.getNumChildFolders(node)
+                            val numChildFiles = megaApi.getNumChildFiles(node)
+                            val folderIconRes = getFolderIcon(node, DrawerItem.CLOUD_DRIVE)
+                            Triple(numChildFolders, numChildFiles, folderIconRes)
+                        }
+                        if ((bindingAdapterPosition != RecyclerView.NO_POSITION) &&
+                            (this@ViewHolderListExplorer.document == currentHandle)
+                        ) {
+                            val folderInfo = TextUtil.getFolderInfo(numChildFolders, numChildFiles, context);
+                            binding.fileExplorerFilesize.text = folderInfo
+                            imageView.load(folderIconRes) {
+                                if (isHiddenNode) {
+                                    transformations(BlurTransformation(context, radius = 16f))
+                                }
+                            }
                         }
                     }
+                    // Save job
+                    jobs[itemView.hashCode()] = job
 
                     if (node.isInShare) {
                         if (context.resources.configuration.orientation == ORIENTATION_LANDSCAPE) {

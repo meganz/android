@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -44,6 +45,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -79,6 +81,10 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
     @Inject
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
+
+    @Inject
+    @IoDispatcher
+    lateinit var ioDispatcher: CoroutineDispatcher
 
     @Inject
     lateinit var sortOrderIntMapper: SortOrderIntMapper
@@ -277,6 +283,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
             recyclerView = recyclerView,
             selectFile = selectFile,
             sortByViewModel = sortByHeaderViewModel,
+            ioDispatcher = ioDispatcher,
             megaApi = megaApi
         )
 

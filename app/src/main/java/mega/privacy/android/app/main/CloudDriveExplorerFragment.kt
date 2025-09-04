@@ -303,6 +303,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             recyclerView = recyclerView,
             selectFile = selectFile,
             sortByViewModel = sortByHeaderViewModel,
+            ioDispatcher = ioDispatcher,
             megaApi = megaApi
         )
 
