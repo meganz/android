@@ -5,6 +5,8 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
@@ -21,8 +23,11 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 /**
@@ -116,7 +121,7 @@ internal class RenameAndCreateBackupViewModelTest {
             underTest.state.test {
                 val state = awaitItem()
                 assertThat(state.errorMessage).isEqualTo(sharedR.string.sync_rename_and_create_backup_dialog_error_message_name_already_exists)
-                assertThat(state.successEvent).isEqualTo(consumed)
+                assertThat(state.successEvent).isEqualTo(triggered)
             }
         }
 
@@ -149,4 +154,56 @@ internal class RenameAndCreateBackupViewModelTest {
             assertThat(state.successEvent).isEqualTo(consumed)
         }
     }
+
+    @Test
+    fun `test that multiple invocations of renameAndCreateBackup do not launch new jobs until previous job finishes`() =
+        runTest {
+            // Mock the use case to delay execution to simulate a long-running operation
+            whenever(
+                syncFolderPairUseCase(
+                    syncType = SyncType.TYPE_BACKUP,
+                    name = "Backup name",
+                    localPath = "Local Path",
+                    remotePath = RemoteFolder(NodeId(-1L), ""),
+                )
+            ).doSuspendableAnswer {
+                delay(100) // Simulate delay
+                true
+            }
+
+            // Launch first job
+            underTest.renameAndCreateBackup(
+                newBackupName = "Backup name",
+                localPath = "Local Path",
+            )
+
+            // Immediately launch second job (should be ignored)
+            underTest.renameAndCreateBackup(
+                newBackupName = "Backup name 2",
+                localPath = "Local Path 2",
+            )
+
+            // Launch third job (should also be ignored)
+            underTest.renameAndCreateBackup(
+                newBackupName = "Backup name 3",
+                localPath = "Local Path 3",
+            )
+            advanceUntilIdle()
+
+            // Wait for the first job to complete
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.errorMessage).isNull()
+                assertThat(state.successEvent).isEqualTo(triggered)
+            }
+
+            // Verify only one invocation occurred
+            verify(syncFolderPairUseCase).invoke(
+                syncType = SyncType.TYPE_BACKUP,
+                name = "Backup name",
+                localPath = "Local Path",
+                remotePath = RemoteFolder(NodeId(-1L), "")
+            )
+            verifyNoMoreInteractions(syncFolderPairUseCase)
+        }
 }

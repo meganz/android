@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,6 +35,8 @@ internal class RenameAndCreateBackupViewModel @Inject constructor(
      */
     val state: StateFlow<RenameAndCreateBackupState> = _state.asStateFlow()
 
+    private var renameAndCreateBackupJob: Job? = null
+
     /**
      * Renames and Creates the Backup
      *
@@ -43,31 +46,40 @@ internal class RenameAndCreateBackupViewModel @Inject constructor(
     fun renameAndCreateBackup(
         newBackupName: String,
         localPath: String,
-    ) = viewModelScope.launch {
-        val trimmedName = newBackupName.trim()
-        if (trimmedName.isBlank()) {
-            _state.update { it.copy(errorMessage = sharedR.string.sync_rename_and_create_backup_dialog_error_message_empty_backup_name) }
-        } else if (INVALID_CHARACTER_REGEX.toRegex().containsMatchIn(trimmedName)) {
-            _state.update { it.copy(errorMessage = sharedR.string.general_invalid_characters_defined) }
-        } else {
+    ) {
+        if (renameAndCreateBackupJob?.isActive == true) {
+            return
+        }
+        renameAndCreateBackupJob = viewModelScope.launch {
             runCatching {
-                syncFolderPairUseCase(
-                    syncType = SyncType.TYPE_BACKUP,
-                    name = trimmedName,
-                    localPath = localPath,
-                    remotePath = RemoteFolder(NodeId(-1L), ""),
-                )
-            }.onSuccess {
-                _state.update {
-                    it.copy(
-                        errorMessage = null,
-                        successEvent = triggered
+                val trimmedName = newBackupName.trim()
+                if (trimmedName.isBlank()) {
+                    _state.update { it.copy(errorMessage = sharedR.string.sync_rename_and_create_backup_dialog_error_message_empty_backup_name) }
+                } else if (INVALID_CHARACTER_REGEX.toRegex().containsMatchIn(trimmedName)) {
+                    _state.update { it.copy(errorMessage = sharedR.string.general_invalid_characters_defined) }
+                } else {
+                    syncFolderPairUseCase(
+                        syncType = SyncType.TYPE_BACKUP,
+                        name = trimmedName,
+                        localPath = localPath,
+                        remotePath = RemoteFolder(NodeId(-1L), ""),
                     )
+                    _state.update {
+                        it.copy(
+                            errorMessage = null,
+                            successEvent = triggered
+                        )
+                    }
                 }
             }.onFailure { exception ->
-                when (exception) {
-                    is BackupAlreadyExistsException -> _state.update { it.copy(errorMessage = sharedR.string.sync_rename_and_create_backup_dialog_error_message_name_already_exists) }
-                    else -> Timber.e(exception)
+                if (exception is BackupAlreadyExistsException) {
+                    _state.update {
+                        it.copy(
+                            errorMessage = sharedR.string.sync_rename_and_create_backup_dialog_error_message_name_already_exists
+                        )
+                    }
+                } else {
+                    Timber.e(exception)
                 }
             }
         }
