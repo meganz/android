@@ -1,8 +1,11 @@
 package mega.privacy.android.app.presentation.transfers.starttransfer.model
 
+import android.content.Context
+import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * One off events related to start transfers
@@ -64,17 +67,53 @@ sealed interface StartTransferEvent {
     data object PayWall : StartTransferEvent
 
     /**
-     * A message should be shown
-     * @param message the [StringRes] of the message to be shown
-     * @param action the [StringRes] of the action, if any
-     * @param actionEvent the one off event to be triggered with the [action], if [action] is null this parameter will be ignored
+     * A snackbar message should be shown
      */
-    sealed class Message(
-        @StringRes val message: Int,
-        @StringRes val action: Int? = null,
-        val actionEvent: ActionEvent? = null,
-        vararg val messageArgs: String,
-    ) : StartTransferEvent {
+    sealed interface Message : StartTransferEvent {
+        /**
+         * [StringRes] of the action, if any
+         */
+        val action: Int?
+
+        /**
+         * the one off event to be triggered with the [action], if [action] is null this parameter will be ignored
+         */
+        val actionEvent: ActionEvent?
+
+        /**
+         * The message to be shown in the snackbar
+         */
+        fun getMessage(context: Context): String
+
+        /**
+         * @param messageRes the [StringRes] of the message to be shown
+         * @param messageArgs arguments to build the message, if needed
+         */
+        sealed class MessageStringRes(
+            @StringRes val messageRes: Int,
+            @StringRes override val action: Int? = null,
+            override val actionEvent: ActionEvent? = null,
+            private vararg val messageArgs: String,
+        ) : Message {
+            override fun getMessage(context: Context) =
+                context.getString(messageRes, *messageArgs)
+        }
+
+        /**
+         * @param pluralRes the [StringRes] of the message to be shown
+         * @param messageArgs arguments to build the message, if needed
+         */
+        sealed class MessagePluralRes(
+            @PluralsRes val pluralRes: Int,
+            val amount: Int,
+            @StringRes override val action: Int? = null,
+            override val actionEvent: ActionEvent? = null,
+            private vararg val messageArgs: String,
+        ) : Message {
+            override fun getMessage(context: Context) =
+                context.resources.getQuantityString(pluralRes, amount, *messageArgs)
+        }
+
         /**
          * The one off event to be triggered with the [action], if [action] is null this parameter will be ignored
          */
@@ -83,12 +122,20 @@ sealed interface StartTransferEvent {
              * The user have chosen to go to settings to file management (from no sufficient disk space snack bar action)
              */
             data object GoToFileManagement : ActionEvent
+
+            /**
+             * Retry a failed transfer that has already been retried but failed again
+             * @param transferTriggerEvent the original retry event that will be re-retied
+             */
+            data class ReRetry(
+                val transferTriggerEvent: TransferTriggerEvent.RetryTransfers,
+            ) : ActionEvent
         }
 
         /**
          * Not sufficient space for save the node, either for offline or an ordinary download
          */
-        data object NotSufficientSpace : Message(
+        data object NotSufficientSpace : MessageStringRes(
             R.string.error_not_enough_free_space,
             R.string.action_settings,
             ActionEvent.GoToFileManagement
@@ -97,12 +144,12 @@ sealed interface StartTransferEvent {
         /**
          * Transfer cancelled by user action
          */
-        data object TransferCancelled : Message(R.string.transfers_cancelled, null, null)
+        data object TransferCancelled : MessageStringRes(R.string.transfers_cancelled, null, null)
 
         /**
          * Copy uri has finished
          */
-        data object FinishCopyUri : Message(R.string.copy_already_downloaded, null, null)
+        data object FinishCopyUri : MessageStringRes(R.string.copy_already_downloaded, null, null)
 
         /**
          * Text file upload has finished
@@ -113,12 +160,32 @@ sealed interface StartTransferEvent {
         data class FailedTextFileUpload(
             val isEditMode: Boolean,
             val isCloudFile: Boolean,
-        ) : Message(
+        ) : MessageStringRes(
             when {
                 isEditMode -> R.string.file_update_failed
                 isCloudFile -> R.string.text_editor_creation_error
                 else -> R.string.file_creation_failed
             }, null, null
         )
+
+        /**
+         * Message to be shown when failed transfers are retried with success
+         * @param retryAmount
+         */
+        data class TransfersRetriedSucceed(val retryAmount: Int) : MessagePluralRes(
+            sharedR.plurals.transfers_retry_feedback_snackbar_message,
+            retryAmount
+        )
+
+        /**
+         * Message to be shown when failed transfers are retried without success
+         * @param transferTriggerEvent the original event to be re-retried if message action is triggered
+         */
+        data class TransfersRetriedFailed(val transferTriggerEvent: TransferTriggerEvent.RetryTransfers) :
+            MessageStringRes(
+                messageRes = sharedR.string.transfers_retry_failed_snackbar_message,
+                action = sharedR.string.transfers_retry_failed_snackbar_action,
+                actionEvent = ActionEvent.ReRetry(transferTriggerEvent)
+            )
     }
 }

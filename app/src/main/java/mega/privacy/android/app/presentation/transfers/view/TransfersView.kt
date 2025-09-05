@@ -312,7 +312,9 @@ internal fun TransfersView(
                             lazyListState = listState,
                             onFailedTransferSelected = onFailedTransferSelected,
                             selectedFailedTransfersIds = selectedFailedTransfersIds,
-                            onRetryTransfer = onRetryTransfer,
+                            onRetryTransfer = {
+                                onRetryTransfer(it)
+                            },
                             modifier = modifier,
                         )
                     }
@@ -376,6 +378,7 @@ internal fun TransfersView(
                 onDismiss = { showConfirmCancelTransfersDialog = false },
             )
         }
+
         StartTransferComponent(
             event = uiState.startEvent,
             onConsumeEvent = onConsumeStartEvent,

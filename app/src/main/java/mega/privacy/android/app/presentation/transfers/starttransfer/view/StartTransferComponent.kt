@@ -82,9 +82,9 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackB
 import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import java.io.File
-import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Helper compose view to show UI related to starting a download transfer
@@ -210,6 +210,9 @@ internal fun StartTransferComponent(
         onCancelTransferConfirmed = viewModel::cancelTransferConfirmed,
         onCancelTransferCancelled = viewModel::cancelTransferCancelled,
         onConsumeCancelTransferResult = viewModel::onConsumeCancelTransferFailure,
+        retryTransfers = {
+            viewModel.startTransfer(it)
+        }
     )
 }
 
@@ -269,6 +272,7 @@ private fun StartTransferComponent(
     onCancelTransferCancelled: () -> Unit,
     onConsumeCancelTransferResult: () -> Unit,
     onScanningFinished: (StartTransferEvent) -> Unit = {},
+    retryTransfers: (TransferTriggerEvent.RetryTransfers) -> Unit,
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -344,6 +348,7 @@ private fun StartTransferComponent(
                         snackBarHostState,
                         context,
                         navigateToStorageSettings,
+                        retryTransfers,
                     )
                 }
 
@@ -581,23 +586,25 @@ private suspend fun consumeMessage(
     snackBarHostState: SnackbarHostStateWrapper?,
     context: Context,
     navigateToStorageSettings: () -> Unit,
+    retryTransfers: (TransferTriggerEvent.RetryTransfers) -> Unit = {},
 ) {
     //show snack bar with an optional action
     val result = snackBarHostState.showAutoDurationSnackbar(
-        context.getString(event.message, *event.messageArgs),
+        event.getMessage(context),
         event.action?.let { context.getString(it) }
     )
-    if (result == SnackbarResult.ActionPerformed && event.actionEvent != null) {
-        consumeMessageAction(event.actionEvent, navigateToStorageSettings)
-    }
-}
+    if (result == SnackbarResult.ActionPerformed || result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
+        event.actionEvent?.let { actionEvent ->
+            when (actionEvent) {
+                StartTransferEvent.Message.ActionEvent.GoToFileManagement -> {
+                    navigateToStorageSettings()
+                }
 
-private fun consumeMessageAction(
-    actionEvent: StartTransferEvent.Message.ActionEvent,
-    navigateToStorageSettings: () -> Unit,
-) = when (actionEvent) {
-    StartTransferEvent.Message.ActionEvent.GoToFileManagement -> {
-        navigateToStorageSettings()
+                is StartTransferEvent.Message.ActionEvent.ReRetry -> {
+                    retryTransfers(actionEvent.transferTriggerEvent)
+                }
+            }
+        }
     }
 }
 

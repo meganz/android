@@ -103,7 +103,10 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.anyValueClass
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
@@ -1299,6 +1302,65 @@ class StartTransfersComponentViewModelTest {
                 underTest.uiState.map { it.oneOffViewEvent }.test {
                     assertThat(awaitItem())
                         .isNotEqualTo(triggered(StartTransferEvent.Message.NotSufficientSpace))
+                }
+            }
+
+        @Test
+        fun `test that state is updated with TransfersRetriedSucceed event if transfer is retried correctly`() =
+            runTest {
+                commonStub()
+
+                whenever(getOfflinePathForNodeUseCase(any())) doReturn DESTINATION
+                whenever(shouldPromptToSaveDestinationUseCase()) doReturn true
+                whenever(
+                    insertPendingDownloadsForNodesUseCase(
+                        retryDownloadEvent.nodes,
+                        UriPath(retryDownloadEvent.downloadLocation),
+                        retryDownloadEvent.isHighPriority,
+                        retryDownloadEvent.appData,
+                    )
+                ) doReturn Unit
+
+                underTest.startTransfer(retryDownloadsEvent)
+
+                underTest.uiState.map { it.oneOffViewEvent }.test {
+                    assertThat(awaitItem()).isEqualTo(
+                        triggered(
+                            StartTransferEvent.Message.TransfersRetriedSucceed(
+                                retryDownloadsEvent.idsAndEvents.size
+                            )
+                        )
+                    )
+                }
+            }
+
+        @Test
+        fun `test that state is updated with TransfersRetriedFailed event if transfer retry fails`() =
+            runTest {
+                commonStub()
+
+                whenever(getOfflinePathForNodeUseCase(any())) doReturn DESTINATION
+                whenever(shouldPromptToSaveDestinationUseCase()) doReturn true
+                whenever(
+                    insertPendingDownloadsForNodesUseCase(
+                        any(),
+                        anyValueClass(),
+                        any(),
+                        anyOrNull(),
+                    )
+                ) doThrow RuntimeException("something worng")
+
+                underTest.startTransfer(retryDownloadsEvent)
+
+                underTest.uiState.map { it.oneOffViewEvent }.test {
+                    assertThat(awaitItem())
+                        .isEqualTo(
+                            triggered(
+                                StartTransferEvent.Message.TransfersRetriedFailed(
+                                    retryDownloadsEvent
+                                )
+                            )
+                        )
                 }
             }
     }

@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.transfers.model
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -727,7 +726,7 @@ class TransfersViewModelTest {
         }
 
     @Test
-    fun `test that retryFailedTransfer does not update startEvent but invokes DeleteCompletedTransfersByIdUseCase when the transfer is a chat upload transfer`() =
+    fun `test that retryFailedTransfer does not add the transfer to the startEvent but invokes DeleteCompletedTransfersByIdUseCase when the transfer is a chat upload transfer`() =
         runTest {
             whenever(retryChatUploadUseCase(chatAppData.mapNotNull { it as? TransferAppData.ChatUpload })) doReturn Unit
 
@@ -737,7 +736,9 @@ class TransfersViewModelTest {
                 retryFailedTransfer(cancelledChatUpload)
                 advanceUntilIdle()
                 uiState.map { it.startEvent }.test {
-                    assertThat(awaitItem()).isEqualTo(consumed())
+                    assertThat(awaitItem()).isEqualTo(
+                        triggered(TransferTriggerEvent.RetryTransfers(emptyMap()))
+                    )
                 }
             }
             cancelledChatUpload.id?.let {

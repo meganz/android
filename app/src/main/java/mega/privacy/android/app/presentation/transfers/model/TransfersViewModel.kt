@@ -279,14 +279,7 @@ class TransfersViewModel @Inject constructor(
      * Retry selected failed transfer
      */
     fun retryFailedTransfer(transfer: CompletedTransfer) {
-        viewModelScope.launch {
-            getCloudTransferEventByFailedTransfer(transfer)?.let { cloudTransferEvent ->
-                transfer.id?.let { id ->
-                    val idAndEvent = mapOf(id to cloudTransferEvent)
-                    setStartEvent(TransferTriggerEvent.RetryTransfers(idAndEvent))
-                }
-            }
-        }
+        retryFailedTransfers(listOf(transfer))
     }
 
     /**

@@ -330,47 +330,57 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 }
             }
         }.let { retriedTransferIds ->
-            if (notEnoughStorage) {
-                _uiState.update { state ->
-                    state.copy(
-                        oneOffViewEvent = triggered(StartTransferEvent.Message.NotSufficientSpace)
-                    )
+            val messageEvent: StartTransferEvent.Message =
+                when {
+                    notEnoughStorage -> StartTransferEvent.Message.NotSufficientSpace
+                    retriedTransferIds.isEmpty() ->
+                        StartTransferEvent.Message.TransfersRetriedFailed(transferTriggerEvent)
+
+                    else ->
+                        StartTransferEvent.Message.TransfersRetriedSucceed(retriedTransferIds.size)
+                            .also {
+                                viewModelScope.launch {
+                                    when {
+                                        retryUploads && retryDownloads -> combine(
+                                            monitorPendingTransfersUntilResolvedUseCase(TransferType.GENERAL_UPLOAD),
+                                            monitorPendingTransfersUntilResolvedUseCase(TransferType.DOWNLOAD)
+                                        ) { uploads, downloads -> uploads + downloads }
+
+                                        retryUploads -> monitorPendingTransfersUntilResolvedUseCase(
+                                            TransferType.GENERAL_UPLOAD
+                                        )
+
+                                        retryDownloads -> monitorPendingTransfersUntilResolvedUseCase(
+                                            TransferType.DOWNLOAD
+                                        )
+
+                                        else -> emptyFlow()
+                                    }.onEach { Timber.d("Pending transfers to process: ${it.size}") }
+                                        .catch { Timber.e(it) }
+                                        .collect() //just wait until finishes
+
+                                    Timber.d("Scanning finished")
+
+                                    invalidateCancelTokenUseCase()
+                                    deleteAllPendingTransfersUseCase()
+                                    deleteCompletedTransfersByIdUseCase(retriedTransferIds)
+                                }
+
+                                if (retryUploads) {
+                                    startUploadsWorkerAndWaitUntilIsStartedUseCase()
+                                    checkUploadRating()
+                                }
+
+                                if (retryDownloads) {
+                                    startDownloadsWorkerAndWaitUntilIsStartedUseCase()
+                                    checkDownloadRating()
+                                }
+                            }
                 }
-            }
-
-            if (retriedTransferIds.isNotEmpty()) {
-                viewModelScope.launch {
-                    when {
-                        retryUploads && retryDownloads -> combine(
-                            monitorPendingTransfersUntilResolvedUseCase(TransferType.GENERAL_UPLOAD),
-                            monitorPendingTransfersUntilResolvedUseCase(TransferType.DOWNLOAD)
-                        ) { uploads, downloads -> uploads + downloads }
-
-                        retryUploads -> monitorPendingTransfersUntilResolvedUseCase(TransferType.GENERAL_UPLOAD)
-
-                        retryDownloads -> monitorPendingTransfersUntilResolvedUseCase(TransferType.DOWNLOAD)
-
-                        else -> emptyFlow()
-                    }.onEach { Timber.d("Pending transfers to process: ${it.size}") }
-                        .catch { Timber.e(it) }
-                        .collect() //just wait until finishes
-
-                    Timber.d("Scanning finished")
-
-                    invalidateCancelTokenUseCase()
-                    deleteAllPendingTransfersUseCase()
-                    deleteCompletedTransfersByIdUseCase(retriedTransferIds)
-                }
-
-                if (retryUploads) {
-                    startUploadsWorkerAndWaitUntilIsStartedUseCase()
-                    checkUploadRating()
-                }
-
-                if (retryDownloads) {
-                    startDownloadsWorkerAndWaitUntilIsStartedUseCase()
-                    checkDownloadRating()
-                }
+            _uiState.update { state ->
+                state.copy(
+                    oneOffViewEvent = triggered(messageEvent)
+                )
             }
         }
     }

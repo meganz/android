@@ -1578,4 +1578,13 @@
     <string name="file_properties_shared_folder_read_write">Read and write</string>
     <!-- Text shown in the app bar when nodes are being selected in selection mode -->
     <string name="general_selecting">Selecting</string>
+    <!-- Snackbar message when retry failed on failed transfers tab. -->
+    <string name="transfers_retry_failed_snackbar_message">Unable to restart transfers</string>
+    <!-- Action for the Snackbar when retry failed on failed transfers tab. -->
+    <string name="transfers_retry_failed_snackbar_action">Retry</string>
+    <!-- Snackbar message when retry success on failed transfers tab. -->
+    <plurals name="transfers_retry_feedback_snackbar_message">
+        <item quantity="one">Retrying transfer, see the Active tab for progress</item>
+        <item quantity="other">Retrying transfers, see the Active tab for progress</item>
+    </plurals>
 </resources>
