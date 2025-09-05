@@ -1014,6 +1014,28 @@ class DefaultAccountRepositoryTest {
         }
 
     @Test
+    fun `test that changeEmail throws TooManyAttemptsException when API_ETOOMANY error occurs`() =
+        runTest {
+            val expectedEmail = "myEmail"
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_ETOOMANY)
+            }
+            val megaRequest = mock<MegaRequest> {
+                on { email }.thenReturn(expectedEmail)
+            }
+            whenever(megaApiGateway.changeEmail(any(), any())).thenAnswer {
+                ((it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError
+                ))
+            }
+            assertThrows<ChangeEmailException.TooManyAttemptsException> {
+                underTest.changeEmail(expectedEmail)
+            }
+        }
+
+    @Test
     fun `test that MegaApiFolderGateway is invoked when resetting accountAuth`() = runTest {
         underTest.resetAccountAuth()
         verify(megaApiFolderGateway).setAccountAuth(null)

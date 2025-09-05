@@ -80,11 +80,11 @@ import mega.privacy.android.domain.exception.ChangeEmailException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.resources.R as sharedResR
 import nz.mega.sdk.MegaChatApi
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
-import mega.privacy.android.shared.resources.R as sharedResR
 
 @AndroidEntryPoint
 class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.PhotoCallback,
@@ -417,6 +417,11 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
             result.exceptionOrNull() is ChangeEmailException.AlreadyRequested -> {
                 firstMessageId = R.string.mail_changed_confirm_requested
+                secondMessageId = R.string.email_verification_title
+            }
+
+            result.exceptionOrNull() is ChangeEmailException.TooManyAttemptsException -> {
+                firstMessageId = sharedR.string.resend_signup_link_error
                 secondMessageId = R.string.email_verification_title
             }
 
