@@ -599,6 +599,10 @@ internal class DefaultAccountRepository @Inject constructor(
                             Result.failure(ChangeEmailException.AlreadyRequested)
                         )
 
+                        MegaError.API_ETOOMANY -> continuation.resumeWith(
+                            Result.failure(ChangeEmailException.TooManyAttemptsException)
+                        )
+
                         else -> continuation.resumeWith(
                             Result.failure(ChangeEmailException.Unknown(error.errorCode))
                         )
