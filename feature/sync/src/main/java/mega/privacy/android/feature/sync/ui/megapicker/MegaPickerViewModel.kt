@@ -107,7 +107,9 @@ internal class MegaPickerViewModel @AssistedInject constructor(
                     }
                     runCatching {
                         if (isStopBackup.not()) {
-                            tryNodeSyncUseCase(state.value.currentFolder?.id ?: NodeId(0))
+                            state.value.currentFolder?.let {
+                                tryNodeSyncUseCase(it.id)
+                            }
                         } else {
                             state.value.currentFolder?.id?.let { currentFolder ->
                                 isFolderExists(currentFolder).let {
@@ -233,7 +235,8 @@ internal class MegaPickerViewModel @AssistedInject constructor(
 
             Timber.d("Current folder: ${currentFolder.name}, id: ${currentFolder.id}, RootFolder: ${rootFolder?.name}, id: ${rootFolder?.id}, Exclude folders: $excludeFolders")
 
-            val isSelectEnabled = isFolderExists(currentFolder.id).not()
+            val isSelectEnabled =
+                if (isStopBackup) isFolderExists(currentFolder.id).not() else currentFolder.id != rootFolder?.id
 
             getTypedNodesFromFolder(currentFolder.id).catch {
                 Timber.d(it, "Error getting child folders of current folder ${currentFolder.name}")

@@ -3,8 +3,8 @@ package mega.privacy.android.feature.sync.ui.megapicker
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
@@ -140,11 +140,17 @@ private fun MegaPickerScreenContent(
     isStopBackupMegaPicker: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier) {
+    Box(modifier = modifier.fillMaxSize()) {
+        // Main content area
         MegaFolderPickerView(
             modifier = Modifier
-                .padding(start = 12.dp, top = 8.dp, end = 12.dp)
-                .weight(1f),
+                .fillMaxSize()
+                .padding(
+                    start = 12.dp,
+                    top = 8.dp,
+                    end = 12.dp,
+                    bottom = if (isSelectEnabled) 80.dp else 8.dp
+                ),
             onSortOrderClick = {},
             onChangeViewTypeClick = {},
             nodesList = nodes,
@@ -159,9 +165,14 @@ private fun MegaPickerScreenContent(
             isLoading = isLoading,
         )
 
-        if (isSelectEnabled) {
+        // Button positioned at the bottom
+        if (isSelectEnabled && isLoading.not()) {
             Box(
-                Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                contentAlignment = Alignment.Center
             ) {
                 RaisedDefaultMegaButton(
                     modifier = Modifier
