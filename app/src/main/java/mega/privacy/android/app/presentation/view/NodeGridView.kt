@@ -13,6 +13,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.view.extension.getNodeTitle
 import mega.privacy.android.core.nodecomponents.extension.getIcon
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
@@ -115,7 +116,7 @@ fun <T : TypedNode> NodeGridView(
             val node = nodeUIItems[it].node
             NodeGridViewItem(
                 isSelected = nodeUIItems[it].isSelected,
-                name = nodeUIItems[it].node.name,
+                name = nodeUIItems[it].node.getNodeTitle(),
                 iconRes = nodeUIItems[it].node.getIcon(fileTypeIconMapper = fileTypeIconMapper),
                 thumbnailData = ThumbnailRequest(nodeUIItems[it].node.id, isPublicNode),
                 duration = nodeUIItems[it].fileDuration,

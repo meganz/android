@@ -1029,8 +1029,12 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         text = when {
             // Triggered if the Bottom Sheet is accessed from Device Center
             nodeDeviceCenterInformation != null -> nodeDeviceCenterInformation.name
-            nodeShareInformation != null && nodeController.nodeComesFromIncoming(megaNode) -> {
-                resources.getString(R.string.shared_items_verify_credentials_undecrypted_folder)
+            !megaNode.isNodeKeyDecrypted && nodeController.nodeComesFromIncoming(megaNode) -> {
+                if (megaNode.isFolder)
+                    resources.getString(R.string.shared_items_verify_credentials_undecrypted_folder) else resources.getQuantityString(
+                    R.plurals.cloud_drive_undecrypted_file,
+                    1
+                )
             }
 
             else -> megaNode.name

@@ -55,6 +55,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -182,6 +184,24 @@ class IncomingSharesComposeViewModelTest {
             underTest.setCurrentHandle(expectedHandle)
             assertThat(underTest.getCurrentNodeHandle()).isEqualTo(expectedHandle)
             assertThat(underTest.state.value.currentNodeName).isEqualTo(expectedName)
+        }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that the isCurrent Node Decrypted information is updated when current node is updated`(
+        nodeKeyDecrypted: Boolean,
+    ) =
+        runTest {
+            val expectedHandle = 123456789L
+            val expectedName = "node name"
+            val node = mock<TypedFolderNode> {
+                on { name }.thenReturn(expectedName)
+                on { isNodeKeyDecrypted }.thenReturn(nodeKeyDecrypted)
+            }
+            whenever(getNodeByIdUseCase.invoke(NodeId(expectedHandle))).thenReturn(node)
+            underTest.setCurrentHandle(expectedHandle)
+            assertThat(underTest.getCurrentNodeHandle()).isEqualTo(expectedHandle)
+            assertThat(underTest.state.value.isCurrentNodeDecrypted).isEqualTo(nodeKeyDecrypted)
         }
 
     @Test
@@ -526,7 +546,8 @@ class IncomingSharesComposeViewModelTest {
     @Test
     fun `test that download event is updated when on download for preview option click is invoked`() =
         runTest {
-            val triggered = TransferTriggerEvent.StartDownloadForPreview(node = mock(), isOpenWith = false)
+            val triggered =
+                TransferTriggerEvent.StartDownloadForPreview(node = mock(), isOpenWith = false)
             underTest.onDownloadFileTriggered(triggered)
             underTest.state.test {
                 val state = awaitItem()

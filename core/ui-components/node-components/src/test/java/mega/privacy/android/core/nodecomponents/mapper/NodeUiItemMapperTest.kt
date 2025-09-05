@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.shares.ShareFileNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.icon.pack.R as IconPackR
@@ -167,6 +168,34 @@ class NodeUiItemMapperTest {
         whenever(it.childFolderCount).thenReturn(2)
         whenever(it.childFileCount).thenReturn(3)
         whenever(it.type).thenReturn(FolderType.Default)
+    }
+
+    private fun createMockShareFileNode(
+        id: Long = 3L,
+        name: String = "Shared Folder",
+        isIncomingShare: Boolean = true,
+        isNodeKeyDecrypted: Boolean = false,
+        shareData: ShareData? = null,
+    ): ShareFileNode = mock {
+        whenever(it.node).thenReturn(mock<TypedFileNode>())
+        whenever(it.shareData).thenReturn(shareData)
+        whenever(it.id).thenReturn(NodeId(id))
+        whenever(it.name).thenReturn(name)
+        whenever(it.parentId).thenReturn(NodeId(0L))
+        whenever(it.base64Id).thenReturn("test_base64_id")
+        whenever(it.label).thenReturn(0)
+        whenever(it.isFavourite).thenReturn(false)
+        whenever(it.isMarkedSensitive).thenReturn(false)
+        whenever(it.isSensitiveInherited).thenReturn(false)
+        whenever(it.isTakenDown).thenReturn(false)
+        whenever(it.isIncomingShare).thenReturn(isIncomingShare)
+        whenever(it.isNodeKeyDecrypted).thenReturn(isNodeKeyDecrypted)
+        whenever(it.creationTime).thenReturn(1234567890L)
+        whenever(it.isAvailableOffline).thenReturn(false)
+        whenever(it.versionCount).thenReturn(0)
+        whenever(it.description).thenReturn(null)
+        whenever(it.tags).thenReturn(emptyList())
+        whenever(it.type).thenReturn(TextFileTypeInfo("text/plain", "txt"))
     }
 
     private fun createMockShareData(
@@ -436,17 +465,15 @@ class NodeUiItemMapperTest {
     }
 
     @Test
-    fun `test that invoke returns StringRes title for unverified incoming share with undecrypted node key`() =
+    fun `test that invoke returns StringRes title for incoming share folder with undecrypted node key`() =
         runTest {
-            val unverifiedShareData = createMockShareData(
-                isVerified = false,
-                count = 0 // This makes isUnverifiedDistinctNode = true
+            val mockShareData = createMockShareData(
             )
             val mockShareFolderNode = createMockShareFolderNode(
-                name = "Unverified Folder",
+                name = "Undecrypted Folder",
                 isIncomingShare = true,
                 isNodeKeyDecrypted = false,
-                shareData = unverifiedShareData
+                shareData = mockShareData
             )
 
             val result = underTest(
@@ -461,17 +488,15 @@ class NodeUiItemMapperTest {
         }
 
     @Test
-    fun `test that invoke returns Literal title for unverified incoming share with decrypted node key`() =
+    fun `test that invoke returns Literal title for incoming share folder with decrypted node key`() =
         runTest {
-            val unverifiedShareData = createMockShareData(
-                isVerified = false,
-                count = 0 // This makes isUnverifiedDistinctNode = true
+            val mockShareData = createMockShareData(
             )
             val mockShareFolderNode = createMockShareFolderNode(
-                name = "Unverified Folder",
+                name = "Decrypted Folder",
                 isIncomingShare = true,
-                isNodeKeyDecrypted = true, // Node key is decrypted
-                shareData = unverifiedShareData
+                isNodeKeyDecrypted = true,
+                shareData = mockShareData
             )
 
             val result = underTest(
@@ -480,52 +505,55 @@ class NodeUiItemMapperTest {
             )
 
             assertThat(result).hasSize(1)
-            assertThat(result[0].title).isEqualTo(LocalizedText.Literal("Unverified Folder"))
+            assertThat(result[0].title).isEqualTo(LocalizedText.Literal("Decrypted Folder"))
         }
 
     @Test
-    fun `test that invoke returns Literal title for verified incoming share`() = runTest {
-        val verifiedShareData = createMockShareData(
-            isVerified = true,
-            count = 1
-        )
-        val mockShareFolderNode = createMockShareFolderNode(
-            name = "Verified Folder",
-            isIncomingShare = true,
-            isNodeKeyDecrypted = false,
-            shareData = verifiedShareData
-        )
+    fun `test that invoke returns PluralsRes title for incoming share file with undecrypted node key`() =
+        runTest {
+            val mockShareData = createMockShareData(
+            )
+            val mockShareFileNode = createMockShareFileNode(
+                name = "Undecrypted File",
+                isIncomingShare = true,
+                isNodeKeyDecrypted = false,
+                shareData = mockShareData
+            )
 
-        val result = underTest(
-            nodeList = listOf(mockShareFolderNode),
-            nodeSourceType = NodeSourceType.INCOMING_SHARES,
-        )
+            val result = underTest(
+                nodeList = listOf(mockShareFileNode),
+                nodeSourceType = NodeSourceType.INCOMING_SHARES,
+            )
 
-        assertThat(result).hasSize(1)
-        assertThat(result[0].title).isEqualTo(LocalizedText.Literal("Verified Folder"))
-    }
+            assertThat(result).hasSize(1)
+            assertThat(result[0].title).isEqualTo(
+                LocalizedText.PluralsRes(
+                    R.plurals.shared_items_verify_credentials_undecrypted_file,
+                    1
+                )
+            )
+        }
 
     @Test
-    fun `test that invoke returns Literal title for unverified outgoing share`() = runTest {
-        val unverifiedShareData = createMockShareData(
-            isVerified = false,
-            count = 0 // This makes isUnverifiedDistinctNode = true
-        )
-        val mockShareFolderNode = createMockShareFolderNode(
-            name = "Unverified Outgoing Folder",
-            isIncomingShare = false, // Outgoing share
-            isNodeKeyDecrypted = false,
-            shareData = unverifiedShareData
-        )
+    fun `test that invoke returns Literal title for incoming share file with decrypted node key`() =
+        runTest {
+            val mockShareData = createMockShareData(
+            )
+            val mockShareFileNode = createMockShareFileNode(
+                name = "Decrypted File",
+                isIncomingShare = true,
+                isNodeKeyDecrypted = true,
+                shareData = mockShareData
+            )
 
-        val result = underTest(
-            nodeList = listOf(mockShareFolderNode),
-            nodeSourceType = NodeSourceType.OUTGOING_SHARES,
-        )
+            val result = underTest(
+                nodeList = listOf(mockShareFileNode),
+                nodeSourceType = NodeSourceType.INCOMING_SHARES,
+            )
 
-        assertThat(result).hasSize(1)
-        assertThat(result[0].title).isEqualTo(LocalizedText.Literal("Unverified Outgoing Folder"))
-    }
+            assertThat(result).hasSize(1)
+            assertThat(result[0].title).isEqualTo(LocalizedText.Literal("Decrypted File"))
+        }
 
     @Test
     fun `test that invoke returns Literal title for regular folder node`() = runTest {
@@ -544,7 +572,7 @@ class NodeUiItemMapperTest {
     }
 
     @Test
-    fun `test that invoke returns Literal title for share folder node without share data`() =
+    fun `test that invoke returns StringRes title for share folder node without share data when node key is not decrypted`() =
         runTest {
             val mockShareFolderNode = createMockShareFolderNode(
                 name = "Share Folder Without Data",
@@ -559,30 +587,9 @@ class NodeUiItemMapperTest {
             )
 
             assertThat(result).hasSize(1)
-            assertThat(result[0].title).isEqualTo(LocalizedText.Literal("Share Folder Without Data"))
-        }
-
-    @Test
-    fun `test that invoke returns Literal title for unverified share with count greater than 0`() =
-        runTest {
-            val unverifiedShareData = createMockShareData(
-                isVerified = false,
-                count = 1 // This makes isUnverifiedDistinctNode = false
+            assertThat(result[0].title).isEqualTo(
+                LocalizedText.StringRes(R.string.shared_items_verify_credentials_undecrypted_folder)
             )
-            val mockShareFolderNode = createMockShareFolderNode(
-                name = "Unverified Share With Count",
-                isIncomingShare = true,
-                isNodeKeyDecrypted = false,
-                shareData = unverifiedShareData
-            )
-
-            val result = underTest(
-                nodeList = listOf(mockShareFolderNode),
-                nodeSourceType = NodeSourceType.INCOMING_SHARES,
-            )
-
-            assertThat(result).hasSize(1)
-            assertThat(result[0].title).isEqualTo(LocalizedText.Literal("Unverified Share With Count"))
         }
 
     // Helper function to create NodeUiItem<TypedNode> for testing

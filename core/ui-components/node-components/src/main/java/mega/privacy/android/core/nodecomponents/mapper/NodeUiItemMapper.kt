@@ -110,10 +110,13 @@ class NodeUiItemMapper @Inject constructor(
     }
 
     private fun getNodeTitle(node: TypedNode): LocalizedText {
-        val isUnverifiedShare =
-            (node as? ShareFolderNode)?.shareData?.isUnverifiedDistinctNode == true
-        return if (node.isIncomingShare && isUnverifiedShare && node.isNodeKeyDecrypted.not()) {
-            LocalizedText.StringRes(R.string.shared_items_verify_credentials_undecrypted_folder)
+        return if (node.isNodeKeyDecrypted.not()) {
+            if (node is FileNode)
+                LocalizedText.PluralsRes(
+                    resId = R.plurals.shared_items_verify_credentials_undecrypted_file,
+                    quantity = 1
+                )
+            else LocalizedText.StringRes(R.string.shared_items_verify_credentials_undecrypted_folder)
         } else {
             LocalizedText.Literal(node.name)
         }

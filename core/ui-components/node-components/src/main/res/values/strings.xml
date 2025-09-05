@@ -167,6 +167,10 @@
     <string name="label_file_size_exa_byte" />
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
+    <plurals name="shared_items_verify_credentials_undecrypted_file">
+        <item quantity="one">[Undecrypted file]</item>
+        <item quantity="other">[Undecrypted files]</item>
+    </plurals>
     <!-- End of node list item resources -->
 
     <!-- Start of take down dialog strings -->

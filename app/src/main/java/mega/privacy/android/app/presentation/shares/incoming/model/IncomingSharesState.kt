@@ -46,6 +46,7 @@ data class IncomingSharesState(
     val isLoading: Boolean = true,
     val currentHandle: Long = -1L,
     val currentNodeName: String? = null,
+    val isCurrentNodeDecrypted: Boolean? = true,
     val accessedFolderHandle: Long? = null,
     val isAccessedFolderExited: Boolean = false,
     val isPendingRefresh: Boolean = false,

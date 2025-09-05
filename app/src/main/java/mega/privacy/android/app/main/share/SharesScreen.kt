@@ -82,7 +82,11 @@ internal fun SharesScreen(
         else -> true
     }
     val titleName = when (uiState.currentTab) {
-        SharesTab.INCOMING_TAB -> incomingUiState.currentNodeName
+        SharesTab.INCOMING_TAB -> if (incomingUiState.isCurrentNodeDecrypted == false) stringResource(
+            id = R.string.shared_items_verify_credentials_undecrypted_folder
+        ) else
+            incomingUiState.currentNodeName
+
         SharesTab.OUTGOING_TAB -> outgoingUiState.currentNodeName
         SharesTab.LINKS_TAB -> linksUiState.parentNode?.name
         else -> stringResource(R.string.title_shared_items)

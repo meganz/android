@@ -54,11 +54,14 @@ internal fun ShareFolderNode?.getSharedNodeItemDescription(): String? {
 
 @Composable
 internal fun TypedNode.getNodeTitle(): String = with(this) {
-    val isUnverifiedShare =
-        (this as? ShareFolderNode)?.shareData?.isUnverifiedDistinctNode == true
-    return if (isIncomingShare && isUnverifiedShare && isNodeKeyDecrypted.not())
-        stringResource(id = R.string.shared_items_verify_credentials_undecrypted_folder)
-    else name
+    return if (isNodeKeyDecrypted.not()) {
+        if (this is FileNode)
+            pluralStringResource(
+                id = R.plurals.cloud_drive_undecrypted_file,
+                count = 1
+            )
+        else stringResource(id = R.string.shared_items_verify_credentials_undecrypted_folder)
+    } else name
 }
 
 @Composable

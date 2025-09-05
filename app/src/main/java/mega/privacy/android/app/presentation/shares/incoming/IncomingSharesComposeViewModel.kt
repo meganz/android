@@ -25,6 +25,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -365,12 +366,14 @@ class IncomingSharesComposeViewModel @Inject constructor(
         val sortOrder = if (isRootNode) getOthersSortOrder() else getCloudSortOrder()
         checkIfSelectedFolderIsSharedByVerifiedContact()
         val nodeUIItems = getNodeUiItems(childrenNodes, highlightedNames)
+        val currentNode: TypedNode? = getNodeByIdUseCase(NodeId(currentHandle))
         _state.update {
             it.copy(
                 nodesList = nodeUIItems,
                 isLoading = false,
                 sortOrder = sortOrder,
-                currentNodeName = getNodeByIdUseCase(NodeId(currentHandle))?.name,
+                currentNodeName = currentNode?.name,
+                isCurrentNodeDecrypted = currentNode?.isNodeKeyDecrypted,
                 updateToolbarTitleEvent = triggered
             )
         }
