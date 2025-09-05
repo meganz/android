@@ -63,6 +63,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.extensions.launchUrl
+import mega.privacy.android.app.features.CloudDriveFeature
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.main.ManagerActivity
@@ -107,7 +108,6 @@ import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.app.features.CloudDriveFeature
 import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
@@ -269,6 +269,22 @@ class CloudDriveSyncsFragment : Fragment() {
                 LaunchedEffect(uiState.selectedTab) {
                     pagerState.scrollToPage(uiState.selectedTab.position)
                 }
+
+                // Restore action mode when selection state changes (e.g., after device rotation)
+                LaunchedEffect(uiState.isInSelection, uiState.selectedNodeHandles.size) {
+                    if (uiState.isInSelection && uiState.selectedNodeHandles.isNotEmpty()) {
+                        if (actionMode == null) {
+                            actionMode =
+                                (requireActivity() as? AppCompatActivity)?.startSupportActionMode(
+                                    ActionBarCallBack()
+                                )
+                        }
+                    } else {
+                        actionMode?.finish()
+                        actionMode = null
+                    }
+                }
+
                 val isTabShown = when (uiState.selectedTab) {
                     CloudDriveTab.CLOUD -> uiState.isRootNode && !uiState.isInSelection
                     else -> true
@@ -835,7 +851,8 @@ class CloudDriveSyncsFragment : Fragment() {
             menu.findItem(R.id.cab_menu_add_favourites)?.isVisible = nonFavouriteCount > 0
 
             // Show "Remove from favourites" if all items are favourites
-            menu.findItem(R.id.cab_menu_remove_favourites)?.isVisible = favouriteCount == selectedNodes.size && selectedNodes.isNotEmpty()
+            menu.findItem(R.id.cab_menu_remove_favourites)?.isVisible =
+                favouriteCount == selectedNodes.size && selectedNodes.isNotEmpty()
         }
     }
 
