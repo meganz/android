@@ -3,7 +3,6 @@ package mega.privacy.mobile.navigation.snowflake
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
@@ -48,6 +47,7 @@ val DefaultNavigationAnimationConfig = NavigationAnimationConfig(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainNavigationScaffold(
+    modifier: Modifier = Modifier,
     mainNavItems: ImmutableSet<NavigationItem>,
     onDestinationClick: (Any) -> Unit,
     isSelected: (Any) -> Boolean,
@@ -78,6 +78,7 @@ fun MainNavigationScaffold(
     }
 
     MegaNavigationSuiteScaffoldLayout(
+        modifier = modifier,
         navigationSuite = {
             MegaNavigationSuite(
                 navSuiteType = navSuiteType,
@@ -184,6 +185,7 @@ private fun orderNavigationItems(
 @Composable
 private fun MegaNavigationSuiteScaffoldLayout(
     navigationSuite: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
     layoutType: NavigationSuiteType =
         NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(WindowAdaptiveInfoDefault),
     isNavigationVisible: Boolean,
@@ -198,6 +200,7 @@ private fun MegaNavigationSuiteScaffoldLayout(
             label = "navigation_visibility"
         )
         Layout(
+            modifier = modifier,
             content = {
                 // Wrap the navigation suite and content composables each in a Box to not propagate the
                 // parent's (Surface) min constraints to its children (see b/312664933).

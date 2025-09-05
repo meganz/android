@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.ads
 
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
 
 /**
@@ -9,4 +10,5 @@ import mega.privacy.android.feature.payment.model.LocalisedSubscription
  */
 data class AdsFreeIntroUiState(
     val cheapestSubscriptionAvailable: LocalisedSubscription? = null,
+    val themeMode: ThemeMode = ThemeMode.System,
 )

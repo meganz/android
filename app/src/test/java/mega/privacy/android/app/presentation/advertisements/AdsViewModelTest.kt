@@ -5,11 +5,13 @@ import com.google.android.ump.ConsentInformation
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.advertisements.MonitorGoogleConsentLoadedUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -28,6 +30,9 @@ class AdsViewModelTest {
     private lateinit var underTest: AdsViewModel
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val consentInformation: ConsentInformation = mock()
+    private val monitorGoogleConsentLoadedUseCase: MonitorGoogleConsentLoadedUseCase = mock {
+        on { invoke() }.thenReturn(flowOf())
+    }
 
     @BeforeEach
     fun resetMocks() {
@@ -41,14 +46,17 @@ class AdsViewModelTest {
         underTest = AdsViewModel(
             getFeatureFlagValueUseCase,
             consentInformation,
+            monitorGoogleConsentLoadedUseCase,
         )
     }
 
     @Test
     fun `test initial state should have null request`() {
+        whenever(monitorGoogleConsentLoadedUseCase()).thenReturn(flowOf(false))
         initTestClass()
 
-        assertThat(underTest.request.value).isNull()
+        assertThat(underTest.uiState.value.request).isNull()
+        assertThat(underTest.uiState.value.isAdsFeatureEnabled).isNull()
     }
 
     @Test
@@ -56,14 +64,16 @@ class AdsViewModelTest {
         runTest {
             whenever(getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)).thenReturn(true)
             whenever(consentInformation.canRequestAds()).thenReturn(true)
+            whenever(monitorGoogleConsentLoadedUseCase()).thenReturn(flowOf(false))
             initTestClass()
 
             underTest.scheduleRefreshAds()
             delay(1000L)
             underTest.cancelRefreshAds()
 
-            assertThat(underTest.request.value).isNotNull()
-            assertThat(underTest.request.value).isInstanceOf(AdManagerAdRequest::class.java)
+            assertThat(underTest.uiState.value.request).isNotNull()
+            assertThat(underTest.uiState.value.request).isInstanceOf(AdManagerAdRequest::class.java)
+            assertThat(underTest.uiState.value.isAdsFeatureEnabled).isTrue()
             verify(consentInformation).canRequestAds()
         }
 
@@ -71,26 +81,30 @@ class AdsViewModelTest {
     fun `test scheduleRefreshAds when ads disabled should not create ad request`() = runTest {
         whenever(getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)).thenReturn(false)
         whenever(consentInformation.canRequestAds()).thenReturn(true)
+        whenever(monitorGoogleConsentLoadedUseCase()).thenReturn(flowOf(false))
         initTestClass()
 
         underTest.scheduleRefreshAds()
         delay(1000L)
         underTest.cancelRefreshAds()
 
-        assertThat(underTest.request.value).isNull()
+        assertThat(underTest.uiState.value.request).isNull()
+        assertThat(underTest.uiState.value.isAdsFeatureEnabled).isFalse()
     }
 
     @Test
     fun `test scheduleRefreshAds when consent not given should not create ad request`() = runTest {
         whenever(getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)).thenReturn(true)
         whenever(consentInformation.canRequestAds()).thenReturn(false)
+        whenever(monitorGoogleConsentLoadedUseCase()).thenReturn(flowOf(false))
         initTestClass()
 
         underTest.scheduleRefreshAds()
         delay(1000L)
         underTest.cancelRefreshAds()
 
-        assertThat(underTest.request.value).isNull()
+        assertThat(underTest.uiState.value.request).isNull()
+        assertThat(underTest.uiState.value.isAdsFeatureEnabled).isTrue()
         verify(consentInformation).canRequestAds()
     }
 
@@ -99,23 +113,25 @@ class AdsViewModelTest {
     fun `test cancelRefreshAds should stop periodic refresh`() = runTest {
         whenever(getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)).thenReturn(true)
         whenever(consentInformation.canRequestAds()).thenReturn(true)
+        whenever(monitorGoogleConsentLoadedUseCase()).thenReturn(flowOf(false))
         initTestClass()
 
         underTest.scheduleRefreshAds()
         delay(1000L)
         underTest.cancelRefreshAds()
 
-        val requestAfterCancel = underTest.request.value
+        val requestAfterCancel = underTest.uiState.value.request
 
         advanceTimeBy(AdsViewModel.MINIMUM_AD_REFRESH_INTERVAL * 2)
 
-        assertThat(underTest.request.value).isSameInstanceAs(requestAfterCancel)
+        assertThat(underTest.uiState.value.request).isSameInstanceAs(requestAfterCancel)
     }
 
     @Test
     fun `test multiple scheduleRefreshAds calls should not create multiple jobs`() = runTest {
         whenever(getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)).thenReturn(true)
         whenever(consentInformation.canRequestAds()).thenReturn(true)
+        whenever(monitorGoogleConsentLoadedUseCase()).thenReturn(flowOf(false))
         initTestClass()
 
         underTest.scheduleRefreshAds()
@@ -124,20 +140,22 @@ class AdsViewModelTest {
         delay(1000L)
         underTest.cancelRefreshAds()
 
-        assertThat(underTest.request.value).isNotNull()
+        assertThat(underTest.uiState.value.request).isNotNull()
     }
 
     @Test
     fun `test error handling when feature flag fetch fails should disable ads`() = runTest {
         whenever(getFeatureFlagValueUseCase(any())).doThrow(RuntimeException("Feature flag error"))
         whenever(consentInformation.canRequestAds()).thenReturn(true)
+        whenever(monitorGoogleConsentLoadedUseCase()).thenReturn(flowOf(false))
         initTestClass()
 
         underTest.scheduleRefreshAds()
         delay(1000L)
         underTest.cancelRefreshAds()
 
-        assertThat(underTest.request.value).isNull()
+        assertThat(underTest.uiState.value.request).isNull()
+        assertThat(underTest.uiState.value.isAdsFeatureEnabled).isFalse()
     }
 
     companion object {

@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.AdsGateway
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.MegaStringListMapper
@@ -39,6 +40,7 @@ internal class AdsRepositoryImplTest {
     private val adDetailsMapper: AdDetailsMapper = mock()
     private val megaStringListMapper: MegaStringListMapper = mock()
     private val uiPreferencesGateway: UIPreferencesGateway = mock()
+    private val appEventGateway: AppEventGateway = mock()
 
     private val testAdDetailsList = listOf(AdDetails("ANDFB", "https://megaad.nz/#z_xyz"))
     private val testAdSlotList = listOf("ANDFB")
@@ -50,7 +52,8 @@ internal class AdsRepositoryImplTest {
             adsGateway = adsGateway,
             adDetailsMapper = adDetailsMapper,
             megaStringListMapper = megaStringListMapper,
-            uiPreferencesGateway = uiPreferencesGateway
+            uiPreferencesGateway = uiPreferencesGateway,
+            appEventGateway = appEventGateway
         )
     }
 
@@ -60,7 +63,8 @@ internal class AdsRepositoryImplTest {
             adsGateway,
             adDetailsMapper,
             megaStringListMapper,
-            uiPreferencesGateway
+            uiPreferencesGateway,
+            appEventGateway
         )
     }
 

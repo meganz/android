@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.update
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate
@@ -58,6 +59,7 @@ internal class AppEventFacade @Inject constructor(
     private val _businessAccountExpired = MutableSharedFlow<Unit>()
     private val _sessionLoggedOutFromAnotherLocation = MutableStateFlow(false)
     private val _isUnverifiedBusinessAccount = MutableSharedFlow<Boolean>()
+    private val _googleConsentLoaded = MutableStateFlow(false)
 
     override val monitorCookieSettings: Flow<Set<CookieType>> = _cookieSettings.asSharedFlow()
 
@@ -281,6 +283,13 @@ internal class AppEventFacade @Inject constructor(
 
     override fun monitorIsUnverifiedBusinessAccount(): Flow<Boolean> =
         _isUnverifiedBusinessAccount.asSharedFlow()
+
+    override fun setGoogleConsentLoaded(isLoaded: Boolean) {
+        _googleConsentLoaded.update { isLoaded }
+    }
+
+    override fun monitorGoogleConsentLoaded(): Flow<Boolean> =
+        _googleConsentLoaded.asStateFlow()
 }
 
 private fun <T> Flow<T>.toSharedFlow(

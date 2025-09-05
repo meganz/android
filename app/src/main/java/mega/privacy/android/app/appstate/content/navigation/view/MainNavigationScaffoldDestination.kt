@@ -3,6 +3,7 @@ package mega.privacy.android.app.appstate.content.navigation.view
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.getValue
@@ -30,6 +31,7 @@ import kotlinx.serialization.Serializable
 import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.content.navigation.MainNavigationStateViewModel
 import mega.privacy.android.app.appstate.content.navigation.model.MainNavState
+import mega.privacy.android.app.main.ads.NewAdsContainer
 import mega.privacy.android.app.presentation.login.view.MEGA_LOGO_TEST_TAG
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -74,50 +76,55 @@ fun NavGraphBuilder.mainNavigationScaffold(
             }
 
             is MainNavState.Data -> {
-                MainNavigationScaffold(
-                    mainNavItems = currentState.mainNavItems,
-                    onDestinationClick = { destination ->
-                        navController.navigate(destination, navOptions {
-                            popUpTo(MainGraph) {
-                                inclusive = false
-                                saveState = true
-                            }
+                NewAdsContainer(
+                    modifier = modifier.fillMaxSize(),
+                ) { modifier ->
+                    MainNavigationScaffold(
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        mainNavItems = currentState.mainNavItems,
+                        onDestinationClick = { destination ->
+                            navController.navigate(destination, navOptions {
+                                popUpTo(MainGraph) {
+                                    inclusive = false
+                                    saveState = true
+                                }
 
-                            launchSingleTop = true
+                                launchSingleTop = true
 
-                            restoreState = true
-                        })
-                    },
-                    isSelected = { destination ->
-                        currentDestination?.isTopLevelDestinationInHierarchy(destination::class) == true
-                    },
-                    navContent = { navigationUiController ->
-                        PsaContainer {
-                            NavHost(
-                                modifier = modifier
-                                    .fillMaxSize(),
-                                navController = navController,
-                                startDestination = MainGraph,
-                                builder = {
-                                    navigation<MainGraph>(
-                                        startDestination = currentState.initialDestination
-                                    ) {
-                                        currentState.mainNavScreens.forEach {
-                                            it(
-                                                navigationHandler,
-                                                navigationUiController,
-                                                transferHandler
-                                            )
+                                restoreState = true
+                            })
+                        },
+                        isSelected = { destination ->
+                            currentDestination?.isTopLevelDestinationInHierarchy(destination::class) == true
+                        },
+                        navContent = { navigationUiController ->
+                            PsaContainer {
+                                NavHost(
+                                    modifier = Modifier.fillMaxSize(),
+                                    navController = navController,
+                                    startDestination = MainGraph,
+                                    builder = {
+                                        navigation<MainGraph>(
+                                            startDestination = currentState.initialDestination
+                                        ) {
+                                            currentState.mainNavScreens.forEach {
+                                                it(
+                                                    navigationHandler,
+                                                    navigationUiController,
+                                                    transferHandler
+                                                )
+                                            }
                                         }
-                                    }
-                                },
-                            )
-                        }
-                    },
-                )
+                                    },
+                                )
+                            }
+                        },
+                    )
+                }
             }
         }
-
     }
 }
 

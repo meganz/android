@@ -6,6 +6,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AdsGateway
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.mapper.MegaStringListMapper
 import mega.privacy.android.data.mapper.advertisements.AdDetailsMapper
@@ -24,6 +25,7 @@ internal class AdsRepositoryImpl @Inject constructor(
     private val adDetailsMapper: AdDetailsMapper,
     private val megaStringListMapper: MegaStringListMapper,
     private val uiPreferencesGateway: UIPreferencesGateway,
+    private val appEventGateway: AppEventGateway,
 ) : AdsRepository {
 
     override suspend fun fetchAdDetails(
@@ -66,4 +68,10 @@ internal class AdsRepositoryImpl @Inject constructor(
     override suspend fun setAdsClosingTimestamp(timestamp: Long) = withContext(ioDispatcher) {
         uiPreferencesGateway.setAdsClosingTimestamp(timestamp)
     }
+
+    override fun setGoogleConsentLoaded(isLoaded: Boolean) {
+        appEventGateway.setGoogleConsentLoaded(isLoaded)
+    }
+
+    override fun monitorGoogleConsentLoaded() = appEventGateway.monitorGoogleConsentLoaded()
 }

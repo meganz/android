@@ -17,6 +17,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,6 +31,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.shared.original.core.ui.controls.ads.AdsFreeItem
@@ -54,17 +56,20 @@ internal fun AdsFreeIntroView(
     viewModel: AdsFreeIntroViewModel = hiltViewModel(),
     onDismiss: () -> Unit,
 ) {
-    val state = viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
         Analytics.tracker.trackEvent(AdFreeDialogScreenEvent)
     }
 
-    AdsFreeIntroContent(
-        modifier = modifier,
-        onDismiss = onDismiss,
-        uiState = state.value,
-    )
+    // keep using OriginalTheme in new single activity revamp
+    OriginalTheme(isDark = state.themeMode.isDarkMode()) {
+        AdsFreeIntroContent(
+            modifier = modifier,
+            onDismiss = onDismiss,
+            uiState = state,
+        )
+    }
 }
 
 /**

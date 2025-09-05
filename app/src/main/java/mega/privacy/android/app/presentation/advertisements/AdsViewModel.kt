@@ -15,29 +15,41 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.advertisements.MonitorGoogleConsentLoadedUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * View model of [AdsBannerView]
+ * View model of [mega.privacy.android.app.main.ads.NewAdsContainer]
  */
 @HiltViewModel
 class AdsViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val consentInformation: ConsentInformation,
+    private val monitorGoogleConsentLoadedUseCase: MonitorGoogleConsentLoadedUseCase,
 ) : ViewModel() {
-    private val _request = MutableStateFlow<AdManagerAdRequest?>(null)
-    private val _isAdsFeatureEnabled = MutableStateFlow<Boolean?>(null)
+    private val _uiState = MutableStateFlow(AdsUiState())
 
     /**
      * Flow to provide the AdRequest to be used in the AdManager.
      */
-    val request = _request.asStateFlow()
+    val uiState = _uiState.asStateFlow()
 
     private var refreshAdsJob: Job? = null
     private var lastFetchTime = -1L
     private val mutex = Mutex()
+
+    init {
+        viewModelScope.launch {
+            monitorGoogleConsentLoadedUseCase().collect { isLoaded ->
+                if (isLoaded) {
+                    Timber.d("User consent is loaded")
+                    scheduleRefreshAds()
+                }
+            }
+        }
+    }
 
     /**
      * Schedule periodic refresh of ads if ads are enabled and user consent is given.
@@ -63,18 +75,18 @@ class AdsViewModel @Inject constructor(
 
     private fun createNewAdRequestIfNeeded() {
         Timber.d("Checking if a new AdRequest is needed")
-        if (_request.value == null || System.currentTimeMillis() - lastFetchTime > MINIMUM_AD_REFRESH_INTERVAL) {
+        if (_uiState.value.request == null || System.currentTimeMillis() - lastFetchTime > MINIMUM_AD_REFRESH_INTERVAL) {
             Timber.d("Creating new AdRequest")
-            _request.update { AdManagerAdRequest.Builder().build() }
+            _uiState.update { it.copy(request = AdManagerAdRequest.Builder().build()) }
             lastFetchTime = System.currentTimeMillis()
         }
     }
 
     private suspend fun isAdsEnabled(): Boolean = mutex.withLock {
-        if (_isAdsFeatureEnabled.value == null) {
+        if (_uiState.value.isAdsFeatureEnabled == null) {
             checkForAdsAvailability()
         }
-        return _isAdsFeatureEnabled.value ?: false
+        return _uiState.value.isAdsFeatureEnabled ?: false
     }
 
     /**
@@ -82,12 +94,14 @@ class AdsViewModel @Inject constructor(
      */
     private suspend fun checkForAdsAvailability() {
         runCatching {
-            _isAdsFeatureEnabled.update {
-                getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)
+            _uiState.update {
+                it.copy(isAdsFeatureEnabled = getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag))
             }
-            Timber.d("Ads feature enabled: ${_isAdsFeatureEnabled.value}")
+            Timber.d("Ads feature enabled: ${_uiState.value.isAdsFeatureEnabled}")
         }.onFailure {
-            _isAdsFeatureEnabled.update { false }
+            _uiState.update {
+                it.copy(isAdsFeatureEnabled = false)
+            }
             Timber.e(it, "Error getting feature flag value")
         }
     }

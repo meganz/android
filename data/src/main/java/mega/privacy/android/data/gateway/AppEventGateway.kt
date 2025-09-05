@@ -435,4 +435,16 @@ internal interface AppEventGateway {
      * @return Flow of Boolean
      */
     fun monitorIsUnverifiedBusinessAccount(): Flow<Boolean>
+
+    /**
+     * Set the state indicating if Google consent has been loaded.
+     */
+    fun setGoogleConsentLoaded(isLoaded: Boolean)
+
+    /**
+     * Monitor the state indicating if Google consent has been loaded.
+     *
+     * @return Flow of Boolean
+     */
+    fun monitorGoogleConsentLoaded(): Flow<Boolean>
 }

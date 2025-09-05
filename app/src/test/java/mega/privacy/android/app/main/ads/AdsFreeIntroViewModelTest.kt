@@ -3,12 +3,15 @@ package mega.privacy.android.app.main.ads
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.feature.payment.model.LocalisedSubscription
-import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Subscription
+import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
+import mega.privacy.android.feature.payment.model.LocalisedSubscription
+import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -25,6 +28,11 @@ class AdsFreeIntroViewModelTest {
     private lateinit var viewModel: AdsFreeIntroViewModel
     private val getRecommendedSubscriptionUseCase: GetRecommendedSubscriptionUseCase = mock()
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper = mock()
+    private val monitorThemeModeUseCase = mock<MonitorThemeModeUseCase> {
+        on { invoke() }.thenReturn(
+            flowOf(ThemeMode.System)
+        )
+    }
 
     @BeforeEach
     fun reset() {
@@ -36,7 +44,11 @@ class AdsFreeIntroViewModelTest {
 
     private fun initViewModel() {
         viewModel =
-            AdsFreeIntroViewModel(getRecommendedSubscriptionUseCase, localisedSubscriptionMapper)
+            AdsFreeIntroViewModel(
+                getRecommendedSubscriptionUseCase,
+                localisedSubscriptionMapper,
+                monitorThemeModeUseCase
+            )
     }
 
     @Test

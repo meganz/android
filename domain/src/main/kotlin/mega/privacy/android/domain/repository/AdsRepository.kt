@@ -30,4 +30,14 @@ interface AdsRepository {
      * Query ads
      */
     suspend fun queryAds(linkHandle: Long): Boolean
+
+    /**
+     * Set Google consent loaded state
+     */
+    fun setGoogleConsentLoaded(isLoaded: Boolean)
+
+    /**
+     * Monitor Google consent loaded state
+     */
+    fun monitorGoogleConsentLoaded(): Flow<Boolean>
 }
