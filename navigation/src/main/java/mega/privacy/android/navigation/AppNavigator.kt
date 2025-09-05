@@ -506,4 +506,19 @@ interface AppNavigator {
      * @param bundle Optional bundle containing extras to be added to the intent
      */
     fun openManagerActivity(context: Context, bundle: Bundle? = null)
+
+    /**
+     * Open Media Discovery Activity
+     *
+     * @param context The context
+     * @param folderId The folder id of the media discovery
+     * @param folderName The folder name of the media discovery
+     * @param isFromFolderLink True if the media discovery is opened from a folder link, false otherwise
+     */
+    fun openMediaDiscoveryActivity(
+        context: Context,
+        folderId: NodeId,
+        folderName: String,
+        isFromFolderLink: Boolean,
+    )
 }

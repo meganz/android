@@ -68,7 +68,6 @@ import mega.privacy.android.navigation.camera.CameraArg
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
-import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -256,8 +255,15 @@ internal fun CloudDriveContent(
             isListView = isListView,
             onSortOrderClick = {}, // TODO: Handle sort order click
             onChangeViewTypeClicked = { onAction(ChangeViewTypeClicked) },
-            showMediaDiscoveryButton = false,
-            onEnterMediaDiscoveryClick = {}, // TODO: Handle media discovery click
+            showMediaDiscoveryButton = uiState.hasMediaItems && !uiState.isCloudDriveRoot,
+            onEnterMediaDiscoveryClick = {
+                megaNavigator.openMediaDiscoveryActivity(
+                    context = context,
+                    folderId = uiState.currentFolderId,
+                    folderName = uiState.title.get(context),
+                    isFromFolderLink = false
+                )
+            },
             inSelectionMode = uiState.isInSelectionMode,
         )
     }

@@ -34,6 +34,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
+import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity
 import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
 import mega.privacy.android.app.presentation.settings.compose.navigation.SettingsNavigatorImpl
@@ -775,5 +776,20 @@ internal class MegaNavigatorImpl @Inject constructor(
         val intent = Intent(context, ManagerActivity::class.java)
         bundle?.let { intent.putExtras(it) }
         context.startActivity(intent)
+    }
+
+    override fun openMediaDiscoveryActivity(
+        context: Context,
+        folderId: NodeId,
+        folderName: String,
+        isFromFolderLink: Boolean,
+    ) {
+        MediaDiscoveryActivity.startMDActivity(
+            context = context,
+            mediaHandle = folderId.longValue,
+            folderName = folderName,
+            isOpenByMDIcon = true,
+            isFromFolderLink = false
+        )
     }
 }

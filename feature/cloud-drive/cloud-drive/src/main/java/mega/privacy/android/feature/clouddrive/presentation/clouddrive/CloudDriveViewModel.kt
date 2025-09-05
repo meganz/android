@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
+import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
@@ -62,6 +63,7 @@ class CloudDriveViewModel @Inject constructor(
     private val scannerHandler: ScannerHandler,
     private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
     private val getNodesByIdInChunkUseCase: GetNodesByIdInChunkUseCase,
+    private val containsMediaItemUseCase: ContainsMediaItemUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -125,11 +127,14 @@ class CloudDriveViewModel @Inject constructor(
                         hasMore -> NodesLoadingState.PartiallyLoaded
                         else -> NodesLoadingState.FullyLoaded
                     }
+                    val hasMediaItems =
+                        uiState.value.hasMediaItems || containsMediaItemUseCase(nodes)
                     _uiState.update { state ->
                         state.copy(
                             items = nodeUiItems,
                             nodesLoadingState = loadingState,
-                            currentFolderId = folderOrRootNodeId
+                            currentFolderId = folderOrRootNodeId,
+                            hasMediaItems = hasMediaItems
                         )
                     }
                 }
@@ -163,19 +168,28 @@ class CloudDriveViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getNodeUiItems() = run {
+    private suspend fun refreshNodes() {
         val folderId = uiState.value.currentFolderId
         runCatching {
-            nodeUiItemMapper(
-                nodeList = getFileBrowserNodeChildrenUseCase(folderId.longValue),
+            val nodes = getFileBrowserNodeChildrenUseCase(folderId.longValue)
+            val hasMediaItems = containsMediaItemUseCase(nodes)
+            val nodeUiItems = nodeUiItemMapper(
+                nodeList = nodes,
                 nodeSourceType = nodeSourceType,
                 highlightedNodeId = highlightedNodeId,
                 highlightedNames = highlightedNodeNames,
                 existingItems = uiState.value.items,
             )
+            _uiState.update { state ->
+                state.copy(
+                    items = nodeUiItems,
+                    nodesLoadingState = NodesLoadingState.FullyLoaded,
+                    hasMediaItems = hasMediaItems
+                )
+            }
         }.onFailure {
             Timber.e(it)
-        }.getOrDefault(emptyList())
+        }
     }
 
     private fun monitorNodeUpdates() {
@@ -189,13 +203,7 @@ class CloudDriveViewModel @Inject constructor(
                 } else {
                     // If nodes are currently loading, ignore updates
                     if (uiState.value.nodesLoadingState == NodesLoadingState.FullyLoaded) {
-                        val nodeUiItems = getNodeUiItems()
-                        _uiState.update { state ->
-                            state.copy(
-                                items = nodeUiItems,
-                                nodesLoadingState = NodesLoadingState.FullyLoaded
-                            )
-                        }
+                        refreshNodes()
                     }
                 }
             }

@@ -63,15 +63,15 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
 
     private val mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel by viewModels()
     private val mediaDiscoveryViewModel: MediaDiscoveryViewModel by viewModels()
-
+    private val isFromLink: Boolean by lazy(LazyThreadSafetyMode.NONE) {
+        intent.getBooleanExtra(INTENT_KEY_FROM_FOLDER_LINK, true)
+    }
     private val folderName: String? by lazy(LazyThreadSafetyMode.NONE) {
         intent.getStringExtra(INTENT_KEY_CURRENT_FOLDER_NAME)
     }
-
     private val mediaHandle: Long by lazy(LazyThreadSafetyMode.NONE) {
         intent.getLongExtra(INTENT_KEY_CURRENT_FOLDER_ID, 0L)
     }
-
     private lateinit var selectImportFolderLauncher: ActivityResultLauncher<Intent>
     private var statusDialog: AlertDialog? = null
     private val nameCollisionActivityLauncher = registerForActivityResult(
@@ -327,11 +327,12 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
             mediaHandle: Long,
             folderName: String,
             isOpenByMDIcon: Boolean = false,
+            isFromFolderLink: Boolean = true,
         ) {
             val intent = Intent(context, MediaDiscoveryActivity::class.java).apply {
                 putExtra(INTENT_KEY_CURRENT_FOLDER_ID, mediaHandle)
                 putExtra(INTENT_KEY_CURRENT_FOLDER_NAME, folderName)
-                putExtra(INTENT_KEY_FROM_FOLDER_LINK, true)
+                putExtra(INTENT_KEY_FROM_FOLDER_LINK, isFromFolderLink)
                 putExtra(INTENT_KEY_OPEN_MEDIA_DISCOVERY_BY_MD_ICON, isOpenByMDIcon)
             }
             context.startActivity(intent)

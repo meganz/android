@@ -330,7 +330,8 @@ class FolderLinkComposeActivity : PasscodeActivity(),
             context = this@FolderLinkComposeActivity,
             mediaHandle = mediaHandle,
             folderName = viewModel.state.value.title,
-            isOpenByMDIcon = true
+            isOpenByMDIcon = true,
+            isFromFolderLink = true
         )
     }
 
