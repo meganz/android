@@ -24,6 +24,7 @@ internal fun VideoQueueView(
     currentPlayingPosition: String,
     isPaused: Boolean,
     isSearchMode: Boolean,
+    shouldApplySensitiveMode: Boolean,
     lazyListState: LazyListState,
     modifier: Modifier = Modifier,
     isSelectMode: Boolean = false,
@@ -60,7 +61,8 @@ internal fun VideoQueueView(
             isSelected = item.isSelected,
             isSearchMode = isSearchMode,
             isSelectMode = isSelectMode,
-            onClick = { onClick(index, item) }
+            onClick = { onClick(index, item) },
+            isSensitive = shouldApplySensitiveMode && item.isSensitive == true
         )
     }
 }
@@ -76,7 +78,8 @@ private fun MediaQueueViewPreview() {
             lazyListState = LazyListState(),
             onClick = { _, _ -> },
             onMove = { _, _ -> },
-            isSearchMode = false
+            isSearchMode = false,
+            shouldApplySensitiveMode = true
         )
     }
 }
@@ -92,7 +95,8 @@ private fun MediaQueueViewWithPausedPreview() {
             lazyListState = LazyListState(),
             onClick = { _, _ -> },
             onMove = { _, _ -> },
-            isSearchMode = false
+            isSearchMode = false,
+            shouldApplySensitiveMode = true
         )
     }
 }

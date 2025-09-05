@@ -47,6 +47,7 @@ class MediaQueueItemWithHeaderAndFooterViewTest {
         isSelected: Boolean = false,
         isSearchMode: Boolean = false,
         isSelectMode: Boolean = false,
+        isSensitive: Boolean = false,
         onClick: () -> Unit = {},
         modifier: Modifier = Modifier,
     ) {
@@ -66,7 +67,8 @@ class MediaQueueItemWithHeaderAndFooterViewTest {
                 isSelected = isSelected,
                 modifier = modifier,
                 isSearchMode = isSearchMode,
-                isSelectMode = isSelectMode
+                isSelectMode = isSelectMode,
+                isSensitive = isSensitive
             )
         }
     }

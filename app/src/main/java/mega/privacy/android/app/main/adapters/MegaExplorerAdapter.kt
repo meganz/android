@@ -705,6 +705,10 @@ class MegaExplorerAdapter(
                 return
             }
 
+            val isHiddenNode =
+                !node.isInShare && accountDetail?.levelDetail?.accountType?.isPaid == true &&
+                        (node.isMarkedSensitive || megaApi.isSensitiveInherited(node))
+
             itemView.alpha = 0.5f.takeIf {
                 !node.isInShare && accountDetail?.levelDetail?.accountType?.isPaid == true &&
                         (node.isMarkedSensitive || megaApi.isSensitiveInherited(node))
@@ -769,9 +773,17 @@ class MegaExplorerAdapter(
                     ) {
                         crossfade(false)
                         transformations(
-                            RoundedCornersTransformation(
-                                dp2px(THUMB_CORNER_RADIUS_DP).toFloat()
-                            )
+                            buildList {
+                                add(
+                                    RoundedCornersTransformation(
+                                        dp2px(THUMB_CORNER_RADIUS_DP).toFloat()
+                                    )
+                                )
+                                if (isHiddenNode) {
+                                    add(BlurTransformation(context, radius = 16f))
+                                }
+                            }
+
                         )
                         listener(
                             onSuccess = { _, _ ->

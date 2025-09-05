@@ -18,6 +18,7 @@ import java.io.File
  * @property type item type
  * @property size size of the node
  * @property duration the duration of media item
+ * @property isSensitive whether the item is marked as sensitive
  * @property isSelected whether the item is selected
  */
 data class VideoPlayerItem(
@@ -28,5 +29,6 @@ data class VideoPlayerItem(
     val type: MediaQueueItemType,
     val size: Long,
     val duration: String,
+    val isSensitive: Boolean? = null,
     val isSelected: Boolean = false,
 )

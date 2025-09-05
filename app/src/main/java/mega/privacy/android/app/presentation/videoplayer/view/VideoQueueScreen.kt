@@ -35,7 +35,7 @@ internal fun VideoQueueScreen(
     val coroutineScope = rememberCoroutineScope()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val systemUiController = rememberSystemUiController()
-    var currentPlayingPosition by rememberSaveable { mutableStateOf<String>("") }
+    var currentPlayingPosition by rememberSaveable { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         systemUiController.isSystemBarsVisible = true
@@ -136,7 +136,10 @@ internal fun VideoQueueScreen(
                     }
                 },
                 onDragFinished = viewModel::updateItemsAfterReorder,
-                onMove = viewModel::swapItems
+                onMove = viewModel::swapItems,
+                shouldApplySensitiveMode = uiState.hiddenNodeEnabled
+                        && uiState.accountType?.isPaid == true
+                        && !uiState.isBusinessAccountExpired
             )
         }
     }
