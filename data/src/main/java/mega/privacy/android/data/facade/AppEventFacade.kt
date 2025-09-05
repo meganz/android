@@ -69,7 +69,7 @@ internal class AppEventFacade @Inject constructor(
     private val audioOutput = MutableSharedFlow<AudioDevice>()
     private val localVideoChangedDueToProximitySensor = MutableSharedFlow<Boolean>()
     private val updateUserData = MutableSharedFlow<Unit>()
-    private val miscLoaded = MutableSharedFlow<Unit>()
+    private val miscLoaded = MutableStateFlow(false)
     private val sslVerificationFailed = MutableSharedFlow<Unit>()
     private val transferTagToCancel = MutableSharedFlow<Int?>()
 
@@ -241,10 +241,14 @@ internal class AppEventFacade @Inject constructor(
     }
 
     override suspend fun broadcastMiscLoaded() {
-        miscLoaded.emit(Unit)
+        miscLoaded.emit(true)
     }
 
-    override fun monitorMiscLoaded(): Flow<Unit> {
+    override suspend fun broadcastMiscUnloaded() {
+        miscLoaded.emit(false)
+    }
+
+    override fun monitorMiscLoaded(): Flow<Boolean> {
         return miscLoaded.asSharedFlow()
     }
 

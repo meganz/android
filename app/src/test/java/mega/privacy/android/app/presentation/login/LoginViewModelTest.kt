@@ -177,7 +177,7 @@ internal class LoginViewModelTest {
     private val getMiscFlagsUseCase = mock<GetMiscFlagsUseCase>()
     private val getDomainNameUseCase = mock<GetDomainNameUseCase>()
     private val monitorMiscLoadedUseCase = mock<MonitorMiscLoadedUseCase>()
-    private val monitorMiscLoadedFlow = MutableSharedFlow<Unit>()
+    private val monitorMiscLoadedFlow = MutableSharedFlow<Boolean>()
 
     @BeforeEach
     fun setUp() {
@@ -758,19 +758,24 @@ internal class LoginViewModelTest {
         }
 
     @Test
-    fun `test that openRecoveryUrlEvent is not triggered until the feature flags are loaded`() = runTest {
+    fun `test that openRecoveryUrlEvent is not triggered until the feature flags are loaded`() =
+        runTest {
 
-        underTest.state.test {
-            assertThat(awaitItem().miscFlagLoaded).isFalse()
-            assertThat(awaitItem().openRecoveryUrlEvent).isInstanceOf(StateEventWithContentConsumed::class.java)
-            underTest.onForgotPassword()
-            this.expectNoEvents()
+            underTest.state.test {
+                assertThat(awaitItem().miscFlagLoaded).isFalse()
+                assertThat(awaitItem().openRecoveryUrlEvent).isInstanceOf(
+                    StateEventWithContentConsumed::class.java
+                )
+                underTest.onForgotPassword()
+                this.expectNoEvents()
 
-            monitorMiscLoadedFlow.emit(Unit)
-            assertThat(awaitItem().miscFlagLoaded).isTrue()
-            assertThat(awaitItem().openRecoveryUrlEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+                monitorMiscLoadedFlow.emit(true)
+                assertThat(awaitItem().miscFlagLoaded).isTrue()
+                assertThat(awaitItem().openRecoveryUrlEvent).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+            }
         }
-    }
 
     companion object {
         private val scheduler = TestCoroutineScheduler()

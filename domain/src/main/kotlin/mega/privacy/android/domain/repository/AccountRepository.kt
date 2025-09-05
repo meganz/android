@@ -724,12 +724,17 @@ interface AccountRepository {
     /**
      * Monitor misc loaded
      */
-    fun monitorMiscLoaded(): Flow<Unit>
+    fun monitorMiscLoaded(): Flow<Boolean>
 
     /**
      * Broadcast misc loaded
      */
     suspend fun broadcastMiscLoaded()
+
+    /**
+     * Broadcast misc un loaded
+     */
+    suspend fun broadcastMiscUnLoaded()
 
     /**
      *  Resend the verification email for Weak Account Protection

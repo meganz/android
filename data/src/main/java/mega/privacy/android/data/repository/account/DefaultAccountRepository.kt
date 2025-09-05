@@ -1402,6 +1402,8 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override suspend fun broadcastMiscLoaded() = appEventGateway.broadcastMiscLoaded()
 
+    override suspend fun broadcastMiscUnLoaded() = appEventGateway.broadcastMiscUnloaded()
+
     override suspend fun resendVerificationEmail() = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaRequestListenerInterface(

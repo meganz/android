@@ -2189,10 +2189,10 @@ class DefaultAccountRepositoryTest {
     fun `test that monitorMiscLoaded is invoked when monitorMiscLoaded called`() =
         runTest {
             whenever(appEventGateway.monitorMiscLoaded()).thenReturn(
-                flowOf(Unit)
+                flowOf(true)
             )
             underTest.monitorMiscLoaded().test {
-                assertThat(awaitItem()).isEqualTo(Unit)
+                assertThat(awaitItem()).isEqualTo(true)
                 cancelAndIgnoreRemainingEvents()
             }
         }

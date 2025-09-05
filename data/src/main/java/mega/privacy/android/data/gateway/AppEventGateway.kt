@@ -379,13 +379,17 @@ internal interface AppEventGateway {
     /**
      * Monitor misc loaded
      */
-    fun monitorMiscLoaded(): Flow<Unit>
+    fun monitorMiscLoaded(): Flow<Boolean>
 
     /**
      * Broadcast misc loaded
      */
     suspend fun broadcastMiscLoaded()
 
+    /**
+     * Broadcast misc unloaded
+     */
+    suspend fun broadcastMiscUnloaded()
     /**
      * Broadcast SSL verification failed
      */
