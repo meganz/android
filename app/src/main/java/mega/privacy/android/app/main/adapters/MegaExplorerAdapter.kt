@@ -55,7 +55,6 @@ import mega.privacy.android.app.utils.Constants.THUMB_MARGIN_DP
 import mega.privacy.android.app.utils.Constants.THUMB_SIZE_DP
 import mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB
 import mega.privacy.android.app.utils.FileUtil.isVideoFile
-import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.MegaNodeUtil.getFileInfo
 import mega.privacy.android.app.utils.MegaNodeUtil.getFolderIcon
 import mega.privacy.android.app.utils.MegaNodeUtil.getNumberOfFolders
@@ -605,7 +604,9 @@ class MegaExplorerAdapter(
 
                     val currentHandle = node.handle
                     val job = fragment.lifecycleScope.launch {
-                        val (numChildFolders, numChildFiles, folderIconRes) = withContext(ioDispatcher) {
+                        val (numChildFolders, numChildFiles, folderIconRes) = withContext(
+                            ioDispatcher
+                        ) {
                             val numChildFolders = megaApi.getNumChildFolders(node)
                             val numChildFiles = megaApi.getNumChildFiles(node)
                             val folderIconRes = getFolderIcon(node, DrawerItem.CLOUD_DRIVE)
@@ -614,7 +615,8 @@ class MegaExplorerAdapter(
                         if ((bindingAdapterPosition != RecyclerView.NO_POSITION) &&
                             (this@ViewHolderListExplorer.document == currentHandle)
                         ) {
-                            val folderInfo = TextUtil.getFolderInfo(numChildFolders, numChildFiles, context);
+                            val folderInfo =
+                                TextUtil.getFolderInfo(numChildFolders, numChildFiles, context)
                             binding.fileExplorerFilesize.text = folderInfo
                             imageView.load(folderIconRes) {
                                 if (isHiddenNode) {
@@ -756,6 +758,10 @@ class MegaExplorerAdapter(
                 return
             }
 
+            val isHiddenNode =
+                !node.isInShare && accountDetail?.levelDetail?.accountType?.isPaid == true &&
+                        (node.isMarkedSensitive || megaApi.isSensitiveInherited(node))
+
             itemView.alpha = 0.5f.takeIf {
                 !node.isInShare && accountDetail?.levelDetail?.accountType?.isPaid == true &&
                         (node.isMarkedSensitive || megaApi.isSensitiveInherited(node))
@@ -820,9 +826,17 @@ class MegaExplorerAdapter(
                     ) {
                         crossfade(false)
                         transformations(
-                            RoundedCornersTransformation(
-                                dp2px(THUMB_CORNER_RADIUS_DP).toFloat()
-                            )
+                            buildList {
+                                add(
+                                    RoundedCornersTransformation(
+                                        dp2px(THUMB_CORNER_RADIUS_DP).toFloat()
+                                    )
+                                )
+                                if (isHiddenNode) {
+                                    add(BlurTransformation(context, radius = 16f))
+                                }
+                            }
+
                         )
                         listener(
                             onSuccess = { _, _ ->

@@ -39,6 +39,7 @@ class MediaQueueItemViewTest {
         isSelected: Boolean = false,
         isReorderEnabled: Boolean = true,
         isAudio: Boolean = false,
+        isSensitive: Boolean = false,
     ) {
         composeTestRule.setContent {
             MediaQueueItemView(
@@ -53,7 +54,8 @@ class MediaQueueItemViewTest {
                 isItemPlaying = isItemPlaying,
                 isSelected = isSelected,
                 isReorderEnabled = isReorderEnabled,
-                isAudio = isAudio
+                isAudio = isAudio,
+                isSensitive = isSensitive
             )
         }
     }

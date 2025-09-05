@@ -12,6 +12,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -51,6 +52,7 @@ fun MediaQueueItemView(
     currentPlayingPosition: String,
     duration: String,
     thumbnailData: Any?,
+    isSensitive: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     isPaused: Boolean = false,
@@ -77,7 +79,8 @@ fun MediaQueueItemView(
                 isSelected = isSelected,
                 isPaused = isPaused,
                 isItemPlaying = isItemPlaying,
-                thumbnailData = thumbnailData
+                thumbnailData = thumbnailData,
+                isSensitive = isSensitive
             )
         },
         trailingIcons = {
@@ -104,6 +107,7 @@ private fun QueueThumbnailView(
     isPaused: Boolean,
     isItemPlaying: Boolean,
     thumbnailData: Any?,
+    isSensitive: Boolean,
 ) {
     if (isSelected) {
         Image(
@@ -117,7 +121,8 @@ private fun QueueThumbnailView(
             contentAlignment = Alignment.Center
         ) {
             AsyncImage(
-                modifier = Modifier.testTag(MEDIA_QUEUE_ITEM_THUMBNAIL_ICON_TEST_TAG),
+                modifier = Modifier.testTag(MEDIA_QUEUE_ITEM_THUMBNAIL_ICON_TEST_TAG)
+                    .blur(16.dp.takeIf { isSensitive } ?: 0.dp),
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(thumbnailData)
                     .crossfade(true)
@@ -166,7 +171,8 @@ private fun MediaQueueItemInfoViewWithPausedPreview() {
             isItemPlaying = true,
             name = "Video name",
             currentPlayingPosition = "00:00",
-            duration = "14:00"
+            duration = "14:00",
+            isSensitive = true
         )
     }
 }
@@ -183,7 +189,8 @@ private fun MediaQueueItemInfoViewWithSelectedPreview() {
             isSelected = true,
             name = "Video name",
             currentPlayingPosition = "",
-            duration = "14:00"
+            duration = "14:00",
+            isSensitive = false
         )
     }
 }
@@ -200,7 +207,8 @@ private fun VideoQueueItemInfoViewPreview() {
             name = "Video name",
             currentPlayingPosition = "",
             duration = "14:00",
-            isReorderEnabled = true
+            isReorderEnabled = true,
+            isSensitive = true
         )
     }
 }
@@ -218,6 +226,7 @@ private fun AudioQueueItemInfoViewPreview() {
             currentPlayingPosition = "",
             duration = "14:00",
             isAudio = true,
+            isSensitive = false
         )
     }
 }

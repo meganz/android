@@ -15,7 +15,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -433,8 +432,6 @@ class VideoPlayerViewModelTest {
             videoPlayerItemMapper,
             getVideoNodeByHandleUseCase,
             getVideoNodesUseCase,
-            getVideoNodeByHandleUseCase,
-            getVideoNodesUseCase,
             getVideoNodesFromPublicLinksUseCase,
             getVideoNodesFromInSharesUseCase,
             getVideoNodesFromOutSharesUseCase,
@@ -689,7 +686,8 @@ class VideoPlayerViewModelTest {
                     thumbnail = null,
                     type = MediaQueueItemType.Playing,
                     size = 100,
-                    duration = testDuration
+                    duration = testDuration,
+                    isSensitive = false,
                 )
             ).thenReturn(videoPlayerItem)
             whenever(intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)).thenReturn(false)
@@ -771,6 +769,7 @@ class VideoPlayerViewModelTest {
                         null,
                         getMediaQueueItemType(index, 1),
                         file.totalSize,
+                        false,
                         200.seconds
                     )
                 ).thenReturn(items[index])
@@ -877,6 +876,7 @@ class VideoPlayerViewModelTest {
                         null,
                         getMediaQueueItemType(index, 0),
                         file.length(),
+                        false,
                         0.seconds
                     )
                 ).thenReturn(items[index])
@@ -1033,6 +1033,7 @@ class VideoPlayerViewModelTest {
                     null,
                     getMediaQueueItemType(index, playingIndex),
                     node.size,
+                    false,
                     node.duration
                 )
             ).thenReturn(entities[index])
@@ -2590,6 +2591,7 @@ class VideoPlayerViewModelTest {
                     null,
                     getMediaQueueItemType(index, playingIndex),
                     node.size,
+                    node.isMarkedSensitive || node.isSensitiveInherited,
                     node.duration
                 )
             ).thenReturn(entities[index])

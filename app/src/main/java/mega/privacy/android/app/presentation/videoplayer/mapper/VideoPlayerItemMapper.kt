@@ -24,6 +24,7 @@ class VideoPlayerItemMapper @Inject constructor(
         thumbnail: File?,
         type: MediaQueueItemType,
         size: Long,
+        isSensitive: Boolean,
         duration: Duration = 0.seconds,
     ) = VideoPlayerItem(
         nodeHandle = nodeHandle,
@@ -32,5 +33,6 @@ class VideoPlayerItemMapper @Inject constructor(
         type = type,
         size = size,
         duration = durationInSecondsTextMapper(duration),
+        isSensitive = isSensitive
     )
 }

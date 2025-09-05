@@ -28,6 +28,7 @@ class VideoPlayerItemMapperTest {
     private val testSize: Long = 100
     private val testDuration: Duration = 200.seconds
     private val testDurationString = "3:20"
+    private val testIsSensitive = true
 
     @BeforeEach
     fun setUp() {
@@ -44,7 +45,8 @@ class VideoPlayerItemMapperTest {
                 thumbnail = null,
                 type = testType,
                 size = testSize,
-                duration = testDuration
+                duration = testDuration,
+                isSensitive = testIsSensitive,
             )
             assertMappedVideoPlayerItem(
                 entity = videoPlayerItem,
@@ -62,7 +64,8 @@ class VideoPlayerItemMapperTest {
                 thumbnail = file,
                 type = testType,
                 size = testSize,
-                duration = testDuration
+                duration = testDuration,
+                isSensitive = testIsSensitive,
             )
             assertMappedVideoPlayerItem(
                 entity = videoPlayerItem,
@@ -83,7 +86,8 @@ class VideoPlayerItemMapperTest {
                 { assertThat(it.size).isEqualTo(testSize) },
                 { assertThat(it.duration).isEqualTo(testDurationString) },
                 { assertThat(it.type).isEqualTo(testType) },
-                { assertThat(it.thumbnail).isEqualTo(expectedThumbnail) }
+                { assertThat(it.thumbnail).isEqualTo(expectedThumbnail) },
+                { assertThat(it.isSensitive).isEqualTo(testIsSensitive) }
             )
         }
     }

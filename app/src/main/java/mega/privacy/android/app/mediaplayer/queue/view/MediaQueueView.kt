@@ -60,7 +60,8 @@ internal fun MediaQueueView(
             isSelected = item.isSelected,
             isSearchMode = isSearchMode,
             isSelectMode = isSelectMode,
-            onClick = { onClick(index, item) }
+            onClick = { onClick(index, item) },
+            isSensitive = false
         )
     }
 }

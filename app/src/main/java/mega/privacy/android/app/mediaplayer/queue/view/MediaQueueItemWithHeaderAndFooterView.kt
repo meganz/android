@@ -43,6 +43,7 @@ internal fun MediaQueueItemWithHeaderAndFooterView(
     isAudio: Boolean,
     isPaused: Boolean,
     isSelected: Boolean,
+    isSensitive: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     isSelectMode: Boolean = false,
@@ -146,6 +147,7 @@ internal fun MediaQueueItemWithHeaderAndFooterView(
             isSelected = isSelected,
             onClick = onClick,
             isAudio = isAudio,
+            isSensitive = isSensitive,
         )
 
         MediaQueueItemDivider(
@@ -290,7 +292,8 @@ private fun PlayingMediaQueueItemPreview() {
             isAudio = false,
             isPaused = false,
             isSelected = false,
-            isSearchMode = false
+            isSearchMode = false,
+            isSensitive = true
         )
     }
 }
@@ -312,7 +315,8 @@ private fun PausedPlayingMediaQueueItemPreview() {
             isAudio = true,
             isPaused = true,
             isSelected = true,
-            isSearchMode = false
+            isSearchMode = false,
+            isSensitive = true
         )
     }
 }
@@ -334,7 +338,8 @@ private fun FirstMediaQueueItemPreview() {
             isAudio = true,
             isPaused = false,
             isSelected = false,
-            isSearchMode = false
+            isSearchMode = false,
+            isSensitive = true
         )
     }
 }
@@ -356,7 +361,8 @@ private fun NextMediaQueueItemPreview() {
             isAudio = true,
             isPaused = false,
             isSelected = false,
-            isSearchMode = false
+            isSearchMode = false,
+            isSensitive = true
         )
     }
 }

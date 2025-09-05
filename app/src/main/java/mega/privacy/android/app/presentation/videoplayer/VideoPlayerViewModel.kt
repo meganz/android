@@ -29,7 +29,6 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -118,7 +117,6 @@ import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OUTGOING
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
-import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
@@ -637,6 +635,11 @@ class VideoPlayerViewModel @Inject constructor(
             type = MediaQueueItemType.Playing,
             size = node?.size ?: INVALID_SIZE,
             duration = node?.duration ?: 0.seconds,
+            isSensitive = if (node == null) {
+                false
+            } else {
+                node.isMarkedSensitive || node.isSensitiveInherited
+            }
         )
 
         uiState.update { it.copy(items = listOf(playingItem)) }
@@ -716,6 +719,7 @@ class VideoPlayerViewModel @Inject constructor(
                     type = getMediaQueueItemType(index, currentPlayingIndex),
                     size = item.totalSize,
                     duration = (item.fileTypeInfo as? VideoFileTypeInfo)?.duration ?: 0.seconds,
+                    isSensitive = false
                 )
             }
 
@@ -807,6 +811,7 @@ class VideoPlayerViewModel @Inject constructor(
                     type = getMediaQueueItemType(index, currentPlayingIndex),
                     size = file.length(),
                     duration = 0.seconds,
+                    isSensitive = false
                 )
             }
 
@@ -1033,6 +1038,7 @@ class VideoPlayerViewModel @Inject constructor(
                     type = getMediaQueueItemType(index, currentPlayingIndex),
                     size = node.size,
                     duration = node.duration,
+                    isSensitive = node.isMarkedSensitive || node.isSensitiveInherited
                 )
             }.onFailure {
                 Timber.e(it)
