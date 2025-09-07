@@ -2,6 +2,7 @@ package mega.privacy.android.app.textEditor
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -771,7 +772,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             } else {
                 statusBarHeight
             }
-            updateScrollerViewTopPadding(topPadding)
+            animateScrollerViewTopPadding(topPadding, ANIMATION_DURATION / 2) // Faster animation for scroll
             binding.fileEditorScrollView.let {
                 if ((it.getChildAt(0).bottom <= it.height + scrollY) || scrollY == 0) {
                     showUI()
@@ -788,6 +789,30 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 updatePadding(top = padding)
             }
         }
+
+    /**
+     * Animates the top padding of the scroll view.
+     *
+     * @param targetPadding Target padding value to animate to.
+     * @param duration Animation duration in milliseconds.
+     */
+    @SuppressLint("RestrictedApi")
+    private fun animateScrollerViewTopPadding(
+        targetPadding: Int,
+        duration: Long = ANIMATION_DURATION,
+    ) {
+        val currentPadding = binding.fileEditorScrollView.paddingTop
+        if (currentPadding == targetPadding) return
+
+        val animator = ValueAnimator.ofInt(currentPadding, targetPadding)
+        animator.duration = duration
+        animator.interpolator = FAST_OUT_LINEAR_IN_INTERPOLATOR
+        animator.addUpdateListener { animation ->
+            val animatedValue = animation.animatedValue as Int
+            binding.fileEditorScrollView.updatePadding(top = animatedValue)
+        }
+        animator.start()
+    }
 
     private fun addStartTransferView() {
         binding.root.addView(
@@ -873,6 +898,9 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         if (viewModel.needsReadOrIsReadingContent()) {
             showLoadingView()
         }
+
+        // Reset UI state when switching modes to ensure proper display
+        resetUIState()
 
         if (mode == TextEditorMode.View.value) {
             supportActionBar?.title = null
@@ -1101,7 +1129,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             binding.editFab.hide()
             animateToolbar(false, ANIMATION_DURATION)
             animateBottom(false, ANIMATION_DURATION)
-            updateScrollerViewTopPadding(statusBarHeight)
+            animateScrollerViewTopPadding(statusBarHeight)
         } else {
             currentUIState = STATE_SHOWN
 
@@ -1111,6 +1139,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
             animateToolbar(true, ANIMATION_DURATION)
             animateBottom(true, ANIMATION_DURATION)
+            animateScrollerViewTopPadding(appBarHeight)
         }
     }
 
@@ -1336,5 +1365,23 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 1,
             )
         Util.showSnackbar(this, message)
+    }
+
+    /**
+     * Resets the UI state to shown when switching modes to ensure proper display.
+     */
+    private fun resetUIState() {
+        if (currentUIState == STATE_HIDDEN) {
+            currentUIState = STATE_SHOWN
+            binding.appBar.isVisible = true
+            binding.nameText.isVisible = true
+            binding.appBar.translationY = 0f
+            binding.nameText.translationY = 0f
+
+            // Show edit FAB if appropriate
+            if (viewModel.canShowEditFab()) {
+                binding.editFab.show()
+            }
+        }
     }
 }
