@@ -36,6 +36,7 @@ import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.account.IsAchievementsEnabled
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
@@ -68,6 +69,7 @@ class MyAccountHomeViewModel @Inject constructor(
     private val getUsedTransferStatusUseCase: GetUsedTransferStatusUseCase,
     private val accountNameMapper: AccountNameMapper,
     private val avatarContentMapper: AvatarContentMapper,
+    private val isAchievementsEnabled: IsAchievementsEnabled,
 ) : ViewModel() {
     private val _uiState =
         MutableStateFlow(MyAccountHomeUIState(accountTypeNameResource = accountNameMapper(null)))
@@ -167,6 +169,17 @@ class MyAccountHomeViewModel @Inject constructor(
                         )
                     }
                 }
+        }
+        viewModelScope.launch {
+            runCatching {
+                isAchievementsEnabled()
+            }.onSuccess { isEnabled ->
+                _uiState.update {
+                    it.copy(isAchievementsAvailable = isEnabled)
+                }
+            }.onFailure {
+                Timber.e(it, "Error checking if achievements is enabled")
+            }
         }
     }
 

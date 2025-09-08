@@ -592,7 +592,7 @@ private fun AccountInfoSection(
             withDivider = true,
         )
 
-        if (uiState.isBusinessAccount.not()) {
+        if (uiState.isAchievementsAvailable) {
             ImageIconItem(
                 icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Rocket),
                 title = sharedR.string.general_section_achievements,
@@ -958,7 +958,8 @@ internal fun MyAccountHomePreview(
                     backgroundColor = colorResource(id = R.color.red_300_red_200).toArgb(),
                     showBorder = true,
                     textSize = 36.sp,
-                )
+                ),
+                isAchievementsAvailable = true
             ),
             uiActions = object : MyAccountHomeViewActions {
                 override val isPhoneNumberDialogShown: Boolean

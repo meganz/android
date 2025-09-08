@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.NavHost
@@ -20,6 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.appstate.content.AppContentStateViewModel
@@ -31,6 +33,7 @@ import mega.privacy.android.app.appstate.global.event.AppDialogViewModel
 import mega.privacy.android.app.appstate.global.model.GlobalState
 import mega.privacy.android.app.appstate.global.util.show
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
+import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
 import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginGraph
@@ -39,6 +42,7 @@ import mega.privacy.android.app.presentation.login.loginNavigationGraph
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.usecase.advertisements.SetGoogleConsentLoadedUseCase
 import mega.privacy.android.navigation.contract.AppDialogDestinations
 import javax.inject.Inject
 
@@ -54,6 +58,11 @@ class MegaActivity : ComponentActivity() {
     @Inject
     lateinit var appDialogDestinations: Set<@JvmSuppressWildcards AppDialogDestinations>
 
+    @Inject
+    lateinit var googleAdsManager: GoogleAdsManager
+
+    @Inject
+    lateinit var setGoogleConsentLoadedUseCase: SetGoogleConsentLoadedUseCase
 
     @Serializable
     data object LoginLoading
@@ -72,6 +81,11 @@ class MegaActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         splashScreen.setKeepOnScreenCondition { keepSplashScreen }
         enableEdgeToEdge()
+        lifecycleScope.launch {
+            googleAdsManager.checkLatestConsentInformation(this@MegaActivity) {
+                setGoogleConsentLoadedUseCase(true)
+            }
+        }
         setContent {
             val viewModel = viewModel<GlobalStateViewModel>()
             val appDialogViewModel = hiltViewModel<AppDialogViewModel>()

@@ -71,4 +71,5 @@ data class MyAccountHomeUIState(
     val userMessage: StateEventWithContent<Int> = consumed(),
     val accountTypeNameResource: Int,
     val avatarContent: AvatarContent? = null,
+    val isAchievementsAvailable: Boolean = false,
 )

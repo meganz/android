@@ -88,7 +88,8 @@ class MyAccountHomeViewTest {
 
     private fun initMyAccountWithDefaults(
         uiState: MyAccountHomeUIState = MyAccountHomeUIState(
-            accountTypeNameResource = defaultAccountNameResource
+            accountTypeNameResource = defaultAccountNameResource,
+            isAchievementsAvailable = true
         ),
     ) {
         composeTestRule.setContent {

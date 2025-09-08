@@ -33,6 +33,7 @@ import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.account.IsAchievementsEnabled
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
@@ -42,12 +43,12 @@ import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCas
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
@@ -56,7 +57,6 @@ import java.util.stream.Stream
 import kotlin.random.Random
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@ExtendWith(InstantTaskExecutorExtension::class)
 class MyAccountHomeViewModelTest {
     private lateinit var underTest: MyAccountHomeViewModel
 
@@ -101,6 +101,7 @@ class MyAccountHomeViewModelTest {
     private val getUserFullNameUseCase: GetUserFullNameUseCase = mock()
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase = mock()
     private val avatarContentMapper: AvatarContentMapper = mock()
+    private val isAchievementsEnabled: IsAchievementsEnabled = mock()
 
     @BeforeEach
     fun setup() {
@@ -132,7 +133,8 @@ class MyAccountHomeViewModelTest {
             getMyAvatarFileUseCase,
             getUsedTransferStatusUseCase,
             accountNameMapper = AccountNameMapper(),
-            avatarContentMapper
+            avatarContentMapper,
+            isAchievementsEnabled
         )
     }
 
@@ -364,6 +366,45 @@ class MyAccountHomeViewModelTest {
             underTest.uiState.test {
                 val state = awaitItem()
                 assertThat(state.isBusinessProFlexiStatusActive).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that isAchievementsAvailable should be true when isAchievementsEnabled returns true`() =
+        runTest {
+            whenever(isAchievementsEnabled()).thenReturn(true)
+            initViewModel()
+
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().isAchievementsAvailable).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that isAchievementsAvailable should be false when isAchievementsEnabled returns false`() =
+        runTest {
+            whenever(isAchievementsEnabled()).thenReturn(false)
+            initViewModel()
+
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().isAchievementsAvailable).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that isAchievementsAvailable should be false when isAchievementsEnabled throws exception`() =
+        runTest {
+            whenever(isAchievementsEnabled()).doThrow(RuntimeException("Test exception"))
+            initViewModel()
+
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().isAchievementsAvailable).isFalse()
             }
         }
 
