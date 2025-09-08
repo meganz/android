@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer.videoplayer.view
 
+import android.app.Activity
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.graphics.Bitmap
@@ -12,9 +13,8 @@ import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
@@ -36,14 +36,15 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.graphics.scale
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.Player
@@ -64,6 +65,8 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.VideoPlayerPlayerViewBinding
 import mega.privacy.android.app.mediaplayer.PlaybackPositionDialog
+import mega.privacy.android.app.mediaplayer.model.NavigationBarInsets
+import mega.privacy.android.app.mediaplayer.model.NavigationBarPosition
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerController
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModel
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
@@ -102,9 +105,22 @@ internal fun VideoPlayerScreen(
     val systemUiController = rememberSystemUiController()
     var isControllerViewVisible by rememberSaveable { mutableStateOf(true) }
 
-    val navigationBarHeight =
-        getNavigationBarHeight(orientation, density, LocalLayoutDirection.current)
+    val view = LocalView.current
+    val rootView: View = (context as? Activity)?.window?.decorView ?: view
+    val navBarInsets = rememberNavigationBarInsets(rootView, orientation, density)
+    val navigationBarHeight = maxOf(navBarInsets.bottom, navBarInsets.right, navBarInsets.left)
     val navigationBarHeightPx = with(density) { navigationBarHeight.toPx().toInt() }
+
+    var navigationBarPosition by remember(navBarInsets) {
+        mutableStateOf(
+            when {
+                navBarInsets.bottom > 0.dp -> NavigationBarPosition.Bottom
+                navBarInsets.right > 0.dp -> NavigationBarPosition.Right
+                navBarInsets.left > 0.dp -> NavigationBarPosition.Left
+                else -> NavigationBarPosition.None
+            }
+        )
+    }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var playbackState by rememberSaveable { mutableIntStateOf(STATE_IDLE) }
@@ -365,7 +381,12 @@ internal fun VideoPlayerScreen(
                     playerComposeView.keepScreenOn =
                         uiState.mediaPlaybackState == MediaPlaybackState.Playing
 
-                    updateControllerViewPadding(controllerView, orientation, navigationBarHeightPx)
+                    updateControllerViewPadding(
+                        controllerView = controllerView,
+                        orientation = orientation,
+                        padding = navigationBarHeightPx,
+                        navigationBarPosition = navigationBarPosition
+                    )
                     root.findViewById<View>(R.id.navigation_bar_bg).isVisible =
                         orientation != ORIENTATION_PORTRAIT
 
@@ -377,13 +398,17 @@ internal fun VideoPlayerScreen(
                 }
 
                 if (isControllerViewVisible && !uiState.isLocked) {
+                    val horizontalPadding = when {
+                        orientation == ORIENTATION_LANDSCAPE && navigationBarPosition == NavigationBarPosition.Left ->
+                            PaddingValues(start = navigationBarHeight)
+
+                        orientation == ORIENTATION_LANDSCAPE && navigationBarPosition == NavigationBarPosition.Right ->
+                            PaddingValues(end = navigationBarHeight)
+
+                        else -> PaddingValues(0.dp)
+                    }
                     VideoPlayerTopBar(
-                        modifier = Modifier.padding(
-                            end = if (orientation == ORIENTATION_PORTRAIT)
-                                0.dp
-                            else
-                                navigationBarHeight
-                        ),
+                        modifier = Modifier.padding(horizontalPadding),
                         title = if (orientation == ORIENTATION_PORTRAIT) {
                             ""
                         } else {
@@ -463,25 +488,60 @@ internal fun VideoPlayerScreen(
 }
 
 @Composable
-private fun getNavigationBarHeight(
+fun rememberNavigationBarInsets(
+    root: View,
     orientation: Int,
     density: Density,
-    layoutDirection: LayoutDirection,
-) = if (orientation == ORIENTATION_LANDSCAPE) {
-    with(density) { WindowInsets.navigationBars.getRight(density, layoutDirection).toDp() }
-} else {
-    with(density) { WindowInsets.navigationBars.getBottom(density).toDp() }
+): NavigationBarInsets {
+    var navInsets by remember { mutableStateOf(NavigationBarInsets()) }
+
+    DisposableEffect(root, orientation) {
+        ViewCompat.setOnApplyWindowInsetsListener(root) { _, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val gestures = insets.getInsets(WindowInsetsCompat.Type.systemGestures())
+            val tappable = insets.getInsets(WindowInsetsCompat.Type.tappableElement())
+
+            val bottomPx = maxOf(systemBars.bottom, gestures.bottom, tappable.bottom)
+            val leftPx = maxOf(systemBars.left, gestures.left, tappable.left)
+            val rightPx = maxOf(systemBars.right, gestures.right, tappable.right)
+
+            navInsets = NavigationBarInsets(
+                bottom = with(density) { bottomPx.toDp() },
+                left = with(density) { leftPx.toDp() },
+                right = with(density) { rightPx.toDp() },
+            )
+            insets
+        }
+        ViewCompat.requestApplyInsets(root)
+
+        onDispose {
+            ViewCompat.setOnApplyWindowInsetsListener(root, null)
+        }
+    }
+
+    return navInsets
 }
 
-private fun updateControllerViewPadding(controllerView: View, orientation: Int, padding: Int) {
-    val layoutParams =
-        controllerView.layoutParams as ViewGroup.MarginLayoutParams
-    if (orientation == ORIENTATION_PORTRAIT) {
+private fun updateControllerViewPadding(
+    controllerView: View,
+    orientation: Int,
+    padding: Int,
+    navigationBarPosition: NavigationBarPosition,
+) {
+    val layoutParams = controllerView.layoutParams as ViewGroup.MarginLayoutParams
+    if (orientation == ORIENTATION_PORTRAIT || navigationBarPosition == NavigationBarPosition.Bottom) {
         controllerView.setPadding(0, 0, 0, padding)
         layoutParams.bottomMargin = 0
+        layoutParams.marginStart = 0
+        layoutParams.marginEnd = 0
     } else {
         controllerView.setPadding(0, 0, 0, 0)
-        layoutParams.marginEnd = padding
+        layoutParams.bottomMargin = 0
+        when (navigationBarPosition) {
+            NavigationBarPosition.Left -> layoutParams.marginStart = padding
+            NavigationBarPosition.Right -> layoutParams.marginEnd = padding
+            else -> {}
+        }
     }
     controllerView.layoutParams = layoutParams
 }
