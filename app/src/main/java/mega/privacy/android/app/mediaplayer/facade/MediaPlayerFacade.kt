@@ -24,7 +24,7 @@ import androidx.media3.common.VideoSize
 import androidx.media3.common.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
 import androidx.media3.common.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.MediaSource
@@ -215,9 +215,7 @@ class MediaPlayerFacade @Inject constructor(
         }
     }
 
-    private val dataSourceFactory = DefaultHttpDataSource.Factory()
-        .setAllowCrossProtocolRedirects(true)
-        .setUserAgent("ExoPlayer")
+    private val dataSourceFactory = DefaultDataSource.Factory(context)
         .setTransferListener(loggingTransferListener)
 
     private val mediaSourceFactory = ProgressiveMediaSource.Factory(dataSourceFactory)
