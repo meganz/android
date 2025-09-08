@@ -1,7 +1,5 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
-import android.content.Context
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.extension.isOutShare
@@ -21,10 +19,9 @@ import javax.inject.Inject
  * @param menuAction [ManageShareFolderMenuAction]
  */
 class ManageShareFolderBottomSheetMenuItem @Inject constructor(
-    @ApplicationContext private val context: Context,
     override val menuAction: ManageShareFolderMenuAction,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val megaNavigator: MegaNavigator
+    private val megaNavigator: MegaNavigator,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
@@ -39,14 +36,18 @@ class ManageShareFolderBottomSheetMenuItem @Inject constructor(
 
     override fun getOnClickFunction(
         node: TypedNode,
-        handler: BottomSheetClickHandler
+        handler: BottomSheetClickHandler,
     ): () -> Unit = {
         handler.onDismiss()
         handler.coroutineScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-                megaNavigator.openFileContactListActivity(context, node.id.longValue, node.name)
+                megaNavigator.openFileContactListActivity(
+                    handler.context,
+                    node.id.longValue,
+                    node.name
+                )
             } else {
-                megaNavigator.openFileContactListActivity(context, node.id.longValue,)
+                megaNavigator.openFileContactListActivity(handler.context, node.id.longValue)
             }
         }
     }

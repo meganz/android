@@ -1,7 +1,5 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
-import android.content.Context
-import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.menu.menuaction.EditMenuAction
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
@@ -26,7 +24,6 @@ import javax.inject.Inject
  * @param menuAction [EditMenuAction]
  */
 class EditBottomSheetMenuItem @Inject constructor(
-    @ApplicationContext private val context: Context,
     override val menuAction: EditMenuAction,
     private val megaNavigator: MegaNavigator,
     private val getFileTypeInfoUseCase: GetFileTypeInfoUseCase,
@@ -56,7 +53,7 @@ class EditBottomSheetMenuItem @Inject constructor(
         handler: BottomSheetClickHandler
     ): () -> Unit = {
         megaNavigator.openTextEditorActivity(
-            context = context,
+            context = handler.context,
             currentNodeId = node.id,
             mode = TextEditorMode.Edit,
             nodeSourceType = NodeSourceTypeInt.FILE_BROWSER_ADAPTER,

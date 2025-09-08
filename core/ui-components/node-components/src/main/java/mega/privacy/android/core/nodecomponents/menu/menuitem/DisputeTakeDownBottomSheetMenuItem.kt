@@ -1,15 +1,13 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
-import android.content.Context
-import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuaction.DisputeTakeDownMenuAction
+import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.navigation.MegaNavigator
 import javax.inject.Inject
-import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 
 /**
  * Dispute take down menu item
@@ -17,7 +15,6 @@ import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
  * @param menuAction [DisputeTakeDownMenuAction]
  */
 class DisputeTakeDownBottomSheetMenuItem @Inject constructor(
-    @ApplicationContext private val context: Context,
     override val menuAction: DisputeTakeDownMenuAction,
     private val megaNavigator: MegaNavigator,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
@@ -35,7 +32,7 @@ class DisputeTakeDownBottomSheetMenuItem @Inject constructor(
         handler: BottomSheetClickHandler
     ): () -> Unit = {
         handler.onDismiss()
-        megaNavigator.launchUrl(context, DISPUTE_URL)
+        megaNavigator.launchUrl(handler.context, DISPUTE_URL)
     }
 
     override val groupId = 4

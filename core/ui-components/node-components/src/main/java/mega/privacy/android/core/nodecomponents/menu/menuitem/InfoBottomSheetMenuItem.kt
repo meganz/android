@@ -1,15 +1,13 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
-import android.content.Context
-import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuaction.InfoMenuAction
+import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.navigation.MegaNavigator
 import javax.inject.Inject
-import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 
 /**
  * Info bottom sheet menu action
@@ -17,7 +15,6 @@ import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
  * @param menuAction [InfoMenuAction]
  */
 class InfoBottomSheetMenuItem @Inject constructor(
-    @ApplicationContext private val context: Context,
     override val menuAction: InfoMenuAction,
     private val megaNavigator: MegaNavigator
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
@@ -35,7 +32,7 @@ class InfoBottomSheetMenuItem @Inject constructor(
     ): () -> Unit = {
         handler.onDismiss()
         megaNavigator.openFileInfoActivity(
-            context = context,
+            context = handler.context,
             handle = node.id.longValue
         )
     }
