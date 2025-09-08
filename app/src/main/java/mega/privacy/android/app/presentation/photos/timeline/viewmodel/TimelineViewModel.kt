@@ -620,8 +620,8 @@ class TimelineViewModel @Inject constructor(
 
         viewModelScope.launch(ioDispatcher) {
             enableCameraUploadsInPhotosUseCase(
-                shouldSyncVideos = _state.value.cuUploadsVideos,
-                shouldUseWiFiOnly = _state.value.cuUseCellularConnection.not(),
+                includeVideos = _state.value.cuUploadsVideos,
+                wifiOnly = _state.value.cuUseCellularConnection.not(),
                 videoCompressionSizeLimit = VIDEO_COMPRESSION_SIZE_LIMIT,
                 videoUploadQuality = VideoQuality.ORIGINAL,
             )

@@ -74,8 +74,8 @@ class EnableCameraUploadsInPhotosUseCaseTest {
         val expectedVideoUploadQuality = VideoQuality.HIGH
 
         underTest(
-            shouldSyncVideos = expectedShouldSyncVideos,
-            shouldUseWiFiOnly = expectedShouldUseWiFiOnly,
+            includeVideos = expectedShouldSyncVideos,
+            wifiOnly = expectedShouldUseWiFiOnly,
             videoCompressionSizeLimit = expectedVideoCompressionSizeLimit,
             videoUploadQuality = expectedVideoUploadQuality,
         )

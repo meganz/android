@@ -548,10 +548,10 @@ internal class TimelineViewModelTest {
             underTest.enableCU()
             advanceUntilIdle()
             verify(enableCameraUploadsInPhotosUseCase).invoke(
-                shouldSyncVideos = any(),
-                shouldUseWiFiOnly = any(),
                 videoCompressionSizeLimit = any(),
                 videoUploadQuality = any(),
+                includeVideos = any(),
+                wifiOnly = any(),
             )
         }
 

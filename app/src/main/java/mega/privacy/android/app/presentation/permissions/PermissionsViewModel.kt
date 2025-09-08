@@ -18,7 +18,6 @@ import mega.privacy.android.app.data.extensions.filterAllowedPermissions
 import mega.privacy.android.app.data.extensions.toPermissionScreen
 import mega.privacy.android.app.presentation.permissions.model.Permission
 import mega.privacy.android.app.presentation.permissions.model.PermissionScreen
-import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -161,10 +160,7 @@ class PermissionsViewModel @Inject constructor(
         applicationScope.launch {
             val result = runCatching {
                 enableCameraUploadsInPhotosUseCase(
-                    shouldSyncVideos = false,
-                    shouldUseWiFiOnly = false,
                     videoCompressionSizeLimit = VIDEO_COMPRESSION_SIZE_LIMIT,
-                    videoUploadQuality = VideoQuality.ORIGINAL
                 )
             }
 

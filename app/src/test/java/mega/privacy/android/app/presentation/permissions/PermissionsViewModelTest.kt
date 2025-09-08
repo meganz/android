@@ -175,8 +175,8 @@ class PermissionsViewModelTest {
         underTest.onMediaPermissionsGranted()
 
         verify(enableCameraUploadsInPhotosUseCase).invoke(
-            shouldSyncVideos = false,
-            shouldUseWiFiOnly = false,
+            includeVideos = true,
+            wifiOnly = true,
             videoCompressionSizeLimit = VIDEO_COMPRESSION_SIZE_LIMIT,
             videoUploadQuality = VideoQuality.ORIGINAL
         )
@@ -221,8 +221,8 @@ class PermissionsViewModelTest {
             whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS)
             whenever(
                 enableCameraUploadsInPhotosUseCase.invoke(
-                    shouldSyncVideos = false,
-                    shouldUseWiFiOnly = false,
+                    includeVideos = true,
+                    wifiOnly = true,
                     videoCompressionSizeLimit = VIDEO_COMPRESSION_SIZE_LIMIT,
                     videoUploadQuality = VideoQuality.ORIGINAL
                 )
