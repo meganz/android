@@ -18,9 +18,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
@@ -138,6 +140,11 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
     private var emptyGeneralText: Spanned? = null
 
     private lateinit var itemDecoration: PositionDividerItemDecoration
+
+    /**
+     * Job used to save the orderNodes operation
+     */
+    private var orderJob: Job? = null
 
     private val fileExplorerActivity: FileExplorerActivity
         get() = (requireActivity() as FileExplorerActivity)
@@ -823,17 +830,26 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
      */
     fun orderNodes(order: Int) {
         this.order = order
-        originalData.clear()
-        originalData.addAll(
-            megaApi.getChildren(
-                if (parentHandle == INVALID_HANDLE) {
-                    megaApi.rootNode
-                } else {
-                    megaApi.getNodeByHandle(parentHandle)
-                }, order
-            )
-        )
-        updateNodesByAdapter(originalData)
+        orderJob?.cancel() // Cancel last job
+        orderJob = lifecycleScope.launch {
+            val children = withContext(ioDispatcher) {
+                runCatching {
+                    megaApi.getChildren(
+                        if (parentHandle == INVALID_HANDLE) {
+                            megaApi.rootNode
+                        } else {
+                            megaApi.getNodeByHandle(parentHandle)
+                        }, order
+                    )
+                }.getOrNull()
+            }
+
+            children?.takeIf { isActive }?.let {
+                originalData.clear()
+                originalData.addAll(it)
+                updateNodesByAdapter(originalData)
+            }
+        }
     }
 
     /**
