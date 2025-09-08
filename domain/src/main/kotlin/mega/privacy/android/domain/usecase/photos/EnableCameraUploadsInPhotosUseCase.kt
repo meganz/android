@@ -37,21 +37,20 @@ class EnableCameraUploadsInPhotosUseCase @Inject constructor(
     /**
      * Invocation function
      *
-     * @param shouldSyncVideos Whether to include videos for uploading or not
-     * @param shouldUseWiFiOnly true if Camera Uploads will only run through Wi-Fi, and false if
-     * Camera Uploads can run through either Wi-Fi or Mobile Data
      * @param videoCompressionSizeLimit The maximum video file size that can be compressed
      * @param videoUploadQuality The Video upload quality
+     * @param includeVideos true if videos should be included in camera uploads, false otherwise
+     * @param wifiOnly true if uploads should be done on wifi only, false otherwise
      */
     suspend operator fun invoke(
-        shouldSyncVideos: Boolean,
-        shouldUseWiFiOnly: Boolean,
         videoCompressionSizeLimit: Int,
-        videoUploadQuality: VideoQuality,
+        videoUploadQuality: VideoQuality = VideoQuality.ORIGINAL,
+        includeVideos: Boolean = true,
+        wifiOnly: Boolean = true,
     ) {
         setDefaultPrimaryFolderPathUseCase()
-        setCameraUploadsByWifiUseCase(shouldUseWiFiOnly)
-        cameraUploadsRepository.setUploadOption(if (shouldSyncVideos) UploadOption.PHOTOS_AND_VIDEOS else UploadOption.PHOTOS)
+        setCameraUploadsByWifiUseCase(wifiOnly)
+        cameraUploadsRepository.setUploadOption(if (includeVideos) UploadOption.PHOTOS_AND_VIDEOS else UploadOption.PHOTOS)
         setUploadVideoQualityUseCase(videoUploadQuality)
         setChargingRequiredForVideoCompressionUseCase(true)
         setVideoCompressionSizeLimitUseCase(videoCompressionSizeLimit)
