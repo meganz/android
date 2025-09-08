@@ -261,10 +261,11 @@ internal class DefaultSettingsRepository @Inject constructor(
     }
 
 
-    override suspend fun isUseHttpsPreferenceEnabled(): Boolean =
+    override suspend fun isUseHttpsPreferenceEnabled(): Boolean = withContext(ioDispatcher) {
         databaseHandler.get().useHttpsOnly.toBoolean()
+    }
 
-    override suspend fun setUseHttpsPreference(enabled: Boolean) {
+    override suspend fun setUseHttpsPreference(enabled: Boolean) = withContext(ioDispatcher) {
         databaseHandler.get().setUseHttpsOnly(enabled)
     }
 
