@@ -1540,7 +1540,7 @@
     <!--Dialog description when the user selected is not on the contact list when sharing a node -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t verify %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
     <!-- Answer for confirmation dialog. -->
-    <string name="general_ok">OK</string>
+    <string name="general_ok">OK, got it</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="general_leave">Leave</string>
     <!-- Success message when left shared folders -->
@@ -1576,4 +1576,57 @@
     <string name="file_properties_shared_folder_read_only">Read-only</string>
     <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="file_properties_shared_folder_read_write">Read and write</string>
+    <!-- Text shown in the app bar when nodes are being selected in selection mode -->
+    <string name="general_selecting">Selecting</string>
+    <!-- Snackbar message when retry failed on failed transfers tab. -->
+    <string name="transfers_retry_failed_snackbar_message">Unable to restart transfers</string>
+    <!-- Action for the Snackbar when retry failed on failed transfers tab. -->
+    <string name="transfers_retry_failed_snackbar_action">Retry</string>
+    <!-- Snackbar message when retry success on failed transfers tab. -->
+    <plurals name="transfers_retry_feedback_snackbar_message">
+        <item quantity="one">Retrying transfer, see the Active tab for progress</item>
+        <item quantity="other">Retrying transfers, see the Active tab for progress</item>
+    </plurals>
+    <!-- success message when a node was restore from Rubbish bin -->
+    <string name="context_correctly_node_restored">Restored to %s</string>
+    <!-- success message when moving a node -->
+    <string name="context_correctly_moved">Item moved</string>
+    <!-- error message when a node was restore from Rubbish bin -->
+    <string name="context_no_restored">An error occurred. Item not restored.</string>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_correctly_restored_from_rubbish">
+        <item quantity="one">%d item restored</item>
+        <item quantity="other">%d items restored</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_incorrectly_restored_from_rubbish">
+        <item quantity="one">%d item wasn’t restored</item>
+        <item quantity="other">%d items weren’t restored</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 item restored but %d item wasn’t restored. Try again later.</item>
+        <item quantity="other">1 item restored but %d items weren’t restored. Try again later.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
+        <item quantity="one">%d item restored but 1 item wasn’t restored. Try again later.</item>
+        <item quantity="other">%d items restored but 1 item wasn’t restored. Try again later.</item>
+    </plurals>
+    <!-- category in sort by action to sort by name -->
+    <string name="action_sort_by_name">Name</string>
+    <!-- category in sort by action to sort by file size -->
+    <string name="action_sort_by_size">Size</string>
+    <!-- category in sort by action to sort by modified date -->
+    <string name="action_sort_by_modified">Modified</string>
+    <!-- category in sort by action to sort by created date -->
+    <string name="action_sort_by_created">Created</string>
+    <!-- category in sort by action to sort by node label name -->
+    <string name="action_sort_by_label">Label</string>
+    <!-- category in sort by action to sort by favorite -->
+    <string name="action_sort_by_favorite">Favorite</string>
+    <!-- category in sort by action to sort by link creation date -->
+    <string name="action_sort_by_link">Link</string>
+    <!-- Header of action to sort nodes -->
+    <string name="action_sort_by_header">Sort by</string>
 </resources>

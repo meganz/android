@@ -123,7 +123,7 @@
     <!-- Hint of the confirmation dialog to get link with password -->
     <string name="confirm_password_text">Şifreyi onayla</string>
     <!-- This question applies to users that do not have an account on MEGA yet -->
-    <string name="new_to_mega">MEGA\’da yeni misiniz?</string>
+    <string name="new_to_mega">MEGA’da yeni misiniz?</string>
     <!-- button that allows the user to create an account -->
     <string name="create_account">Kaydol</string>
     <!-- when the user tries to log in MEGA without typing the email -->
@@ -157,7 +157,7 @@
     <!-- Last name of the user -->
     <string name="lastname_text">Soyad</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
-    <string name="top">[B]Şifremi kaybedersem verilerimi de kaybedebileceğimi[/B] anlıyorum. [A]MEGA\’nın uçtan uca şifrelemesi[/A] hakkında daha fazlasını öğrenin.</string>
+    <string name="top">[B]Şifremi kaybedersem verilerimi de kaybedebileceğimi[/B] anlıyorum. [A]MEGA’nın uçtan uca şifrelemesi[/A] hakkında daha fazlasını öğrenin.</string>
     <!-- warning dialog -->
     <string name="create_account_no_terms">Hizmet Şartlarımızı kabul etmelisiniz</string>
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
@@ -306,7 +306,7 @@
     <!-- menu item -->
     <string name="context_move_to_trash">Çöp kutusuna taşı</string>
     <!-- menu item -->
-    <string name="context_delete_from_mega">MEGA\’dan kaldır</string>
+    <string name="context_delete_from_mega">MEGA’dan kaldır</string>
     <!-- Input field description in the create folder dialog. -->
     <string name="context_new_folder_name">Klasör adı</string>
     <!-- status dialog when performing the action -->
@@ -1240,7 +1240,7 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Çöp kutusuna taşınsın mı?</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_delete_from_mega">MEGA\’dan silinsin mi?</string>
+    <string name="confirmation_delete_from_mega">MEGA’dan silinsin mi?</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
     <string name="title_properties_contact_notifications_for_chat">Sohbet bildirimleri</string>
     <!-- subtitle of the section for achievements -->
@@ -1308,7 +1308,7 @@
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">Dosya adı</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
-    <string name="context_new_link_name">Bağlantı URL\’si</string>
+    <string name="context_new_link_name">Bağlantı URL’si</string>
     <!-- Title of the field subject when a new file is created to upload -->
     <string name="new_file_subject_when_uploading">Konu</string>
     <!-- Title of the field email when a new contact is created to upload -->
@@ -1602,7 +1602,7 @@
     <!-- Summary of the preference Recovery key on Settings section -->
     <string name="settings_recovery_key_summary">Kurtarma anahtarını dışa aktarmak ve güvenli bir yerde saklamak, veri kaybı olmadan yeni bir şifre belirlemenizi sağlar.</string>
     <!-- message when a temporary error on logging in is due to connectivity issues -->
-    <string name="login_connectivity_issues">MEGA\’ya ulaşılamıyor. Lütfen bağlantınızı kontrol edin veya daha sonra tekrar deneyin.</string>
+    <string name="login_connectivity_issues">MEGA’ya ulaşılamıyor. Lütfen bağlantınızı kontrol edin veya daha sonra tekrar deneyin.</string>
     <!-- message when a temporary error on logging in is due to servers busy -->
     <string name="login_servers_busy">Sunucular çok meşgul. Lütfen bekleyin.</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -1701,11 +1701,11 @@
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">İki faktörlü kimlik doğrulayıcı uygulaması</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">Bir kimlik doğrulayıcı uygulaması yüklemek için Google Play\’i açmak ister misiniz?</string>
+    <string name="open_play_store_2fa">Bir kimlik doğrulayıcı uygulaması yüklemek için Google Play’i açmak ister misiniz?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">Google Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
-    <string name="text_2fa_help">MEGA\’da 2FA\’yı etkinleştirmek için bir kimlik doğrulayıcı uygulamasına ihtiyacınız var. Telefonunuz veya tabletiniz için Google Authenticator, Duo Mobile, Authy veya Microsoft Authenticator uygulamasını indirip yükleyebilirsiniz.</string>
+    <string name="text_2fa_help">MEGA’da 2FA’yı etkinleştirmek için bir kimlik doğrulayıcı uygulamasına ihtiyacınız var. Telefonunuz veya tabletiniz için Google Authenticator, Duo Mobile, Authy veya Microsoft Authenticator uygulamasını indirip yükleyebilirsiniz.</string>
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">Aç</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
@@ -1831,13 +1831,13 @@
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="invalid_code">Geçersiz kod</string>
     <!-- Text of the dialog shown when the storage of a FREE account is almost full -->
-    <string name="text_almost_full_warning">Bulut depolama neredeyse dolu. Pro\’ya yükseltin ve %1$s depolama ile %2$s aktarım kotasına sahip olun.</string>
+    <string name="text_almost_full_warning">Bulut depolama neredeyse dolu. Pro’ya yükseltin ve %1$s depolama ile %2$s aktarım kotasına sahip olun.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
     <string name="text_almost_full_warning_pro_account">Bulut depolama neredeyse dolu. Şimdi yükseltin ve %1$s depolama ile %2$s aktarım kotasına sahip olun.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
     <string name="text_almost_full_warning_pro3_account">Bulut depolama neredeyse dolu. Daha fazla depolama alanına ihtiyacınız varsa özel bir plan almak için lütfen MEGA destek ile iletişime geçin.</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
-    <string name="text_storage_full_warning">Bulut depolama dolu. Pro\’ya yükseltin ve %1$s depolama ile %2$s aktarım kotasına sahip olun.</string>
+    <string name="text_storage_full_warning">Bulut depolama dolu. Pro’ya yükseltin ve %1$s depolama ile %2$s aktarım kotasına sahip olun.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
     <string name="text_storage_full_warning_pro_account">Bulut depolama dolu. Şimdi yükseltin ve %1$s depolama ile %2$s aktarım kotasına sahip olun.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is full -->
@@ -1914,7 +1914,7 @@
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="make_chat_private_option_text">Şifreleme anahtarı döndürme biraz daha güvenlidir ancak bir sohbet bağlantısı oluşturmanıza izin vermez ve yeni katılımcılar geçmiş mesajları görmez.</string>
     <!-- Text of the option to change a public chat to private (enable encrypted key rotation) -->
-    <string name="make_chat_private_not_available_text">Şifreleme anahtarı döndürme, 100\’den fazla katılımcısı olan konuşmalar için devre dışı bırakılır.</string>
+    <string name="make_chat_private_not_available_text">Şifreleme anahtarı döndürme, 100’den fazla katılımcısı olan konuşmalar için devre dışı bırakılır.</string>
     <!-- Warning show to the user when tries to make private a public chat and the chat has more than 100 participants -->
     <string name="warning_make_chat_private">Katılımcı sayısı özel sohbetler için sınırı aştığından sohbet özel olarak dönüştürülemedi.</string>
     <!-- Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
@@ -1954,7 +1954,7 @@
     <!-- Item menu option upon right click on one or multiple files -->
     <string name="general_save_to_device">Cihaza kaydet</string>
     <!-- Title of cloud explorer to upload a file -->
-    <string name="title_upload_explorer">MEGA\’ya yükle</string>
+    <string name="title_upload_explorer">MEGA’ya yükle</string>
     <!-- Label choose destination -->
     <string name="choose_destionation">Hedef seç</string>
     <!-- Label that indicates show more items -->
@@ -2030,7 +2030,7 @@
     <!-- Option in Settings section to enable the last active connection in chat -->
     <string name="option_enable_last_green_chat">Son görülmeyi göster</string>
     <!-- Subtitle of the option in Settings section to enable the last active connection in chat -->
-    <string name="subtitle_option_enable_last_green_chat">Kişilerinizin MEGA\’da en son ne zaman aktif olduğunuzu görmesine izin verin</string>
+    <string name="subtitle_option_enable_last_green_chat">Kişilerinizin MEGA’da en son ne zaman aktif olduğunuzu görmesine izin verin</string>
     <!-- title of notification when device is out of storage during camera upload -->
     <string name="title_out_of_space">Yeterli depolama alanı yok</string>
     <!-- message will be shown when there is not enough space to perform camera upload. -->
@@ -2218,7 +2218,7 @@
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">Şifrenizi girin</string>
     <!-- Text of the dialog shown when a pdf required password -->
-    <string name="text_pdf_password">%s şifre korumalı bir PDF belgesidir. PDF\’yi açmak için lütfen şifreyi girin.</string>
+    <string name="text_pdf_password">%s şifre korumalı bir PDF belgesidir. PDF’yi açmak için lütfen şifreyi girin.</string>
     <!-- Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password -->
     <string name="error_max_pdf_password">Girdiğiniz şifre geçerli değil</string>
     <!-- Alert shown when exists some call and the user tries to play an audio or video -->
@@ -2272,9 +2272,9 @@
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
     <string name="alert_enter_group_name">Bir sohbet bağlantısı oluşturmak için gruba bir ad vermelisiniz.</string>
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
-    <string name="invite_contacts_to_start_chat">MEGA\’nın şifreli sohbeti ile kişilerinizi davet edin ve güvenli bir şekilde sohbet etmeye başlayın.</string>
+    <string name="invite_contacts_to_start_chat">MEGA’nın şifreli sohbeti ile kişilerinizi davet edin ve güvenli bir şekilde sohbet etmeye başlayın.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Merhaba, MEGA\’ya katılarak ücretsiz ve güvenli bir şekilde şifrelenmiş depolama ve iletişimin keyfini çıkart. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Merhaba, MEGA’ya katılarak ücretsiz ve güvenli bir şekilde şifrelenmiş depolama ve iletişimin keyfini çıkart. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Sohbet bağlantısı yok.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -2292,7 +2292,7 @@
     <!-- Action button label -->
     <string name="invite_contact_action_button">Bir arkadaşınızı davet edin&#8230;</string>
     <!-- Title of the login screen -->
-    <string name="login_to_mega">MEGA\’ya giriş yapın</string>
+    <string name="login_to_mega">MEGA’ya giriş yapın</string>
     <!-- Title of the create account screen -->
     <string name="create_account_title">MEGA hesabı oluşturun</string>
     <!-- Label to reference a recents section -->
@@ -2325,7 +2325,7 @@
     <!-- Used in recents list screen to indicate an action done by me -->
     <string name="bucket_word_me">Ben</string>
     <!-- Text to explain the benefits of adding phone number to non achievement users -->
-    <string name="sms_add_phone_number_dialog_msg_non_achievement_user">Telefon numaranızı MEGA\’ya ekleyin. Bu, kişilerinizin sizi MEGA\’da bulmasını kolaylaştırır.</string>
+    <string name="sms_add_phone_number_dialog_msg_non_achievement_user">Telefon numaranızı MEGA’ya ekleyin. Bu, kişilerinizin sizi MEGA’da bulmasını kolaylaştırır.</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="title_notification_incoming_call">Gelen arama</string>
     <!-- Title of the notification shown on the action bar when there is a incoming group call -->
@@ -2351,7 +2351,7 @@
     <!-- Title of transfer section in Storage -->
     <string name="transfer_label">Aktarım</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
-    <string name="grace_period_admin_alert">Son ödemenizde bir sorun oluştu. Daha fazla bilgi için lütfen bir masaüstü tarayıcısı kullanarak MEGA\’ya erişin.</string>
+    <string name="grace_period_admin_alert">Son ödemenizde bir sorun oluştu. Daha fazla bilgi için lütfen bir masaüstü tarayıcısı kullanarak MEGA’ya erişin.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
     <string name="camera_uploads_business_alert">MEGA verilerinize erişemez. Ancak, İşletme hesabı yöneticiniz Kamera yüklemelerinize erişebilir.</string>
     <!-- General label to alert user that somehting went wrong -->
@@ -2480,7 +2480,7 @@
     <!-- Text show in a snackbar when reset phone number failed. -->
     <string name="remove_phone_number_fail">Telefon numaranız kaldırılamadı.</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
-    <string name="search_hint">MEGA\’da ara</string>
+    <string name="search_hint">MEGA’da ara</string>
     <!-- Alert shown when a user tries to reset an account wich is bloqued. -->
     <string name="error_reset_account_blocked">Sıfırlamaya çalıştığınız hesap engellenmiş.</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
@@ -2512,9 +2512,9 @@
     <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_video">[B]Hiç[/B] [A]video[/A] [B]bulunamadı[/B]</string>
     <!-- Title of the screen to attach GIFs -->
-    <string name="search_giphy_title">GIPHY\’de ara</string>
+    <string name="search_giphy_title">GIPHY’de ara</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
-    <string name="empty_search_giphy">[A]GIF\’ler[/A] bulunamadı</string>
+    <string name="empty_search_giphy">[A]GIF’ler[/A] bulunamadı</string>
     <!-- Label indicating there is not available GIFs due to down server -->
     <string name="server_down_giphy">Kullanılabilir GIF yok. Lütfen daha sonra tekrar deneyin.</string>
     <!-- Label indicating the end of Giphy list. The format placeholders are to showing it in different colors. -->
@@ -2623,7 +2623,7 @@
     <!-- Message displayed to inform that a link and its password have been sent separately to a chat -->
     <string name="link_and_password_sent">Bağlantı ve şifre gönderildi</string>
     <!-- Title of a warning recommending upgrade to Pro -->
-    <string name="upgrade_pro">Pro\’ya yükseltin</string>
+    <string name="upgrade_pro">Pro’ya yükseltin</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">MEGA Pro kullanıcıları, hesabınızı daha da güvenli hale getiren ek bağlantı güvenliği özelliklerine özel erişime sahiptir.</string>
     <!-- Meaning of links decryption key -->
@@ -2641,7 +2641,7 @@
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
     <string name="share_link_with_password">Bağlantı: %1$s\n\nŞifre: %2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
-    <string name="files_required_permissions_warning">MEGA\’nın, paylaşım için dosyalarınıza erişmek üzere izninize ihtiyacı var.</string>
+    <string name="files_required_permissions_warning">MEGA’nın, paylaşım için dosyalarınıza erişmek üzere izninize ihtiyacı var.</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
     <string name="file_properties_favourite">Favori</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
@@ -2705,7 +2705,7 @@
     <!-- Option of color theme, follow the system setting. -->
     <string name="theme_system_default">Sistem varsayılanı</string>
     <!-- Option of color theme, follow the system battery saver settings. -->
-    <string name="theme_battery_saver">Pil Tasarrufuna Göre Ayarla</string>
+    <string name="theme_battery_saver">Şarj Tasarrufuna Göre Ayarla</string>
     <!-- Warning which alerts the user before discard changes -->
     <string name="discard_changes_warning">Değişiklikler silinsin ve düzenleyici kapatılsın mı?</string>
     <!-- Action discard -->
@@ -2804,8 +2804,6 @@
     <string name="action_change_anyway">Yine de değiştir</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: 15GB / 20GB. The placeholders are for warning the user and set used storage in red if is in storage over quota.-->
     <string name="used_storage_transfer">[A]%1$s[/A] / %2$s</string>
-    <!-- String to show the transfer quota and the used space in My Account section -->
-    <string name="used_storage_transfer_percentage">%%%1$s</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -2821,7 +2819,7 @@
     <!-- Action to add phone number -->
     <string name="add_phone_number_action">Telefon numarası ekle</string>
     <!-- Warning indicating the app needs write permissions to do any action -->
-    <string name="denied_write_permissions">Devam etmek için MEGA\’nın cihazınızın depolama alanına yazma izinlerine ihtiyacı var.</string>
+    <string name="denied_write_permissions">Devam etmek için MEGA’nın cihazınızın depolama alanına yazma izinlerine ihtiyacı var.</string>
     <!-- Date indicating is tomorrow. E.g: Tomorrow, 3 Jul 2021 -->
     <string name="tomorrow_date">Yarın, %1$s</string>
     <!-- Title of the confirmation dialog shown when a subscription has been processed successfully -->
@@ -2922,11 +2920,11 @@
     <!-- Warning show to the user when the app needs permissions to start a meeting.-->
     <string name="meeting_permission_info">MEGA için gerekli erişim izinleri</string>
     <!-- Message of a dialog to show user the permissions that needed-->
-    <string name="meeting_permission_info_message">MEGA\’nın, toplantılar için mikrofonunuza ve kameranıza erişmesi gerekir.</string>
+    <string name="meeting_permission_info_message">MEGA’nın, toplantılar için mikrofonunuza ve kameranıza erişmesi gerekir.</string>
     <!-- Button to confirm the action of restarting one transfer-->
     <string name="button_permission_info">Anladım</string>
     <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
-    <string name="meeting_required_permissions_warning">MEGA\’nın kameranıza ve mikrofonunuza erişmesine izin vermek için Ayarlar\’a gidin.</string>
+    <string name="meeting_required_permissions_warning">MEGA’nın kameranıza ve mikrofonunuza erişmesine izin vermek için Ayarlar’a gidin.</string>
     <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
     <string name="view_meeting_chat">Toplantı sohbetini görüntüle</string>
     <!-- the content of tips when the user uses the meeting first time-->
@@ -3052,7 +3050,7 @@
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Moderatörlükten kaldır</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
-    <string name="meeting_bluetooth_connect_required_permissions_warning">MEGA\’nın Bluetooth kullanarak yakındaki cihazlarınıza erişmesine izin vermek için Ayarlar\’a gidin.</string>
+    <string name="meeting_bluetooth_connect_required_permissions_warning">MEGA’nın Bluetooth kullanarak yakındaki cihazlarınıza erişmesine izin vermek için Ayarlar’a gidin.</string>
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">%1s aboneliği</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
@@ -3242,7 +3240,7 @@
     <!-- Report issue setting name-->
     <string name="settings_help_report_issue">Sorun bildir</string>
     <!-- Report issue fragment instructions-->
-    <string name="settings_help_report_issue_instructions">Geri bildiriminiz MEGA\’yı geliştirmemize yardımcı olur. Lütfen yaşadığınız sorunu açıkça tanımlayın. Ne kadar fazla ayrıntı verirseniz çözmemiz o kadar kolay olur.</string>
+    <string name="settings_help_report_issue_instructions">Geri bildiriminiz MEGA’yı geliştirmemize yardımcı olur. Lütfen yaşadığınız sorunu açıkça tanımlayın. Ne kadar fazla ayrıntı verirseniz çözmemiz o kadar kolay olur.</string>
     <!-- Label for the switch to enable attaching logs when reporting an issue-->
     <string name="settings_help_report_issue_attach_logs_label">Günlük dosyasını gönder</string>
     <!-- Error message when there is no connectivity when reporting an issue-->
@@ -3364,11 +3362,11 @@
     <!-- Title of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_title">[B]Yedeklemeler [/B][A]içinde öğe yok[/A]</string>
     <!-- Description of the Backups feature when no Backup files or folders exist -->
-    <string name="backups_empty_state_body">Yedeklenen dosyalarınız ve klasörleriniz burada saklanır. Yedeklenen öğeleriniz, bulut depolamanızda yanlışlıkla değiştirilmesini önlemek amacıyla “salt okunur”dur. Bilgisayarınızdaki öğeleri masaüstü uygulamamızı kullanarak MEGA\’ya yedekleyebilirsiniz.</string>
+    <string name="backups_empty_state_body">Yedeklenen dosyalarınız ve klasörleriniz burada saklanır. Yedeklenen öğeleriniz, bulut depolamanızda yanlışlıkla değiştirilmesini önlemek amacıyla “salt okunur”dur. Bilgisayarınızdaki öğeleri masaüstü uygulamamızı kullanarak MEGA’ya yedekleyebilirsiniz.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">MEGA hesabınız tekrarlanan telif hakkı ihlali iddiaları nedeniyle askıya alındı. Bu, hesabınıza veya içindeki verilere erişemeyeceğiniz anlamına gelir.\nKarşı bildiriminin nasıl gönderileceği hakkında daha fazlasını öğrenmek için e-posta gelen kutunuzu kontrol edin.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Hesabınız MEGA Hizmet Şartları\’nın ihlali nedeniyle feshedildi.\nSaklanan verilerinize yeniden erişemeyecek veya yeni bir MEGA hesabına kaydolma yetkiniz olmayacaktır.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Hesabınız MEGA Hizmet Şartları’nın ihlali nedeniyle feshedildi.\nSaklanan verilerinize yeniden erişemeyecek veya yeni bir MEGA hesabına kaydolma yetkiniz olmayacaktır.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">Toplantılar</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -3400,7 +3398,7 @@
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
     <string name="chat_group_chat_info_allow_non_host_participants_option">Yönetici olmayanların katılımcı eklemesine izin ver</string>
     <!-- Title of gif album. -->
-    <string name="photos_album_title_gif">GIF\’ler</string>
+    <string name="photos_album_title_gif">GIF’ler</string>
     <!-- Title of raw album. -->
     <string name="photos_album_title_raw">RAW</string>
     <!-- Title of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
@@ -3453,7 +3451,7 @@
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_context">Yalnızca görüntü veya video içeren klasörleri ızgara görünümünde açın. Ortamı küçük resimlere göre gezinin ve tarihe göre filtreleyin.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">Bu klasör yalnızca görüntü ve video içerdiği için otomatik olarak galeri görünümünde açtık. Görsel içeriğinizin keyfini daha sürükleyici bir düzende çıkarabilirsiniz. Bunu Ayarlar\’dan devre dışı bırakabilirsiniz.</string>
+    <string name="cloud_drive_media_discovery_banner_context">Bu klasör yalnızca görüntü ve video içerdiği için otomatik olarak galeri görünümünde açtık. Görsel içeriğinizin keyfini daha sürükleyici bir düzende çıkarabilirsiniz. Bunu Ayarlar’dan devre dışı bırakabilirsiniz.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Ayarlar</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4264,7 +4262,7 @@
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">Ses</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_label_save_up_to">Yıllık faturalandırma ile %16\’ya varan tasarruf edin</string>
+    <string name="account_upgrade_account_label_save_up_to">Yıllık faturalandırma ile %16’ya varan tasarruf edin</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">Önerilen</string>
     <!-- Title of label, which will be shown next to the plan user have already purchased. -->
@@ -4511,7 +4509,7 @@
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Toplantı tekrarı güncellendi</string>
     <!-- Header content about secure sharing in approve credentials screen-->
-    <string name="contact_approve_credentials_secure_share_description">Verilerinizi sıfır bilgi şifrelemesi ile koruyoruz, böylece MEGA\’da depoladığınız, paylaştığınız ve aldığınız tüm bilgiler güvende olur. Ekstra güvenlik sağlamak için bilgi paylaştığınız veya veri aldığınız kişileri doğrulamanızı rica ederiz.</string>
+    <string name="contact_approve_credentials_secure_share_description">Verilerinizi sıfır bilgi şifrelemesi ile koruyoruz, böylece MEGA’da depoladığınız, paylaştığınız ve aldığınız tüm bilgiler güvende olur. Ekstra güvenlik sağlamak için bilgi paylaştığınız veya veri aldığınız kişileri doğrulamanızı rica ederiz.</string>
     <!-- Message of contact verification in approve credentials screen -->
     <string name="contact_approve_credentials_contact_verify_description">Kişinizi doğrulamak için yukarıda gördüğünüz kimlik bilgilerinin kendi hesap kimlik bilgileriyle eşleştiğinden emin olun. Onlardan kimlik bilgilerini sizinle paylaşmalarını isteyebilirsiniz.</string>
     <!-- Toolbar title text in approve credentials screen -->
@@ -4523,7 +4521,7 @@
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">Aramalar sırasında yönetici olmayanlar tarafından eklenen katılımcılar bekleme odasına gönderilmez.</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
-    <string name="contact_share_file_to_unverified_contact_warning_message">Bilgi paylaştığınız bazı kişiler sizin tarafınızdan doğrulanmadı. Ek güvenlik sağlamak için, kimlik bilgilerini kişilerde doğrulamanızı öneririz. Doğrulamak istediğiniz kişinin yanındaki üç noktaya ve ardından Bilgi\’ye dokunun.</string>
+    <string name="contact_share_file_to_unverified_contact_warning_message">Bilgi paylaştığınız bazı kişiler sizin tarafınızdan doğrulanmadı. Ek güvenlik sağlamak için, kimlik bilgilerini kişilerde doğrulamanızı öneririz. Doğrulamak istediğiniz kişinin yanındaki üç noktaya ve ardından Bilgi’ye dokunun.</string>
     <!-- Success message when participants was removed to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_removing_participants_success">
         <item quantity="one">%1$d katılımcı kaldırıldı</item>
@@ -4546,7 +4544,7 @@
     <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
     <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">Moderatörün sizi içeri alması bekleniyor</string>
     <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
-    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s, doğrulamadığınız bir kişi tarafından paylaşıldı. Ek güvenlik sağlamak için, kimlik bilgilerini kişilerde doğrulamanızı öneririz. Doğrulamak istediğiniz kişinin yanındaki üç noktaya ve ardından Bilgi\’ye dokunun.</string>
+    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s, doğrulamadığınız bir kişi tarafından paylaşıldı. Ek güvenlik sağlamak için, kimlik bilgilerini kişilerde doğrulamanızı öneririz. Doğrulamak istediğiniz kişinin yanındaki üç noktaya ve ardından Bilgi’ye dokunun.</string>
     <!-- Cancel button in leave meeting dialog in a waiting room -->
     <string name="meetings__waiting_room_leave_meeting_dialog_cancel_button">Ayrılma</string>
     <!-- Admit button to admit a user to the waiting room in the user admission dialog for a meeting waiting room -->
@@ -4694,9 +4692,9 @@
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Tümünü ara</string>
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
-    <string name="chat_attach_pick_from_camera_deny_permission">MEGA\’nın fotoğraf ve video çekmek için kameranıza erişmesi gerekir.</string>
+    <string name="chat_attach_pick_from_camera_deny_permission">MEGA’nın fotoğraf ve video çekmek için kameranıza erişmesi gerekir.</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->
-    <string name="chat_attach_location_deny_permission">MEGA\’nın konumunuza erişimini reddettiniz. Konumunuzu paylaşmak istiyorsanız, MEGA\’ya izin verin.</string>
+    <string name="chat_attach_location_deny_permission">MEGA’nın konumunuza erişimini reddettiniz. Konumunuzu paylaşmak istiyorsanız, MEGA’ya izin verin.</string>
     <!-- Title for the confirmation dialog shown when the user is starting a large download -->
     <string name="transfers_confirm_large_download_title">Büyük indirme</string>
     <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start -->
@@ -4746,7 +4744,7 @@
     <!-- Camera uploads no internet info in Photos screen. -->
     <string name="photos_camera_uploads_no_internet">İnternet bağlantısı olmadığı için yükleme duraklatıldı</string>
     <!-- Camera uploads low battery info in Photos screen. -->
-    <string name="photos_camera_uploads_low_battery">Pil %%%1$d altında olduğu için yükleme duraklatıldı</string>
+    <string name="photos_camera_uploads_low_battery">Şarjınız %%%1$d’nin altında olduğu için yükleme duraklatıldı</string>
     <!-- Camera uploads general issue info in Photos screen. -->
     <string name="photos_camera_uploads_general_issue">Kamera yüklemeleri çalışmayı durdurdu. Çözmek için kamera yüklemelerini yeniden etkinleştirmeyi deneyin. Sorun devam ederse support&#64;mega.io ile iletişime geçin.</string>
     <!-- Camera uploads pending info in Photos screen. -->
@@ -4760,7 +4758,7 @@
         <item quantity="other">Kamera yüklemeleri tamamlandı, %1$d dosya yüklendi</item>
     </plurals>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes. -->
-    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]Ücretsiz planınızda toplantılar için 60 dakikalık bir sınır bulunmaktadır. Pro kullanıcılar sınırsız arama ve 1000\’e kadar katılımcı hakkına sahiptir.[/A] [B]Şimdi yükseltin.[/B]</string>
+    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]Ücretsiz planınızda toplantılar için 60 dakikalık bir sınır bulunmaktadır. Pro kullanıcılar sınırsız arama ve 1000’e kadar katılımcı hakkına sahiptir.[/A] [B]Şimdi yükseltin.[/B]</string>
     <!-- Bottom sheet button to hide a node/file -->
     <string name="general_hide_node">Gizle</string>
     <!-- Bottom sheet button to unhide a node/file -->
@@ -4778,13 +4776,13 @@
     <!-- Button text to change SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_action_button">Değiştir</string>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
-    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]Ücretsiz planınızda toplantılar için 60 dakikalık bir sınır bulunmaktadır. Pro kullanıcılar sınırsız arama ve 1000\’e kadar katılımcı hakkına sahiptir.[/A] [B]Şimdi yükseltin.[/B]</string>
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]Ücretsiz planınızda toplantılar için 60 dakikalık bir sınır bulunmaktadır. Pro kullanıcılar sınırsız arama ve 1000’e kadar katılımcı hakkına sahiptir.[/A] [B]Şimdi yükseltin.[/B]</string>
     <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_title">İşletme hesabı devre dışı bırakıldı</string>
     <!-- The body of the Dialog shown to a suspended Business Account Sub-User -->
     <string name="account_business_account_deactivated_dialog_sub_user_body">İşletme hesabınız ödeme hatası nedeniyle devre dışı bırakıldı. Yalnızca verilerinize göz atabilirsiniz.\nİşletme hesabı yöneticinizden sorunu çözmesini isteyin.</string>
     <!-- The body of the Dialog shown to a suspended Business Account Administrator -->
-    <string name="account_business_account_deactivated_dialog_admin_body">İşletme hesabınız ödeme hatası nedeniyle devre dışı bırakıldı. Yalnızca verilerinize göz atabilirsiniz.\nÖdeme yapmak ve aboneliğinizi yeniden etkinleştirmek için bir tarayıcı aracılığıyla MEGA\’ya giriş yapın.</string>
+    <string name="account_business_account_deactivated_dialog_admin_body">İşletme hesabınız ödeme hatası nedeniyle devre dışı bırakıldı. Yalnızca verilerinize göz atabilirsiniz.\nÖdeme yapmak ve aboneliğinizi yeniden etkinleştirmek için bir tarayıcı aracılığıyla MEGA’ya giriş yapın.</string>
     <!-- The button of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_button">Tamam</string>
     <!-- The body of the Dialog shown to upgrade meeting from the free version -->
@@ -4801,7 +4799,7 @@
     <!-- Expiration date and time for promotional notifications. Shown on Notifications screen under each promotional notification. The placeholder %1$s will be replaced with localised date and the placeholder %2$s will be replaced with localised time.  -->
     <string name="notifications_screen_notification_promo_expiration_time">%1$s tarihinde, %2$s saatinden itibaren süresi doluyor</string>
     <!-- Warning Message and upgrade link for organiser for Free Call -->
-    <string name="meetings_free_call_organiser_number_of_participants_warning">Aramaya yalnızca 100 katılımcı katılabilir. Ek katılımcılar yalnızca mesaj gönderip alabilir. Yönetici, bu kısıtlamaları kaldırmak için Pro\’ya yükseltebilir.</string>
+    <string name="meetings_free_call_organiser_number_of_participants_warning">Aramaya yalnızca 100 katılımcı katılabilir. Ek katılımcılar yalnızca mesaj gönderip alabilir. Yönetici, bu kısıtlamaları kaldırmak için Pro’ya yükseltebilir.</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Low Quality before being uploaded by Camera Uploads -->
     <string name="settings_camera_uploads_video_quality_dialog_option_low">Düşük</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Medium Quality before being uploaded by Camera Uploads -->
@@ -4811,7 +4809,7 @@
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos are automatically uploaded by Camera Uploads without any Video Compression -->
     <string name="settings_camera_uploads_video_quality_dialog_option_original">Orijinal</string>
     <!-- Warning shown when the recording of audio permission is required for sending a voice clip and it has been denied by the user -->
-    <string name="chat_microphone_permissions_denied_for_voice_clip">MEGA\’nın mikrofonunuza erişimini reddettiniz. Bir ses klibi kaydetmek istiyorsanız, MEGA\’ya izin verin.</string>
+    <string name="chat_microphone_permissions_denied_for_voice_clip">MEGA’nın mikrofonunuza erişimini reddettiniz. Bir ses klibi kaydetmek istiyorsanız, MEGA’ya izin verin.</string>
     <!-- Free plan limitation dialog title for scheduled meeting calls with more than 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Katılınamıyor</string>
     <!-- Free plan limitation dialogue description for scheduled meeting calls with more than 100 participants -->
@@ -4824,7 +4822,7 @@
         <item quantity="other">%1$d öğe gizlendi</item>
     </plurals>
     <!-- The title of the Upgrade bottom sheet dialog  -->
-    <string name="meetings_upgrade_pro_plan_title">Sınırsız arama süresi için Pro\’ya yükseltin</string>
+    <string name="meetings_upgrade_pro_plan_title">Sınırsız arama süresi için Pro’ya yükseltin</string>
     <!-- The body of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_body">Aramanız 60 dakika sınırına ulaştığı için sona erdi. Pro kullanıcılar sınırsız arama süresine sahip olup 1000 katılımcıya kadar davet edebilir.</string>
     <!-- The button text of the Upgrade bottom sheet dialog  -->
@@ -4840,7 +4838,7 @@
     <!-- Search drop down chips filter type file type documents -->
     <string name="search_dropdown_chip_filter_type_file_type_documents">Belgeler</string>
     <!-- Search drop down chips filter type date added -->
-    <string name="search_dropdown_chip_filter_type_date_added">Eklenme tarihi</string>
+    <string name="search_dropdown_chip_filter_type_date_added">Eklenme zamanı</string>
     <!-- Search drop down chips filter type last modified -->
     <string name="search_dropdown_chip_filter_type_last_modified">Son değiştirilme</string>
     <!-- Search drop down chips filter type date modified today -->

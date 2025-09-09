@@ -2882,8 +2882,6 @@
     <string name="action_change_anyway">Cambia lo stesso</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: 15GB / 20GB. The placeholders are for warning the user and set used storage in red if is in storage over quota.-->
     <string name="used_storage_transfer">[A]%1$s[/A] / %2$s</string>
-    <!-- String to show the transfer quota and the used space in My Account section -->
-    <string name="used_storage_transfer_percentage">%1$s%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
