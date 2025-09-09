@@ -111,7 +111,7 @@ internal fun rememberSingleNodeActionHandler(
         restoreLauncher,
         sendToChatLauncher,
         hiddenNodesOnboardingLauncher,
-        coroutineScope
+        coroutineScope,
     ) {
         { action, node ->
             nodeOptionsActionViewModel.updateSelectedNodes(listOf(node))
@@ -119,6 +119,7 @@ internal fun rememberSingleNodeActionHandler(
             val actionContext = SingleNodeActionProvider(
                 viewModel = nodeOptionsActionViewModel,
                 coroutineScope = coroutineScope,
+                postMessage = nodeOptionsActionViewModel::postMessage,
                 versionsLauncher = versionsLauncher,
                 moveLauncher = moveLauncher,
                 copyLauncher = copyLauncher,
@@ -231,6 +232,7 @@ internal fun rememberMultipleNodesActionHandler(
             val actionContext = MultipleNodesActionProvider(
                 viewModel = nodeOptionsActionViewModel,
                 coroutineScope = coroutineScope,
+                postMessage = nodeOptionsActionViewModel::postMessage,
                 moveLauncher = moveLauncher,
                 copyLauncher = copyLauncher,
                 shareFolderLauncher = shareFolderLauncher,
