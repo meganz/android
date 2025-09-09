@@ -1540,7 +1540,7 @@
     <!--Dialog description when the user selected is not on the contact list when sharing a node -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t verify %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
     <!-- Answer for confirmation dialog. -->
-    <string name="general_ok">OK</string>
+    <string name="general_ok">OK, got it</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="general_leave">Leave</string>
     <!-- Success message when left shared folders -->
@@ -1605,13 +1605,13 @@
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item restored but the other one not restored. Try again later.</item>
-        <item quantity="other">1 item restored but %d items not restored. Try again later.</item>
+        <item quantity="one">1 item restored but %d item wasn’t restored. Try again later.</item>
+        <item quantity="other">1 item restored but %d items weren’t restored. Try again later.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
-        <item quantity="one">%d item restored but the other one not restored. Try again later.</item>
-        <item quantity="other">%d items restored but 1 item not restored. Try again later.</item>
+        <item quantity="one">%d item restored but 1 item wasn’t restored. Try again later.</item>
+        <item quantity="other">%d items restored but 1 item wasn’t restored. Try again later.</item>
     </plurals>
     <!-- category in sort by action to sort by name -->
     <string name="action_sort_by_name">Name</string>

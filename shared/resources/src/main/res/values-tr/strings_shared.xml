@@ -9,7 +9,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
     <string name="general_sync_initial_scan_failed">İlk tarama başarısız oldu. Senkronizasyonunuzu veya yedeklemenizi masaüstü uygulamasından yeniden etkinleştirmeniz gerekecek.</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
-    <string name="general_sync_remote_node_not_found">MEGA\’daki klasör taşındığı, silindiği veya erişiminiz olmayabileceği için bulunamıyor</string>
+    <string name="general_sync_remote_node_not_found">MEGA’daki klasör taşındığı, silindiği veya erişiminiz olmayabileceği için bulunamıyor</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
     <string name="general_sync_storage_overquota">Depolama alanınız dolduğundan bu klasör senkronize edilemiyor veya yedeklenemiyor</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
@@ -71,7 +71,7 @@
     <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
     <string name="general_sync_local_filesystem_mismatch">Bu klasördeki dosyalar senkronize edilemez veya yedeklenemez. Senkronizasyonu veya yedeklemeyi masaüstü uygulamasından yeniden etkinleştirmeniz gerekecek.</string>
     <!-- Warning message to display when sync has been paused due a low battery level -->
-    <string name="general_message_sync_paused_low_battery_level">Pil seviyesi çok düşük olduğu için senkronizasyon duraklatıldı. Senkronizasyona devam etmek için pili şarj edin.</string>
+    <string name="general_message_sync_paused_low_battery_level">Şarj seviyesi çok düşük olduğu için senkronizasyon duraklatıldı. Senkronizasyona devam etmek için şarj edin.</string>
     <!-- Search drop down chips filter type file type -->
     <string name="search_dropdown_chip_filter_type_file_type">Tür</string>
     <!-- Search drop down chips filter type file type images -->
@@ -83,7 +83,7 @@
     <!-- Search drop down chips filter type file type documents -->
     <string name="search_dropdown_chip_filter_type_file_type_documents">Belgeler</string>
     <!-- Search drop down chips filter type file type pdf -->
-    <string name="search_dropdown_chip_filter_type_file_type_pdf">PDF\’ler</string>
+    <string name="search_dropdown_chip_filter_type_file_type_pdf">PDF’ler</string>
     <!-- Search drop down chips filter type file type spreadsheets -->
     <string name="search_dropdown_chip_filter_type_file_type_spreadsheets">Elektronik Tablolar</string>
     <!-- Search drop down chips filter type file type presentations -->
@@ -93,7 +93,7 @@
     <!-- Search drop down chips filter type file type others -->
     <string name="search_dropdown_chip_filter_type_file_type_others">Diğer</string>
     <!-- Search drop down chips filter type date added -->
-    <string name="search_dropdown_chip_filter_type_date_added">Eklenme tarihi</string>
+    <string name="search_dropdown_chip_filter_type_date_added">Eklenme zamanı</string>
     <!-- Search drop down chips filter type last modified -->
     <string name="search_dropdown_chip_filter_type_last_modified">Son değiştirilme</string>
     <!-- Search drop down chips filter type date modified today -->
@@ -245,7 +245,7 @@
     <!-- The title of the warning dialog shown to a suspended Pro Flexi Account User -->
     <string name="account_pro_flexi_account_deactivated_dialog_title">Hesap devre dışı bırakıldı</string>
     <!-- The body of the warning dialog shown to a suspended Pro Flexi Account User -->
-    <string name="account_pro_flexi_account_deactivated_dialog_body">Pro&#160;Flexi hesabınız bir ödeme hatası nedeniyle veya aboneliğinizi iptal ettiğiniz için devre dışı bırakıldı. Hesabınızda depolanan verilere erişemezsiniz.\nÖdeme yapmak ve aboneliğinizi yeniden etkinleştirmek için bir tarayıcı aracılığıyla MEGA\’ya giriş yapın.</string>
+    <string name="account_pro_flexi_account_deactivated_dialog_body">Pro&#160;Flexi hesabınız bir ödeme hatası nedeniyle veya aboneliğinizi iptal ettiğiniz için devre dışı bırakıldı. Hesabınızda depolanan verilere erişemezsiniz.\nÖdeme yapmak ve aboneliğinizi yeniden etkinleştirmek için bir tarayıcı aracılığıyla MEGA’ya giriş yapın.</string>
     <!-- Label for new low-tier plan Starter. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_starter_label">MEGA&#160;Starter</string>
     <!-- Label for new low-tier plan Basic. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
@@ -253,7 +253,7 @@
     <!-- Label for new low-tier plan Essential. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_essential_label">MEGA&#160;Essential</string>
     <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
-    <string name="settings_camera_uploads_upload_only_while_charging_option_body">Cihazınızı şarj etmeye başlayana kadar yüklemeler duraklatılır. Piliniz %20\’nin altındaysa yüklemeler duraklatılmaya devam eder.</string>
+    <string name="settings_camera_uploads_upload_only_while_charging_option_body">Cihazınızı şarj etmeye başlayana kadar yüklemeler duraklatılır. Şarjınız %20’nin altındaysa yüklemeler duraklatılmaya devam eder.</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">Yeni senkronizasyon ekle</string>
     <!-- Text for the Sync solved issues chip -->
@@ -345,7 +345,7 @@
     <!-- Row label for call and meeting participants in the comparison table -->
     <string name="account_cancel_account_plan_call_meeting_participants">Arama ve toplantı katılımcıları</string>
     <!-- Limit on call and meeting participants in the free plan -->
-    <string name="account_cancel_account_free_plan_call_meeting_participants">100\’e kadar</string>
+    <string name="account_cancel_account_free_plan_call_meeting_participants">100’e kadar</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
     <string name="account_cancel_account_pro_plan_call_meeting_participants">Sınırsız</string>
     <!-- Button label to keep the current pro plan -->
@@ -367,7 +367,7 @@
     <!-- Title shown when cancelling the current plan in the instructions screen, informing the user about the account is not managed by google -->
     <string name="account_cancellation_instructions_not_managed_by_google">Aboneliğiniz Google tarafından yönetilmiyor</string>
     <!-- Message shown when cancelling the current plan in the instructions screen, informing the user about how to cancel subscription -->
-    <string name="account_cancellation_instructions_message_apple_description">Bunun nedeni Apple aracılığıyla MEGA\’ya abone olmanızdır. Aboneliğinizi iptal etmek için yapmanız gerekenler:</string>
+    <string name="account_cancellation_instructions_message_apple_description">Bunun nedeni Apple aracılığıyla MEGA’ya abone olmanızdır. Aboneliğinizi iptal etmek için yapmanız gerekenler:</string>
     <!-- Label for the subscription managed by App Store on Cancellation instructions screen-->
     <string name="account_cancellation_instructions_ios_device">Bir iOS cihazdan</string>
     <!-- Step 1: instruction step no.1 to Open the settings App to cancel the subscription from iOS device-->
@@ -375,11 +375,11 @@
     <!-- Step 2: instruction step no.2 to Tap on the name in the iOS device-->
     <string name="account_cancellation_instructions_tap_on_name">2. Adınıza dokunun.</string>
     <!-- Step 3: instruction step no.3 to Select subscriptions section in the iOS device-->
-    <string name="account_cancellation_instructions_select_subscriptions">3. [A]Abonelikler[/A]\’e dokunun.</string>
+    <string name="account_cancellation_instructions_select_subscriptions">3. [A]Abonelikler[/A]’e dokunun.</string>
     <!-- Step 4: instruction step no.4 to Select MEGA subscription in the iOS device -->
     <string name="account_cancellation_instructions_select_mega_subscription">4. MEGA aboneliğinize dokunun.</string>
     <!-- Step 5: instruction step no.5 to Select Cancel subscription of the App inside subscription section in the iOS device-->
-    <string name="account_cancellation_instructions_open_select_cancel_subscription">5. [A]Aboneliği iptal et[/A]\’e dokunun.</string>
+    <string name="account_cancellation_instructions_open_select_cancel_subscription">5. [A]Aboneliği iptal et[/A]’e dokunun.</string>
     <!-- Message description to provide the user with more details on how to cancel your subscription on a computer or other device. -->
     <string name="account_cancellation_instructions_detailed_instructions">Aboneliğinizi bir bilgisayarda veya başka bir cihazda nasıl iptal edeceğinizle ilgili ayrıntılı talimatlar için [A]buraya dokunun[/A].</string>
     <!-- Title shown when needing to cancel the subscription using a web browser -->
@@ -387,9 +387,9 @@
     <!-- Title shown when needing to reactivate the subscription using a web browser -->
     <string name="account_cancellation_instructions_reactivation_web_browser_needed">Aboneliğinizi bir web tarayıcısı kullanarak yeniden etkinleştirmeniz gerekiyor</string>
     <!-- Message shown when reactivating the current plan in the instructions screen, informing the user about how to reactivate the subscription -->
-    <string name="account_cancellation_instructions_reactivation_web_browser_description">Bunun nedeni web tarayıcınızda MEGA\’ya abone olmanızdır. Aboneliğinizi yeniden etkinleştirmek için yapmanız gerekenler:</string>
+    <string name="account_cancellation_instructions_reactivation_web_browser_description">Bunun nedeni web tarayıcınızda MEGA’ya abone olmanızdır. Aboneliğinizi yeniden etkinleştirmek için yapmanız gerekenler:</string>
     <!-- Description explaining why the subscription needs to be canceled using a web browser -->
-    <string name="account_cancellation_instructions_web_browser_description">Bunun nedeni web tarayıcınızda MEGA\’ya abone olmanızdır. Aboneliğinizi iptal etmek için yapmanız gerekenler:</string>
+    <string name="account_cancellation_instructions_web_browser_description">Bunun nedeni web tarayıcınızda MEGA’ya abone olmanızdır. Aboneliğinizi iptal etmek için yapmanız gerekenler:</string>
     <!-- Label for cancellation instructions on a computer -->
     <string name="account_cancellation_instructions_on_computer">Bir bilgisayardan</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
@@ -399,19 +399,19 @@
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
     <string name="account_cancellation_instructions_click_main_menu">3. Ana menüye tıklayın.</string>
     <!-- Step 4: instruction step no.4 to Click Settings of the MEGA account on MEGA website -->
-    <string name="account_cancellation_instructions_click_settings">4. [A]Ayarlar[/A]\’a tıklayın.</string>
+    <string name="account_cancellation_instructions_click_settings">4. [A]Ayarlar[/A]’a tıklayın.</string>
     <!-- Step 5: instruction step no.5 to Click on Plan section of the MEGA account on MEGA website-->
-    <string name="account_cancellation_instructions_click_plan">5. [A]Plan[/A]\’a tıklayın.</string>
+    <string name="account_cancellation_instructions_click_plan">5. [A]Plan[/A]’a tıklayın.</string>
     <!-- Step 6: instruction step no.6 Click Cancel subscription of the MEGA account on MEGA website -->
-    <string name="account_cancellation_instructions_click_cancel_subscription">6. [A]Aboneliği iptal et[/A]\’e tıklayın.</string>
+    <string name="account_cancellation_instructions_click_cancel_subscription">6. [A]Aboneliği iptal et[/A]’e tıklayın.</string>
     <!-- Alternative Step 6: instruction step no.5 Click Reactivate subscription when user's subscription has expired of the MEGA account on MEGA website-->
-    <string name="account_cancellation_instructions_click_reactivate_subscription">6. [A]Aboneliği yeniden etkinleştir[/A]\’e tıklayın.</string>
+    <string name="account_cancellation_instructions_click_reactivate_subscription">6. [A]Aboneliği yeniden etkinleştir[/A]’e tıklayın.</string>
     <!-- Label for cancellation instructions on a mobile device -->
     <string name="account_cancellation_instructions_on_mobile_device">Mobil cihazdan</string>
     <!-- Step 3: instruction step no.3 Tap on the user avatar on the MEGA website from the mobile device-->
     <string name="account_cancellation_instructions_tap_avatar">3. Avatarınıza dokunun.</string>
     <!-- Step 4: instruction step no.4 Tap Cancel subscription on the account from the MEGA website from the mobile device-->
-    <string name="account_cancellation_instructions_tap_cancel_subscription">4. [A]Aboneliği iptal et[/A]\’e dokunun.</string>
+    <string name="account_cancellation_instructions_tap_cancel_subscription">4. [A]Aboneliği iptal et[/A]’e dokunun.</string>
     <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
     <string name="sync_no_network_state">İnternet bağlantısı yok</string>
     <!-- Menu option to create a new folder in the file manager -->
@@ -449,7 +449,7 @@
         <item quantity="other">%1$d/%2$d klasör</item>
     </plurals>
     <!-- Title of the clear debris item displayed in the sync settings menu -->
-    <string name="settings_sync_clear_debris_item_title">.debris\’i temizle (yerel önbellek)</string>
+    <string name="settings_sync_clear_debris_item_title">.debris’i temizle (yerel önbellek)</string>
     <!-- Title of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_title">.debris temizlensin mi?</string>
     <!-- Body of the dialog shown when user clicks to clear debris from settings menu -->
@@ -500,11 +500,11 @@
     <!-- Option in the survey indicating that the user doesn't need all the storage in their plan -->
     <string name="account_cancel_subscription_survey_option_no_storage_need">Planımdaki tüm depolama alanına ihtiyacım yok</string>
     <!-- Option in the survey indicating that the user needs features MEGA doesn't have -->
-    <string name="account_cancel_subscription_survey_option_missing_features">MEGA\’nın sahip olmadığı özelliklere ihtiyacım var</string>
+    <string name="account_cancel_subscription_survey_option_missing_features">MEGA’nın sahip olmadığı özelliklere ihtiyacım var</string>
     <!-- Option in the survey indicating that the user is switching to a different provider -->
     <string name="account_cancel_subscription_survey_option_switch_provider">Daha çok beğendiğim bir sağlayıcıya geçiyorum</string>
     <!-- Option in the survey indicating that the user finds MEGA confusing and difficult to use -->
-    <string name="account_cancel_subscription_survey_option_confusing">MEGA\’yı kafa karıştırıcı ve kullanımı zor buluyorum</string>
+    <string name="account_cancel_subscription_survey_option_confusing">MEGA’yı kafa karıştırıcı ve kullanımı zor buluyorum</string>
     <!-- Option in the survey indicating dissatisfaction with support and customer service -->
     <string name="account_cancel_subscription_survey_option_dissatisfied_support">Destek ve müşteri hizmetlerinden memnun değilim</string>
     <!-- Option in the survey indicating that the plan was needed temporarily -->
@@ -512,7 +512,7 @@
     <!-- Option in the survey for other reasons, with a prompt to provide details -->
     <string name="account_cancel_subscription_survey_option_other">Diğer (lütfen ayrıntıları belirtin)</string>
     <!-- Checkbox allowing MEGA to contact the user for further discussion -->
-    <string name="account_cancel_subscription_survey_allow_contact">MEGA\’nın bu konu hakkında daha fazla görüşmek için benimle iletişime geçmesine izin veriyorum</string>
+    <string name="account_cancel_subscription_survey_allow_contact">MEGA’nın bu konu hakkında daha fazla görüşmek için benimle iletişime geçmesine izin veriyorum</string>
     <!-- Button label to cancel the subscription -->
     <string name="account_cancel_subscription_survey_cancel_button">Abonelikleri iptal et</string>
     <!-- Button label to not cancel the subscription -->
@@ -558,7 +558,7 @@
     <!-- Title of the Contact Permission Explanation -->
     <string name="title_enable_access_contact">Arkadaşlarınızı davet etmek için erişimi etkinleştirin</string>
     <!-- Sub title of the Contact Permission Explanation -->
-    <string name="subtitle_enable_access_contact">MEGA\’nın kişi listenize erişmesine izin verirseniz, telefonunuzun kişi listesinden de kişi ekleyebilirsiniz.</string>
+    <string name="subtitle_enable_access_contact">MEGA’nın kişi listenize erişmesine izin verirseniz, telefonunuzun kişi listesinden de kişi ekleyebilirsiniz.</string>
     <!-- Button text of Contact Permission Explanation -->
     <string name="grant_permission">Erişime izin ver</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
@@ -602,15 +602,15 @@
     <!-- Backup text for the the button to begin backup -->
     <string name="sync_add_new_backup_proceed_button_label">Yedekle</string>
     <!-- Title of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
-    <string name="sync_backup_access_storage_permission_dialog_title">MEGA\’nın tüm dosyalara erişmesine izin verilsin mi?</string>
+    <string name="sync_backup_access_storage_permission_dialog_title">MEGA’nın tüm dosyalara erişmesine izin verilsin mi?</string>
     <!-- Message of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
-    <string name="sync_backup_access_storage_permission_dialog_message">Dosyalarınızı yedeklemek için MEGA\’nın cihazınızdaki dosya ve klasörlere erişmesi gerekir. Verileriniz bizimle her zaman güvendedir.</string>
+    <string name="sync_backup_access_storage_permission_dialog_message">Dosyalarınızı yedeklemek için MEGA’nın cihazınızdaki dosya ve klasörlere erişmesi gerekir. Verileriniz bizimle her zaman güvendedir.</string>
     <!-- Text for the warning banner displayed if try to create a new backup but storage permission has not been granted. The placeholders are to underline text -->
-    <string name="sync_add_new_backup_storage_permission_banner">MEGA\’nın yerel klasörünüzü yedeklemek için cihazınızın depolama alanına erişmesi gerekir. [U]Erişim izni vermek için dokunun[/U]</string>
+    <string name="sync_add_new_backup_storage_permission_banner">MEGA’nın yerel klasörünüzü yedeklemek için cihazınızın depolama alanına erişmesi gerekir. [U]Erişim izni vermek için dokunun[/U]</string>
     <!-- Title in the files permission screen -->
-    <string name="files_permission_screen_title">MEGA\’nın cihazınızın dosyalarına erişmesine izin verin</string>
+    <string name="files_permission_screen_title">MEGA’nın cihazınızın dosyalarına erişmesine izin verin</string>
     <!-- Context message in the files permission screen -->
-    <string name="files_permission_screen_message">MEGA\’nın dosyalarınıza erişmesine izin vererek, geçici kopyalar oluşturmadan MEGA\’ya yükleyebilir, cihazınızda yer tasarrufu sağlayabilir ve daha hızlı yüklemeler gerçekleştirebilirsiniz.</string>
+    <string name="files_permission_screen_message">MEGA’nın dosyalarınıza erişmesine izin vererek, geçici kopyalar oluşturmadan MEGA’ya yükleyebilir, cihazınızda yer tasarrufu sağlayabilir ve daha hızlı yüklemeler gerçekleştirebilirsiniz.</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_do_not_show_again_button">Bunu bir daha gösterme</string>
     <!-- Title of the dialog to confirm stop a sync -->
@@ -636,15 +636,15 @@
     <!-- Title of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_title">Henüz senkronizasyon veya yedekleme ayarlanmadı</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_message">Cihazınızdaki bir klasörü MEGA\’daki bir klasörle senkronize edin veya yedekleyin</string>
+    <string name="device_center_sync_backup_list_empty_state_message">Cihazınızdaki bir klasörü MEGA’daki bir klasörle senkronize edin veya yedekleyin</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
     <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA toplantı adınızı ve açıklamanızı görebilir, ancak bunları gizli tutarız</string>
     <!-- Capital letters. Text of the label of a new historic notifications-->
     <string name="notifications_notification_item_new_tag">Yeni</string>
     <!-- Title in the display over other apps permission screen -->
-    <string name="display_over_other_apps_permission_screen_title">MEGA\’nın diğer uygulamaların üzerinde görüntülenmesine izin verin</string>
+    <string name="display_over_other_apps_permission_screen_title">MEGA’nın diğer uygulamaların üzerinde görüntülenmesine izin verin</string>
     <!-- Context message in the display over other apps permission screen -->
-    <string name="display_over_other_apps_permission_screen_message">MEGA\’nın diğer uygulamalar üzerinde görüntülenmesi için izninize ihtiyacı var. Bu, başka bir gelen arama bildirimini asla kaçırmayacağınız anlamına gelir.</string>
+    <string name="display_over_other_apps_permission_screen_message">MEGA’nın diğer uygulamalar üzerinde görüntülenmesi için izninize ihtiyacı var. Bu, başka bir gelen arama bildirimini asla kaçırmayacağınız anlamına gelir.</string>
     <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
     <string name="general_allow_permission_positive_button">İzin ver</string>
     <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
@@ -728,7 +728,7 @@
     <!-- The additional security label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass ve MEGA&#160;VPN</string>
     <!-- The additional security description in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_additional_security_description">Şifre yöneticimiz ve yüksek hızlı VPN\’imiz ile çevrim içi hayatınızı daha güvenli, daha hızlı ve daha kolay hale getirin</string>
+    <string name="payment_ads_free_intro_additional_security_description">Şifre yöneticimiz ve yüksek hızlı VPN’imiz ile çevrim içi hayatınızı daha güvenli, daha hızlı ve daha kolay hale getirin</string>
     <!-- The button text view pro plan in the ads free introduction screen -->
     <string name="payment_ads_free_intro_button_view_pro_plan">Pro planlarını görüntüle</string>
     <!-- Label for call option on settings -->
@@ -750,7 +750,7 @@
     <!-- Description of the save location in the camera setting screen -->
     <string name="camera_settings_save_location_description">Fotoğraflar ve videolar için coğrafi etiketlemeyi etkinleştirin</string>
     <!-- Message when user denies location permission in the camera setting screen -->
-    <string name="camera_settings_save_location_permission_denied">Devam etmek için MEGA\’nın bu cihazın konumuna erişmesine izin verin</string>
+    <string name="camera_settings_save_location_permission_denied">Devam etmek için MEGA’nın bu cihazın konumuna erişmesine izin verin</string>
     <!-- Warning message to indicate that cannot select a currently synced folder -->
     <string name="sync_local_device_folder_currently_synced_message">Bu klasör zaten senkronize ediliyor</string>
     <!-- Warning message to indicate that cannot select a currently backed up folder -->
@@ -850,7 +850,7 @@
     <!-- Cookie settings title in the cookie settings page -->
     <string name="settings_cookie_setting_title_cookie_and_ad_settings">Çerez ve reklam ayarları</string>
     <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
-    <string name="sync_promotion_bottom_sheet_body_text">Cihazınızdaki bir klasörü MEGA\’daki bir klasörle senkronize edin veya yedekleyin. [U]Daha fazlasını öğrenin[/U]</string>
+    <string name="sync_promotion_bottom_sheet_body_text">Cihazınızdaki bir klasörü MEGA’daki bir klasörle senkronize edin veya yedekleyin. [U]Daha fazlasını öğrenin[/U]</string>
     <!-- Title of note to self chat -->
     <string name="chat_note_to_self_chat_title">Kendime not</string>
     <!-- First message header in note to self chat -->
@@ -885,7 +885,7 @@
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">MEGA hesabınız tekrarlanan telif hakkı ihlali iddiaları nedeniyle askıya alındı. Bu, hesabınıza veya içindeki verilere erişemeyeceğiniz anlamına gelir.\nKarşı bildiriminin nasıl gönderileceği hakkında daha fazlasını öğrenmek için e-posta gelen kutunuzu kontrol edin.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Hesabınız MEGA Hizmet Şartları\’nın ihlali nedeniyle feshedildi.\nSaklanan verilerinize yeniden erişemeyecek veya yeni bir MEGA hesabına kaydolma yetkiniz olmayacaktır.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Hesabınız MEGA Hizmet Şartları’nın ihlali nedeniyle feshedildi.\nSaklanan verilerinize yeniden erişemeyecek veya yeni bir MEGA hesabına kaydolma yetkiniz olmayacaktır.</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
     <string name="error_business_disabled">Hesabınız yöneticiniz tarafından devre dışı bırakıldı. Daha fazla ayrıntı için lütfen İşletme hesabı yöneticinizle iletişime geçin.</string>
     <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
@@ -909,13 +909,13 @@
     <!-- First message header paragraph in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header_paragraph">Resimler, önemli bilgiler veya harika fikirler için özel bir alan. Her zaman senkronize edilir ve sıfır bilgi şifrelemesiyle korunur.</string>
     <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
-    <string name="general_sync_notification_low_battery_title">Düşük pil nedeniyle senkronizasyon duraklatıldı</string>
+    <string name="general_sync_notification_low_battery_title">Düşük şarj nedeniyle senkronizasyon duraklatıldı</string>
     <!-- Text of the notification displayed when Syncs are paused due to low battery conditions -->
     <string name="general_sync_notification_low_battery_text">Devam etmek için güç kaynağına bağlayın</string>
     <!-- Title of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
     <string name="general_sync_notification_lost_wifi_title">Bağlantı kesilmesi nedeniyle senkronizasyon duraklatıldı</string>
     <!-- Text of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_notification_lost_wifi_text">Devam etmek için Wi-Fi\’ye yeniden bağlanın</string>
+    <string name="general_sync_notification_lost_wifi_text">Devam etmek için Wi-Fi’ye yeniden bağlanın</string>
     <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
     <string name="general_sync_notification_generic_error_title">Senkronizasyon durdu</string>
     <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
@@ -955,7 +955,7 @@
     <!--Message to be shown when password is considered weak -->
     <string name="sign_up_password_weak_password_error_message">Şifrenizi tahmin etmek çok kolay. Lütfen daha güçlü bir karakter kombinasyonu deneyin.</string>
     <!--Sign Up page terms and condition content text-->
-    <string name="sign_up_terms_condition_content">[A]MEGA\’nın Hizmet Şartları[/A]\’nı okudum ve kabul ediyorum.</string>
+    <string name="sign_up_terms_condition_content">[A]MEGA’nın Hizmet Şartları[/A]’nı okudum ve kabul ediyorum.</string>
     <!--Sign Up page password hint and suggestion title-->
     <string name="sign_up_password_hint_title_text">Şunları içermesi iyidir:</string>
     <!--Sign Up page password hint to suggest a password with upper case and lower case letter-->
@@ -993,11 +993,11 @@
     <!-- USP Carousel page 2 title-->
     <string name="carousel_page_title_slide_2">Her anı güvende tutun</string>
     <!-- USP Carousel page 2 description-->
-    <string name="carousel_page_description_slide_2">MEGA Bulut\’a otomatik kamera yüklemeleri ve cömert depolama alanı sayesinde değerli bir anınızı asla kaybetmezsiniz</string>
+    <string name="carousel_page_description_slide_2">MEGA Bulut’a otomatik kamera yüklemeleri ve cömert depolama alanı sayesinde değerli bir anınızı asla kaybetmezsiniz</string>
     <!-- USP Carousel page 3 title-->
     <string name="carousel_page_title_slide_3">Verileriniz. Sizin alanınız.</string>
     <!-- USP Carousel page 3 description-->
-    <string name="carousel_page_description_slide_3">Geniş depolama alanı ve dosyalarınızı aktarmanın, paylaşmanın ve düzenlemenin kolay yolları sayesinde, seçtiğiniz her şey için MEGA\’yı güvenle kullanabilirsiniz</string>
+    <string name="carousel_page_description_slide_3">Geniş depolama alanı ve dosyalarınızı aktarmanın, paylaşmanın ve düzenlemenin kolay yolları sayesinde, seçtiğiniz her şey için MEGA’yı güvenle kullanabilirsiniz</string>
     <!-- USP Carousel page 4 title-->
     <string name="carousel_page_title_slide_4">Özel olarak söyleyin</string>
     <!-- USP Carousel page 4 description-->
@@ -1039,7 +1039,7 @@
     <!-- Title of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
     <string name="general_sync_warning_lost_wifi_title">Bağlantı kesilmesi nedeniyle senkronizasyon duraklatıldı</string>
     <!-- Text of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_warning_lost_wifi_text">Devam etmek için Wi-Fi\’ye yeniden bağlanın.</string>
+    <string name="general_sync_warning_lost_wifi_text">Devam etmek için Wi-Fi’ye yeniden bağlanın.</string>
     <!-- Subtitle of link unavailable reasons, shown in folder and file link screen -->
     <string name="general_link_unavailable_subtitle">Bu durum, şu nedenlerden kaynaklanıyor olabilir:</string>
     <!-- Bullet point shown when link is unavailable due to invalid URL -->
@@ -1057,13 +1057,13 @@
     <!-- Description of the dialog explaining the need to verify administrator credentials -->
     <string name="unverified_business_account_dialog_description">Devam etmek için İşletme hesabı yöneticinizin kimlik bilgilerini doğrulamanız gerekir. Hesabınıza bir masaüstü web tarayıcısında giriş yapın ve kimlik bilgisi doğrulamasını tamamlayın.</string>
     <!-- Title shown when a file link is unavailable (general case) -->
-    <string name="file_link_unavailable_title">Erişmeye çalıştığınız dosya bağlantısının süresi doldu</string>
+    <string name="file_link_unavailable_title">Erişmeye çalıştığınız dosya bağlantısı kullanılamıyor</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
     <string name="file_link_unavailable_disabled">Dosya bağlantısı sahibi tarafından devre dışı bırakıldı</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
     <string name="file_link_unavailable_deleted">Dosya silindi</string>
     <!-- Title shown when a file link has expired -->
-    <string name="file_link_expired_title">Erişmeye çalıştığınız dosya bağlantısının süresi doldu</string>
+    <string name="file_link_expired_title">Erişmeye çalıştığınız dosya bağlantısı artık geçerli değil</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
     <string name="folder_link_unavailable_deleted">Klasör silindi</string>
     <!-- Tooltip description for transfer section play action -->
@@ -1107,7 +1107,7 @@
     <!-- Title for MEGA VPN feature -->
     <string name="pro_plan_feature_vpn_title">MEGA&#160;VPN</string>
     <!-- Description for MEGA VPN feature -->
-    <string name="pro_plan_feature_vpn_desc">Hem hızlı hem de kullanımı basit olan yüksek hızlı VPN\’imizle çevrim içi ortamda güvende kalın</string>
+    <string name="pro_plan_feature_vpn_desc">Hem hızlı hem de kullanımı basit olan yüksek hızlı VPN’imizle çevrim içi ortamda güvende kalın</string>
     <!-- Title for MEGA Pass feature -->
     <string name="pro_plan_feature_pass_title">MEGA&#160;Pass</string>
     <!-- Description for MEGA Pass feature -->
@@ -1143,7 +1143,7 @@
     <!-- Maybe later button text in the choose account screen-->
     <string name="choose_account_screen_maybe_later_button_text">Belki daha sonra</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_label_save_up_to">Yıllık faturalandırma ile %16\’ya varan tasarruf edin</string>
+    <string name="account_upgrade_account_label_save_up_to">Yıllık faturalandırma ile %16’ya varan tasarruf edin</string>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
     <string name="choose_account_screen_storage_label">%1$s depolama</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
@@ -1176,9 +1176,9 @@
     <!-- title of the section for start mega pass free trial in achivements section -->
     <string name="title_start_mega_pass_free_trial">MEGA&#160;Pass ücretsiz denemesini başlatın</string>
     <!-- Text of the button for install mega vpn in achivements section -->
-    <string name="button_text_install_mega_vpn">MEGA&#160;VPN\’i yükleyin</string>
+    <string name="button_text_install_mega_vpn">MEGA&#160;VPN’i yükleyin</string>
     <!-- Text of the button for install mega pass in achivements section -->
-    <string name="button_text_install_mega_pass">MEGA&#160;Pass\’i yükleyin</string>
+    <string name="button_text_install_mega_pass">MEGA&#160;Pass’i yükleyin</string>
     <!-- title of how it works for mega vpn free trial in achivements section -->
     <string name="title_how_it_works_free_trial">Nasıl işliyor?</string>
     <!-- text of how it works for mega vpn free trial in achivements section -->
@@ -1190,7 +1190,7 @@
     <!-- text of received mega pass free trial in achivements section -->
     <string name="text_received_mega_pass_free_trial">MEGA&#160;Pass ücretsiz deneme sürümünü başlattığınız için %1$s depolama alanı aldınız</string>
     <!-- Sync change root path title-->
-    <string name="sync_change_root_uri_warning_title">Bazı klasörler senkronize edilemez veya yedeklenemez çünkü MEGA uygulaması, yerel klasörlere erişim izinlerini kaybetti. Her etkilenen klasör için izinleri yeniden eklemek üzere Devam ettir\’e dokunun.</string>
+    <string name="sync_change_root_uri_warning_title">Bazı klasörler senkronize edilemez veya yedeklenemez çünkü MEGA uygulaması, yerel klasörlere erişim izinlerini kaybetti. Her etkilenen klasör için izinleri yeniden eklemek üzere Devam ettir’e dokunun.</string>
     <!-- Title for the free plan card when the user is an existing account -->
     <string name="free_plan_card_existing_title">Ücretsiz planınızla devam edin</string>
     <!-- Button text for existing users to continue with the free plan -->
@@ -1250,7 +1250,7 @@
     <!-- The camera uploads notification title to reminder the camera uploads paused-->
     <string name="camera_uploads_notification_title_paused_warning">Kamera yüklemeleri duraklatıldı</string>
     <!-- The camera uploads notification content to reminder there is no wifi connection-->
-    <string name="camera_uploads_notification_content_no_wifi_connection">WIFI\’ye bağlanın veya mobil veriye izin verin</string>
+    <string name="camera_uploads_notification_content_no_wifi_connection">WIFI’ye bağlanın veya mobil veriye izin verin</string>
     <!-- The camera uploads notification action text to allow mobile data-->
     <string name="camera_uploads_notification_action_allow_mobile_data">Mobil veriye izin ver</string>
     <!-- Alert title before download a big file for preview. -->
@@ -1278,7 +1278,7 @@
     <!--Title of playback position dialog that is displayed when audio has playback position history. -->
     <string name="audio_playback_position_dialog_title">Ses çalmaya devam etsin mi?</string>
     <!--Message of playback position dialog that is displayed when audio has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
-    <string name="audio_playback_position_dialog_message">“%1$s”, %2$s\’den devam edecektir.</string>
+    <string name="audio_playback_position_dialog_message">“%1$s”, %2$s’den devam edecektir.</string>
     <!--Resume of playback position dialog for playing audio from the playback position history. -->
     <string name="audio_playback_position_dialog_resume_button">Devam et</string>
     <!--Resume of playback position dialog for playing audio from beginning. -->
@@ -1352,15 +1352,15 @@
     <!-- Action to show any file in its location -->
     <string name="view_in_folder_label">Klasörde görüntüle</string>
     <!-- Stop Backup confirmation dialog delete explanation -->
-    <string name="sync_stop_backup_confirm_dialog_delete_explanation">Veya klasörü MEGA\’dan silin. Cihazınızdan silinmez. Bu işlem geri alınamaz.</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_explanation">Veya klasörü MEGA’dan silin. Cihazınızdan silinmez. Bu işlem geri alınamaz.</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
     <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Klasörü Bulut depolamaya taşı</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
-    <string name="sync_stop_backup_confirm_dialog_delete_permanently">Klasörü MEGA\’dan sil</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_permanently">Klasörü MEGA’dan sil</string>
     <!-- Title of the Camera Uploads complete banner in Photos -->
     <string name="camera_uploads_banner_complete_title">Kamera yüklemeleri tamamlandı</string>
     <!-- Message of the Camera Uploads no full access warning banner in Photos -->
-    <string name="camera_uploads_banner_no_full_access_message">Tüm anılarınızı kaçırmadığımızdan emin olmak için MEGA\’nın fotoğraf arşivinize tam erişimi olması gerekiyor.</string>
+    <string name="camera_uploads_banner_no_full_access_message">Tüm anılarınızı kaçırmadığımızdan emin olmak için MEGA’nın fotoğraf arşivinize tam erişimi olması gerekiyor.</string>
     <!-- Message of notice that the zip file format is error -->
     <string name="message_zip_format_error">Dosya formatı desteklenmediği için açılamıyor</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
@@ -1390,9 +1390,9 @@
     <!-- Snackbar message when backup is moved to a cloud drive folder -->
     <string name="sync_snackbar_message_confirm_backup_moved">Yedekleme durduruldu. Klasör %1$s konumuna taşındı.</string>
     <!-- Name for a general label which action is "Select or create new folder" -->
-    <string name="sync_snackbar_message_confirm_backup_deleted">Yedekleme durduruldu. Klasör MEGA\’dan silindi.</string>
+    <string name="sync_snackbar_message_confirm_backup_deleted">Yedekleme durduruldu. Klasör MEGA’dan silindi.</string>
     <!-- Explanation text when choose the local file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_local_file_explanation">MEGA\’daki dosyanın yerini [A]%1$s[/A] alacaktır. Mevcut sürüm, Çöp kutunuzdaki SyncDebris klasörüne taşınacaktır.</string>
+    <string name="sync_stalled_issue_choose_local_file_explanation">MEGA’daki dosyanın yerini [A]%1$s[/A] alacaktır. Mevcut sürüm, Çöp kutunuzdaki SyncDebris klasörüne taşınacaktır.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_remote_file_explanation">Yerel dosya [A]%1$s[/A], .debris klasörüne taşınacaktır</string>
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
@@ -1433,7 +1433,7 @@
     <!-- when Choose the local file action is selected , title of the apply to all dialog -->
     <string name="sync_stalled_issue_choose_local_file_title">Yerel dosya mı seçilsin?</string>
     <!-- when Choose the file stored in MEGA action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_remote_file_title">MEGA\’da depolanan dosya mı seçilsin?</string>
+    <string name="sync_stalled_issue_choose_remote_file_title">MEGA’da depolanan dosya mı seçilsin?</string>
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
     <string name="sync_stalled_issue_choose_latest_modified_time_title">Son değiştirilen dosya mı seçilsin?</string>
     <!-- Colored folders onboarding title -->
@@ -1481,8 +1481,8 @@
     </plurals>
     <!-- Warning that appears prior to remove links of files. Plural. -->
     <plurals name="remove_links_warning_text">
-        <item quantity="one">Bu bağlantı artık herkese açık olmayacak.</item>
-        <item quantity="other">Bu bağlantılar artık herkese açık olmayacak.</item>
+        <item quantity="one"></item>
+        <item quantity="other"></item>
     </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
     <string name="context_share_correctly_removed">Paylaşım kaldırıldı</string>
@@ -1569,11 +1569,64 @@
         <item quantity="other">Bu klasörlerden ayrılırsanız bir daha göremezsiniz.</item>
     </plurals>
     <!-- Title of the dialog to choose permissions when sharing. -->
-    <string name="dialog_select_permissions">Paylaşım izinleri</string>
+    <string name="dialog_select_permissions">İzni seçin</string>
     <!-- Refers to access rights for a file folder. -->
     <string name="file_properties_shared_folder_full_access">Tam erişim</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
     <string name="file_properties_shared_folder_read_only">Salt okunur</string>
     <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="file_properties_shared_folder_read_write">Okuma ve yazma</string>
+    <!-- Text shown in the app bar when nodes are being selected in selection mode -->
+    <string name="general_selecting">Seçiliyor</string>
+    <!-- Snackbar message when retry failed on failed transfers tab. -->
+    <string name="transfers_retry_failed_snackbar_message">Aktarımlar yeniden başlatılamıyor</string>
+    <!-- Action for the Snackbar when retry failed on failed transfers tab. -->
+    <string name="transfers_retry_failed_snackbar_action">Yeniden dene</string>
+    <!-- Snackbar message when retry success on failed transfers tab. -->
+    <plurals name="transfers_retry_feedback_snackbar_message">
+        <item quantity="one"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- success message when a node was restore from Rubbish bin -->
+    <string name="context_correctly_node_restored">%s geri yüklendi</string>
+    <!-- success message when moving a node -->
+    <string name="context_correctly_moved">Öğe taşındı</string>
+    <!-- error message when a node was restore from Rubbish bin -->
+    <string name="context_no_restored">Bir hata oluştu. Öğe geri yüklenemedi.</string>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_correctly_restored_from_rubbish">
+        <item quantity="one">%d öğe geri yüklendi</item>
+        <item quantity="other">%d öğe geri yüklendi</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_incorrectly_restored_from_rubbish">
+        <item quantity="one">%d öğe geri yüklenemedi</item>
+        <item quantity="other">%d öğe geri yüklenemedi</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 öğe geri yüklendi ancak %d öğe geri yüklenemedi. Daha sonra tekrar deneyin.</item>
+        <item quantity="other">1 öğe geri yüklendi ancak %d öğe geri yüklenemedi. Daha sonra tekrar deneyin.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
+        <item quantity="one">%d öğe geri yüklendi ancak 1 öğe geri yüklenemedi. Daha sonra tekrar deneyin.</item>
+        <item quantity="other">%d öğe geri yüklendi ancak 1 öğe geri yüklenemedi. Daha sonra tekrar deneyin.</item>
+    </plurals>
+    <!-- category in sort by action to sort by name -->
+    <string name="action_sort_by_name">İsim</string>
+    <!-- category in sort by action to sort by file size -->
+    <string name="action_sort_by_size">Boyut</string>
+    <!-- category in sort by action to sort by modified date -->
+    <string name="action_sort_by_modified">Değiştirme</string>
+    <!-- category in sort by action to sort by created date -->
+    <string name="action_sort_by_created">Created</string>
+    <!-- category in sort by action to sort by node label name -->
+    <string name="action_sort_by_label">İşaret</string>
+    <!-- category in sort by action to sort by favorite -->
+    <string name="action_sort_by_favorite">Favorite</string>
+    <!-- category in sort by action to sort by link creation date -->
+    <string name="action_sort_by_link">Bağlantı</string>
+    <!-- Header of action to sort nodes -->
+    <string name="action_sort_by_header">Sırala</string>
 </resources>

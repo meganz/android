@@ -1121,13 +1121,13 @@
     <!-- Description of the dialog explaining the need to verify administrator credentials -->
     <string name="unverified_business_account_dialog_description">تحتاج إلى التحقق من بيانات اعتماد مسؤول حساب الأعمال Business الخاص بك للمتابعة. قم بتسجيل الدخول إلى حسابك في متصفح ويب سطح المكتب وأكمل التحقق من بيانات الاعتماد.</string>
     <!-- Title shown when a file link is unavailable (general case) -->
-    <string name="file_link_unavailable_title">لم يعد رابط الملف الذي تحاول الوصول إليه متاحًا</string>
+    <string name="file_link_unavailable_title">رابط الملف الذي تحاول الوصول إليه غير متاح</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
     <string name="file_link_unavailable_disabled">تم تعطيل رابط الملف من قبل المالك</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
     <string name="file_link_unavailable_deleted">تم حذف الملف</string>
     <!-- Title shown when a file link has expired -->
-    <string name="file_link_expired_title">رابط الملف الذي تحاول الوصول إليه غير متاح</string>
+    <string name="file_link_expired_title">لم يعد رابط الملف الذي تحاول الوصول إليه متاحًا</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
     <string name="folder_link_unavailable_deleted">تم حذف المجلد</string>
     <!-- Tooltip description for transfer section play action -->
@@ -1470,7 +1470,7 @@
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_last_modified_file_explanation">سيحل الملف الذي تم تحديثه مؤخرًا محل الملف الأقدم في كلا الموقعين</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict</string>
+    <string name="sync_stalled_issue_general_explanation">سيتم تطبيق هذا الإجراء لحل التعارض</string>
     <!-- Dialog choose option -->
     <string name="general_dialog_choose_button">اختر</string>
     <!-- Text label of Apply to all -->
@@ -1523,17 +1523,21 @@
     <!--Sign Up page text field input last name error message when character limit exceeded-->
     <string name="sign_up_last_name_text_field_char_limit_exceed_error">لا يمكن أن يتجاوز الاسم الأخير 40 محرفًا</string>
     <!-- Error message when IP has already sent an issue report and needs to wait -->
-    <string name="report_issue_too_many_times_error">You’ve already sent an issue report within the last 10 minutes. Please wait before trying again, or contact %1$s for assistance.</string>
+    <string name="report_issue_too_many_times_error">لقد قمت بالفعل بإرسال تقرير المشكلة خلال آخر 10 دقائق. يرجى الانتظار قبل المحاولة مرة أخرى أو التواصل مع %1$s للحصول على المساعدة.</string>
     <!-- The snackbar message for informing the user about the invitation is trying to sent, is already in the received contact requests because the user already invited them. -->
-    <string name="contacts_invite_already_received">This user has already sent you an invitation</string>
+    <string name="contacts_invite_already_received">لقد أرسل لك هذا المستخدم دعوة بالفعل</string>
     <!-- The snackbar message for informing the user about the invitations is trying to sent, are already in the received contact requests because the users already invited them. -->
-    <string name="contacts_invites_already_received">All the people you invited have already sent you an invitation</string>
+    <string name="contacts_invites_already_received">جميع الأشخاص الذين دعوتهم أرسلوا لك دعوة بالفعل</string>
     <!-- The snackbar message for informing the user about the invitations are correctly sent. -->
-    <string name="contacts_invites_sent">Invitation sent. They’ll appear in Contacts once accepted.</string>
+    <string name="contacts_invites_sent">تم إرسال الدعوة. وستظهر في جهات الاتصال بمجرد قبولها.</string>
     <!-- The snackbar message for informing the user about some invitations correctly sent, but not others because they are already in the received contact requests because the users already invited them. -->
     <plurals name="contacts_invites_sent_but_others_already_received">
-        <item quantity="one">%1$d user invited, but one or more users have already invited you</item>
-        <item quantity="other">%1$d users invited, but one or more users have already invited you</item>
+        <item quantity="zero">تمت دعوة %1$d مستخدم ولكن قام مستخدم واحد أو أكثر قاموا بدعوتك بالفعل</item>
+        <item quantity="one">تمت دعوة %1$d مستخدم ولكن قام مستخدم واحد أو أكثر قاموا بدعوتك بالفعل</item>
+        <item quantity="two">تمت دعوة %1$d مستخدمين ولكن قام مستخدم واحد أو أكثر قاموا بدعوتك بالفعل</item>
+        <item quantity="few">تمت دعوة %1$d مستخدمين ولكن قام مستخدم واحد أو أكثر قاموا بدعوتك بالفعل</item>
+        <item quantity="many">تمت دعوة %1$d مستخدم ولكن قام مستخدم واحد أو أكثر قاموا بدعوتك بالفعل</item>
+        <item quantity="other">تمت دعوة %1$d مستخدم ولكن قام مستخدم واحد أو أكثر قاموا بدعوتك بالفعل</item>
     </plurals>
     <!--  Error shown when the user tries to resend the sign up link multiple times at once. -->
     <string name="resend_signup_link_error">تم إرسال البريد الإلكتروني بالفعل. يرجى الانتظار بضع دقائق قبل المحاولة مرة أخرى.</string>
@@ -1561,12 +1565,12 @@
     </plurals>
     <!-- Warning that appears prior to remove links of files. Plural. -->
     <plurals name="remove_links_warning_text">
-        <item quantity="zero">لن يكون هذا الرابط متاحاً كمشاركة عامة بعد الآن.</item>
-        <item quantity="one">لن يكون هذا الرابط متاحاً كمشاركة عامة بعد الآن.</item>
-        <item quantity="two">لن تكون هذه الروابط متاحة كمشاركة عامة بعد الآن.</item>
-        <item quantity="few">لن تكون هذه الروابط متاحة كمشاركة عامة بعد الآن.</item>
-        <item quantity="many">لن تكون هذه الروابط متاحة كمشاركة عامة بعد الآن.</item>
-        <item quantity="other">لن تكون هذه الروابط متاحة كمشاركة عامة بعد الآن.</item>
+        <item quantity="zero"></item>
+        <item quantity="one"></item>
+        <item quantity="two"></item>
+        <item quantity="few"></item>
+        <item quantity="many"></item>
+        <item quantity="other"></item>
     </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
     <string name="context_share_correctly_removed">تم حذف المشاركة</string>
@@ -1585,8 +1589,12 @@
     </plurals>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
-        <item quantity="one">This folder is shared with %1$d contact. Stop sharing?</item>
-        <item quantity="other">This folder is shared with %1$d contacts. Stop sharing?</item>
+        <item quantity="zero">تمت مشاركة هذا المجلد مع %1$d جهة الاتصال. إيقاف المشاركة؟</item>
+        <item quantity="one">تمت مشاركة هذا المجلد مع %1$d جهة الاتصال. إيقاف المشاركة؟</item>
+        <item quantity="two">تمت مشاركة هذا المجلد مع %1$d جهتي الاتصال. إيقاف المشاركة؟</item>
+        <item quantity="few">تمت مشاركة هذا المجلد مع %1$d جهات الاتصال. إيقاف المشاركة؟</item>
+        <item quantity="many">تمت مشاركة هذا المجلد مع %1$d جهة الاتصال. إيقاف المشاركة؟</item>
+        <item quantity="other">تمت مشاركة هذا المجلد مع %1$d جهة الاتصال. إيقاف المشاركة؟</item>
     </plurals>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
     <plurals name="alert_remove_several_shares">
@@ -1598,33 +1606,33 @@
         <item quantity="other"></item>
     </plurals>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
-    <string name="figures_storage_referrals_achievements_text">%1$s extra storage for each invitation, valid for %2$d days</string>
+    <string name="figures_storage_referrals_achievements_text">%1$s مساحة تخزين إضافية لكل دعوة، صالحة لـمدة %2$d أيام</string>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with permanent valid duration -->
-    <string name="figures_storage_referrals_achievements_text_permanent">%1$s extra storage for each invitation, valid permanently</string>
+    <string name="figures_storage_referrals_achievements_text_permanent">%1$s مساحة تخزين إضافية لكل دعوة، صالحة بشكل دائم</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement with dynamic valid duration -->
-    <string name="figures_storage_achievements_text">%1$s extra storage, valid for %2$d days</string>
+    <string name="figures_storage_achievements_text">%1$s مساحة تخزين إضافية، صالحة لمدة %2$d أيام</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement with permanent valid duration -->
-    <string name="figures_storage_achievements_text_permanent">%1$s extra storage, valid permanently</string>
+    <string name="figures_storage_achievements_text_permanent">%1$s مساحة تخزين إضافية، صالحة بشكل دائم</string>
     <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with dynamic valid duration -->
-    <string name="figures_storage_achievements_awarded_text">%1$s storage bonus applied, valid for %2$d days</string>
+    <string name="figures_storage_achievements_awarded_text">تم تطبيق مكافأة %1$s مساحة تخزين، صالحة لمدة %2$d أيام</string>
     <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with permanent valid duration -->
-    <string name="figures_storage_achievements_awarded_text_permanent">%1$s storage bonus applied, valid permanently</string>
+    <string name="figures_storage_achievements_awarded_text_permanent">تم تطبيق مكافأة %1$s مساحة تخزين، صالحة بشكل دائم</string>
     <!-- info paragraph about the achievement install megasync with dynamic valid duration -->
-    <string name="paragraph_info_achievement_install_desktop_dynamic_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid for %2$s days. The desktop app is available for Windows, macOS and Linux.</string>
+    <string name="paragraph_info_achievement_install_desktop_dynamic_duration">قم بتثبيت تطبيق ميغا MEGA للحاسوب المكتبي واحصل على %1$s من مساحة التخزين الإضافية المجانية، صالحة لمدة %2$s أيام. تطبيق الحاسوب المكتبي متاح لأنظمة التشغيل ويندوز Windows و ماك او إس macOS و لينكس Linux.</string>
     <!-- info paragraph about the achievement install megasync with permanent valid duration -->
-    <string name="paragraph_info_achievement_install_desktop_permanent_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid permanently. The desktop app is available for Windows, macOS and Linux.</string>
+    <string name="paragraph_info_achievement_install_desktop_permanent_duration">قم بتثبيت تطبيق ميغا MEGA للحاسوب المكتبي واحصل على %1$s من مساحة التخزين الإضافية المجانية، صالحة بشكل دائم. تطبيق الحاسوب المكتبي متاح لأنظمة التشغيل ويندوز Windows و ماك او إس macOS و لينكس Linux.</string>
     <!-- info paragraph about the achievement install mobile app with dynamic valid duration -->
-    <string name="paragraph_info_achievement_install_mobile_app_dynamic_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid for %2$s days. The mobile apps are available for iOS and Android.</string>
+    <string name="paragraph_info_achievement_install_mobile_app_dynamic_duration">قم بتثبيت أحد تطبيقات ميغا MEGA للأجهزة المحمولة واحصل على %1$s من مساحة التخزين الإضافية المجانية، صالحة لمدة %2$s أيام. تطبيقات الهاتف المحمول متاحة لنظامي التشغيل أي أو إس iOS و اندرويد Android.</string>
     <!-- info paragraph about the achievement install mobile app with permanent valid duration -->
-    <string name="paragraph_info_achievement_install_mobile_app_permanent_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid permanently. The mobile apps are available for iOS and Android.</string>
+    <string name="paragraph_info_achievement_install_mobile_app_permanent_duration">قم بتثبيت أحد تطبيقات ميغا MEGA للأجهزة المحمولة واحصل على %1$s من مساحة التخزين الإضافية المجانية صالحة بشكل دائم. تطبيقات الهاتف المحمول متاحة لنظامي التشغيل أي أو إس iOS و اندرويد Android..</string>
     <!-- Share multi backup folders, show below warning message -->
-    <string name="backup_multi_share_permission_text">These are backup folders and can only be shared as read-only</string>
+    <string name="backup_multi_share_permission_text">هذه مجلدات احتياطية ولا يمكن مشاركتها إلا للقراءة فقط</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_share_permission_text">This is a backup folder and can only be shared as read-only</string>
+    <string name="backup_share_permission_text">هذا مجلد نسخ احتياطي ولا يمكن مشاركته إلا للقراءة فقط</string>
     <!-- Button to confirm the action of restarting one transfer-->
     <string name="button_permission_info">إغلاق</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_share_permission_title">Backup folders are read-only</string>
+    <string name="backup_share_permission_title">مجلدات النسخ الاحتياطي للقراءة فقط</string>
     <!-- dialog option continue in alert dialog -->
     <string name="button_continue">استمرار</string>
     <!--Dialog title when the user selected is not on the contact list when sharing a node -->
@@ -1632,7 +1640,7 @@
     <!--Dialog description when the user selected is not on the contact list when sharing a node -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">لا يمكنك التحقق من %s لأنه ليس في قائمة جهات الاتصال الخاصة بك. انتظر حتى يقبل دعوتك أولاً.</string>
     <!-- Answer for confirmation dialog. -->
-    <string name="general_ok">موافق</string>
+    <string name="general_ok">إغلاق</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="general_leave">غادر</string>
     <!-- Success message when left shared folders -->
@@ -1681,11 +1689,76 @@
         <item quantity="other">إذا غادرت هذه المجلدات، فلن تتمكن من رؤيتهم مرة أخرى.</item>
     </plurals>
     <!-- Title of the dialog to choose permissions when sharing. -->
-    <string name="dialog_select_permissions">أذونات المشاركة</string>
+    <string name="dialog_select_permissions">اختر الأذونات</string>
     <!-- Refers to access rights for a file folder. -->
     <string name="file_properties_shared_folder_full_access">وصول كامل</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
     <string name="file_properties_shared_folder_read_only">للقراءة فقط</string>
     <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="file_properties_shared_folder_read_write">قراءة وكتابة</string>
+    <!-- Text shown in the app bar when nodes are being selected in selection mode -->
+    <string name="general_selecting">الاختيار</string>
+    <!-- Snackbar message when retry failed on failed transfers tab. -->
+    <string name="transfers_retry_failed_snackbar_message">غير قادر على إعادة تشغيل عمليات التراسل</string>
+    <!-- Action for the Snackbar when retry failed on failed transfers tab. -->
+    <string name="transfers_retry_failed_snackbar_action">اعادة المحاولة</string>
+    <!-- Snackbar message when retry success on failed transfers tab. -->
+    <plurals name="transfers_retry_feedback_snackbar_message">
+        <item quantity="zero"></item>
+        <item quantity="one"></item>
+        <item quantity="two"></item>
+        <item quantity="few"></item>
+        <item quantity="many"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- success message when a node was restore from Rubbish bin -->
+    <string name="context_correctly_node_restored">تم الاسترجاع الى %s</string>
+    <!-- success message when moving a node -->
+    <string name="context_correctly_moved">تم نقل العنصر</string>
+    <!-- error message when a node was restore from Rubbish bin -->
+    <string name="context_no_restored">حدث خطأ. لم تتم استعادة العنصر.</string>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_correctly_restored_from_rubbish">
+        <item quantity="zero">تمت استعادة %d عنصر</item>
+        <item quantity="one">تمت استعادة %d عنصر</item>
+        <item quantity="two">تمت استعادة %d عنصرين</item>
+        <item quantity="few">تمت استعادة %d عناصر</item>
+        <item quantity="many">تمت استعادة %d عنصراً</item>
+        <item quantity="other">تمت استعادة %d عنصر</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_incorrectly_restored_from_rubbish">
+        <item quantity="zero">لم تتم استعادة %d عنصر</item>
+        <item quantity="one">لم تتم استعادة %d عنصر</item>
+        <item quantity="two">لم تتم استعادة %d عنصرين</item>
+        <item quantity="few">لم تتم استعادة %d عناصر</item>
+        <item quantity="many">لم تتم استعادة %d عنصراً</item>
+        <item quantity="other">لم تتم استعادة %d عنصر</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 item restored but %d item wasn’t restored. Try again later.</item>
+        <item quantity="other">1 item restored but %d items weren’t restored. Try again later.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
+        <item quantity="one">%d item restored but 1 item wasn’t restored. Try again later.</item>
+        <item quantity="other">%d items restored but 1 item wasn’t restored. Try again later.</item>
+    </plurals>
+    <!-- category in sort by action to sort by name -->
+    <string name="action_sort_by_name">الاسم</string>
+    <!-- category in sort by action to sort by file size -->
+    <string name="action_sort_by_size">الحجم</string>
+    <!-- category in sort by action to sort by modified date -->
+    <string name="action_sort_by_modified">عُدِّل</string>
+    <!-- category in sort by action to sort by created date -->
+    <string name="action_sort_by_created">أنشئ</string>
+    <!-- category in sort by action to sort by node label name -->
+    <string name="action_sort_by_label">صنف</string>
+    <!-- category in sort by action to sort by favorite -->
+    <string name="action_sort_by_favorite">Favorite</string>
+    <!-- category in sort by action to sort by link creation date -->
+    <string name="action_sort_by_link">رابط</string>
+    <!-- Header of action to sort nodes -->
+    <string name="action_sort_by_header">ترتيب حسب</string>
 </resources>

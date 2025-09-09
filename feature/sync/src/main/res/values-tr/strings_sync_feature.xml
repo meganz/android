@@ -7,9 +7,9 @@
     <!-- Sync text of sync-->
     <string name="sync">Sync</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">MEGA\’nın yerel klasörünüzü senkronize edebilmesi için cihazınızın depolama alanına erişmesi gerekiyor. Erişime izin vermek için buraya dokunun.</string>
+    <string name="sync_storage_permission_banner">MEGA’nın yerel klasörünüzü senkronize edebilmesi için cihazınızın depolama alanına erişmesi gerekiyor. Erişime izin vermek için buraya dokunun.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
-    <string name="sync_battery_optimisation_banner">Dosyalarınızı ve klasörlerinizi sürekli senkronize etmek için MEGA\’nın arka planda çalışmasına izin verin</string>
+    <string name="sync_battery_optimisation_banner">Dosyalarınızı ve klasörlerinizi sürekli senkronize etmek için MEGA’nın arka planda çalışmasına izin verin</string>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_files_with_parameter">
         <item quantity="one">%d dosya</item>
@@ -41,7 +41,7 @@
     <!-- Sync to resolve conflict Choose local file -->
     <string name="sync_stalled_issue_choose_local_file">Yerel dosyayı seç</string>
     <!-- Sync to resolve conflict Choose remote file -->
-    <string name="sync_stalled_issue_choose_remote_file">MEGA\’da depolanan dosyayı seç</string>
+    <string name="sync_stalled_issue_choose_remote_file">MEGA’da depolanan dosyayı seç</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
     <string name="sync_stalled_issue_choose_latest_modified_time">Son değiştirilen dosyayı seç</string>
     <!-- Sync dialog continue button -->
@@ -49,7 +49,7 @@
     <!-- Sync dialog not now button -->
     <string name="sync_dialog_file_permission_negative_button">Şimdi değil</string>
     <!-- Sync dialog title for battery optimization -->
-    <string name="sync_dialog_battery_optimization_title">Pil optimizasyonu</string>
+    <string name="sync_dialog_battery_optimization_title">Şarj optimizasyonu</string>
     <!-- Sync dialog cancel button text -->
     <string name="sync_dialog_battery_optimization_negative_button">İzin verme</string>
     <!-- Sync dialog allow button text -->
@@ -135,17 +135,17 @@
     <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
     <string name="sync_stalled_issue_folder_matched_against_file_detail">Senkronize etmeye çalıştığınız dosyanın uzantısı yok ve mevcut bir klasörle aynı ada sahip</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync detailed description-->
-    <string name="sync_stalled_issue_local_and_remote_change_last_sync_detail">Bu dosya, son senkronizasyondan bu yana hem MEGA\’da hem de yerel olarak değiştirildi.</string>
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync_detail">Bu dosya, son senkronizasyondan bu yana hem MEGA’da hem de yerel olarak değiştirildi.</string>
     <!-- Sync stalled issue reason is Local and remote not synced detailed description-->
     <string name="sync_stalled_issue_local_and_remote_not_synced_detail">Bu dosyanın çakışan kopyaları var</string>
     <!-- Sync stalled issue reason is Name clash detailed description-->
     <string name="sync_stalled_issue_name_clash_detail">Senkronizasyonunuzun bir tarafında aynı ada sahip birden fazla öğe var ve bunların tümü senkronizasyonunuzun diğer tarafında aynı tek öğe haline gelecek</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_mega">MEGA\’da bir taşıma veya yeniden adlandırma eylemi algılandı, ancak yerel olarak çoğaltılamadı.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_mega">MEGA’da bir taşıma veya yeniden adlandırma eylemi algılandı, ancak yerel olarak çoğaltılamadı.</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_local">Yerel olarak bir taşıma veya yeniden adlandırma eylemi algılandı, ancak MEGA\’da çoğaltılamadı.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_local">Yerel olarak bir taşıma veya yeniden adlandırma eylemi algılandı, ancak MEGA’da çoğaltılamadı.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Dosyanın taşınıp taşınmadığını veya silinip silinmediğini belirlemek için taramanın bitmesi bekleniyor.</string>
     <!-- Sync change root path title-->
-    <string name="sync_change_root_uri_warning_title">Bazı klasörler senkronize edilemez veya yedeklenemez çünkü MEGA uygulaması, yerel klasörlere erişim izinlerini kaybetti. Her etkilenen klasör için izinleri yeniden eklemek üzere Devam ettir\’e dokunun.</string>
+    <string name="sync_change_root_uri_warning_title">Bazı klasörler senkronize edilemez veya yedeklenemez çünkü MEGA uygulaması, yerel klasörlere erişim izinlerini kaybetti. Her etkilenen klasör için izinleri yeniden eklemek üzere Devam ettir’e dokunun.</string>
 </resources>
