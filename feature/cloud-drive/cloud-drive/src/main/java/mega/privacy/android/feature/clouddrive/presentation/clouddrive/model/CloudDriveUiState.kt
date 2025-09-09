@@ -48,7 +48,7 @@ data class CloudDriveUiState(
     val documentScanningError: DocumentScanningError? = null,
     val isSelecting: Boolean = false,
     val hasMediaItems: Boolean = false,
-    val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default
+    val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
 ) {
 
     /**
@@ -98,10 +98,16 @@ data class CloudDriveUiState(
     val isEmpty = visibleItemsCount == 0 && !isLoading
 
     /**
+     * Returns a list of selected nodes.
+     */
+    val selectedNodes: List<TypedNode>
+        get() = items.mapNotNull { if (it.isSelected) it.node else null }
+
+    /**
      * Returns a list of selected node ids.
      */
     val selectedNodeIds: List<NodeId>
-        get() = items.mapNotNull { if (it.isSelected) it.node.id else null }
+        get() = selectedNodes.map { it.id }
 }
 
 /**

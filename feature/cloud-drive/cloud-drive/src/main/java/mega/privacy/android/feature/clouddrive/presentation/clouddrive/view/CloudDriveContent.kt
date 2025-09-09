@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -40,6 +41,7 @@ import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.NewFolderNodeDialog
@@ -56,7 +58,6 @@ import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottom
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
@@ -96,9 +97,9 @@ internal fun CloudDriveContent(
     contentPadding: PaddingValues = PaddingValues(0.dp, 0.dp),
     listState: LazyListState = rememberLazyListState(),
     gridState: LazyGridState = rememberLazyGridState(),
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
+    nodeActionHandler: NodeActionHandler = rememberNodeActionHandler(nodeOptionsActionViewModel),
 ) {
-    val nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel()
-    val actionHandler = rememberNodeActionHandler(nodeOptionsActionViewModel)
     var showNewFolderDialog by remember { mutableStateOf(false) }
     var showNewTextFileDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
@@ -213,6 +214,20 @@ internal fun CloudDriveContent(
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
+
+    // Reset selection mode after handling move, copy, delete action
+    LaunchedEffect(nodeActionState.infoToShowEvent) {
+        if (nodeActionState.infoToShowEvent is StateEventWithContentTriggered) {
+            onAction(CloudDriveAction.DeselectAllItems)
+        }
+    }
+
+    // Reset selection mode after handling name collision
+    LaunchedEffect(nodeActionState.nodeNameCollisionsResult) {
+        if (nodeActionState.nodeNameCollisionsResult is StateEventWithContentTriggered) {
+            onAction(CloudDriveAction.DeselectAllItems)
+        }
+    }
 
     EventEffect(
         event = nodeActionState.renameNodeRequestEvent,
@@ -409,7 +424,7 @@ internal fun CloudDriveContent(
                 nodeId = nodeId.longValue,
                 nodeSourceType = NodeSourceType.CLOUD_DRIVE,
                 onTransfer = onTransfer,
-                actionHandler = actionHandler,
+                actionHandler = nodeActionHandler,
                 nodeOptionsActionViewModel = nodeOptionsActionViewModel,
             )
         }

@@ -2,7 +2,9 @@ package mega.privacy.android.feature.clouddrive.presentation.clouddrive
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -10,12 +12,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
+import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
+import mega.privacy.android.core.nodecomponents.sheet.nodeactions.NodeActionUiOption
+import mega.privacy.android.core.nodecomponents.sheet.nodeactions.NodeMoreOptionsBottomSheet
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.model.CloudDriveAppBarAction
@@ -25,6 +33,7 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.Clou
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.original.core.ui.model.TopAppBarActionWithClick
+import timber.log.Timber
 
 /**
  * Cloud Drive Screen, used to display contents of a folder
@@ -50,10 +59,26 @@ fun CloudDriveScreen(
     var showUploadOptionsBottomSheet by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val megaNavigator = rememberMegaNavigator()
+    var showMoreBottomSheet by remember { mutableStateOf(false) }
+    val moreOptionsBottomSheetState = rememberModalBottomSheetState()
+    val nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel()
+    val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
+    val nodeActionHandler = rememberNodeActionHandler(nodeOptionsActionViewModel)
 
     BackHandler(enabled = uiState.isInSelectionMode) {
         viewModel.processAction(DeselectAllItems)
     }
+
+    LaunchedEffect(uiState.items) {
+        nodeOptionsActionViewModel.updateSelectedNodes(uiState.selectedNodes)
+        Timber.d("Selected nodes: ${nodeOptionsActionViewModel.uiState.value.selectedNodes}")
+    }
+
+    EventEffect(
+        event = nodeOptionsActionUiState.downloadEvent,
+        onConsumed = nodeOptionsActionViewModel::markDownloadEventConsumed,
+        action = onTransfer
+    )
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         topBar = {
@@ -99,8 +124,12 @@ fun CloudDriveScreen(
             NodeSelectionModeBottomBar(
                 count = uiState.selectedItemsCount,
                 visible = uiState.isInSelectionMode,
-                onActionPressed = {
-                    // TODO
+                onActionPressed = { action ->
+                    when (action) {
+                        is NodeSelectionAction.More -> {
+                            showMoreBottomSheet = true
+                        }
+                    }
                 }
             )
         },
@@ -123,7 +152,9 @@ fun CloudDriveScreen(
                 onTransfer = onTransfer,
                 onCreatedNewFolder = onCreatedNewFolder,
                 onRenameNode = onRenameNode,
-                onSortNodes = viewModel::setCloudSortOrder
+                onSortNodes = viewModel::setCloudSortOrder,
+                nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+                nodeActionHandler = nodeActionHandler
             )
         }
     )
@@ -132,4 +163,18 @@ fun CloudDriveScreen(
         cloudDriveUiState = uiState,
         cloudDriveViewModel = viewModel,
     )
+
+    if (showMoreBottomSheet) {
+        NodeMoreOptionsBottomSheet(
+            options = NodeActionUiOption.defaults,
+            sheetState = moreOptionsBottomSheetState,
+            onDismissRequest = {
+                showMoreBottomSheet = false
+            },
+            onOptionSelected = { option ->
+                // Todo
+                showMoreBottomSheet = false
+            }
+        )
+    }
 }
