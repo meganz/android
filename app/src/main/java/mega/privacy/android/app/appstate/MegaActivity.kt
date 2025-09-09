@@ -2,9 +2,9 @@ package mega.privacy.android.app.appstate
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,7 +47,7 @@ import mega.privacy.android.navigation.contract.AppDialogDestinations
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MegaActivity : ComponentActivity() {
+class MegaActivity : AppCompatActivity() {
 
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory

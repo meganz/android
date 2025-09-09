@@ -49,6 +49,7 @@ import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
+import mega.privacy.android.navigation.destination.CloudDrive
 import timber.log.Timber
 import javax.inject.Inject
 

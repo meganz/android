@@ -12,6 +12,7 @@ import timber.log.Timber.Forest.e
 fun MediaDiscoveryFragment.actionSaveToDevice() {
     lifecycleScope.launch {
         val selectedNodes = mediaDiscoveryViewModel.getSelectedNodes()
+        // TODO
         managerActivity?.saveNodesToDevice(
             selectedNodes,
             highPriority = false,
@@ -29,9 +30,9 @@ fun MediaDiscoveryFragment.actionShareLink() {
     try {
         selectedPhotosIds.let {
             if (it.size == 1) {
-                LinksUtil.showGetLinkActivity(managerActivity, it[0])
+                LinksUtil.showGetLinkActivity(requireActivity(), it[0])
             } else {
-                LinksUtil.showGetLinkActivity(managerActivity, it.toLongArray())
+                LinksUtil.showGetLinkActivity(requireActivity(), it.toLongArray())
             }
         }
     } catch (e: Exception) {
@@ -42,6 +43,7 @@ fun MediaDiscoveryFragment.actionShareLink() {
 fun MediaDiscoveryFragment.actionSendToChat() {
     lifecycleScope.launch {
         val selectedNodes = mediaDiscoveryViewModel.getSelectedNodes()
+        // TODO
         managerActivity?.attachNodesToChats(selectedNodes)
     }
 }
@@ -49,7 +51,7 @@ fun MediaDiscoveryFragment.actionSendToChat() {
 fun MediaDiscoveryFragment.actionShareOut() {
     lifecycleScope.launch {
         val selectedNodes = mediaDiscoveryViewModel.getSelectedNodes()
-        managerActivity?.let { MegaNodeUtil.shareNodes(it, selectedNodes) }
+        MegaNodeUtil.shareNodes(requireActivity(), selectedNodes)
     }
 }
 
@@ -67,7 +69,8 @@ fun MediaDiscoveryFragment.actionMove() {
     val selectedPhotosIds = arrayListOf<Long>().apply {
         addAll(mediaDiscoveryViewModel.getSelectedIds())
     }
-    NodeController(managerActivity).chooseLocationToMoveNodes(selectedPhotosIds)
+    // TODO
+    NodeController(requireActivity()).chooseLocationToMoveNodes(selectedPhotosIds)
 }
 
 
@@ -75,7 +78,8 @@ fun MediaDiscoveryFragment.actionCopy() {
     val selectedPhotosIds = arrayListOf<Long>().apply {
         addAll(mediaDiscoveryViewModel.getSelectedIds())
     }
-    NodeController(managerActivity).chooseLocationToCopyNodes(selectedPhotosIds)
+    // TODO
+    NodeController(requireActivity()).chooseLocationToCopyNodes(selectedPhotosIds)
 }
 
 
@@ -84,7 +88,7 @@ fun MediaDiscoveryFragment.actionMoveToTrash() {
         addAll(mediaDiscoveryViewModel.getSelectedIds())
     }
     if (selectedPhotosIds.isNotEmpty()) {
-        managerActivity?.supportFragmentManager?.let {
+        requireActivity().supportFragmentManager.let {
             ConfirmMoveToRubbishBinDialogFragment.newInstance(selectedPhotosIds)
                 .show(
                     it,

@@ -2,13 +2,11 @@ package mega.privacy.android.feature.clouddrive.navigation
 
 import androidx.navigation.NavGraphBuilder
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialog
-import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheet
-import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDrive
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.cloudDriveScreen
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.destination.CloudDrive
 
 class CloudDriveFeatureDestination : FeatureDestination {
     override val navigationGraph: NavGraphBuilder.(NavigationHandler, TransferHandler) -> Unit =

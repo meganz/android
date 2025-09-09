@@ -13,15 +13,22 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -45,11 +52,19 @@ import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
@@ -89,6 +104,16 @@ class MediaDiscoveryFragment : Fragment() {
             ::handleAddToAlbumResult,
         )
 
+    private val currentFolderName: String by lazy {
+        arguments?.getString(INTENT_KEY_CURRENT_FOLDER_NAME, "") ?: ""
+    }
+
+    private val isNewDesign: Boolean by lazy {
+        arguments?.getBoolean(IS_NEW_DESIGN, false) ?: false
+    }
+    private val nodeOptionsActionViewModel: NodeOptionsActionViewModel by viewModels()
+    var navigationHandler: NavigationHandler? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         managerActivity = activity as? ManagerActivity
@@ -96,6 +121,7 @@ class MediaDiscoveryFragment : Fragment() {
             MediaDiscoveryActionModeCallback(this)
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -108,14 +134,31 @@ class MediaDiscoveryFragment : Fragment() {
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by mediaDiscoveryViewModel.state.collectAsStateWithLifecycle()
 
+                val actionHandler: NodeActionHandler =
+                    rememberNodeActionHandler(nodeOptionsActionViewModel)
+                var visibleNodeOptionId by remember { mutableStateOf<NodeId?>(null) }
+                val nodeOptionSheetState =
+                    rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
                 OriginalTheme(isDark = mode.isDarkMode()) {
-                    Box(
+                    MegaScaffold(
                         modifier = Modifier
                             .background(MaterialTheme.colors.background)
                             .clickable(
                                 enabled = false,
                                 onClick = {}
-                            )
+                            ),
+                        topBar = {
+                            if (isNewDesign) {
+                                MegaAppBar(
+                                    modifier = Modifier,
+                                    appBarType = AppBarType.BACK_NAVIGATION,
+                                    title = currentFolderName,
+                                    elevation = 0.dp,
+                                    windowInsets = WindowInsets(0.dp),
+                                )
+                            }
+                        }
                     ) {
                         MediaDiscoveryView(
                             mediaDiscoveryGlobalStateViewModel = mediaDiscoveryGlobalStateViewModel,
@@ -282,7 +325,7 @@ class MediaDiscoveryFragment : Fragment() {
     private fun enterActionMode() {
         actionMode = managerActivity?.startSupportActionMode(
             actionModeCallback
-        )
+        ) ?: (activity as? AppCompatActivity)?.startSupportActionMode(actionModeCallback)
         managerActivity?.showHideBottomNavigationView(true)
         managerActivity?.hideAdsView()
     }
@@ -433,6 +476,8 @@ class MediaDiscoveryFragment : Fragment() {
     companion object {
         internal const val INTENT_KEY_CURRENT_FOLDER_ID = "CURRENT_FOLDER_ID"
         private const val INTENT_KEY_IS_ACCESSED_BY_ICON_CLICK = "IS_ACCESSED_BY_ICON_CLICK"
+        const val IS_NEW_DESIGN = "IS_NEW_DESIGN"
+        const val INTENT_KEY_CURRENT_FOLDER_NAME = "CURRENT_FOLDER_NAME"
 
         /**
          * The message to be displayed in the error banner

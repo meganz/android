@@ -59,10 +59,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
 import mega.privacy.android.app.presentation.clouddrive.ui.StorageOverQuotaBanner
@@ -83,6 +85,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
+import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -435,7 +438,7 @@ private fun MDView(
     onTimeBarTabSelected: (TimeBarTab) -> Unit,
     onSwitchListView: () -> Unit,
     addFabButton: @Composable () -> Unit,
-    photoDownloaderViewModel: PhotoDownloaderViewModel = viewModel(),
+    photoDownloaderViewModel: PhotoDownloaderViewModel = hiltViewModel(),
     showSettingDialog: Boolean = false,
 ) {
     val lazyGridState = rememberSaveable(
@@ -584,10 +587,10 @@ private fun ListViewIconButton(
             .size(16.dp),
         onClick = onSwitchListView,
     ) {
-        Icon(
+        MegaIcon(
             painter = rememberVectorPainter(IconPack.Small.Thin.Outline.ListSmall),
             contentDescription = "",
-            tint = MaterialTheme.colors.textColorSecondary
+            tint = IconColor.Secondary
         )
     }
 }
