@@ -55,10 +55,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.original.core.ui.controls.appbar.ProvideDefaultMegaAppBarColors
 import mega.privacy.android.shared.original.core.ui.controls.menus.MenuActions
-import mega.android.core.ui.model.menu.MenuAction
 
 
 /**
@@ -208,13 +208,14 @@ fun ExpandedSearchAppBar(
     hintId: Int,
     onSearchTextChange: (String) -> Unit,
     onCloseClicked: () -> Unit,
-    onSearchClicked: (String) -> Unit = {},
     elevation: Boolean,
     modifier: Modifier = Modifier,
+    onSearchClicked: (String) -> Unit = {},
     isHideAfterSearch: Boolean = false,
     windowInsets: WindowInsets = WindowInsets.statusBars,
     overwriteText: Boolean = false,
     transparentBackground: Boolean = false,
+    shouldAutoFocus: Boolean = true,
 ) {
     var textFieldValue by remember(text.takeIf { overwriteText } ?: Unit) {
         mutableStateOf(
@@ -312,7 +313,7 @@ fun ExpandedSearchAppBar(
         )
 
         SideEffect {
-            if (initialLaunch.value || keyboardVisibleInPreviousConfiguration) {
+            if (shouldAutoFocus && (initialLaunch.value || keyboardVisibleInPreviousConfiguration)) {
                 initialLaunch.value = false
                 focusRequester.requestFocus()
             }

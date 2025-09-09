@@ -4,18 +4,19 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import mega.android.core.ui.model.menu.MenuActionWithClick
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.app.R
-import mega.privacy.android.app.R.string
-import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowMenuAction.SettingOptionsMenuAction
-import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowMenuAction.SettingTutorialMenuAction
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.view.ToolbarMenuItem
 import mega.privacy.android.app.presentation.node.view.toolbar.NodeToolbarViewModel
@@ -23,14 +24,10 @@ import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetRoute
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.legacy.core.ui.controls.appbar.CollapsedSearchAppBar
 import mega.privacy.android.legacy.core.ui.controls.appbar.ExpandedSearchAppBar
-import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.appbar.SelectModeAppBar
-import mega.android.core.ui.model.menu.MenuActionWithClick
-import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
@@ -97,6 +94,13 @@ private fun SearchToolbarBody(
     nodeSourceType: NodeSourceType,
 ) {
     val scope = rememberCoroutineScope()
+    var enteredSelectionMode by remember { mutableStateOf(false) }
+    LaunchedEffect(selectedNodes.isEmpty()) {
+        if (selectedNodes.isNotEmpty()) {
+            enteredSelectionMode = true
+        }
+    }
+
     if (selectedNodes.isNotEmpty()) {
         val actions = menuActions.map {
             MenuActionWithClick(
@@ -147,7 +151,8 @@ private fun SearchToolbarBody(
                 onCloseClicked = { onBackPressed() },
                 elevation = false,
                 isHideAfterSearch = true,
-                transparentBackground = true
+                transparentBackground = true,
+                shouldAutoFocus = !enteredSelectionMode
             )
         }
     }
