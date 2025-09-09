@@ -5,6 +5,7 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.domain.entity.node.NodeId
@@ -47,6 +48,7 @@ data class CloudDriveUiState(
     val documentScanningError: DocumentScanningError? = null,
     val isSelecting: Boolean = false,
     val hasMediaItems: Boolean = false,
+    val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default
 ) {
 
     /**

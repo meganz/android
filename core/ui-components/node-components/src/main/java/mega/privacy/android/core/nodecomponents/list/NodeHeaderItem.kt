@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
@@ -19,6 +20,8 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.icon.pack.IconPack
 
 
@@ -39,7 +42,7 @@ fun NodeHeaderItem(
     onSortOrderClick: () -> Unit,
     onChangeViewTypeClick: () -> Unit,
     onEnterMediaDiscoveryClick: () -> Unit,
-    sortOrder: String,
+    sortConfiguration: NodeSortConfiguration,
     isListView: Boolean,
     showSortOrder: Boolean,
     showChangeViewType: Boolean,
@@ -61,12 +64,16 @@ fun NodeHeaderItem(
                 MegaText(
                     style = AppTheme.typography.titleSmall,
                     textColor = TextColor.Secondary,
-                    text = sortOrder,
+                    text = stringResource(sortConfiguration.sortOption.displayName),
                     modifier = Modifier.testTag(SORT_ORDER_TAG)
                 )
                 Spacer(modifier = Modifier.size(DSTokens.spacings.s2))
                 MegaIcon(
-                    imageVector = IconPack.Small.Thin.Outline.ArrowDown,
+                    imageVector = if (sortConfiguration.sortDirection == SortDirection.Ascending) {
+                        IconPack.Small.Thin.Outline.ArrowUp
+                    } else {
+                        IconPack.Small.Thin.Outline.ArrowDown
+                    },
                     tint = IconColor.Secondary,
                     contentDescription = "DropDown arrow",
                     modifier = Modifier
@@ -133,7 +140,7 @@ private fun NodeHeaderItemListPreview() {
             onSortOrderClick = {},
             onEnterMediaDiscoveryClick = {},
             isListView = true,
-            sortOrder = "Name",
+            sortConfiguration = NodeSortConfiguration.default,
             showSortOrder = true,
             showChangeViewType = true,
             showMediaDiscoveryButton = false
@@ -151,7 +158,7 @@ private fun NodeHeaderItemGridPreview() {
             onSortOrderClick = {},
             onEnterMediaDiscoveryClick = {},
             isListView = false,
-            sortOrder = "Name",
+            sortConfiguration = NodeSortConfiguration.default,
             showSortOrder = true,
             showChangeViewType = true,
             showMediaDiscoveryButton = true

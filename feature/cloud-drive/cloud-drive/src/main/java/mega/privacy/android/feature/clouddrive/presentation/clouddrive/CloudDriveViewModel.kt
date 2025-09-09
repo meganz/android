@@ -18,7 +18,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
@@ -30,9 +32,11 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeNameByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
+import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
@@ -64,6 +68,9 @@ class CloudDriveViewModel @Inject constructor(
     private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
     private val getNodesByIdInChunkUseCase: GetNodesByIdInChunkUseCase,
     private val containsMediaItemUseCase: ContainsMediaItemUseCase,
+    private val getCloudSortOrderUseCase: GetCloudSortOrder,
+    private val setCloudSortOrderUseCase: SetCloudSortOrder,
+    private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -86,6 +93,7 @@ class CloudDriveViewModel @Inject constructor(
         viewModelScope.launch { updateTitle() }
         setupNodesLoading()
         monitorNodeUpdates()
+        getCloudSortOrder()
     }
 
     /**
@@ -164,6 +172,35 @@ class CloudDriveViewModel @Inject constructor(
                 _uiState.update { state ->
                     state.copy(isHiddenNodeSettingsLoading = false)
                 }
+            }
+        }
+    }
+
+    private fun getCloudSortOrder(refresh: Boolean = false) {
+        viewModelScope.launch {
+            runCatching {
+                getCloudSortOrderUseCase()
+            }.onSuccess { sortOrder ->
+                val sortOrderPair = nodeSortConfigurationUiMapper(sortOrder)
+                _uiState.update { it.copy(selectedSortConfiguration = sortOrderPair) }
+                if (refresh) {
+                    refreshNodes()
+                }
+            }.onFailure {
+                Timber.e(it, "Failed to get cloud sort order")
+            }
+        }
+    }
+
+    internal fun setCloudSortOrder(sortConfiguration: NodeSortConfiguration) {
+        viewModelScope.launch {
+            runCatching {
+                val order = nodeSortConfigurationUiMapper(sortConfiguration)
+                setCloudSortOrderUseCase(order)
+            }.onFailure {
+                Timber.e(it, "Failed to set cloud sort order")
+            }.onSuccess {
+                getCloudSortOrder(refresh = true)
             }
         }
     }

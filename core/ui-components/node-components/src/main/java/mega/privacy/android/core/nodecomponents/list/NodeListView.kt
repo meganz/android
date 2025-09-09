@@ -14,7 +14,9 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.nodecomponents.list.previewdata.FolderNodePreviewDataProvider
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 
@@ -45,7 +47,7 @@ fun <T : TypedNode> NodeListView(
     onItemClicked: (NodeUiItem<T>) -> Unit,
     onLongClick: (NodeUiItem<T>) -> Unit,
     onEnterMediaDiscoveryClick: () -> Unit,
-    sortOrder: String,
+    sortConfiguration: NodeSortConfiguration,
     onSortOrderClick: () -> Unit,
     onChangeViewTypeClick: () -> Unit,
     showSortOrder: Boolean,
@@ -74,7 +76,7 @@ fun <T : TypedNode> NodeListView(
                     onSortOrderClick = onSortOrderClick,
                     onChangeViewTypeClick = onChangeViewTypeClick,
                     onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
-                    sortOrder = sortOrder,
+                    sortConfiguration = sortConfiguration,
                     isListView = true,
                     showSortOrder = showSortOrder,
                     showChangeViewType = showChangeViewType,
@@ -114,7 +116,7 @@ private fun NodeListViewPreview(
             onItemClicked = {},
             onLongClick = {},
             onEnterMediaDiscoveryClick = {},
-            sortOrder = "",
+            sortConfiguration = NodeSortConfiguration.default,
             onSortOrderClick = {},
             onChangeViewTypeClick = {},
             showSortOrder = true,

@@ -18,22 +18,29 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNodeNameByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
+import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
@@ -54,6 +61,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
@@ -78,6 +86,9 @@ class CloudDriveViewModelTest {
     private val scannerHandler: ScannerHandler = mock()
     private val getRootNodeIdUseCase: GetRootNodeIdUseCase = mock()
     private val containsMediaItemUseCase: ContainsMediaItemUseCase = mock()
+    private val getCloudSortOrderUseCase: GetCloudSortOrder = mock()
+    private val setCloudSortOrderUseCase: SetCloudSortOrder = mock()
+    private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = mock()
     private val folderNodeHandle = 123L
     private val folderNodeId = NodeId(folderNodeHandle)
 
@@ -106,7 +117,11 @@ class CloudDriveViewModelTest {
             monitorNodeUpdatesByIdUseCase,
             nodeUiItemMapper,
             scannerHandler,
-            getRootNodeIdUseCase
+            getRootNodeIdUseCase,
+            containsMediaItemUseCase,
+            getCloudSortOrderUseCase,
+            setCloudSortOrderUseCase,
+            nodeSortConfigurationUiMapper
         )
     }
 
@@ -125,12 +140,17 @@ class CloudDriveViewModelTest {
         getRootNodeIdUseCase = getRootNodeIdUseCase,
         getNodesByIdInChunkUseCase = getNodesByIdInChunkUseCase,
         containsMediaItemUseCase = containsMediaItemUseCase,
+        getCloudSortOrderUseCase = getCloudSortOrderUseCase,
+        setCloudSortOrderUseCase = setCloudSortOrderUseCase,
+        nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
         savedStateHandle = SavedStateHandle.Companion.invoke(
             route = CloudDrive(nodeHandle)
         ),
     )
 
     private suspend fun setupTestData(items: List<TypedNode>) {
+        whenever(getCloudSortOrderUseCase()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+        whenever(nodeSortConfigurationUiMapper(any<SortOrder>())).thenReturn(NodeSortConfiguration.default)
         whenever(getNodeNameByIdUseCase(eq(folderNodeId))).thenReturn("Test folder")
         whenever(getFileBrowserNodeChildrenUseCase(folderNodeHandle)).thenReturn(items)
 
@@ -170,6 +190,8 @@ class CloudDriveViewModelTest {
     }
 
     private suspend fun setupTestDataWithPartialLoad(items: List<TypedNode>) {
+        whenever(getCloudSortOrderUseCase()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+        whenever(nodeSortConfigurationUiMapper(any<SortOrder>())).thenReturn(NodeSortConfiguration.default)
         whenever(getNodeNameByIdUseCase(eq(folderNodeId))).thenReturn("Test folder")
         whenever(getFileBrowserNodeChildrenUseCase(folderNodeHandle)).thenReturn(items)
 
@@ -2074,4 +2096,44 @@ class CloudDriveViewModelTest {
                 assertThat(loadedState.hasMediaItems).isFalse()
             }
         }
+
+    @Test
+    fun `test that getCloudSortOrder updates selectedSort in UI state on success`() = runTest {
+        setupTestData(emptyList())
+        val expectedSortOrder = SortOrder.ORDER_DEFAULT_ASC
+        val expectedSortConfiguration = NodeSortConfiguration.default
+
+        whenever(getCloudSortOrderUseCase()).thenReturn(expectedSortOrder)
+        whenever(nodeSortConfigurationUiMapper(expectedSortOrder)).thenReturn(expectedSortConfiguration)
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().selectedSortConfiguration).isEqualTo(expectedSortConfiguration)
+        }
+    }
+
+    @Test
+    fun `test that setCloudSortOrder calls use case and refetches sort order`() = runTest {
+        setupTestData(emptyList())
+        val sortConfiguration =
+            NodeSortConfiguration(NodeSortOption.Size, SortDirection.Ascending)
+        val expectedSortOrder = SortOrder.ORDER_SIZE_ASC
+
+        whenever(nodeSortConfigurationUiMapper(sortConfiguration)).thenReturn(expectedSortOrder)
+        whenever(getCloudSortOrderUseCase()).thenReturn(expectedSortOrder)
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.setCloudSortOrder(sortConfiguration)
+        advanceUntilIdle()
+
+        // Verify that getCloudSortOrderUseCase was called at least twice:
+        // 1. During initialization
+        // 2. After setting the sort order (refetch)
+        verify(getCloudSortOrderUseCase, times(2)).invoke()
+        verify(setCloudSortOrderUseCase).invoke(expectedSortOrder)
+    }
 } 

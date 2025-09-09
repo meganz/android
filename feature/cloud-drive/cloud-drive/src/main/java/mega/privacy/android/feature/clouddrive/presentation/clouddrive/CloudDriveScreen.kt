@@ -123,6 +123,7 @@ fun CloudDriveScreen(
                 onTransfer = onTransfer,
                 onCreatedNewFolder = onCreatedNewFolder,
                 onRenameNode = onRenameNode,
+                onSortNodes = viewModel::setCloudSortOrder
             )
         }
     )

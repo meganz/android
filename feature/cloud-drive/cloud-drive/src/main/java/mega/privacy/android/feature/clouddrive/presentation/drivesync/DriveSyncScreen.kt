@@ -161,6 +161,7 @@ internal fun DriveSyncScreen(
                             showUploadOptionsBottomSheet = false
                         },
                         onRenameNode = onRenameNode,
+                        onSortNodes = cloudDriveViewModel::setCloudSortOrder
                     )
                 }
                 addTextTab(

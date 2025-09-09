@@ -1,5 +1,6 @@
 package mega.privacy.android.core.nodecomponents.sheet.sort
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetState
@@ -14,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.FlexibleLineListItem
@@ -24,31 +26,21 @@ import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.IconColor
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.resources.R as sharedR
 
 internal const val SORT_BOTTOM_SHEET_TITLE_TAG = "sort_bottom_sheet:title"
 
 /**
  * Interface for sort option items that can be used in the SortBottomSheet.
  *
- * @property key Unique identifier for the sort option
  * @property displayName Human-readable name to display in the UI
  */
 interface SortOptionItem {
-    val key: String
-    val displayName: String
+    @get:StringRes
+    val displayName: Int
     val testTag: String
-}
-
-/**
- * Represents the sort order direction.
- */
-enum class SortOrder {
-    /** Sort in ascending order (A-Z, 1-9, oldest to newest) */
-    Ascending,
-
-    /** Sort in descending order (Z-A, 9-1, newest to oldest) */
-    Descending
 }
 
 /**
@@ -56,11 +48,11 @@ enum class SortOrder {
  *
  * @param T The type of sort option item
  * @property sortOptionItem The selected sort option
- * @property sortOrder The selected sort order (ascending or descending)
+ * @property sortDirection The selected sort direction (ascending or descending)
  */
 data class SortBottomSheetResult<T : SortOptionItem>(
     val sortOptionItem: T,
-    val sortOrder: SortOrder,
+    val sortDirection: SortDirection,
 )
 
 /**
@@ -117,19 +109,19 @@ fun <T : SortOptionItem> SortBottomSheet(
             FlexibleLineListItem(
                 modifier = Modifier
                     .testTag(option.testTag),
-                title = option.displayName,
+                title = stringResource(option.displayName),
                 trailingElement = {
                     if (isSelected) {
                         MegaIcon(
                             modifier = Modifier.size(24.dp),
                             painter = rememberVectorPainter(
-                                if (currentSort?.sortOrder == SortOrder.Ascending) {
+                                if (currentSort?.sortDirection == SortDirection.Ascending) {
                                     IconPack.Small.Thin.Outline.ArrowUp
                                 } else {
                                     IconPack.Small.Thin.Outline.ArrowDown
                                 }
                             ),
-                            contentDescription = currentSort?.sortOrder?.name,
+                            contentDescription = currentSort?.sortDirection?.name,
                             tint = IconColor.Secondary,
                         )
                     }
@@ -153,7 +145,7 @@ fun <T : SortOptionItem> SortBottomSheet(
  * Extension function to create a SortBottomSheetResult from a SortOptionItem with default ascending order.
  */
 private fun <T : SortOptionItem> T.toSortResult(): SortBottomSheetResult<T> =
-    SortBottomSheetResult(this, SortOrder.Ascending)
+    SortBottomSheetResult(this, SortDirection.Ascending)
 
 /**
  * Extension function to toggle the sort order of an existing SortBottomSheetResult.
@@ -161,23 +153,18 @@ private fun <T : SortOptionItem> T.toSortResult(): SortBottomSheetResult<T> =
 private fun <T : SortOptionItem> SortBottomSheetResult<T>.toggleOrder(): SortBottomSheetResult<T> =
     SortBottomSheetResult(
         sortOptionItem,
-        if (sortOrder == SortOrder.Ascending) SortOrder.Descending else SortOrder.Ascending
+        if (sortDirection == SortDirection.Ascending) SortDirection.Descending else SortDirection.Ascending
     )
 
 // For preview purposes, we define a simple enum class for sort options.
 private enum class PreviewSortOption(
-    override val key: String,
-    override val displayName: String,
-    override val testTag: String = "sort_option:$key",
+    override val displayName: Int,
+    override val testTag: String = "sort_option:$displayName",
 ) : SortOptionItem {
-    Name("name", "Name"),
-    Date("date", "Date"),
-    Size("size", "Size"),
-    Type("type", "Type"),
-    Modified("modified", "Modified"),
-    Created("created", "Created"),
-    Favourite("favourite", "Favourite"),
-    Custom("custom", "Custom")
+    Name(sharedR.string.action_sort_by_name),
+    Date(sharedR.string.action_sort_by_created),
+    Size(sharedR.string.action_sort_by_size),
+    Label(sharedR.string.action_sort_by_label),
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -198,7 +185,7 @@ private fun SortBottomSheetPreview() {
         }
 
         SortBottomSheet(
-            title = "Sort by (${selectedSort?.sortOptionItem?.displayName ?: "-"}, ${selectedSort?.sortOrder ?: "-"})",
+            title = "Sort by (${selectedSort?.sortOptionItem?.displayName ?: "-"}, ${selectedSort?.sortOptionItem ?: "-"})",
             options = PreviewSortOption.entries,
             sheetState = sheetState,
             selectedSort = selectedSort,

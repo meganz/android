@@ -10,6 +10,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -19,14 +21,15 @@ class SortBottomSheetViewTest {
     @get:Rule
     var composeRule = createComposeRule()
 
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+
     private enum class FakeSortOption(
-        override val key: String,
-        override val displayName: String,
-        override val testTag: String = "sort_option:$key"
+        override val displayName: Int,
+        override val testTag: String = "sort_option:$displayName",
     ) : SortOptionItem {
-        Name("name", "Name"),
-        Date("date", "Date"),
-        Size("size", "Size"),
+        Name(sharedR.string.action_sort_by_name),
+        Date(sharedR.string.action_sort_by_created),
+        Size(sharedR.string.action_sort_by_size),
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -74,7 +77,8 @@ class SortBottomSheetViewTest {
         setContent(options = options)
 
         options.forEach { option ->
-            composeRule.onNodeWithText(option.displayName)
+            composeRule
+                .onNodeWithText(context.getString(option.displayName))
                 .assertIsDisplayed()
         }
     }

@@ -27,6 +27,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -46,11 +47,16 @@ import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeD
 import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetRoute
+import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
+import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
@@ -68,6 +74,7 @@ import mega.privacy.android.navigation.camera.CameraArg
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,6 +90,7 @@ internal fun CloudDriveContent(
     onCreatedNewFolder: (NodeId) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     onRenameNode: (NodeId) -> Unit,
+    onSortNodes: (NodeSortConfiguration) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp, 0.dp),
     listState: LazyListState = rememberLazyListState(),
@@ -202,6 +210,8 @@ internal fun CloudDriveContent(
     var shouldShowSkeleton by remember { mutableStateOf(false) }
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
+    val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
 
     EventEffect(
         event = nodeActionState.renameNodeRequestEvent,
@@ -251,9 +261,9 @@ internal fun CloudDriveContent(
             onMenuClicked = { visibleNodeOptionId = it.id },
             onItemClicked = { onAction(ItemClicked(it)) },
             onLongClicked = { onAction(ItemLongClicked(it)) },
-            sortOrder = "Name", // TODO: Replace with actual sort order from state
+            sortConfiguration = uiState.selectedSortConfiguration,
             isListView = isListView,
-            onSortOrderClick = {}, // TODO: Handle sort order click
+            onSortOrderClick = { showSortBottomSheet = true },
             onChangeViewTypeClicked = { onAction(ChangeViewTypeClicked) },
             showMediaDiscoveryButton = uiState.hasMediaItems && !uiState.isCloudDriveRoot,
             onEnterMediaDiscoveryClick = {
@@ -401,5 +411,28 @@ internal fun CloudDriveContent(
                 nodeOptionsActionViewModel = nodeOptionsActionViewModel,
             )
         }
+    }
+
+    if (showSortBottomSheet) {
+        SortBottomSheet(
+            title = stringResource(sharedR.string.action_sort_by_header),
+            options = NodeSortOption.entries,
+            sheetState = sortBottomSheetState,
+            selectedSort = SortBottomSheetResult(
+                sortOptionItem = uiState.selectedSortConfiguration.sortOption,
+                sortDirection = uiState.selectedSortConfiguration.sortDirection
+            ),
+            onSortOptionSelected = { result ->
+                result?.let {
+                    onSortNodes(
+                        NodeSortConfiguration(
+                            sortOption = it.sortOptionItem,
+                            sortDirection = it.sortDirection
+                        )
+                    )
+                    showSortBottomSheet = false
+                }
+            },
+        )
     }
 }

@@ -1482,7 +1482,7 @@
     <!-- Warning that appears prior to remove links of files. Plural. -->
     <plurals name="remove_links_warning_text">
         <item quantity="one">This link will not be publicly available anymore.</item>
-        <item quantity="other">These links will not be publicly available anymore.</item>
+        <item quantity="other">These links will not be publicly available anymore</item>
     </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
     <string name="context_share_correctly_removed">Share removed</string>
@@ -1613,4 +1613,20 @@
         <item quantity="one">%d item restored but the other one not restored. Try again later.</item>
         <item quantity="other">%d items restored but 1 item not restored. Try again later.</item>
     </plurals>
+    <!-- category in sort by action to sort by name -->
+    <string name="action_sort_by_name">Name</string>
+    <!-- category in sort by action to sort by file size -->
+    <string name="action_sort_by_size">Size</string>
+    <!-- category in sort by action to sort by modified date -->
+    <string name="action_sort_by_modified">Modified</string>
+    <!-- category in sort by action to sort by created date -->
+    <string name="action_sort_by_created">Created</string>
+    <!-- category in sort by action to sort by node label name -->
+    <string name="action_sort_by_label">Label</string>
+    <!-- category in sort by action to sort by favorite -->
+    <string name="action_sort_by_favorite">Favorite</string>
+    <!-- category in sort by action to sort by link creation date -->
+    <string name="action_sort_by_link">Link</string>
+    <!-- Header of action to sort nodes -->
+    <string name="action_sort_by_header">Sort by</string>
 </resources>

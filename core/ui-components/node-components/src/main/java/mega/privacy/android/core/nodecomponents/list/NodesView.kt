@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import mega.android.core.ui.theme.devicetype.DeviceType
 import mega.android.core.ui.theme.devicetype.LocalDeviceType
 import mega.privacy.android.core.nodecomponents.dialog.TakeDownDialog
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -31,7 +32,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @param onMenuClicked three dots click
  * @param onItemClicked callback for item click
  * @param onLongClicked callback for long item click
- * @param sortOrder the sort order of the list
+ * @param sortConfiguration the sort order of the list
  * @param isListView whether the current view is list view
  * @param onSortOrderClick callback for sort order click
  * @param onChangeViewTypeClicked callback for change view type click
@@ -55,7 +56,7 @@ fun <T : TypedNode> NodesView(
     onMenuClicked: (NodeUiItem<T>) -> Unit,
     onItemClicked: (NodeUiItem<T>) -> Unit,
     onLongClicked: (NodeUiItem<T>) -> Unit,
-    sortOrder: String,
+    sortConfiguration: NodeSortConfiguration,
     isListView: Boolean,
     onSortOrderClick: () -> Unit,
     onChangeViewTypeClicked: () -> Unit,
@@ -110,7 +111,7 @@ fun <T : TypedNode> NodesView(
             },
             onLongClick = onLongClicked,
             onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
-            sortOrder = sortOrder,
+            sortConfiguration = sortConfiguration,
             highlightText = highlightText,
             onSortOrderClick = onSortOrderClick,
             onChangeViewTypeClick = onChangeViewTypeClicked,
@@ -138,7 +139,7 @@ fun <T : TypedNode> NodesView(
             onLongClicked = onLongClicked,
             onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
             spanCount = spanCount,
-            sortOrder = sortOrder,
+            sortConfiguration = sortConfiguration,
             onSortOrderClick = onSortOrderClick,
             onChangeViewTypeClick = onChangeViewTypeClicked,
             showSortOrder = showSortOrder,

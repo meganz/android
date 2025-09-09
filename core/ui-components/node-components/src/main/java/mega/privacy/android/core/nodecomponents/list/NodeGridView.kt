@@ -14,7 +14,9 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
 import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedNode
 
 /**
@@ -44,7 +46,7 @@ fun <T : TypedNode> NodeGridView(
     onItemClicked: (NodeUiItem<T>) -> Unit,
     onLongClicked: (NodeUiItem<T>) -> Unit,
     onEnterMediaDiscoveryClick: () -> Unit,
-    sortOrder: String,
+    sortConfiguration: NodeSortConfiguration,
     onSortOrderClick: () -> Unit,
     onChangeViewTypeClick: () -> Unit,
     showSortOrder: Boolean,
@@ -79,7 +81,7 @@ fun <T : TypedNode> NodeGridView(
                     onSortOrderClick = onSortOrderClick,
                     onChangeViewTypeClick = onChangeViewTypeClick,
                     onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
-                    sortOrder = sortOrder,
+                    sortConfiguration = sortConfiguration,
                     isListView = false,
                     showSortOrder = showSortOrder,
                     showChangeViewType = showChangeViewType,

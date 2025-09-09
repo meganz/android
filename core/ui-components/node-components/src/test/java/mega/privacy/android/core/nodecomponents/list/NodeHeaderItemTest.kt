@@ -7,6 +7,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,9 +22,11 @@ class NodeHeaderItemTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+
     @Test
     fun `test that sort order section is displayed when showSortOrder is true`() {
-        val sortOrder = "Name"
+        val sortConfiguration = NodeSortConfiguration.default
         val onSortOrderClick = mock<() -> Unit>()
 
         composeTestRule.setContent {
@@ -30,7 +34,7 @@ class NodeHeaderItemTest {
                 onSortOrderClick = onSortOrderClick,
                 onChangeViewTypeClick = {},
                 onEnterMediaDiscoveryClick = {},
-                sortOrder = sortOrder,
+                sortConfiguration = sortConfiguration,
                 isListView = true,
                 showSortOrder = true,
                 showChangeViewType = false,
@@ -38,19 +42,21 @@ class NodeHeaderItemTest {
             )
         }
 
-        composeTestRule.onNodeWithText(sortOrder).assertIsDisplayed()
+        composeTestRule.onNodeWithText(
+            context.getString(sortConfiguration.sortOption.displayName)
+        ).assertIsDisplayed()
     }
 
     @Test
     fun `test that sort order section is not displayed when showSortOrder is false`() {
-        val sortOrder = "Name"
+        val sortConfiguration = NodeSortConfiguration.default
 
         composeTestRule.setContent {
             NodeHeaderItem(
                 onSortOrderClick = {},
                 onChangeViewTypeClick = {},
                 onEnterMediaDiscoveryClick = {},
-                sortOrder = sortOrder,
+                sortConfiguration = sortConfiguration,
                 isListView = true,
                 showSortOrder = false,
                 showChangeViewType = false,
@@ -58,7 +64,9 @@ class NodeHeaderItemTest {
             )
         }
 
-        composeTestRule.onNodeWithText(sortOrder).assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(
+            context.getString(sortConfiguration.sortOption.displayName)
+        ).assertIsNotDisplayed()
     }
 
     @Test
@@ -70,7 +78,7 @@ class NodeHeaderItemTest {
                 onSortOrderClick = onSortOrderClick,
                 onChangeViewTypeClick = {},
                 onEnterMediaDiscoveryClick = {},
-                sortOrder = "Name",
+                sortConfiguration = NodeSortConfiguration.default,
                 isListView = true,
                 showSortOrder = true,
                 showChangeViewType = false,
@@ -91,7 +99,7 @@ class NodeHeaderItemTest {
                 onSortOrderClick = {},
                 onChangeViewTypeClick = onChangeViewTypeClick,
                 onEnterMediaDiscoveryClick = {},
-                sortOrder = "Name",
+                sortConfiguration = NodeSortConfiguration.default,
                 isListView = true,
                 showSortOrder = false,
                 showChangeViewType = true,
@@ -110,7 +118,7 @@ class NodeHeaderItemTest {
                 onSortOrderClick = {},
                 onChangeViewTypeClick = {},
                 onEnterMediaDiscoveryClick = {},
-                sortOrder = "Name",
+                sortConfiguration = NodeSortConfiguration.default,
                 isListView = true,
                 showSortOrder = false,
                 showChangeViewType = false,
@@ -131,7 +139,7 @@ class NodeHeaderItemTest {
                 onSortOrderClick = {},
                 onChangeViewTypeClick = onChangeViewTypeClick,
                 onEnterMediaDiscoveryClick = {},
-                sortOrder = "Name",
+                sortConfiguration = NodeSortConfiguration.default,
                 isListView = true,
                 showSortOrder = false,
                 showChangeViewType = true,
@@ -152,7 +160,7 @@ class NodeHeaderItemTest {
                 onSortOrderClick = {},
                 onChangeViewTypeClick = {},
                 onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
-                sortOrder = "Name",
+                sortConfiguration = NodeSortConfiguration.default,
                 isListView = true,
                 showSortOrder = false,
                 showChangeViewType = false,
@@ -170,7 +178,7 @@ class NodeHeaderItemTest {
                 onSortOrderClick = {},
                 onChangeViewTypeClick = {},
                 onEnterMediaDiscoveryClick = {},
-                sortOrder = "Name",
+                sortConfiguration = NodeSortConfiguration.default,
                 isListView = true,
                 showSortOrder = false,
                 showChangeViewType = false,
@@ -190,7 +198,7 @@ class NodeHeaderItemTest {
                 onSortOrderClick = {},
                 onChangeViewTypeClick = {},
                 onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
-                sortOrder = "Name",
+                sortConfiguration = NodeSortConfiguration.default,
                 isListView = true,
                 showSortOrder = false,
                 showChangeViewType = false,
@@ -213,7 +221,7 @@ class NodeHeaderItemTest {
                 onSortOrderClick = onSortOrderClick,
                 onChangeViewTypeClick = onChangeViewTypeClick,
                 onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
-                sortOrder = "Name",
+                sortConfiguration = NodeSortConfiguration.default,
                 isListView = true,
                 showSortOrder = true,
                 showChangeViewType = true,
@@ -233,7 +241,7 @@ class NodeHeaderItemTest {
                 onSortOrderClick = {},
                 onChangeViewTypeClick = {},
                 onEnterMediaDiscoveryClick = {},
-                sortOrder = "Name",
+                sortConfiguration = NodeSortConfiguration.default,
                 isListView = true,
                 showSortOrder = false,
                 showChangeViewType = false,
@@ -254,7 +262,7 @@ class NodeHeaderItemTest {
                 onSortOrderClick = {},
                 onChangeViewTypeClick = {},
                 onEnterMediaDiscoveryClick = {},
-                sortOrder = "Name",
+                sortConfiguration = NodeSortConfiguration.default,
                 isListView = true,
                 showSortOrder = true,
                 showChangeViewType = false,
@@ -272,7 +280,7 @@ class NodeHeaderItemTest {
                 onSortOrderClick = {},
                 onChangeViewTypeClick = {},
                 onEnterMediaDiscoveryClick = {},
-                sortOrder = "Name",
+                sortConfiguration = NodeSortConfiguration.default,
                 isListView = true,
                 showSortOrder = false,
                 showChangeViewType = false,
@@ -294,7 +302,7 @@ class NodeHeaderItemTest {
                 onSortOrderClick = onSortOrderClick,
                 onChangeViewTypeClick = onChangeViewTypeClick,
                 onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
-                sortOrder = "Name",
+                sortConfiguration = NodeSortConfiguration.default,
                 isListView = true,
                 showSortOrder = false,
                 showChangeViewType = false,
@@ -309,26 +317,6 @@ class NodeHeaderItemTest {
     }
 
     @Test
-    fun `test that different sort order text is displayed correctly`() {
-        val sortOrder = "Date Modified"
-
-        composeTestRule.setContent {
-            NodeHeaderItem(
-                onSortOrderClick = {},
-                onChangeViewTypeClick = {},
-                onEnterMediaDiscoveryClick = {},
-                sortOrder = sortOrder,
-                isListView = true,
-                showSortOrder = true,
-                showChangeViewType = false,
-                showMediaDiscoveryButton = false
-            )
-        }
-
-        composeTestRule.onNodeWithText(sortOrder).assertIsDisplayed()
-    }
-
-    @Test
     fun `test that list view toggle is displayed when showChangeViewType is true and isListView is false`() {
         val onChangeViewTypeClick = mock<() -> Unit>()
 
@@ -337,7 +325,7 @@ class NodeHeaderItemTest {
                 onSortOrderClick = {},
                 onChangeViewTypeClick = onChangeViewTypeClick,
                 onEnterMediaDiscoveryClick = {},
-                sortOrder = "Name",
+                sortConfiguration = NodeSortConfiguration.default,
                 isListView = false,
                 showSortOrder = false,
                 showChangeViewType = true,
@@ -358,7 +346,7 @@ class NodeHeaderItemTest {
                 onSortOrderClick = {},
                 onChangeViewTypeClick = onChangeViewTypeClick,
                 onEnterMediaDiscoveryClick = {},
-                sortOrder = "Name",
+                sortConfiguration = NodeSortConfiguration.default,
                 isListView = false,
                 showSortOrder = false,
                 showChangeViewType = true,
