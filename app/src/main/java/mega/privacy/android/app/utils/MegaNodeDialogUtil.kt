@@ -57,6 +57,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import java.util.Locale
+import mega.privacy.android.shared.resources.R as sharedResR
 
 object MegaNodeDialogUtil {
     private const val TYPE_RENAME = 0
@@ -646,7 +647,7 @@ object MegaNodeDialogUtil {
                                 } else {
                                     snackbarShower.showSnackbar(
                                         activity.getString(
-                                            if (megaError.errorCode == MegaError.API_OK) R.string.context_correctly_moved
+                                            if (megaError.errorCode == MegaError.API_OK) sharedResR.string.context_correctly_moved
                                             else R.string.context_no_moved
                                         )
                                     )

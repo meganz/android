@@ -41,6 +41,7 @@ import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * ViewModel for business logic regarding the toolbar.
@@ -233,7 +234,7 @@ class MediaPlayerViewModel @Inject constructor(
                 result.moveRequestResult?.let {
                     if (it.isSuccess) {
                         _itemToRemove.value = nodeHandle
-                        snackbarMessage.value = R.string.context_correctly_moved
+                        snackbarMessage.value = sharedResR.string.context_correctly_moved
                     } else {
                         snackbarMessage.value = R.string.context_no_moved
                     }

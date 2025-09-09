@@ -25,6 +25,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunnin
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
+import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import java.io.File
@@ -103,10 +104,10 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
 
     private suspend fun openAudioOrVideoFiles(
         context: Context,
-        snackbarHandler: (SnackbarAttributes) -> Unit,
         localFile: File?,
         node: TypedFileNode,
         parentCoroutineScope: CoroutineScope,
+        snackbarHandler: (SnackbarAttributes) -> Unit,
         openWithAction: () -> Unit,
     ) {
         val fileUri = getAudioOrVideoFileUri(context, localFile, node)
@@ -115,7 +116,11 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
                 setDataAndType(Uri.parse(fileUri), node.type.mimeType)
             } else {
                 snackbarHandler(
-                    SnackbarAttributes(context.getString(sharedResR.string.error_open_file_with))
+                    SnackbarAttributes(
+                        message = context.getString(
+                            sharedResR.string.error_open_file_with
+                        )
+                    )
                 )
             }
             if (resolveActivity(context.packageManager) != null) {
@@ -128,7 +133,11 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
                 openWithAction()
             } else {
                 snackbarHandler(
-                    SnackbarAttributes(context.getString(sharedResR.string.intent_not_available_file))
+                    SnackbarAttributes(
+                        message = context.getString(
+                            sharedResR.string.intent_not_available_file
+                        )
+                    )
                 )
             }
         }
@@ -136,10 +145,10 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
 
     private suspend fun openNotStreamableFiles(
         context: Context,
-        snackbarHandler: (SnackbarAttributes) -> Unit,
         localFile: File?,
         fileTypeInfo: FileTypeInfo,
         parentCoroutineScope: CoroutineScope,
+        snackbarHandler: (SnackbarAttributes) -> Unit,
     ) {
         val localFileUri = getLocalFileUri(localFile, context)
         Intent(Intent.ACTION_VIEW).apply {
@@ -151,15 +160,19 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
                 if (resolveActivity(context.packageManager) != null) {
                     flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                     parentCoroutineScope.ensureActive()
-                    context.startActivity(this)
+                    context.startActivity(this@apply)
                 } else {
                     snackbarHandler(
-                        SnackbarAttributes(context.getString(sharedResR.string.intent_not_available))
+                        SnackbarAttributes(
+                            message = context.getString(sharedResR.string.intent_not_available)
+                        )
                     )
                 }
             } ?: run {
                 snackbarHandler(
-                    SnackbarAttributes(context.getString(R.string.general_text_error))
+                    SnackbarAttributes(
+                        message = context.getString(sharedResR.string.general_text_error)
+                    )
                 )
             }
         }

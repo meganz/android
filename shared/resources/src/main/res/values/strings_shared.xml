@@ -1587,4 +1587,30 @@
         <item quantity="one">Retrying transfer, see the Active tab for progress</item>
         <item quantity="other">Retrying transfers, see the Active tab for progress</item>
     </plurals>
+    <!-- success message when a node was restore from Rubbish bin -->
+    <string name="context_correctly_node_restored">Restored to %s</string>
+    <!-- success message when moving a node -->
+    <string name="context_correctly_moved">Item moved</string>
+    <!-- error message when a node was restore from Rubbish bin -->
+    <string name="context_no_restored">An error occurred. Item not restored.</string>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_correctly_restored_from_rubbish">
+        <item quantity="one">%d item restored</item>
+        <item quantity="other">%d items restored</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_incorrectly_restored_from_rubbish">
+        <item quantity="one">%d item wasn’t restored</item>
+        <item quantity="other">%d items weren’t restored</item>
+    </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 item restored but the other one not restored. Try again later.</item>
+        <item quantity="other">1 item restored but %d items not restored. Try again later.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
+        <item quantity="one">%d item restored but the other one not restored. Try again later.</item>
+        <item quantity="other">%d items restored but 1 item not restored. Try again later.</item>
+    </plurals>
 </resources>

@@ -44,6 +44,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @ExperimentalCoroutinesApi
 @ExtendWith(InstantTaskExecutorExtension::class)
@@ -199,7 +200,7 @@ internal class MediaPlayerViewModelTest {
             )
             advanceUntilIdle()
             underTest.onSnackbarMessage().observeOnce {
-                assertThat(it).isEqualTo(R.string.context_correctly_moved)
+                assertThat(it).isEqualTo(sharedResR.string.context_correctly_moved)
             }
         }
 

@@ -218,6 +218,7 @@ import java.io.File
 import java.time.Instant
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @ExtendWith(
     value = [
@@ -1611,7 +1612,7 @@ class VideoPlayerViewModelTest {
             )
             advanceUntilIdle()
             underTest.onSnackbarMessage().observeOnce {
-                assertThat(it).isEqualTo(R.string.context_correctly_moved)
+                assertThat(it).isEqualTo(sharedResR.string.context_correctly_moved)
             }
         }
 

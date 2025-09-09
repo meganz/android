@@ -4,9 +4,12 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.mapper.RestoreNodeResultMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RestoreMenuAction
+import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -14,7 +17,6 @@ import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import timber.log.Timber
 import javax.inject.Inject
-import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 
 /**
  * Restore bottom sheet menu item
@@ -25,9 +27,7 @@ class RestoreBottomSheetMenuItem @Inject constructor(
     override val menuAction: RestoreMenuAction,
     private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
     private val restoreNodesUseCase: RestoreNodesUseCase,
-    // Todo provide snackbar
-    // private val restoreNodeResultMapper: RestoreNodeResultMapper,
-    // private val snackBarHandler: SnackBarHandler,
+    private val restoreNodeResultMapper: RestoreNodeResultMapper,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
@@ -57,9 +57,8 @@ class RestoreBottomSheetMenuItem @Inject constructor(
                     }
                     if (result.noConflictNodes.isNotEmpty()) {
                         val restoreResult = restoreNodesUseCase(result.noConflictNodes)
-                        // Todo provide snackbar
-                        // val message = restoreNodeResultMapper(restoreResult)
-                        // snackBarHandler.postSnackbarMessage(message)
+                        val message = restoreNodeResultMapper(restoreResult)
+                        handler.snackbarHandler(SnackbarAttributes(message = message))
                     }
                 }.onFailure { throwable ->
                     Timber.e(throwable)

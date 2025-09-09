@@ -47,6 +47,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
@@ -239,7 +240,7 @@ internal class PdfViewerViewModelTest {
             advanceUntilIdle()
             underTest.uiState.test {
                 val actual = awaitItem()
-                assertThat(actual.snackBarMessage).isEqualTo(R.string.context_correctly_moved)
+                assertThat(actual.snackBarMessage).isEqualTo(sharedResR.string.context_correctly_moved)
             }
         }
 

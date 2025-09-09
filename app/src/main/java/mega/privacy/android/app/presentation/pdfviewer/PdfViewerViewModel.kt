@@ -37,6 +37,7 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import java.net.URL
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * View model for [PdfViewerActivity]
@@ -231,7 +232,7 @@ class PdfViewerViewModel @Inject constructor(
                     _state.update {
                         it.copy(
                             snackBarMessage = if (movementResult.isSuccess)
-                                R.string.context_correctly_moved
+                                sharedResR.string.context_correctly_moved
                             else
                                 R.string.context_no_moved,
                             shouldFinishActivity = movementResult.isSuccess

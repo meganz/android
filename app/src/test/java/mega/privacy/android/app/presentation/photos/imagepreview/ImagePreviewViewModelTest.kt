@@ -79,6 +79,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.time.Duration
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -425,7 +426,7 @@ class ImagePreviewViewModelTest {
             val newParentNode = 158401030174851
             val successMessage = "Move success"
             val context = mock<Context> {
-                on { getString(R.string.context_correctly_moved) } doReturn successMessage
+                on { getString(sharedResR.string.context_correctly_moved) } doReturn successMessage
             }
             whenever(
                 checkNodesNameCollisionWithActionUseCase(

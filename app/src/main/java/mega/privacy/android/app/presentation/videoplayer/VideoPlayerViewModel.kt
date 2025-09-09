@@ -225,6 +225,7 @@ import java.util.Date
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * ViewModel for video player.
@@ -1523,7 +1524,7 @@ class VideoPlayerViewModel @Inject constructor(
                 }
                 it.moveRequestResult?.let { result ->
                     if (result.isSuccess) {
-                        snackbarMessage.value = R.string.context_correctly_moved
+                        snackbarMessage.value = sharedResR.string.context_correctly_moved
                     } else {
                         snackbarMessage.value = R.string.context_no_moved
                     }

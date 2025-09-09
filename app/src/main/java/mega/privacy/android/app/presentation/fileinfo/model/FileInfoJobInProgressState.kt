@@ -7,6 +7,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.ShareAccessNotSetException
 import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import nz.mega.sdk.MegaError
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Represents the job in progress state
@@ -50,7 +51,7 @@ sealed class FileInfoJobInProgressState(
      */
     object Moving : FileInfoJobInProgressState(
         progressMessage = R.string.context_moving,
-        successMessage = R.string.context_correctly_moved,
+        successMessage = sharedResR.string.context_correctly_moved,
         failMessage = R.string.context_no_moved,
     )
 

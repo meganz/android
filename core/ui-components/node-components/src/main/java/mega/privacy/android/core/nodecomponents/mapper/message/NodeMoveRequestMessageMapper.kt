@@ -5,6 +5,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Mapper implementation for General Movement Message node action
@@ -227,7 +228,7 @@ class NodeMoveRequestMessageMapper @Inject constructor(
                 when {
                     request.isAllRequestError -> {
                         context.resources.getQuantityString(
-                            R.plurals.number_incorrectly_restored_from_rubbish,
+                            sharedResR.plurals.number_incorrectly_restored_from_rubbish,
                             request.count,
                             request.count
                         )
@@ -235,7 +236,7 @@ class NodeMoveRequestMessageMapper @Inject constructor(
 
                     request.isSuccess -> {
                         context.resources.getQuantityString(
-                            R.plurals.number_correctly_restored_from_rubbish,
+                            sharedResR.plurals.number_correctly_restored_from_rubbish,
                             request.count,
                             request.count
                         )
@@ -244,13 +245,13 @@ class NodeMoveRequestMessageMapper @Inject constructor(
                     else -> {
                         "${
                             context.resources.getQuantityString(
-                                R.plurals.number_correctly_restored_from_rubbish,
+                                sharedResR.plurals.number_correctly_restored_from_rubbish,
                                 request.count - request.errorCount,
                                 request.count - request.errorCount
                             )
                         }, ${
                             context.resources.getQuantityString(
-                                R.plurals.number_incorrectly_restored_from_rubbish,
+                                sharedResR.plurals.number_incorrectly_restored_from_rubbish,
                                 request.errorCount,
                                 request.errorCount
                             )

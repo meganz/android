@@ -117,6 +117,7 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Main ViewModel to handle all logic related to the [TextEditorActivity].
@@ -899,7 +900,7 @@ class TextEditorViewModel @Inject constructor(
                 }
                 result.moveRequestResult?.let {
                     snackBarMessage.value = if (it.isSuccess) {
-                        R.string.context_correctly_moved
+                        sharedResR.string.context_correctly_moved
                     } else {
                         R.string.context_no_moved
                     }

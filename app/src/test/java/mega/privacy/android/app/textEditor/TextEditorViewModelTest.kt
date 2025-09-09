@@ -68,7 +68,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
-
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @ExperimentalCoroutinesApi
 @ExtendWith(InstantTaskExecutorExtension::class)
@@ -251,7 +251,7 @@ internal class TextEditorViewModelTest {
             )
             advanceUntilIdle()
             underTest.onSnackBarMessage().observeOnce {
-                assertThat(it).isEqualTo(R.string.context_correctly_moved)
+                assertThat(it).isEqualTo(sharedResR.string.context_correctly_moved)
             }
         }
 
