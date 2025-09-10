@@ -52,11 +52,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEvent
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.privacy.android.analytics.Analytics
@@ -730,6 +732,7 @@ class CloudDriveSyncsFragment : Fragment() {
                     handleHiddenNodes(selected, nodeList, menu)
                     handleAddToAlbum(selected, nodeList, menu)
                     handleFavourites(selected, nodeList, menu)
+                    handleLabels(selected, nodeList, menu)
                 }.onFailure {
                     Timber.e(it)
                 }
@@ -853,6 +856,32 @@ class CloudDriveSyncsFragment : Fragment() {
             // Show "Remove from favourites" if all items are favourites
             menu.findItem(R.id.cab_menu_remove_favourites)?.isVisible =
                 favouriteCount == selectedNodes.size && selectedNodes.isNotEmpty()
+        }
+
+        private suspend fun handleLabels(
+            selected: List<Long>,
+            nodeList: List<NodeUIItem<TypedNode>>,
+            menu: Menu,
+        ) {
+            // Check if the feature for allowing label in multiple selection is enabled
+            val isLabelMultipleSelectionEnabled = runCatching {
+                getFeatureFlagValueUseCase(CloudDriveFeature.LABEL_MULTIPLE_SELECTION)
+            }
+                .onFailure { Timber.w(it, "Label multi-select flag check failed") }
+                .getOrElse { false }
+
+            // Only show label options when the feature is enabled
+            val menuItem = menu.findItem(R.id.cab_menu_add_label)
+            if (!isLabelMultipleSelectionEnabled) {
+                menuItem?.isVisible = false
+                return
+            }
+
+            val selectedNodes = nodeList.filter { it.id.longValue in selected }
+
+            // Always show "Add label" when multiple selection is enabled and nodes are selected
+            // The label dialog will handle both adding and removing labels
+            menuItem?.isVisible = selectedNodes.isNotEmpty()
         }
     }
 
@@ -1023,6 +1052,17 @@ class CloudDriveSyncsFragment : Fragment() {
                     )
                     disableSelectMode()
                 }
+
+                OptionItems.ADD_LABEL_CLICKED -> {
+                    parentFragmentManager.setFragmentResultListener(
+                        "labels_applied",
+                        viewLifecycleOwner
+                    ) { _, _ ->
+                        disableSelectMode()
+                    }
+                    // Show label selection dialog for multiple nodes
+                    showMultipleLabelSelectionDialog(it.selectedNode)
+                }
             }
         }
     }
@@ -1030,6 +1070,17 @@ class CloudDriveSyncsFragment : Fragment() {
     private fun disableSelectMode() {
         fileBrowserViewModel.clearAllNodes()
         actionMode?.finish()
+    }
+
+    /**
+     * Shows a dialog to select a label for multiple nodes
+     */
+    private fun showMultipleLabelSelectionDialog(selectedNodes: List<TypedNode>) {
+        if (selectedNodes.isEmpty()) return
+
+        // Use the existing NodeLabelBottomSheetDialogFragment with multiple nodes
+        val nodeIds = selectedNodes.map { it.id }
+        (requireActivity() as ManagerActivity).showNodeLabelsPanel(nodeIds)
     }
 
     /**

@@ -14,6 +14,14 @@ internal enum class CloudDriveFeature(
     FAVORITE_MULTIPLE_SELECTION(
         "Allow multiple selection for favorite in Cloud Drive (SAO-2344)",
         true
+    ),
+
+    /**
+     * Toggle for enabling label multiple selection in Cloud Drive.
+     */
+    LABEL_MULTIPLE_SELECTION(
+        "Allow multiple selection for labeling in Cloud Drive (SAO-3057)",
+        true
     );
 
     companion object : FeatureFlagValueProvider {

@@ -108,5 +108,10 @@ enum class OptionItems {
     /**
      * Option item remove from favourites clicked
      */
-    REMOVE_FROM_FAVOURITES_CLICKED;
+    REMOVE_FROM_FAVOURITES_CLICKED,
+
+    /**
+     * Option item add label clicked
+     */
+    ADD_LABEL_CLICKED;
 }

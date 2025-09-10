@@ -5674,6 +5674,16 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
     }
 
+    fun showNodeLabelsPanel(nodeIds: List<NodeId>) {
+        Timber.d("showNodeLabelsPanel for multiple nodes")
+        if (bottomSheetDialogFragment.isBottomSheetDialogShown()) {
+            bottomSheetDialogFragment?.dismiss()
+        }
+        val handles = nodeIds.map { it.longValue }
+        bottomSheetDialogFragment = NodeLabelBottomSheetDialogFragment.newInstance(handles)
+        bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
+    }
+
     fun showNewSortByPanel(orderType: Int) {
         if (bottomSheetDialogFragment.isBottomSheetDialogShown()) {
             return

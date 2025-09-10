@@ -202,4 +202,14 @@
         app:iconTint="?attr/colorSecondary"
         app:showAsAction="never"
         tools:visible="true" />
+
+    <item
+        android:id="@+id/cab_menu_add_label"
+        android:icon="@drawable/ic_tag_simple_medium_thin_outline"
+        android:orderInCategory="245"
+        android:title="@string/file_properties_label"
+        android:visible="false"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never"
+        tools:visible="true" />
 </menu>

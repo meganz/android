@@ -613,6 +613,9 @@ class IncomingSharesComposeFragment : Fragment() {
                 // Favorite actions not supported in incoming shares
                 OptionItems.ADD_TO_FAVOURITES_CLICKED, OptionItems.REMOVE_FROM_FAVOURITES_CLICKED -> {}
 
+                // Label actions not supported in incoming shares
+                OptionItems.ADD_LABEL_CLICKED -> {}
+
                 OptionItems.COPY_CLICKED -> {
                     val nC = NodeController(requireActivity())
                     nC.chooseLocationToCopyNodes(viewModel.state.value.selectedNodeHandles)

@@ -18,12 +18,25 @@ class CloudDriveFeatureTest {
     }
 
     @Test
+    fun `test LABEL_MULTIPLE_SELECTION feature flag properties`() {
+        val feature = CloudDriveFeature.LABEL_MULTIPLE_SELECTION
+
+        assertThat(feature.description).isEqualTo(
+            "Allow multiple selection for labeling in Cloud Drive (SAO-3057)"
+        )
+        assertThat(feature).isInstanceOf(Feature::class.java)
+    }
+
+    @Test
     fun `test companion object provides default values`() = runTest {
         val provider = CloudDriveFeature.Companion
 
-        // Test that it returns the correct default value for our feature
-        val result = provider.isEnabled(CloudDriveFeature.FAVORITE_MULTIPLE_SELECTION)
-        assertThat(result).isTrue() // Default value is true
+        // Test that it returns the correct default value for our features
+        val favoriteResult = provider.isEnabled(CloudDriveFeature.FAVORITE_MULTIPLE_SELECTION)
+        assertThat(favoriteResult).isTrue() // Default value is true
+        
+        val labelResult = provider.isEnabled(CloudDriveFeature.LABEL_MULTIPLE_SELECTION)
+        assertThat(labelResult).isTrue() // Default value is true
 
         // Test that it returns null for unknown features
         val unknownFeature = object : Feature {
