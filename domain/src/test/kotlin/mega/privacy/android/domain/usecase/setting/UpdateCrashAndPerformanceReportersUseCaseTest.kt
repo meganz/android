@@ -18,14 +18,12 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class UpdateCrashAndPerformanceReportersUseCaseTest {
 
     private lateinit var underTest: UpdateCrashAndPerformanceReportersUseCase
-    private val getCookieSettingsUseCase = mock<GetCookieSettingsUseCase>()
     private val enablePerformanceReporterUseCase = mock<EnablePerformanceReporterUseCase>()
     private val crashReporter = mock<CrashReporter>()
 
@@ -38,7 +36,6 @@ internal class UpdateCrashAndPerformanceReportersUseCaseTest {
     fun resetAndTearDown() {
         Dispatchers.resetMain()
         reset(
-            getCookieSettingsUseCase,
             enablePerformanceReporterUseCase,
             crashReporter
         )
@@ -46,7 +43,6 @@ internal class UpdateCrashAndPerformanceReportersUseCaseTest {
 
     private fun initTestClass() {
         underTest = UpdateCrashAndPerformanceReportersUseCase(
-            getCookieSettingsUseCase,
             enablePerformanceReporterUseCase,
             crashReporter
         )
@@ -63,10 +59,9 @@ internal class UpdateCrashAndPerformanceReportersUseCaseTest {
         isEnabled: Boolean,
         containsAnalytics: Boolean,
     ) = runTest {
-        whenever(getCookieSettingsUseCase()).thenReturn(if (containsAnalytics) setOf(CookieType.ANALYTICS) else emptySet())
 
         initTestClass()
-        underTest.invoke()
+        underTest.invoke(if (containsAnalytics) setOf(CookieType.ANALYTICS) else emptySet())
 
         verify(crashReporter).setEnabled(isEnabled)
         verify(enablePerformanceReporterUseCase).invoke(isEnabled)

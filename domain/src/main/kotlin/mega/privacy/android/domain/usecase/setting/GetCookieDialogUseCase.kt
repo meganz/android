@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.setting
 
 import mega.privacy.android.domain.entity.settings.cookie.CookieDialog
 import mega.privacy.android.domain.entity.settings.cookie.CookieDialogType
-import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
+import mega.privacy.android.domain.usecase.setting.cookies.GetCookieUrlUseCase
 import javax.inject.Inject
 
 /**
@@ -11,7 +11,7 @@ import javax.inject.Inject
 class GetCookieDialogUseCase @Inject constructor(
     private val shouldShowGenericCookieDialogUseCase: ShouldShowGenericCookieDialogUseCase,
     private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
-    private val getDomainNameUseCase: GetDomainNameUseCase,
+    private val getCookieUrlUseCase: GetCookieUrlUseCase,
 ) {
     /**
      *  Get the type of cookie dialog to be shown.
@@ -24,10 +24,11 @@ class GetCookieDialogUseCase @Inject constructor(
         return if (shouldShowGenericCookieDialog) {
             CookieDialog(
                 CookieDialogType.GenericCookieDialog,
-                "https://${getDomainNameUseCase()}/cookie"
+                getCookieUrlUseCase()
             )
         } else {
             CookieDialog(CookieDialogType.None)
         }
     }
 }
+

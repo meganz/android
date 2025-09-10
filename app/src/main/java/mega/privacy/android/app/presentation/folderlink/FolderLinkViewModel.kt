@@ -79,6 +79,7 @@ import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetFolderLinkNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
+import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -130,6 +131,7 @@ class FolderLinkViewModel @Inject constructor(
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
     private val updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase,
+    private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
     private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
     private val stopAudioService: StopAudioService,
     @ApplicationScope private val applicationScope: CoroutineScope,
@@ -239,7 +241,8 @@ class FolderLinkViewModel @Inject constructor(
     private fun checkCookiesSettings() {
         viewModelScope.launch {
             runCatching {
-                updateCrashAndPerformanceReportersUseCase()
+                val enabledCookies = getCookieSettingsUseCase()
+                updateCrashAndPerformanceReportersUseCase(enabledCookies)
             }.onFailure {
                 Timber.e(it)
             }

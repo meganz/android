@@ -24,7 +24,6 @@ import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.setting.BroadcastCookieSettingsSavedUseCase
 import mega.privacy.android.domain.usecase.setting.GetCookieDialogUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCookieSettingsUseCase
-import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -33,7 +32,6 @@ import javax.inject.Inject
  *
  * @property updateCookieSettingsUseCase                Use Case to update cookie settings.
  * @property broadcastCookieSettingsSavedUseCase        Use Case to broadcast cookie settings saved.
- * @property updateCrashAndPerformanceReportersUseCase  Use Case to update crash and performance reporters.
  * @property getCookieDialogUseCase                     Use Case to get cookie dialog type.
  * @property applicationScope                           Scope for the Coroutine launched by the Use Case.
  * @property ioDispatcher                              Dispatcher for the Coroutine launched by the Use Case to perform background operations.
@@ -42,7 +40,6 @@ import javax.inject.Inject
 class CookieDialogHandler @Inject constructor(
     private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase,
     private val broadcastCookieSettingsSavedUseCase: BroadcastCookieSettingsSavedUseCase,
-    private val updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase,
     private val getCookieDialogUseCase: GetCookieDialogUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -128,7 +125,6 @@ class CookieDialogHandler @Inject constructor(
             runCatching {
                 updateCookieSettingsUseCase(enabledCookies)
                 broadcastCookieSettingsSavedUseCase(enabledCookies)
-                updateCrashAndPerformanceReportersUseCase()
             }.onFailure { Timber.e("failed to accept all cookies: $it") }
         }
     }

@@ -75,6 +75,7 @@ import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetFolderLinkNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
+import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -145,7 +146,7 @@ class FolderLinkViewModelTest {
     private val stopAudioService: StopAudioService = mock()
     private val getPublicLinkInformationUseCase: GetPublicLinkInformationUseCase = mock()
     private val queryAdsUseCase: QueryAdsUseCase = mock()
-
+    private val getCookieSettingsUseCase = mock<GetCookieSettingsUseCase>()
 
     @BeforeEach
     fun setup() {
@@ -236,7 +237,8 @@ class FolderLinkViewModelTest {
             applicationScope = CoroutineScope(UnconfinedTestDispatcher()),
             monitorMiscLoadedUseCase = mock(),
             getPublicLinkInformationUseCase = getPublicLinkInformationUseCase,
-            queryAdsUseCase = queryAdsUseCase
+            queryAdsUseCase = queryAdsUseCase,
+            getCookieSettingsUseCase = getCookieSettingsUseCase
         )
     }
 

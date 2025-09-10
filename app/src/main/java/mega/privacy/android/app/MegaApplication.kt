@@ -63,6 +63,7 @@ import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.apiserver.UpdateApiServerUseCase
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
+import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorAndHandleTransferEventsUseCase
@@ -147,6 +148,9 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
 
     @Inject
     lateinit var updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase
+
+    @Inject
+    lateinit var getCookieSettingsUseCase: GetCookieSettingsUseCase
 
     @Inject
     lateinit var monitorCallSoundsUseCase: MonitorCallSoundsUseCase
@@ -443,7 +447,8 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     fun checkEnabledCookies() {
         applicationScope.launch {
             runCatching {
-                updateCrashAndPerformanceReportersUseCase()
+                val enabledCookies = getCookieSettingsUseCase()
+                updateCrashAndPerformanceReportersUseCase(enabledCookies)
             }.onFailure {
                 Timber.e("Failed to get cookie settings: $it")
             }

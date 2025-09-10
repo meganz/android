@@ -34,6 +34,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
+import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.domain.exception.MegaException
@@ -75,6 +76,7 @@ import mega.privacy.android.domain.usecase.notifications.ShouldShowNotificationR
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMonitorUseCase
 import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusProgressEventUseCase
+import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
@@ -98,6 +100,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -178,6 +181,7 @@ internal class LoginViewModelTest {
     private val getDomainNameUseCase = mock<GetDomainNameUseCase>()
     private val monitorMiscLoadedUseCase = mock<MonitorMiscLoadedUseCase>()
     private val monitorMiscLoadedFlow = MutableSharedFlow<Boolean>()
+    private val getCookieSettingsUseCase = mock<GetCookieSettingsUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -238,6 +242,7 @@ internal class LoginViewModelTest {
             getMiscFlagsUseCase = getMiscFlagsUseCase,
             getDomainNameUseCase = getDomainNameUseCase,
             monitorMiscLoadedUseCase = monitorMiscLoadedUseCase,
+            getCookieSettingsUseCase = getCookieSettingsUseCase,
         )
     }
 
@@ -751,10 +756,13 @@ internal class LoginViewModelTest {
     @Test
     fun `test that updateCrashAndPerformanceReportersUseCase is invoked when fetchNodes is`() =
         runTest {
+            val enabledCookies = setOf(CookieType.ESSENTIAL)
+            getCookieSettingsUseCase.stub {
+                onBlocking { invoke() } doReturn enabledCookies
+            }
             underTest.fetchNodes()
             advanceUntilIdle()
-
-            verify(updateCrashAndPerformanceReportersUseCase).invoke()
+            verify(updateCrashAndPerformanceReportersUseCase).invoke(enabledCookies)
         }
 
     @Test

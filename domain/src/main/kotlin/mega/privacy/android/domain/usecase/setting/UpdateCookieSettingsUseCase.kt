@@ -9,6 +9,7 @@ import javax.inject.Inject
  */
 class UpdateCookieSettingsUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
+    private val updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase
 ) {
 
     /**
@@ -18,5 +19,8 @@ class UpdateCookieSettingsUseCase @Inject constructor(
      */
     suspend operator fun invoke(
         enabledCookieSettings: Set<CookieType>,
-    ) = accountRepository.setCookieSettings(enabledCookieSettings)
+    ) {
+        accountRepository.setCookieSettings(enabledCookieSettings)
+        updateCrashAndPerformanceReportersUseCase(enabledCookieSettings)
+    }
 }

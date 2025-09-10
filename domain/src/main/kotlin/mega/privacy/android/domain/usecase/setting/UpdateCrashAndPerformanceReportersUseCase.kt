@@ -8,12 +8,10 @@ import javax.inject.Inject
 /**
  * Use case to update crash and performance reporters
  *
- * @property getCookieSettingsUseCase                    Get cookie settings use case
  * @property enablePerformanceReporterUseCase            Enable performance reporter use case
  * @property crashReporter                               Crash reporter
  */
 class UpdateCrashAndPerformanceReportersUseCase @Inject constructor(
-    private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
     private val enablePerformanceReporterUseCase: EnablePerformanceReporterUseCase,
     private val crashReporter: CrashReporter,
 ) {
@@ -21,8 +19,8 @@ class UpdateCrashAndPerformanceReportersUseCase @Inject constructor(
     /**
      * Invoke
      */
-    suspend operator fun invoke() {
-        val isEnabled = getCookieSettingsUseCase().contains(CookieType.ANALYTICS)
+    suspend operator fun invoke(enabledCookieSettings: Set<CookieType>,) {
+        val isEnabled = enabledCookieSettings.contains(CookieType.ANALYTICS)
         crashReporter.setEnabled(isEnabled)
         enablePerformanceReporterUseCase(isEnabled)
     }

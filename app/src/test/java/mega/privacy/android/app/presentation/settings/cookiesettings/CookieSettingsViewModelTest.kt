@@ -102,7 +102,7 @@ class CookieSettingsViewModelTest {
             whenever(updateCookieSettingsUseCase(enabledCookies)).thenReturn(Unit)
             initTestClass()
             underTest.saveCookieSettings()
-            verify(updateCrashAndPerformanceReportersUseCase).invoke()
+            verify(updateCrashAndPerformanceReportersUseCase).invoke(enabledCookies)
         }
 
     @Test

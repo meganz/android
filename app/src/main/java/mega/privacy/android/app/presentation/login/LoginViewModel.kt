@@ -103,6 +103,7 @@ import mega.privacy.android.domain.usecase.notifications.ShouldShowNotificationR
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMonitorUseCase
 import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusProgressEventUseCase
+import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
@@ -175,6 +176,7 @@ class LoginViewModel @Inject constructor(
     private val ephemeralCredentialManager: EphemeralCredentialManager,
     private val resumeTransfersForNotLoggedInInstanceUseCase: ResumeTransfersForNotLoggedInInstanceUseCase,
     private val updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase,
+    private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
     private val startScreenUtil: StartScreenUtil,
     private val getMiscFlagsUseCase: GetMiscFlagsUseCase,
     private val getDomainNameUseCase: GetDomainNameUseCase,
@@ -939,7 +941,8 @@ class LoginViewModel @Inject constructor(
     private fun checkEnabledCookies() {
         applicationScope.launch {
             runCatching {
-                updateCrashAndPerformanceReportersUseCase()
+                val enabledCookies = getCookieSettingsUseCase()
+                updateCrashAndPerformanceReportersUseCase(enabledCookies)
             }.onFailure {
                 Timber.e("Failed to get cookie settings: $it")
             }

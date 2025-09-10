@@ -12,10 +12,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.fragments.settingsFragments.cookie.model.CookieSettingsUIState
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
@@ -123,8 +123,9 @@ class CookieSettingsViewModel @Inject constructor(
             }
             enabledCookies.value?.let {
                 runCatching {
-                    updateCookieSettingsUseCase(it.toSet())
-                    updateCrashAndPerformanceReportersUseCase()
+                    val enabledCookieSettings = it.toSet()
+                    updateCookieSettingsUseCase(enabledCookieSettings)
+                    updateCrashAndPerformanceReportersUseCase(enabledCookieSettings)
                     updateResult.value = true
                 }.onFailure {
                     Timber.e(it)
