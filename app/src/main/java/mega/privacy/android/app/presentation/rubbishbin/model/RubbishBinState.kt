@@ -7,7 +7,6 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import nz.mega.sdk.MegaNode
 
 /**
  *  @property currentHandle The current Handle
@@ -20,8 +19,7 @@ import nz.mega.sdk.MegaNode
  *  @property currentViewType ViewType The current ViewType used by the UI
  *  @property sortOrder [SortOrder] of current list
  *  @property isPendingRefresh
- *  @property selectedNodeHandles List of selected node handles
- *  @property selectedMegaNodes List of selected [MegaNode]
+ *  @property selectedNodes List of selected [TypedNode]
  *  @property restoreType Determines the specific "Restore" behavior
  *  @property accountType
  *  @property isBusinessAccountExpired
@@ -38,8 +36,7 @@ data class RubbishBinState(
     val isInSelection: Boolean = false,
     val currentViewType: ViewType = ViewType.LIST,
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
-    val selectedNodeHandles: List<Long> = emptyList(),
-    val selectedMegaNodes: List<MegaNode>? = null,
+    val selectedNodes: List<TypedNode> = emptyList(),
     val isPendingRefresh: Boolean = false,
     val restoreType: RestoreType? = null,
     val accountType: AccountType? = null,
@@ -47,7 +44,7 @@ data class RubbishBinState(
     val hiddenNodeEnabled: Boolean = false,
     val openedFolderNodeHandles: List<Long> = listOf(-1L),
     val isLoading: Boolean = true,
-    val resetScrollPositionEvent: StateEvent = consumed
+    val resetScrollPositionEvent: StateEvent = consumed,
 ) {
     val isRootDirectory get() = currentHandle == -1L || currentHandle == rubbishBinHandle
 }

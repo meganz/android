@@ -15,9 +15,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.extensions.updateItemAt
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.app.presentation.rubbishbin.model.RubbishBinState
@@ -31,6 +29,7 @@ import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
@@ -46,7 +45,6 @@ import mega.privacy.android.shared.original.core.ui.utils.pop
 import mega.privacy.android.shared.original.core.ui.utils.push
 import mega.privacy.android.shared.original.core.ui.utils.toMutableArrayDeque
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -72,7 +70,6 @@ class RubbishBinViewModel @Inject constructor(
     private val monitorViewType: MonitorViewType,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getRubbishBinFolderUseCase: GetRubbishBinFolderUseCase,
-    private val getNodeByHandle: GetNodeByHandle,
     private val fileDurationMapper: FileDurationMapper,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
@@ -249,7 +246,7 @@ class RubbishBinViewModel @Inject constructor(
         val existingNodeList = _state.value.nodeList
         return nodeList.mapIndexed { index, it ->
             val isSelected =
-                state.value.selectedNodeHandles.contains(it.id.longValue)
+                state.value.selectedNodes.any { selectedNode -> it.id == selectedNode.id }
             val fileDuration = if (it is FileNode) {
                 fileDurationMapper(it.type)?.let { durationInSecondsTextMapper(it) }
             } else null
@@ -342,21 +339,21 @@ class RubbishBinViewModel @Inject constructor(
         nodeUIItem.isSelected = !nodeUIItem.isSelected
         var totalSelectedFileNode = _state.value.selectedFileNodes
         var totalSelectedFolderNode = _state.value.selectedFolderNodes
-        val selectedNodeHandle = _state.value.selectedNodeHandles.toMutableList()
+        val selectedNodes = _state.value.selectedNodes.toMutableList()
         if (nodeUIItem.isSelected) {
             if (nodeUIItem.node is FolderNode) {
                 totalSelectedFolderNode = _state.value.selectedFolderNodes + 1
             } else if (nodeUIItem.node is FileNode) {
                 totalSelectedFileNode = _state.value.selectedFileNodes + 1
             }
-            selectedNodeHandle.add(nodeUIItem.node.id.longValue)
+            selectedNodes.add(nodeUIItem.node)
         } else {
             if (nodeUIItem.node is FolderNode) {
                 totalSelectedFolderNode = _state.value.selectedFolderNodes - 1
             } else if (nodeUIItem.node is FileNode) {
                 totalSelectedFileNode = _state.value.selectedFileNodes - 1
             }
-            selectedNodeHandle.remove(nodeUIItem.node.id.longValue)
+            selectedNodes.remove(nodeUIItem.node)
         }
         val newNodesList = _state.value.nodeList.updateItemAt(index = index, item = nodeUIItem)
         _state.update {
@@ -365,7 +362,7 @@ class RubbishBinViewModel @Inject constructor(
                 selectedFileNodes = totalSelectedFileNode,
                 nodeList = newNodesList,
                 isInSelection = totalSelectedFolderNode > 0 || totalSelectedFileNode > 0,
-                selectedNodeHandles = selectedNodeHandle
+                selectedNodes = selectedNodes
             )
         }
     }
@@ -377,11 +374,11 @@ class RubbishBinViewModel @Inject constructor(
         val selectedNodeList = selectAllNodesUiList()
         var totalFolderNode = 0
         var totalFileNode = 0
-        val selectedNodeHandle = mutableListOf<Long>()
+        val selectedNodes = mutableListOf<TypedNode>()
         selectedNodeList.forEach {
             if (it.node is FileNode) totalFolderNode++
             if (it.node is FolderNode) totalFileNode++
-            selectedNodeHandle.add(it.node.id.longValue)
+            selectedNodes.add(it.node)
         }
         _state.update {
             it.copy(
@@ -389,7 +386,7 @@ class RubbishBinViewModel @Inject constructor(
                 isInSelection = true,
                 selectedFolderNodes = totalFolderNode,
                 selectedFileNodes = totalFileNode,
-                selectedNodeHandles = selectedNodeHandle
+                selectedNodes = selectedNodes
             )
         }
     }
@@ -424,8 +421,7 @@ class RubbishBinViewModel @Inject constructor(
             selectedFileNodes = 0,
             selectedFolderNodes = 0,
             isInSelection = false,
-            selectedNodeHandles = emptyList(),
-            selectedMegaNodes = null,
+            selectedNodes = emptyList(),
         )
     }
 
@@ -439,21 +435,6 @@ class RubbishBinViewModel @Inject constructor(
     }
 
     /**
-     * Given a list of Node Handles, this retrieves the list of Nodes that were selected by the User
-     */
-    private suspend fun retrieveSelectedMegaNodes() {
-        val megaNodeList = _state.value.selectedNodeHandles.mapNotNull { getNodeByHandle(it) }
-        updateSelectedMegaNodes(megaNodeList)
-    }
-
-    /**
-     * Updates the selected Nodes to [RubbishBinState.selectedMegaNodes]
-     */
-    private fun updateSelectedMegaNodes(selectedMegaNodes: List<MegaNode>?) = _state.update {
-        it.copy(selectedMegaNodes = selectedMegaNodes)
-    }
-
-    /**
      * Restores the list of selected Nodes when the "Restore" button is clicked
      *
      * If any of the Nodes is a Backup Node, the "Move" command is executed and will prompt the user
@@ -462,12 +443,11 @@ class RubbishBinViewModel @Inject constructor(
      * Otherwise, the list of Nodes will be restored back to where they came from
      */
     fun onRestoreClicked() = viewModelScope.launch {
-        retrieveSelectedMegaNodes()
-        val selectedNodes = _state.value.selectedMegaNodes ?: emptyList()
+        val selectedNodes = _state.value.selectedNodes
         if (selectedNodes.isNotEmpty()) {
             val deferredResults = mutableListOf<Deferred<Boolean>>()
             for (node in selectedNodes) {
-                deferredResults += async { isNodeDeletedFromBackupsUseCase(NodeId(node.handle)) }
+                deferredResults += async { isNodeDeletedFromBackupsUseCase(node.id) }
             }
             val hasBackupNodes = deferredResults.awaitAll().contains(true)
             _state.update {

@@ -68,6 +68,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.SingleNodeRestoreResult
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.sync.SyncType
@@ -1094,14 +1095,14 @@ class ManagerViewModelTest {
     fun `test that nodeNameCollisionResult updated when calling checkRestoreNodesNameCollision successfully`() =
         runTest {
             testScheduler.advanceUntilIdle()
-            val node = mock<MegaNode> {
-                on { handle }.thenReturn(1L)
-                on { restoreHandle }.thenReturn(100L)
+            val node = mock<TypedFileNode> {
+                on { id }.thenReturn(NodeId(1L))
+                on { restoreId }.thenReturn(NodeId(100L))
             }
             val result = mock<NodeNameCollisionsResult>()
             whenever(
                 checkNodesNameCollisionUseCase(
-                    mapOf(node.handle to node.restoreHandle),
+                    mapOf(1L to 100L),
                     NodeNameCollisionType.RESTORE
                 )
             ).thenReturn(result)

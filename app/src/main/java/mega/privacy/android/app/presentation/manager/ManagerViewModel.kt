@@ -22,23 +22,22 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
-import mega.privacy.android.core.nodecomponents.mapper.RemovePublicLinkResultMapper
-import mega.privacy.android.core.nodecomponents.mapper.RemoveShareResultMapper
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
-import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
-import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.psa.legacy.LegacyPsaGlobalState
-import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
-import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import mega.privacy.android.core.nodecomponents.mapper.RemovePublicLinkResultMapper
+import mega.privacy.android.core.nodecomponents.mapper.RemoveShareResultMapper
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
+import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
+import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
+import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallStatus
@@ -54,10 +53,12 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.extension.mapAsync
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
@@ -748,7 +749,7 @@ class ManagerViewModel @Inject constructor(
             runCatching {
                 getFullAccountInfoUseCase()
             }.onFailure {
-                Timber.w("Exception getting account info.", it)
+                Timber.e(it, "Exception getting account info.")
             }
         }
     }
@@ -767,7 +768,7 @@ class ManagerViewModel @Inject constructor(
         }.onSuccess {
             _state.update { state -> state.copy(show2FADialog = it) }
         }.onFailure {
-            Timber.w("Exception checking 2FA.", it)
+            Timber.e(it, "Exception checking 2FA.")
         }
     }
 
@@ -834,7 +835,7 @@ class ManagerViewModel @Inject constructor(
         runCatching {
             setUsersCallLimitRemindersUseCase(if (enabled) UsersCallLimitReminders.Enabled else UsersCallLimitReminders.Disabled)
         }.onFailure { exception ->
-            Timber.e("An error occurred when setting the call limit reminder", exception)
+            Timber.e(exception, "An error occurred when setting the call limit reminder")
         }
     }
 
@@ -943,12 +944,13 @@ class ManagerViewModel @Inject constructor(
      *
      * @param nodes
      */
-    fun checkRestoreNodesNameCollision(nodes: List<MegaNode>) {
+    fun checkRestoreNodesNameCollision(nodes: List<TypedNode>) {
         viewModelScope.launch {
             runCatching {
                 checkNodesNameCollisionUseCase(
-                    nodes.associate { it.handle to it.restoreHandle },
-                    NodeNameCollisionType.RESTORE
+                    nodes = nodes.associate { it.id.longValue to (it.restoreId?.longValue ?: -1) }
+                        .filter { it.value != -1L },
+                    type = NodeNameCollisionType.RESTORE
                 )
             }.onSuccess { result ->
                 _state.update { it.copy(nodeNameCollisionsResult = result) }

@@ -56,7 +56,6 @@ import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaChatApiJava
-import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -130,7 +129,7 @@ class RubbishBinComposeFragment : Fragment() {
                             uiState = uiState,
                             onMenuClick = ::showOptionsMenuForItem,
                             onItemClicked = {
-                                if (uiState.selectedNodeHandles.isEmpty()) {
+                                if (uiState.selectedNodes.isEmpty()) {
                                     when (it.node) {
                                         is TypedFileNode -> {
                                             clickedFile = it.node
@@ -187,8 +186,7 @@ class RubbishBinComposeFragment : Fragment() {
                 )
                 handleRestoreBehavior(
                     restoreType = uiState.restoreType,
-                    selectedNodes = uiState.selectedMegaNodes,
-                    selectedNodeHandles = uiState.selectedNodeHandles,
+                    selectedNodes = uiState.selectedNodes,
                 )
 
                 clickedFile?.let {
@@ -213,13 +211,12 @@ class RubbishBinComposeFragment : Fragment() {
      *
      * @param restoreType The behavior when the "Restore" button is clicked
      * @param selectedNodes The list of Nodes selected by the User
-     * @param selectedNodeHandles The list of Node Handles selected by the User
      */
     private fun handleRestoreBehavior(
         restoreType: RestoreType?,
-        selectedNodes: List<MegaNode>?,
-        selectedNodeHandles: List<Long>,
+        selectedNodes: List<TypedNode>,
     ) {
+        val selectedNodeHandles = selectedNodes.map { it.id.longValue }
         restoreType?.let {
             when (it) {
                 RestoreType.MOVE -> {
@@ -227,7 +224,7 @@ class RubbishBinComposeFragment : Fragment() {
                 }
 
                 RestoreType.RESTORE -> {
-                    if (!selectedNodes.isNullOrEmpty()) {
+                    if (selectedNodes.isNotEmpty()) {
                         ((requireActivity()) as ManagerActivity).restoreFromRubbish(selectedNodes)
                     }
                 }
@@ -287,7 +284,7 @@ class RubbishBinComposeFragment : Fragment() {
                 }
 
                 R.id.cab_menu_delete -> {
-                    val documents = viewModel.state.value.selectedNodeHandles
+                    val documents = viewModel.state.value.selectedNodes.map { it.id.longValue }
                     if (documents.isNotEmpty()) {
                         ConfirmMoveToRubbishBinDialogFragment.newInstance(documents)
                             .show(

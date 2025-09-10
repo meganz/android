@@ -298,7 +298,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 nodeOptionsViewModel.setMoveNodeClicked(false)
             }
             if (state.canRestoreNode) {
-                state.legacyNodeWrapper?.let { onRestoreClicked(it.node) }
+                state.legacyNodeWrapper?.let { onRestoreClicked(it.typedNode) }
                 // Once the action has been acknowledged, notify the ViewModel
                 nodeOptionsViewModel.setRestoreNodeClicked(false)
             }
@@ -1625,7 +1625,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         dismissAllowingStateLoss()
     }
 
-    private fun onRestoreClicked(node: MegaNode) {
+    private fun onRestoreClicked(node: TypedNode) {
         (requireActivity() as ManagerActivity).restoreFromRubbish(listOf(node))
         dismissAllowingStateLoss()
         setStateBottomSheetBehaviorHidden()

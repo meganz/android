@@ -283,6 +283,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.RestoreNodeResult
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -5150,7 +5151,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      *
      * @param nodes List of nodes.
      */
-    fun restoreFromRubbish(nodes: List<MegaNode>) {
+    fun restoreFromRubbish(nodes: List<TypedNode>) {
         viewModel.checkRestoreNodesNameCollision(nodes)
     }
 
