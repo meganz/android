@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.photos.mediadiscovery.navigation
+package mega.privacy.android.app.activities.destinations
 
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.ui.Modifier
@@ -8,9 +8,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
-import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.MediaDiscovery
 
 fun NavGraphBuilder.legacyMediaDiscoveryScreen(
@@ -30,11 +28,4 @@ fun NavGraphBuilder.legacyMediaDiscoveryScreen(
             fragment.navigationHandler = navigationHandler
         }
     }
-}
-
-class LegacyMediaDiscoveryFeatureDestination : FeatureDestination {
-    override val navigationGraph: NavGraphBuilder.(NavigationHandler, TransferHandler) -> Unit =
-        { navigationHandler, _ ->
-            legacyMediaDiscoveryScreen(navigationHandler)
-        }
 }

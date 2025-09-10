@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import mega.privacy.android.app.activities.destinations.LegacyCoreActivityFeatureGraph
+import mega.privacy.android.app.activities.destinations.LegacyCoreFragmentFeatureGraph
 import mega.privacy.android.navigation.contract.FeatureDestination
 
 @Module
@@ -17,4 +18,8 @@ class FeatureDestinationModule {
     fun provideLegacyCoreActivityFeatureDestination(): FeatureDestination =
         LegacyCoreActivityFeatureGraph()
 
+    @Provides
+    @IntoSet
+    fun provideLegacyCoreFragmentFeatureDestination(): FeatureDestination =
+        LegacyCoreFragmentFeatureGraph()
 }

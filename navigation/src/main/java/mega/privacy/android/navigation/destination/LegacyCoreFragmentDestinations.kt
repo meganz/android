@@ -4,6 +4,9 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
+data object RubbishBin : NavKey
+
+@Serializable
 data class MediaDiscovery(
     val nodeHandle: Long,
     val nodeName: String? = null,
