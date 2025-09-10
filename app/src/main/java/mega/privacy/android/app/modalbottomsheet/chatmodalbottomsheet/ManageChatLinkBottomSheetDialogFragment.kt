@@ -19,6 +19,7 @@ import mega.privacy.android.app.utils.ChatUtil.showConfirmationRemoveChatLink
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.COPIED_TEXT_LABEL
 import mega.privacy.android.app.utils.Util.showSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 
 class ManageChatLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
@@ -82,7 +83,7 @@ class ManageChatLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment() 
 
             showSnackbar(
                 requireActivity(),
-                getString(R.string.chat_link_copied_clipboard)
+                getString(sharedR.string.general_link_copied_clipboard)
             )
 
             setStateBottomSheetBehaviorHidden()

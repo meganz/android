@@ -18,7 +18,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_NONE_SENSITIVE
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_WARNING_TYPE_FOLDER
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_WARNING_TYPE_LINKS
-import mega.privacy.android.domain.entity.node.chat.SendToChatResult
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.Util
@@ -27,6 +26,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.chat.SendToChatResult
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveDescendantUseCase
@@ -415,10 +415,7 @@ class GetLinkViewModel @Inject constructor(
             if (isFirstTime) context.resources.getQuantityString(
                 R.plurals.general_snackbar_link_created_and_copied,
                 1
-            ) else context.resources.getQuantityString(
-                R.plurals.links_copied_clipboard,
-                1
-            )
+            ) else context.getString(sharedR.string.general_link_copied_clipboard)
         )
     }
 

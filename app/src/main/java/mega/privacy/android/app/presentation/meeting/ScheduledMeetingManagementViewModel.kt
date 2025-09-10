@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.getLink.BaseLinkViewModel
 import mega.privacy.android.app.presentation.extensions.getDayAndMonth
 import mega.privacy.android.app.presentation.extensions.getEndZoneDateTime
@@ -36,6 +35,7 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.IsDevice24HourFormatUseCase
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
@@ -64,6 +64,7 @@ import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomRemindersUseCas
 import mega.privacy.android.domain.usecase.meeting.UpdateOccurrenceUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.time.ZonedDateTime
 import javax.inject.Inject
@@ -822,7 +823,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
         _state.value.meetingLink?.let { meetingLink ->
             val clip = ClipData.newPlainText(Constants.COPIED_TEXT_LABEL, meetingLink)
             clipboard.setPrimaryClip(clip)
-            triggerSnackbarMessage(getStringFromStringResMapper(R.string.scheduled_meetings_meeting_link_copied))
+            triggerSnackbarMessage(getStringFromStringResMapper(sharedR.string.general_link_copied_clipboard))
         }
     }
 

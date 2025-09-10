@@ -3410,7 +3410,7 @@
     <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_left_to_add_message">You’ve already added all your contacts to this chat. If you want to add more participants, first invite them to your contact list.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
-    <string name="media_player_video_snackbar_screenshot_saved">Saved image to your device gallery</string>
+    <string name="media_player_video_snackbar_screenshot_saved">Image saved to your device</string>
     <!-- Album creation dialog title -->
     <string name="photos_album_creation_dialog_title">Enter album name</string>
     <!-- Album creation input name placeholder -->
@@ -4590,7 +4590,7 @@
         <item quantity="other">%1$d participants are waiting to join “%2$s”.</item>
     </plurals>
     <!-- Title of video option of snapshot-->
-    <string name="media_player_video_option_snapshot_title">Snapshot</string>
+    <string name="media_player_video_option_snapshot_title">Capture</string>
     <!-- Title of video option of lock-->
     <string name="media_player_video_option_lock_title">Lock</string>
     <!-- Title of video option of zoom to fill-->

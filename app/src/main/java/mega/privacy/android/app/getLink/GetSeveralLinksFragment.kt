@@ -23,7 +23,6 @@ import mega.privacy.android.app.activities.contract.SendToChatActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentGetSeveralLinksBinding
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_NONE_SENSITIVE
 import mega.privacy.android.app.getLink.adapter.LinksAdapter
 import mega.privacy.android.app.getLink.data.LinkItem
@@ -36,6 +35,7 @@ import mega.privacy.android.app.utils.Constants.ALPHA_VIEW_ENABLED
 import mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.TextUtil.copyToClipboard
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.resources.R as sharedR
 import java.util.UUID
@@ -279,17 +279,17 @@ class GetSeveralLinksFragment : Fragment() {
      */
     private fun copyLinks(links: String, isForFirstTime: Boolean) {
         copyToClipboard(requireActivity(), links)
+        val linksNumber = viewModel.getLinksNumber()
         (requireActivity() as SnackbarShower).showSnackbar(
-            if (isForFirstTime) {
-                requireContext().resources.getQuantityString(
+            when {
+                isForFirstTime -> requireContext().resources.getQuantityString(
                     R.plurals.general_snackbar_link_created_and_copied,
-                    viewModel.getLinksNumber()
+                    linksNumber
                 )
-            } else {
-                requireContext().resources.getQuantityString(
-                    R.plurals.links_copied_clipboard,
-                    viewModel.getLinksNumber()
-                )
+
+                linksNumber == 1 -> requireContext().getString(sharedR.string.general_link_copied_clipboard)
+
+                else -> requireContext().getString(sharedR.string.general_links_copied_clipboard)
             }
         )
     }

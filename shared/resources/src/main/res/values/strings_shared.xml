@@ -392,8 +392,6 @@
     <string name="account_cancellation_instructions_web_browser_description">This is because you subscribed to MEGA in your web browser. To cancel your subscription, you will need to:</string>
     <!-- Label for cancellation instructions on a computer -->
     <string name="account_cancellation_instructions_on_computer">On a computer</string>
-    <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website">1. Visit [A]https://mega.nz[/A] in your web browser.</string>
     <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
     <string name="account_cancellation_instructions_login_account">2. Log in to your MEGA account.</string>
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
@@ -1197,10 +1195,6 @@
     <string name="free_plan_card_existing_button">Continue with free plan</string>
     <!-- Storage feature label for the free plan card, e.g. '20 GB of storage' -->
     <string name="free_plan_card_storage_feature_for_existing_user">%1$s storage</string>
-    <!-- Sort by newest shares -->
-    <string name="general_sort_newest_shares">Newest shares</string>
-    <!-- Sort by oldest shares -->
-    <string name="general_sort_oldest_shares">Oldest shares</string>
     <!-- Title for recovery key error dialog -->
     <string name="recovery_key_error_title">Recovery key error</string>
     <!-- Description for recovery key error dialog -->
@@ -1629,4 +1623,8 @@
     <string name="action_sort_by_link">Link</string>
     <!-- Header of action to sort nodes -->
     <string name="action_sort_by_header">Sort by</string>
+    <!-- Confirmation shown informing link has been copied to the clipboard -->
+    <string name="general_link_copied_clipboard">Copied link to clipboard</string>
+    <!-- Confirmation shown informing links have been copied to the clipboard -->
+    <string name="general_links_copied_clipboard">Copied links to clipboard</string>
 </resources>

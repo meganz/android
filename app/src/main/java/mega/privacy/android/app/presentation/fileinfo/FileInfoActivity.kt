@@ -81,6 +81,7 @@ import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.NodeInfoDescriptionAddedMessageDisplayedEvent
 import mega.privacy.mobile.analytics.event.NodeInfoDescriptionUpdatedMessageDisplayedEvent
 import mega.privacy.mobile.analytics.event.NodeInfoScreenEvent
@@ -518,7 +519,7 @@ class FileInfoActivity : BaseActivity() {
             FileInfoOneOffViewEvent.PublicLinkCopiedToClipboard -> {
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
                     //Android 13 and up shows a system notification, so no need to show the toast
-                    snackBarHostState.showAutoDurationSnackbar(getString(R.string.file_properties_get_link))
+                    snackBarHostState.showAutoDurationSnackbar(getString(sharedR.string.general_link_copied_clipboard))
                 }
             }
 

@@ -198,7 +198,7 @@ class QRCodeViewModel @Inject constructor(
         Timber.d("copyLink")
         (uiState.value.myQRCodeState as? MyCodeUIState.QRCodeAvailable)?.let {
             copyToClipBoard(label = "contact link", it.contactLink)
-            setResultMessage(R.string.qrcode_link_copied)
+            setResultMessage(sharedR.string.general_link_copied_clipboard)
         }
     }
 

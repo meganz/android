@@ -37,6 +37,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.showSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 
 /**
@@ -130,7 +131,7 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
             clipboard.setPrimaryClip(clip)
             showSnackbar(
                 requireContext(),
-                getString(R.string.copied_meeting_link)
+                getString(sharedR.string.general_link_copied_clipboard)
             )
         } else {
             showSnackbar(
