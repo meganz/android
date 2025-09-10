@@ -74,3 +74,6 @@ credentials.properties
 # Java error artefacts
 hs_err_pid*
 replay_pid*
+
+#copilot
+.idea/copilot*
