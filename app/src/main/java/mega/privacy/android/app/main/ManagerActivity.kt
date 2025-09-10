@@ -185,7 +185,6 @@ import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType
 import mega.privacy.android.app.presentation.manager.UserInfoViewModel
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
-import mega.privacy.android.core.nodecomponents.mapper.RestoreNodeResultMapper
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.UpgradeProPlanBottomSheet
@@ -263,6 +262,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
+import mega.privacy.android.core.nodecomponents.mapper.RestoreNodeResultMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.sharedcomponents.serializable
 import mega.privacy.android.data.model.MegaAttributes
@@ -3139,9 +3139,11 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         if (drawerItem == null) {
             return@launch
         }
+
+        supportActionBar?.subtitle = null
+
         when (drawerItem) {
             DrawerItem.CLOUD_DRIVE -> {
-                supportActionBar?.subtitle = null
                 Timber.d("Cloud Drive SECTION")
                 val parentNode = withContext(ioDispatcher) {
                     megaApi.getNodeByHandle(fileBrowserViewModel.state().fileBrowserHandle)
@@ -3180,7 +3182,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }
 
             DrawerItem.RUBBISH_BIN -> {
-                supportActionBar?.subtitle = null
                 val node =
                     megaApi.getNodeByHandle(rubbishBinViewModel.state().currentHandle)
                 val rubbishNode = megaApi.rubbishNode
@@ -3197,7 +3198,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }
 
             DrawerItem.NOTIFICATIONS -> {
-                supportActionBar?.subtitle = null
                 supportActionBar?.title =
                     getString(R.string.title_properties_chat_contact_notifications)
                 viewModel.setIsFirstNavigationLevel(true)
@@ -3210,7 +3210,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }
 
             DrawerItem.PHOTOS -> {
-                supportActionBar?.subtitle = null
                 if (isInAlbumContent) {
                     if (albumContentFragment is AlbumContentFragment) {
                         val title = (albumContentFragment as? AlbumContentFragment)
