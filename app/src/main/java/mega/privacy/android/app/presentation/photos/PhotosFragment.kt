@@ -35,6 +35,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
@@ -55,7 +59,8 @@ import mega.privacy.android.app.presentation.photos.albums.albumcontent.AlbumCon
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
-import mega.privacy.android.app.presentation.photos.compose.main.PhotosScreen
+import mega.privacy.android.app.presentation.photos.compose.navigation.PhotosNavigationGraph
+import mega.privacy.android.app.presentation.photos.compose.navigation.photosNavigationGraph
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
@@ -105,6 +110,7 @@ class PhotosViewComposeCoordinator {
 /**
  * PhotosFragment
  */
+@OptIn(ExperimentalMaterialNavigationApi::class)
 @AndroidEntryPoint
 class PhotosFragment : Fragment() {
 
@@ -204,20 +210,28 @@ class PhotosFragment : Fragment() {
                 val mode by monitorThemeModeUseCase()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 OriginalTheme(isDark = mode.isDarkMode()) {
-                    PhotosScreen(
-                        viewComposeCoordinator = viewComposeCoordinator,
-                        photosViewModel = photosViewModel,
-                        timelineViewModel = timelineViewModel,
-                        albumsViewModel = albumsViewModel,
-                        photoDownloaderViewModel = photoDownloaderViewModel,
-                        onEnableCameraUploads = ::enableCameraUploads,
-                        onNavigateAlbumContent = ::openAlbum,
-                        onNavigateAlbumPhotosSelection = ::openAlbumPhotosSelection,
-                        onZoomIn = ::handleZoomIn,
-                        onZoomOut = ::handleZoomOut,
-                        onNavigateCameraUploadsSettings = ::openCameraUploadsSettings,
-                        onChangeCameraUploadsPermissions = ::changeCameraUploadsPermissions,
-                    )
+                    val bottomSheetNavigator = rememberBottomSheetNavigator()
+                    val navHostController = rememberNavController(bottomSheetNavigator)
+
+                    NavHost(
+                        navController = navHostController,
+                        startDestination = PhotosNavigationGraph
+                    ) {
+                        photosNavigationGraph(
+                            viewComposeCoordinator = viewComposeCoordinator,
+                            photosViewModel = photosViewModel,
+                            timelineViewModel = timelineViewModel,
+                            albumsViewModel = albumsViewModel,
+                            photoDownloaderViewModel = photoDownloaderViewModel,
+                            onEnableCameraUploads = ::enableCameraUploads,
+                            onNavigateAlbumContent = ::openAlbum,
+                            onNavigateAlbumPhotosSelection = ::openAlbumPhotosSelection,
+                            onZoomIn = ::handleZoomIn,
+                            onZoomOut = ::handleZoomOut,
+                            onNavigateCameraUploadsSettings = ::openCameraUploadsSettings,
+                            onChangeCameraUploadsPermissions = ::changeCameraUploadsPermissions,
+                        )
+                    }
                 }
             }
         }
