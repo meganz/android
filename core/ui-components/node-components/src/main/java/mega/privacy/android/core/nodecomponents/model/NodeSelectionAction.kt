@@ -51,7 +51,7 @@ sealed interface NodeSelectionAction : TopAppBarAction {
 
     data class ShareLink(
         private val count: Int,
-    ) : TopAppBarAction {
+    ) : NodeSelectionAction {
         override val testTag: String = "node_selection_action:share_link"
 
         @Composable
@@ -63,6 +63,12 @@ sealed interface NodeSelectionAction : TopAppBarAction {
         @Composable
         override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.Link01)
     }
+
+    data object Copy : NodeSelectionActionString(
+        testTag = "node_selection_action:copy",
+        descriptionRes = sharedR.string.general_copy,
+        imageVector = IconPack.Medium.Thin.Outline.Copy01
+    )
 
     data object Move : NodeSelectionActionString(
         testTag = "node_selection_action:move",
@@ -82,6 +88,12 @@ sealed interface NodeSelectionAction : TopAppBarAction {
         imageVector = IconPack.Medium.Thin.Outline.MoreVertical
     )
 
+    data object Hide : NodeSelectionActionString(
+        testTag = "node_selection_action:hide",
+        descriptionRes = sharedR.string.general_hide_node,
+        imageVector = IconPack.Medium.Thin.Outline.EyeOff
+    )
+
     /**
      * Helper class to build node selection TopAppBarAction
      * @property descriptionRes
@@ -90,11 +102,26 @@ sealed interface NodeSelectionAction : TopAppBarAction {
         @StringRes val descriptionRes: Int,
         val imageVector: ImageVector,
         override val testTag: String,
-    ) : TopAppBarAction {
+    ) : NodeSelectionAction {
         @Composable
         override fun getDescription() = stringResource(id = descriptionRes)
 
         @Composable
         override fun getIconPainter() = rememberVectorPainter(imageVector)
+    }
+
+    companion object {
+        const val DEFAULT_MAX_VISIBLE_ITEMS = 4
+
+        val defaults = getDefaults(1)
+
+        fun getDefaults(size: Int) = listOf(
+            Download,
+            ShareLink(size),
+            Hide,
+            Move,
+            Copy,
+            RubbishBin
+        )
     }
 }

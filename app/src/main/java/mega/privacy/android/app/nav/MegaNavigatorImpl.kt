@@ -644,6 +644,13 @@ internal class MegaNavigatorImpl @Inject constructor(
         )
     }
 
+    override fun openGetLinkActivity(context: Context, handles: LongArray) {
+        context.startActivity(
+            Intent(context, GetLinkActivity::class.java)
+                .putExtra(Constants.HANDLE_LIST, handles)
+        )
+    }
+
     override fun openFileInfoActivity(context: Context, handle: Long) {
         context.startActivity(
             Intent(context, FileInfoActivity::class.java)

@@ -377,6 +377,17 @@ interface AppNavigator {
     )
 
     /**
+     * Open Get Link Activity
+     *
+     * @param context Context
+     * @param handles Node handles
+     */
+    fun openGetLinkActivity(
+        context: Context,
+        handles: LongArray,
+    )
+
+    /**
      * Open File Info Activity
      *
      * @param context Context
