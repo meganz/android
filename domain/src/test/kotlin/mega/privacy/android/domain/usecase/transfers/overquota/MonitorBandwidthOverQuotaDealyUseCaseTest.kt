@@ -16,7 +16,6 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.time.Duration.Companion.seconds
@@ -28,17 +27,19 @@ class MonitorBandwidthOverQuotaDelayUseCaseTest {
 
     private val transfersRepository = mock<TransferRepository>()
     private val getCurrentTimeInMillisUseCase = mock<GetCurrentTimeInMillisUseCase>()
-    private val updateTransferOverQuotaTimestampUseCase =
-        mock<UpdateTransferOverQuotaTimestampUseCase>()
     private val monitorTransferOverQuotaUseCase = mock<MonitorTransferOverQuotaUseCase>()
     private val getBandwidthOverQuotaDelayUseCase = mock<GetBandwidthOverQuotaDelayUseCase>()
+
+    private val bandwidthDelay = 1000.seconds
+    private val currentTime = 123456789L
+
+    private val atomicLong = AtomicLong(0L)
 
     @BeforeAll
     fun setUp() {
         underTest = MonitorBandwidthOverQuotaDelayUseCase(
             transferRepository = transfersRepository,
             getCurrentTimeInMillisUseCase = getCurrentTimeInMillisUseCase,
-            updateTransferOverQuotaTimestampUseCase = updateTransferOverQuotaTimestampUseCase,
             monitorTransferOverQuotaUseCase = monitorTransferOverQuotaUseCase,
             getBandwidthOverQuotaDelayUseCase = getBandwidthOverQuotaDelayUseCase
         )
@@ -49,7 +50,6 @@ class MonitorBandwidthOverQuotaDelayUseCaseTest {
         reset(
             transfersRepository,
             getCurrentTimeInMillisUseCase,
-            updateTransferOverQuotaTimestampUseCase,
             monitorTransferOverQuotaUseCase,
             getBandwidthOverQuotaDelayUseCase
         )
@@ -59,6 +59,24 @@ class MonitorBandwidthOverQuotaDelayUseCaseTest {
     fun `test that if MonitorTransferOverQuotaUseCase emits false, this use case emits null`() =
         runTest {
             whenever(monitorTransferOverQuotaUseCase()) doReturn flowOf(false)
+            whenever(transfersRepository.transferOverQuotaTimestamp) doReturn atomicLong
+
+            underTest().test {
+                assertThat(awaitItem()).isNull()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that if transferOverQuotaTimestamp is already updated, this use case emits null`() =
+        runTest {
+            val updatedAtomicLong = AtomicLong(currentTime)
+
+            whenever(monitorTransferOverQuotaUseCase()) doReturn flowOf(true)
+            whenever(transfersRepository.transferOverQuotaTimestamp)
+                .thenReturn(atomicLong, updatedAtomicLong)
+            whenever(getCurrentTimeInMillisUseCase()) doReturn currentTime
+            whenever(getBandwidthOverQuotaDelayUseCase()) doReturn bandwidthDelay
 
             underTest().test {
                 assertThat(awaitItem()).isNull()
@@ -67,12 +85,10 @@ class MonitorBandwidthOverQuotaDelayUseCaseTest {
         }
 
     @ParameterizedTest
-    @ValueSource(longs = [123456780L, 113456789L])
+    @ValueSource(longs = [0L, 123456780L, 113456789L])
     fun `test that use case emits correctly when transferOverQuotaTimestamp is null or old enough`(
         transferOverQuotaTimestamp: Long,
     ) = runTest {
-        val bandwidthDelay = 1000.seconds
-        val currentTime = 123456789L
         val atomicLong = AtomicLong(transferOverQuotaTimestamp)
 
         whenever(monitorTransferOverQuotaUseCase()) doReturn flowOf(true)
@@ -83,7 +99,6 @@ class MonitorBandwidthOverQuotaDelayUseCaseTest {
         underTest().test {
             if ((currentTime - transferOverQuotaTimestamp) > WAIT_TIME_TO_SHOW_TRANSFER_OVER_QUOTA_WARNING) {
                 assertThat(awaitItem()).isEqualTo(bandwidthDelay)
-                verify(updateTransferOverQuotaTimestampUseCase)()
             } else {
                 assertThat(awaitItem()).isNull()
             }
