@@ -12,7 +12,6 @@ import javax.inject.Inject
 class MonitorBandwidthOverQuotaDelayUseCase @Inject constructor(
     private val transferRepository: TransferRepository,
     private val getCurrentTimeInMillisUseCase: GetCurrentTimeInMillisUseCase,
-    private val updateTransferOverQuotaTimestampUseCase: UpdateTransferOverQuotaTimestampUseCase,
     private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
     private val getBandwidthOverQuotaDelayUseCase: GetBandwidthOverQuotaDelayUseCase,
 ) {
@@ -20,17 +19,38 @@ class MonitorBandwidthOverQuotaDelayUseCase @Inject constructor(
     operator fun invoke() = monitorTransferOverQuotaUseCase()
         .conflate()
         .map { isTransferOverQuota ->
-            if (isTransferOverQuota && isTimeToWarnTransferOverQuota()) {
+            val currentTime = getCurrentTimeInMillisUseCase()
+            val transferOverQuotaTimestamp = transferRepository.transferOverQuotaTimestamp.get()
+
+            if (isTransferOverQuota && isTimeToWarnTransferOverQuota(
+                    currentTime,
+                    transferOverQuotaTimestamp
+                )
+            ) {
                 val bandwidthDelay = getBandwidthOverQuotaDelayUseCase()
-                if (bandwidthDelay.inWholeSeconds > 0) {
-                    updateTransferOverQuotaTimestampUseCase()
+
+                if (bandwidthDelay.inWholeSeconds > 0 && wasTimestampRecentlyUpdated(
+                        transferOverQuotaTimestamp,
+                        currentTime
+                    )
+                ) {
                     bandwidthDelay
-                } else null
-            } else null
+                } else {
+                    null
+                }
+            } else {
+                null
+            }
         }
 
-    private fun isTimeToWarnTransferOverQuota() =
-        (getCurrentTimeInMillisUseCase() - transferRepository.transferOverQuotaTimestamp.get()) > WAIT_TIME_TO_SHOW_TRANSFER_OVER_QUOTA_WARNING
+    private fun isTimeToWarnTransferOverQuota(currentTime: Long, transferOverQuotaTimestamp: Long) =
+        (currentTime - transferOverQuotaTimestamp) > WAIT_TIME_TO_SHOW_TRANSFER_OVER_QUOTA_WARNING
+
+    private fun wasTimestampRecentlyUpdated(transferOverQuotaTimestamp: Long, currentTime: Long) =
+        transferRepository.transferOverQuotaTimestamp.compareAndSet(
+            transferOverQuotaTimestamp,
+            currentTime
+        )
 
     companion object {
         internal const val WAIT_TIME_TO_SHOW_TRANSFER_OVER_QUOTA_WARNING = 60000L
