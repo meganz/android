@@ -53,6 +53,7 @@ import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import mega.privacy.android.navigation.destination.MyAccount
+import mega.privacy.android.navigation.destination.Notifications
 import timber.log.Timber
 
 @Composable
@@ -85,7 +86,7 @@ fun MenuHomeScreenUi(
                 trailingIcons = {
                     IconButton(
                         modifier = Modifier.testTag(NOTIFICATION_ICON),
-                        onClick = { Timber.d("Notification icon clicked") }
+                        onClick = { navigateToFeature(Notifications) }
                     ) {
                         MegaIcon(
                             painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Bell),

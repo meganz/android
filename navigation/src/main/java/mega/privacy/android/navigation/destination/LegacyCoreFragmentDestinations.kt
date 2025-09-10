@@ -7,6 +7,9 @@ import kotlinx.serialization.Serializable
 data object RubbishBin : NavKey
 
 @Serializable
+data object Notifications : NavKey
+
+@Serializable
 data class MediaDiscovery(
     val nodeHandle: Long,
     val nodeName: String? = null,

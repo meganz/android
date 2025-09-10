@@ -10,5 +10,6 @@ class LegacyCoreFragmentFeatureGraph : FeatureDestination {
         { navigationHandler, transferHandler ->
             rubbishBin(navigationHandler)
             legacyMediaDiscoveryScreen(navigationHandler)
+            notifications(navigationHandler)
         }
 }
