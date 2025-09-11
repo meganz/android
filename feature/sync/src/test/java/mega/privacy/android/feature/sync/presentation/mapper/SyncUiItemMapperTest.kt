@@ -81,6 +81,7 @@ class SyncUiItemMapperTest {
                 megaStorageNodeId = NodeId(233L),
                 expanded = false,
                 deviceStorageUri = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM"),
+                uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM"),
             )
         )
 
@@ -101,7 +102,8 @@ class SyncUiItemMapperTest {
                 deviceStoragePath = localPath,
                 megaStoragePath = "photos",
                 megaStorageNodeId = NodeId(1234L),
-                expanded = false
+                expanded = false,
+                uriPath = UriPath(localPath),
             )
         )
 
@@ -126,7 +128,8 @@ class SyncUiItemMapperTest {
             megaStorageNodeId = folderPairWithError.remoteFolder.id,
             expanded = false,
             error = null,
-            isLocalRootChangeNeeded = true
+            isLocalRootChangeNeeded = true,
+            uriPath = UriPath(folderPairWithError.localFolderPath),
         )
 
         whenever(deviceFolderUINodeErrorMessageMapper(folderPairWithError.syncError)).thenReturn(

@@ -32,6 +32,7 @@ import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
@@ -108,6 +109,7 @@ internal fun SyncCard(
                     creationTime = sync.creationTime,
                     deviceName = deviceName,
                     onOpenDeviceFolderClicked = onOpenDeviceFolderClicked,
+                    uriPath = sync.uriPath
                 )
             }
 
@@ -228,6 +230,7 @@ private fun SyncCardDetailedInfo(
     creationTime: Long,
     deviceName: String,
     onOpenDeviceFolderClicked: (String) -> Unit,
+    uriPath: UriPath
 ) {
     Column(Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp)) {
         InfoRow(
@@ -237,7 +240,7 @@ private fun SyncCardDetailedInfo(
                     textColor = TextColor.Accent,
                     modifier = Modifier.clickable {
                         Analytics.tracker.trackEvent(SyncCardOpenDeviceFolderButtonPressedEvent)
-                        onOpenDeviceFolderClicked(deviceStoragePath)
+                        onOpenDeviceFolderClicked(uriPath.value)
                     },
                     style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Medium)
                 )
@@ -472,6 +475,7 @@ private fun SyncCardExpandedPreview(
                 numberOfFolders = 5,
                 totalSizeInBytes = 23552L,
                 creationTime = 1699454365L,
+                uriPath = UriPath("/storage/emulated/0/Download")
             ),
             pauseRunClicked = {},
             expandClicked = {},
@@ -508,6 +512,7 @@ private fun SyncCardExpandedWithBannerPreview(
                 numberOfFolders = 5,
                 totalSizeInBytes = 23552L,
                 creationTime = 1699454365L,
+                uriPath = UriPath("/storage/emulated/0/Download")
             ),
             pauseRunClicked = {},
             expandClicked = {},
@@ -544,6 +549,7 @@ private fun SyncCardCollapsedPreview(
                 numberOfFolders = 5,
                 totalSizeInBytes = 23552L,
                 creationTime = 1699454365L,
+                uriPath = UriPath("/storage/emulated/0/Download")
             ),
             pauseRunClicked = {},
             expandClicked = {},
@@ -580,6 +586,7 @@ private fun SyncCardCollapsedWithBannerPreview(
                 numberOfFolders = 5,
                 totalSizeInBytes = 23552L,
                 creationTime = 1699454365L,
+                uriPath = UriPath("/storage/emulated/0/Download")
             ),
             pauseRunClicked = {},
             expandClicked = {},

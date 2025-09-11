@@ -127,7 +127,7 @@ internal class StalledIssuesMapperTest {
     fun `test that stalled issue matches by remote folder name when local path does not match`() {
         val syncs = createTestSyncs(1L, "/different/local/path", "test_folder")
         val stalledIssueSDKObject = createMockStalledIssue(
-            nodeName = "test_folder/some_file.txt",
+            nodeName = "/test_folder/some_file.txt",
             localPath = "/unrelated/path/file.txt"
         )
         val stalledIssuesSDKList = listOf(stalledIssueSDKObject)

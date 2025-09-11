@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.stopbackup.STOP_BACKUP_CONFIRMATION_DIALOG_BODY_TEST_TAG
@@ -75,7 +76,8 @@ class SyncFoldersScreenTest {
                     deviceStoragePath = folderName,
                     megaStoragePath = folderName,
                     megaStorageNodeId = NodeId(1234L),
-                    expanded = false
+                    expanded = false,
+                    uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                 )
             )
         )
@@ -251,6 +253,7 @@ class SyncFoldersScreenTest {
                         megaStoragePath = "MEGA Path",
                         megaStorageNodeId = NodeId(1111L),
                         expanded = false,
+                        uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                     ),
                     SyncUiItem(
                         id = 2L,
@@ -262,6 +265,7 @@ class SyncFoldersScreenTest {
                         megaStoragePath = "MEGA Path",
                         megaStorageNodeId = NodeId(2222L),
                         expanded = false,
+                        uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                     )
                 ),
                 cardExpanded = {},
@@ -297,6 +301,7 @@ class SyncFoldersScreenTest {
                         megaStoragePath = "MEGA Path",
                         megaStorageNodeId = NodeId(1111L),
                         expanded = false,
+                        uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                     ),
                 ),
                 cardExpanded = {},
@@ -333,6 +338,7 @@ class SyncFoldersScreenTest {
                         megaStoragePath = "MEGA Path",
                         megaStorageNodeId = NodeId(1111L),
                         expanded = true,
+                        uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                     ),
                 ),
                 cardExpanded = {},

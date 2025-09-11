@@ -13,6 +13,7 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
@@ -82,7 +83,8 @@ internal class SyncListRouteTest {
             deviceStoragePath = "Folder Path",
             megaStoragePath = "MEGA Patch",
             megaStorageNodeId = NodeId(1234L),
-            expanded = false
+            expanded = false,
+            uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
         )
     )
 

@@ -191,71 +191,72 @@ internal class SyncFoldersViewModel @Inject constructor(
         loadSyncsJob?.cancel()
         loadSyncsJob = viewModelScope.launch {
             combine(
-                monitorSyncsUseCase().map(syncUiItemMapper::invoke),
-                monitorCameraUploadsStatusInfoUseCase.invoke()
-                    .onStart { emit(CameraUploadsStatusInfo.Unknown) },
-            ) { syncs: List<SyncUiItem>, cuStatusInfo: CameraUploadsStatusInfo ->
-                Pair(syncs, cuStatusInfo)
-            }.catch { Timber.e(it) }
-                .distinctUntilChanged()
-                .collect { (syncs, cuStatusInfo) ->
-                    val stalledIssues = monitorStalledIssuesUseCase().first()
-                    var numOfFiles = 0
-                    var numOfFolders = 0
-                    var totalSizeInBytes = 0L
-                    var creationTime = 0L
-                    val syncsWithUpdatedDetails = syncs.map { sync ->
+                flow = monitorSyncsUseCase().map(syncUiItemMapper::invoke).distinctUntilChanged()
+                    .map { syncs ->
+                        val stalledIssues = monitorStalledIssuesUseCase().first()
+                        var numOfFiles = 0
+                        var numOfFolders = 0
+                        var totalSizeInBytes = 0L
+                        var creationTime = 0L
+                        val syncUiItems = syncs.map { sync ->
 
-                        runCatching {
-                            getNodeByIdUseCase(sync.megaStorageNodeId)
-                        }.onSuccess { node ->
-                            node?.let { folder ->
-                                creationTime = folder.creationTime
-                                runCatching {
-                                    getFolderTreeInfo(folder as TypedFolderNode)
-                                }.onSuccess { folderTreeInfo ->
-                                    with(folderTreeInfo) {
-                                        numOfFiles = numberOfFiles
-                                        numOfFolders = numberOfFolders
-                                        totalSizeInBytes = totalCurrentSizeInBytes
+                            runCatching {
+                                getNodeByIdUseCase(sync.megaStorageNodeId)
+                            }.onSuccess { node ->
+                                node?.let { folder ->
+                                    creationTime = folder.creationTime
+                                    runCatching {
+                                        getFolderTreeInfo(folder as TypedFolderNode)
+                                    }.onSuccess { folderTreeInfo ->
+                                        with(folderTreeInfo) {
+                                            numOfFiles = numberOfFiles
+                                            numOfFolders = numberOfFolders
+                                            totalSizeInBytes = totalCurrentSizeInBytes
+                                        }
+                                    }.onFailure {
+                                        Timber.e(it)
                                     }
-                                }.onFailure {
-                                    Timber.e(it)
                                 }
+                            }.onFailure {
+                                Timber.e(it)
                             }
-                        }.onFailure {
-                            Timber.e(it)
+                            sync.copy(
+                                hasStalledIssues = stalledIssues.any {
+                                    it.syncId == sync.id
+                                },
+                                expanded = _uiState.value.syncUiItems.firstOrNull { it.id == sync.id }?.expanded == true,
+                                numberOfFiles = numOfFiles,
+                                numberOfFolders = numOfFolders,
+                                totalSizeInBytes = totalSizeInBytes,
+                                creationTime = creationTime,
+                            )
                         }
-
-                        sync.copy(
-                            hasStalledIssues = stalledIssues.any {
-                                it.localPaths.firstOrNull()?.contains(sync.deviceStoragePath)
-                                    ?: (it.nodeNames.first().contains(sync.megaStoragePath))
-                            },
-                            expanded = _uiState.value.syncUiItems.firstOrNull { it.id == sync.id }?.expanded == true,
-                            numberOfFiles = numOfFiles,
-                            numberOfFolders = numOfFolders,
-                            totalSizeInBytes = totalSizeInBytes,
-                            creationTime = creationTime,
-                        )
-                    }
-
-                    val syncsList: MutableList<SyncUiItem> = emptyList<SyncUiItem>().toMutableList()
-                    getCameraUploadsOrMediaUploadsSyncUiItem(
-                        cameraUploadsOrMediaUploadsBackup = getCameraUploadsBackupUseCase(),
-                        cuStatusInfo = cuStatusInfo,
-                    )?.let { syncsList.add(it) }
-                    getCameraUploadsOrMediaUploadsSyncUiItem(
-                        cameraUploadsOrMediaUploadsBackup = getMediaUploadsBackupUseCase(),
-                        cuStatusInfo = cuStatusInfo,
-                    )?.let { syncsList.add(it) }
-                    syncsList.addAll(syncsWithUpdatedDetails)
+                        (syncUiItems to stalledIssues.size)
+                    },
+                flow2 = monitorCameraUploadsStatusInfoUseCase.invoke()
+                    .onStart { emit(CameraUploadsStatusInfo.Unknown) }.distinctUntilChanged()
+                    .map { cuStatusInfo ->
+                        buildList {
+                            getCameraUploadsOrMediaUploadsSyncUiItem(
+                                cameraUploadsOrMediaUploadsBackup = getCameraUploadsBackupUseCase(),
+                                cuStatusInfo = cuStatusInfo,
+                            )?.let { add(it) }
+                            getCameraUploadsOrMediaUploadsSyncUiItem(
+                                cameraUploadsOrMediaUploadsBackup = getMediaUploadsBackupUseCase(),
+                                cuStatusInfo = cuStatusInfo,
+                            )?.let { add(it) }
+                        }
+                    },
+            ) { syncs: Pair<List<SyncUiItem>, Int>, cameraUploadsBackup: List<SyncUiItem> ->
+                Pair(syncs, cameraUploadsBackup)
+            }.catch { Timber.e(it) }
+                .collect { (syncs, cuBackups) ->
                     _uiState.update {
                         it.copy(
-                            syncUiItems = syncsList,
+                            syncUiItems = cuBackups + syncs.first,
                             isRefreshing = false,
                             isLoading = false,
-                            stalledIssueCount = stalledIssues.size
+                            stalledIssueCount = syncs.second
                         )
                     }
                 }

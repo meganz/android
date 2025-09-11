@@ -147,7 +147,8 @@ internal class SyncFoldersViewModelTest {
             megaStoragePath = "photos",
             megaStorageNodeId = NodeId(1234L),
             deviceStorageUri = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM"),
-            expanded = false
+            expanded = false,
+            uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM"),
         ),
         SyncUiItem(
             id = 4L,
@@ -158,7 +159,8 @@ internal class SyncFoldersViewModelTest {
             hasStalledIssues = false,
             megaStoragePath = "Backup",
             megaStorageNodeId = NodeId(5678L),
-            expanded = false
+            expanded = false,
+            uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM"),
         ),
     )
 
@@ -483,7 +485,8 @@ internal class SyncFoldersViewModelTest {
         megaStoragePath = "photos",
         megaStorageNodeId = NodeId(1234L),
         hasStalledIssues = false,
-        expanded = false
+        expanded = false,
+        uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM"),
     )
 
     private fun initViewModel() {

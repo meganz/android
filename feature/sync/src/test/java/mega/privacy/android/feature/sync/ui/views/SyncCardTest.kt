@@ -11,6 +11,7 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
@@ -50,6 +51,7 @@ internal class SyncCardTest {
                     megaStoragePath = "MEGA Path",
                     megaStorageNodeId = NodeId(1111L),
                     expanded = false,
+                    uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                 ),
                 expandClicked = {},
                 pauseRunClicked = {},
@@ -103,6 +105,7 @@ internal class SyncCardTest {
                     megaStoragePath = "MEGA Path",
                     megaStorageNodeId = NodeId(1111L),
                     expanded = true,
+                    uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                 ),
                 expandClicked = {},
                 pauseRunClicked = {},
@@ -157,6 +160,7 @@ internal class SyncCardTest {
                     megaStoragePath = "MEGA Path",
                     megaStorageNodeId = NodeId(1111L),
                     expanded = false,
+                    uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                 ),
                 expandClicked = {},
                 pauseRunClicked = { clicked = true },
@@ -205,6 +209,7 @@ internal class SyncCardTest {
                     megaStoragePath = "MEGA Path",
                     megaStorageNodeId = NodeId(1111L),
                     expanded = false,
+                    uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                 ),
                 expandClicked = {},
                 pauseRunClicked = { clicked = true },
@@ -240,6 +245,7 @@ internal class SyncCardTest {
                     megaStoragePath = "MEGA Path",
                     megaStorageNodeId = NodeId(1111L),
                     expanded = true,
+                    uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                 ),
                 expandClicked = {},
                 pauseRunClicked = {},
@@ -287,6 +293,7 @@ internal class SyncCardTest {
                     megaStoragePath = "MEGA Path",
                     megaStorageNodeId = NodeId(1111L),
                     expanded = true,
+                    uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                 ),
                 expandClicked = {},
                 pauseRunClicked = {},
@@ -319,6 +326,7 @@ internal class SyncCardTest {
                     megaStoragePath = "MEGA Path",
                     megaStorageNodeId = NodeId(1111L),
                     expanded = false,
+                    uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                 ),
                 expandClicked = {},
                 pauseRunClicked = {},
@@ -372,6 +380,7 @@ internal class SyncCardTest {
                     megaStoragePath = "MEGA Path",
                     megaStorageNodeId = NodeId(1111L),
                     expanded = true,
+                    uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                 ),
                 expandClicked = {},
                 pauseRunClicked = {},
@@ -426,6 +435,7 @@ internal class SyncCardTest {
                     megaStoragePath = "MEGA Path",
                     megaStorageNodeId = NodeId(1111L),
                     expanded = false,
+                    uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                 ),
                 expandClicked = {},
                 pauseRunClicked = { clicked = true },
@@ -474,6 +484,7 @@ internal class SyncCardTest {
                     megaStoragePath = "MEGA Path",
                     megaStorageNodeId = NodeId(1111L),
                     expanded = false,
+                    uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                 ),
                 expandClicked = {},
                 pauseRunClicked = { clicked = true },
@@ -509,6 +520,7 @@ internal class SyncCardTest {
                     megaStoragePath = "MEGA Path",
                     megaStorageNodeId = NodeId(1111L),
                     expanded = true,
+                    uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                 ),
                 expandClicked = {},
                 pauseRunClicked = {},
@@ -556,6 +568,7 @@ internal class SyncCardTest {
                     megaStoragePath = "MEGA Path",
                     megaStorageNodeId = NodeId(1111L),
                     expanded = true,
+                    uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                 ),
                 expandClicked = {},
                 pauseRunClicked = {},
@@ -588,6 +601,7 @@ internal class SyncCardTest {
                     megaStoragePath = "MEGA Path",
                     megaStorageNodeId = NodeId(1111L),
                     expanded = false,
+                    uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                 ),
                 expandClicked = {},
                 pauseRunClicked = {},
@@ -641,6 +655,7 @@ internal class SyncCardTest {
                     megaStoragePath = "MEGA Path",
                     megaStorageNodeId = NodeId(1111L),
                     expanded = true,
+                    uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                 ),
                 expandClicked = {},
                 pauseRunClicked = {},
@@ -695,6 +710,7 @@ internal class SyncCardTest {
                     megaStoragePath = "MEGA Path",
                     megaStorageNodeId = NodeId(1111L),
                     expanded = false,
+                    uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                 ),
                 expandClicked = {},
                 pauseRunClicked = {},
@@ -736,6 +752,7 @@ internal class SyncCardTest {
                     megaStoragePath = "MEGA Path",
                     megaStorageNodeId = NodeId(1111L),
                     expanded = true,
+                    uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                 ),
                 expandClicked = {},
                 pauseRunClicked = {},
@@ -768,6 +785,7 @@ internal class SyncCardTest {
                     megaStoragePath = "MEGA Path",
                     megaStorageNodeId = NodeId(1111L),
                     expanded = false,
+                    uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                 ),
                 expandClicked = {},
                 pauseRunClicked = {},
@@ -821,6 +839,7 @@ internal class SyncCardTest {
                     megaStoragePath = "MEGA Path",
                     megaStorageNodeId = NodeId(1111L),
                     expanded = true,
+                    uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                 ),
                 expandClicked = {},
                 pauseRunClicked = {},
@@ -875,6 +894,7 @@ internal class SyncCardTest {
                     megaStoragePath = "MEGA Path",
                     megaStorageNodeId = NodeId(1111L),
                     expanded = false,
+                    uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                 ),
                 expandClicked = {},
                 pauseRunClicked = {},
@@ -916,6 +936,7 @@ internal class SyncCardTest {
                     megaStoragePath = "MEGA Path",
                     megaStorageNodeId = NodeId(1111L),
                     expanded = true,
+                    uriPath = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM")
                 ),
                 expandClicked = {},
                 pauseRunClicked = {},

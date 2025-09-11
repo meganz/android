@@ -81,7 +81,7 @@ internal class StalledIssuesMapper @Inject constructor(
 
         // Fallback to remote folder name matching
         return nodeInfoList.any { node ->
-            node.nodeName.startsWith(sync.remoteFolder.name)
+            node.nodeName.startsWith("/${sync.remoteFolder.name}")
         }
     }
 

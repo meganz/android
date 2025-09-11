@@ -16,7 +16,7 @@ class MonitorCameraUploadsStatusInfoUseCase @Inject constructor(
      * Invoke
      * @return flow of [CameraUploadsStatusInfo]
      */
-    suspend operator fun invoke() =
+    operator fun invoke() =
         cameraUploadsRepository.monitorCameraUploadsStatusInfo()
             .filter { cameraUploadsRepository.isCameraUploadsEnabled() == true }
 }

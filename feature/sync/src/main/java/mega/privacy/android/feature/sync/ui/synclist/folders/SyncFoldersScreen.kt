@@ -32,6 +32,7 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
@@ -282,6 +283,7 @@ private fun SyncFoldersScreenSyncingPreview(
                     megaStoragePath = "/path/to/mega/folder",
                     megaStorageNodeId = NodeId(1234L),
                     expanded = false,
+                    uriPath = UriPath("/path/to/local/folder")
                 )
             ),
             cardExpanded = {},
@@ -318,7 +320,8 @@ private fun SyncFoldersScreenSyncingWithStalledIssuesPreview(
                     deviceStoragePath = "/path/to/local/folder",
                     megaStoragePath = "/path/to/mega/folder",
                     megaStorageNodeId = NodeId(1234L),
-                    expanded = false
+                    expanded = false,
+                    uriPath = UriPath("/path/to/local/folder")
                 )
             ),
             cardExpanded = {},

@@ -54,13 +54,10 @@ internal class SyncUiItemMapper @Inject constructor(
             error = if (folderPair.syncError != SyncError.COULD_NOT_CREATE_IGNORE_FILE) {
                 deviceFolderUINodeErrorMessageMapper(folderPair.syncError)
             } else null,
-            isLocalRootChangeNeeded = folderPair.isLocalPathUri.not() || folderPair.syncError == SyncError.COULD_NOT_CREATE_IGNORE_FILE
+            isLocalRootChangeNeeded = folderPair.isLocalPathUri.not() || folderPair.syncError == SyncError.COULD_NOT_CREATE_IGNORE_FILE,
+            uriPath = UriPath(folderPair.localFolderPath)
         )
-
     }
-
-    operator fun invoke(backup: Backup): SyncUiItem =
-        getSyncUiItemFromBackup(backup = backup, cuStatusInfo = null)
 
     operator fun invoke(cuBackup: Backup, cuStatusInfo: CameraUploadsStatusInfo): SyncUiItem =
         getSyncUiItemFromBackup(backup = cuBackup, cuStatusInfo = cuStatusInfo)
@@ -89,6 +86,7 @@ internal class SyncUiItemMapper @Inject constructor(
             megaStoragePath = backup.targetFolderPath,
             megaStorageNodeId = backup.targetNode,
             expanded = false,
-            error = deviceFolderUINodeErrorMessageMapper(SyncError.NO_SYNC_ERROR)
+            error = deviceFolderUINodeErrorMessageMapper(SyncError.NO_SYNC_ERROR),
+            uriPath = UriPath(backup.localFolder)
         )
 }
