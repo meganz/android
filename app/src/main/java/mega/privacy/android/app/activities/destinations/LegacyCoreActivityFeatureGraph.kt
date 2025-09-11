@@ -1,6 +1,7 @@
 package mega.privacy.android.app.activities.destinations
 
 import androidx.navigation.NavGraphBuilder
+import mega.privacy.android.app.presentation.settings.cookieSettingsNavigationDestination
 import mega.privacy.android.feature.payment.upgradeAccount
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -14,5 +15,6 @@ class LegacyCoreActivityFeatureGraph : FeatureDestination {
             myAccount(navigationHandler::back)
             achievement(navigationHandler::back)
             webDestinations(navigationHandler::back)
+            cookieSettingsNavigationDestination(navigationHandler::back)
         }
 }

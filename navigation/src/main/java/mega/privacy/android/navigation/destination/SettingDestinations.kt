@@ -8,3 +8,6 @@ import mega.privacy.android.navigation.settings.arguments.TargetPreference
 data class LegacySettings(
     val targetPreference: TargetPreference?,
 ) : NavKey
+
+@Serializable
+data object CookieSettings : NavKey
