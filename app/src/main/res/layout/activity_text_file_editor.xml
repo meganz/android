@@ -58,7 +58,6 @@
                 android:paddingEnd="@dimen/text_editor_padding_without_nLines"
                 android:paddingBottom="@dimen/text_editor_padding_bottom"
                 android:textAppearance="@style/TextAppearance.Mega.Body2"
-                android:theme="@style/TransparentEditText.Transparent"
                 tools:ignore="Autofill,LabelFor" />
 
             <WebView
