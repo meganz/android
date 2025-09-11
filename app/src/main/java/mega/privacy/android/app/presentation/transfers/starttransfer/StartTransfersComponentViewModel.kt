@@ -431,6 +431,10 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     /* No actions required. Execution should not reach here as this event
                     is only used for [TransferTriggerEvent.RetryTransfers] */
                 }
+
+                is TransferTriggerEvent.StartDownloadForAttach -> {
+                    startDownloadForAttach(transferTriggerEvent)
+                }
             }
         }
     }
@@ -588,6 +592,31 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * It starts downloading the node for attach with the appropriate use case
+     *
+     * @param event the [TransferTriggerEvent.StartDownloadForAttach] event that starts this download
+     */
+    private fun startDownloadForAttach(event: TransferTriggerEvent.StartDownloadForAttach) {
+        viewModelScope.launch {
+            startDownloadNodes(
+                nodes = event.nodes,
+                isHighPriority = true,
+                getUri = {
+                    runCatching {
+                        getFilePreviewDownloadPathUseCase().also {
+                            // delete the existing file if already exists, because if the preview exists and we need to download it means it's outdated
+                            deleteCacheFilesUseCase(event.nodes.map { node -> UriPath(it + node.name) })
+                        }
+                    }
+                        .onFailure { Timber.e(it) }
+                        .getOrNull()
+                },
+                transferTriggerEvent = event
+            )
         }
     }
 

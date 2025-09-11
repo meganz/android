@@ -350,6 +350,8 @@ class StartTransfersComponentViewModelTest {
         } else if (startEvent is TransferTriggerEvent.StartDownloadForPreview) {
             whenever(getPreviewDownloadUseCase(node)).thenReturn(null)
             whenever(getFilePreviewDownloadPathUseCase()).thenReturn(DESTINATION)
+        } else if (startEvent is TransferTriggerEvent.StartDownloadForAttach) {
+            whenever(getFilePreviewDownloadPathUseCase()).thenReturn(DESTINATION)
         }
 
         underTest.startTransfer(startEvent)
@@ -1698,8 +1700,8 @@ class StartTransfersComponentViewModelTest {
             withStartMessage = false,
         ),
         TransferTriggerEvent.StartDownloadForPreview(node, false),
-
-        )
+        TransferTriggerEvent.StartDownloadForAttach(nodes),
+    )
 
     private fun provideStartChatUploadEvents() = listOf(
         TransferTriggerEvent.StartChatUpload.Files(CHAT_ID, listOf(uploadUri)),

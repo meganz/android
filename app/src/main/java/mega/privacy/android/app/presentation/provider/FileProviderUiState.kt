@@ -9,5 +9,5 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @property startDownloadEvent event to start the needed downloads
  */
 data class FileProviderUiState(
-    val startDownloadEvent: StateEventWithContent<TransferTriggerEvent.StartDownloadNode> = consumed(),
+    val startDownloadEvent: StateEventWithContent<TransferTriggerEvent.StartDownloadForAttach> = consumed(),
 )

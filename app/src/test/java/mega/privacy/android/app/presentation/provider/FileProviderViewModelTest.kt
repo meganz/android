@@ -83,11 +83,7 @@ class FileProviderViewModelTest {
             val node = mock<TypedFileNode>()
             whenever(getNodeByIdUseCase(id)) doReturn node
             val expected = triggered(
-                TransferTriggerEvent.StartDownloadNode(
-                    nodes = listOf(node),
-                    isHighPriority = true,
-                    withStartMessage = false
-                )
+                TransferTriggerEvent.StartDownloadForAttach(nodes = listOf(node))
             )
 
             underTest.uiState.test {

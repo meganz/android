@@ -210,6 +210,18 @@ sealed interface TransferTriggerEvent {
     }
 
     /**
+     * Event to start downloading node for attach
+     */
+    data class StartDownloadForAttach(
+        override val nodes: List<TypedNode>,
+    ) : DownloadTriggerEvent {
+        override val waitNotificationPermissionResponseToStart: Boolean = false
+        override val withStartMessage: Boolean = false
+        override val isHighPriority: Boolean = true
+        override val appData = TransferAppData.BackgroundTransfer
+    }
+
+    /**
      * Event to start uploading a list of files
      *
      * @property pathsAndNames List of files to be uploaded along with the chosen names for them.

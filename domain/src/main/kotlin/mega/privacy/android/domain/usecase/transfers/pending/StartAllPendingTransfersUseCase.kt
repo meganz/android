@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isAlreadyTransferredEvent
+import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
 import mega.privacy.android.domain.entity.transfer.isFinishScanningEvent
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.entity.transfer.isTransferUpdated
@@ -53,7 +54,9 @@ abstract class StartAllPendingTransfersUseCase(
                         //start all transfers in parallel to get the scanning result without the need to finish previous transfer.
                         launch {
                             doTransfer(pendingTransfer).takeWhile { transferEvent ->
-                                if (transferEvent is TransferEvent.TransferStartEvent) {
+                                if (transferEvent is TransferEvent.TransferStartEvent &&
+                                    transferEvent.transfer.isBackgroundTransfer().not()
+                                ) {
                                     //to be sure that the active transfer is added before deleting the pending transfer. Transfer Workers use collectChunked to monitor transfer events
                                     transferRepository.insertOrUpdateActiveTransfer(
                                         transferEvent.transfer
