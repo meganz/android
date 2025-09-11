@@ -35,6 +35,7 @@ import mega.privacy.android.data.mapper.node.NodeListMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.node.OfflineAvailabilityMapper
+import mega.privacy.android.data.mapper.node.TypedNodeMapper
 import mega.privacy.android.data.mapper.node.label.NodeLabelIntMapper
 import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
@@ -140,6 +141,7 @@ internal class NodeRepositoryImplTest {
     private val stringListMapper = mock<StringListMapper>()
     private val workManagerGateway = mock<WorkManagerGateway>()
     private val nodeLabelMapper = mock<NodeLabelMapper>()
+    private val typedNodeMapper = mock<TypedNodeMapper>()
 
     private val fileNodeMapper = FileNodeMapper(
         cacheGateway = cacheGateway,
@@ -201,6 +203,7 @@ internal class NodeRepositoryImplTest {
             workManagerGateway = workManagerGateway,
             stringListMapper = stringListMapper,
             nodeLabelMapper = nodeLabelMapper,
+            typedNodeMapper = typedNodeMapper,
         )
     }
 
@@ -1527,6 +1530,63 @@ internal class NodeRepositoryImplTest {
         whenever(megaApiGateway.getSyncs()).thenReturn(syncList)
         assertThat(underTest.isNodeSynced(NodeId(1234L))).isTrue()
         assertThat(underTest.isNodeSynced(NodeId(4321L))).isFalse()
+    }
+
+    @Test
+    fun `test that getAllSyncedNodeIds returns all synced node IDs`() = runTest {
+        val sync1 = mock<MegaSync> {
+            on { megaHandle }.thenReturn(1234L)
+        }
+        val sync2 = mock<MegaSync> {
+            on { megaHandle }.thenReturn(5678L)
+        }
+        val sync3 = mock<MegaSync> {
+            on { megaHandle }.thenReturn(9012L)
+        }
+        val syncList = mock<MegaSyncList> {
+            on { size() }.thenReturn(3)
+            on { get(0) }.thenReturn(sync1)
+            on { get(1) }.thenReturn(sync2)
+            on { get(2) }.thenReturn(sync3)
+        }
+        whenever(megaApiGateway.getSyncs()).thenReturn(syncList)
+
+        val actual = underTest.getAllSyncedNodeIds()
+
+        assertThat(actual).containsExactly(
+            NodeId(1234L),
+            NodeId(5678L),
+            NodeId(9012L)
+        )
+    }
+
+    @Test
+    fun `test that getAllSyncedNodeIds returns empty set when no syncs exist`() = runTest {
+        val syncList = mock<MegaSyncList> {
+            on { size() }.thenReturn(0)
+        }
+        whenever(megaApiGateway.getSyncs()).thenReturn(syncList)
+
+        val actual = underTest.getAllSyncedNodeIds()
+
+        assertThat(actual).isEmpty()
+    }
+
+    @Test
+    fun `test that getAllSyncedNodeIds handles null sync nodes`() = runTest {
+        val sync1 = mock<MegaSync> {
+            on { megaHandle }.thenReturn(1234L)
+        }
+        val syncList = mock<MegaSyncList> {
+            on { size() }.thenReturn(2)
+            on { get(0) }.thenReturn(sync1)
+            on { get(1) }.thenReturn(null) // null sync node
+        }
+        whenever(megaApiGateway.getSyncs()).thenReturn(syncList)
+
+        val actual = underTest.getAllSyncedNodeIds()
+
+        assertThat(actual).containsExactly(NodeId(1234L))
     }
 
     @Test

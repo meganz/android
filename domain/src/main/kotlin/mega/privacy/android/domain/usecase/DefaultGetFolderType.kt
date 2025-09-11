@@ -6,19 +6,18 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.repository.ChatRepository
-import mega.privacy.android.domain.repository.NodeRepository
 import javax.inject.Inject
 
 /**
  * Default [GetFolderType] implementation
  */
+@Deprecated("Use FolderTypeMapper")
 class DefaultGetFolderType @Inject constructor(
     private val cameraUploadsRepository: CameraUploadsRepository,
     private val chatRepository: ChatRepository,
     private val monitorBackupFolder: MonitorBackupFolder,
     private val hasAncestor: HasAncestor,
     private val getDeviceType: GetDeviceType,
-    private val nodeRepository: NodeRepository,
 ) : GetFolderType {
     override suspend fun invoke(folder: FolderNode) = with(folder) {
         when {
@@ -27,7 +26,7 @@ class DefaultGetFolderType @Inject constructor(
             isRootBackup(id) -> FolderType.RootBackup
             isChildBackup(id) -> FolderType.ChildBackup
             isDeviceFolder(this) -> FolderType.DeviceBackup(getDeviceType(this))
-            isSyncedFolder(id) -> FolderType.Sync
+            folder.isSynced -> FolderType.Sync
             else -> FolderType.Default
         }
     }
@@ -52,7 +51,4 @@ class DefaultGetFolderType @Inject constructor(
 
     private fun isDeviceFolder(folder: FolderNode) =
         !folder.device.isNullOrEmpty()
-
-    private suspend fun isSyncedFolder(nodeId: NodeId) =
-        nodeRepository.isNodeSynced(nodeId = nodeId)
 }

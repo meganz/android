@@ -3,6 +3,7 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
+import mega.privacy.android.domain.entity.FolderTypeData
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.ShareData
@@ -148,13 +149,15 @@ interface NodeRepository {
      * @param nodeId [NodeId] The parent node ID
      * @param order [SortOrder] Optional sorting order
      * @param initialBatchSize [Int] Size of initial batch (default: 1000)
-     * @return Flow of pairs containing node lists and hasMore flag for progressive loading
+     * @param folderTypeData [FolderTypeData] Optional data for folder type determination
+     * @return Flow of pairs containing typed node lists and hasMore flag for progressive loading
      */
     suspend fun getNodeChildrenInChunks(
         nodeId: NodeId,
         order: SortOrder? = null,
         initialBatchSize: Int = 1000,
-    ): Flow<Pair<List<UnTypedNode>, Boolean>>
+        folderTypeData: FolderTypeData? = null,
+    ): Flow<Pair<List<TypedNode>, Boolean>>
 
     /**
      * Get node children file types
@@ -858,6 +861,13 @@ interface NodeRepository {
      * @return True if node is synced or False otherwise
      */
     suspend fun isNodeSynced(nodeId: NodeId): Boolean
+
+    /**
+     * Get all synced node IDs
+     *
+     * @return Set of node IDs that are synced
+     */
+    suspend fun getAllSyncedNodeIds(): Set<NodeId>
 
     /**
      * Remove all versions of a nodes in app

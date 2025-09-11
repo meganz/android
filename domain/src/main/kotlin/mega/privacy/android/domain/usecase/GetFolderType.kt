@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 /**
  * Get folder location information
  */
+@Deprecated("Use FolderTypeMapper")
 fun interface GetFolderType {
     /**
      * Invoke

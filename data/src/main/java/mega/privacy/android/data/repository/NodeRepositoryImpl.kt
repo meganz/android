@@ -40,6 +40,7 @@ import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.node.NodeListMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
+import mega.privacy.android.data.mapper.node.TypedNodeMapper
 import mega.privacy.android.data.mapper.node.label.NodeLabelIntMapper
 import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
@@ -49,6 +50,7 @@ import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
+import mega.privacy.android.domain.entity.FolderTypeData
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
@@ -131,6 +133,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val workManagerGateway: WorkManagerGateway,
     private val stringListMapper: StringListMapper,
     private val nodeLabelMapper: NodeLabelMapper,
+    private val typedNodeMapper: TypedNodeMapper,
 ) : NodeRepository {
 
     override suspend fun getNodeOutgoingShares(nodeId: NodeId) =
@@ -1233,6 +1236,17 @@ internal class NodeRepositoryImpl @Inject constructor(
         return@withContext false
     }
 
+    override suspend fun getAllSyncedNodeIds(): Set<NodeId> = withContext(ioDispatcher) {
+        val syncs = megaApiGateway.getSyncs()
+        val syncedNodeIds = mutableSetOf<NodeId>()
+        for (i in 0..syncs.size()) {
+            syncs.get(i)?.let { syncNode ->
+                syncedNodeIds.add(NodeId(syncNode.megaHandle))
+            }
+        }
+        syncedNodeIds
+    }
+
     override suspend fun removeAllVersions() = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("removeAllVersions") {}
@@ -1252,7 +1266,8 @@ internal class NodeRepositoryImpl @Inject constructor(
         nodeId: NodeId,
         order: SortOrder?,
         initialBatchSize: Int,
-    ): Flow<Pair<List<UnTypedNode>, Boolean>> = flow {
+        folderTypeData: FolderTypeData?,
+    ): Flow<Pair<List<TypedNode>, Boolean>> = flow {
         val token = cancelTokenProvider.getOrCreateCancelToken()
         val filter = megaSearchFilterMapper(parentHandle = nodeId)
         val offlineItems = getAllOfflineNodeHandle()
@@ -1266,8 +1281,9 @@ internal class NodeRepositoryImpl @Inject constructor(
         val initialNodes = allChildren
             .take(initialBatchSize)
             .mapAsync(ConcurrencyStrategy.Parallel) { megaNode ->
-                convertToUnTypedNode(
-                    node = megaNode,
+                typedNodeMapper(
+                    megaNode = megaNode,
+                    folderTypeData = folderTypeData,
                     offline = offlineItems[megaNode.handle.toString()]
                 )
             }
@@ -1279,8 +1295,9 @@ internal class NodeRepositoryImpl @Inject constructor(
             val remainingNodes = allChildren
                 .drop(initialBatchSize)
                 .mapAsync(ConcurrencyStrategy.ChunkedSequential(2000)) { megaNode ->
-                    convertToUnTypedNode(
-                        node = megaNode,
+                    typedNodeMapper(
+                        megaNode = megaNode,
+                        folderTypeData = folderTypeData,
                         offline = offlineItems[megaNode.handle.toString()]
                     )
                 }

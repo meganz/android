@@ -54,7 +54,6 @@ class DefaultGetFolderTypeTest {
             monitorBackupFolder = monitorBackupFolder,
             hasAncestor = hasAncestor,
             getDeviceType = getDeviceType,
-            nodeRepository = nodeRepository,
         )
     }
 
@@ -171,10 +170,13 @@ class DefaultGetFolderTypeTest {
 
     @Test
     fun `test that synced folder is marked as a Sync folder`() = runTest {
-        nodeRepository.stub {
-            onBlocking { isNodeSynced(testFolder.id) }.thenReturn(true)
+        val syncedFolder = mock<FolderNode> {
+            on { id }.thenReturn(folderId)
+            on { parentId }.thenReturn(parentId)
+            on { isSynced }.thenReturn(true)
         }
-        val actual = underTest(testFolder)
+
+        val actual = underTest(syncedFolder)
 
         assertThat(actual).isEqualTo(FolderType.Sync)
     }

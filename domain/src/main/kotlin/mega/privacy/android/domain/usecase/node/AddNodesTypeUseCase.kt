@@ -6,6 +6,8 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.extension.ConcurrencyStrategy
+import mega.privacy.android.domain.extension.mapAsync
 import mega.privacy.android.domain.usecase.GetFolderType
 import javax.inject.Inject
 
@@ -22,7 +24,7 @@ class AddNodesTypeUseCase @Inject constructor(
      * @param nodes
      */
     suspend operator fun invoke(nodes: List<UnTypedNode>): List<TypedNode> {
-        return nodes.map { node ->
+        return nodes.mapAsync(ConcurrencyStrategy.Parallel) { node ->
             when (node) {
                 is TypedNode -> node
                 is FileNode -> DefaultTypedFileNode(fileNode = node)

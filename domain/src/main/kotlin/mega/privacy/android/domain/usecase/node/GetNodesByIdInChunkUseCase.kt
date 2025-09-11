@@ -1,9 +1,11 @@
 package mega.privacy.android.domain.usecase.node
 
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetFolderTypeDataUseCase
 import javax.inject.Inject
 
 /**
@@ -11,7 +13,7 @@ import javax.inject.Inject
  */
 class GetNodesByIdInChunkUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
-    private val addNodesTypeUseCase: AddNodesTypeUseCase,
+    private val getFolderTypeDataUseCase: GetFolderTypeDataUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
 ) {
 
@@ -20,16 +22,15 @@ class GetNodesByIdInChunkUseCase @Inject constructor(
      *
      * @param nodeId The parent node ID
      * @param initialBatchSize The initial batch size for loading nodes, default is 1000
-     * @return Flow that emits pairs containing node lists and hasMore flag progressively
+     * @return Flow that emits pairs containing typed node lists and hasMore flag progressively
      */
     suspend operator fun invoke(
         nodeId: NodeId,
         initialBatchSize: Int = 1000,
-    ) = nodeRepository.getNodeChildrenInChunks(
+    ): Flow<Pair<List<TypedNode>, Boolean>> = nodeRepository.getNodeChildrenInChunks(
         nodeId = nodeId,
         order = getCloudSortOrder(),
         initialBatchSize = initialBatchSize,
-    ).map { (nodes, hasMore) ->
-        addNodesTypeUseCase(nodes) to hasMore
-    }
+        folderTypeData = getFolderTypeDataUseCase(),
+    )
 }
