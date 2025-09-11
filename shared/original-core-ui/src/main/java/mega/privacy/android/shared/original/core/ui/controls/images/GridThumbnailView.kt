@@ -2,7 +2,6 @@ package mega.privacy.android.shared.original.core.ui.controls.images
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -107,7 +106,6 @@ fun GridThumbnailView(
             contentDescription = contentDescription,
             contentScale = if (imageLoaded) contentScale else ContentScale.Fit,
             modifier = finalModifier
-                .aspectRatio(1f)
                 .clip(RoundedCornerShape(cornerRadius))
                 .padding(vertical = if (imageLoaded) 0.dp else 34.dp),
             onSuccess = {
