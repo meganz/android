@@ -30,9 +30,9 @@ internal class SessionViewModel @Inject constructor(
      * @param optimistic If true, assumes that the SDK session exists while waiting for a response. That way it starts showing the content immediately
      */
     fun checkSdkSession(optimistic: Boolean = false) {
-        if (optimistic && _state.value.isRootNodeExists == null) {
+        if (optimistic && _state.value.doesRootNodeExist == null) {
             _state.update { state ->
-                state.copy(isRootNodeExists = true)
+                state.copy(doesRootNodeExist = true)
             }
         }
         viewModelScope.launch {
@@ -40,12 +40,12 @@ internal class SessionViewModel @Inject constructor(
                 rootNodeExistsUseCase()
             }.onSuccess {
                 _state.update { state ->
-                    state.copy(isRootNodeExists = it)
+                    state.copy(doesRootNodeExist = it)
                 }
             }.onFailure {
                 Timber.e(it, "Failed to check if root node exists")
                 _state.update { state ->
-                    state.copy(isRootNodeExists = false)
+                    state.copy(doesRootNodeExist = false)
                 }
             }
         }

@@ -23,10 +23,11 @@ internal fun openChatFragment(
     context: Context,
     chatId: Long,
     chatLink: String? = null,
+    action: String? = null,
 ) {
     context.findChatHostActivity()?.apply {
         Bundle().apply {
-            putString(EXTRA_ACTION, ACTION_CHAT_SHOW_MESSAGES)
+            putString(EXTRA_ACTION, action ?: ACTION_CHAT_SHOW_MESSAGES)
             putLong(Constants.CHAT_ID, chatId)
             chatLink?.let {
                 putString(EXTRA_LINK, it)

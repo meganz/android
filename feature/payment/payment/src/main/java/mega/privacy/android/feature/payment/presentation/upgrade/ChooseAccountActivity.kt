@@ -83,7 +83,12 @@ open class ChooseAccountActivity : AppCompatActivity() {
             putInt(ExtraConstant.EXTRA_ACCOUNT_TYPE, accountTypeInt)
         }
 
-        megaNavigator.openManagerActivity(this, bundle)
+        megaNavigator.openManagerActivity(
+            context = this,
+            data = intent.data,
+            action = intent.action,
+            bundle = bundle
+        )
         finish()
     }
 

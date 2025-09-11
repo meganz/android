@@ -267,13 +267,13 @@ class ChatViewModel @Inject constructor(
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
     actionFactories: Set<@JvmSuppressWildcards (ChatViewModel) -> MessageAction>,
 ) : ViewModel() {
-    private val _state = MutableStateFlow(ChatUiState())
-    val state = _state.asStateFlow()
-
     private val conversationArgs = ChatArgs(savedStateHandle)
     private val chatId = conversationArgs.chatId
     private val launchAction = conversationArgs.action
     private val chatLink = conversationArgs.link.orEmpty()
+
+    private val _state = MutableStateFlow(ChatUiState(chatLink = chatLink))
+    val state = _state.asStateFlow()
 
     private val usersTyping = Collections.synchronizedMap(mutableMapOf<Long, String?>())
     private val jobs = mutableMapOf<Long, Job>()

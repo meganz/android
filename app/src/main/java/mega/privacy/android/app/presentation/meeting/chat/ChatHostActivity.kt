@@ -6,6 +6,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.commit
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openChatFragment
 import mega.privacy.android.app.utils.Constants
@@ -35,6 +36,7 @@ class ChatHostActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         val chatId = intent.getLongExtra(Constants.CHAT_ID, -1L)
         val link = intent.getStringExtra(EXTRA_LINK)
-        openChatFragment(this, chatId = chatId, chatLink = link)
+        val action = intent.getStringExtra(EXTRA_ACTION)
+        openChatFragment(this, chatId = chatId, chatLink = link, action = action)
     }
 }

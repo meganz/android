@@ -1754,10 +1754,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     }
                 }
             }
-            Timber.d("Check if there any unread chat")
-            if (joiningToChatLink && !TextUtil.isTextEmpty(linkJoinToChatLink)) {
-                viewModel.checkLink(linkJoinToChatLink)
-            }
             Timber.d("Check if there any INCOMING pendingRequest contacts")
             viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE)
             if (drawerItem == null) {

@@ -779,8 +779,15 @@ internal class MegaNavigatorImpl @Inject constructor(
         context.startActivity(intent)
     }
 
-    override fun openManagerActivity(context: Context, bundle: Bundle?) {
+    override fun openManagerActivity(
+        context: Context,
+        data: Uri?,
+        action: String?,
+        bundle: Bundle?,
+    ) {
         val intent = Intent(context, ManagerActivity::class.java)
+        intent.action = action
+        intent.data = data
         bundle?.let { intent.putExtras(it) }
         context.startActivity(intent)
     }

@@ -30,12 +30,14 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
  * Session container, check session is ready or not.
  * If not, navigate to login page.
  *
+ * @param isSessionRequired If false, it will not check the session and always show the content. Used for pages that do not require a session, such as Preview Chat.
  * @param optimistic If true, assumes that the SDK session exists while waiting for a response. That way it starts showing the content immediately
  * @param loadingView Composable function that will be shown while waiting for the check session result. Use { DefaultLoadingSessionView() } for basic implementation.
  * @param content
  */
 @Composable
 internal fun SessionContainer(
+    isSessionRequired: Boolean = true,
     shouldFinish: Boolean = true,
     optimistic: Boolean = false,
     viewModel: SessionViewModel = hiltViewModel(),
@@ -47,9 +49,8 @@ internal fun SessionContainer(
     }
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-
-    when (state.isRootNodeExists) {
-        true ->
+    when {
+        !isSessionRequired || state.doesRootNodeExist == true ->
             Box(modifier = Modifier.pointerInput(Unit) {
                 awaitEachGesture {
                     do {
@@ -63,8 +64,8 @@ internal fun SessionContainer(
                 content()
             }
 
-        false -> navigateToLogin(shouldFinish)
-        null -> loadingView()
+        state.doesRootNodeExist == false -> navigateToLogin(shouldFinish)
+        state.doesRootNodeExist == null -> loadingView()
     }
 }
 

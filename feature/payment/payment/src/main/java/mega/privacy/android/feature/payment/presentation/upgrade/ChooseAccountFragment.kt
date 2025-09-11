@@ -193,7 +193,12 @@ class ChooseAccountFragment : Fragment() {
                 }
             }
 
-            megaNavigator.openManagerActivity(chooseAccountActivity, bundle)
+            megaNavigator.openManagerActivity(
+                context = chooseAccountActivity,
+                data = chooseAccountActivity.intent.data,
+                action = chooseAccountActivity.intent.action,
+                bundle = bundle
+            )
         }
 
         requireActivity().finish()

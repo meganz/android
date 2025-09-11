@@ -38,6 +38,7 @@ class LoginUseCaseTest {
     private val resetChatSettingsUseCase = mock<ResetChatSettingsUseCase>()
     private val disableChatApiUseCase = mock<DisableChatApiUseCase>()
     private val saveAccountCredentialsUseCase = mock<SaveAccountCredentialsUseCase>()
+    private val chatAnonymousLogoutUseCase = mock<ChatAnonymousLogoutUseCase>()
     private val loginMutex = mock<Mutex>()
 
     private val email = "test@email.com"
@@ -50,6 +51,7 @@ class LoginUseCaseTest {
             chatLogoutUseCase = chatLogoutUseCase,
             resetChatSettingsUseCase = resetChatSettingsUseCase,
             saveAccountCredentialsUseCase = saveAccountCredentialsUseCase,
+            chatAnonymousLogoutUseCase = chatAnonymousLogoutUseCase,
             loginMutex = loginMutex
         )
     }
@@ -62,6 +64,7 @@ class LoginUseCaseTest {
             chatLogoutUseCase,
             resetChatSettingsUseCase,
             saveAccountCredentialsUseCase,
+            chatAnonymousLogoutUseCase,
             loginMutex
         )
     }
@@ -78,6 +81,7 @@ class LoginUseCaseTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
+            verify(chatAnonymousLogoutUseCase).invoke()
             verify(loginRepository).initMegaChat()
             verify(chatLogoutUseCase).invoke(disableChatApiUseCase)
             verify(saveAccountCredentialsUseCase).invoke()
@@ -97,6 +101,7 @@ class LoginUseCaseTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
+            verify(chatAnonymousLogoutUseCase).invoke()
             verify(loginRepository).initMegaChat()
             val inOrder = inOrder(loginMutex)
             inOrder.verify(loginMutex).lock()
@@ -113,6 +118,7 @@ class LoginUseCaseTest {
                 assertThat(awaitError()).isInstanceOf(LoginRequireValidation::class.java)
             }
 
+            verify(chatAnonymousLogoutUseCase).invoke()
             verify(loginRepository).initMegaChat()
             verify(chatLogoutUseCase).invoke(disableChatApiUseCase)
             verify(resetChatSettingsUseCase).invoke()
@@ -131,6 +137,7 @@ class LoginUseCaseTest {
                 assertThat(awaitError()).isInstanceOf(LoginLoggedOutFromOtherLocation::class.java)
             }
 
+            verify(chatAnonymousLogoutUseCase).invoke()
             verify(loginRepository).initMegaChat()
             verifyNoInteractions(chatLogoutUseCase)
             verifyNoInteractions(resetChatSettingsUseCase)
@@ -149,6 +156,7 @@ class LoginUseCaseTest {
             cancelAndIgnoreRemainingEvents()
         }
 
+        verify(chatAnonymousLogoutUseCase).invoke()
         verify(loginRepository).initMegaChat()
         verify(saveAccountCredentialsUseCase).invoke()
         val inOrder = inOrder(loginMutex)

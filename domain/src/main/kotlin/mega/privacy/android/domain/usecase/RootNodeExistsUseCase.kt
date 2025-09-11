@@ -13,5 +13,5 @@ class RootNodeExistsUseCase @Inject constructor(private val nodeRepository: Node
      *
      * @return True if root node exists, false otherwise.
      */
-    suspend operator fun invoke() = nodeRepository.getRootNode() != null
+    suspend operator fun invoke() = nodeRepository.getRootNodeId() != null
 }

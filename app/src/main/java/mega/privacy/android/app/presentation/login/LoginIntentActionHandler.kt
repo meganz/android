@@ -570,6 +570,10 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                         }
                     }
 
+                    Constants.ACTION_JOIN_OPEN_CHAT_LINK -> {
+                        intentDataString = intent.dataString
+                    }
+
                     LoginViewModel.ACTION_FORCE_RELOAD_ACCOUNT -> {
                         viewModel.setForceReloadAccountAsPendingAction()
                         return@LaunchedEffect

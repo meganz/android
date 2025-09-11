@@ -56,7 +56,7 @@ internal class SessionViewModelTest {
         whenever(rootNodeExistsUseCase()).thenReturn(rootNodeExists)
         underTest.checkSdkSession()
         underTest.state.test {
-            assertThat(awaitItem().isRootNodeExists).isEqualTo(rootNodeExists)
+            assertThat(awaitItem().doesRootNodeExist).isEqualTo(rootNodeExists)
         }
     }
 
@@ -71,16 +71,16 @@ internal class SessionViewModelTest {
 
         whenever(rootNodeExistsUseCase()).thenReturn(false)
 
-        assertThat(underTest.state.value.isRootNodeExists).isNull()
+        assertThat(underTest.state.value.doesRootNodeExist).isNull()
         underTest.checkSdkSession(optimistic)
 
         underTest.state.test {
             if (optimistic) {
-                assertThat(awaitItem().isRootNodeExists).isEqualTo(true)
+                assertThat(awaitItem().doesRootNodeExist).isEqualTo(true)
             } else {
-                assertThat(awaitItem().isRootNodeExists).isNull()
+                assertThat(awaitItem().doesRootNodeExist).isNull()
             }
-            assertThat(awaitItem().isRootNodeExists).isEqualTo(false)
+            assertThat(awaitItem().doesRootNodeExist).isEqualTo(false)
         }
 
         Dispatchers.setMain(UnconfinedTestDispatcher())

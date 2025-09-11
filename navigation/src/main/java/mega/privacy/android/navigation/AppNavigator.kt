@@ -516,7 +516,12 @@ interface AppNavigator {
      * @param context The context
      * @param bundle Optional bundle containing extras to be added to the intent
      */
-    fun openManagerActivity(context: Context, bundle: Bundle? = null)
+    fun openManagerActivity(
+        context: Context,
+        data: Uri? = null,
+        action: String? = null,
+        bundle: Bundle? = null,
+    )
 
     /**
      * Open Media Discovery Activity

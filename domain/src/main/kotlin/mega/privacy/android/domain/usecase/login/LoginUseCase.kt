@@ -23,6 +23,7 @@ class LoginUseCase @Inject constructor(
     private val chatLogoutUseCase: ChatLogoutUseCase,
     private val resetChatSettingsUseCase: ResetChatSettingsUseCase,
     private val saveAccountCredentialsUseCase: SaveAccountCredentialsUseCase,
+    private val chatAnonymousLogoutUseCase: ChatAnonymousLogoutUseCase,
     @LoginMutex private val loginMutex: Mutex,
 ) {
 
@@ -42,6 +43,8 @@ class LoginUseCase @Inject constructor(
         runCatching {
             loginMutex.lock()
 
+            // logout anonymous chat if needed
+            runCatching { chatAnonymousLogoutUseCase() }
             runCatching { loginRepository.initMegaChat() }
                 .onFailure { exception ->
                     when (exception) {

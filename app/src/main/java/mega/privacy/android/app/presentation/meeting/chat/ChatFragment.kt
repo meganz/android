@@ -78,8 +78,13 @@ internal class ChatFragment : Fragment() {
         setContent {
             val mode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             var passcodeEnabled by remember { mutableStateOf(true) }
+            val action =
+                requireActivity().intent.getStringExtra(EXTRA_ACTION)
+                    ?: Constants.ACTION_CHAT_SHOW_MESSAGES
 
-            SessionContainer {
+            SessionContainer(
+                isSessionRequired = action != Constants.ACTION_OPEN_CHAT_LINK
+            ) {
                 ChatSessionContainer {
                     OriginalTheme(isDark = mode.isDarkMode()) {
                         PasscodeContainer(
@@ -92,9 +97,6 @@ internal class ChatFragment : Fragment() {
                                         rememberNavController(bottomSheetNavigator)
                                     val chatId =
                                         requireActivity().intent.getLongExtra(Constants.CHAT_ID, -1)
-                                    val action =
-                                        requireActivity().intent.getStringExtra(EXTRA_ACTION)
-                                            ?: Constants.ACTION_CHAT_SHOW_MESSAGES
                                     val chatLink =
                                         requireActivity().intent.getStringExtra(EXTRA_LINK)
                                     val coroutineScope = rememberCoroutineScope()
