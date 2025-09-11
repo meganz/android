@@ -129,6 +129,8 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     private val monitorTransferOverQuotaErrorTimestamp = MutableStateFlow<Instant?>(null)
 
+    private val monitorTransferInErrorStatus = MutableStateFlow(false)
+
     /**
      * To store in progress transfers in memory instead of in database
      */
@@ -427,7 +429,7 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override fun monitorCompletedTransfersByStateWithLimit(
         limit: Int,
-        vararg states: TransferState
+        vararg states: TransferState,
     ): Flow<List<CompletedTransfer>> =
         megaLocalRoomGateway.getCompletedTransfersByStateWithLimit(limit, *states)
             .flowOn(ioDispatcher)
@@ -438,6 +440,7 @@ internal class DefaultTransfersRepository @Inject constructor(
             val completedTransfers = finishEvents.map { event ->
                 if (event.transfer.state == TransferState.STATE_FAILED) {
                     completedTransferState = CompletedTransferState.Error
+                    monitorTransferInErrorStatus.update { true }
                 }
                 completedTransferMapper(event.transfer, event.error)
             }
@@ -457,6 +460,7 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaLocalRoomGateway.addCompletedTransfer(completedTransfer)
         removeInProgressTransfers(setOfNotNull(pendingTransfer.transferUniqueId))
         appEventGateway.broadcastCompletedTransfer(CompletedTransferState.Error)
+        monitorTransferInErrorStatus.update { true }
     }
 
     override suspend fun addCompletedTransferFromFailedPendingTransfers(
@@ -469,6 +473,7 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaLocalRoomGateway.addCompletedTransfers(completedTransfers)
         removeInProgressTransfers(pendingTransfers.mapNotNull { it.transferUniqueId }.toSet())
         appEventGateway.broadcastCompletedTransfer(CompletedTransferState.Error)
+        monitorTransferInErrorStatus.update { true }
     }
 
     override suspend fun deleteOldestCompletedTransfers() = withContext(ioDispatcher) {
@@ -848,6 +853,12 @@ internal class DefaultTransfersRepository @Inject constructor(
         monitorTransferOverQuotaErrorTimestamp.emit(
             Instant.fromEpochMilliseconds(deviceGateway.getCurrentTimeInMillis())
         )
+    }
+
+    override fun monitorTransferInErrorStatus() = monitorTransferInErrorStatus.asStateFlow()
+
+    override fun clearTransferErrorStatus() {
+        monitorTransferInErrorStatus.update { false }
     }
 
     private fun MegaTransfer.isBackgroundTransfer() =

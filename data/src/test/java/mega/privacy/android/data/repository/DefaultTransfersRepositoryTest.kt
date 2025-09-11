@@ -1906,4 +1906,62 @@ class DefaultTransfersRepositoryTest {
 
         assertThat(underTest.transferOverQuotaTimestamp).isEqualTo(value)
     }
+
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class MonitorTransferInErrorStatusTests {
+        private fun mockFailedTransferEvent(): TransferEvent.TransferFinishEvent {
+            val transfer = mock<Transfer>()
+            val transferEvent = mock<TransferEvent.TransferFinishEvent>()
+            whenever(transfer.state) doReturn TransferState.STATE_FAILED
+            whenever(transfer.uniqueId) doReturn 32453L
+            whenever(transferEvent.error) doReturn mock()
+            whenever(transferEvent.transfer) doReturn transfer
+            return transferEvent
+        }
+
+        @Test
+        fun `test that monitorTransferInErrorStatus change to true when a failed transfer is added with addCompletedTransfers`() =
+            runTest {
+                underTest.clearTransferErrorStatus()
+                underTest.monitorTransferInErrorStatus().test {
+                    assertThat(awaitItem()).isFalse()
+                    underTest.addCompletedTransfers(listOf(mockFailedTransferEvent()))
+                    assertThat(awaitItem()).isTrue()
+                }
+            }
+
+        @Test
+        fun `test that monitorTransferInErrorStatus change to true when a failed transfer is added with addCompletedTransferFromFailedPendingTransfer`() =
+            runTest {
+                underTest.clearTransferErrorStatus()
+                underTest.monitorTransferInErrorStatus().test {
+                    assertThat(awaitItem()).isFalse()
+                    underTest.addCompletedTransferFromFailedPendingTransfer(mock(), 0L, mock())
+                    assertThat(awaitItem()).isTrue()
+                }
+            }
+
+        @Test
+        fun `test that monitorTransferInErrorStatus change to true when a failed transfer is added with addCompletedTransferFromFailedPendingTransfers`() =
+            runTest {
+                underTest.clearTransferErrorStatus()
+                underTest.monitorTransferInErrorStatus().test {
+                    assertThat(awaitItem()).isFalse()
+                    underTest.addCompletedTransferFromFailedPendingTransfers(listOf(mock()), mock())
+                    assertThat(awaitItem()).isTrue()
+                }
+            }
+
+        @Test
+        fun `test that monitorTransferInErrorStatus change to false when clearTransferErrorStatus is invoked`() =
+            runTest {
+                underTest.addCompletedTransfers(listOf(mockFailedTransferEvent()))
+                underTest.monitorTransferInErrorStatus().test {
+                    assertThat(awaitItem()).isTrue()
+                    underTest.clearTransferErrorStatus()
+                    assertThat(awaitItem()).isFalse()
+                }
+            }
+    }
 }

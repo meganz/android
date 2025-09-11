@@ -656,4 +656,18 @@ interface TransferRepository {
      * Set transfer over quota error timestamp as current time.
      */
     suspend fun setTransferOverQuotaErrorTimestamp()
+
+
+    /**
+     * Monitors the transfer in error status.
+     * The error status is initiated when any transfer completes with an error.
+     * And it finishes when the user sees the error (transfers section is opened)
+     */
+    fun monitorTransferInErrorStatus(): StateFlow<Boolean>
+
+    /**
+     * Sets the transfer in error status to false.
+     * It should be set when the user sees the error (transfers section is opened)
+     */
+    fun clearTransferErrorStatus()
 }
