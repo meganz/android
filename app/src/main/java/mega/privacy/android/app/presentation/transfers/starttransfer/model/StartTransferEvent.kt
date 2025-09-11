@@ -172,9 +172,12 @@ sealed interface StartTransferEvent {
          * Message to be shown when failed transfers are retried with success
          * @param retryAmount
          */
-        data class TransfersRetriedSucceed(val retryAmount: Int) : MessagePluralRes(
-            sharedR.plurals.transfers_retry_feedback_snackbar_message,
-            retryAmount
+        data class TransfersRetriedSucceed(val retryAmount: Int) : MessageStringRes(
+            if (retryAmount == 1) {
+                sharedR.string.transfers_retry_feedback_snackbar_message_singular
+            } else {
+                sharedR.string.transfers_retry_feedback_snackbar_message_plural
+            }
         )
 
         /**
