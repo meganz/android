@@ -251,7 +251,7 @@ internal class AppEventFacade @Inject constructor(
     }
 
     override fun monitorMiscLoaded(): Flow<Boolean> {
-        return miscLoaded.asSharedFlow()
+        return miscLoaded.asStateFlow()
     }
 
     override suspend fun broadcastSslVerificationFailed() {

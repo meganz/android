@@ -26,6 +26,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesUnknownStatus
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.chat.IsMegaApiLoggedInUseCase
 import mega.privacy.android.domain.usecase.login.FastLoginUseCase
@@ -73,6 +74,7 @@ class LoginInProgressViewModelTest {
                 )
             )
     }
+    private val getUserDataUseCase: GetUserDataUseCase = mock()
 
     @BeforeAll
     fun initialisation() {
@@ -99,6 +101,7 @@ class LoginInProgressViewModelTest {
             resetChatSettingsUseCase,
             monitorAccountBlockedUseCase,
             isMegaApiLoggedInUseCase,
+            getUserDataUseCase
         )
     }
 
@@ -117,7 +120,8 @@ class LoginInProgressViewModelTest {
             resetChatSettingsUseCase = resetChatSettingsUseCase,
             monitorAccountBlockedUseCase = monitorAccountBlockedUseCase,
             isMegaApiLoggedInUseCase = isMegaApiLoggedInUseCase,
-            savedStateHandle = savedStateHandle
+            savedStateHandle = savedStateHandle,
+            getUserDataUseCase = getUserDataUseCase
         )
     }
 
@@ -369,7 +373,6 @@ class LoginInProgressViewModelTest {
 
             // Verify fetch nodes was called initially
             verify(fetchNodesUseCase).invoke()
-
             cancelAndIgnoreRemainingEvents()
         }
     }

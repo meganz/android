@@ -31,6 +31,7 @@ import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesException
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.chat.IsMegaApiLoggedInUseCase
 import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
@@ -60,6 +61,7 @@ class LoginInProgressViewModel @Inject constructor(
     private val resetChatSettingsUseCase: ResetChatSettingsUseCase,
     private val monitorAccountBlockedUseCase: MonitorAccountBlockedUseCase,
     private val isMegaApiLoggedInUseCase: IsMegaApiLoggedInUseCase,
+    private val getUserDataUseCase: GetUserDataUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val route = savedStateHandle.toRoute<MegaActivity.LoggedInScreens>()
@@ -223,6 +225,7 @@ class LoginInProgressViewModel @Inject constructor(
                     )
                 }
             }
+            getUserData()
             fetchNodes()
         }
 
@@ -251,6 +254,16 @@ class LoginInProgressViewModel @Inject constructor(
                 }
             } else {
                 Unit
+            }
+        }
+    }
+
+    private fun getUserData() {
+        viewModelScope.launch {
+            runCatching {
+                getUserDataUseCase()
+            }.onFailure { exception ->
+                Timber.e(exception, "Error getting user data")
             }
         }
     }

@@ -42,6 +42,7 @@ import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.CheckRecoveryKeyUseCase
 import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
+import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorLoggedOutFromAnotherLocationUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -182,6 +183,7 @@ internal class LoginViewModelTest {
     private val monitorMiscLoadedUseCase = mock<MonitorMiscLoadedUseCase>()
     private val monitorMiscLoadedFlow = MutableSharedFlow<Boolean>()
     private val getCookieSettingsUseCase = mock<GetCookieSettingsUseCase>()
+    private val getUserDataUseCase: GetUserDataUseCase = mock()
 
     @BeforeEach
     fun setUp() {
@@ -243,6 +245,7 @@ internal class LoginViewModelTest {
             getDomainNameUseCase = getDomainNameUseCase,
             monitorMiscLoadedUseCase = monitorMiscLoadedUseCase,
             getCookieSettingsUseCase = getCookieSettingsUseCase,
+            getUserDataUseCase = getUserDataUseCase
         )
     }
 

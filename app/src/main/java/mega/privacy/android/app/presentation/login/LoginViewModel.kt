@@ -68,6 +68,7 @@ import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.CheckRecoveryKeyUseCase
 import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
+import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorLoggedOutFromAnotherLocationUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -181,6 +182,7 @@ class LoginViewModel @Inject constructor(
     private val getMiscFlagsUseCase: GetMiscFlagsUseCase,
     private val getDomainNameUseCase: GetDomainNameUseCase,
     private val monitorMiscLoadedUseCase: MonitorMiscLoadedUseCase,
+    private val getUserDataUseCase: GetUserDataUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -844,6 +846,7 @@ class LoginViewModel @Inject constructor(
                         isFastLoginInProgress = false
                     )
                 }
+                getUserData()
             } else {
                 ephemeralCredentialManager.setEphemeralCredential(null)
                 _state.update {
@@ -901,6 +904,16 @@ class LoginViewModel @Inject constructor(
                 }
             } else {
                 Unit
+            }
+        }
+    }
+
+    private fun getUserData() {
+        viewModelScope.launch {
+            runCatching {
+                getUserDataUseCase()
+            }.onFailure { exception ->
+                Timber.e(exception, "Error getting user data")
             }
         }
     }

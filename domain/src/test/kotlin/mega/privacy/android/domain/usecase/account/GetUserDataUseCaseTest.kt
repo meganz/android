@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.account
 
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.usecase.setting.BroadcastMiscLoadedUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -11,6 +12,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -24,6 +26,9 @@ class GetUserDataUseCaseTest {
 
     @Mock
     private lateinit var broadcastUpdateUserDataUseCase: BroadcastUpdateUserDataUseCase
+
+    @Mock
+    private lateinit var broadcastMiscLoadedUseCase: BroadcastMiscLoadedUseCase
 
     private lateinit var closeable: AutoCloseable
 
@@ -41,6 +46,7 @@ class GetUserDataUseCaseTest {
             // Then
             verify(accountRepository).getUserData()
             verify(broadcastUpdateUserDataUseCase).invoke()
+            verify(broadcastMiscLoadedUseCase).invoke()
         }
 
     @Test
@@ -56,6 +62,7 @@ class GetUserDataUseCaseTest {
                 // Then
                 verify(accountRepository).getUserData()
                 verify(broadcastUpdateUserDataUseCase, never()).invoke()
+                verifyNoInteractions(broadcastMiscLoadedUseCase)
             }
         }
 
