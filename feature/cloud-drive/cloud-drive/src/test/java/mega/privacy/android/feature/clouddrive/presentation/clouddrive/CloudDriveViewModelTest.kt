@@ -2105,13 +2105,17 @@ class CloudDriveViewModelTest {
         val expectedSortConfiguration = NodeSortConfiguration.default
 
         whenever(getCloudSortOrderUseCase()).thenReturn(expectedSortOrder)
-        whenever(nodeSortConfigurationUiMapper(expectedSortOrder)).thenReturn(expectedSortConfiguration)
+        whenever(nodeSortConfigurationUiMapper(expectedSortOrder)).thenReturn(
+            expectedSortConfiguration
+        )
 
         val underTest = createViewModel()
         advanceUntilIdle()
 
         underTest.uiState.test {
-            assertThat(awaitItem().selectedSortConfiguration).isEqualTo(expectedSortConfiguration)
+            val state = awaitItem()
+            assertThat(state.selectedSortConfiguration).isEqualTo(expectedSortConfiguration)
+            assertThat(state.selectedSortOrder).isEqualTo(expectedSortOrder)
         }
     }
 

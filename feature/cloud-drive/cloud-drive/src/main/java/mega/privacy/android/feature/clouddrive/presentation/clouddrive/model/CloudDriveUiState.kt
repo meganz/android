@@ -8,6 +8,7 @@ import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -48,6 +49,7 @@ data class CloudDriveUiState(
     val documentScanningError: DocumentScanningError? = null,
     val isSelecting: Boolean = false,
     val hasMediaItems: Boolean = false,
+    val selectedSortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC,
     val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
 ) {
 

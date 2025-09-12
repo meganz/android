@@ -183,7 +183,12 @@ class CloudDriveViewModel @Inject constructor(
                 getCloudSortOrderUseCase()
             }.onSuccess { sortOrder ->
                 val sortOrderPair = nodeSortConfigurationUiMapper(sortOrder)
-                _uiState.update { it.copy(selectedSortConfiguration = sortOrderPair) }
+                _uiState.update {
+                    it.copy(
+                        selectedSortConfiguration = sortOrderPair,
+                        selectedSortOrder = sortOrder
+                    )
+                }
                 if (refresh) {
                     refreshNodes()
                 }

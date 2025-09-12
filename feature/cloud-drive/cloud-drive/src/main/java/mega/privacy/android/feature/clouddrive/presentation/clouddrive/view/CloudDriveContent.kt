@@ -55,7 +55,6 @@ import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomS
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
-import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -333,7 +332,7 @@ internal fun CloudDriveContent(
             onActionHandled = { onAction(OpenedFileNodeHandled) },
             nodeSourceType = NodeSourceType.CLOUD_DRIVE,
             onDownloadEvent = onTransfer,
-            sortOrder = SortOrder.ORDER_NONE
+            sortOrder = uiState.selectedSortOrder
         )
     }
 
