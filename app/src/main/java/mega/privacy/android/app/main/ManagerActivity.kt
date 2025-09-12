@@ -2477,7 +2477,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     private fun isShowingAds(): Boolean {
         return (isTablet() || isPortrait()) && googleAdsManager.isAdsEnabled()
                 && googleAdsManager.hasAdsRequest() &&
-                (drawerItem == DrawerItem.CLOUD_DRIVE
+                (drawerItem == DrawerItem.CLOUD_DRIVE && !fileBrowserViewModel.isInSelection()
                         || drawerItem == DrawerItem.CHAT
                         || drawerItem == DrawerItem.SHARED_ITEMS
                         || drawerItem == DrawerItem.HOMEPAGE && homepageScreen == HomepageScreen.HOMEPAGE
@@ -6667,7 +6667,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             if (hide && visibility == View.VISIBLE) {
                 updateMiniAudioPlayerVisibility(false)
                 val bottom =
-                    if (adsContainerViewModel.isAdsLoaded()) resources.getDimensionPixelSize(R.dimen.ads_web_view_container_height) else 0
+                    if (adsContainerViewModel.isAdsLoaded() && adsContainerView.isVisible) resources.getDimensionPixelSize(R.dimen.ads_web_view_container_height) else 0
                 params.setMargins(0, 0, 0, bottom)
                 fragmentLayout.layoutParams = params
                 animate().translationY(height.toFloat())

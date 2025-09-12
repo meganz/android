@@ -708,8 +708,8 @@ class CloudDriveSyncsFragment : Fragment() {
             inflater.inflate(R.menu.cloud_storage_action, menu)
             (requireActivity() as ManagerActivity).let {
                 it.hideFabButton()
-                it.showHideBottomNavigationView(true)
                 it.hideAdsView()
+                it.showHideBottomNavigationView(true)
             }
             return true
         }

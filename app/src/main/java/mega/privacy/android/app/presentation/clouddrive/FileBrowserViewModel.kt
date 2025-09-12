@@ -1103,6 +1103,11 @@ class FileBrowserViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Check if we are in selection mode
+     */
+    fun isInSelection() = _state.value.isInSelection
+
     suspend fun doesUriPathExists(uriPath: UriPath) =
         doesUriPathExistsUseCase(uriPath)
 }
