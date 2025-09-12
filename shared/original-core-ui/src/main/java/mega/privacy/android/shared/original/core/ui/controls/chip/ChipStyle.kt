@@ -122,7 +122,7 @@ data object RoundedChipStyle : ChipStyle {
         selectedBackgroundColor = DSTokens.colors.components.selectionControl,
         selectedContentColor = DSTokens.colors.text.inverse,
         selectedLeadingIconColor = DSTokens.colors.icon.inverse,
-        backgroundColor = DSTokens.colors.button.secondary,
+        backgroundColor = DSTokens.colors.background.surface1,
         contentColor = DSTokens.colors.text.primary,
         leadingIconColor = DSTokens.colors.icon.primary,
         disabledBackgroundColor = DSTokens.colors.button.secondary,
