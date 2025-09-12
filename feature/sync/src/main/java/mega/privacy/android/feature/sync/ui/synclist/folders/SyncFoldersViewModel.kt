@@ -11,18 +11,16 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
-import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.exception.ResourceAlreadyExistsMegaException
-import mega.privacy.android.domain.usecase.GetFolderTreeInfo
+import mega.privacy.android.domain.usecase.GetCompleteFolderInfoUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNodePathByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
@@ -79,7 +77,7 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getNodePathByIdUseCase: GetNodePathByIdUseCase,
-    private val getFolderTreeInfo: GetFolderTreeInfo,
+    private val getCompleteFolderInfoUseCase: GetCompleteFolderInfoUseCase,
     private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
@@ -89,7 +87,6 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val getMediaUploadsBackupUseCase: GetMediaUploadsBackupUseCase,
     private val monitorCameraUploadsSettingsActionsUseCase: MonitorCameraUploadsSettingsActionsUseCase,
     private val monitorCameraUploadsStatusInfoUseCase: MonitorCameraUploadsStatusInfoUseCase,
-    private val backupInfoTypeIntMapper: BackupInfoTypeIntMapper,
     private val getPrimaryFolderNodeUseCase: GetPrimaryFolderNodeUseCase,
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
     private val getSecondaryFolderNodeUseCase: GetSecondaryFolderNodeUseCase,
@@ -189,138 +186,92 @@ internal class SyncFoldersViewModel @Inject constructor(
 
     private fun loadSyncs() {
         loadSyncsJob?.cancel()
-        loadSyncsJob = viewModelScope.launch {
-            combine(
-                flow = monitorSyncsUseCase().map(syncUiItemMapper::invoke).distinctUntilChanged()
-                    .map { syncs ->
-                        val stalledIssues = monitorStalledIssuesUseCase().first()
-                        var numOfFiles = 0
-                        var numOfFolders = 0
-                        var totalSizeInBytes = 0L
-                        var creationTime = 0L
-                        val syncUiItems = syncs.map { sync ->
-
-                            runCatching {
-                                getNodeByIdUseCase(sync.megaStorageNodeId)
-                            }.onSuccess { node ->
-                                node?.let { folder ->
-                                    creationTime = folder.creationTime
-                                    runCatching {
-                                        getFolderTreeInfo(folder as TypedFolderNode)
-                                    }.onSuccess { folderTreeInfo ->
-                                        with(folderTreeInfo) {
-                                            numOfFiles = numberOfFiles
-                                            numOfFolders = numberOfFolders
-                                            totalSizeInBytes = totalCurrentSizeInBytes
-                                        }
-                                    }.onFailure {
-                                        Timber.e(it)
-                                    }
-                                }
-                            }.onFailure {
-                                Timber.e(it)
-                            }
-                            sync.copy(
-                                hasStalledIssues = stalledIssues.any {
-                                    it.syncId == sync.id
-                                },
-                                expanded = _uiState.value.syncUiItems.firstOrNull { it.id == sync.id }?.expanded == true,
-                                numberOfFiles = numOfFiles,
-                                numberOfFolders = numOfFolders,
-                                totalSizeInBytes = totalSizeInBytes,
-                                creationTime = creationTime,
-                            )
-                        }
-                        (syncUiItems to stalledIssues.size)
-                    },
-                flow2 = monitorCameraUploadsStatusInfoUseCase.invoke()
-                    .onStart { emit(CameraUploadsStatusInfo.Unknown) }.distinctUntilChanged()
-                    .map { cuStatusInfo ->
-                        buildList {
-                            getCameraUploadsOrMediaUploadsSyncUiItem(
-                                cameraUploadsOrMediaUploadsBackup = getCameraUploadsBackupUseCase(),
-                                cuStatusInfo = cuStatusInfo,
-                            )?.let { add(it) }
-                            getCameraUploadsOrMediaUploadsSyncUiItem(
-                                cameraUploadsOrMediaUploadsBackup = getMediaUploadsBackupUseCase(),
-                                cuStatusInfo = cuStatusInfo,
-                            )?.let { add(it) }
-                        }
-                    },
-            ) { syncs: Pair<List<SyncUiItem>, Int>, cameraUploadsBackup: List<SyncUiItem> ->
-                Pair(syncs, cameraUploadsBackup)
-            }.catch { Timber.e(it) }
-                .collect { (syncs, cuBackups) ->
-                    _uiState.update {
-                        it.copy(
-                            syncUiItems = cuBackups + syncs.first,
-                            isRefreshing = false,
-                            isLoading = false,
-                            stalledIssueCount = syncs.second
-                        )
-                    }
-                }
-        }
+        loadSyncsJob = combine(
+            flow = processSyncsFlow(),
+            flow2 = processCameraUploadsFlow()
+        ) { syncs, cameraUploadsBackup ->
+            _uiState.update {
+                it.copy(
+                    syncUiItems = cameraUploadsBackup + syncs.first,
+                    isRefreshing = false,
+                    isLoading = false,
+                    stalledIssueCount = syncs.second
+                )
+            }
+        }.catch { Timber.e(it) }.launchIn(viewModelScope)
     }
+
+    private fun processSyncsFlow() = monitorSyncsUseCase()
+        .map(syncUiItemMapper::invoke)
+        .distinctUntilChanged()
+        .map { syncs ->
+            val stalledIssues = monitorStalledIssuesUseCase().first()
+            val syncUiItems = syncs.map { sync ->
+                val folderInfo = getCompleteFolderInfoUseCase(sync.megaStorageNodeId)
+                sync.copy(
+                    hasStalledIssues = stalledIssues.any { it.syncId == sync.id },
+                    expanded = _uiState.value.syncUiItems.firstOrNull { it.id == sync.id }?.expanded == true,
+                    numberOfFiles = folderInfo?.numOfFiles ?: 0,
+                    numberOfFolders = folderInfo?.numOfFolders ?: 0,
+                    totalSizeInBytes = folderInfo?.totalSizeInBytes ?: 0L,
+                    creationTime = folderInfo?.creationTime ?: 0L,
+                )
+            }
+            syncUiItems to stalledIssues.size
+        }
+
+
+    private fun processCameraUploadsFlow() = monitorCameraUploadsStatusInfoUseCase()
+        .onStart { emit(CameraUploadsStatusInfo.Unknown) }
+        .distinctUntilChanged()
+        .map { cuStatusInfo ->
+            buildList {
+                getCameraUploadsOrMediaUploadsSyncUiItem(
+                    cameraUploadsOrMediaUploadsBackup = getCameraUploadsBackupUseCase(),
+                    cuStatusInfo = cuStatusInfo,
+                )?.let { add(it) }
+                getCameraUploadsOrMediaUploadsSyncUiItem(
+                    cameraUploadsOrMediaUploadsBackup = getMediaUploadsBackupUseCase(),
+                    cuStatusInfo = cuStatusInfo,
+                )?.let { add(it) }
+            }
+        }
 
     private suspend fun getCameraUploadsOrMediaUploadsSyncUiItem(
         cameraUploadsOrMediaUploadsBackup: Backup?,
         cuStatusInfo: CameraUploadsStatusInfo,
     ): SyncUiItem? {
-        var localPath = ""
-        var megaStoragePath = ""
-        var megaStorageNodeId = NodeId(-1L)
-        var numOfFiles = 0
-        var numOfFolders = 0
-        var totalSizeInBytes = 0L
-        var creationTime = 0L
-
-        cameraUploadsOrMediaUploadsBackup?.let { backup ->
+        return cameraUploadsOrMediaUploadsBackup?.let { backup ->
             runCatching {
-                when (backupInfoTypeIntMapper(backup.backupType)) {
+                val node = when (backup.backupInfoType) {
                     BackupInfoType.CAMERA_UPLOADS -> getPrimaryFolderNodeUseCase()
                     BackupInfoType.MEDIA_UPLOADS -> getSecondaryFolderNodeUseCase()
                     else -> getNodeByIdUseCase(backup.targetNode)
+                } ?: return null
+                val localPath = when (backup.backupInfoType) {
+                    BackupInfoType.CAMERA_UPLOADS -> getPrimaryFolderPathUseCase()
+                    BackupInfoType.MEDIA_UPLOADS -> getSecondaryFolderPathUseCase()
+                    else -> backup.localFolder
                 }
-            }.onSuccess { node ->
-                node?.let { folder ->
-                    localPath = when (backupInfoTypeIntMapper(backup.backupType)) {
-                        BackupInfoType.CAMERA_UPLOADS -> getPrimaryFolderPathUseCase()
-                        BackupInfoType.MEDIA_UPLOADS -> getSecondaryFolderPathUseCase()
-                        else -> backup.localFolder
-                    }
-                    megaStorageNodeId = folder.id
-                    megaStoragePath = getNodePathByIdUseCase(folder.id)
-                    creationTime = folder.creationTime
-                    runCatching {
-                        getFolderTreeInfo(folder as TypedFolderNode)
-                    }.onSuccess { folderTreeInfo ->
-                        with(folderTreeInfo) {
-                            numOfFiles = numberOfFiles
-                            numOfFolders = numberOfFolders
-                            totalSizeInBytes = totalCurrentSizeInBytes
-                        }
-                    }.onFailure {
-                        Timber.e(it)
-                    }
-                }
-            }.onFailure {
-                Timber.e(it)
-            }
 
-            return syncUiItemMapper(cuBackup = backup, cuStatusInfo = cuStatusInfo).copy(
-                hasStalledIssues = false,
-                expanded = _uiState.value.syncUiItems.firstOrNull { it.id == backup.backupId }?.expanded == true,
-                numberOfFiles = numOfFiles,
-                numberOfFolders = numOfFolders,
-                totalSizeInBytes = totalSizeInBytes,
-                creationTime = creationTime,
-                deviceStoragePath = localPath,
-                megaStoragePath = megaStoragePath,
-                megaStorageNodeId = megaStorageNodeId
-            )
+                val megaStoragePath = getNodePathByIdUseCase(node.id)
+                val folderInfo = getCompleteFolderInfoUseCase(node.id)
+                val expanded =
+                    _uiState.value.syncUiItems.firstOrNull { it.id == backup.backupId }?.expanded == true
+
+                syncUiItemMapper(cuBackup = backup, cuStatusInfo = cuStatusInfo).copy(
+                    hasStalledIssues = false,
+                    expanded = expanded,
+                    numberOfFiles = folderInfo?.numOfFiles ?: 0,
+                    numberOfFolders = folderInfo?.numOfFolders ?: 0,
+                    totalSizeInBytes = folderInfo?.totalSizeInBytes ?: 0L,
+                    creationTime = folderInfo?.creationTime ?: 0L,
+                    deviceStoragePath = localPath,
+                    megaStoragePath = megaStoragePath,
+                    megaStorageNodeId = node.id
+                )
+            }.getOrNull()
         }
-        return null
     }
 
     private fun checkOverQuotaStatus() {

@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFolderState
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsState
 import mega.privacy.android.domain.entity.node.NodeId
@@ -57,7 +58,7 @@ internal class SendBackupHeartBeatSyncUseCaseTest {
 
     private val fakeBackup = Backup(
         backupId = 123L,
-        backupType = 123,
+        backupInfoType = BackupInfoType.BACKUP_UPLOAD,
         targetNode = NodeId(123L),
         localFolder = "local",
         backupName = "camera uploads",
@@ -69,7 +70,7 @@ internal class SendBackupHeartBeatSyncUseCaseTest {
 
     private val doNotSyncBackup = Backup(
         backupId = 123L,
-        backupType = 123,
+        backupInfoType = BackupInfoType.BACKUP_UPLOAD,
         targetNode = NodeId(123L),
         localFolder = "local",
         backupName = "camera uploads",

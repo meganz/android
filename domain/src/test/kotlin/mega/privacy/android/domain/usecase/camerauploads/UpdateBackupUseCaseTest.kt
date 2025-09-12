@@ -50,7 +50,7 @@ internal class UpdateBackupUseCaseTest {
         val newBackupName = "New Backup Name"
         val backup = Backup(
             backupId = backupId,
-            backupType = 123,
+            backupInfoType = BackupInfoType.BACKUP_UPLOAD,
             targetNode = NodeId(123L),
             localFolder = "test/local/folder/path",
             backupName = "Camera Uploads",

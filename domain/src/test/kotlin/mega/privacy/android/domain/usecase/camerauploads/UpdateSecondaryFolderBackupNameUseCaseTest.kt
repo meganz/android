@@ -36,7 +36,7 @@ internal class UpdateSecondaryFolderBackupNameUseCaseTest {
 
     private val testBackup = Backup(
         backupId = 123L,
-        backupType = 123,
+        backupInfoType = BackupInfoType.BACKUP_UPLOAD,
         targetNode = NodeId(123L),
         localFolder = "test/local/folder/path/secondary",
         backupName = "Media Uploads",

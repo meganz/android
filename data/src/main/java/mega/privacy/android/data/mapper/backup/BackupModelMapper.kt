@@ -13,6 +13,7 @@ import javax.inject.Inject
 internal class BackupModelMapper @Inject constructor(
     private val decryptData: DecryptData,
     private val backupStateMapper: BackupStateMapper,
+    private val backupInfoTypeMapper: BackupInfoTypeMapper,
 ) {
     /**
      * Invocation function
@@ -24,7 +25,7 @@ internal class BackupModelMapper @Inject constructor(
         return Backup(
             id = entity.id,
             backupId = decryptData(entity.encryptedBackupId)?.toLong() ?: return null,
-            backupType = entity.backupType,
+            backupInfoType = backupInfoTypeMapper(entity.backupType),
             targetNode = decryptData(entity.encryptedTargetNode)?.toLong()?.let { NodeId(it) }
                 ?: return null,
             localFolder = decryptData(entity.encryptedLocalFolder) ?: return null,

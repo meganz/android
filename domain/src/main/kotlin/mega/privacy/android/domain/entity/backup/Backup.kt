@@ -7,7 +7,7 @@ import mega.privacy.android.domain.entity.node.NodeId
  * Backup data object.
  * @property id local id if exists
  * @property backupId ID of the backup, generate by server when set backup.
- * @property backupType [Int]
+ * @property backupInfoType [BackupInfoType] of the backup.
  * @property targetNode NodeId(Handle) of the MegaNode where the backup targets to.
  * @property localFolder  Path of the local folder where the backup uploads from.
  * @property backupName
@@ -24,7 +24,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 data class Backup(
     val id: Int? = null,
     val backupId: Long,
-    val backupType: Int,
+    val backupInfoType: BackupInfoType,
     val targetNode: NodeId,
     val localFolder: String,
     val backupName: String,

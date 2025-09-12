@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui.mapper.sync
 
-import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
@@ -17,7 +16,6 @@ import javax.inject.Inject
 
 internal class SyncUiItemMapper @Inject constructor(
     private val deviceFolderUINodeErrorMessageMapper: DeviceFolderUINodeErrorMessageMapper,
-    private val backupInfoTypeIntMapper: BackupInfoTypeIntMapper,
     private val syncStatusMapper: SyncStatusMapper,
     private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase,
 ) {
@@ -68,7 +66,7 @@ internal class SyncUiItemMapper @Inject constructor(
     ): SyncUiItem =
         SyncUiItem(
             id = backup.backupId,
-            syncType = when (backupInfoTypeIntMapper(backup.backupType)) {
+            syncType = when (backup.backupInfoType) {
                 BackupInfoType.TWO_WAY_SYNC -> SyncType.TYPE_TWOWAY
                 BackupInfoType.UP_SYNC -> SyncType.TYPE_BACKUP
                 BackupInfoType.CAMERA_UPLOADS -> SyncType.TYPE_CAMERA_UPLOADS
@@ -78,7 +76,7 @@ internal class SyncUiItemMapper @Inject constructor(
             folderPairName = backup.backupName,
             status = syncStatusMapper(
                 backupState = backup.state,
-                backupType = backupInfoTypeIntMapper(backup.backupType),
+                backupType = backup.backupInfoType,
                 cuStatusInfo = cuStatusInfo
             ),
             hasStalledIssues = false,

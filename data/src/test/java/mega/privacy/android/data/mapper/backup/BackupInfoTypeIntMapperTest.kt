@@ -28,12 +28,6 @@ internal class BackupInfoTypeIntMapperTest {
         Truth.assertThat(underTest(backupInfoType)).isEqualTo(sdkType)
     }
 
-    @ParameterizedTest(name = "when sdkType is {0}, then backupInfoType is {1}")
-    @MethodSource("provideParameters")
-    fun `test that the inverse mapping is correct`(sdkType: Int, backupInfoType: BackupInfoType) {
-        Truth.assertThat(underTest(sdkType)).isEqualTo(backupInfoType)
-    }
-
     private fun provideParameters() = Stream.of(
         Arguments.of(MegaApiJava.BACKUP_TYPE_INVALID, BackupInfoType.INVALID),
         Arguments.of(MegaApiJava.BACKUP_TYPE_TWO_WAY_SYNC, BackupInfoType.TWO_WAY_SYNC),

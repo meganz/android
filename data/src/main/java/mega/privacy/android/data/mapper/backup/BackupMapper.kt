@@ -9,7 +9,9 @@ import javax.inject.Inject
 /**
  * Mapper that converts a [MegaRequest] into an [Backup]
  */
-internal class BackupMapper @Inject constructor() {
+internal class BackupMapper @Inject constructor(
+    private val backupInfoTypeMapper: BackupInfoTypeMapper,
+) {
 
     /**
      * Invocation function
@@ -20,7 +22,7 @@ internal class BackupMapper @Inject constructor() {
     operator fun invoke(megaRequest: MegaRequest) = with(megaRequest) {
         Backup(
             backupId = parentHandle,
-            backupType = totalBytes.toInt(),
+            backupInfoType = backupInfoTypeMapper(totalBytes.toInt()),
             targetNode = NodeId(nodeHandle),
             localFolder = file,
             backupName = name,

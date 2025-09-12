@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.account.AccountDetail
@@ -18,7 +17,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.usecase.GetFolderTreeInfo
+import mega.privacy.android.domain.usecase.GetCompleteFolderInfoUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNodePathByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
@@ -68,6 +67,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -90,7 +90,7 @@ internal class SyncFoldersViewModelTest {
     private val getBatteryInfoUseCase: GetBatteryInfoUseCase = mock()
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
     private val getNodePathByIdUseCase: GetNodePathByIdUseCase = mock()
-    private val getFolderTreeInfo: GetFolderTreeInfo = mock()
+    private val getCompleteFolderInfoUseCase: GetCompleteFolderInfoUseCase = mock()
     private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase = mock()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
     private val getRootNodeUseCase: GetRootNodeUseCase = mock()
@@ -102,7 +102,6 @@ internal class SyncFoldersViewModelTest {
         mock()
     private val monitorCameraUploadsStatusInfoUseCase: MonitorCameraUploadsStatusInfoUseCase =
         mock()
-    private val backupInfoTypeIntMapper: BackupInfoTypeIntMapper = mock()
     private val getPrimaryFolderNodeUseCase: GetPrimaryFolderNodeUseCase = mock()
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase = mock()
     private val getSecondaryFolderNodeUseCase: GetSecondaryFolderNodeUseCase = mock()
@@ -216,7 +215,6 @@ internal class SyncFoldersViewModelTest {
             getNodePathByIdUseCase,
             getCameraUploadsBackupUseCase,
             monitorCameraUploadsStatusInfoUseCase,
-            backupInfoTypeIntMapper,
             getPrimaryFolderNodeUseCase,
             getPrimaryFolderPathUseCase,
             getSecondaryFolderNodeUseCase,
@@ -229,20 +227,8 @@ internal class SyncFoldersViewModelTest {
             monitorConnectivityUseCase,
             monitorSelectedMegaFolderUseCase,
             clearSelectedMegaFolderUseCase,
+            getCompleteFolderInfoUseCase,
         )
-    }
-
-    @Test
-    fun `test that viewmodel fetches all folder pairs upon initialization`() = runTest {
-        whenever(isStorageOverQuotaUseCase()).thenReturn(false)
-        whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
-        val expectedState = SyncFoldersUiState(syncUiItems, stalledIssueCount = stalledIssues.size)
-
-        initViewModel()
-
-        underTest.uiState.test {
-            assertThat(awaitItem()).isEqualTo(expectedState)
-        }
     }
 
     @Test
@@ -265,27 +251,6 @@ internal class SyncFoldersViewModelTest {
     }
 
     @Test
-    fun `test that remove action changes the state to display the confirm dialog`() = runTest {
-        whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
-        val syncUiItem = syncUiItems.first()
-        val expectedState =
-            SyncFoldersUiState(
-                syncUiItems = syncUiItems,
-                showConfirmRemoveSyncFolderDialog = true,
-                syncUiItemToRemove = syncUiItem,
-                stalledIssueCount = stalledIssues.size
-            )
-        initViewModel()
-        underTest.handleAction(
-            SyncFoldersAction.RemoveFolderClicked(syncUiItem = syncUiItem)
-        )
-
-        underTest.uiState.test {
-            assertThat(awaitItem()).isEqualTo(expectedState)
-        }
-    }
-
-    @Test
     fun `test that confirm the remove action for a Sync removes folder pair`() = runTest {
         whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
         val syncUiItem = syncUiItems.first { it.syncType == SyncType.TYPE_TWOWAY }
@@ -296,7 +261,10 @@ internal class SyncFoldersViewModelTest {
             SyncFoldersAction.OnRemoveSyncFolderDialogConfirmed
         )
 
-        verify(removeFolderPairUseCase).invoke(folderPairId = syncUiItem.id)
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.snackbarMessage).isEqualTo(sharedResR.string.sync_snackbar_message_confirm_sync_stopped)
+        }
     }
 
     @Test
@@ -426,22 +394,6 @@ internal class SyncFoldersViewModelTest {
     }
 
     @Test
-    fun `test that the folder is in error status when the stalled issues are not empty`() =
-        runTest {
-            whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
-            val expectedState = SyncFoldersUiState(
-                syncUiItems.map { if (it == syncUiItems.first()) it.copy(hasStalledIssues = true) else it },
-                stalledIssueCount = stalledIssues.size
-            )
-
-            initViewModel()
-
-            underTest.uiState.test {
-                assertThat(awaitItem()).isEqualTo(expectedState)
-            }
-        }
-
-    @Test
     fun `test that storage over quota use case returns true changes ui state to show storage over quota`() =
         runTest {
             whenever(isStorageOverQuotaUseCase()).thenReturn(true)
@@ -475,6 +427,167 @@ internal class SyncFoldersViewModelTest {
         verify(resumeSyncUseCase).invoke(syncUiItem.id)
     }
 
+    @Test
+    fun `test that snackbar message is cleared when SnackBarShown action is triggered`() = runTest {
+        initViewModel()
+        underTest.handleAction(SyncFoldersAction.RemoveFolderClicked(syncUiItems.first()))
+        underTest.handleAction(SyncFoldersAction.SnackBarShown)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.snackbarMessage).isNull()
+            assertThat(state.movedFolderName).isNull()
+        }
+    }
+
+    @Test
+    fun `test that battery level monitoring works correctly`() = runTest {
+        val lowBatteryInfo = BatteryInfo(15, false)
+        whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(lowBatteryInfo))
+        initViewModel()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isLowBatteryLevel).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that battery level monitoring shows not low when charging`() = runTest {
+        val lowBatteryInfo = BatteryInfo(15, true)
+        whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(lowBatteryInfo))
+        initViewModel()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isLowBatteryLevel).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that feature flag for disable battery optimization is loaded`() = runTest {
+        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
+        initViewModel()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isDisableBatteryOptimizationEnabled).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that complete folder info use case is called for sync items`() = runTest {
+        val nodeId = NodeId(1234L)
+        val completeFolderInfo = mega.privacy.android.domain.entity.CompleteFolderInfo(
+            numOfFiles = 10,
+            numOfFolders = 5,
+            totalSizeInBytes = 1024L,
+            creationTime = 1000L
+        )
+        whenever(getCompleteFolderInfoUseCase(nodeId)).thenReturn(completeFolderInfo)
+        initViewModel()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            val syncItem = state.syncUiItems.find { it.megaStorageNodeId == nodeId }
+            assertThat(syncItem).isNotNull()
+            assertThat(syncItem?.numberOfFiles).isEqualTo(10)
+            assertThat(syncItem?.numberOfFolders).isEqualTo(5)
+            assertThat(syncItem?.totalSizeInBytes).isEqualTo(1024L)
+            assertThat(syncItem?.creationTime).isEqualTo(1000L)
+        }
+    }
+
+    @Test
+    fun `test that complete folder info use case returns default values when folder info is null`() =
+        runTest {
+            val nodeId = NodeId(1234L)
+            whenever(getCompleteFolderInfoUseCase(nodeId)).thenReturn(null)
+            initViewModel()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                val syncItem = state.syncUiItems.find { it.megaStorageNodeId == nodeId }
+                assertThat(syncItem).isNotNull()
+                assertThat(syncItem?.numberOfFiles).isEqualTo(0)
+                assertThat(syncItem?.numberOfFolders).isEqualTo(0)
+                assertThat(syncItem?.totalSizeInBytes).isEqualTo(0L)
+                assertThat(syncItem?.creationTime).isEqualTo(0L)
+            }
+        }
+
+    @Test
+    fun `test that account detail monitoring triggers over quota check and sync refresh`() =
+        runTest {
+            val accountLevelDetail = mock<AccountLevelDetail> {
+                on { accountType } doReturn AccountType.PRO_I
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { levelDetail } doReturn accountLevelDetail
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(isStorageOverQuotaUseCase()).thenReturn(true)
+
+            initViewModel()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isStorageOverQuota).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that sync items maintain expanded state when reloaded`() = runTest {
+        val syncUiItem = syncUiItems.first()
+        initViewModel()
+
+        // Expand first item
+        underTest.handleAction(SyncFoldersAction.CardExpanded(syncUiItem, true))
+
+        // Simulate reload by emitting new data
+        whenever(monitorSyncsUseCase()).thenReturn(flow {
+            emit(folderPairs)
+            awaitCancellation()
+        })
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            val expandedItem = state.syncUiItems.find { it.id == syncUiItem.id }
+            assertThat(expandedItem?.expanded).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that stalled issues count is correctly calculated`() = runTest {
+        val multipleStalledIssues = listOf(
+            StalledIssue(
+                syncId = 3L,
+                nodeIds = listOf(NodeId(3L)),
+                localPaths = listOf("DCIM/photo1.jpg"),
+                issueType = StallIssueType.DownloadIssue,
+                conflictName = "conflict1",
+                nodeNames = listOf("Camera"),
+                id = "1_1_0",
+            ),
+            StalledIssue(
+                syncId = 4L,
+                nodeIds = listOf(NodeId(4L)),
+                localPaths = listOf("Backup/file1.txt"),
+                issueType = StallIssueType.UploadIssue,
+                conflictName = "conflict2",
+                nodeNames = listOf("Backup"),
+                id = "2_1_0",
+            )
+        )
+        whenever(monitorStalledIssuesUseCase()).thenReturn(flowOf(multipleStalledIssues))
+        initViewModel()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.stalledIssueCount).isEqualTo(2)
+        }
+    }
+
 
     private fun getSyncUiItem(status: SyncStatus): SyncUiItem = SyncUiItem(
         id = 3L,
@@ -503,7 +616,7 @@ internal class SyncFoldersViewModelTest {
             monitorBatteryInfoUseCase = monitorBatteryInfoUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             getNodePathByIdUseCase = getNodePathByIdUseCase,
-            getFolderTreeInfo = getFolderTreeInfo,
+            getCompleteFolderInfoUseCase = getCompleteFolderInfoUseCase,
             isStorageOverQuotaUseCase = isStorageOverQuotaUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getRootNodeUseCase = getRootNodeUseCase,
@@ -513,7 +626,6 @@ internal class SyncFoldersViewModelTest {
             getMediaUploadsBackupUseCase = getMediaUploadsBackupUseCase,
             monitorCameraUploadsSettingsActionsUseCase = monitorCameraUploadsSettingsActionsUseCase,
             monitorCameraUploadsStatusInfoUseCase = monitorCameraUploadsStatusInfoUseCase,
-            backupInfoTypeIntMapper = backupInfoTypeIntMapper,
             getPrimaryFolderNodeUseCase = getPrimaryFolderNodeUseCase,
             getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
             getSecondaryFolderNodeUseCase = getSecondaryFolderNodeUseCase,

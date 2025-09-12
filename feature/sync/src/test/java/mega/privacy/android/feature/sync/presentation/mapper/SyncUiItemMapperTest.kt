@@ -34,7 +34,6 @@ class SyncUiItemMapperTest {
     private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase = mock()
     private val underTest = SyncUiItemMapper(
         deviceFolderUINodeErrorMessageMapper = deviceFolderUINodeErrorMessageMapper,
-        backupInfoTypeIntMapper = backupInfoTypeIntMapper,
         syncStatusMapper = syncStatusMapper,
         getPathByDocumentContentUriUseCase = getPathByDocumentContentUriUseCase
     )

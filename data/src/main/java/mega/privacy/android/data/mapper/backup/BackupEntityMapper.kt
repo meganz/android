@@ -12,6 +12,7 @@ import javax.inject.Inject
 internal class BackupEntityMapper @Inject constructor(
     private val encryptData: EncryptData,
     private val backupStateIntMapper: BackupStateIntMapper,
+    private val backupInfoTypeIntMapper: BackupInfoTypeIntMapper
 ) {
     /**
      * Invocation function
@@ -23,7 +24,7 @@ internal class BackupEntityMapper @Inject constructor(
         return BackupEntity(
             id = backup.id,
             encryptedBackupId = encryptData(backup.backupId.toString()) ?: return null,
-            backupType = backup.backupType,
+            backupType = backupInfoTypeIntMapper(backup.backupInfoType),
             encryptedTargetNode = encryptData(backup.targetNode.longValue.toString())
                 ?: return null,
             encryptedLocalFolder = encryptData(backup.localFolder) ?: return null,

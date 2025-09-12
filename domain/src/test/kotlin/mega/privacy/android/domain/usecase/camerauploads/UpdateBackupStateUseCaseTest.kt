@@ -4,6 +4,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.jupiter.api.BeforeAll
@@ -45,7 +46,7 @@ internal class UpdateBackupStateUseCaseTest {
         val newBackupState = BackupState.ACTIVE
         val backup = Backup(
             backupId = backupId,
-            backupType = 123,
+            backupInfoType = BackupInfoType.BACKUP_UPLOAD,
             targetNode = NodeId(123L),
             localFolder = "test/local/folder/path",
             backupName = "Camera Uploads",

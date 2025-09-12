@@ -8,6 +8,7 @@ import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.mapper.camerauploads.BackupStateMapper
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.node.NodeId
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -25,15 +26,16 @@ internal class BackupModelMapperTest {
 
     private val decryptData: DecryptData = mock()
     private val backupStateMapper: BackupStateMapper = mock()
+    private val backupInfoTypeMapper: BackupInfoTypeMapper = mock()
 
     @BeforeAll
     fun setUp() {
-        underTest = BackupModelMapper(decryptData, backupStateMapper)
+        underTest = BackupModelMapper(decryptData, backupStateMapper, backupInfoTypeMapper)
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(decryptData, backupStateMapper)
+        reset(decryptData, backupStateMapper, backupInfoTypeMapper)
     }
 
     @Test
@@ -74,7 +76,7 @@ internal class BackupModelMapperTest {
         val expected = Backup(
             id = 1,
             backupId = backupId,
-            backupType = backupType,
+            backupInfoType = BackupInfoType.CAMERA_UPLOADS,
             targetNode = NodeId(targetNode),
             localFolder = localFolder,
             backupName = backupName,
@@ -104,6 +106,7 @@ internal class BackupModelMapperTest {
         whenever(decryptData(outdated.toString())).thenReturn(outdated.toString())
         whenever(decryptData(BackupState.ACTIVE.value.toString())).thenReturn(BackupState.ACTIVE.value.toString())
         whenever(backupStateMapper(BackupState.ACTIVE.value)).thenReturn(BackupState.ACTIVE)
+        whenever(backupInfoTypeMapper(backupType)).thenReturn(BackupInfoType.CAMERA_UPLOADS)
         val actual = underTest(entity)
         Truth.assertThat(actual).isEqualTo(expected)
     }

@@ -8,6 +8,7 @@ import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.mapper.camerauploads.BackupStateIntMapper
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.node.NodeId
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -25,22 +26,23 @@ internal class BackupEntityMapperTest {
 
     private val encryptData: EncryptData = mock()
     private val backupStateIntMapper: BackupStateIntMapper = mock()
+    private val backupInfoTypeIntMapper: BackupInfoTypeIntMapper = mock()
 
     @BeforeAll
     fun setUp() {
-        underTest = BackupEntityMapper(encryptData, backupStateIntMapper)
+        underTest = BackupEntityMapper(encryptData, backupStateIntMapper, backupInfoTypeIntMapper)
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(encryptData, backupStateIntMapper)
+        reset(encryptData, backupStateIntMapper, backupInfoTypeIntMapper)
     }
 
 
     @Test
     fun `test that mapper returns entity correctly when invoked`() = runTest {
         val backupId = 1234L
-        val backupType = 3
+        val backupType = BackupInfoType.CAMERA_UPLOADS
         val targetNode = 4567L
         val localFolder = "path/to/local"
         val backupName = "Camera Uploads"
@@ -56,7 +58,7 @@ internal class BackupEntityMapperTest {
         val model = Backup(
             id = 1,
             backupId = backupId,
-            backupType = backupType,
+            backupInfoType = backupType,
             targetNode = NodeId(targetNode),
             localFolder = localFolder,
             backupName = backupName,
@@ -74,7 +76,7 @@ internal class BackupEntityMapperTest {
         val expected = BackupEntity(
             id = 1,
             encryptedBackupId = backupId.toString(),
-            backupType = backupType,
+            backupType = 1,
             encryptedTargetNode = targetNode.toString(),
             encryptedLocalFolder = localFolder,
             encryptedBackupName = backupName,
@@ -103,6 +105,7 @@ internal class BackupEntityMapperTest {
         whenever(encryptData(isDeleteEmptySubFolders.toString())).thenReturn(isDeleteEmptySubFolders.toString())
         whenever(encryptData(outdated.toString())).thenReturn(outdated.toString())
         whenever(backupStateIntMapper(BackupState.ACTIVE)).thenReturn(BackupState.ACTIVE.value)
+        whenever(backupInfoTypeIntMapper(backupType)).thenReturn(1)
         val actual = underTest(model)
         Truth.assertThat(actual).isEqualTo(expected)
     }
