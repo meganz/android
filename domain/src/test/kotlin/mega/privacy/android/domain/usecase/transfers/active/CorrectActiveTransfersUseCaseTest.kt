@@ -13,6 +13,8 @@ import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.UpdatePendingTransferStateUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -43,6 +45,9 @@ internal class CorrectActiveTransfersUseCaseTest {
     private val getInProgressTransfersUseCase = mock<GetInProgressTransfersUseCase>()
     private val updatePendingTransferStateUseCase = mock<UpdatePendingTransferStateUseCase>()
     private val fileSystemRepository = mock<FileSystemRepository>()
+    private val isUserLoggedInUseCase = mock<IsUserLoggedInUseCase>()
+    private val rootNodeExistsUseCase = mock<RootNodeExistsUseCase>()
+
 
     private val mockedActiveTransfers = (0L..10L).map { mock<ActiveTransfer>() }
     private val mockedTransfers = (0L..10L).map { mock<Transfer>() }
@@ -54,6 +59,8 @@ internal class CorrectActiveTransfersUseCaseTest {
             transferRepository = transferRepository,
             updatePendingTransferStateUseCase = updatePendingTransferStateUseCase,
             fileSystemRepository = fileSystemRepository,
+            isUserLoggedInUseCase = isUserLoggedInUseCase,
+            rootNodeExistsUseCase = rootNodeExistsUseCase,
         )
     }
 
@@ -64,6 +71,8 @@ internal class CorrectActiveTransfersUseCaseTest {
             getInProgressTransfersUseCase,
             updatePendingTransferStateUseCase,
             fileSystemRepository,
+            isUserLoggedInUseCase,
+            rootNodeExistsUseCase,
             *mockedActiveTransfers.toTypedArray(),
             *mockedTransfers.toTypedArray(),
         )
@@ -81,6 +90,8 @@ internal class CorrectActiveTransfersUseCaseTest {
             .thenReturn(emptyList())
         whenever(transferRepository.getPendingTransfersByState(any()))
             .thenReturn(emptyList())
+        whenever(isUserLoggedInUseCase()).thenReturn(true)
+        whenever(rootNodeExistsUseCase()).thenReturn(true)
     }
 
     private fun stubActiveTransfers(areFinished: Boolean) {
@@ -368,4 +379,32 @@ internal class CorrectActiveTransfersUseCaseTest {
 
             verify(transferRepository).updateTransferredBytes(eq(transfers))
         }
+
+    @ParameterizedTest
+    @EnumSource(TransferType::class)
+    @NullSource
+    fun `test that nothing is done when the user is not logged in`(
+        transferType: TransferType?,
+    ) = runTest {
+        whenever(isUserLoggedInUseCase()).thenReturn(false)
+        underTest(transferType)
+        verifyNoInteractions(transferRepository)
+        verifyNoInteractions(fileSystemRepository)
+        verifyNoInteractions(getInProgressTransfersUseCase)
+        verifyNoInteractions(updatePendingTransferStateUseCase)
+    }
+
+    @ParameterizedTest
+    @EnumSource(TransferType::class)
+    @NullSource
+    fun `test that nothing is done when root node does not exist`(
+        transferType: TransferType?,
+    ) = runTest {
+        whenever(rootNodeExistsUseCase()).thenReturn(false)
+        underTest(transferType)
+        verifyNoInteractions(transferRepository)
+        verifyNoInteractions(fileSystemRepository)
+        verifyNoInteractions(getInProgressTransfersUseCase)
+        verifyNoInteractions(updatePendingTransferStateUseCase)
+    }
 }

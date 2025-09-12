@@ -9,6 +9,8 @@ import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.UpdatePendingTransferStateUseCase
 import javax.inject.Inject
@@ -23,12 +25,17 @@ class CorrectActiveTransfersUseCase @Inject constructor(
     private val transferRepository: TransferRepository,
     private val updatePendingTransferStateUseCase: UpdatePendingTransferStateUseCase,
     private val fileSystemRepository: FileSystemRepository,
+    private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
+    private val rootNodeExistsUseCase: RootNodeExistsUseCase,
 ) {
     /**
      * Invoke.
      * @param transferType the transfer type we want to check, or null if we want to check all of them
      */
     suspend operator fun invoke(transferType: TransferType?) {
+        if (!(isUserLoggedInUseCase() && rootNodeExistsUseCase())) {
+            return
+        }
         val activeTransfers = if (transferType == null) {
             transferRepository.getCurrentActiveTransfers()
         } else {
