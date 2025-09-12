@@ -52,13 +52,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEvent
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.privacy.android.analytics.Analytics
@@ -86,7 +84,7 @@ import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
-import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
+import mega.privacy.android.app.presentation.transfers.widget.TransfersWidgetViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
@@ -183,7 +181,7 @@ class CloudDriveSyncsFragment : Fragment() {
 
     private val fileBrowserViewModel: FileBrowserViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
-    private val transfersManagementViewModel: TransfersManagementViewModel by activityViewModels()
+    private val transfersWidgetViewModel: TransfersWidgetViewModel by activityViewModels()
     private val syncIssueNotificationViewModel: SyncIssueNotificationViewModel by activityViewModels()
 
     private var tempNodeIds: List<NodeId> = listOf()
@@ -387,9 +385,9 @@ class CloudDriveSyncsFragment : Fragment() {
                                         },
                                         onFabExpanded = { isExpanded ->
                                             if (isExpanded) {
-                                                transfersManagementViewModel.hideTransfersWidget()
+                                                transfersWidgetViewModel.hideTransfersWidget()
                                             } else {
-                                                transfersManagementViewModel.showTransfersWidget()
+                                                transfersWidgetViewModel.showTransfersWidget()
                                             }
                                         }
                                     )

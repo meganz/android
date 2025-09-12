@@ -65,7 +65,7 @@ import mega.privacy.android.app.presentation.search.navigation.shareFolderAccess
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
-import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
+import mega.privacy.android.app.presentation.transfers.widget.TransfersWidgetViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.Constants
@@ -104,7 +104,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
     private val viewModel: SearchViewModel by viewModels()
     private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
-    private val transfersManagementViewModel: TransfersManagementViewModel by viewModels()
+    private val transfersWidgetViewModel: TransfersWidgetViewModel by viewModels()
 
     /**
      * Application Theme Mode
@@ -205,7 +205,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
             val nodeActionState by nodeActionsViewModel.state.collectAsStateWithLifecycle()
-            val transferState by transfersManagementViewModel.state.collectAsStateWithLifecycle()
+            val transferState by transfersWidgetViewModel.state.collectAsStateWithLifecycle()
             // Remember a SystemUiController
             val systemUiController = rememberSystemUiController()
             val useDarkIcons = themeMode.isDarkMode().not()

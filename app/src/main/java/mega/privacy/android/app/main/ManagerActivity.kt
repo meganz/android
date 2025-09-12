@@ -943,8 +943,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         addStartTransferView()
         addNodeAttachmentView()
         findViewById<ComposeView>(R.id.transfers_widget).setTransfersWidgetContent(
-            transfersInfoFlow = transfersManagementViewModel.state.map { it.transfersInfo },
-            hideFlow = transfersManagementViewModel.state.map { it.hideTransfersWidget },
+            transfersInfoFlow = transfersWidgetViewModel.state.map { it.transfersInfo },
+            hideFlow = transfersWidgetViewModel.state.map { it.hideTransfersWidget },
             onClick = this::onTransfersWidgetClick
         )
         setInitialViewProperties()
@@ -2996,7 +2996,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         replaceFragment: Boolean = false,
         @StringRes errorMessage: Int?,
     ) {
-        transfersManagementViewModel.hideTransfersWidget()
+        transfersWidgetViewModel.hideTransfersWidget()
         // Remove the existing Media Discovery View first
         mediaDiscoveryFragment?.let { removeFragment(it) }
         MediaDiscoveryFragment.newInstance(
@@ -4141,9 +4141,9 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      */
     private fun updateTransfersWidgetVisibility() {
         if (isOnFileManagementManagerSection) {
-            transfersManagementViewModel.showTransfersWidget()
+            transfersWidgetViewModel.showTransfersWidget()
         } else {
-            transfersManagementViewModel.hideTransfersWidget()
+            transfersWidgetViewModel.hideTransfersWidget()
         }
     }
 

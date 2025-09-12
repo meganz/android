@@ -13,8 +13,9 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel.Companion.waitTimeToShowOffline
+import mega.privacy.android.app.presentation.transfers.widget.TransfersWidgetViewModel.Companion.waitTimeToShowOffline
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
+import mega.privacy.android.app.presentation.transfers.widget.TransfersWidgetViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.TransfersStatusInfo
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -41,8 +42,8 @@ import org.mockito.kotlin.whenever
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class TransfersManagementViewModelTest {
-    private lateinit var underTest: TransfersManagementViewModel
+class TransfersWidgetViewModelTest {
+    private lateinit var underTest: TransfersWidgetViewModel
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
@@ -67,7 +68,7 @@ class TransfersManagementViewModelTest {
         //this mocks are only used in viewmodel init, so no need to reset
         val monitorTransfersStatusUseCase = mock<MonitorTransfersStatusUseCase>()
         whenever(monitorTransfersStatusUseCase()) doReturn monitorTransfersStatusFlow
-        underTest = TransfersManagementViewModel(
+        underTest = TransfersWidgetViewModel(
             transfersInfoMapper = transfersInfoMapper,
             ioDispatcher = ioDispatcher,
             monitorConnectivityUseCase = monitorConnectivityUseCase,

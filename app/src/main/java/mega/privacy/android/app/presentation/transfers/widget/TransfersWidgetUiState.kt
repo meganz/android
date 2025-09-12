@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.transfers
+package mega.privacy.android.app.presentation.transfers.widget
 
 import mega.privacy.android.shared.original.core.ui.model.TransfersInfo
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
@@ -14,7 +14,7 @@ import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
  * @property isTransferError true if there is a transfer error and transfers section has not been visited.
  * @property isOnline true if the device is online
  */
-data class TransferManagementUiState(
+data class TransfersWidgetUiState(
     val transfersInfo: TransfersInfo = TransfersInfo(),
     val hideTransfersWidget: Boolean = false,
     val lastTransfersCancelled: Boolean = false,

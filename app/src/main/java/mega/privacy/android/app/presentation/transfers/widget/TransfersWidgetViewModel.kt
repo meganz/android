@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.transfers
+package mega.privacy.android.app.presentation.transfers.widget
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -31,7 +31,7 @@ import kotlin.time.Duration.Companion.milliseconds
  */
 @OptIn(FlowPreview::class)
 @HiltViewModel
-class TransfersManagementViewModel @Inject constructor(
+class TransfersWidgetViewModel @Inject constructor(
     private val transfersInfoMapper: TransfersInfoMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
@@ -40,7 +40,7 @@ class TransfersManagementViewModel @Inject constructor(
     private val monitorTransferInErrorStatusUseCase: MonitorTransferInErrorStatusUseCase,
     private val samplePeriod: Long?,
 ) : ViewModel() {
-    private val _state = MutableStateFlow(TransferManagementUiState())
+    private val _state = MutableStateFlow(TransfersWidgetUiState())
 
     /**
      * Transfers info

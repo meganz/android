@@ -201,7 +201,7 @@ class FolderLinkComposeActivity : PasscodeActivity(),
         val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val uiState by viewModel.state.collectAsStateWithLifecycle()
         val request by googleAdsManager.request.collectAsStateWithLifecycle()
-        val transferState by transfersManagementViewModel.state.collectAsStateWithLifecycle()
+        val transferState by transfersWidgetViewModel.state.collectAsStateWithLifecycle()
 
         val scaffoldState = rememberScaffoldState()
         OriginalTheme(isDark = themeMode.isDarkMode()) {

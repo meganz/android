@@ -69,7 +69,7 @@ import mega.privacy.android.app.presentation.folderlink.view.Constants.SAVE_BUTT
 import mega.privacy.android.app.presentation.search.SEARCH_SCREEN_MINI_AUDIO_PLAYER_TEST_TAG
 import mega.privacy.android.app.presentation.search.view.LoadingStateView
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
-import mega.privacy.android.app.presentation.transfers.TransferManagementUiState
+import mega.privacy.android.app.presentation.transfers.widget.TransfersWidgetUiState
 import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -96,7 +96,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 @Composable
 internal fun FolderLinkView(
     state: FolderLinkState,
-    transferState: TransferManagementUiState,
+    transferState: TransfersWidgetUiState,
     scaffoldState: ScaffoldState,
     onBackPressed: () -> Unit,
     onShareClicked: () -> Unit,

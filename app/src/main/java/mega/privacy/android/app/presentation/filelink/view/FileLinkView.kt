@@ -45,7 +45,7 @@ import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.folderlink.view.ExpiredLinkView
 import mega.privacy.android.app.presentation.folderlink.view.ImportDownloadView
 import mega.privacy.android.app.presentation.folderlink.view.UnavailableLinkView
-import mega.privacy.android.app.presentation.transfers.TransferManagementUiState
+import mega.privacy.android.app.presentation.transfers.widget.TransfersWidgetUiState
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
@@ -74,7 +74,7 @@ internal const val SAVE_BUTTON_TAG = "file_link_view:button_save"
 internal fun FileLinkView(
     viewState: FileLinkState,
     snackBarHostState: SnackbarHostState,
-    transferState: TransferManagementUiState,
+    transferState: TransfersWidgetUiState,
     onBackPressed: () -> Unit,
     onShareClicked: () -> Unit,
     onPreviewClick: () -> Unit,
@@ -367,7 +367,7 @@ private fun PreviewFileLinkView() {
         FileLinkView(
             viewState = viewState,
             snackBarHostState = remember { SnackbarHostState() },
-            transferState = TransferManagementUiState(),
+            transferState = TransfersWidgetUiState(),
             onBackPressed = {},
             onShareClicked = {},
             onPreviewClick = {},

@@ -48,7 +48,7 @@ import mega.privacy.android.app.presentation.search.navigation.searchOverQuotaDi
 import mega.privacy.android.app.presentation.search.searchRoute
 import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
-import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
+import mega.privacy.android.app.presentation.transfers.widget.TransfersWidgetViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.sharedcomponents.snackbar.MegaSnackbarDuration
@@ -93,7 +93,7 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
 
     private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
 
-    private val transfersManagementViewModel: TransfersManagementViewModel by viewModels()
+    private val transfersWidgetViewModel: TransfersWidgetViewModel by viewModels()
 
     private val snackbarHostState = SnackbarHostState()
 
@@ -132,7 +132,7 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                 PhotosSearchScreen(
                                     photosSearchViewModel = photosSearchViewModel,
                                     photoDownloaderViewModel = photoDownloaderViewModel,
-                                    transfersManagementViewModel = transfersManagementViewModel,
+                                    transfersWidgetViewModel = transfersWidgetViewModel,
                                     scaffoldState = scaffoldState,
                                     onOpenAlbum = ::openAlbum,
                                     onOpenImagePreviewScreen = ::openImagePreview,
