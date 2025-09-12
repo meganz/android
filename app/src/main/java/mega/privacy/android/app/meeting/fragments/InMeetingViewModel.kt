@@ -2001,7 +2001,8 @@ class InMeetingViewModel @Inject constructor(
      * @return the position of the participant
      */
     fun removeParticipant(session: ChatSession): Int {
-        participants.value?.first { it.peerId == session.peerId && it.clientId == session.clientId }
+        participants.value
+            ?.firstOrNull { it.peerId == session.peerId && it.clientId == session.clientId }
             ?.let { participant ->
                 val position = participants.value?.indexOf(participant)
                 val isSpeaker = participant.isSpeaker
@@ -2028,7 +2029,9 @@ class InMeetingViewModel @Inject constructor(
                     return position
                 }
 
-            }
+            } ?: run {
+            Timber.e("Participant not found when trying to remove it.")
+        }
 
         return INVALID_POSITION
     }
