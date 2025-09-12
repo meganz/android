@@ -27,7 +27,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.extensions.openTransfersAndConsumeErrorStatus
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
@@ -246,10 +245,7 @@ class FileLinkComposeActivity : PasscodeActivity(),
                 return@launch
             }
 
-            navigator.openTransfersAndConsumeErrorStatus(
-                this@FileLinkComposeActivity,
-                transfersManagementViewModel
-            )
+            navigator.openTransfers(this@FileLinkComposeActivity)
 
             finish()
         }

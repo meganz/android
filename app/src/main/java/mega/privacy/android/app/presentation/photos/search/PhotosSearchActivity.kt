@@ -23,7 +23,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
-import mega.privacy.android.app.extensions.openTransfersAndConsumeErrorStatus
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNodeFetcher
@@ -270,10 +269,7 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
     }
 
     private fun openTransfersScreen() {
-        megaNavigator.openTransfersAndConsumeErrorStatus(
-            this@PhotosSearchActivity,
-            transfersManagementViewModel
-        )
+        megaNavigator.openTransfers(this@PhotosSearchActivity)
     }
 
     private fun handleNodesNameCollisionResult(result: NodeNameCollisionsResult) {

@@ -38,7 +38,6 @@ import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscover
 import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
 import mega.privacy.android.app.presentation.settings.compose.navigation.SettingsNavigatorImpl
-import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
 import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
@@ -215,10 +214,8 @@ internal class MegaNavigatorImpl @Inject constructor(
         }
     }
 
-    override fun openTransfers(context: Context, tab: Int) {
-        Intent(context, TransfersActivity::class.java).apply {
-            putExtra(EXTRA_TAB, tab)
-        }.let(context::startActivity)
+    override fun openTransfers(context: Context) {
+        context.startActivity(TransfersActivity.getIntent(context))
     }
 
     override suspend fun openMediaPlayerActivityByFileNode(

@@ -7,18 +7,15 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.transfers.model.TransfersViewModel
-import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.TransfersView
 
 /**
  * TransfersInfo data class to hold navigation info for the Transfers screen.
  *
- * @param tabIndex The index of the tab to open, default is [ACTIVE_TAB_INDEX].
+ * @param tabIndex The index of the tab to open, if null it will be decided by view model logic
  */
 @Serializable
-class TransfersInfo(
-    val tabIndex: Int = ACTIVE_TAB_INDEX,
-)
+class TransfersInfo(val tabIndex: Int? = null)
 
 internal fun NavGraphBuilder.transfersScreen(
     onBackPress: () -> Unit,

@@ -33,7 +33,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.extensions.launchUrl
-import mega.privacy.android.app.extensions.openTransfersAndConsumeErrorStatus
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
@@ -432,10 +431,7 @@ class FolderLinkComposeActivity : PasscodeActivity(),
                 return@launch
             }
 
-            megaNavigator.openTransfersAndConsumeErrorStatus(
-                this@FolderLinkComposeActivity,
-                transfersManagementViewModel
-            )
+            megaNavigator.openTransfers(this@FolderLinkComposeActivity)
 
             finish()
         }

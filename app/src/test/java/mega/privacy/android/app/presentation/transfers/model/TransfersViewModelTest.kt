@@ -17,6 +17,7 @@ import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.extensions.moveElement
 import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
 import mega.privacy.android.app.presentation.transfers.model.TransfersViewModel.Companion.MAX_COMPLETED_TRANSFER_FOR_STATE
+import mega.privacy.android.app.presentation.transfers.view.FAILED_TAB_INDEX
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
@@ -43,6 +44,8 @@ import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTr
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteFailedOrCancelledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersByStateWithLimitUseCase
+import mega.privacy.android.domain.usecase.transfers.errorstatus.ClearTransferErrorStatusUseCase
+import mega.privacy.android.domain.usecase.transfers.errorstatus.IsTransferInErrorStatusUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
@@ -94,6 +97,8 @@ class TransfersViewModelTest {
     private val deleteCompletedTransfersUseCase = mock<DeleteCompletedTransfersUseCase>()
     private val deleteCompletedTransfersByIdUseCase = mock<DeleteCompletedTransfersByIdUseCase>()
     private val cancelTransferByTagUseCase = mock<CancelTransferByTagUseCase>()
+    private val clearTransferErrorStatusUseCase = mock<ClearTransferErrorStatusUseCase>()
+    private val isTransferInErrorStatusUseCase = mock<IsTransferInErrorStatusUseCase>()
 
     private val originalPath = "originalPath"
     private val chatAppData = listOf<TransferAppData>(TransferAppData.ChatUpload(1))
@@ -162,6 +167,8 @@ class TransfersViewModelTest {
             cancelTransferByTagUseCase,
             cancelTransfersUseCase,
             monitorCompletedTransfersByStateWithLimitUseCase,
+            clearTransferErrorStatusUseCase,
+            isTransferInErrorStatusUseCase,
         )
         wheneverBlocking { monitorInProgressTransfersUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorStorageStateEventUseCase() } doReturn MutableStateFlow(
@@ -175,6 +182,7 @@ class TransfersViewModelTest {
                 anyVararg()
             )
         }.thenReturn(emptyFlow())
+        wheneverBlocking { isTransferInErrorStatusUseCase() }.thenReturn(false)
     }
 
     private fun initTestClass() {
@@ -198,7 +206,9 @@ class TransfersViewModelTest {
             deleteCompletedTransfersUseCase = deleteCompletedTransfersUseCase,
             deleteCompletedTransfersByIdUseCase = deleteCompletedTransfersByIdUseCase,
             cancelTransferByTagUseCase = cancelTransferByTagUseCase,
+            clearTransferErrorStatusUseCase = clearTransferErrorStatusUseCase,
             savedStateHandle = savedStateHandle,
+            isTransferInErrorStatusUseCase = isTransferInErrorStatusUseCase,
         )
     }
 
@@ -912,6 +922,15 @@ class TransfersViewModelTest {
             underTest.clearAllCompletedTransfers()
 
             verify(deleteCompletedTransfersUseCase).invoke()
+        }
+
+    @Test
+    fun `test that clearTransferErrorStatusUseCase is invoked when failed transfers tab is selected`() =
+        runTest {
+            initTestClass()
+            underTest.updateSelectedTab(FAILED_TAB_INDEX)
+
+            verify(clearTransferErrorStatusUseCase).invoke()
         }
 
     @Nested

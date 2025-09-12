@@ -22,11 +22,11 @@ import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.COMPLETED_TAB_INDEX
-import mega.privacy.android.app.presentation.transfers.view.FAILED_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.navigation.TransfersInfo
 import mega.privacy.android.app.presentation.transfers.view.navigation.transfersScreen
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.transfers.errorstatus.IsTransferInErrorStatusUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
@@ -43,15 +43,27 @@ const val EXTRA_TAB = "TAB"
 @AndroidEntryPoint
 class TransfersActivity : AppCompatActivity() {
 
+    /**
+     * monitorThemeModeUseCase
+     */
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
+    /**
+     * passcodeCryptObjectFactory
+     */
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
 
+    /**
+     * megaNavigator
+     */
     @Inject
     lateinit var megaNavigator: MegaNavigator
 
+    /**
+     * On create
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -64,8 +76,8 @@ class TransfersActivity : AppCompatActivity() {
                             passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                             content = {
                                 PsaContainer {
-                                    val tabIndex = intent?.getIntExtra(EXTRA_TAB, ACTIVE_TAB_INDEX)
-                                        ?: ACTIVE_TAB_INDEX
+                                    val tabIndex =
+                                        intent?.getIntExtra(EXTRA_TAB, -1)?.takeIf { it >= 0 }
 
                                     NavHost(
                                         navController = rememberNavController(),
@@ -96,22 +108,29 @@ class TransfersActivity : AppCompatActivity() {
 
     companion object {
 
+        /**
+         * Get the Intent to open the [TransfersActivity] in the active tab
+         */
         @JvmStatic
         fun getActiveTabIntent(context: Context): Intent =
             Intent(context, TransfersActivity::class.java).apply {
                 putExtra(EXTRA_TAB, ACTIVE_TAB_INDEX)
             }
 
+        /**
+         * Get the Intent to open the [TransfersActivity] in the completed tab
+         */
         @JvmStatic
         fun getCompletedTabIntent(context: Context): Intent =
             Intent(context, TransfersActivity::class.java).apply {
                 putExtra(EXTRA_TAB, COMPLETED_TAB_INDEX)
             }
 
+        /**
+         * Get the Intent to open the [TransfersActivity] in the default tab (failed tab if the transfer are in error status, active tab otherwise)
+         */
         @JvmStatic
-        fun getFailedTabIntent(context: Context): Intent =
-            Intent(context, TransfersActivity::class.java).apply {
-                putExtra(EXTRA_TAB, FAILED_TAB_INDEX)
-            }
+        fun getIntent(context: Context): Intent =
+            Intent(context, TransfersActivity::class.java)
     }
 }

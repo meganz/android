@@ -41,7 +41,6 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.extensions.launchUrl
-import mega.privacy.android.app.extensions.openTransfersAndConsumeErrorStatus
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
@@ -656,10 +655,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
     }
 
     private fun transfersWidgetClicked() {
-        megaNavigator.openTransfersAndConsumeErrorStatus(
-            this@SearchActivity,
-            transfersManagementViewModel
-        )
+        megaNavigator.openTransfers(this@SearchActivity)
         finish()
     }
 }

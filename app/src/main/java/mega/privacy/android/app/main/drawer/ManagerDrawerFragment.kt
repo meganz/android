@@ -25,7 +25,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.databinding.NavigationViewLayoutBinding
-import mega.privacy.android.app.extensions.openTransfersAndConsumeErrorStatus
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.NavigationDrawerManager
@@ -81,8 +80,6 @@ internal class ManagerDrawerFragment : Fragment() {
     private val viewModel: ManagerDrawerViewModel by viewModels()
     private val userInfoViewModel: UserInfoViewModel by activityViewModels()
     private val managerViewModel: ManagerViewModel by activityViewModels()
-
-    private val transfersManagementViewModel: TransfersManagementViewModel by activityViewModels()
 
     private val listener = object : DrawerLayout.DrawerListener {
         override fun onDrawerOpened(drawerView: View) {
@@ -206,10 +203,7 @@ internal class ManagerDrawerFragment : Fragment() {
             drawerManager.drawerItemClicked(DrawerItem.DEVICE_CENTER)
         }
         binding.transfersSection.setOnClickListener {
-            megaNavigator.openTransfersAndConsumeErrorStatus(
-                requireContext(),
-                transfersManagementViewModel
-            )
+            megaNavigator.openTransfers(requireContext())
         }
         binding.rubbishBinSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.RUBBISH_BIN) }
         binding.offlineSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.OFFLINE) }

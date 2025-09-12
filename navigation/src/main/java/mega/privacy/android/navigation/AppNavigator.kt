@@ -161,7 +161,7 @@ interface AppNavigator {
     /**
      * Navigate to [TransfersActivity]
      */
-    fun openTransfers(context: Context, tab: Int)
+    fun openTransfers(context: Context)
 
     /**
      * Open media player by file node

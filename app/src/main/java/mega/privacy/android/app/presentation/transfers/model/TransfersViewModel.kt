@@ -20,6 +20,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.extensions.matchOrderWithNewAtEnd
 import mega.privacy.android.app.extensions.moveElement
+import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
+import mega.privacy.android.app.presentation.transfers.view.FAILED_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.navigation.TransfersInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
@@ -42,6 +44,8 @@ import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTr
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteFailedOrCancelledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersByStateWithLimitUseCase
+import mega.privacy.android.domain.usecase.transfers.errorstatus.ClearTransferErrorStatusUseCase
+import mega.privacy.android.domain.usecase.transfers.errorstatus.IsTransferInErrorStatusUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
@@ -74,6 +78,8 @@ class TransfersViewModel @Inject constructor(
     private val deleteCompletedTransfersUseCase: DeleteCompletedTransfersUseCase,
     private val deleteCompletedTransfersByIdUseCase: DeleteCompletedTransfersByIdUseCase,
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
+    private val clearTransferErrorStatusUseCase: ClearTransferErrorStatusUseCase,
+    isTransferInErrorStatusUseCase: IsTransferInErrorStatusUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -83,7 +89,13 @@ class TransfersViewModel @Inject constructor(
     private val transfersInfo = savedStateHandle.toRoute<TransfersInfo>()
 
     init {
-        updateSelectedTab(transfersInfo.tabIndex)
+        val initialTabIndex = transfersInfo.tabIndex
+            ?: if (isTransferInErrorStatusUseCase()) {
+                FAILED_TAB_INDEX
+            } else {
+                ACTIVE_TAB_INDEX
+            }
+        updateSelectedTab(initialTabIndex)
         monitorActiveTransfers()
         monitorStorageOverQuota()
         monitorTransferOverQuota()
@@ -262,6 +274,9 @@ class TransfersViewModel @Inject constructor(
     fun updateSelectedTab(tabIndex: Int) {
         _uiState.update { state ->
             state.copy(selectedTab = tabIndex)
+        }
+        if (tabIndex == FAILED_TAB_INDEX) {
+            viewModelScope.launch { clearTransferErrorStatusUseCase() }
         }
     }
 

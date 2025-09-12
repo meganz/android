@@ -117,7 +117,6 @@ import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.extensions.consumeParentInsets
 import mega.privacy.android.app.extensions.isPortrait
 import mega.privacy.android.app.extensions.isTablet
-import mega.privacy.android.app.extensions.openTransfersAndConsumeErrorStatus
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
@@ -1401,10 +1400,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     }
 
     private fun onTransfersWidgetClick() {
-        megaNavigator.openTransfersAndConsumeErrorStatus(
-            this@ManagerActivity,
-            transfersManagementViewModel,
-        )
+        megaNavigator.openTransfers(this@ManagerActivity)
     }
 
     private fun initialiseChatBadgeView() {
