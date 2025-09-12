@@ -101,6 +101,8 @@ internal fun CloudDriveContent(
         navigationHandler = navigationHandler,
         viewModel = nodeOptionsActionViewModel
     ),
+    visibleParentNodeOptionId: NodeId? = null,
+    onDismissNodeOptionsBottomSheet: () -> Unit = {},
 ) {
     var showNewFolderDialog by remember { mutableStateOf(false) }
     var showNewTextFileDialog by remember { mutableStateOf(false) }
@@ -209,13 +211,17 @@ internal fun CloudDriveContent(
         nameCollisionLauncher = nameCollisionLauncher,
         snackbarHostState = snackbarHostState,
     )
-    var visibleNodeOptionId by remember { mutableStateOf<NodeId?>(null) }
+    var visibleNodeOptionId by remember { mutableStateOf(visibleParentNodeOptionId) }
     val nodeOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     var shouldShowSkeleton by remember { mutableStateOf(false) }
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(visibleParentNodeOptionId) {
+        visibleNodeOptionId = visibleParentNodeOptionId
+    }
 
     EventEffect(
         event = nodeOptionsActionUiState.downloadEvent,
@@ -430,12 +436,18 @@ internal fun CloudDriveContent(
         MegaModalBottomSheet(
             modifier = Modifier.statusBarsPadding(),
             sheetState = nodeOptionSheetState,
-            onDismissRequest = { visibleNodeOptionId = null },
+            onDismissRequest = { 
+                visibleNodeOptionId = null
+                onDismissNodeOptionsBottomSheet()
+            },
             bottomSheetBackground = MegaModalBottomSheetBackground.Surface1
         ) {
             NodeOptionsBottomSheetRoute(
                 navigationHandler = navigationHandler,
-                onDismiss = { visibleNodeOptionId = null },
+                onDismiss = { 
+                    visibleNodeOptionId = null
+                    onDismissNodeOptionsBottomSheet()
+                },
                 nodeId = nodeId.longValue,
                 nodeSourceType = NodeSourceType.CLOUD_DRIVE,
                 onTransfer = onTransfer,

@@ -59,6 +59,8 @@ fun CloudDriveScreen(
         viewModel = nodeOptionsActionViewModel,
         megaNavigator = megaNavigator,
     )
+    // Controls the visibility of the Node Options Bottom Sheet on CloudDriveContent
+    var visibleNodeOptionId: NodeId? by remember { mutableStateOf(null) }
 
     BackHandler(enabled = uiState.isInSelectionMode) {
         viewModel.processAction(DeselectAllItems)
@@ -100,7 +102,7 @@ fun CloudDriveScreen(
                                 TopAppBarActionWithClick(
                                     CloudDriveAppBarAction.More
                                 ) {
-                                    // TODO Open node options bottom sheet
+                                    visibleNodeOptionId = uiState.currentFolderId
                                 }
                             )
                         }
@@ -139,6 +141,8 @@ fun CloudDriveScreen(
                 onSortNodes = viewModel::setCloudSortOrder,
                 nodeOptionsActionViewModel = nodeOptionsActionViewModel,
                 nodeActionHandler = nodeActionHandler,
+                visibleParentNodeOptionId = visibleNodeOptionId,
+                onDismissNodeOptionsBottomSheet = { visibleNodeOptionId = null }
             )
         }
     )
