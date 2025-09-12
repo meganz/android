@@ -43,5 +43,7 @@ data class NodeActionState(
     val infoToShowEvent: StateEventWithContent<LocalizedText> = consumed(),
     val renameNodeRequestEvent: StateEventWithContent<NodeId> = consumed(),
     val shareFolderDialogEvent: StateEventWithContent<List<Long>> = consumed(),
-    val shareFolderEvent: StateEventWithContent<List<Long>> = consumed()
+    val shareFolderEvent: StateEventWithContent<List<Long>> = consumed(),
+    val visibleActions: List<NodeSelectionAction> = emptyList(),
+    val availableActions: List<NodeSelectionAction> = emptyList(),
 )

@@ -9,7 +9,6 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -23,16 +22,17 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.icon.pack.IconPack
 
 @Composable
-fun NodeMoreOptionsBottomSheet(
-    options: List<NodeActionUiOption>,
+internal fun NodeMoreOptionsBottomSheet(
+    actions: List<NodeSelectionAction>,
     sheetState: SheetState,
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit = {},
-    onOptionSelected: ((NodeActionUiOption) -> Unit)? = null,
-    onHelpClicked: ((NodeActionUiOption) -> Unit)? = null,
+    onActionPressed: ((NodeSelectionAction) -> Unit)? = null,
+    onHelpClicked: ((NodeSelectionAction) -> Unit)? = null,
 ) {
     MegaModalBottomSheet(
         bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
@@ -40,35 +40,34 @@ fun NodeMoreOptionsBottomSheet(
         modifier = modifier,
         onDismissRequest = onDismissRequest
     ) {
-        options.distinct().forEach { option ->
-            val label = remember(option) { option.label }
-
+        actions.distinct().forEach { action ->
             FlexibleLineListItem(
                 modifier = Modifier
-                    .testTag(option.key),
-                title = label.text,
-                titleTextColor = option.textColor,
+                    .testTag(action.testTag),
+                title = action.getDescription(),
+                titleTextColor = action.getTextColor(),
                 leadingElement = {
                     NodeActionIcon(
                         modifier = Modifier
                             .align(Alignment.Center)
                             .size(24.dp),
-                        option = option,
-                        contentDescription = label.text
+                        action = action,
+                        contentDescription = action.getDescription()
                     )
                 },
                 trailingElement = {
-                    if (option.showHelpButton) {
+                    if (action.showHelpButton()) {
                         HelpIcon(
-                            option = option,
-                            contentDescription = "Help for ${label.text}",
+                            action = action,
+                            contentDescription = "Help for ${action.getDescription()}",
                             onHelpClicked = onHelpClicked
                         )
                     }
                 },
                 onClickListener = {
-                    onOptionSelected?.invoke(option)
-                }
+                    onActionPressed?.invoke(action)
+                },
+                enableClick = action.enabled
             )
         }
     }
@@ -77,24 +76,24 @@ fun NodeMoreOptionsBottomSheet(
 @Composable
 private fun NodeActionIcon(
     modifier: Modifier,
-    option: NodeActionUiOption,
+    action: NodeSelectionAction,
     contentDescription: String,
 ) {
-    if (option.textColor == TextColor.Error) {
+    if (action is NodeSelectionAction.RubbishBin) {
         MegaIcon(
             modifier = modifier
                 .testTag(ERROR_NODE_ICON_TAG)
                 .size(24.dp),
-            painter = rememberVectorPainter(option.icon),
+            painter = action.getIconPainter(),
             contentDescription = contentDescription,
-            textColorTint = option.textColor,
+            textColorTint = TextColor.Error,
         )
     } else {
         MegaIcon(
             modifier = modifier
                 .testTag(NODE_ICON_TAG)
                 .size(24.dp),
-            painter = rememberVectorPainter(option.icon),
+            painter = action.getIconPainter(),
             contentDescription = contentDescription,
             tint = IconColor.Secondary,
         )
@@ -103,19 +102,31 @@ private fun NodeActionIcon(
 
 @Composable
 private fun HelpIcon(
-    option: NodeActionUiOption,
+    action: NodeSelectionAction,
     contentDescription: String,
-    onHelpClicked: ((NodeActionUiOption) -> Unit)?,
+    onHelpClicked: ((NodeSelectionAction) -> Unit)?,
 ) {
     MegaIcon(
         modifier = Modifier
             .size(24.dp)
             .testTag(HELP_ICON_TAG)
-            .clickable { onHelpClicked?.invoke(option) },
+            .clickable { onHelpClicked?.invoke(action) },
         painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.HelpCircle),
         contentDescription = contentDescription,
         tint = IconColor.Secondary,
     )
+}
+
+@Composable
+private fun NodeSelectionAction.getTextColor(): TextColor = when (this) {
+    is NodeSelectionAction.RubbishBin -> TextColor.Error
+    else -> TextColor.Primary
+}
+
+@Composable
+private fun NodeSelectionAction.showHelpButton(): Boolean = when (this) {
+    is NodeSelectionAction.Hide -> true
+    else -> false
 }
 
 @Composable
@@ -129,7 +140,7 @@ private fun NodeMoreOptionsBottomSheetPreview() {
         }
 
         NodeMoreOptionsBottomSheet(
-            options = NodeActionUiOption.defaults,
+            actions = NodeSelectionAction.defaults,
             sheetState = sheetState,
         )
     }

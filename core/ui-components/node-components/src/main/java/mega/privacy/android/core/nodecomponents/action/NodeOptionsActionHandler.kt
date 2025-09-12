@@ -10,6 +10,9 @@ import kotlinx.coroutines.CoroutineScope
 import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.megaActivityResultContract
 
 /**
@@ -26,6 +29,8 @@ import mega.privacy.android.navigation.megaActivityResultContract
 @Composable
 internal fun rememberSingleNodeActionHandler(
     nodeOptionsActionViewModel: NodeOptionsActionViewModel,
+    navigationHandler: NavigationHandler?,
+    megaNavigator: MegaNavigator,
     coroutineScope: CoroutineScope,
 ): (MenuAction, TypedNode) -> Unit {
     val context = LocalContext.current
@@ -112,14 +117,19 @@ internal fun rememberSingleNodeActionHandler(
         sendToChatLauncher,
         hiddenNodesOnboardingLauncher,
         coroutineScope,
+        navigationHandler,
+        megaNavigator
     ) {
         { action, node ->
             nodeOptionsActionViewModel.updateSelectedNodes(listOf(node))
 
             val actionContext = SingleNodeActionProvider(
                 viewModel = nodeOptionsActionViewModel,
+                context = context,
                 coroutineScope = coroutineScope,
                 postMessage = nodeOptionsActionViewModel::postMessage,
+                navigationHandler = navigationHandler,
+                megaNavigator = megaNavigator,
                 versionsLauncher = versionsLauncher,
                 moveLauncher = moveLauncher,
                 copyLauncher = copyLauncher,
@@ -146,6 +156,8 @@ internal fun rememberSingleNodeActionHandler(
 @Composable
 internal fun rememberMultipleNodesActionHandler(
     nodeOptionsActionViewModel: NodeOptionsActionViewModel,
+    navigationHandler: NavigationHandler?,
+    megaNavigator: MegaNavigator,
     coroutineScope: CoroutineScope,
 ): (MenuAction, List<TypedNode>) -> Unit {
     val context = LocalContext.current
@@ -224,15 +236,20 @@ internal fun rememberMultipleNodesActionHandler(
         restoreLauncher,
         sendToChatLauncher,
         hiddenNodesOnboardingLauncher,
-        coroutineScope
+        coroutineScope,
+        navigationHandler,
+        megaNavigator
     ) {
         { action, nodes ->
             nodeOptionsActionViewModel.updateSelectedNodes(nodes)
 
             val actionContext = MultipleNodesActionProvider(
                 viewModel = nodeOptionsActionViewModel,
+                context = context,
                 coroutineScope = coroutineScope,
                 postMessage = nodeOptionsActionViewModel::postMessage,
+                navigationHandler = navigationHandler,
+                megaNavigator = megaNavigator,
                 moveLauncher = moveLauncher,
                 copyLauncher = copyLauncher,
                 shareFolderLauncher = shareFolderLauncher,
@@ -260,14 +277,29 @@ internal fun rememberMultipleNodesActionHandler(
 fun rememberNodeActionHandler(
     viewModel: NodeOptionsActionViewModel = hiltViewModel(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    megaNavigator: MegaNavigator = rememberMegaNavigator(),
+    navigationHandler: NavigationHandler? = null,
 ): NodeActionHandler {
     val singleNodeHandler =
-        rememberSingleNodeActionHandler(viewModel, coroutineScope)
+        rememberSingleNodeActionHandler(
+            nodeOptionsActionViewModel = viewModel,
+            navigationHandler = navigationHandler,
+            megaNavigator = megaNavigator,
+            coroutineScope = coroutineScope
+        )
     val multipleNodesHandler =
-        rememberMultipleNodesActionHandler(viewModel, coroutineScope)
+        rememberMultipleNodesActionHandler(
+            nodeOptionsActionViewModel = viewModel,
+            navigationHandler = navigationHandler,
+            megaNavigator = megaNavigator,
+            coroutineScope = coroutineScope
+        )
 
     return remember(singleNodeHandler, multipleNodesHandler) {
-        NodeActionHandler(singleNodeHandler, multipleNodesHandler)
+        NodeActionHandler(
+            singleNodeHandler = singleNodeHandler,
+            multipleNodesHandler = multipleNodesHandler
+        )
     }
 }
 

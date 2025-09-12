@@ -1,9 +1,9 @@
 package mega.privacy.android.core.nodecomponents.action
 
 import android.content.Intent
-import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.Lazy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -18,12 +18,17 @@ import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionActionUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeSelectionModeActionMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeSendToChatMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
+import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
+import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction.Companion.DEFAULT_MAX_VISIBLE_ITEMS
+import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -36,18 +41,24 @@ import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.qualifier.features.CloudDrive
+import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
+import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
@@ -59,9 +70,11 @@ import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
+import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -114,10 +127,35 @@ class NodeOptionsActionViewModel @Inject constructor(
     private val createShareKeyUseCase: CreateShareKeyUseCase,
     private val snackBarHandler: SnackBarHandler,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    @CloudDrive private val cloudDriveOptions: Lazy<Set<@JvmSuppressWildcards NodeSelectionMenuItem<*>>>,
+    private val nodeSelectionModeActionMapper: NodeSelectionModeActionMapper,
+    private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
+    private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
+    private val getNodeAccessPermission: GetNodeAccessPermission,
+    private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode,
+    private val nodeSelectionActionUiMapper: NodeSelectionActionUiMapper,
 ) : ViewModel() {
 
     val uiState: StateFlow<NodeActionState>
         field = MutableStateFlow(NodeActionState())
+
+    private var rubbishBinNode: UnTypedNode? = null
+
+    init {
+        getRubbishBinNode()
+    }
+
+    private fun getRubbishBinNode() {
+        viewModelScope.launch {
+            runCatching {
+                getRubbishNodeUseCase()
+            }.onSuccess { rubbishBin ->
+                rubbishBinNode = rubbishBin
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
 
     /**
      * Check move nodes name collision
@@ -688,4 +726,97 @@ class NodeOptionsActionViewModel @Inject constructor(
 
     fun postMessage(message: String) =
         snackBarHandler.postSnackbarMessage(message)
+
+    fun updateSelectionModeAvailableActions(
+        selectedNodes: Set<TypedNode>,
+        nodeSourceType: NodeSourceType,
+    ) {
+        viewModelScope.launch {
+            updateSelectedNodes(selectedNodes.toList())
+
+            Timber.d("Update state called with ${selectedNodes.size} nodes")
+            val options = getOptions(nodeSourceType)
+            if (options.isEmpty()) {
+                Timber.w("No options available for node source type: $nodeSourceType")
+                uiState.update { it.copy(visibleActions = emptyList()) }
+                return@launch
+            }
+
+            val (canBeMovedToTarget, anyNodeInBackups, hasAccessPermission) = when (nodeSourceType) {
+                NodeSourceType.RUBBISH_BIN -> Triple(false, false, true)
+                NodeSourceType.INCOMING_SHARES -> Triple(
+                    canSelectedNodesBeMovedToRubbishBin(selectedNodes),
+                    anyNodesInBackups(selectedNodes),
+                    hasFullAccessPermission(selectedNodes)
+                )
+
+                else -> Triple(
+                    canSelectedNodesBeMovedToRubbishBin(selectedNodes),
+                    anyNodesInBackups(selectedNodes),
+                    true
+                )
+            }
+
+            val availableActions = nodeSelectionModeActionMapper(
+                options = options,
+                hasNodeAccessPermission = hasAccessPermission,
+                selectedNodes = selectedNodes.toList(),
+                allNodeCanBeMovedToTarget = canBeMovedToTarget,
+                noNodeInBackups = !anyNodeInBackups
+            ).mapNotNull { nodeSelectionActionUiMapper(it) }
+                .filterNot { it is NodeSelectionAction.More }
+
+            val visibleActions = if (availableActions.size > DEFAULT_MAX_VISIBLE_ITEMS) {
+                availableActions.take(DEFAULT_MAX_VISIBLE_ITEMS) + NodeSelectionAction.More
+            } else {
+                availableActions
+            }
+
+            uiState.update {
+                it.copy(
+                    visibleActions = visibleActions,
+                    availableActions = availableActions
+                )
+            }
+            Timber.d("Visible actions: $visibleActions, Available actions: $availableActions")
+        }
+    }
+
+    private suspend fun canSelectedNodesBeMovedToRubbishBin(
+        selectedNodes: Set<TypedNode>,
+    ) = rubbishBinNode?.let { rubbishBinNode ->
+        runCatching {
+            selectedNodes.any { node ->
+                checkNodeCanBeMovedToTargetNode(nodeId = node.id, targetNodeId = rubbishBinNode.id)
+            }
+        }.getOrElse {
+            Timber.e(it)
+            true
+        }
+    } ?: true
+
+    private suspend fun hasFullAccessPermission(selectedNodes: Set<TypedNode>): Boolean {
+        return runCatching {
+            selectedNodes.all { getNodeAccessPermission(it.id) == AccessPermission.FULL }
+        }.onFailure {
+            Timber.e(it)
+        }.getOrDefault(false)
+    }
+
+    private suspend fun anyNodesInBackups(selectedNodes: Set<TypedNode>) =
+        selectedNodes.any {
+            runCatching {
+                isNodeInBackupsUseCase(handle = it.id.longValue)
+            }.getOrElse { e ->
+                Timber.e(e)
+                false
+            }
+        }
+
+    private fun getOptions(nodeSourceType: NodeSourceType) =
+        when (nodeSourceType) {
+            NodeSourceType.CLOUD_DRIVE -> cloudDriveOptions.get()
+            // Update when other source types are supported
+            else -> emptySet()
+        }
 }

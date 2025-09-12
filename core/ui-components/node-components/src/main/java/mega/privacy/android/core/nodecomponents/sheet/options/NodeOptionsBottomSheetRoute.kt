@@ -49,7 +49,10 @@ fun NodeOptionsBottomSheetRoute(
     nodeSourceType: NodeSourceType,
     onTransfer: (TransferTriggerEvent) -> Unit,
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
-    actionHandler: NodeActionHandler = rememberNodeActionHandler(nodeOptionsActionViewModel),
+    actionHandler: NodeActionHandler = rememberNodeActionHandler(
+        navigationHandler = navigationHandler,
+        viewModel = nodeOptionsActionViewModel
+    ),
     viewModel: NodeOptionsBottomSheetViewModel = hiltViewModel(),
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current

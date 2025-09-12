@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,7 +21,6 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.tabs.MegaScrollableTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
@@ -33,9 +31,6 @@ import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
-import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
-import mega.privacy.android.core.nodecomponents.sheet.nodeactions.NodeActionUiOption
-import mega.privacy.android.core.nodecomponents.sheet.nodeactions.NodeMoreOptionsBottomSheet
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -51,7 +46,6 @@ import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.shared.original.core.ui.model.TopAppBarActionWithClick
 import mega.privacy.android.shared.resources.R as sharedR
-import timber.log.Timber
 
 /**
  * Drive Sync Screen, shown in the Drive bottom navigation tab
@@ -79,28 +73,17 @@ internal fun DriveSyncScreen(
     var showUploadOptionsBottomSheet by remember { mutableStateOf(false) }
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showSyncSettings by rememberSaveable { mutableStateOf(false) }
-    var showMoreBottomSheet by remember { mutableStateOf(false) }
-    val moreOptionsBottomSheetState = rememberModalBottomSheetState()
     val nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel()
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
-    val nodeActionHandler = rememberNodeActionHandler(nodeOptionsActionViewModel)
+    val nodeActionHandler = rememberNodeActionHandler(
+        navigationHandler = navigationHandler,
+        viewModel = nodeOptionsActionViewModel,
+        megaNavigator = megaNavigator
+    )
 
     BackHandler(enabled = cloudDriveUiState.isInSelectionMode) {
         cloudDriveViewModel.processAction(DeselectAllItems)
     }
-
-    LaunchedEffect(cloudDriveUiState.items) {
-        nodeOptionsActionViewModel.updateSelectedNodes(cloudDriveUiState.selectedNodes)
-        Timber.d("Selected nodes: ${nodeOptionsActionViewModel.uiState.value.selectedNodes}")
-    }
-
-    EventEffect(
-        event = nodeOptionsActionUiState.downloadEvent,
-        onConsumed = nodeOptionsActionViewModel::markDownloadEventConsumed,
-        action = {
-            onTransfer(it)
-        }
-    )
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
@@ -143,15 +126,11 @@ internal fun DriveSyncScreen(
         },
         bottomBar = {
             NodeSelectionModeBottomBar(
-                count = cloudDriveUiState.selectedItemsCount,
-                visible = cloudDriveUiState.isInSelectionMode,
-                onActionPressed = { action ->
-                    when (action) {
-                        is NodeSelectionAction.More -> {
-                            showMoreBottomSheet = true
-                        }
-                    }
-                }
+                availableActions = nodeOptionsActionUiState.availableActions,
+                visibleActions = nodeOptionsActionUiState.visibleActions,
+                visible = nodeOptionsActionUiState.visibleActions.isNotEmpty() && cloudDriveUiState.isInSelectionMode,
+                nodeActionHandler = nodeActionHandler,
+                selectedNodes = cloudDriveUiState.selectedNodes,
             )
         },
         floatingActionButton = {
@@ -193,7 +172,7 @@ internal fun DriveSyncScreen(
                         onRenameNode = onRenameNode,
                         onSortNodes = cloudDriveViewModel::setCloudSortOrder,
                         nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-                        nodeActionHandler = nodeActionHandler
+                        nodeActionHandler = nodeActionHandler,
                     )
                 }
                 addTextTab(
@@ -250,20 +229,6 @@ internal fun DriveSyncScreen(
         cloudDriveUiState = cloudDriveUiState,
         cloudDriveViewModel = cloudDriveViewModel,
     )
-
-    if (showMoreBottomSheet) {
-        NodeMoreOptionsBottomSheet(
-            options = NodeActionUiOption.defaults,
-            sheetState = moreOptionsBottomSheetState,
-            onDismissRequest = {
-                showMoreBottomSheet = false
-            },
-            onOptionSelected = { option ->
-                // Todo
-                showMoreBottomSheet = false
-            }
-        )
-    }
 
     SyncSettingsBottomSheetViewM3(shouldShowBottomSheet = showSyncSettings) {
         showSyncSettings = false

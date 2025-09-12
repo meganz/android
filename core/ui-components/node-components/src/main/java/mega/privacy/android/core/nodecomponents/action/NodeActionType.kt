@@ -5,12 +5,15 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.menu.MenuAction
+import mega.privacy.android.core.nodecomponents.dialog.delete.MoveToRubbishOrDeleteDialogArgs
+import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.RestoreNodeResultMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AvailableOfflineMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ClearSelectionMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.CopyMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.ManageLinkMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.OpenWithMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RenameMenuAction
@@ -18,6 +21,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.RestoreMenuActio
 import mega.privacy.android.core.nodecomponents.menu.menuaction.SelectAllMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareFolderMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VersionsMenuAction
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -122,7 +126,7 @@ class RestoreAction @Inject constructor(
 
     private fun handleRestore(
         nodes: List<TypedNode>,
-        provider: NodeActionProvider
+        provider: NodeActionProvider,
     ) {
         provider.coroutineScope.launch {
             withContext(NonCancellable) {
@@ -230,6 +234,8 @@ class HideAction @Inject constructor() : SingleNodeAction, MultiNodeAction {
         provider: MultipleNodesActionProvider,
     ) {
         provider.coroutineScope.launch {
+            // Todo add analytics when available
+            //Analytics.tracker.trackEvent(HideNodeMultiSelectMenuItemEvent)
             provider.hiddenNodesOnboardingLauncher.launch(provider.viewModel.isOnboarding())
         }
     }
@@ -263,5 +269,65 @@ class RenameNodeAction @Inject constructor() : SingleNodeAction {
 
     override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
         provider.viewModel.handleRenameNodeRequest(node.id)
+    }
+}
+
+class MoveToRubbishBinAction @Inject constructor(
+    private val nodeHandlesToJsonMapper: NodeHandlesToJsonMapper,
+) : SingleNodeAction, MultiNodeAction {
+    override fun canHandle(action: MenuAction): Boolean = action is TrashMenuAction
+
+    override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
+        handleTrashAction(listOf(node), provider)
+    }
+
+    override fun handle(
+        action: MenuAction,
+        nodes: List<TypedNode>,
+        provider: MultipleNodesActionProvider,
+    ) {
+        handleTrashAction(nodes, provider)
+    }
+
+    private fun handleTrashAction(
+        nodes: List<TypedNode>,
+        provider: NodeActionProvider,
+    ) {
+        provider.coroutineScope.launch {
+            val handles = nodes.map { it.id.longValue }
+            runCatching { nodeHandlesToJsonMapper(handles) }
+                .onSuccess {
+                    provider.navigationHandler?.navigate(
+                        MoveToRubbishOrDeleteDialogArgs(
+                            isInRubbish = false,
+                            nodeHandles = handles
+                        )
+                    )
+                }
+                .onFailure { Timber.e(it) }
+        }
+    }
+}
+
+class ManageLinkAction @Inject constructor() : SingleNodeAction, MultiNodeAction {
+    override fun canHandle(action: MenuAction): Boolean = action is ManageLinkMenuAction
+
+    override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
+        provider.megaNavigator.openGetLinkActivity(
+            context = provider.context,
+            handle = node.id.longValue
+        )
+    }
+
+    override fun handle(
+        action: MenuAction,
+        nodes: List<TypedNode>,
+        provider: MultipleNodesActionProvider,
+    ) {
+        val handles = nodes.map { it.id.longValue }.toLongArray()
+        provider.megaNavigator.openGetLinkActivity(
+            context = provider.context,
+            handles = handles
+        )
     }
 }

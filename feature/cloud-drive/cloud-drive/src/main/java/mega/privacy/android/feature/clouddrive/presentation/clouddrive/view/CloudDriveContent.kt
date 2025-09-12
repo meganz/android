@@ -98,7 +98,10 @@ internal fun CloudDriveContent(
     listState: LazyListState = rememberLazyListState(),
     gridState: LazyGridState = rememberLazyGridState(),
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
-    nodeActionHandler: NodeActionHandler = rememberNodeActionHandler(nodeOptionsActionViewModel),
+    nodeActionHandler: NodeActionHandler = rememberNodeActionHandler(
+        navigationHandler = navigationHandler,
+        viewModel = nodeOptionsActionViewModel
+    ),
 ) {
     var showNewFolderDialog by remember { mutableStateOf(false) }
     var showNewTextFileDialog by remember { mutableStateOf(false) }
@@ -110,7 +113,7 @@ internal fun CloudDriveContent(
     var uploadUris by rememberSaveable { mutableStateOf(emptyList<Uri>()) }
     var isUploadFolder by rememberSaveable { mutableStateOf(false) }
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
-
+    val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val internalFolderPickerLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             val intent = it.data
@@ -208,12 +211,25 @@ internal fun CloudDriveContent(
         snackbarHostState = snackbarHostState,
     )
     var visibleNodeOptionId by remember { mutableStateOf<NodeId?>(null) }
-    val nodeOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val nodeOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     var shouldShowSkeleton by remember { mutableStateOf(false) }
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
+
+    EventEffect(
+        event = nodeOptionsActionUiState.downloadEvent,
+        onConsumed = nodeOptionsActionViewModel::markDownloadEventConsumed,
+        action = onTransfer
+    )
+
+    LaunchedEffect(uiState.selectedItemsCount) {
+        nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
+            uiState.selectedNodes.toSet(),
+            NodeSourceType.CLOUD_DRIVE
+        )
+    }
 
     // Reset selection mode after handling move, copy, delete action
     LaunchedEffect(nodeActionState.infoToShowEvent) {
