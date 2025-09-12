@@ -13,13 +13,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
 import mega.privacy.android.domain.entity.TransfersStatusInfo
-import mega.privacy.android.domain.entity.transfer.CompletedTransferState
 import mega.privacy.android.domain.extension.skipUnstable
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorLastTransfersHaveBeenCancelledUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersStatusUseCase
-import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
+import mega.privacy.android.domain.usecase.transfers.errorstatus.MonitorTransferInErrorStatusUseCase
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import timber.log.Timber
 import javax.inject.Inject
@@ -38,7 +37,7 @@ class TransfersManagementViewModel @Inject constructor(
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     monitorTransfersStatusUseCase: MonitorTransfersStatusUseCase,
     monitorLastTransfersHaveBeenCancelledUseCase: MonitorLastTransfersHaveBeenCancelledUseCase,
-    private val monitorCompletedTransfersEventUseCase: MonitorCompletedTransferEventUseCase,
+    private val monitorTransferInErrorStatusUseCase: MonitorTransferInErrorStatusUseCase,
     private val samplePeriod: Long?,
 ) : ViewModel() {
     private val _state = MutableStateFlow(TransferManagementUiState())
@@ -85,39 +84,23 @@ class TransfersManagementViewModel @Inject constructor(
 
     private fun monitorFailedTransfers() {
         viewModelScope.launch(ioDispatcher) {
-            monitorCompletedTransfersEventUseCase().collect { completedState ->
-                if (completedState == CompletedTransferState.Error) {
-                    _state.update { state -> state.copy(isTransferError = true) }
-                }
-            }
-        }
-    }
-
-    /**
-     * Checks if should show transfer errors. If so, updates state as the error is immediately consumed.
-     */
-    fun shouldCheckTransferError() = state.value.isTransferError.let { isTransferError ->
-        if (isTransferError) {
-            _state.update { state ->
-                val transferInfo = state.transfersInfo.let {
-                    if (it.status == TransfersStatus.TransferError) {
-                        it.copy(
-                            status =
-                                if (it.totalSizeToTransfer == 0L) TransfersStatus.Completed
-                                else TransfersStatus.Transferring
-                        )
-                    } else {
-                        it
+            monitorTransferInErrorStatusUseCase().collect { isInErrorStatus ->
+                if (isInErrorStatus != _state.value.isTransferError) {
+                    _state.update { state ->
+                        if (isInErrorStatus) {
+                            state.copy(isTransferError = true)
+                        } else {
+                            val transfersInfo = state.transfersInfo.copy(
+                                status =
+                                    if (state.transfersInfo.totalSizeToTransfer == 0L) TransfersStatus.Completed
+                                    else TransfersStatus.Transferring
+                            )
+                            state.copy(transfersInfo = transfersInfo, isTransferError = false)
+                        }
                     }
                 }
-                state.copy(
-                    isTransferError = false,
-                    transfersInfo = transferInfo
-                )
             }
         }
-
-        isTransferError
     }
 
     /**

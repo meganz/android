@@ -8,7 +8,6 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
-import mega.privacy.android.domain.entity.transfer.CompletedTransferState
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
@@ -200,13 +199,6 @@ interface TransferRepository {
      *
      */
     suspend fun getInProgressTransfers(): List<Transfer>
-
-    /**
-     * Monitor completed transfers
-     *
-     * @return a flow of [CompletedTransferState]
-     */
-    fun monitorCompletedTransfer(): Flow<CompletedTransferState>
 
     /**
      * Monitors list of completed transfers

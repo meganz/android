@@ -54,7 +54,6 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
-import mega.privacy.android.domain.entity.transfer.CompletedTransferState
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
@@ -424,9 +423,6 @@ internal class DefaultTransfersRepository @Inject constructor(
         transfers.sortedBy { it.priority }
     }
 
-    override fun monitorCompletedTransfer(): Flow<CompletedTransferState> =
-        appEventGateway.monitorCompletedTransfer
-
     override fun monitorCompletedTransfersByStateWithLimit(
         limit: Int,
         vararg states: TransferState,
@@ -436,17 +432,14 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override suspend fun addCompletedTransfers(finishEvents: List<TransferEvent.TransferFinishEvent>) {
         withContext(ioDispatcher) {
-            var completedTransferState = CompletedTransferState.Completed
             val completedTransfers = finishEvents.map { event ->
                 if (event.transfer.state == TransferState.STATE_FAILED) {
-                    completedTransferState = CompletedTransferState.Error
                     monitorTransferInErrorStatus.update { true }
                 }
                 completedTransferMapper(event.transfer, event.error)
             }
             megaLocalRoomGateway.addCompletedTransfers(completedTransfers)
             removeInProgressTransfers(finishEvents.map { it.transfer.uniqueId }.toSet())
-            appEventGateway.broadcastCompletedTransfer(completedTransferState)
         }
     }
 
@@ -459,7 +452,6 @@ internal class DefaultTransfersRepository @Inject constructor(
             completedTransferPendingTransferMapper(pendingTransfer, sizeInBytes, error)
         megaLocalRoomGateway.addCompletedTransfer(completedTransfer)
         removeInProgressTransfers(setOfNotNull(pendingTransfer.transferUniqueId))
-        appEventGateway.broadcastCompletedTransfer(CompletedTransferState.Error)
         monitorTransferInErrorStatus.update { true }
     }
 
@@ -472,7 +464,6 @@ internal class DefaultTransfersRepository @Inject constructor(
         }
         megaLocalRoomGateway.addCompletedTransfers(completedTransfers)
         removeInProgressTransfers(pendingTransfers.mapNotNull { it.transferUniqueId }.toSet())
-        appEventGateway.broadcastCompletedTransfer(CompletedTransferState.Error)
         monitorTransferInErrorStatus.update { true }
     }
 

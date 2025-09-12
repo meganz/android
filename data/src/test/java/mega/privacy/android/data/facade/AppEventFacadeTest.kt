@@ -9,7 +9,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.domain.entity.call.AudioDevice
-import mega.privacy.android.domain.entity.transfer.CompletedTransferState
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -40,17 +39,6 @@ class AppEventFacadeTest {
     @Test
     fun `test that is SMSVerification Shown default value is the correct one`() = runTest {
         assertThat(underTest.isSMSVerificationShown()).isFalse()
-    }
-
-    @Test
-    fun `test that broadcast completed transfer fires an event`() = runTest {
-        val expected = CompletedTransferState.Completed
-        underTest.monitorCompletedTransfer.test {
-            underTest.broadcastCompletedTransfer(expected)
-
-            val actual = awaitItem()
-            assertThat(actual).isEqualTo(expected)
-        }
     }
 
     @Test

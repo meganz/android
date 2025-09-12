@@ -39,7 +39,6 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
-import mega.privacy.android.domain.entity.transfer.CompletedTransferState
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
@@ -683,7 +682,6 @@ class DefaultTransfersRepositoryTest {
             whenever(completedTransferMapper(transfer, error)).thenReturn(expected.first())
             underTest.addCompletedTransfers(listOf(event))
             verify(megaLocalRoomGateway).addCompletedTransfers(expected)
-            verify(appEventGateway).broadcastCompletedTransfer(CompletedTransferState.Error)
         }
 
     @Test
@@ -701,7 +699,6 @@ class DefaultTransfersRepositoryTest {
             whenever(completedTransferMapper(transfer, error)).thenReturn(expected.first())
             underTest.addCompletedTransfers(listOf(event))
             verify(megaLocalRoomGateway).addCompletedTransfers(expected)
-            verify(appEventGateway).broadcastCompletedTransfer(CompletedTransferState.Completed)
         }
 
     @Test
@@ -715,7 +712,6 @@ class DefaultTransfersRepositoryTest {
                 .thenReturn(expected)
             underTest.addCompletedTransferFromFailedPendingTransfer(transfer, size, error)
             verify(megaLocalRoomGateway).addCompletedTransfer(expected)
-            verify(appEventGateway).broadcastCompletedTransfer(CompletedTransferState.Error)
         }
 
     @Test
@@ -731,18 +727,6 @@ class DefaultTransfersRepositoryTest {
             }
             underTest.addCompletedTransferFromFailedPendingTransfers(transfers, error)
             verify(megaLocalRoomGateway).addCompletedTransfers(expected)
-            verify(appEventGateway).broadcastCompletedTransfer(CompletedTransferState.Error)
-        }
-
-    @Test
-    fun `test that monitorCompletedTransfer returns the result of app event gateway monitorCompletedTransfer`() =
-        runTest {
-            val expected = CompletedTransferState.Completed
-            whenever(appEventGateway.monitorCompletedTransfer).thenReturn(flowOf(expected))
-            underTest.monitorCompletedTransfer().test {
-                assertThat(awaitItem()).isEqualTo(expected)
-                awaitComplete()
-            }
         }
 
     @Test

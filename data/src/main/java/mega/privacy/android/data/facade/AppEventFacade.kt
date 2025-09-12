@@ -16,7 +16,6 @@ import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
-import mega.privacy.android.domain.entity.transfer.CompletedTransferState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import javax.inject.Inject
 
@@ -49,7 +48,6 @@ internal class AppEventFacade @Inject constructor(
     private val _finishActivity = MutableSharedFlow<Boolean>()
 
     private val updateUpgradeSecurityState = MutableStateFlow(false)
-    private val _monitorCompletedTransfer = MutableSharedFlow<CompletedTransferState>()
     private val _monitorRefreshSession = MutableSharedFlow<Unit>()
     private val _monitorBackupInfoType = MutableSharedFlow<BackupInfoType>()
     private val _monitorUpgradeDialogShown = MutableSharedFlow<Unit>()
@@ -62,9 +60,6 @@ internal class AppEventFacade @Inject constructor(
     private val _googleConsentLoaded = MutableStateFlow(false)
 
     override val monitorCookieSettings: Flow<Set<CookieType>> = _cookieSettings.asSharedFlow()
-
-    override val monitorCompletedTransfer =
-        _monitorCompletedTransfer.toSharedFlow(appScope)
 
     private val callEnded = MutableSharedFlow<Long>()
     private val callScreenOpened = MutableSharedFlow<Boolean>()
@@ -128,9 +123,6 @@ internal class AppEventFacade @Inject constructor(
 
     override fun monitorPushNotificationSettings() =
         pushNotificationSettingsUpdate.toSharedFlow(appScope)
-
-    override suspend fun broadcastCompletedTransfer(completedTransferState: CompletedTransferState) =
-        _monitorCompletedTransfer.emit(completedTransferState)
 
     override fun monitorMyAccountUpdate(): Flow<MyAccountUpdate> =
         myAccountUpdate.toSharedFlow(appScope)
@@ -208,7 +200,7 @@ internal class AppEventFacade @Inject constructor(
 
     override fun monitorCallEnded() = callEnded.asSharedFlow()
 
-    override suspend fun broadcastCallEnded(callId: Long) = callEnded.emit(callId)
+    override suspend fun broadcastCallEnded(chatId: Long) = callEnded.emit(chatId)
 
     override fun monitorCallScreenOpened() = callScreenOpened.asSharedFlow()
 

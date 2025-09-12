@@ -7,14 +7,8 @@ import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
-import mega.privacy.android.domain.entity.transfer.CompletedTransferState
 
 internal interface AppEventGateway {
-
-    /**
-     * Monitor completed transfer
-     */
-    val monitorCompletedTransfer: Flow<CompletedTransferState>
 
     /**
      * Monitor cookie settings saved.
@@ -138,13 +132,6 @@ internal interface AppEventGateway {
      * Monitor push notification settings
      */
     fun monitorPushNotificationSettings(): Flow<Boolean>
-
-    /**
-     * Broadcast an event when there is a new completed transfer
-     *
-     * @param completedTransferState [CompletedTransferState]
-     */
-    suspend fun broadcastCompletedTransfer(completedTransferState: CompletedTransferState)
 
     /**
      * Monitor account update.
@@ -390,6 +377,7 @@ internal interface AppEventGateway {
      * Broadcast misc unloaded
      */
     suspend fun broadcastMiscUnloaded()
+
     /**
      * Broadcast SSL verification failed
      */
