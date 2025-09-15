@@ -1607,6 +1607,23 @@ internal class NodeRepositoryImplTest {
     }
 
     @Test
+    fun `test that cleanRubbishBin triggers correctly`() = runTest {
+        whenever(megaApiGateway.cleanRubbishBin(any())).thenAnswer {
+            ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                api = mock(),
+                request = mock(),
+                error = mock {
+                    on { errorCode }.thenReturn(
+                        MegaError.API_OK
+                    )
+                },
+            )
+        }
+        underTest.cleanRubbishBin()
+        verify(megaApiGateway).cleanRubbishBin(any())
+    }
+
+    @Test
     fun `test that getNodeLabel returns correct value`() = runTest {
         val mockResult = mock<NodeLabel>()
         whenever(nodeLabelMapper(any())).thenReturn(mockResult)

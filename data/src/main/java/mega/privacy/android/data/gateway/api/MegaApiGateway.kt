@@ -3667,6 +3667,19 @@ interface MegaApiGateway {
     fun removeVersions(listener: MegaRequestListenerInterface)
 
     /**
+     * Clean the Rubbish Bin in the MEGA account
+     *
+     * This function effectively removes every node contained in the Rubbish Bin. In order to
+     * avoid accidental deletions, you might want to warn the user about the action.
+     * The request returns an error if the Rubbish bin is already empty.
+     * If the MEGA account is a business account and its status is expired, this will
+     * throw an exception with the error code API_EBUSINESSPASTDUE.
+     *
+     * @param listener MegaRequestListener to track this request
+     */
+    fun cleanRubbishBin(listener: MegaRequestListenerInterface)
+
+    /**
      * Allow to resend the verification email for Weak Account Protection
      * The verification email will be resent to the same address as it was previously sent to.
      * This function can be called if the the reason for being blocked is: 700: the account is suspended for Weak Account Protection.

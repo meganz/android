@@ -875,6 +875,12 @@ interface NodeRepository {
     suspend fun removeAllVersions()
 
     /**
+     * Clean the Rubbish Bin in the MEGA account
+     *
+     */
+    suspend fun cleanRubbishBin()
+
+    /**
      * Get root node id
      *
      * @return The root node id if found else null

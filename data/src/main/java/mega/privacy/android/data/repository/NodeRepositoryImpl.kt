@@ -1254,6 +1254,13 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun cleanRubbishBin() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("cleanRubbishBin") {}
+            megaApiGateway.cleanRubbishBin(listener)
+        }
+    }
+
     override suspend fun getRootNodeId(): NodeId? = withContext(ioDispatcher) {
         megaApiGateway.getRootNode()?.let { NodeId(it.handle) }
     }
