@@ -8,14 +8,19 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fromId
 import mega.privacy.android.app.presentation.achievements.view.AchievementView
 import mega.privacy.android.app.presentation.achievements.view.AchievementViewTestTags
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.StartMEGAPWMFreeTrialEvent
+import mega.privacy.mobile.analytics.event.StartMEGAVPNFreeTrialEvent
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.verify
@@ -24,8 +29,12 @@ import org.robolectric.annotation.Config
 @RunWith(AndroidJUnit4::class)
 @Config(qualifiers = "w720dp-h1280dp-xhdpi")
 internal class AchievementScreenTest {
-    @get:Rule
     val composeTestRule = createComposeRule()
+
+    private val analyticsRule = AnalyticsTestRule()
+
+    @get:Rule
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
     private fun setComposeContent(
         currentStorage: Long? = 0,
@@ -178,7 +187,7 @@ internal class AchievementScreenTest {
                 assertIsDisplayed()
                 performClick()
             }
-
+        assertThat(analyticsRule.events).contains(StartMEGAVPNFreeTrialEvent)
         verify(onMegaVPNFreeTrialClicked).invoke(false, 0, 0, 365)
     }
 
@@ -197,6 +206,7 @@ internal class AchievementScreenTest {
                 performClick()
             }
 
+        assertThat(analyticsRule.events).contains(StartMEGAPWMFreeTrialEvent)
         verify(onMegaPassFreeTrialClicked).invoke(false, 0, 0, 365)
     }
 }

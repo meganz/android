@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.getTextByDurationInDays
 import mega.privacy.android.app.data.extensions.toStorageString
@@ -37,6 +38,8 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_dark_grey
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.StartMEGAPWMFreeTrialEvent
+import mega.privacy.mobile.analytics.event.StartMEGAVPNFreeTrialEvent
 
 internal object AchievementViewTestTags {
     private const val ACHIEVEMENTS_VIEW = "achievements_info_view"
@@ -311,6 +314,7 @@ internal fun AchievementView(
                                 Modifier
                                     .testTag(AchievementViewTestTags.START_MEGA_VPN_FREE_TRIAL_SECTION)
                                     .clickable {
+                                        Analytics.tracker.trackEvent(StartMEGAVPNFreeTrialEvent)
                                         onMegaVPNFreeTrialClicked(
                                             megaVPNTrialAwardStorage > 0,
                                             megaVPNTrialStorage ?: 0,
@@ -350,6 +354,7 @@ internal fun AchievementView(
                                 Modifier
                                     .testTag(AchievementViewTestTags.START_MEGA_PASS_FREE_TRIAL_SECTION)
                                     .clickable {
+                                        Analytics.tracker.trackEvent(StartMEGAPWMFreeTrialEvent)
                                         onMegaPassFreeTrialClicked(
                                             megaPassTrialAwardStorage > 0,
                                             megaPassTrialStorage ?: 0,
