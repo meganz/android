@@ -15,7 +15,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.rubbishbin.model.RubbishBinState
+import mega.privacy.android.app.presentation.rubbishbin.model.LegacyRubbishBinState
 import mega.privacy.android.app.presentation.search.view.LoadingStateView
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
 import mega.privacy.android.app.presentation.view.NodesView
@@ -27,7 +27,7 @@ import mega.privacy.android.shared.original.core.ui.model.rememberListGridNaviga
 
 /**
  * View for RubbishBinComposeFragment
- * @param uiState [RubbishBinState]
+ * @param uiState [LegacyRubbishBinState]
  * @param onMenuClick
  * @param onItemClicked
  * @param onLongClick
@@ -38,7 +38,7 @@ import mega.privacy.android.shared.original.core.ui.model.rememberListGridNaviga
  */
 @Composable
 fun RubbishBinComposeView(
-    uiState: RubbishBinState,
+    uiState: LegacyRubbishBinState,
     onMenuClick: (NodeUIItem<TypedNode>) -> Unit,
     onItemClicked: (NodeUIItem<TypedNode>) -> Unit,
     onLongClick: (NodeUIItem<TypedNode>) -> Unit,

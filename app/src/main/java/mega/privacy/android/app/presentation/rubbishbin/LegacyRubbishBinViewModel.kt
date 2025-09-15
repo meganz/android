@@ -17,8 +17,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.rubbishbin.model.LegacyRubbishBinState
 import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
-import mega.privacy.android.app.presentation.rubbishbin.model.RubbishBinState
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
@@ -61,7 +61,7 @@ import javax.inject.Inject
  * @param fileDurationMapper [FileDurationMapper]
  */
 @HiltViewModel
-class RubbishBinViewModel @Inject constructor(
+class LegacyRubbishBinViewModel @Inject constructor(
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val getParentNodeUseCase: GetParentNodeUseCase,
     private val getRubbishBinNodeChildrenUseCase: GetRubbishBinNodeChildrenUseCase,
@@ -80,12 +80,12 @@ class RubbishBinViewModel @Inject constructor(
     /**
      * The RubbishBin UI State
      */
-    private val _state = MutableStateFlow(RubbishBinState())
+    private val _state = MutableStateFlow(LegacyRubbishBinState())
 
     /**
      * The RubbishBin UI State accessible outside the ViewModel
      */
-    val state: StateFlow<RubbishBinState> = _state
+    val state: StateFlow<LegacyRubbishBinState> = _state
 
     init {
         setRubbishBinFolderHandle()
@@ -120,9 +120,9 @@ class RubbishBinViewModel @Inject constructor(
     }
 
     /**
-     * A shorthand way of retrieving the [RubbishBinState]
+     * A shorthand way of retrieving the [LegacyRubbishBinState]
      *
-     * @return the [RubbishBinState]
+     * @return the [LegacyRubbishBinState]
      */
     fun state() = _state.value
 

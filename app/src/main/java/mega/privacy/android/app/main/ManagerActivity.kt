@@ -203,8 +203,8 @@ import mega.privacy.android.app.presentation.photos.timeline.photosfilter.Photos
 import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
 import mega.privacy.android.app.presentation.recentactions.recentactionbucket.RecentActionBucketFragment
 import mega.privacy.android.app.presentation.requeststatus.RequestStatusProgressContainer
-import mega.privacy.android.app.presentation.rubbishbin.RubbishBinComposeFragment
-import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
+import mega.privacy.android.app.presentation.rubbishbin.LegacyRubbishBinFragment
+import mega.privacy.android.app.presentation.rubbishbin.LegacyRubbishBinViewModel
 import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.presentation.settings.model.startScreenTargetPreference
@@ -358,7 +358,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     internal val incomingSharesViewModel: IncomingSharesComposeViewModel by viewModels()
     private val outgoingSharesViewModel: OutgoingSharesComposeViewModel by viewModels()
     private val linksViewModel: LinksViewModel by viewModels()
-    internal val rubbishBinViewModel: RubbishBinViewModel by viewModels()
+    internal val rubbishBinViewModel: LegacyRubbishBinViewModel by viewModels()
     private val callInProgressViewModel: OngoingCallViewModel by viewModels()
     private val userInfoViewModel: UserInfoViewModel by viewModels()
     private val waitingRoomManagementViewModel: WaitingRoomManagementViewModel by viewModels()
@@ -547,7 +547,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
     // Fragments
     private var cloudDriveSyncsFragment: CloudDriveSyncsFragment? = null
-    private var rubbishBinComposeFragment: RubbishBinComposeFragment? = null
+    private var rubbishBinComposeFragment: LegacyRubbishBinFragment? = null
     private var photosFragment: PhotosFragment? = null
     private var albumContentFragment: Fragment? = null
     private var photosFilterFragment: PhotosFilterFragment? = null
@@ -3782,7 +3782,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 showHideBottomNavigationView(true)
                 setAppBarVisibility(true)
                 rubbishBinComposeFragment = getRubbishBinComposeFragment()
-                    ?: RubbishBinComposeFragment.newInstance()
+                    ?: LegacyRubbishBinFragment.newInstance()
                 rubbishBinComposeFragment?.let {
                     replaceFragment(
                         it,
@@ -6905,8 +6905,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         transfersWidgetLayout.layoutParams = params
     }
 
-    private fun getRubbishBinComposeFragment(): RubbishBinComposeFragment? {
-        return (supportFragmentManager.findFragmentByTag(FragmentTag.RUBBISH_BIN_COMPOSE.tag) as? RubbishBinComposeFragment).also {
+    private fun getRubbishBinComposeFragment(): LegacyRubbishBinFragment? {
+        return (supportFragmentManager.findFragmentByTag(FragmentTag.RUBBISH_BIN_COMPOSE.tag) as? LegacyRubbishBinFragment).also {
             rubbishBinComposeFragment = it
         }
     }

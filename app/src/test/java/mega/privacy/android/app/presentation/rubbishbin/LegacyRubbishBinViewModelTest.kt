@@ -56,9 +56,9 @@ import kotlin.time.Duration.Companion.seconds
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class RubbishBinViewModelTest {
+class LegacyRubbishBinViewModelTest {
 
-    private lateinit var underTest: RubbishBinViewModel
+    private lateinit var underTest: LegacyRubbishBinViewModel
 
     private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
@@ -85,7 +85,7 @@ class RubbishBinViewModelTest {
     }
 
     private fun initViewModel() {
-        underTest = RubbishBinViewModel(
+        underTest = LegacyRubbishBinViewModel(
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             getParentNodeUseCase = getParentNodeUseCase,
             getRubbishBinNodeChildrenUseCase = getRubbishBinNodeChildrenUseCase,

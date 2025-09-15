@@ -63,13 +63,13 @@ import javax.inject.Inject
  * Fragment is for Rubbish Bin
  */
 @AndroidEntryPoint
-class RubbishBinComposeFragment : Fragment() {
-    companion object {
+class LegacyRubbishBinFragment : Fragment() {
+    companion object Companion {
         /**
          * Returns the instance of RubbishBinFragment
          */
         @JvmStatic
-        fun newInstance() = RubbishBinComposeFragment()
+        fun newInstance() = LegacyRubbishBinFragment()
     }
 
     /**
@@ -90,7 +90,7 @@ class RubbishBinComposeFragment : Fragment() {
     @Inject
     lateinit var megaNavigator: MegaNavigator
 
-    private val viewModel: RubbishBinViewModel by activityViewModels()
+    private val viewModel: LegacyRubbishBinViewModel by activityViewModels()
     private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
     private val managerViewModel: ManagerViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()

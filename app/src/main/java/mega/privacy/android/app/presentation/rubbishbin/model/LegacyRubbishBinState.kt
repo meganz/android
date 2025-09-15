@@ -26,7 +26,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  *  @property hiddenNodeEnabled
  *  @property openedFolderNodeHandles List of opened folder node handles
  */
-data class RubbishBinState(
+data class LegacyRubbishBinState(
     val rubbishBinHandle: Long = -1L,
     val currentHandle: Long = -1L,
     val parentHandle: Long? = null,

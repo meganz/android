@@ -5,7 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.rubbishbin.model.RubbishBinState
+import mega.privacy.android.app.presentation.rubbishbin.model.LegacyRubbishBinState
 import mega.privacy.android.app.presentation.rubbishbin.view.RubbishBinComposeView
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
@@ -25,7 +25,7 @@ class RubbishBinComposeFragmentTest {
     fun `test that NodesView not displayed when list is empty`() {
         composeRule.setContent {
             RubbishBinComposeView(
-                uiState = RubbishBinState(
+                uiState = LegacyRubbishBinState(
                     isLoading = false,
                 ),
                 onMenuClick = {},
