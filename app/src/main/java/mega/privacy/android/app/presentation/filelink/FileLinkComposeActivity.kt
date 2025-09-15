@@ -132,7 +132,6 @@ class FileLinkComposeActivity : PasscodeActivity(),
             val themeMode by monitorThemeModeUseCase()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by viewModel.state.collectAsStateWithLifecycle()
-            val transferState by transfersWidgetViewModel.state.collectAsStateWithLifecycle()
             val request by googleAdsManager.request.collectAsStateWithLifecycle()
 
             EventEffect(
@@ -152,7 +151,6 @@ class FileLinkComposeActivity : PasscodeActivity(),
                 FileLinkView(
                     viewState = uiState,
                     snackBarHostState = snackBarHostState,
-                    transferState = transferState,
                     onBackPressed = { onBackPressedDispatcher.onBackPressed() },
                     onShareClicked = ::onShareClicked,
                     onPreviewClick = ::onPreviewClick,

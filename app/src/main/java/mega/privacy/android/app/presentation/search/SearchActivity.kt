@@ -65,8 +65,8 @@ import mega.privacy.android.app.presentation.search.navigation.shareFolderAccess
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
-import mega.privacy.android.app.presentation.transfers.widget.TransfersWidgetViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
+import mega.privacy.android.app.presentation.transfers.widget.TransfersWidget
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
@@ -88,7 +88,6 @@ import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetViewAnimated
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
@@ -104,7 +103,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
     private val viewModel: SearchViewModel by viewModels()
     private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
-    private val transfersWidgetViewModel: TransfersWidgetViewModel by viewModels()
 
     /**
      * Application Theme Mode
@@ -205,7 +203,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
             val nodeActionState by nodeActionsViewModel.state.collectAsStateWithLifecycle()
-            val transferState by transfersWidgetViewModel.state.collectAsStateWithLifecycle()
             // Remember a SystemUiController
             val systemUiController = rememberSystemUiController()
             val useDarkIcons = themeMode.isDarkMode().not()
@@ -232,15 +229,12 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                             .semantics { testTagsAsResourceId = true },
                         scaffoldState = scaffoldState,
                         floatingActionButton = {
-                            if (!transferState.hideTransfersWidget) {
-                                TransfersWidgetViewAnimated(
-                                    transfersInfo = transferState.transfersInfo,
-                                    onClick = ::transfersWidgetClicked,
-                                    modifier = Modifier
-                                        .navigationBarsPadding()
-                                        .testTag(SEARCH_SCREEN_TRANSFERS_WIDGET_TEST_TAG)
-                                )
-                            }
+                            TransfersWidget(
+                                onOpenTransferSection = { transfersWidgetClicked() },
+                                modifier = Modifier
+                                    .navigationBarsPadding()
+                                    .testTag(SEARCH_SCREEN_TRANSFERS_WIDGET_TEST_TAG)
+                            )
                         },
                     ) { padding ->
                         ConstraintLayout(

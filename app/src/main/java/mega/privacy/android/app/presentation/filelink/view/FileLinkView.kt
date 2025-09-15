@@ -36,7 +36,6 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.main.ads.AdsContainer
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoHeader
 import mega.privacy.android.app.presentation.fileinfo.view.PreviewWithShadow
 import mega.privacy.android.app.presentation.filelink.model.FileLinkJobInProgressState
@@ -45,16 +44,16 @@ import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.folderlink.view.ExpiredLinkView
 import mega.privacy.android.app.presentation.folderlink.view.ImportDownloadView
 import mega.privacy.android.app.presentation.folderlink.view.UnavailableLinkView
-import mega.privacy.android.app.presentation.transfers.widget.TransfersWidgetUiState
+import mega.privacy.android.app.presentation.transfers.widget.TransfersWidget
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
+import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.buttons.DebouncedButtonContainer
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.ScaffoldWithCollapsibleHeader
 import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
-import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetViewAnimated
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_700
@@ -74,7 +73,6 @@ internal const val SAVE_BUTTON_TAG = "file_link_view:button_save"
 internal fun FileLinkView(
     viewState: FileLinkState,
     snackBarHostState: SnackbarHostState,
-    transferState: TransfersWidgetUiState,
     onBackPressed: () -> Unit,
     onShareClicked: () -> Unit,
     onPreviewClick: () -> Unit,
@@ -156,12 +154,9 @@ internal fun FileLinkView(
             }
         },
         floatingActionButton = {
-            if (!transferState.hideTransfersWidget) {
-                TransfersWidgetViewAnimated(
-                    transfersInfo = transferState.transfersInfo,
-                    onClick = onTransferWidgetClick,
-                )
-            }
+            TransfersWidget(
+                onOpenTransferSection = onTransferWidgetClick,
+            )
         },
         headerSpacerHeight = if (viewState.errorState == LinkErrorState.NoError && !viewState.isLoading) {
             if (viewState.iconResource != null) (MAX_HEADER_HEIGHT + APP_BAR_HEIGHT).dp else MAX_HEADER_HEIGHT.dp
@@ -367,7 +362,6 @@ private fun PreviewFileLinkView() {
         FileLinkView(
             viewState = viewState,
             snackBarHostState = remember { SnackbarHostState() },
-            transferState = TransfersWidgetUiState(),
             onBackPressed = {},
             onShareClicked = {},
             onPreviewClick = {},

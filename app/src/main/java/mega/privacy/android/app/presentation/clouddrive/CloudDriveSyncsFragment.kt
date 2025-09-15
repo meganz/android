@@ -84,7 +84,6 @@ import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
-import mega.privacy.android.app.presentation.transfers.widget.TransfersWidgetViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
@@ -181,7 +180,6 @@ class CloudDriveSyncsFragment : Fragment() {
 
     private val fileBrowserViewModel: FileBrowserViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
-    private val transfersWidgetViewModel: TransfersWidgetViewModel by activityViewModels()
     private val syncIssueNotificationViewModel: SyncIssueNotificationViewModel by activityViewModels()
 
     private var tempNodeIds: List<NodeId> = listOf()
@@ -385,9 +383,9 @@ class CloudDriveSyncsFragment : Fragment() {
                                         },
                                         onFabExpanded = { isExpanded ->
                                             if (isExpanded) {
-                                                transfersWidgetViewModel.hideTransfersWidget()
+                                                (activity as? ManagerActivity)?.hideTransfersWidget()
                                             } else {
-                                                transfersWidgetViewModel.showTransfersWidget()
+                                                (activity as? ManagerActivity)?.updateTransfersWidgetVisibility()
                                             }
                                         }
                                     )

@@ -54,7 +54,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
-import mega.privacy.android.app.presentation.transfers.widget.TransfersWidgetViewModel
+import mega.privacy.android.app.presentation.transfers.widget.TransfersWidget
 import mega.privacy.android.core.R as coreR
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -69,7 +69,6 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivide
 import mega.privacy.android.shared.original.core.ui.controls.text.HighlightedText
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetViewAnimated
 import mega.privacy.android.shared.original.core.ui.theme.teal_200_alpha_038
 import mega.privacy.android.shared.resources.R as resourcesR
 import kotlin.time.Duration.Companion.milliseconds
@@ -78,7 +77,6 @@ import kotlin.time.Duration.Companion.milliseconds
 internal fun PhotosSearchScreen(
     photosSearchViewModel: PhotosSearchViewModel,
     photoDownloaderViewModel: PhotoDownloaderViewModel,
-    transfersWidgetViewModel: TransfersWidgetViewModel,
     scaffoldState: ScaffoldState,
     onOpenAlbum: (Album) -> Unit,
     onOpenImagePreviewScreen: (Photo) -> Unit,
@@ -87,7 +85,6 @@ internal fun PhotosSearchScreen(
     onCloseScreen: () -> Unit,
 ) {
     val state by photosSearchViewModel.state.collectAsStateWithLifecycle()
-    val transfersState by transfersWidgetViewModel.state.collectAsStateWithLifecycle()
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -103,9 +100,8 @@ internal fun PhotosSearchScreen(
             )
         },
         floatingActionButton = {
-            TransfersWidgetViewAnimated(
-                transfersInfo = transfersState.transfersInfo,
-                onClick = onOpenTransfersScreen,
+            TransfersWidget(
+                onOpenTransferSection = { onOpenTransfersScreen() },
                 modifier = Modifier.navigationBarsPadding(),
             )
         },

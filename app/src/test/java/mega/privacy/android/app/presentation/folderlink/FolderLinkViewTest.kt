@@ -21,7 +21,6 @@ import mega.privacy.android.app.presentation.folderlink.view.Constants.BOTTOM_SH
 import mega.privacy.android.app.presentation.folderlink.view.Constants.IMPORT_BUTTON_TAG
 import mega.privacy.android.app.presentation.folderlink.view.Constants.SAVE_BUTTON_TAG
 import mega.privacy.android.app.presentation.folderlink.view.FolderLinkView
-import mega.privacy.android.app.presentation.transfers.widget.TransfersWidgetUiState
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.legacy.core.ui.controls.lists.MEDIA_DISCOVERY_TAG
@@ -73,7 +72,6 @@ class FolderLinkViewTest {
                 onEnterMediaDiscoveryClick = { },
                 fileTypeIconMapper = FileTypeIconMapper(),
                 onTransferWidgetClick = { },
-                transferState = TransfersWidgetUiState(),
                 request = null
             )
         }

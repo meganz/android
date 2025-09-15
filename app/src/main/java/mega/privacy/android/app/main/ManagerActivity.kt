@@ -224,6 +224,7 @@ import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
+import mega.privacy.android.app.presentation.transfers.widget.setTransfersWidgetContent
 import mega.privacy.android.app.psa.PsaViewHolder
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.service.push.MegaMessageService
@@ -313,7 +314,6 @@ import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.settings.arguments.TargetPreference
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
-import mega.privacy.android.shared.original.core.ui.controls.widgets.setTransfersWidgetContent
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ArchivedChatsMenuItemEvent
@@ -592,6 +592,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     private var onAskingPermissionsFragment = false
     private var initialPermissionsAlreadyAsked = false
     private lateinit var navHostView: View
+    private lateinit var transfersWidget: ComposeView
     private var navController: NavController? = null
     private var mHomepageSearchable: HomepageSearchable? = null
     private var initFabButtonShow = false
@@ -942,10 +943,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         initialiseViews()
         addStartTransferView()
         addNodeAttachmentView()
-        findViewById<ComposeView>(R.id.transfers_widget).setTransfersWidgetContent(
-            transfersInfoFlow = transfersWidgetViewModel.state.map { it.transfersInfo },
-            hideFlow = transfersWidgetViewModel.state.map { it.hideTransfersWidget },
-            onClick = this::onTransfersWidgetClick
+        transfersWidget.setTransfersWidgetContent(
+            onOpenTransferSection = this::onTransfersWidgetClick
         )
         setInitialViewProperties()
         setViewListeners()
@@ -990,6 +989,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         fragmentContainer = findViewById(R.id.fragment_container)
         cameraUploadViewTypes = findViewById(R.id.cu_view_type)
         navHostView = findViewById(R.id.nav_host_fragment)
+        transfersWidget = findViewById(R.id.transfers_widget)
     }
 
     private fun addStartTransferView() {
@@ -1804,7 +1804,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         intent.getBooleanExtra(ExtraConstant.EXTRA_UPGRADE_ACCOUNT, false)
                     newAccount =
                         intent.getBooleanExtra(ExtraConstant.EXTRA_NEW_ACCOUNT, false)
-                    newCreationAccount = intent.getBooleanExtra(ExtraConstant.NEW_CREATION_ACCOUNT, false)
+                    newCreationAccount =
+                        intent.getBooleanExtra(ExtraConstant.NEW_CREATION_ACCOUNT, false)
                     //reset flag to fix incorrect view loaded when orientation changes
                     intent.removeExtra(ExtraConstant.EXTRA_NEW_ACCOUNT)
                     intent.removeExtra(ExtraConstant.EXTRA_UPGRADE_ACCOUNT)
@@ -2996,7 +2997,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         replaceFragment: Boolean = false,
         @StringRes errorMessage: Int?,
     ) {
-        transfersWidgetViewModel.hideTransfersWidget()
+        transfersWidget.isVisible = false
         // Remove the existing Media Discovery View first
         mediaDiscoveryFragment?.let { removeFragment(it) }
         MediaDiscoveryFragment.newInstance(
@@ -4139,12 +4140,15 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     /**
      * Updates the transfers widget.
      */
-    private fun updateTransfersWidgetVisibility() {
-        if (isOnFileManagementManagerSection) {
-            transfersWidgetViewModel.showTransfersWidget()
-        } else {
-            transfersWidgetViewModel.hideTransfersWidget()
-        }
+    fun updateTransfersWidgetVisibility() {
+        transfersWidget.isVisible = isOnFileManagementManagerSection
+    }
+
+    /**
+     * Hides the transfers widget.
+     */
+    fun hideTransfersWidget() {
+        transfersWidget.isVisible = false
     }
 
     fun checkScrollElevation() {

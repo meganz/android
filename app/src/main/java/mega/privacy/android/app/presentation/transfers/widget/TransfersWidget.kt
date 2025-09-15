@@ -36,8 +36,6 @@ fun TransfersWidget(
 /**
  * Sets a transfers widget as the content of this ComposeView.
  *
- * @param transfersInfoFlow a flow with the info to update the widget
- * @param hideFlow a flow to hide the widget regardless of [transfersInfoFlow]
  */
 fun ComposeView.setTransfersWidgetContent(
     onOpenTransferSection: () -> Unit,

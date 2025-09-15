@@ -48,7 +48,6 @@ import mega.privacy.android.app.presentation.base.BaseViewModel
 import mega.privacy.android.app.presentation.container.AppContainerWrapper
 import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
 import mega.privacy.android.app.presentation.login.LoginActivity
-import mega.privacy.android.app.presentation.transfers.widget.TransfersWidgetViewModel
 import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
 import mega.privacy.android.app.presentation.weakaccountprotection.WeakAccountProtectionAlertActivity
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
@@ -183,7 +182,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
     private val billingViewModel by viewModels<BillingViewModel>()
     private val viewModel by viewModels<BaseViewModel>()
-    protected val transfersWidgetViewModel: TransfersWidgetViewModel by viewModels()
 
     @JvmField
     protected var app: MegaApplication = MegaApplication.getInstance()
