@@ -477,6 +477,9 @@ internal fun CloudDriveContent(
                     showSortBottomSheet = false
                 }
             },
+            onDismissRequest = {
+                showSortBottomSheet = false
+            }
         )
     }
 }
