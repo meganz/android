@@ -6,12 +6,15 @@ import mega.privacy.android.app.presentation.validator.toolbaractions.model.Sele
 import mega.privacy.android.app.presentation.validator.toolbaractions.model.SelectedNodeType.File
 import mega.privacy.android.app.presentation.validator.toolbaractions.model.SelectedNodeType.Folder
 import mega.privacy.android.app.presentation.validator.toolbaractions.model.ToolbarActionsRequest
+import mega.privacy.android.app.presentation.validator.toolbaractions.modifier.ToolbarActionsModifier
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil.MAX_ACTION_COUNT
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import javax.inject.Inject
 
-class ToolbarActionsValidator @Inject constructor() {
+class ToolbarActionsValidator @Inject constructor(
+    private val modifiers: Set<@JvmSuppressWildcards ToolbarActionsModifier>,
+) {
 
     operator fun invoke(request: ToolbarActionsRequest): CloudStorageOptionControlUtil.Control {
         val control = CloudStorageOptionControlUtil.Control()
@@ -46,7 +49,14 @@ class ToolbarActionsValidator @Inject constructor() {
             totalNodes = request.totalNodes
         )
 
-        return updatedControlByFlags
+        // Update control based on modifiers
+        val modifier = modifiers.find { it.canHandle(item = request.modifierItem) }
+        modifier?.modify(
+            control = updatedControlByFlags,
+            item = request.modifierItem
+        )
+
+        return control
     }
 
     private fun allHaveOwnerAccessAndNotTakenDown(selectedNodes: List<SelectedNode>): Boolean {
