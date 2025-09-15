@@ -80,8 +80,8 @@ fun ChatToolbarBottomSheet(
     uiState: ChatUiState,
     scaffoldState: ScaffoldState,
     onAttachContacts: (List<String>) -> Unit,
-    modifier: Modifier = Modifier,
     navigateToFileModal: () -> Unit,
+    modifier: Modifier = Modifier,
     onAttachFiles: (List<UriPath>) -> Unit = {},
     onCameraPermissionDenied: () -> Unit = {},
     onAttachScan: () -> Unit = {},
@@ -91,30 +91,27 @@ fun ChatToolbarBottomSheet(
 ) {
     val context = LocalContext.current
 
-    val galleryPicker =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.PickMultipleVisualMedia()
-        ) {
-            if (it.isNotEmpty()) {
-                onAttachFiles(it.map { UriPath(it.toString()) })
-            }
-            hideSheet()
+    val galleryPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickMultipleVisualMedia()
+    ) {
+        if (it.isNotEmpty()) {
+            onAttachFiles(it.map { UriPath(it.toString()) })
         }
+        hideSheet()
+    }
 
-    val gifPickerLauncher =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.StartActivityForResult()
-        ) {
-            onSendGiphyMessage(
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    it.data?.getParcelableExtra(GIF_DATA, GifData::class.java)
-                } else {
-                    @Suppress("DEPRECATION")
-                    it.data?.getParcelableExtra(GIF_DATA)
-                }
-            )
-            hideSheet()
-        }
+    val gifPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) {
+        onSendGiphyMessage(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                it.data?.getParcelableExtra(GIF_DATA, GifData::class.java)
+            } else {
+                @Suppress("DEPRECATION") it.data?.getParcelableExtra(GIF_DATA)
+            }
+        )
+        hideSheet()
+    }
 
     val saveScannedDocumentsActivityLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -137,19 +134,12 @@ fun ChatToolbarBottomSheet(
 
                     // The PDF URI must exist before moving to the Scan Confirmation page
                     pdf?.uri?.let { pdfUri ->
-                        val intent = Intent(
-                            context, SaveScannedDocumentsActivity::class.java
-                        ).apply {
-                            putExtra(
-                                SaveScannedDocumentsActivity.EXTRA_ORIGINATED_FROM_CHAT,
-                                true,
-                            )
-                            putExtra(SaveScannedDocumentsActivity.EXTRA_SCAN_PDF_URI, pdfUri)
-                            putExtra(
-                                SaveScannedDocumentsActivity.EXTRA_SCAN_SOLO_IMAGE_URI,
-                                if (imageUris.size == 1) imageUris[0] else null,
-                            )
-                        }
+                        val intent = SaveScannedDocumentsActivity.getIntent(
+                            context = context,
+                            fromChat = true,
+                            pdfUri = pdfUri,
+                            imageUris = imageUris,
+                        )
                         saveScannedDocumentsActivityLauncher.launch(intent)
                     } ?: run {
                         Timber.e("The PDF file could not be retrieved from Chat after scanning")
@@ -161,16 +151,15 @@ fun ChatToolbarBottomSheet(
         }
     }
 
-    val attachContactLauncher =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            result.data?.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
-                ?.let { contactList ->
-                    onAttachContacts(contactList.toList())
-                }
-            hideSheet()
-        }
+    val attachContactLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        result.data?.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
+            ?.let { contactList ->
+                onAttachContacts(contactList.toList())
+            }
+        hideSheet()
+    }
 
     val coroutineScope = rememberCoroutineScope()
     val onAttachContactClicked: () -> Unit = {
@@ -183,15 +172,14 @@ fun ChatToolbarBottomSheet(
         }
     }
 
-    val takePictureLauncher =
-        rememberLauncherForActivityResult(
-            contract = InAppCameraLauncher()
-        ) { uri ->
-            uri?.let {
-                onAttachFiles(listOf(UriPath(it.toString())))
-            }
-            closeModal()
+    val takePictureLauncher = rememberLauncherForActivityResult(
+        contract = InAppCameraLauncher()
+    ) { uri ->
+        uri?.let {
+            onAttachFiles(listOf(UriPath(it.toString())))
         }
+        closeModal()
+    }
 
     val capturePhotoOrVideoPermissionsLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -211,8 +199,7 @@ fun ChatToolbarBottomSheet(
     val onTakePicture: () -> Unit = {
         capturePhotoOrVideoPermissionsLauncher.launch(
             arrayOf(
-                PermissionUtils.getCameraPermission(),
-                PermissionUtils.getRecordAudioPermission()
+                PermissionUtils.getCameraPermission(), PermissionUtils.getRecordAudioPermission()
             )
         )
     }
@@ -246,8 +233,7 @@ fun ChatToolbarBottomSheet(
             onFileGalleryItemClicked = {
                 Analytics.tracker.trackEvent(
                     ChatImageAttachmentItemSelectedEvent(
-                        ChatImageAttachmentItemSelected.SelectionType.SingleMode,
-                        1
+                        ChatImageAttachmentItemSelected.SelectionType.SingleMode, 1
                     )
                 )
                 it.fileUri?.toUri()?.let { uri ->
@@ -348,19 +334,18 @@ private fun openDocumentScanner(
     onDocumentScannerFailedToOpen: () -> Unit,
 ) {
     context.findActivity()?.let { activity ->
-        documentScanner.getStartScanIntent(activity)
-            .addOnSuccessListener { intentSender ->
-                Analytics.tracker.trackEvent(DocumentScanInitiatedEvent)
-                documentScannerLauncher.launch(
-                    IntentSenderRequest.Builder(intentSender).build()
-                )
-            }.addOnFailureListener { exception ->
-                Timber.e(
-                    exception,
-                    "An error occurred when attempting to run the ML Kit Document Scanner from Chat",
-                )
-                onDocumentScannerFailedToOpen()
-            }
+        documentScanner.getStartScanIntent(activity).addOnSuccessListener { intentSender ->
+            Analytics.tracker.trackEvent(DocumentScanInitiatedEvent)
+            documentScannerLauncher.launch(
+                IntentSenderRequest.Builder(intentSender).build()
+            )
+        }.addOnFailureListener { exception ->
+            Timber.e(
+                exception,
+                "An error occurred when attempting to run the ML Kit Document Scanner from Chat",
+            )
+            onDocumentScannerFailedToOpen()
+        }
     } ?: run {
         Timber.e("Unable to run the ML Kit Document Scanner in Chat as no Activity can be found")
     }

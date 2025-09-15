@@ -58,27 +58,36 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
         viewModelScope.launch {
             combine(
                 savedStateHandle.getStateFlow(
-                    key = SaveScannedDocumentsActivity.EXTRA_ORIGINATED_FROM_CHAT,
+                    key = EXTRA_ORIGINATED_FROM_CHAT,
                     initialValue = false,
                 ),
                 savedStateHandle.getStateFlow(
-                    key = SaveScannedDocumentsActivity.EXTRA_CLOUD_DRIVE_PARENT_HANDLE,
+                    key = EXTRA_CLOUD_DRIVE_PARENT_HANDLE,
                     initialValue = -1L,
                 ),
                 savedStateHandle.getStateFlow(
-                    key = SaveScannedDocumentsActivity.EXTRA_SCAN_PDF_URI,
+                    key = EXTRA_SCAN_PDF_URI,
                     initialValue = null
                 ),
                 savedStateHandle.getStateFlow(
-                    key = SaveScannedDocumentsActivity.EXTRA_SCAN_SOLO_IMAGE_URI,
+                    key = EXTRA_SCAN_SOLO_IMAGE_URI,
                     initialValue = null,
                 ),
-            ) { originatedFromChat: Boolean, cloudDriveParentHandle: Long, pdfUri: Uri?, soloImageUri: Uri? ->
+                savedStateHandle.getStateFlow(
+                    key = INITIAL_FILENAME_FORMAT,
+                    initialValue = "",
+                ),
+            ) { originatedFromChat: Boolean, cloudDriveParentHandle: Long, pdfUri: Uri?, soloImageUri: Uri?, fileFormat ->
                 { state: SaveScannedDocumentsUiState ->
+                    val formattedDateTime = String.format(
+                        Locale.getDefault(),
+                        DATE_TIME_FORMAT,
+                        Calendar.getInstance(),
+                    )
                     val initialFilename = String.format(
                         Locale.getDefault(),
-                        INITIAL_FILENAME_FORMAT,
-                        Calendar.getInstance(),
+                        fileFormat,
+                        formattedDateTime,
                     ) + _uiState.value.scanFileType.fileSuffix
 
                     state.copy(
@@ -281,6 +290,12 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
     }
 
     companion object {
-        private const val INITIAL_FILENAME_FORMAT = "Scanned_%1tY%<tm%<td%<tH%<tM%<tS"
+        internal const val EXTRA_ORIGINATED_FROM_CHAT = "EXTRA_ORIGINATED_FROM_CHAT"
+        internal const val EXTRA_CLOUD_DRIVE_PARENT_HANDLE = "EXTRA_CLOUD_DRIVE_PARENT_HANDLE"
+        internal const val EXTRA_SCAN_PDF_URI = "EXTRA_SCAN_PDF_URI"
+        internal const val EXTRA_SCAN_SOLO_IMAGE_URI = "EXTRA_SCAN_SOLO_IMAGE_URI"
+        internal const val INITIAL_FILENAME_FORMAT = "INITIAL_FILENAME_FORMAT"
+
+        internal const val DATE_TIME_FORMAT = "%1tY%<tm%<td%<tH%<tM%<tS"
     }
 }

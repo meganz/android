@@ -707,15 +707,13 @@ internal class MegaNavigatorImpl @Inject constructor(
         scanPdfUri: Uri,
         scanSoloImageUri: Uri?,
     ) {
-        val intent = Intent(context, SaveScannedDocumentsActivity::class.java).apply {
-            putExtra(SaveScannedDocumentsActivity.EXTRA_ORIGINATED_FROM_CHAT, originatedFromChat)
-            putExtra(
-                SaveScannedDocumentsActivity.EXTRA_CLOUD_DRIVE_PARENT_HANDLE,
-                cloudDriveParentHandle
-            )
-            putExtra(SaveScannedDocumentsActivity.EXTRA_SCAN_PDF_URI, scanPdfUri)
-            putExtra(SaveScannedDocumentsActivity.EXTRA_SCAN_SOLO_IMAGE_URI, scanSoloImageUri)
-        }
+        val intent = SaveScannedDocumentsActivity.getIntent(
+            context = context,
+            fromChat = originatedFromChat,
+            parentHandle = cloudDriveParentHandle,
+            pdfUri = scanPdfUri,
+            imageUris = scanSoloImageUri?.let { listOf(it) } ?: emptyList(),
+        )
         context.startActivity(intent)
     }
 

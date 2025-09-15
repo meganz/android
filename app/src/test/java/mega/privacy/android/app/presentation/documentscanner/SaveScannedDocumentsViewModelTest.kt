@@ -9,6 +9,12 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.analytics.test.AnalyticsTestExtension
+import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.DATE_TIME_FORMAT
+import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.EXTRA_CLOUD_DRIVE_PARENT_HANDLE
+import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.EXTRA_ORIGINATED_FROM_CHAT
+import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.EXTRA_SCAN_PDF_URI
+import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.EXTRA_SCAN_SOLO_IMAGE_URI
+import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.INITIAL_FILENAME_FORMAT
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -81,12 +87,12 @@ internal class SaveScannedDocumentsViewModelTest {
     fun `test that state parameters without any logic checking are immediately set upon initialization`() =
         runTest {
             val originatedFromChat = false
-            savedStateHandle[SaveScannedDocumentsActivity.EXTRA_ORIGINATED_FROM_CHAT] =
+            savedStateHandle[EXTRA_ORIGINATED_FROM_CHAT] =
                 originatedFromChat
-            savedStateHandle[SaveScannedDocumentsActivity.EXTRA_CLOUD_DRIVE_PARENT_HANDLE] =
+            savedStateHandle[EXTRA_CLOUD_DRIVE_PARENT_HANDLE] =
                 cloudDriveParentHandle
-            savedStateHandle[SaveScannedDocumentsActivity.EXTRA_SCAN_PDF_URI] = pdfUri
-            savedStateHandle[SaveScannedDocumentsActivity.EXTRA_SCAN_SOLO_IMAGE_URI] = soloImageUri
+            savedStateHandle[EXTRA_SCAN_PDF_URI] = pdfUri
+            savedStateHandle[EXTRA_SCAN_SOLO_IMAGE_URI] = soloImageUri
 
             initViewModel()
 
@@ -102,7 +108,7 @@ internal class SaveScannedDocumentsViewModelTest {
     @Test
     fun `test that the default scan destination is set to cloud drive upon initialization if document scanning is accessed anywhere other than chat`() =
         runTest {
-            savedStateHandle[SaveScannedDocumentsActivity.EXTRA_ORIGINATED_FROM_CHAT] = false
+            savedStateHandle[EXTRA_ORIGINATED_FROM_CHAT] = false
 
             initViewModel()
 
@@ -114,7 +120,7 @@ internal class SaveScannedDocumentsViewModelTest {
     @Test
     fun `test that the default scan destination is set to chat upon initialization if document scanning is accessed from chat`() =
         runTest {
-            savedStateHandle[SaveScannedDocumentsActivity.EXTRA_ORIGINATED_FROM_CHAT] = true
+            savedStateHandle[EXTRA_ORIGINATED_FROM_CHAT] = true
 
             initViewModel()
 
@@ -135,10 +141,19 @@ internal class SaveScannedDocumentsViewModelTest {
 
     @Test
     fun `test that the default filename ends with PDF upon initialization`() = runTest {
+        val format = "Scanned_%1\$s"
+        val dateString = String.format(
+            Locale.getDefault(),
+            DATE_TIME_FORMAT,
+            Calendar.getInstance(),
+        )
+
+        savedStateHandle[INITIAL_FILENAME_FORMAT] = format
+
         val expectedFilename = String.format(
             Locale.getDefault(),
-            "Scanned_%1tY%<tm%<td%<tH%<tM%<tS",
-            Calendar.getInstance(),
+            format,
+            dateString,
         ) + ".pdf"
 
         initViewModel()
@@ -395,12 +410,12 @@ internal class SaveScannedDocumentsViewModelTest {
                 on { toString() } doReturn "/data/user/0/app_location/cache/test_solo_scan.jpg"
                 on { path } doReturn null
             }
-            savedStateHandle[SaveScannedDocumentsActivity.EXTRA_ORIGINATED_FROM_CHAT] =
+            savedStateHandle[EXTRA_ORIGINATED_FROM_CHAT] =
                 false
-            savedStateHandle[SaveScannedDocumentsActivity.EXTRA_CLOUD_DRIVE_PARENT_HANDLE] =
+            savedStateHandle[EXTRA_CLOUD_DRIVE_PARENT_HANDLE] =
                 cloudDriveParentHandle
-            savedStateHandle[SaveScannedDocumentsActivity.EXTRA_SCAN_PDF_URI] = modifiedPdfUri
-            savedStateHandle[SaveScannedDocumentsActivity.EXTRA_SCAN_SOLO_IMAGE_URI] =
+            savedStateHandle[EXTRA_SCAN_PDF_URI] = modifiedPdfUri
+            savedStateHandle[EXTRA_SCAN_SOLO_IMAGE_URI] =
                 modifiedSoloImageUri
 
             initViewModel()
@@ -421,11 +436,11 @@ internal class SaveScannedDocumentsViewModelTest {
         runTest {
             val newFilename = "new_filename.pdf"
             // Initialize the PDF and Solo Image URIs
-            savedStateHandle[SaveScannedDocumentsActivity.EXTRA_ORIGINATED_FROM_CHAT] = false
-            savedStateHandle[SaveScannedDocumentsActivity.EXTRA_CLOUD_DRIVE_PARENT_HANDLE] =
+            savedStateHandle[EXTRA_ORIGINATED_FROM_CHAT] = false
+            savedStateHandle[EXTRA_CLOUD_DRIVE_PARENT_HANDLE] =
                 cloudDriveParentHandle
-            savedStateHandle[SaveScannedDocumentsActivity.EXTRA_SCAN_PDF_URI] = pdfUri
-            savedStateHandle[SaveScannedDocumentsActivity.EXTRA_SCAN_SOLO_IMAGE_URI] = soloImageUri
+            savedStateHandle[EXTRA_SCAN_PDF_URI] = pdfUri
+            savedStateHandle[EXTRA_SCAN_SOLO_IMAGE_URI] = soloImageUri
             whenever(
                 renameFileAndDeleteOriginalUseCase(
                     originalUriPath = UriPath(pdfUriPath),
@@ -457,11 +472,11 @@ internal class SaveScannedDocumentsViewModelTest {
             on { toUri() }.thenReturn(fileToUploadUri)
         }
         // Initialize the PDF and Solo Image URIs
-        savedStateHandle[SaveScannedDocumentsActivity.EXTRA_ORIGINATED_FROM_CHAT] = false
-        savedStateHandle[SaveScannedDocumentsActivity.EXTRA_CLOUD_DRIVE_PARENT_HANDLE] =
+        savedStateHandle[EXTRA_ORIGINATED_FROM_CHAT] = false
+        savedStateHandle[EXTRA_CLOUD_DRIVE_PARENT_HANDLE] =
             cloudDriveParentHandle
-        savedStateHandle[SaveScannedDocumentsActivity.EXTRA_SCAN_PDF_URI] = pdfUri
-        savedStateHandle[SaveScannedDocumentsActivity.EXTRA_SCAN_SOLO_IMAGE_URI] = soloImageUri
+        savedStateHandle[EXTRA_SCAN_PDF_URI] = pdfUri
+        savedStateHandle[EXTRA_SCAN_SOLO_IMAGE_URI] = soloImageUri
         whenever(
             renameFileAndDeleteOriginalUseCase(
                 originalUriPath = UriPath(pdfUriPath),

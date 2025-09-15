@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.documentscanner
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -16,12 +17,18 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.presentation.container.MegaAppContainer
+import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.EXTRA_CLOUD_DRIVE_PARENT_HANDLE
+import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.EXTRA_ORIGINATED_FROM_CHAT
+import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.EXTRA_SCAN_PDF_URI
+import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.EXTRA_SCAN_SOLO_IMAGE_URI
+import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.INITIAL_FILENAME_FORMAT
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingPDFToChatEvent
 import javax.inject.Inject
@@ -139,9 +146,38 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val EXTRA_ORIGINATED_FROM_CHAT = "EXTRA_ORIGINATED_FROM_CHAT"
-        const val EXTRA_CLOUD_DRIVE_PARENT_HANDLE = "EXTRA_CLOUD_DRIVE_PARENT_HANDLE"
-        const val EXTRA_SCAN_PDF_URI = "EXTRA_SCAN_PDF_URI"
-        const val EXTRA_SCAN_SOLO_IMAGE_URI = "EXTRA_SCAN_SOLO_IMAGE_URI"
+
+        fun getIntent(
+            context: Context,
+            fromChat: Boolean = false,
+            parentHandle: Long? = null,
+            pdfUri: Uri? = null,
+            imageUris: List<Uri> = emptyList(),
+        ): Intent {
+            return Intent(
+                context,
+                SaveScannedDocumentsActivity::class.java,
+            ).apply {
+                putExtra(
+                    EXTRA_ORIGINATED_FROM_CHAT,
+                    fromChat,
+                )
+                parentHandle?.let {
+                    putExtra(
+                        EXTRA_CLOUD_DRIVE_PARENT_HANDLE,
+                        it,
+                    )
+                }
+                pdfUri?.let { putExtra(EXTRA_SCAN_PDF_URI, it) }
+                putExtra(
+                    EXTRA_SCAN_SOLO_IMAGE_URI,
+                    if (imageUris.size == 1) imageUris[0] else null,
+                )
+                putExtra(
+                    INITIAL_FILENAME_FORMAT,
+                    context.getString(SharedR.string.document_scanning_default_file_name)
+                )
+            }
+        }
     }
 }

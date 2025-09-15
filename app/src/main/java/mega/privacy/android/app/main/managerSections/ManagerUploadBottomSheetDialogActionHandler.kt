@@ -151,20 +151,14 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
 
                     // The PDF URI must exist before moving to the Scan Confirmation page
                     pdf?.uri?.let { pdfUri ->
-                        val intent = Intent(
-                            managerActivity, SaveScannedDocumentsActivity::class.java
-                        ).apply {
-                            putExtra(SaveScannedDocumentsActivity.EXTRA_ORIGINATED_FROM_CHAT, false)
-                            putExtra(
-                                SaveScannedDocumentsActivity.EXTRA_CLOUD_DRIVE_PARENT_HANDLE,
-                                parentNodeManager.currentParentHandle,
-                            )
-                            putExtra(SaveScannedDocumentsActivity.EXTRA_SCAN_PDF_URI, pdfUri)
-                            putExtra(
-                                SaveScannedDocumentsActivity.EXTRA_SCAN_SOLO_IMAGE_URI,
-                                if (imageUris.size == 1) imageUris[0] else null,
-                            )
-                        }
+                        val intent = SaveScannedDocumentsActivity.getIntent(
+                            context = managerActivity,
+                            fromChat = false,
+                            parentHandle = parentNodeManager.currentParentHandle,
+                            pdfUri = pdfUri,
+                            imageUris = imageUris,
+                        )
+
                         managerActivity.startActivity(intent)
                     } ?: run {
                         Timber.e("The PDF file could not be retrieved from Cloud Drive after scanning")

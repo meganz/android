@@ -203,24 +203,14 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
 
                         // The PDF URI must exist before moving to the Scan Confirmation page
                         pdf?.uri?.let { pdfUri ->
-                            val intent = Intent(
-                                this@ContactFileListActivity,
-                                SaveScannedDocumentsActivity::class.java,
-                            ).apply {
-                                putExtra(
-                                    SaveScannedDocumentsActivity.EXTRA_ORIGINATED_FROM_CHAT,
-                                    false,
-                                )
-                                putExtra(
-                                    SaveScannedDocumentsActivity.EXTRA_CLOUD_DRIVE_PARENT_HANDLE,
-                                    getParentHandle(),
-                                )
-                                putExtra(SaveScannedDocumentsActivity.EXTRA_SCAN_PDF_URI, pdfUri)
-                                putExtra(
-                                    SaveScannedDocumentsActivity.EXTRA_SCAN_SOLO_IMAGE_URI,
-                                    if (imageUris.size == 1) imageUris[0] else null,
-                                )
-                            }
+                            val intent = SaveScannedDocumentsActivity.getIntent(
+                                context = this@ContactFileListActivity,
+                                fromChat = false,
+                                parentHandle = getParentHandle(),
+                                pdfUri = pdfUri,
+                                imageUris = imageUris,
+                            )
+
                             this@ContactFileListActivity.startActivity(intent)
                         } ?: run {
                             Timber.e("The PDF file could not be retrieved from Contact File List after scanning")
