@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.menu.navigation.AchievementsItem
 import mega.privacy.android.app.menu.navigation.CurrentPlanItem
 import mega.privacy.android.app.menu.navigation.RubbishBinItem
 import mega.privacy.android.app.menu.navigation.StorageItem
@@ -28,6 +29,7 @@ import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.account.IsAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
@@ -38,7 +40,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MenuViewModel @Inject constructor(
-    menuItems: Map<Int, @JvmSuppressWildcards NavDrawerItem>,
+    val menuItems: Map<Int, @JvmSuppressWildcards NavDrawerItem>,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
@@ -50,6 +52,7 @@ class MenuViewModel @Inject constructor(
     private val getUserFullNameUseCase: GetUserFullNameUseCase,
     private val getCurrentUserEmail: GetCurrentUserEmail,
     private val monitorUserUpdates: MonitorUserUpdates,
+    private val isAchievementsEnabledUseCase: IsAchievementsEnabledUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     // Flows for items that need dynamic subtitles
@@ -57,58 +60,19 @@ class MenuViewModel @Inject constructor(
     private val storageSubtitleFlow = MutableStateFlow<String?>(null)
     private val rubbishBinSubtitleFlow = MutableStateFlow<String?>(null)
 
-    private val myAccountItems: Map<Int, NavDrawerItem.Account> = menuItems
-        .filterValues { it is NavDrawerItem.Account }
-        .mapValues {
-            val item = it.value as NavDrawerItem.Account
-            when (item) {
-                is CurrentPlanItem -> {
-                    NavDrawerItem.Account(
-                        destination = item.destination,
-                        icon = item.icon,
-                        title = item.title,
-                        subTitle = currentPlanSubtitleFlow,
-                        actionLabel = item.actionLabel
-                    )
-                }
-
-                is StorageItem -> {
-                    NavDrawerItem.Account(
-                        destination = item.destination,
-                        icon = item.icon,
-                        title = item.title,
-                        subTitle = storageSubtitleFlow,
-                        actionLabel = item.actionLabel
-                    )
-                }
-
-                is RubbishBinItem -> {
-                    NavDrawerItem.Account(
-                        destination = item.destination,
-                        icon = item.icon,
-                        title = item.title,
-                        subTitle = rubbishBinSubtitleFlow,
-                        actionLabel = item.actionLabel
-                    )
-                }
-
-                else -> item
-            }
-        }
-
     private val privacySuiteItems: Map<Int, NavDrawerItem.PrivacySuite> = menuItems
         .filterValues { it is NavDrawerItem.PrivacySuite }
         .mapValues { it.value as NavDrawerItem.PrivacySuite }
 
     private val _uiState = MutableStateFlow(
         MenuUiState(
-            myAccountItems = myAccountItems,
             privacySuiteItems = privacySuiteItems
         )
     )
     val uiState = _uiState.asStateFlow()
 
     init {
+        setMyAccountItems()
         monitorConnectivity()
         monitorUserDataAndAvatar()
         monitorAccountDetails()
@@ -116,6 +80,58 @@ class MenuViewModel @Inject constructor(
         refreshCurrentUserEmail()
         monitorUserChanges()
     }
+
+    private fun setMyAccountItems() {
+        viewModelScope.launch {
+            val isAchievementsEnabled =
+                runCatching { isAchievementsEnabledUseCase() }.getOrNull() == true
+            val myAccountItems: Map<Int, NavDrawerItem.Account> =
+                filterMyAccountItems(isAchievementsEnabled)
+            _uiState.update {
+                it.copy(myAccountItems = myAccountItems)
+            }
+        }
+    }
+
+    private fun filterMyAccountItems(isAchievementsEnabled: Boolean): Map<Int, NavDrawerItem.Account> =
+        menuItems
+            .filterValues { it is NavDrawerItem.Account && (it !is AchievementsItem || it is AchievementsItem && isAchievementsEnabled) }
+            .mapValues {
+                val item = it.value as NavDrawerItem.Account
+                when (item) {
+                    is CurrentPlanItem -> {
+                        NavDrawerItem.Account(
+                            destination = item.destination,
+                            icon = item.icon,
+                            title = item.title,
+                            subTitle = currentPlanSubtitleFlow,
+                            actionLabel = item.actionLabel
+                        )
+                    }
+
+                    is StorageItem -> {
+                        NavDrawerItem.Account(
+                            destination = item.destination,
+                            icon = item.icon,
+                            title = item.title,
+                            subTitle = storageSubtitleFlow,
+                            actionLabel = item.actionLabel
+                        )
+                    }
+
+                    is RubbishBinItem -> {
+                        NavDrawerItem.Account(
+                            destination = item.destination,
+                            icon = item.icon,
+                            title = item.title,
+                            subTitle = rubbishBinSubtitleFlow,
+                            actionLabel = item.actionLabel
+                        )
+                    }
+
+                    else -> item
+                }
+            }
 
     private fun monitorUserChanges() {
         viewModelScope.launch {

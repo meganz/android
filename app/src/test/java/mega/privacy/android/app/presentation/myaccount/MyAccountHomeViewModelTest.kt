@@ -33,7 +33,7 @@ import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
-import mega.privacy.android.domain.usecase.account.IsAchievementsEnabled
+import mega.privacy.android.domain.usecase.account.IsAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
@@ -101,7 +101,7 @@ class MyAccountHomeViewModelTest {
     private val getUserFullNameUseCase: GetUserFullNameUseCase = mock()
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase = mock()
     private val avatarContentMapper: AvatarContentMapper = mock()
-    private val isAchievementsEnabled: IsAchievementsEnabled = mock()
+    private val isAchievementsEnabledUseCase: IsAchievementsEnabledUseCase = mock()
 
     @BeforeEach
     fun setup() {
@@ -134,7 +134,7 @@ class MyAccountHomeViewModelTest {
             getUsedTransferStatusUseCase,
             accountNameMapper = AccountNameMapper(),
             avatarContentMapper,
-            isAchievementsEnabled
+            isAchievementsEnabledUseCase
         )
     }
 
@@ -372,7 +372,7 @@ class MyAccountHomeViewModelTest {
     @Test
     fun `test that isAchievementsAvailable should be true when isAchievementsEnabled returns true`() =
         runTest {
-            whenever(isAchievementsEnabled()).thenReturn(true)
+            whenever(isAchievementsEnabledUseCase()).thenReturn(true)
             initViewModel()
 
             advanceUntilIdle()
@@ -385,7 +385,7 @@ class MyAccountHomeViewModelTest {
     @Test
     fun `test that isAchievementsAvailable should be false when isAchievementsEnabled returns false`() =
         runTest {
-            whenever(isAchievementsEnabled()).thenReturn(false)
+            whenever(isAchievementsEnabledUseCase()).thenReturn(false)
             initViewModel()
 
             advanceUntilIdle()
@@ -398,7 +398,7 @@ class MyAccountHomeViewModelTest {
     @Test
     fun `test that isAchievementsAvailable should be false when isAchievementsEnabled throws exception`() =
         runTest {
-            whenever(isAchievementsEnabled()).doThrow(RuntimeException("Test exception"))
+            whenever(isAchievementsEnabledUseCase()).doThrow(RuntimeException("Test exception"))
             initViewModel()
 
             advanceUntilIdle()

@@ -10,7 +10,7 @@ import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
-import mega.privacy.android.domain.usecase.account.IsAchievementsEnabled
+import mega.privacy.android.domain.usecase.account.IsAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.feature.payment.model.AccountTypeInt
 import org.junit.jupiter.api.BeforeEach
@@ -27,20 +27,20 @@ import org.mockito.kotlin.wheneverBlocking
 internal class StorageStatusViewModelTest {
     private lateinit var underTest: StorageStatusViewModel
     private val getPricing: GetPricing = mock()
-    private val isAchievementsEnabled: IsAchievementsEnabled = mock()
+    private val isAchievementsEnabledUseCase: IsAchievementsEnabledUseCase = mock()
     private val getAccountTypeUseCase: GetAccountTypeUseCase = mock()
     private val getCurrentUserEmail: GetCurrentUserEmail = mock()
 
     @BeforeEach
     fun resetMocks() {
         wheneverBlocking { getAccountTypeUseCase() }.thenReturn(AccountType.FREE)
-        reset(getPricing, isAchievementsEnabled, getCurrentUserEmail)
+        reset(getPricing, isAchievementsEnabledUseCase, getCurrentUserEmail)
     }
 
     private fun initTestClass() {
         underTest = StorageStatusViewModel(
             getPricing = getPricing,
-            isAchievementsEnabled = isAchievementsEnabled,
+            isAchievementsEnabledUseCase = isAchievementsEnabledUseCase,
             getAccountTypeUseCase = getAccountTypeUseCase,
             getCurrentUserEmail = getCurrentUserEmail
         )
@@ -49,7 +49,7 @@ internal class StorageStatusViewModelTest {
     @Test
     fun `test that isAchievementsEnabled updated correctly when calling isAchievementsEnabled return true`() =
         runTest {
-            whenever(isAchievementsEnabled()).thenReturn(true)
+            whenever(isAchievementsEnabledUseCase()).thenReturn(true)
             initTestClass()
             underTest.state.test {
                 val state = awaitItem()
@@ -60,7 +60,7 @@ internal class StorageStatusViewModelTest {
     @Test
     fun `test that isAchievementsEnabled updated correctly when calling isAchievementsEnabled return false`() =
         runTest {
-            whenever(isAchievementsEnabled()).thenReturn(false)
+            whenever(isAchievementsEnabledUseCase()).thenReturn(false)
             initTestClass()
             underTest.state.test {
                 val state = awaitItem()

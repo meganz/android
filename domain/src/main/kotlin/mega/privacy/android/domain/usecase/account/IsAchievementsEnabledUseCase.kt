@@ -7,7 +7,7 @@ import javax.inject.Inject
  * Is achievements enabled
  *
  */
-class IsAchievementsEnabled @Inject constructor(
+class IsAchievementsEnabledUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
 ) {
     /**

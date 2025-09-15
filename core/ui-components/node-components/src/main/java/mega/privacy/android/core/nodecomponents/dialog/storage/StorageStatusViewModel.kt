@@ -11,7 +11,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
-import mega.privacy.android.domain.usecase.account.IsAchievementsEnabled
+import mega.privacy.android.domain.usecase.account.IsAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import timber.log.Timber
 import javax.inject.Inject
@@ -19,7 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class StorageStatusViewModel @Inject constructor(
     private val getPricing: GetPricing,
-    private val isAchievementsEnabled: IsAchievementsEnabled,
+    private val isAchievementsEnabledUseCase: IsAchievementsEnabledUseCase,
     private val getAccountTypeUseCase: GetAccountTypeUseCase,
     private val getCurrentUserEmail: GetCurrentUserEmail,
 ) : ViewModel() {
@@ -33,7 +33,7 @@ class StorageStatusViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             runCatching {
-                isAchievementsEnabled()
+                isAchievementsEnabledUseCase()
             }.onSuccess { isEnabled ->
                 _state.update { it.copy(isAchievementsEnabled = isEnabled) }
             }.onFailure {

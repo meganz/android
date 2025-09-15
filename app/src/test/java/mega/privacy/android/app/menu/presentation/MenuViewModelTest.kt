@@ -16,6 +16,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.menu.navigation.AchievementsItem
 import mega.privacy.android.app.menu.navigation.CurrentPlanItem
 import mega.privacy.android.app.menu.navigation.RubbishBinItem
 import mega.privacy.android.app.menu.navigation.StorageItem
@@ -32,6 +33,7 @@ import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.account.IsAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
@@ -69,6 +71,7 @@ class MenuViewModelTest {
     private val getUserFullNameUseCase = mock<GetUserFullNameUseCase>()
     private val getCurrentUserEmail = mock<GetCurrentUserEmail>()
     private val monitorUserUpdates = mock<MonitorUserUpdates>()
+    private val isAchievementsEnabledUseCase = mock<IsAchievementsEnabledUseCase>()
     private val ioDispatcher = UnconfinedTestDispatcher()
 
     private object TestDestination : NavKey
@@ -96,7 +99,8 @@ class MenuViewModelTest {
             fileSizeStringMapper,
             getUserFullNameUseCase,
             getCurrentUserEmail,
-            monitorUserUpdates
+            monitorUserUpdates,
+            isAchievementsEnabledUseCase
         )
     }
 
@@ -508,6 +512,8 @@ class MenuViewModelTest {
         monitorUserUpdates.stub {
             on { invoke() }.thenReturn(flow { awaitCancellation() })
         }
+
+        whenever(isAchievementsEnabledUseCase()).thenReturn(true)
     }
 
     private fun initUnderTest(
@@ -526,6 +532,7 @@ class MenuViewModelTest {
             getUserFullNameUseCase = getUserFullNameUseCase,
             getCurrentUserEmail = getCurrentUserEmail,
             monitorUserUpdates = monitorUserUpdates,
+            isAchievementsEnabledUseCase = isAchievementsEnabledUseCase,
             ioDispatcher = ioDispatcher,
         )
     }
@@ -689,4 +696,152 @@ class MenuViewModelTest {
         val state = underTest.uiState.value
         assertThat(state.email).isNull()
     }
+
+    @Test
+    fun `test that achievements item is included when achievements are enabled`() = runTest {
+        stubDefaultDependencies()
+        whenever(isAchievementsEnabledUseCase()).thenReturn(true)
+
+        val menuItems = mapOf(
+            10 to CurrentPlanItem,
+            20 to StorageItem,
+            40 to AchievementsItem,
+            90 to RubbishBinItem
+        )
+
+        initUnderTest(menuItems = menuItems)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.myAccountItems).hasSize(4)
+            assertThat(state.myAccountItems[10]).isNotNull()
+            assertThat(state.myAccountItems[20]).isNotNull()
+            assertThat(state.myAccountItems[40]).isNotNull() // AchievementsItem should be included
+            assertThat(state.myAccountItems[90]).isNotNull()
+            verify(isAchievementsEnabledUseCase).invoke()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that achievements item is filtered out when achievements are disabled`() = runTest {
+        stubDefaultDependencies()
+        whenever(isAchievementsEnabledUseCase()).thenReturn(false)
+
+        val menuItems = mapOf(
+            10 to CurrentPlanItem,
+            20 to StorageItem,
+            40 to AchievementsItem,
+            90 to RubbishBinItem
+        )
+
+        initUnderTest(menuItems = menuItems)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.myAccountItems).hasSize(3)
+            assertThat(state.myAccountItems[10]).isNotNull()
+            assertThat(state.myAccountItems[20]).isNotNull()
+            assertThat(state.myAccountItems[40]).isNull() // AchievementsItem should be filtered out
+            assertThat(state.myAccountItems[90]).isNotNull()
+            verify(isAchievementsEnabledUseCase).invoke()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that achievements item is not included when IsAchievementsEnabled throws exception`() =
+        runTest {
+            stubDefaultDependencies()
+            whenever(isAchievementsEnabledUseCase()).thenThrow(RuntimeException("Achievements check failed"))
+
+            val menuItems = mapOf(
+                10 to CurrentPlanItem,
+                20 to StorageItem,
+                40 to AchievementsItem,
+                90 to RubbishBinItem
+            )
+
+            initUnderTest(menuItems = menuItems)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                // Should default to enabled (true) when exception occurs
+                assertThat(state.myAccountItems).hasSize(3)
+                assertThat(state.myAccountItems[10]).isNotNull()
+                assertThat(state.myAccountItems[20]).isNotNull()
+                assertThat(state.myAccountItems[40]).isNull() // AchievementsItem should not be included
+                assertThat(state.myAccountItems[90]).isNotNull()
+                verify(isAchievementsEnabledUseCase).invoke()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that achievements item is not included when IsAchievementsEnabled returns null`() =
+        runTest {
+            stubDefaultDependencies()
+            whenever(isAchievementsEnabledUseCase()).thenReturn(null)
+
+            val menuItems = mapOf(
+                10 to CurrentPlanItem,
+                20 to StorageItem,
+                40 to AchievementsItem,
+                90 to RubbishBinItem
+            )
+
+            initUnderTest(menuItems = menuItems)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                // Should default to enabled (false) when null is returned
+                assertThat(state.myAccountItems).hasSize(3)
+                assertThat(state.myAccountItems[10]).isNotNull()
+                assertThat(state.myAccountItems[20]).isNotNull()
+                assertThat(state.myAccountItems[40]).isNull() // AchievementsItem should not be included
+                assertThat(state.myAccountItems[90]).isNotNull()
+                verify(isAchievementsEnabledUseCase).invoke()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that achievements filtering works with only achievements item`() = runTest {
+        stubDefaultDependencies()
+        whenever(isAchievementsEnabledUseCase()).thenReturn(false)
+
+        val menuItems = mapOf(
+            40 to AchievementsItem
+        )
+
+        initUnderTest(menuItems = menuItems)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.myAccountItems).isEmpty() // AchievementsItem should be filtered out
+            verify(isAchievementsEnabledUseCase).invoke()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that achievements filtering works with achievements enabled and only achievements item`() =
+        runTest {
+            stubDefaultDependencies()
+            whenever(isAchievementsEnabledUseCase()).thenReturn(true)
+
+            val menuItems = mapOf(
+                40 to AchievementsItem
+            )
+
+            initUnderTest(menuItems = menuItems)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.myAccountItems).hasSize(1)
+                assertThat(state.myAccountItems[40]).isNotNull() // AchievementsItem should be included
+                verify(isAchievementsEnabledUseCase).invoke()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 } 
