@@ -40,7 +40,8 @@ internal class TypedNodeMapper @Inject constructor(
             megaNode = megaNode,
             fromFolderLink = fromFolderLink,
             requireSerializedData = requireSerializedData,
-            offline = offline
+            offline = offline,
+            syncedNodeIds = folderTypeData?.syncedNodeIds
         )
         return when (unTypedNode) {
             is TypedNode -> unTypedNode

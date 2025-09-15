@@ -1152,6 +1152,8 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun getNodePath(node: MegaNode): String? = megaApi.getNodePath(node)
 
+    override suspend fun getNodePathByHandle(handle: Long) = megaApi.getNodePathByHandle(handle)
+
     override fun getAccess(megaNode: MegaNode) =
         megaApi.getAccess(megaNode)
 

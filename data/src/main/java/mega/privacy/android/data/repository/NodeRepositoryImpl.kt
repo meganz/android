@@ -275,9 +275,7 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
 
     override suspend fun getNodePathById(nodeId: NodeId) = withContext(ioDispatcher) {
-        megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {
-            megaApiGateway.getNodePath(it) ?: ""
-        } ?: ""
+        megaApiGateway.getNodePathByHandle(nodeId.longValue) ?: ""
     }
 
     override suspend fun getNodeChildren(

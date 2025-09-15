@@ -2348,6 +2348,14 @@ interface MegaApiGateway {
     suspend fun getNodePath(node: MegaNode): String?
 
     /**
+     * Get the path of a MegaNode by its handle
+     *
+     * @param handle MegaNode handle for which the path will be returned
+     * @return The path of the node
+     */
+    suspend fun getNodePathByHandle(handle: Long): String?
+
+    /**
      * Returns the access level of the sharing
      *
      * Possible return values are:

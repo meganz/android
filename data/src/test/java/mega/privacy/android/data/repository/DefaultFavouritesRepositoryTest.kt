@@ -80,6 +80,7 @@ class DefaultFavouritesRepositoryTest {
                 any(),
                 any(),
                 any(),
+                anyOrNull(),
                 anyOrNull()
             )
         ).thenReturn(
@@ -120,6 +121,7 @@ class DefaultFavouritesRepositoryTest {
                 any(),
                 any(),
                 any(),
+                anyOrNull(),
                 anyOrNull()
             )
         ).thenReturn(

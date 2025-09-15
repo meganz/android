@@ -26,20 +26,25 @@ internal class FolderNodeMapper @Inject constructor(
     private val megaApiFolderGateway: MegaApiFolderGateway,
     private val fetChildrenMapper: FetchChildrenMapper,
     private val stringListMapper: StringListMapper,
-    private val nodeLabelMapper: NodeLabelMapper
+    private val nodeLabelMapper: NodeLabelMapper,
 ) {
     /**
      * Invoke
      *
      * @param megaNode
      * @param requireSerializedData
-     * @return
+     * @param fromFolderLink
+     * @param isAvailableOffline
+     * @param syncedNodeIds
+     *
+     * @return FolderNode
      */
     suspend operator fun invoke(
         megaNode: MegaNode,
         fromFolderLink: Boolean,
         requireSerializedData: Boolean,
-        isAvailableOffline: Boolean
+        isAvailableOffline: Boolean,
+        syncedNodeIds: Set<NodeId>? = null,
     ): FolderNode = DefaultFolderNode(
         id = NodeId(megaNode.handle),
         name = megaNode.name,
@@ -69,7 +74,7 @@ internal class FolderNodeMapper @Inject constructor(
         isIncomingShare = megaNode.isInShare,
         isShared = megaNode.isOutShare,
         isPendingShare = megaApiGateway.isPendingShare(megaNode),
-        isSynced = isSynced(megaNode),
+        isSynced = syncedNodeIds?.contains(NodeId(megaNode.handle)) ?: isSynced(megaNode),
         device = megaNode.deviceId,
         isNodeKeyDecrypted = megaNode.isNodeKeyDecrypted,
         creationTime = megaNode.creationTime,
@@ -81,6 +86,7 @@ internal class FolderNodeMapper @Inject constructor(
         tags = megaNode.tags?.let { stringListMapper(it) }
     )
 
+    // Legacy method working as a fallback in case syncedNodeIds are not provided
     private fun isSynced(megaNode: MegaNode): Boolean {
         val syncs = megaApiGateway.getSyncs()
         for (i in 0..syncs.size()) {

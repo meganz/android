@@ -26,6 +26,7 @@ class GetFolderTypeDataUseCaseTest {
     private val secondarySyncHandle = 5678L
     private val chatFilesFolderId = NodeId(9012L)
     private val backupFolderId = NodeId(3456L)
+    private val backupFolderPath = "/backup/folder/path"
     private val syncedNodeIds = setOf(NodeId(1111L), NodeId(2222L), NodeId(3333L))
 
     @Before
@@ -52,6 +53,7 @@ class GetFolderTypeDataUseCaseTest {
         }
         nodeRepository.stub {
             onBlocking { getAllSyncedNodeIds() }.thenReturn(syncedNodeIds)
+            onBlocking { getNodePathById(backupFolderId) }.thenReturn(backupFolderPath)
         }
 
         val result = underTest()
@@ -61,6 +63,7 @@ class GetFolderTypeDataUseCaseTest {
             secondarySyncHandle = secondarySyncHandle,
             chatFilesFolderId = chatFilesFolderId,
             backupFolderId = backupFolderId,
+            backupFolderPath = backupFolderPath,
             syncedNodeIds = syncedNodeIds
         )
         assertThat(result).isEqualTo(expected)
@@ -89,6 +92,7 @@ class GetFolderTypeDataUseCaseTest {
             secondarySyncHandle = null,
             chatFilesFolderId = null,
             backupFolderId = null,
+            backupFolderPath = null,
             syncedNodeIds = emptySet()
         )
         assertThat(result).isEqualTo(expected)
@@ -117,6 +121,7 @@ class GetFolderTypeDataUseCaseTest {
             secondarySyncHandle = null,
             chatFilesFolderId = chatFilesFolderId,
             backupFolderId = null,
+            backupFolderPath = null,
             syncedNodeIds = setOf(NodeId(1111L))
         )
         assertThat(result).isEqualTo(expected)
@@ -127,6 +132,7 @@ class GetFolderTypeDataUseCaseTest {
         // Given
         val firstBackupId = NodeId(1111L)
         val secondBackupId = NodeId(2222L)
+        val firstBackupPath = "/first/backup/path"
 
         cameraUploadsRepository.stub {
             onBlocking { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
@@ -145,6 +151,7 @@ class GetFolderTypeDataUseCaseTest {
         }
         nodeRepository.stub {
             onBlocking { getAllSyncedNodeIds() }.thenReturn(syncedNodeIds)
+            onBlocking { getNodePathById(firstBackupId) }.thenReturn(firstBackupPath)
         }
 
         val result = underTest()
@@ -155,6 +162,7 @@ class GetFolderTypeDataUseCaseTest {
             secondarySyncHandle = secondarySyncHandle,
             chatFilesFolderId = chatFilesFolderId,
             backupFolderId = firstBackupId,
+            backupFolderPath = firstBackupPath,
             syncedNodeIds = syncedNodeIds
         )
         assertThat(result).isEqualTo(expected)
@@ -189,6 +197,7 @@ class GetFolderTypeDataUseCaseTest {
             secondarySyncHandle = secondarySyncHandle,
             chatFilesFolderId = chatFilesFolderId,
             backupFolderId = null,
+            backupFolderPath = null,
             syncedNodeIds = syncedNodeIds
         )
         assertThat(result).isEqualTo(expected)
@@ -217,6 +226,7 @@ class GetFolderTypeDataUseCaseTest {
             secondarySyncHandle = secondarySyncHandle,
             chatFilesFolderId = chatFilesFolderId,
             backupFolderId = null,
+            backupFolderPath = null,
             syncedNodeIds = syncedNodeIds
         )
         assertThat(result).isEqualTo(expected)
@@ -238,6 +248,7 @@ class GetFolderTypeDataUseCaseTest {
         }
         nodeRepository.stub {
             onBlocking { getAllSyncedNodeIds() }.thenReturn(largeSyncedNodeSet)
+            onBlocking { getNodePathById(backupFolderId) }.thenReturn(backupFolderPath)
         }
 
         val result = underTest()
@@ -247,6 +258,7 @@ class GetFolderTypeDataUseCaseTest {
             secondarySyncHandle = secondarySyncHandle,
             chatFilesFolderId = chatFilesFolderId,
             backupFolderId = backupFolderId,
+            backupFolderPath = backupFolderPath,
             syncedNodeIds = largeSyncedNodeSet
         )
         assertThat(result).isEqualTo(expected)
@@ -267,6 +279,7 @@ class GetFolderTypeDataUseCaseTest {
         }
         nodeRepository.stub {
             onBlocking { getAllSyncedNodeIds() }.thenReturn(syncedNodeIds)
+            onBlocking { getNodePathById(backupFolderId) }.thenReturn(backupFolderPath)
         }
 
         underTest()
@@ -276,5 +289,98 @@ class GetFolderTypeDataUseCaseTest {
         verify(chatRepository).getChatFilesFolderId()
         verify(monitorBackupFolder).invoke()
         verify(nodeRepository).getAllSyncedNodeIds()
+        verify(nodeRepository).getNodePathById(backupFolderId)
+    }
+
+    @Test
+    fun `test that invoke handles backup folder with empty path`() = runTest {
+        cameraUploadsRepository.stub {
+            onBlocking { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
+            onBlocking { getSecondarySyncHandle() }.thenReturn(secondarySyncHandle)
+        }
+        chatRepository.stub {
+            onBlocking { getChatFilesFolderId() }.thenReturn(chatFilesFolderId)
+        }
+        monitorBackupFolder.stub {
+            onBlocking { invoke() }.thenReturn(flowOf(Result.success(backupFolderId)))
+        }
+        nodeRepository.stub {
+            onBlocking { getAllSyncedNodeIds() }.thenReturn(syncedNodeIds)
+            onBlocking { getNodePathById(backupFolderId) }.thenReturn("")
+        }
+
+        val result = underTest()
+
+        val expected = FolderTypeData(
+            primarySyncHandle = primarySyncHandle,
+            secondarySyncHandle = secondarySyncHandle,
+            chatFilesFolderId = chatFilesFolderId,
+            backupFolderId = backupFolderId,
+            backupFolderPath = null, // Empty path should result in null
+            syncedNodeIds = syncedNodeIds
+        )
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that invoke handles backup folder with null path`() = runTest {
+        cameraUploadsRepository.stub {
+            onBlocking { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
+            onBlocking { getSecondarySyncHandle() }.thenReturn(secondarySyncHandle)
+        }
+        chatRepository.stub {
+            onBlocking { getChatFilesFolderId() }.thenReturn(chatFilesFolderId)
+        }
+        monitorBackupFolder.stub {
+            onBlocking { invoke() }.thenReturn(flowOf(Result.success(backupFolderId)))
+        }
+        nodeRepository.stub {
+            onBlocking { getAllSyncedNodeIds() }.thenReturn(syncedNodeIds)
+            onBlocking { getNodePathById(backupFolderId) }.thenReturn(null)
+        }
+
+        val result = underTest()
+
+        val expected = FolderTypeData(
+            primarySyncHandle = primarySyncHandle,
+            secondarySyncHandle = secondarySyncHandle,
+            chatFilesFolderId = chatFilesFolderId,
+            backupFolderId = backupFolderId,
+            backupFolderPath = null, // Null path should result in null
+            syncedNodeIds = syncedNodeIds
+        )
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that invoke handles backup folder with valid path`() = runTest {
+        val customBackupPath = "/custom/backup/path"
+
+        cameraUploadsRepository.stub {
+            onBlocking { getPrimarySyncHandle() }.thenReturn(primarySyncHandle)
+            onBlocking { getSecondarySyncHandle() }.thenReturn(secondarySyncHandle)
+        }
+        chatRepository.stub {
+            onBlocking { getChatFilesFolderId() }.thenReturn(chatFilesFolderId)
+        }
+        monitorBackupFolder.stub {
+            onBlocking { invoke() }.thenReturn(flowOf(Result.success(backupFolderId)))
+        }
+        nodeRepository.stub {
+            onBlocking { getAllSyncedNodeIds() }.thenReturn(syncedNodeIds)
+            onBlocking { getNodePathById(backupFolderId) }.thenReturn(customBackupPath)
+        }
+
+        val result = underTest()
+
+        val expected = FolderTypeData(
+            primarySyncHandle = primarySyncHandle,
+            secondarySyncHandle = secondarySyncHandle,
+            chatFilesFolderId = chatFilesFolderId,
+            backupFolderId = backupFolderId,
+            backupFolderPath = customBackupPath,
+            syncedNodeIds = syncedNodeIds
+        )
+        assertThat(result).isEqualTo(expected)
     }
 }

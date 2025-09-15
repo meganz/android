@@ -36,7 +36,6 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNodeNameByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
@@ -71,8 +70,6 @@ import org.robolectric.annotation.Config
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [34])
 class CloudDriveViewModelTest {
-
-    private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
     private val getNodeNameByIdUseCase: GetNodeNameByIdUseCase = mock()
     private val getFileBrowserNodeChildrenUseCase: GetFileBrowserNodeChildrenUseCase = mock()
     private val getNodesByIdInChunkUseCase: GetNodesByIdInChunkUseCase = mock()
@@ -105,7 +102,6 @@ class CloudDriveViewModelTest {
     fun tearDown() {
         Dispatchers.resetMain()
         reset(
-            getNodeByIdUseCase,
             getNodeNameByIdUseCase,
             getFileBrowserNodeChildrenUseCase,
             getNodesByIdInChunkUseCase,
@@ -1550,7 +1546,6 @@ class CloudDriveViewModelTest {
 
         setupTestData(emptyList())
         whenever(getRootNodeIdUseCase()).thenReturn(rootNodeId)
-        whenever(getNodeByIdUseCase(eq(rootNodeId))).thenReturn(rootNode)
         whenever(getFileBrowserNodeChildrenUseCase(rootNodeId.longValue)).thenReturn(emptyList())
         // Setup the new chunked use case for root node
         whenever(getNodesByIdInChunkUseCase.invoke(rootNodeId)).thenReturn(
@@ -1575,7 +1570,6 @@ class CloudDriveViewModelTest {
     fun `test that loadNodes uses NodeId(-1L) when getRootNodeIdUseCase returns null`() = runTest {
         setupTestData(emptyList())
         whenever(getRootNodeIdUseCase()).thenReturn(null)
-        whenever(getNodeByIdUseCase(eq(NodeId(-1L)))).thenReturn(null)
         whenever(getNodesByIdInChunkUseCase(NodeId(-1L))).thenReturn(
             flowOf(
                 Pair(
@@ -1599,7 +1593,6 @@ class CloudDriveViewModelTest {
     fun `test that isCloudDriveRoot is true when nodeHandle is -1L`() = runTest {
         setupTestData(emptyList())
         whenever(getRootNodeIdUseCase()).thenReturn(null)
-        whenever(getNodeByIdUseCase(eq(NodeId(-1L)))).thenReturn(null)
         whenever(getFileBrowserNodeChildrenUseCase(-1L)).thenReturn(emptyList())
         whenever(getNodesByIdInChunkUseCase(NodeId(-1L))).thenReturn(
             flowOf(
@@ -1645,7 +1638,6 @@ class CloudDriveViewModelTest {
 
             setupTestData(emptyList())
             whenever(getRootNodeIdUseCase()).thenReturn(rootNodeId)
-            whenever(getNodeByIdUseCase(eq(rootNodeId))).thenReturn(rootNode)
             whenever(getFileBrowserNodeChildrenUseCase(rootNodeId.longValue)).thenReturn(emptyList())
             // Setup the new chunked use case for root node
             whenever(getNodesByIdInChunkUseCase.invoke(rootNodeId)).thenReturn(

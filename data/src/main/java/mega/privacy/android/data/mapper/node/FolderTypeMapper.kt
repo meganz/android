@@ -1,5 +1,6 @@
 package mega.privacy.android.data.mapper.node
 
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.FolderTypeData
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -12,7 +13,7 @@ import javax.inject.Inject
  */
 class FolderTypeMapper @Inject constructor(
     private val getDeviceType: GetDeviceType,
-    // private val hasAncestor: HasAncestor,
+    private val megaApiGateway: MegaApiGateway,
 ) {
 
     /**
@@ -35,24 +36,24 @@ class FolderTypeMapper @Inject constructor(
             }
         }
 
-    private fun isMediaSyncFolder(folder: NodeId, data: FolderTypeData) =
-        folder.longValue in listOfNotNull(
+    private fun isMediaSyncFolder(nodeId: NodeId, data: FolderTypeData) =
+        nodeId.longValue in listOfNotNull(
             data.primarySyncHandle,
             data.secondarySyncHandle
         )
 
-    private fun isChatFolder(folder: NodeId, data: FolderTypeData) =
-        data.chatFilesFolderId == folder
+    private fun isChatFolder(nodeId: NodeId, data: FolderTypeData) =
+        data.chatFilesFolderId == nodeId
 
-    private fun isRootBackup(folder: NodeId, data: FolderTypeData) =
-        data.backupFolderId == folder
+    private fun isRootBackup(nodeId: NodeId, data: FolderTypeData) = data.backupFolderId == nodeId
 
-    private fun isChildBackup(nodeId: NodeId, data: FolderTypeData) =
-        data.backupFolderId?.let { backupFolderId ->
-            // hasAncestor(nodeId, backupFolderId) // TODO
-            false
-        } ?: false
+    private suspend fun isChildBackup(
+        nodeId: NodeId,
+        data: FolderTypeData,
+    ) = data.backupFolderPath?.let { backupFolderPath ->
+        val nodePath = megaApiGateway.getNodePathByHandle(nodeId.longValue) ?: return false
+        nodePath.startsWith(backupFolderPath)
+    } ?: false
 
-    private fun isDeviceFolder(folder: FolderNode) =
-        !folder.device.isNullOrEmpty()
+    private fun isDeviceFolder(nodeId: FolderNode) = !nodeId.device.isNullOrEmpty()
 }

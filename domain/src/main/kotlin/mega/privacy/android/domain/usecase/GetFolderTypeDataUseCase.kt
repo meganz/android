@@ -28,13 +28,20 @@ class GetFolderTypeDataUseCase @Inject constructor(
         val primarySyncHandle = async { cameraUploadsRepository.getPrimarySyncHandle() }
         val secondarySyncHandle = async { cameraUploadsRepository.getSecondarySyncHandle() }
         val chatFilesFolderId = async { chatRepository.getChatFilesFolderId() }
-        val backupFolderId = async { monitorBackupFolder().firstOrNull()?.getOrNull() }
         val syncedNodeIds = async { nodeRepository.getAllSyncedNodeIds() }
+        val backupFolderDeferred = async {
+            val id = monitorBackupFolder().firstOrNull()?.getOrNull()
+            val path = id?.let { nodeRepository.getNodePathById(it) }?.takeIf { it.isNotEmpty() }
+            id to path
+        }
+        val (backupFolderId, backupFolderPath) = backupFolderDeferred.await()
+
         FolderTypeData(
             primarySyncHandle = primarySyncHandle.await(),
             secondarySyncHandle = secondarySyncHandle.await(),
             chatFilesFolderId = chatFilesFolderId.await(),
-            backupFolderId = backupFolderId.await(),
+            backupFolderId = backupFolderId,
+            backupFolderPath = backupFolderPath,
             syncedNodeIds = syncedNodeIds.await()
         )
     }

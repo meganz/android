@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.node.NodeId
  * @property secondarySyncHandle Secondary camera uploads sync handle
  * @property chatFilesFolderId Chat files folder ID
  * @property backupFolderId Root backup folder ID
+ * @property backupFolderPath Root backup folder path
  * @property syncedNodeIds Set of node IDs that are synced
  */
 data class FolderTypeData(
@@ -16,5 +17,6 @@ data class FolderTypeData(
     val secondarySyncHandle: Long?,
     val chatFilesFolderId: NodeId?,
     val backupFolderId: NodeId?,
+    val backupFolderPath: String?,
     val syncedNodeIds: Set<NodeId>,
 )

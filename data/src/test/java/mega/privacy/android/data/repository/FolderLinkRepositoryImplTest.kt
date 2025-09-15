@@ -137,7 +137,7 @@ class FolderLinkRepositoryImplTest {
         val parentNode = mock<MegaNode>()
         whenever(megaApiFolderGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
         whenever(megaApiFolderGateway.getParentNode(megaNode)).thenReturn(parentNode)
-        whenever(nodeMapper(any(), any(), any(), anyOrNull())).thenReturn(untypedNode)
+        whenever(nodeMapper(any(), any(), any(), anyOrNull(), anyOrNull())).thenReturn(untypedNode)
 
         assertThat(underTest.getParentNode(nodeId)).isEqualTo(untypedNode)
     }
@@ -161,7 +161,7 @@ class FolderLinkRepositoryImplTest {
         val megaNode = mock<MegaNode>()
         whenever(megaApiGateway.base64ToHandle(base64Handle)).thenReturn(handle)
         whenever(megaApiFolderGateway.getMegaNodeByHandle(handle)).thenReturn(megaNode)
-        whenever(nodeMapper(any(), any(), any(), anyOrNull())).thenReturn(untypedNode)
+        whenever(nodeMapper(any(), any(), any(), anyOrNull(), anyOrNull())).thenReturn(untypedNode)
 
         assertThat(underTest.getFolderLinkNode(base64Handle)).isEqualTo(untypedNode)
     }
@@ -234,7 +234,7 @@ class FolderLinkRepositoryImplTest {
         val id = 1L
         whenever(megaApiFolderGateway.getMegaNodeByHandle(id)).thenReturn(megaNode)
         whenever(megaApiFolderGateway.authorizeNode(megaNode)).thenReturn(megaNode)
-        whenever(nodeMapper(any(), any(), any(), anyOrNull())).thenReturn(untypedNode)
+        whenever(nodeMapper(any(), any(), any(), anyOrNull(), anyOrNull())).thenReturn(untypedNode)
         val actual = underTest.getChildNode(NodeId(id))
         assertThat(actual).isEqualTo(untypedNode)
     }
@@ -245,7 +245,7 @@ class FolderLinkRepositoryImplTest {
         val id = 1L
         whenever(megaApiFolderGateway.getMegaNodeByHandle(id)).thenReturn(megaNode)
         whenever(megaApiFolderGateway.authorizeNode(megaNode)).thenReturn(megaNode)
-        whenever(nodeMapper(any(), any(), any(), anyOrNull())).thenReturn(untypedNode)
+        whenever(nodeMapper(any(), any(), any(), anyOrNull(), anyOrNull())).thenReturn(untypedNode)
         underTest.getChildNode(NodeId(id))
         verify(megaApiFolderGateway).authorizeNode(megaNode)
     }
@@ -257,13 +257,14 @@ class FolderLinkRepositoryImplTest {
             val id = 1L
             whenever(megaApiFolderGateway.getMegaNodeByHandle(id)).thenReturn(megaNode)
             whenever(megaApiFolderGateway.authorizeNode(megaNode)).thenReturn(megaNode)
-            whenever(nodeMapper(any(), any(), any(), anyOrNull())).thenReturn(untypedNode)
+            whenever(nodeMapper(any(), any(), any(), anyOrNull(), anyOrNull())).thenReturn(untypedNode)
             underTest.getChildNode(NodeId(id))
             verify(nodeMapper).invoke(
                 megaNode,
                 fromFolderLink = true,
                 requireSerializedData = false,
-                offline = null
+                offline = null,
+                syncedNodeIds = null
             )
         }
 
@@ -282,7 +283,7 @@ class FolderLinkRepositoryImplTest {
             megaApiFolderGateway.stub {
                 onBlocking { getChildren(filter, expectedOrder, token) }.thenReturn(listOf(child))
             }
-            whenever(nodeMapper(child, fromFolderLink = true)).thenReturn(untypedNode)
+            whenever(nodeMapper(child, fromFolderLink = true, requireSerializedData = false, offline = null, syncedNodeIds = null)).thenReturn(untypedNode)
             val id = 1L
             val order = 0
             whenever(megaApiFolderGateway.authorizeNode(megaNode)).thenReturn(megaNode)
@@ -317,7 +318,7 @@ class FolderLinkRepositoryImplTest {
                     child.duration
                 )
             ).thenReturn(mock<RawFileTypeInfo>())
-            whenever(nodeMapper(child, fromFolderLink = true)).thenReturn(untypedNode)
+            whenever(nodeMapper(child, fromFolderLink = true, requireSerializedData = false, offline = null, syncedNodeIds = null)).thenReturn(untypedNode)
             whenever(imageNodeMapper(any(), any(), any(), anyOrNull())).thenReturn(imageNode)
             val id = 1L
             val order = 0

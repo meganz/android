@@ -387,7 +387,7 @@ internal class NodeRepositoryImplTest {
         }
 
     @Test
-    fun `test that getNodePathById returns an empty node path if getMegaNodeByHandle returns null`() =
+    fun `test that getNodePathById returns an empty node path if getNodePathByHandle returns null`() =
         runTest {
             whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(null)
             val nodePath = underTest.getNodePathById(NodeId(123456))
@@ -401,12 +401,11 @@ internal class NodeRepositoryImplTest {
         nodePath: String?,
         expectedNodePath: String,
     ) = runTest {
-        val testNode = mock<MegaNode>()
+        val nodeHandle = 123456L
         megaApiGateway.stub {
-            onBlocking { getMegaNodeByHandle(any()) }.thenReturn(testNode)
-            onBlocking { getNodePath(testNode) }.thenReturn(nodePath)
+            onBlocking { getNodePathByHandle(nodeHandle) }.thenReturn(nodePath)
         }
-        val actualNodePath = underTest.getNodePathById(NodeId(123456))
+        val actualNodePath = underTest.getNodePathById(NodeId(nodeHandle))
         assertThat(actualNodePath).isEqualTo(expectedNodePath)
     }
 
