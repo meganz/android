@@ -3132,7 +3132,9 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             return@launch
         }
 
-        supportActionBar?.subtitle = null
+        if (drawerItem != DrawerItem.CHAT) {
+            supportActionBar?.subtitle = null
+        }
 
         when (drawerItem) {
             DrawerItem.CLOUD_DRIVE -> {
