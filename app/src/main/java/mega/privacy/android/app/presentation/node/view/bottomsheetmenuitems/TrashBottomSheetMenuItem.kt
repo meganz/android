@@ -1,10 +1,15 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
+import androidx.navigation.NavHostController
+import kotlinx.coroutines.CoroutineScope
+import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.app.presentation.node.model.menuaction.TrashMenuAction
+import mega.privacy.android.app.presentation.search.navigation.moveToRubbishOrDelete
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -34,4 +39,18 @@ class TrashBottomSheetMenuItem @Inject constructor(
         get() = true
 
     override val groupId = 9
+
+    override fun getOnClickFunction(
+        node: TypedNode,
+        onDismiss: () -> Unit,
+        actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
+        navController: NavHostController,
+        parentCoroutineScope: CoroutineScope,
+    ): () -> Unit = {
+        onDismiss()
+        val handles = listOf(node.id.longValue)
+        runCatching { listToStringWithDelimitersMapper(handles) }
+            .onSuccess { navController.navigate(route = "$moveToRubbishOrDelete/${false}/${it}") }
+            .onFailure { Timber.e(it) }
+    }
 }
