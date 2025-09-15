@@ -131,24 +131,6 @@ class TransfersWidgetViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Updates UI state to hide the transfers widget. It will be hide regardless of whether there are active transfers or not
-     */
-    fun hideTransfersWidget() {
-        _state.update {
-            it.copy(hideTransfersWidget = true)
-        }
-    }
-
-    /**
-     * Updates UI state to show the transfers widget when there are active transfers
-     */
-    fun showTransfersWidget() {
-        _state.update {
-            it.copy(hideTransfersWidget = false)
-        }
-    }
-
     companion object {
         private const val DEFAULT_SAMPLE_PERIOD = 500L
         internal val waitTimeToShowOffline = 30_000L.milliseconds

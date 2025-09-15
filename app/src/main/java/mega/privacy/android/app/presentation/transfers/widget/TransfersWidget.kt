@@ -24,13 +24,11 @@ fun TransfersWidget(
     onOpenTransferSection: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    if (!state.hideTransfersWidget) {
-        TransfersWidgetViewAnimated(
-            transfersInfo = state.transfersInfo,
-            onClick = onOpenTransferSection,
-            modifier = modifier,
-        )
-    }
+    TransfersWidgetViewAnimated(
+        transfersInfo = state.transfersInfo,
+        onClick = onOpenTransferSection,
+        modifier = modifier,
+    )
 }
 
 /**
