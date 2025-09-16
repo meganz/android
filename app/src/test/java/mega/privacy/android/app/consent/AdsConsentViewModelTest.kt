@@ -6,10 +6,8 @@ import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.consent.model.AdsConsentState
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -28,7 +26,6 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AdsConsentViewModelTest {
@@ -130,8 +127,7 @@ class AdsConsentViewModelTest {
 
             underTest.state.test {
                 assertThat(awaitItem()).isInstanceOf(AdsConsentState.Loading::class.java)
-                underTest.onLoaded(mock<Activity>())
-                advanceUntilIdle()
+                underTest.onLoaded(mock())
                 val triggeredEvent = awaitItem() as AdsConsentState.Data
                 assertWithMessage("Show consent form is expected to be triggered").that(
                     triggeredEvent.showConsentFormEvent
@@ -140,7 +136,8 @@ class AdsConsentViewModelTest {
                 val actual = awaitItem() as AdsConsentState.Data
                 assertThat(actual.adFeatureDisabled).isEqualTo(consumed)
                 assertThat(actual.adConsentHandledEvent).isEqualTo(consumed)
-                assertWithMessage("Show consent form is expected to be consumed").that(actual.showConsentFormEvent).isEqualTo(consumed)
+                assertWithMessage("Show consent form is expected to be consumed").that(actual.showConsentFormEvent)
+                    .isEqualTo(consumed)
             }
         }
 
@@ -156,7 +153,7 @@ class AdsConsentViewModelTest {
                     awaitCancellation()
                 }
             }
-            underTest.onLoaded(mock<Activity>())
+            underTest.onLoaded(mock())
             underTest.state.test {
                 val initial = awaitItem() as AdsConsentState.Data
                 assertThat(initial.adFeatureDisabled).isEqualTo(consumed)

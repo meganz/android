@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.advertisements
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import mega.privacy.android.domain.repository.AdsRepository
 import javax.inject.Inject
 
@@ -14,5 +15,6 @@ class MonitorGoogleConsentLoadedUseCase @Inject constructor(
      * Invoke
      * @return [Flow] of [Boolean]
      */
-    operator fun invoke(): Flow<Boolean> = adsRepository.monitorGoogleConsentLoaded()
+    operator fun invoke(): Flow<Boolean> =
+        adsRepository.monitorGoogleConsentLoaded().distinctUntilChanged()
 }
