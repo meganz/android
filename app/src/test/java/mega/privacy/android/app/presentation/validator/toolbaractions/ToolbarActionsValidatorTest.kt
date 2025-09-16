@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.validator.toolbaractions.model.SelectedNode
 import mega.privacy.android.app.presentation.validator.toolbaractions.model.SelectedNodeType
 import mega.privacy.android.app.presentation.validator.toolbaractions.model.ToolbarActionsRequest
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.CloudDriveSyncsToolbarActionsModifierItem
 import mega.privacy.android.app.presentation.validator.toolbaractions.modifier.ToolbarActionsModifier
 import mega.privacy.android.app.presentation.validator.toolbaractions.modifier.ToolbarActionsModifierItem
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
@@ -659,7 +660,9 @@ class ToolbarActionsValidatorTest {
     }
 
     private fun newToolbarActionsRequest(
-        modifierItem: ToolbarActionsModifierItem = ToolbarActionsModifierItem.CloudDriveSyncs,
+        modifierItem: ToolbarActionsModifierItem = ToolbarActionsModifierItem.CloudDriveSyncs(
+            item = CloudDriveSyncsToolbarActionsModifierItem()
+        ),
         selectedNodes: List<SelectedNode> = emptyList(),
         totalNodes: Int = 0,
     ) = ToolbarActionsRequest(

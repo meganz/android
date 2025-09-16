@@ -1,11 +1,11 @@
 package mega.privacy.android.app.utils;
 
-import static mega.privacy.android.app.utils.Util.isAndroid11OrUpper;
-
 import android.view.Menu;
 import android.view.MenuItem;
+
 import java.util.Arrays;
 import java.util.List;
+
 import mega.privacy.android.app.R;
 
 public class CloudStorageOptionControlUtil {
@@ -43,6 +43,74 @@ public class CloudStorageOptionControlUtil {
     }
   }
 
+  public static void applyControl(Menu menu, Control control) {
+    menu.findItem(R.id.cab_menu_select_all).setVisible(control.selectAll.visible);
+    menu.findItem(R.id.cab_menu_select_all).setShowAsAction(control.selectAll.showAsAction);
+
+    menu.findItem(R.id.cab_menu_clear_selection).setVisible(control.clearSelection.visible);
+    menu.findItem(R.id.cab_menu_clear_selection)
+        .setShowAsAction(control.clearSelection.showAsAction);
+
+    menu.findItem(R.id.cab_menu_hide).setVisible(control.hide.visible);
+    menu.findItem(R.id.cab_menu_hide).setShowAsAction(control.hide.showAsAction);
+
+    menu.findItem(R.id.cab_menu_unhide).setVisible(control.unhide.visible);
+    menu.findItem(R.id.cab_menu_unhide).setShowAsAction(control.unhide.showAsAction);
+
+    menu.findItem(R.id.cab_menu_remove_link).setVisible(control.removeLink.visible);
+    menu.findItem(R.id.cab_menu_remove_link).setShowAsAction(control.removeLink.showAsAction);
+
+    menu.findItem(R.id.cab_menu_remove_share).setVisible(control.removeShare.visible);
+    menu.findItem(R.id.cab_menu_remove_share).setShowAsAction(control.removeShare.showAsAction);
+
+    menu.findItem(R.id.cab_menu_rename).setVisible(control.rename.visible);
+    menu.findItem(R.id.cab_menu_rename).setShowAsAction(control.rename.showAsAction);
+
+    menu.findItem(R.id.cab_menu_download).setVisible(control.saveToDevice.visible);
+    menu.findItem(R.id.cab_menu_download).setShowAsAction(control.saveToDevice.showAsAction);
+
+    menu.findItem(R.id.cab_menu_share_link).setVisible(control.getLink.visible);
+    menu.findItem(R.id.cab_menu_share_link).setShowAsAction(control.getLink.showAsAction);
+
+    menu.findItem(R.id.cab_menu_edit_link).setVisible(control.manageLink.visible);
+    menu.findItem(R.id.cab_menu_edit_link).setShowAsAction(control.manageLink.showAsAction);
+
+    menu.findItem(R.id.cab_menu_share_folder).setVisible(control.shareFolder.visible);
+    menu.findItem(R.id.cab_menu_share_folder).setShowAsAction(control.shareFolder.showAsAction);
+
+    menu.findItem(R.id.cab_menu_send_to_chat).setVisible(control.sendToChat.visible);
+    menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(control.sendToChat.showAsAction);
+
+    menu.findItem(R.id.cab_menu_share_out).setVisible(control.shareOut.visible);
+    menu.findItem(R.id.cab_menu_share_out).setShowAsAction(control.shareOut.showAsAction);
+
+    menu.findItem(R.id.cab_menu_move).setVisible(control.move.visible);
+    menu.findItem(R.id.cab_menu_move).setShowAsAction(control.move.showAsAction);
+
+    menu.findItem(R.id.cab_menu_copy).setVisible(control.copy.visible);
+    menu.findItem(R.id.cab_menu_copy).setShowAsAction(control.copy.showAsAction);
+
+    menu.findItem(R.id.cab_menu_leave_share).setVisible(control.leaveShare.visible);
+    menu.findItem(R.id.cab_menu_leave_share).setShowAsAction(control.leaveShare.showAsAction);
+
+    menu.findItem(R.id.cab_menu_trash).setVisible(control.trash.visible);
+    menu.findItem(R.id.cab_menu_trash).setShowAsAction(control.trash.showAsAction);
+
+    menu.findItem(R.id.cab_menu_add_favourites).setVisible(control.addFavourites.visible);
+    menu.findItem(R.id.cab_menu_add_favourites).setShowAsAction(control.addFavourites.showAsAction);
+
+    menu.findItem(R.id.cab_menu_remove_favourites).setVisible(control.removeFavourites.visible);
+    menu.findItem(R.id.cab_menu_remove_favourites).setShowAsAction(control.removeFavourites.showAsAction);
+
+    menu.findItem(R.id.cab_menu_dispute).setVisible(control.disputeTakedown.visible);
+    menu.findItem(R.id.cab_menu_dispute).setShowAsAction(control.disputeTakedown.showAsAction);
+
+    menu.findItem(R.id.cab_menu_add_to_album).setVisible(control.addToAlbum.visible);
+    menu.findItem(R.id.cab_menu_add_to).setVisible(control.addTo.visible);
+
+    menu.findItem(R.id.cab_menu_add_label).setVisible(control.addLabel.visible);
+  }
+
   public static class Control {
     private final Option selectAll;
     private final Option clearSelection;
@@ -61,11 +129,13 @@ public class CloudStorageOptionControlUtil {
     private final Option copy;
     private final Option leaveShare;
     private final Option trash;
+    private final Option addFavourites;
     private final Option removeFavourites;
 
     private final Option disputeTakedown;
     private final Option addToAlbum;
     private final Option addTo;
+    private final Option addLabel;
 
     private final List<Option> options;
 
@@ -87,14 +157,16 @@ public class CloudStorageOptionControlUtil {
       copy = new Option(false);
       leaveShare = new Option(false);
       trash = new Option(true);
+      addFavourites = new Option(false);
       removeFavourites = new Option(false);
       disputeTakedown = new Option(false);
       addToAlbum = new Option(false);
       addTo = new Option(false);
+      addLabel = new Option(false);
 
       options = Arrays.asList(
               selectAll, clearSelection, hide, unhide, removeLink, removeShare, rename, saveToDevice, getLink, disputeTakedown,
-              manageLink, shareFolder, sendToChat, shareOut, move, copy, leaveShare, trash, removeFavourites, addToAlbum, addTo);
+              manageLink, shareFolder, sendToChat, shareOut, move, copy, leaveShare, trash, addFavourites, removeFavourites, addToAlbum, addTo, addLabel);
     }
 
     public Option selectAll() {
@@ -165,6 +237,10 @@ public class CloudStorageOptionControlUtil {
       return trash;
     }
 
+    public Option addFavourites() {
+      return addFavourites;
+    }
+
     public Option removeFavourites() {
       return removeFavourites;
     }
@@ -181,6 +257,10 @@ public class CloudStorageOptionControlUtil {
       return addTo;
     }
 
+    public Option addLabel() {
+      return addLabel;
+    }
+
     public int alwaysActionCount() {
       int count = 0;
       for (Option option : options) {
@@ -190,68 +270,5 @@ public class CloudStorageOptionControlUtil {
       }
       return count;
     }
-  }
-
-  public static void applyControl(Menu menu, Control control) {
-    menu.findItem(R.id.cab_menu_select_all).setVisible(control.selectAll.visible);
-    menu.findItem(R.id.cab_menu_select_all).setShowAsAction(control.selectAll.showAsAction);
-
-    menu.findItem(R.id.cab_menu_clear_selection).setVisible(control.clearSelection.visible);
-    menu.findItem(R.id.cab_menu_clear_selection)
-        .setShowAsAction(control.clearSelection.showAsAction);
-
-    menu.findItem(R.id.cab_menu_hide).setVisible(control.hide.visible);
-    menu.findItem(R.id.cab_menu_hide).setShowAsAction(control.hide.showAsAction);
-
-    menu.findItem(R.id.cab_menu_unhide).setVisible(control.unhide.visible);
-    menu.findItem(R.id.cab_menu_unhide).setShowAsAction(control.unhide.showAsAction);
-
-    menu.findItem(R.id.cab_menu_remove_link).setVisible(control.removeLink.visible);
-    menu.findItem(R.id.cab_menu_remove_link).setShowAsAction(control.removeLink.showAsAction);
-
-    menu.findItem(R.id.cab_menu_remove_share).setVisible(control.removeShare.visible);
-    menu.findItem(R.id.cab_menu_remove_share).setShowAsAction(control.removeShare.showAsAction);
-
-    menu.findItem(R.id.cab_menu_rename).setVisible(control.rename.visible);
-    menu.findItem(R.id.cab_menu_rename).setShowAsAction(control.rename.showAsAction);
-
-    menu.findItem(R.id.cab_menu_download).setVisible(control.saveToDevice.visible);
-    menu.findItem(R.id.cab_menu_download).setShowAsAction(control.saveToDevice.showAsAction);
-
-    menu.findItem(R.id.cab_menu_share_link).setVisible(control.getLink.visible);
-    menu.findItem(R.id.cab_menu_share_link).setShowAsAction(control.getLink.showAsAction);
-
-    menu.findItem(R.id.cab_menu_edit_link).setVisible(control.manageLink.visible);
-    menu.findItem(R.id.cab_menu_edit_link).setShowAsAction(control.manageLink.showAsAction);
-
-    menu.findItem(R.id.cab_menu_share_folder).setVisible(control.shareFolder.visible);
-    menu.findItem(R.id.cab_menu_share_folder).setShowAsAction(control.shareFolder.showAsAction);
-
-    menu.findItem(R.id.cab_menu_send_to_chat).setVisible(control.sendToChat.visible);
-    menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(control.sendToChat.showAsAction);
-
-    menu.findItem(R.id.cab_menu_share_out).setVisible(control.shareOut.visible);
-    menu.findItem(R.id.cab_menu_share_out).setShowAsAction(control.shareOut.showAsAction);
-
-    menu.findItem(R.id.cab_menu_move).setVisible(control.move.visible);
-    menu.findItem(R.id.cab_menu_move).setShowAsAction(control.move.showAsAction);
-
-    menu.findItem(R.id.cab_menu_copy).setVisible(control.copy.visible);
-    menu.findItem(R.id.cab_menu_copy).setShowAsAction(control.copy.showAsAction);
-
-    menu.findItem(R.id.cab_menu_leave_share).setVisible(control.leaveShare.visible);
-    menu.findItem(R.id.cab_menu_leave_share).setShowAsAction(control.leaveShare.showAsAction);
-
-    menu.findItem(R.id.cab_menu_trash).setVisible(control.trash.visible);
-    menu.findItem(R.id.cab_menu_trash).setShowAsAction(control.trash.showAsAction);
-
-    menu.findItem(R.id.cab_menu_remove_favourites).setVisible(control.removeFavourites.visible);
-    menu.findItem(R.id.cab_menu_remove_favourites).setShowAsAction(control.removeFavourites.showAsAction);
-
-    menu.findItem(R.id.cab_menu_dispute).setVisible(control.disputeTakedown.visible);
-    menu.findItem(R.id.cab_menu_dispute).setShowAsAction(control.disputeTakedown.showAsAction);
-
-    menu.findItem(R.id.cab_menu_add_to_album).setVisible(control.addToAlbum.visible);
-    menu.findItem(R.id.cab_menu_add_to).setVisible(control.addTo.visible);
   }
 }
