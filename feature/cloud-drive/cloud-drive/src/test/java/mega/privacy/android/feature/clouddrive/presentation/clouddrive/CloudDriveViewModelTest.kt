@@ -42,7 +42,6 @@ import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
-import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
@@ -83,7 +82,6 @@ class CloudDriveViewModelTest {
     private val nodeUiItemMapper: NodeUiItemMapper = mock()
     private val scannerHandler: ScannerHandler = mock()
     private val getRootNodeIdUseCase: GetRootNodeIdUseCase = mock()
-    private val containsMediaItemUseCase: ContainsMediaItemUseCase = mock()
     private val getCloudSortOrderUseCase: GetCloudSortOrder = mock()
     private val setCloudSortOrderUseCase: SetCloudSortOrder = mock()
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = mock()
@@ -115,7 +113,6 @@ class CloudDriveViewModelTest {
             nodeUiItemMapper,
             scannerHandler,
             getRootNodeIdUseCase,
-            containsMediaItemUseCase,
             getCloudSortOrderUseCase,
             setCloudSortOrderUseCase,
             nodeSortConfigurationUiMapper
@@ -136,7 +133,6 @@ class CloudDriveViewModelTest {
         scannerHandler = scannerHandler,
         getRootNodeIdUseCase = getRootNodeIdUseCase,
         getNodesByIdInChunkUseCase = getNodesByIdInChunkUseCase,
-        containsMediaItemUseCase = containsMediaItemUseCase,
         getCloudSortOrderUseCase = getCloudSortOrderUseCase,
         setCloudSortOrderUseCase = setCloudSortOrderUseCase,
         nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
@@ -1902,193 +1898,6 @@ class CloudDriveViewModelTest {
             assertThat(finalState.showHiddenNodes).isFalse() // Default value
         }
     }
-
-    @Test
-    fun `test that hasMediaItems is true when containsMediaItemUseCase returns true`() = runTest {
-        val node1 = mock<TypedNode> {
-            on { id } doReturn NodeId(1L)
-            on { name } doReturn "Test Node 1"
-        }
-        val node2 = mock<TypedNode> {
-            on { id } doReturn NodeId(2L)
-            on { name } doReturn "Test Node 2"
-        }
-
-        setupTestData(listOf(node1, node2))
-        whenever(containsMediaItemUseCase(listOf(node1, node2))).thenReturn(true)
-
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem() // Initial state
-            val loadedState = awaitItem() // State after nodes are loaded
-
-            assertThat(loadedState.hasMediaItems).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that hasMediaItems is false when containsMediaItemUseCase returns false`() = runTest {
-        val node1 = mock<TypedNode> {
-            on { id } doReturn NodeId(1L)
-            on { name } doReturn "Test Node 1"
-        }
-        val node2 = mock<TypedNode> {
-            on { id } doReturn NodeId(2L)
-            on { name } doReturn "Test Node 2"
-        }
-
-        setupTestData(listOf(node1, node2))
-        whenever(containsMediaItemUseCase(listOf(node1, node2))).thenReturn(false)
-
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem() // Initial state
-            val loadedState = awaitItem() // State after nodes are loaded
-
-            assertThat(loadedState.hasMediaItems).isFalse()
-        }
-    }
-
-    @Test
-    fun `test that hasMediaItems is false when no nodes are present`() = runTest {
-        setupTestData(emptyList())
-        whenever(containsMediaItemUseCase(emptyList())).thenReturn(false)
-
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem() // Initial state
-            val loadedState = awaitItem() // State after nodes are loaded
-
-            assertThat(loadedState.hasMediaItems).isFalse()
-        }
-    }
-
-    @Test
-    fun `test that hasMediaItems is true when containsMediaItemUseCase returns true for single node`() =
-        runTest {
-            val node1 = mock<TypedNode> {
-                on { id } doReturn NodeId(1L)
-                on { name } doReturn "Test Node 1"
-            }
-
-            setupTestData(listOf(node1))
-            whenever(containsMediaItemUseCase(listOf(node1))).thenReturn(true)
-
-            val underTest = createViewModel()
-
-            underTest.uiState.test {
-                awaitItem() // Initial state
-                val loadedState = awaitItem() // State after nodes are loaded
-
-                assertThat(loadedState.hasMediaItems).isTrue()
-            }
-        }
-
-    @Test
-    fun `test that hasMediaItems state persists when nodes are updated`() = runTest {
-        val node1 = mock<TypedNode> {
-            on { id } doReturn NodeId(1L)
-            on { name } doReturn "Test Node 1"
-        }
-        val node2 = mock<TypedNode> {
-            on { id } doReturn NodeId(2L)
-            on { name } doReturn "Test Node 2"
-        }
-
-        setupTestData(listOf(node1, node2))
-        whenever(containsMediaItemUseCase(listOf(node1, node2))).thenReturn(true)
-
-        // Override the monitorNodeUpdatesByIdUseCase to emit NodeChanges.Attributes
-        whenever(monitorNodeUpdatesByIdUseCase(folderNodeId)).thenReturn(flowOf(NodeChanges.Attributes))
-
-        // Ensure that getFileBrowserNodeChildrenUseCase is mocked for the node update scenario
-        whenever(getFileBrowserNodeChildrenUseCase(folderNodeHandle)).thenReturn(
-            listOf(node1, node2)
-        )
-
-        // Ensure that nodeUiItemMapper is mocked for the node update scenario
-        val updatedNodeUiItems = listOf(
-            NodeUiItem(node = node1, isSelected = false),
-            NodeUiItem(node = node2, isSelected = false)
-        )
-        whenever(
-            nodeUiItemMapper(
-                nodeList = listOf(node1, node2),
-                existingItems = listOf(
-                    NodeUiItem(node = node1, isSelected = false),
-                    NodeUiItem(node = node2, isSelected = false)
-                ),
-                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
-                isPublicNodes = false,
-                showPublicLinkCreationTime = false,
-                highlightedNodeId = null,
-                highlightedNames = null,
-                isContactVerificationOn = false,
-            )
-        ).thenReturn(updatedNodeUiItems)
-
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem() // Initial state
-            val loadedState = awaitItem() // State after initial load
-            assertThat(loadedState.hasMediaItems).isTrue()
-
-            val updatedState = awaitItem() // State after node update
-            assertThat(updatedState.hasMediaItems).isTrue() // Should persist
-        }
-    }
-
-    @Test
-    fun `test that hasMediaItems is updated when nodes change`() = runTest {
-        val node1 = mock<TypedNode> {
-            on { id } doReturn NodeId(1L)
-            on { name } doReturn "Test Node 1"
-        }
-
-        setupTestData(listOf(node1))
-        whenever(containsMediaItemUseCase(listOf(node1))).thenReturn(false)
-
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem() // Initial state
-            val loadedState = awaitItem() // State after nodes are loaded
-            assertThat(loadedState.hasMediaItems).isFalse()
-            assertThat(loadedState.nodesLoadingState).isEqualTo(NodesLoadingState.FullyLoaded)
-
-            // Wait for hidden nodes loading to complete
-            val finalLoadedState = awaitItem() // State after hidden nodes loading
-            assertThat(finalLoadedState.isHiddenNodeSettingsLoading).isFalse()
-            assertThat(finalLoadedState.isLoading).isFalse()
-            assertThat(finalLoadedState.hasMediaItems).isFalse()
-        }
-    }
-
-    @Test
-    fun `test that hasMediaItems is false initially and remains false when no media items are found`() =
-        runTest {
-            val node1 = mock<TypedNode> {
-                on { id } doReturn NodeId(1L)
-                on { name } doReturn "Test Node 1"
-            }
-
-            setupTestData(listOf(node1))
-            whenever(containsMediaItemUseCase(listOf(node1))).thenReturn(false)
-
-            val underTest = createViewModel()
-
-            underTest.uiState.test {
-                val initialState = awaitItem()
-                assertThat(initialState.hasMediaItems).isFalse()
-
-                val loadedState = awaitItem()
-                assertThat(loadedState.hasMediaItems).isFalse()
-            }
-        }
 
     @Test
     fun `test that getCloudSortOrder updates selectedSort in UI state on success`() = runTest {

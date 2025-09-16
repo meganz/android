@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.usecase.node
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -27,10 +29,14 @@ class GetNodesByIdInChunkUseCase @Inject constructor(
     suspend operator fun invoke(
         nodeId: NodeId,
         initialBatchSize: Int = 1000,
-    ): Flow<Pair<List<TypedNode>, Boolean>> = nodeRepository.getNodeChildrenInChunks(
-        nodeId = nodeId,
-        order = getCloudSortOrder(),
-        initialBatchSize = initialBatchSize,
-        folderTypeData = getFolderTypeDataUseCase(),
-    )
+    ): Flow<Pair<List<TypedNode>, Boolean>> = coroutineScope {
+        val sortOrderDiffer = async { getCloudSortOrder() }
+        val folderTypeDataDiffer = async { getFolderTypeDataUseCase() }
+        nodeRepository.getNodeChildrenInChunks(
+            nodeId = nodeId,
+            order = sortOrderDiffer.await(),
+            initialBatchSize = initialBatchSize,
+            folderTypeData = folderTypeDataDiffer.await(),
+        )
+    }
 }

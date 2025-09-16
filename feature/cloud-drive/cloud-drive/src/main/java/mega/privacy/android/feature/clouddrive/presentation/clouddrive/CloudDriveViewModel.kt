@@ -39,7 +39,6 @@ import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
-import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
@@ -68,7 +67,6 @@ class CloudDriveViewModel @Inject constructor(
     private val scannerHandler: ScannerHandler,
     private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
     private val getNodesByIdInChunkUseCase: GetNodesByIdInChunkUseCase,
-    private val containsMediaItemUseCase: ContainsMediaItemUseCase,
     private val getCloudSortOrderUseCase: GetCloudSortOrder,
     private val setCloudSortOrderUseCase: SetCloudSortOrder,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
@@ -132,18 +130,15 @@ class CloudDriveViewModel @Inject constructor(
                         highlightedNames = highlightedNodeNames,
                         existingItems = uiState.value.items,
                     )
-                    val loadingState = when {
-                        hasMore -> NodesLoadingState.PartiallyLoaded
-                        else -> NodesLoadingState.FullyLoaded
-                    }
-                    val hasMediaItems =
-                        uiState.value.hasMediaItems || containsMediaItemUseCase(nodes)
                     _uiState.update { state ->
                         state.copy(
                             items = nodeUiItems,
-                            nodesLoadingState = loadingState,
+                            nodesLoadingState = if (hasMore) {
+                                NodesLoadingState.PartiallyLoaded
+                            } else {
+                                NodesLoadingState.FullyLoaded
+                            },
                             currentFolderId = folderOrRootNodeId,
-                            hasMediaItems = hasMediaItems
                         )
                     }
                 }
@@ -215,7 +210,6 @@ class CloudDriveViewModel @Inject constructor(
         val folderId = uiState.value.currentFolderId
         runCatching {
             val nodes = getFileBrowserNodeChildrenUseCase(folderId.longValue)
-            val hasMediaItems = containsMediaItemUseCase(nodes)
             val nodeUiItems = nodeUiItemMapper(
                 nodeList = nodes,
                 nodeSourceType = nodeSourceType,
@@ -227,7 +221,6 @@ class CloudDriveViewModel @Inject constructor(
                 state.copy(
                     items = nodeUiItems,
                     nodesLoadingState = NodesLoadingState.FullyLoaded,
-                    hasMediaItems = hasMediaItems
                 )
             }
         }.onFailure {

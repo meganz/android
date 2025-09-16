@@ -34,7 +34,7 @@ import kotlinx.coroutines.sync.withPermit
  * val limitedResults = listOf("a", "b", "c").mapAsync(ConcurrencyStrategy.ParallelWithLimit(5)) { processElement(it) }
  *
  * // Chunked processing with parallel chunks
- * val parallelChunked = listOf("a", "b", "c").mapAsync(ConcurrencyStrategy.ChunkedParallel(100)) { processElement(it) }
+ * val parallelChunked = listOf("a", "b", "c").mapAsync(ConcurrencyStrategy.ChunkedParallel(Chunk.Count(10)) { processElement(it) }
  *
  * // Chunked processing with sequential chunks but parallel elements
  * val sequentialChunked = listOf("a", "b", "c").mapAsync(ConcurrencyStrategy.ChunkedSequential(100)) { processElement(it) }
@@ -79,7 +79,17 @@ suspend fun <T, R> Iterable<T>.mapAsync(
         strategy is ConcurrencyStrategy.ChunkedParallel -> {
             // Process chunks in parallel, then join sequentially
             coroutineScope {
-                chunked(strategy.chunkSize).map { chunk ->
+                val targetChunkSize = when (strategy.chunk) {
+                    is Chunk.Size -> strategy.chunk.value
+
+                    is Chunk.Count -> if (strategy.chunk.value <= 0 || strategy.chunk.value > count) {
+                        count
+                    } else {
+                        (count + strategy.chunk.value - 1) / strategy.chunk.value // Ceiling division
+                    }
+                }.coerceAtLeast(1)
+
+                chunked(targetChunkSize).map { chunk ->
                     async {
                         chunk.map { element ->
                             transformation(element)
@@ -177,9 +187,9 @@ sealed class ConcurrencyStrategy {
      *
      * Execution pattern: All chunks start processing simultaneously, results are collected when all complete.
      *
-     * @param chunkSize Size of each chunk to process
+     * @param chunk Size of each chunk, or number of chunks to process
      */
-    data class ChunkedParallel(val chunkSize: Int) : ConcurrencyStrategy()
+    data class ChunkedParallel(val chunk: Chunk) : ConcurrencyStrategy()
 
     /**
      * Process chunks sequentially, but elements within each chunk in parallel.
@@ -209,4 +219,14 @@ sealed class ConcurrencyStrategy {
     data class DynamicChunked(val limit: Int) : ConcurrencyStrategy()
 }
 
+/**
+ * Defines how to determine chunk sizes for chunked processing strategies.
+ *
+ * - [Count]: Specifies the number of chunks to divide the collection into.
+ * - [Size]: Specifies the size of each chunk.
+ */
+sealed interface Chunk {
+    data class Count(val value: Int) : Chunk
+    data class Size(val value: Int) : Chunk
+}
 

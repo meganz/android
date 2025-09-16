@@ -21,6 +21,8 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.toDuration
+import mega.privacy.android.domain.extension.Chunk
+import mega.privacy.android.domain.extension.ConcurrencyStrategy
 import mega.privacy.android.domain.extension.mapAsync
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import javax.inject.Inject
@@ -65,7 +67,11 @@ class NodeUiItemMapper @Inject constructor(
                 }
             }
         }
-        nodeList.mapAsync { node ->
+        nodeList.mapAsync(
+            ConcurrencyStrategy.ChunkedParallel(
+                Chunk.Count(if (nodeList.size <= 1000) 10 else 50)
+            )
+        ) { node ->
             val isHighlighted = node.id == highlightedNodeId ||
                     highlightedNamesSet?.contains(node.name) == true
             val duration = if (node is TypedFileNode) {

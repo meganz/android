@@ -70,6 +70,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.SynchronisationException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
+import mega.privacy.android.domain.extension.Chunk
 import mega.privacy.android.domain.extension.ConcurrencyStrategy
 import mega.privacy.android.domain.extension.mapAsync
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -1285,7 +1286,7 @@ internal class NodeRepositoryImpl @Inject constructor(
         // Emit initial batch immediately
         val initialNodes = allChildren
             .take(initialBatchSize)
-            .mapAsync(ConcurrencyStrategy.Parallel) { megaNode ->
+            .mapAsync(ConcurrencyStrategy.ChunkedParallel(Chunk.Count(40))) { megaNode ->
                 typedNodeMapper(
                     megaNode = megaNode,
                     folderTypeData = folderTypeData,
@@ -1299,7 +1300,7 @@ internal class NodeRepositoryImpl @Inject constructor(
             // Process remaining nodes in chunks
             val remainingNodes = allChildren
                 .drop(initialBatchSize)
-                .mapAsync(ConcurrencyStrategy.ChunkedSequential(2000)) { megaNode ->
+                .mapAsync(ConcurrencyStrategy.ChunkedParallel(Chunk.Count(40))) { megaNode ->
                     typedNodeMapper(
                         megaNode = megaNode,
                         folderTypeData = folderTypeData,
