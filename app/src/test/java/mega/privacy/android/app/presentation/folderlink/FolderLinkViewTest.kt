@@ -71,7 +71,6 @@ class FolderLinkViewTest {
                 onDisputeTakeDownClicked = { },
                 onEnterMediaDiscoveryClick = { },
                 fileTypeIconMapper = FileTypeIconMapper(),
-                onTransferWidgetClick = { },
                 request = null
             )
         }

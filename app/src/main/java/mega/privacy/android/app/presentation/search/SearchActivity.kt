@@ -230,7 +230,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                         scaffoldState = scaffoldState,
                         floatingActionButton = {
                             TransfersWidget(
-                                onOpenTransferSection = { transfersWidgetClicked() },
                                 modifier = Modifier
                                     .navigationBarsPadding()
                                     .testTag(SEARCH_SCREEN_TRANSFERS_WIDGET_TEST_TAG)
@@ -646,11 +645,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                 }
             )
         }
-    }
-
-    private fun transfersWidgetClicked() {
-        megaNavigator.openTransfers(this@SearchActivity)
-        finish()
     }
 }
 

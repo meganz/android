@@ -132,7 +132,6 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                     scaffoldState = scaffoldState,
                                     onOpenAlbum = ::openAlbum,
                                     onOpenImagePreviewScreen = ::openImagePreview,
-                                    onOpenTransfersScreen = ::openTransfersScreen,
                                     onShowMoreMenu = { nodeId ->
                                         val route =
                                             "$nodeBottomSheetRoute/${nodeId.longValue}/${NodeSourceType.OTHER.name}"
@@ -262,10 +261,6 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
         }
         setResult(RESULT_OK, data)
         finish()
-    }
-
-    private fun openTransfersScreen() {
-        megaNavigator.openTransfers(this@PhotosSearchActivity)
     }
 
     private fun handleNodesNameCollisionResult(result: NodeNameCollisionsResult) {

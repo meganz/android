@@ -121,7 +121,6 @@ internal fun FolderLinkView(
     onLinkClicked: (String) -> Unit,
     onDisputeTakeDownClicked: (String) -> Unit,
     onEnterMediaDiscoveryClick: () -> Unit,
-    onTransferWidgetClick: () -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
     request: AdManagerAdRequest?,
 ) {
@@ -206,9 +205,7 @@ internal fun FolderLinkView(
                 }
             },
             floatingActionButton = {
-                TransfersWidget(
-                    onOpenTransferSection = onTransferWidgetClick
-                )
+                TransfersWidget()
             },
             bottomBar = {
                 Column(modifier = Modifier.fillMaxWidth()) {

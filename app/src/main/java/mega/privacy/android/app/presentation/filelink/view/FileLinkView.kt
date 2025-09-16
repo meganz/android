@@ -78,7 +78,6 @@ internal fun FileLinkView(
     onPreviewClick: () -> Unit,
     onSaveToDeviceClicked: () -> Unit,
     onImportClicked: () -> Unit,
-    onTransferWidgetClick: () -> Unit,
     onErrorMessageConsumed: () -> Unit,
     onOverQuotaErrorConsumed: () -> Unit,
     onForeignNodeErrorConsumed: () -> Unit,
@@ -154,9 +153,7 @@ internal fun FileLinkView(
             }
         },
         floatingActionButton = {
-            TransfersWidget(
-                onOpenTransferSection = onTransferWidgetClick,
-            )
+            TransfersWidget()
         },
         headerSpacerHeight = if (viewState.errorState == LinkErrorState.NoError && !viewState.isLoading) {
             if (viewState.iconResource != null) (MAX_HEADER_HEIGHT + APP_BAR_HEIGHT).dp else MAX_HEADER_HEIGHT.dp
@@ -367,7 +364,6 @@ private fun PreviewFileLinkView() {
             onPreviewClick = {},
             onSaveToDeviceClicked = {},
             onImportClicked = {},
-            onTransferWidgetClick = {},
             onErrorMessageConsumed = {},
             onOverQuotaErrorConsumed = {},
             onForeignNodeErrorConsumed = {},

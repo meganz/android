@@ -80,7 +80,6 @@ internal fun PhotosSearchScreen(
     scaffoldState: ScaffoldState,
     onOpenAlbum: (Album) -> Unit,
     onOpenImagePreviewScreen: (Photo) -> Unit,
-    onOpenTransfersScreen: () -> Unit,
     onShowMoreMenu: (NodeId) -> Unit,
     onCloseScreen: () -> Unit,
 ) {
@@ -101,7 +100,6 @@ internal fun PhotosSearchScreen(
         },
         floatingActionButton = {
             TransfersWidget(
-                onOpenTransferSection = { onOpenTransfersScreen() },
                 modifier = Modifier.navigationBarsPadding(),
             )
         },

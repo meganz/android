@@ -76,12 +76,6 @@ class FileLinkComposeActivity : PasscodeActivity(),
     lateinit var megaNavigator: MegaNavigator
 
     /**
-     * [MegaNavigator]
-     */
-    @Inject
-    lateinit var navigator: MegaNavigator
-
-    /**
      * [GoogleAdsManager]
      */
     @Inject
@@ -156,7 +150,6 @@ class FileLinkComposeActivity : PasscodeActivity(),
                     onPreviewClick = ::onPreviewClick,
                     onSaveToDeviceClicked = viewModel::handleSaveFile,
                     onImportClicked = ::onImportClicked,
-                    onTransferWidgetClick = ::onTransfersWidgetClick,
                     onErrorMessageConsumed = viewModel::resetErrorMessage,
                     onOverQuotaErrorConsumed = viewModel::resetOverQuotaError,
                     onForeignNodeErrorConsumed = viewModel::resetForeignNodeError,
@@ -230,23 +223,6 @@ class FileLinkComposeActivity : PasscodeActivity(),
 
     private fun onShareClicked() {
         MegaNodeUtil.shareLink(this, viewModel.state.value.url, viewModel.state.value.title)
-    }
-
-    /**
-     * Handle widget click
-     */
-    private fun onTransfersWidgetClick() {
-        lifecycleScope.launch {
-            val credentials = runCatching { getAccountCredentialsUseCase() }.getOrNull()
-            if (megaApi.isLoggedIn == 0 || credentials == null) {
-                Timber.w("Not logged in, no action.")
-                return@launch
-            }
-
-            navigator.openTransfers(this@FileLinkComposeActivity)
-
-            finish()
-        }
     }
 
     /**

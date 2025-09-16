@@ -3,7 +3,8 @@ package mega.privacy.android.app.presentation.transfers.widget
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +15,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
 import mega.privacy.android.domain.entity.TransfersStatusInfo
 import mega.privacy.android.domain.extension.skipUnstable
-import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorLastTransfersHaveBeenCancelledUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersStatusUseCase
@@ -33,12 +34,12 @@ import kotlin.time.Duration.Companion.milliseconds
 @HiltViewModel
 class TransfersWidgetViewModel @Inject constructor(
     private val transfersInfoMapper: TransfersInfoMapper,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     monitorTransfersStatusUseCase: MonitorTransfersStatusUseCase,
     monitorLastTransfersHaveBeenCancelledUseCase: MonitorLastTransfersHaveBeenCancelledUseCase,
     private val monitorTransferInErrorStatusUseCase: MonitorTransferInErrorStatusUseCase,
     private val samplePeriod: Long?,
+    private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(TransfersWidgetUiState())
 
@@ -48,7 +49,7 @@ class TransfersWidgetViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     init {
-        viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch {
             val samplePeriodFinal = samplePeriod ?: DEFAULT_SAMPLE_PERIOD
             if (samplePeriodFinal > 0) {
                 monitorTransfersStatusUseCase().sample(samplePeriodFinal)
@@ -60,7 +61,7 @@ class TransfersWidgetViewModel @Inject constructor(
                     updateUiState(transfersInfo)
                 }
         }
-        viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch {
             monitorLastTransfersHaveBeenCancelledUseCase()
                 .catch { Timber.e(it) }
                 .collect {
@@ -69,7 +70,7 @@ class TransfersWidgetViewModel @Inject constructor(
                     }
                 }
         }
-        viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch {
             monitorConnectivityUseCase()
                 .skipUnstable(waitTimeToShowOffline) { it }
                 .catch { Timber.e(it) }
@@ -82,8 +83,27 @@ class TransfersWidgetViewModel @Inject constructor(
         monitorFailedTransfers()
     }
 
+    /**
+     * Trigger the event to open the transfers section if the user is logged in, do nothing otherwise
+     */
+    fun openTransfers() {
+        viewModelScope.launch {
+            if (isUserLoggedInUseCase()) {
+                _state.update { it.copy(openTransfersSectionEvent = triggered) }
+            }
+        }
+    }
+
+    /**
+     * Consume the event to open the transfers section
+     */
+    fun onConsumeOpenTransfersSectionEvent() {
+        _state.update { it.copy(openTransfersSectionEvent = consumed) }
+    }
+
+
     private fun monitorFailedTransfers() {
-        viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch {
             monitorTransferInErrorStatusUseCase().collect { isInErrorStatus ->
                 if (isInErrorStatus != _state.value.isTransferError) {
                     _state.update { state ->

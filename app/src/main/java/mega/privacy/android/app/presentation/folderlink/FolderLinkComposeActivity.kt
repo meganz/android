@@ -232,7 +232,6 @@ class FolderLinkComposeActivity : PasscodeActivity(),
                 onDisputeTakeDownClicked = this::launchUrl,
                 onLinkClicked = this::launchUrl,
                 onEnterMediaDiscoveryClick = ::onEnterMediaDiscoveryClick,
-                onTransferWidgetClick = ::onTransfersWidgetClick,
                 fileTypeIconMapper = fileTypeIconMapper,
                 request = request
             )
@@ -415,23 +414,6 @@ class FolderLinkComposeActivity : PasscodeActivity(),
                     viewModel.openOtherTypeFile(this, fileNode)
                 }
             }
-        }
-    }
-
-    /**
-     * Handle widget click
-     */
-    private fun onTransfersWidgetClick() {
-        lifecycleScope.launch {
-            val credentials = runCatching { getAccountCredentialsUseCase() }.getOrNull()
-            if (megaApi.isLoggedIn == 0 || credentials == null) {
-                Timber.w("Not logged in, no action.")
-                return@launch
-            }
-
-            megaNavigator.openTransfers(this@FolderLinkComposeActivity)
-
-            finish()
         }
     }
 

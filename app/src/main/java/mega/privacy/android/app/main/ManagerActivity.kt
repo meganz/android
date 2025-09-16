@@ -943,9 +943,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         initialiseViews()
         addStartTransferView()
         addNodeAttachmentView()
-        transfersWidget.setTransfersWidgetContent(
-            onOpenTransferSection = this::onTransfersWidgetClick
-        )
+        transfersWidget.setTransfersWidgetContent()
         setInitialViewProperties()
         setViewListeners()
     }
@@ -1397,10 +1395,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
     override fun removeDrawerListener(listener: DrawerLayout.DrawerListener) {
         drawerLayout.removeDrawerListener(listener)
-    }
-
-    private fun onTransfersWidgetClick() {
-        megaNavigator.openTransfers(this@ManagerActivity)
     }
 
     private fun initialiseChatBadgeView() {

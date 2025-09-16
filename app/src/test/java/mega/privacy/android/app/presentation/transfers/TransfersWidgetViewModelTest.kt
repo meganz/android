@@ -2,29 +2,25 @@ package mega.privacy.android.app.presentation.transfers
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.presentation.transfers.widget.TransfersWidgetViewModel.Companion.waitTimeToShowOffline
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
 import mega.privacy.android.app.presentation.transfers.widget.TransfersWidgetViewModel
+import mega.privacy.android.app.presentation.transfers.widget.TransfersWidgetViewModel.Companion.waitTimeToShowOffline
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.TransfersStatusInfo
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorLastTransfersHaveBeenCancelledUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersStatusUseCase
 import mega.privacy.android.domain.usecase.transfers.errorstatus.MonitorTransferInErrorStatusUseCase
 import mega.privacy.android.shared.original.core.ui.model.TransfersInfo
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -39,14 +35,12 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
+
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TransfersWidgetViewModelTest {
     private lateinit var underTest: TransfersWidgetViewModel
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
     private val transfersInfoMapper = mock<TransfersInfoMapper>()
     private val monitorLastTransfersHaveBeenCancelledUseCase =
         mock<MonitorLastTransfersHaveBeenCancelledUseCase>()
@@ -56,10 +50,10 @@ class TransfersWidgetViewModelTest {
     private var monitorConnectivityUseCaseFlow = MutableStateFlow(false)
     private val monitorLastTransfersHaveBeenCancelledUseCaseFlow = MutableSharedFlow<Unit>()
     private val monitorTransferInErrorStatusUseCase = mock<MonitorTransferInErrorStatusUseCase>()
+    private val isUserLoggedInUseCase = mock<IsUserLoggedInUseCase>()
 
     @BeforeAll
     fun setup() = runTest {
-        Dispatchers.setMain(ioDispatcher)
         commonStub()
         initTest()
     }
@@ -70,12 +64,12 @@ class TransfersWidgetViewModelTest {
         whenever(monitorTransfersStatusUseCase()) doReturn monitorTransfersStatusFlow
         underTest = TransfersWidgetViewModel(
             transfersInfoMapper = transfersInfoMapper,
-            ioDispatcher = ioDispatcher,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             monitorTransfersStatusUseCase = monitorTransfersStatusUseCase,
             monitorLastTransfersHaveBeenCancelledUseCase = monitorLastTransfersHaveBeenCancelledUseCase,
             monitorTransferInErrorStatusUseCase = monitorTransferInErrorStatusUseCase,
             samplePeriod = 0L,
+            isUserLoggedInUseCase = isUserLoggedInUseCase,
         )
     }
 
@@ -85,13 +79,9 @@ class TransfersWidgetViewModelTest {
             transfersInfoMapper,
             monitorConnectivityUseCase,
             monitorLastTransfersHaveBeenCancelledUseCase,
+            isUserLoggedInUseCase,
         )
         commonStub()
-    }
-
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @Test
@@ -251,6 +241,43 @@ class TransfersWidgetViewModelTest {
                 expectNoEvents()
             }
         }
+
+    @Test
+    fun `test that openTransfers invokes navigator correctly when the user is logged in`() =
+        runTest {
+            whenever(isUserLoggedInUseCase()) doReturn true
+
+            underTest.state.test {
+                awaitItem()
+                underTest.openTransfers()
+                assertThat(awaitItem().openTransfersSectionEvent).isEqualTo(triggered)
+            }
+        }
+
+    @Test
+    fun `test that openTransfers does not invoke navigator when the user is not logged in`() =
+        runTest {
+            whenever(isUserLoggedInUseCase()) doReturn false
+
+            underTest.state.test {
+                awaitItem()
+                underTest.openTransfers()
+                expectNoEvents()
+            }
+        }
+
+    @Test
+    fun `test that consume event works correctly`() = runTest {
+        whenever(isUserLoggedInUseCase()) doReturn true
+
+        underTest.state.test {
+            awaitItem()
+            underTest.openTransfers()
+            assertThat(awaitItem().openTransfersSectionEvent).isEqualTo(triggered)
+            underTest.onConsumeOpenTransfersSectionEvent()
+            assertThat(awaitItem().openTransfersSectionEvent).isEqualTo(consumed)
+        }
+    }
 
     private fun commonStub() {
         monitorConnectivityUseCaseFlow = MutableStateFlow(true)
