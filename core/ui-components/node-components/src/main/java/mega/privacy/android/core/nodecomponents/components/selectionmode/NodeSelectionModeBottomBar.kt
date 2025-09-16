@@ -34,6 +34,7 @@ fun NodeSelectionModeBottomBar(
     visible: Boolean,
     nodeActionHandler: NodeActionHandler,
     selectedNodes: List<TypedNode>,
+    isSelecting: Boolean,
     modifier: Modifier = Modifier,
     viewModel: NodeSelectionModeBottomBarViewModel = hiltViewModel(),
     onActionPressed: (TopAppBarAction) -> Unit = {},
@@ -57,6 +58,7 @@ fun NodeSelectionModeBottomBar(
             MegaFloatingToolbar(
                 modifier = Modifier.align(Alignment.BottomCenter),
                 actions = visibleActions,
+                actionsEnabled = !isSelecting,
                 onActionPressed = { action ->
                     onActionPressed(action)
 
