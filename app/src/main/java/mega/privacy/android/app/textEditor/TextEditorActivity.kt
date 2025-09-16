@@ -645,6 +645,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                     menu.findItem(R.id.action_unhide)?.isVisible = shouldShowUnhideNode
 
                     menu.findItem(R.id.action_save).isVisible = false
+                    menu.findItem(R.id.action_share).isVisible = isNotInShare
                 }
             }
         } else {
