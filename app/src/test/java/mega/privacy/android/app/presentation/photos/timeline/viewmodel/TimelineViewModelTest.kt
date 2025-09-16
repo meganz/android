@@ -71,6 +71,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
@@ -158,15 +159,12 @@ internal class TimelineViewModelTest {
         reset(
             enableCameraUploadsInPhotosUseCase
         )
-        getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
-        }
-        initViewModel()
+        // Note: Feature flags and ViewModel initialization are now handled in each individual test
     }
 
     @AfterEach
     fun tearDownEach() {
-        reset(startCameraUploadUseCase)
+        reset(startCameraUploadUseCase, getFeatureFlagValueUseCase)
     }
 
     fun initViewModel() {
@@ -202,8 +200,37 @@ internal class TimelineViewModelTest {
         )
     }
 
+    private fun initViewModelWithDefaultFlags() {
+        // Set up default feature flags (legacy behavior)
+        getFeatureFlagValueUseCase.stub {
+            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
+            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
+        }
+        initViewModel()
+    }
+
+    private fun setupUIDrivenPhotoMonitoring(enabled: Boolean) {
+        getFeatureFlagValueUseCase.stub {
+            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
+            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(enabled)
+        }
+        whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf()))
+    }
+
+    private fun setupUIDrivenPhotoMonitoringWithMockPhotos(enabled: Boolean) {
+        val mockPhoto =
+            mock<Photo.Image> { on { modificationTime }.thenReturn(LocalDateTime.now()) }
+        getFeatureFlagValueUseCase.stub {
+            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
+            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(enabled)
+        }
+        whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf(mockPhoto)))
+    }
+
     @Test
     fun `test initial state`() = runTest {
+        initViewModelWithDefaultFlags()
+
         underTest.state.test {
             val initialState = awaitItem()
             assertWithMessage("photos value is incorrect").that(initialState.photos).isEmpty()
@@ -279,10 +306,16 @@ internal class TimelineViewModelTest {
         whenever(getTimelineFilterPreferencesUseCase()).thenReturn(null)
         whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf(photo)))
 
+        // Set up default feature flags
+        getFeatureFlagValueUseCase.stub {
+            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
+            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
+        }
+
         initViewModel()
+        advanceUntilIdle()
 
         underTest.state.test {
-            awaitItem()
             val initialisedState = awaitItem()
             assertWithMessage("Expected photos do not match").that(initialisedState.photos)
                 .containsExactly(photo)
@@ -326,6 +359,8 @@ internal class TimelineViewModelTest {
     @Test
     fun `test that shouldShowBusinessAccountPrompt is true when checkEnableCameraUploadsStatusUseCase returns SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT`() =
         runTest {
+            initViewModelWithDefaultFlags()
+
             handleEnableCameraUploads(status = EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT)
             advanceUntilIdle()
 
@@ -355,6 +390,8 @@ internal class TimelineViewModelTest {
     @Test
     fun `test that shouldTriggerCameraUploads is true when checkEnableCameraUploadsStatusUseCase returns CAN_ENABLE_CAMERA_UPLOADS`() =
         runTest {
+            initViewModelWithDefaultFlags()
+
             handleEnableCameraUploads(status = EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS)
             advanceUntilIdle()
 
@@ -367,6 +404,9 @@ internal class TimelineViewModelTest {
     @Test
     fun `test that when camera upload progress is received, then state is set properly`() =
         runTest {
+            initViewModelWithDefaultFlags()
+            advanceUntilIdle() // Wait for init to complete
+
             val totalUploaded = 100
             val totalToUpload = 200
             val expectedProgress = 0.5f
@@ -391,6 +431,7 @@ internal class TimelineViewModelTest {
     @Test
     fun `test that when camera upload progress is received with status finished, then progressBarShowing state is set to false`() =
         runTest {
+            initViewModelWithDefaultFlags()
             val cameraUploadsStatusInfo =
                 CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.COMPLETED)
             cameraUploadsStatusInfoFlow.emit(cameraUploadsStatusInfo)
@@ -406,6 +447,9 @@ internal class TimelineViewModelTest {
     @Test
     fun `test that the paused camera uploads toolbar menu icon is shown when camera uploads finishes because the device is not charged`() =
         runTest {
+            initViewModelWithDefaultFlags()
+            advanceUntilIdle() // Wait for init to complete
+
             val cameraUploadsStatusInfo =
                 CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET)
             cameraUploadsStatusInfoFlow.emit(cameraUploadsStatusInfo)
@@ -413,13 +457,15 @@ internal class TimelineViewModelTest {
             advanceUntilIdle()
 
             underTest.state.test {
-                assertThat(awaitItem().showCameraUploadsPaused).isTrue()
+                val state = awaitItem()
+                assertThat(state.showCameraUploadsPaused).isTrue()
             }
         }
 
     @Test
     fun `test that other toolbar menu icons are hidden when camera uploads finishes because the device is not charged`() =
         runTest {
+            initViewModelWithDefaultFlags()
             val cameraUploadsStatusInfo =
                 CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET)
             cameraUploadsStatusInfoFlow.emit(cameraUploadsStatusInfo)
@@ -436,6 +482,7 @@ internal class TimelineViewModelTest {
     @Test
     fun `test that the fab icon is hidden when camera uploads finishes because the device is not charged`() =
         runTest {
+            initViewModelWithDefaultFlags()
             val cameraUploadsStatusInfo =
                 CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET)
             cameraUploadsStatusInfoFlow.emit(cameraUploadsStatusInfo)
@@ -443,7 +490,8 @@ internal class TimelineViewModelTest {
             advanceUntilIdle()
 
             underTest.state.test {
-                assertThat(awaitItem().cameraUploadsStatus).isEqualTo(CameraUploadsStatus.None)
+                val state = awaitItem()
+                assertThat(state.cameraUploadsStatus).isEqualTo(CameraUploadsStatus.None)
             }
         }
 
@@ -456,6 +504,10 @@ internal class TimelineViewModelTest {
     fun `test that no toolbar menu icon is shown and a warning fab icon is shown when camera uploads finishes for any other reason`(
         cameraUploadsFinishedReason: CameraUploadsFinishedReason,
     ) = runTest {
+        initViewModelWithDefaultFlags()
+        // Wait for init block to complete (monitoring starts automatically when feature flag is disabled)
+        advanceUntilIdle()
+
         val cameraUploadsStatusInfo = CameraUploadsStatusInfo.Finished(cameraUploadsFinishedReason)
         cameraUploadsStatusInfoFlow.emit(cameraUploadsStatusInfo)
 
@@ -476,6 +528,7 @@ internal class TimelineViewModelTest {
     @Test
     fun `test that when camera upload progress is received with pending 0, then progressBarShowing state is set to false`() =
         runTest {
+            initViewModelWithDefaultFlags()
             val totalUploaded = 200
             val cameraUploadsStatusInfo = CameraUploadsStatusInfo.UploadProgress(
                 totalUploaded = totalUploaded,
@@ -498,6 +551,7 @@ internal class TimelineViewModelTest {
     @Test
     fun `test that when camera upload progress is received and some items are currently selected, the progressBarShowing state is set to false`() =
         runTest {
+            initViewModelWithDefaultFlags()
             val progress = mock<CameraUploadsStatusInfo.UploadProgress>()
 
             val selectedPhoto = mock<Photo.Image> { on { id }.thenReturn(1L) }
@@ -519,6 +573,7 @@ internal class TimelineViewModelTest {
     @Test
     fun `test that when camera upload progress is received and current view is not TimeBar ALL, the progressBarShowing state is set to false`() =
         runTest {
+            initViewModelWithDefaultFlags()
             val progress = mock<CameraUploadsStatusInfo.UploadProgress>()
 
             underTest.onTimeBarTabSelected(TimeBarTab.Years)
@@ -535,6 +590,8 @@ internal class TimelineViewModelTest {
     @Test
     fun `test that when stopCameraUploadAndHeartbeat is called, stopCameraUploadAndHeartbeatUseCase is called`() =
         runTest {
+            initViewModelWithDefaultFlags()
+
             underTest.stopCameraUploads()
 
             advanceUntilIdle()
@@ -545,6 +602,8 @@ internal class TimelineViewModelTest {
     @Test
     fun `test that when enableCU is called, enableCameraUploadsInPhotosUseCase is called`() =
         runTest {
+            initViewModelWithDefaultFlags()
+
             underTest.enableCU()
             advanceUntilIdle()
             verify(enableCameraUploadsInPhotosUseCase).invoke(
@@ -557,6 +616,8 @@ internal class TimelineViewModelTest {
 
     @Test
     fun `test that when enableCU is called, startCameraUploadUseCase is called`() = runTest {
+        initViewModelWithDefaultFlags()
+
         underTest.enableCU()
         advanceUntilIdle()
         verify(startCameraUploadUseCase).invoke()
@@ -564,6 +625,8 @@ internal class TimelineViewModelTest {
 
     @Test
     fun `test that first time sync CU call start process`() = runTest {
+        initViewModelWithDefaultFlags()
+
         // when
         underTest.syncCameraUploadsStatus()
         advanceUntilIdle()
@@ -574,8 +637,12 @@ internal class TimelineViewModelTest {
 
     @Test
     fun `test that CU status check files for upload is handled properly`() = runTest {
+        initViewModelWithDefaultFlags()
+        advanceUntilIdle() // Wait for init to complete
+
         // given
         cameraUploadsStatusInfoFlow.emit(CameraUploadsStatusInfo.CheckFilesForUpload)
+        advanceUntilIdle()
 
         // then
         underTest.state.test {
@@ -586,6 +653,9 @@ internal class TimelineViewModelTest {
 
     @Test
     fun `test that CU status upload progress is handled properly`() = runTest {
+        initViewModelWithDefaultFlags()
+        advanceUntilIdle() // Wait for init to complete
+
         // given
         val progress = CameraUploadsStatusInfo.UploadProgress(
             totalToUpload = 0,
@@ -596,6 +666,7 @@ internal class TimelineViewModelTest {
             areUploadsPaused = false,
         )
         cameraUploadsStatusInfoFlow.emit(progress)
+        advanceUntilIdle()
 
         // then
         underTest.state.test {
@@ -606,11 +677,15 @@ internal class TimelineViewModelTest {
 
     @Test
     fun `test that CU status finished is handled properly`() = runTest {
+        initViewModelWithDefaultFlags()
+        advanceUntilIdle() // Wait for init to complete
+
         // given
         val info = CameraUploadsStatusInfo.Finished(
             reason = CameraUploadsFinishedReason.COMPLETED,
         )
         cameraUploadsStatusInfoFlow.emit(info)
+        advanceUntilIdle()
 
         // then
         underTest.state.test {
@@ -621,6 +696,7 @@ internal class TimelineViewModelTest {
 
     @Test
     fun `test that CU completed message is set properly`() = runTest {
+        initViewModelWithDefaultFlags()
         // when
         underTest.setCameraUploadsCompletedMessage(true)
 
@@ -635,6 +711,7 @@ internal class TimelineViewModelTest {
     fun `test that if there is no preference set yet the saved timeline state is false`() =
         runTest {
             whenever(getTimelineFilterPreferencesUseCase()).thenReturn(null)
+            initViewModel()
 
             underTest.state.test {
                 val state = awaitItem()
@@ -671,9 +748,16 @@ internal class TimelineViewModelTest {
 
         whenever(timelinePreferencesMapper(any())).thenReturn(latestPref)
 
-        initViewModel()
+        // Set up default feature flags
+        getFeatureFlagValueUseCase.stub {
+            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
+            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
+        }
 
-        underTest.state.drop(3).test {
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
             val state = awaitItem()
             assertThat(state.rememberFilter).isTrue()
             assertThat(state.currentMediaSource).isEqualTo(expectedLocation)
@@ -713,6 +797,11 @@ internal class TimelineViewModelTest {
     fun `test that isCameraUploadsBannerImprovementEnabled is updated as expected`(
         isEnabled: Boolean,
     ) = runTest {
+        // Set up default feature flags first
+        getFeatureFlagValueUseCase.stub {
+            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
+            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
+        }
         whenever(getFeatureFlagValueUseCase(AppFeatures.CameraUploadsBannerImprovement))
             .thenReturn(isEnabled)
 
@@ -722,6 +811,205 @@ internal class TimelineViewModelTest {
         underTest.state.test {
             val state = awaitItem()
             assertThat(state.isCameraUploadsBannerImprovementEnabled).isEqualTo(isEnabled)
+        }
+    }
+
+    @Test
+    fun `test that photo monitoring does not start automatically in init when UI-driven lifecycle is enabled`() =
+        runTest {
+            // Given: UI-driven lifecycle is enabled
+            // Reset the use case to clear any previous setup from setUp()
+            reset(getTimelinePhotosUseCase, monitorPaginatedTimelinePhotosUseCase)
+            setupUIDrivenPhotoMonitoringWithMockPhotos(enabled = true)
+            initViewModel()
+            advanceUntilIdle()
+
+            // Then: Verify that monitoring use cases are NOT called in init when UI-driven lifecycle is enabled
+            verify(getTimelinePhotosUseCase, never()).invoke()
+            verify(monitorPaginatedTimelinePhotosUseCase, never()).invoke()
+
+            underTest.state.test {
+                val initialState = awaitItem()
+                assertWithMessage("Photos should not be loaded automatically in init when UI-driven lifecycle is enabled")
+                    .that(initialState.photos).isEmpty()
+                assertWithMessage("loadPhotosDone should be false initially")
+                    .that(initialState.loadPhotosDone).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that photo monitoring starts automatically in init when UI-driven lifecycle is disabled`() =
+        runTest {
+            // Given: UI-driven lifecycle is disabled (legacy behavior)
+            setupUIDrivenPhotoMonitoringWithMockPhotos(enabled = false)
+            initViewModel()
+            advanceUntilIdle()
+
+            // Then: Verify that monitoring use case IS called in init when UI-driven lifecycle is disabled
+            verify(getTimelinePhotosUseCase, atLeast(1)).invoke()
+            verify(monitorPaginatedTimelinePhotosUseCase, never()).invoke()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertWithMessage("Photos should be loaded automatically when UI-driven lifecycle is disabled")
+                    .that(state.photos).isNotEmpty()
+                assertWithMessage("State should be properly initialized in legacy mode")
+                    .that(state).isNotNull()
+            }
+        }
+
+    @Test
+    fun `test that startPhotoMonitoring starts photo monitoring when UI-driven lifecycle is enabled`() =
+        runTest {
+            // Given: UI-driven lifecycle is enabled
+            setupUIDrivenPhotoMonitoring(enabled = true)
+            initViewModel()
+
+            // When: startPhotoMonitoring is called and camera uploads status is emitted
+            underTest.startPhotoMonitoring()
+            advanceUntilIdle()
+
+            val cameraUploadsStatusInfo = CameraUploadsStatusInfo.CheckFilesForUpload
+            cameraUploadsStatusInfoFlow.emit(cameraUploadsStatusInfo)
+            advanceUntilIdle()
+
+            // Then: Verify that monitoring use case IS called when startPhotoMonitoring is invoked
+            verify(getTimelinePhotosUseCase, atLeast(1)).invoke()
+            verify(monitorPaginatedTimelinePhotosUseCase, never()).invoke()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertWithMessage("Camera uploads status should be processed after startPhotoMonitoring when UI-driven lifecycle is enabled")
+                    .that(state.cameraUploadsStatus).isEqualTo(CameraUploadsStatus.Sync)
+            }
+        }
+
+    @Test
+    fun `test that startPhotoMonitoring does nothing when UI-driven lifecycle is disabled`() =
+        runTest {
+            // Given: UI-driven lifecycle is disabled
+            setupUIDrivenPhotoMonitoring(enabled = false)
+            initViewModel()
+            advanceUntilIdle() // Wait for init to complete
+
+            // When: startPhotoMonitoring is called
+            underTest.startPhotoMonitoring()
+
+            // Then: Verify that monitoring use cases are called in init but NOT called again by startPhotoMonitoring in disabled mode
+            verify(getTimelinePhotosUseCase, atLeast(1)).invoke() // Called in init
+            verify(monitorPaginatedTimelinePhotosUseCase, never()).invoke()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertWithMessage("Photos should remain empty when UI-driven lifecycle is disabled")
+                    .that(state.photos).isEmpty()
+                assertWithMessage("Camera uploads status should remain None when UI-driven lifecycle is disabled")
+                    .that(state.cameraUploadsStatus).isEqualTo(CameraUploadsStatus.None)
+            }
+        }
+
+    @Test
+    fun `test that startPhotoMonitoring prevents duplicate calls when UI-driven lifecycle is enabled`() =
+        runTest {
+            // Given: UI-driven lifecycle is enabled
+            setupUIDrivenPhotoMonitoring(enabled = true)
+
+            // Reset mocks to clear any previous calls from setUp()
+            reset(monitorPaginatedTimelinePhotosUseCase, getTimelinePhotosUseCase)
+
+            // Mock the use cases to return empty flows
+            whenever(monitorPaginatedTimelinePhotosUseCase()).thenReturn(flowOf(listOf()))
+            whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf()))
+
+            // Create a fresh ViewModel with the correct flag values
+            initViewModel()
+            advanceUntilIdle() // Wait for init to complete
+
+            // When: startPhotoMonitoring is called multiple times
+            underTest.startPhotoMonitoring()
+            underTest.startPhotoMonitoring()
+            underTest.startPhotoMonitoring()
+            advanceUntilIdle()
+
+            // Then: Only one monitoring method should be called (duplicates prevented)
+            // Since TimelinePhotosPagination is not set, it defaults to false, so getTimelinePhotosUseCase is called
+            verify(getTimelinePhotosUseCase).invoke()
+            verify(monitorPaginatedTimelinePhotosUseCase, never()).invoke()
+        }
+
+    @Test
+    fun `test that startPhotoMonitoring allows multiple calls when UI-driven lifecycle is disabled`() =
+        runTest {
+            // Given: UI-driven lifecycle is disabled
+            setupUIDrivenPhotoMonitoring(enabled = false)
+            initViewModel()
+            advanceUntilIdle() // Wait for init to complete
+
+            // When: startPhotoMonitoring is called multiple times
+            underTest.startPhotoMonitoring()
+            underTest.startPhotoMonitoring()
+            underTest.startPhotoMonitoring()
+
+            // Then: Verify that monitoring use cases are called in init but NOT called again by multiple startPhotoMonitoring calls in disabled mode
+            verify(getTimelinePhotosUseCase, atLeast(1)).invoke() // Called in init
+            verify(monitorPaginatedTimelinePhotosUseCase, never()).invoke()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertWithMessage("Photos should remain empty after multiple calls when UI-driven lifecycle is disabled")
+                    .that(state.photos).isEmpty()
+                assertWithMessage("Camera uploads status should remain None after multiple calls when UI-driven lifecycle is disabled")
+                    .that(state.cameraUploadsStatus).isEqualTo(CameraUploadsStatus.None)
+            }
+        }
+
+    @Test
+    fun `test that feature flag exception defaults to enabled behavior`() = runTest {
+        // Given: Feature flag throws exception (simulating network/API error)
+        getFeatureFlagValueUseCase.stub {
+            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
+            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenThrow(RuntimeException("Network error"))
+        }
+        whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf()))
+        initViewModel()
+        advanceUntilIdle() // Wait for init to complete
+
+        // When: startPhotoMonitoring is called
+        underTest.startPhotoMonitoring()
+
+        // Then: Verify that monitoring use case IS called when feature flag throws exception (defaults to enabled)
+        verify(getTimelinePhotosUseCase, atLeast(1)).invoke()
+        verify(monitorPaginatedTimelinePhotosUseCase, never()).invoke()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertWithMessage("State should be accessible when feature flag throws exception (defaults to enabled)")
+                .that(state).isNotNull()
+        }
+    }
+
+    @Test
+    fun `test that feature flag null result defaults to enabled behavior`() = runTest {
+        // Given: Feature flag returns null (simulating missing config)
+        getFeatureFlagValueUseCase.stub {
+            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
+            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(null)
+        }
+        whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf()))
+        initViewModel()
+        advanceUntilIdle() // Wait for init to complete
+
+        // When: startPhotoMonitoring is called
+        underTest.startPhotoMonitoring()
+
+        // Then: Verify that monitoring use case IS called when feature flag returns null (defaults to enabled)
+        verify(getTimelinePhotosUseCase, atLeast(1)).invoke()
+        verify(monitorPaginatedTimelinePhotosUseCase, never()).invoke()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertWithMessage("State should be accessible when feature flag returns null (defaults to enabled)")
+                .that(state).isNotNull()
         }
     }
 

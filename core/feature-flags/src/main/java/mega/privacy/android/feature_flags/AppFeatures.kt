@@ -16,6 +16,14 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
 
+    /**
+     * UI-driven photo monitoring lifecycle
+     */
+    UIDrivenPhotoMonitoring(
+        "Enable UI-driven photo monitoring lifecycle to prevent race conditions",
+        true
+    ),
+
     CameraUploadsBannerImprovement(
         "Enable Camera Uploads Banner Improvement",
         true
@@ -171,8 +179,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
         "Onboarding Revamp with new components",
         true,
     ),
-
-
 
     /**
      *  Enable pagination in timeline photos

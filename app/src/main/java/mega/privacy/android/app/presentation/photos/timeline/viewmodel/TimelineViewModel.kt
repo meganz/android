@@ -146,27 +146,65 @@ class TimelineViewModel @Inject constructor(
     private var isCameraUploadsUploading = false
     private var showHiddenItems: Boolean? = null
     private var isPaginationEnabled: Boolean = false
+    private var isPhotoMonitoringStarted = false
 
     init {
-        monitorPhotos()
-        monitorCameraUploadsStatus()
-
-        viewModelScope.launch {
-            if (isHiddenNodesActive()) {
-                monitorShowHiddenItems()
-                monitorAccountDetail()
-                monitorIsHiddenNodesOnboarded()
-            }
-        }
-
-        checkCameraUploadsBannerImprovementEnabled()
-
         updatePhotos(listOf())
         viewModelScope.launch {
             _state.collectLatest {
                 updatePhotos(it.photos)
             }
         }
+
+        // Check if UI-driven lifecycle is enabled
+        viewModelScope.launch {
+            if (isUIDrivenPhotoMonitoringEnabled()) {
+                // UI-driven lifecycle: monitoring will start when UI is ready
+                // No automatic monitoring in init
+            } else {
+                // Legacy behavior: start monitoring immediately in init
+                startMonitoring()
+            }
+        }
+    }
+
+    /**
+     * Start photo monitoring when UI is ready (called from Fragment onResume)
+     * Only works when UI-driven photo monitoring is enabled
+     */
+    fun startPhotoMonitoring() {
+        viewModelScope.launch {
+            // Check flag inside coroutine scope to avoid race conditions
+            if (isUIDrivenPhotoMonitoringEnabled() && !isPhotoMonitoringStarted) {
+                isPhotoMonitoringStarted = true
+                startMonitoring()
+            }
+        }
+    }
+
+    /**
+     * Private method to start all monitoring tasks
+     * Used by both legacy behavior (init) and UI-driven behavior (startPhotoMonitoring)
+     */
+    private suspend fun startMonitoring() {
+        monitorPhotos()
+        monitorCameraUploadsStatus()
+
+        if (isHiddenNodesActive()) {
+            monitorShowHiddenItems()
+            monitorAccountDetail()
+            monitorIsHiddenNodesOnboarded()
+        }
+
+        checkCameraUploadsBannerImprovementEnabled()
+    }
+
+    private suspend fun isUIDrivenPhotoMonitoringEnabled(): Boolean {
+        val result = runCatching {
+            getFeatureFlagValueUseCase(AppFeatures.UIDrivenPhotoMonitoring)
+        }
+
+        return result.getOrElse { true } // Default to true for the new behavior
     }
 
     private suspend fun isPaginationEnabled(): Boolean {

@@ -247,6 +247,9 @@ class PhotosFragment : Fragment() {
         Firebase.crashlytics.log("Screen: ${PhotoScreenEvent.eventName}")
         super.onResume()
         checkCameraUploadsPermissions()
+        
+        // Start photo monitoring when UI is ready (UI-driven lifecycle)
+        timelineViewModel.startPhotoMonitoring()
     }
 
     private fun checkCameraUploadsPermissions(showAction: Boolean = false) {
