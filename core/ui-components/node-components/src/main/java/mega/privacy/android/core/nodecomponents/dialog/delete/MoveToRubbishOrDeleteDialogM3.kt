@@ -32,7 +32,7 @@ fun MoveToRubbishOrDeleteNodeDialogM3(
     }
 
     BasicDialog(
-        title = stringResource(id = message),
+        description = stringResource(id = message),
         positiveButtonText = stringResource(id = positiveText),
         negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onPositiveButtonClicked = {

@@ -1,10 +1,12 @@
 package mega.privacy.android.core.nodecomponents.components.selectionmode
 
 import mega.privacy.android.core.nodecomponents.menu.menuaction.CopyMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.DeletePermanentlyMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ManageLinkMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.RestoreMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionModeMenuItem
@@ -19,6 +21,8 @@ class NodeSelectionActionUiMapper @Inject constructor() {
             is TrashMenuAction -> NodeSelectionAction.RubbishBin
             is DownloadMenuAction -> NodeSelectionAction.Download
             is ManageLinkMenuAction -> NodeSelectionAction.ShareLink(2)
+            is DeletePermanentlyMenuAction -> NodeSelectionAction.DeletePermanently
+            is RestoreMenuAction -> NodeSelectionAction.Restore
             else -> null
         }
 }

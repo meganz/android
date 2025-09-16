@@ -8,10 +8,12 @@ import dagger.multibindings.ElementsIntoSet
 import mega.privacy.android.core.nodecomponents.action.AvailableOfflineAction
 import mega.privacy.android.core.nodecomponents.action.ClearSelectionAction
 import mega.privacy.android.core.nodecomponents.action.CopyAction
+import mega.privacy.android.core.nodecomponents.action.DeletePermanentAction
 import mega.privacy.android.core.nodecomponents.action.DownloadAction
 import mega.privacy.android.core.nodecomponents.action.HideAction
 import mega.privacy.android.core.nodecomponents.action.ManageLinkAction
 import mega.privacy.android.core.nodecomponents.action.MoveAction
+import mega.privacy.android.core.nodecomponents.action.MoveToRubbishBinAction
 import mega.privacy.android.core.nodecomponents.action.MultiNodeAction
 import mega.privacy.android.core.nodecomponents.action.OpenWithAction
 import mega.privacy.android.core.nodecomponents.action.RenameNodeAction
@@ -20,7 +22,6 @@ import mega.privacy.android.core.nodecomponents.action.SelectAllAction
 import mega.privacy.android.core.nodecomponents.action.SendToChatAction
 import mega.privacy.android.core.nodecomponents.action.ShareFolderAction
 import mega.privacy.android.core.nodecomponents.action.SingleNodeAction
-import mega.privacy.android.core.nodecomponents.action.MoveToRubbishBinAction
 import mega.privacy.android.core.nodecomponents.action.VersionsAction
 import javax.inject.Singleton
 
@@ -53,6 +54,7 @@ object NodeActionHandlerModule {
         renameNodeAction: RenameNodeAction,
         moveToRubbishBinAction: MoveToRubbishBinAction,
         manageLinkAction: ManageLinkAction,
+        deletePermanentAction: DeletePermanentAction,
     ): Set<SingleNodeAction> {
         return setOf(
             versionsAction,
@@ -68,6 +70,7 @@ object NodeActionHandlerModule {
             renameNodeAction,
             moveToRubbishBinAction,
             manageLinkAction,
+            deletePermanentAction
         )
     }
 
@@ -93,6 +96,7 @@ object NodeActionHandlerModule {
         hideAction: HideAction,
         moveToRubbishBinAction: MoveToRubbishBinAction,
         manageLinkAction: ManageLinkAction,
+        deletePermanentAction: DeletePermanentAction,
     ): Set<MultiNodeAction> {
         return setOf(
             openWithAction,
@@ -108,6 +112,7 @@ object NodeActionHandlerModule {
             hideAction,
             moveToRubbishBinAction,
             manageLinkAction,
+            deletePermanentAction
         )
     }
 }

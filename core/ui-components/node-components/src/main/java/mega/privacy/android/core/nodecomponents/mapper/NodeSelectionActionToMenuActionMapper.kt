@@ -2,10 +2,12 @@ package mega.privacy.android.core.nodecomponents.mapper
 
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.menu.menuaction.CopyMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.DeletePermanentlyMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ManageLinkMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.RestoreMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -25,6 +27,8 @@ class NodeSelectionActionToMenuActionMapper @Inject constructor(
     private val moveMenuAction: MoveMenuAction,
     private val copyMenuAction: CopyMenuAction,
     private val trashMenuAction: TrashMenuAction,
+    private val restoreMenuAction: RestoreMenuAction,
+    private val deletePermanentlyMenuAction: DeletePermanentlyMenuAction,
 ) {
     /**
      * Handles a NodeSelectionAction by mapping it to the appropriate MenuAction
@@ -68,6 +72,14 @@ class NodeSelectionActionToMenuActionMapper @Inject constructor(
 
             is NodeSelectionAction.More -> {
                 onMoreActionPressed()
+            }
+
+            is NodeSelectionAction.Restore -> {
+                nodeActionHandler(restoreMenuAction, selectedNodes)
+            }
+
+            is NodeSelectionAction.DeletePermanently -> {
+                nodeActionHandler(deletePermanentlyMenuAction, selectedNodes)
             }
 
             else -> {

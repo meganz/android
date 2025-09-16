@@ -54,6 +54,7 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.features.CloudDrive
+import mega.privacy.android.domain.qualifier.features.RubbishBin
 import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
@@ -128,6 +129,7 @@ class NodeOptionsActionViewModel @Inject constructor(
     private val snackBarHandler: SnackBarHandler,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @CloudDrive private val cloudDriveOptions: Lazy<Set<@JvmSuppressWildcards NodeSelectionMenuItem<*>>>,
+    @RubbishBin private val rubbishBinOptions: Lazy<Set<@JvmSuppressWildcards NodeSelectionMenuItem<*>>>,
     private val nodeSelectionModeActionMapper: NodeSelectionModeActionMapper,
     private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
@@ -816,6 +818,7 @@ class NodeOptionsActionViewModel @Inject constructor(
     private fun getOptions(nodeSourceType: NodeSourceType) =
         when (nodeSourceType) {
             NodeSourceType.CLOUD_DRIVE -> cloudDriveOptions.get()
+            NodeSourceType.RUBBISH_BIN -> rubbishBinOptions.get()
             // Update when other source types are supported
             else -> emptySet()
         }

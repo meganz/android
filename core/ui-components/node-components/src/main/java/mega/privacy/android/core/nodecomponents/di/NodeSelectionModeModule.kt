@@ -10,9 +10,12 @@ import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.Down
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.HideSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.ManageLinkSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.MoveSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.DeletePermanentlySelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RestoreSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RubbishBinSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.domain.qualifier.features.CloudDrive
+import mega.privacy.android.domain.qualifier.features.RubbishBin
 import javax.inject.Singleton
 
 @Module
@@ -38,6 +41,18 @@ abstract class NodeSelectionModeModule {
             rubbishBinSelectionMenuAction,
             manageLinkSelectionMenuAction,
             downloadSelectionMenuItem
+        )
+
+        @Provides
+        @ElementsIntoSet
+        @RubbishBin
+        @Singleton
+        fun provideRubbishBinToolbarItems(
+            deletePermanentlySelectionMenuItem: DeletePermanentlySelectionMenuItem,
+            restoreSelectionMenuItem: RestoreSelectionMenuItem,
+        ): Set<NodeSelectionMenuItem<*>> = setOf(
+            deletePermanentlySelectionMenuItem,
+            restoreSelectionMenuItem,
         )
     }
 }

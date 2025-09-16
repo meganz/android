@@ -94,6 +94,18 @@ sealed interface NodeSelectionAction : TopAppBarAction {
         imageVector = IconPack.Medium.Thin.Outline.EyeOff
     )
 
+    data object DeletePermanently : NodeSelectionActionString(
+        testTag = "node_selection_action:remove",
+        descriptionRes = sharedR.string.rubbish_bin_bottom_menu_option_delete,
+        imageVector = IconPack.Medium.Thin.Outline.X
+    )
+
+    data object Restore : NodeSelectionActionString(
+        testTag = "node_selection_action:restore",
+        descriptionRes = sharedR.string.context_restore,
+        imageVector = IconPack.Medium.Thin.Outline.RotateCcw
+    )
+
     /**
      * Helper class to build node selection TopAppBarAction
      * @property descriptionRes

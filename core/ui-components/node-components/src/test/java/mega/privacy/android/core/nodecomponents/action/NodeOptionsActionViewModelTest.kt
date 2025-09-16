@@ -138,6 +138,8 @@ class NodeOptionsActionViewModelTest {
 
     private val cloudDriveOptions =
         mock<Lazy<Set<@JvmSuppressWildcards NodeSelectionMenuItem<*>>>>()
+    private val rubbishBinOptions =
+        mock<Lazy<Set<@JvmSuppressWildcards NodeSelectionMenuItem<*>>>>()
     private val nodeSelectionModeActionMapper = mock<NodeSelectionModeActionMapper>()
     private val getRubbishNodeUseCase = mock<GetRubbishNodeUseCase>()
     private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>()
@@ -196,7 +198,8 @@ class NodeOptionsActionViewModelTest {
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
             checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
-            nodeSelectionActionUiMapper = nodeSelectionActionUiMapper
+            nodeSelectionActionUiMapper = nodeSelectionActionUiMapper,
+            rubbishBinOptions = rubbishBinOptions
         )
     }
 
@@ -630,7 +633,8 @@ class NodeOptionsActionViewModelTest {
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
             checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
-            nodeSelectionActionUiMapper = nodeSelectionActionUiMapper
+            nodeSelectionActionUiMapper = nodeSelectionActionUiMapper,
+            rubbishBinOptions = rubbishBinOptions
         )
 
         val mockAction = mock<VersionsMenuAction>()
@@ -689,7 +693,8 @@ class NodeOptionsActionViewModelTest {
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
             checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
-            nodeSelectionActionUiMapper = nodeSelectionActionUiMapper
+            nodeSelectionActionUiMapper = nodeSelectionActionUiMapper,
+            rubbishBinOptions = rubbishBinOptions
         )
 
         val mockAction = mock<MoveMenuAction>()
@@ -742,7 +747,8 @@ class NodeOptionsActionViewModelTest {
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
             checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
-            nodeSelectionActionUiMapper = nodeSelectionActionUiMapper
+            nodeSelectionActionUiMapper = nodeSelectionActionUiMapper,
+            rubbishBinOptions = rubbishBinOptions
         )
 
         val mockAction = mock<VersionsMenuAction>()
@@ -787,7 +793,8 @@ class NodeOptionsActionViewModelTest {
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
             checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
-            nodeSelectionActionUiMapper = nodeSelectionActionUiMapper
+            nodeSelectionActionUiMapper = nodeSelectionActionUiMapper,
+            rubbishBinOptions = rubbishBinOptions
         )
 
         assertThrows<IllegalArgumentException> {
@@ -1018,15 +1025,15 @@ class NodeOptionsActionViewModelTest {
             val selectedNodes = setOf(mockFileNode)
             val nodeSourceType = NodeSourceType.CLOUD_DRIVE
 
-        viewModel.uiState.test {
-            assertThat(awaitItem().visibleActions).isEmpty()
+            viewModel.uiState.test {
+                assertThat(awaitItem().visibleActions).isEmpty()
 
-            viewModel.updateSelectionModeAvailableActions(selectedNodes, nodeSourceType)
+                viewModel.updateSelectionModeAvailableActions(selectedNodes, nodeSourceType)
 
-            val updatedState = awaitItem()
-            assertThat(updatedState.visibleActions).isNotEmpty()
-            assertThat(updatedState.visibleActions).contains(mockNodeSelectionAction)
-        }
+                val updatedState = awaitItem()
+                assertThat(updatedState.visibleActions).isNotEmpty()
+                assertThat(updatedState.visibleActions).contains(mockNodeSelectionAction)
+            }
         }
 
     @Test
