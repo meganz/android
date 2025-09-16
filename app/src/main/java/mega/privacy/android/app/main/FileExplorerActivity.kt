@@ -269,6 +269,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private val nameCollisionActivityLauncher = registerForActivityResult(
         NameCollisionActivityContract()
     ) { result ->
+        viewModel.setIsAskingForCollisionsResolution(isAskingForCollisionsResolution = false)
         backToCloud(
             if (result != null) parentHandle else INVALID_HANDLE,
             0,
@@ -1722,14 +1723,13 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }.onSuccess { collisions ->
                     dismissAlertDialogIfExists(statusDialog)
                     if (collisions.isNotEmpty()) {
+                        viewModel.setIsAskingForCollisionsResolution(isAskingForCollisionsResolution = true)
                         nameCollisionActivityLauncher.launch(ArrayList(collisions))
                     }
-                    val collidedSharesPath = collisions.map { it.path.value }.toSet()
-                    val sharesWithoutCollision = documents.filter {
-                        collidedSharesPath.contains(it.uri.value).not()
-                    }
-                    if (sharesWithoutCollision.isNotEmpty()) {
-                        viewModel.uploadFiles(parentHandle)
+                    collisions.map { it.path.value }.let { collidedPaths ->
+                        if (collidedPaths.size < documents.size) {
+                            viewModel.uploadFiles(parentHandle, collidedPaths)
+                        }
                     }
                 }.onFailure {
                     dismissAlertDialogIfExists(statusDialog)
@@ -1974,7 +1974,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
 
         startActivity(startIntent)
-        finishAndRemoveTask()
+        finish()
     }
 
     /**
@@ -2723,6 +2723,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     )
                 }
             ) { startTransferEvent ->
+                if (viewModel.isAskingForCollisionsResolution()) {
+                    //Not ready to finish yet
+                    return@createStartTransferView
+                }
+
                 ((startTransferEvent as StartTransferEvent.FinishUploadProcessing).triggerEvent as TransferTriggerEvent.StartUpload.Files).let {
                     backToCloud(
                         it.destinationId.longValue,

@@ -275,10 +275,7 @@ class NameCollisionActivity : PasscodeActivity() {
                 collision.size ?: 0,
                 this@NameCollisionActivity
             ) else getFolderContentString(collision)
-            date.text = formatLongDateTime(
-                if (collision is NameCollisionUiEntity.Upload) collision.lastModified / 1000
-                else collision.lastModified
-            )
+            date.text = formatLongDateTime(collisionResult.collisionLastModified ?: 0)
 
             val thumbnailView = if (hasThumbnail) R.id.thumbnail else R.id.thumbnail_icon
 

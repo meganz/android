@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @property isScanUploadingAborted true if the User is in the process of uploading the scans, but
  * decides to back out of the process
  * @property shouldFinishScreen true if the File Explorer should be finished
+ * @property isAskingForCollisionsResolution true if the app is asking for name collisions resolution, false otherwise.
  */
 data class FileExplorerUiState(
     val uploadEvent: StateEventWithContent<TransferTriggerEvent.StartUpload> = consumed(),
@@ -23,6 +24,7 @@ data class FileExplorerUiState(
     val isUploadingScans: Boolean = false,
     val isScanUploadingAborted: Boolean = false,
     val shouldFinishScreen: Boolean = false,
+    val isAskingForCollisionsResolution: Boolean = false,
 ) {
     /**
      * Documents associated by its uri value

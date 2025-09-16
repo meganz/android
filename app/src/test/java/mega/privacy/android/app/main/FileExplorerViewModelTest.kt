@@ -230,7 +230,7 @@ internal class FileExplorerViewModelTest {
 
         with(underTest) {
             setDocuments(documents)
-            uploadFiles(parentHandle)
+            uploadFiles(parentHandle, emptyList())
             uiState.map { it.uploadEvent }.test {
                 assertThat(awaitItem()).isEqualTo(expected)
             }
@@ -261,7 +261,41 @@ internal class FileExplorerViewModelTest {
         with(underTest) {
             setDocuments(documents)
 
-            uploadFiles(parentHandle)
+            uploadFiles(parentHandle, emptyList())
+            uiState.map { it.uploadEvent }.test {
+                assertThat(awaitItem()).isEqualTo(expected)
+            }
+        }
+    }
+
+    @Test
+    fun `test that state is updated correctly if upload files and collided files`() = runTest {
+        val fileName1 = "name1"
+        val uriPath1 = UriPath("/path/$fileName1")
+        val uri1 = mock<Uri> {
+            on { toString() } doReturn uriPath1.value
+        }
+        val fileName2 = "name2"
+        val uriPath2 = UriPath("/path/$fileName2")
+        val documents = listOf(
+            DocumentEntity(fileName1, 656L, 454L, uriPath1),
+            DocumentEntity(fileName2, 656L, 454L, uriPath2)
+        )
+        val parentHandle = 123L
+        val expected = triggered(
+            TransferTriggerEvent.StartUpload.Files(
+                mapOf(uri1.toString() to fileName1),
+                NodeId(parentHandle),
+                waitNotificationPermissionResponseToStart = true,
+            )
+        )
+        val collidedFiles = listOf(uriPath2.value)
+
+        initViewModel()
+
+        with(underTest) {
+            setDocuments(documents)
+            uploadFiles(parentHandle, collidedFiles)
             uiState.map { it.uploadEvent }.test {
                 assertThat(awaitItem()).isEqualTo(expected)
             }
@@ -345,6 +379,20 @@ internal class FileExplorerViewModelTest {
 
         underTest.uiState.test {
             assertThat(awaitItem().shouldFinishScreen).isEqualTo(shouldFinishScreen)
+        }
+    }
+
+    @ParameterizedTest(name = " when setIsAskingForCollisionsResolution: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that setIsAskingForCollisionsResolution is updated`(
+        isAskingForCollisionsResolution: Boolean,
+    ) = runTest {
+        initViewModel()
+        underTest.setIsAskingForCollisionsResolution(isAskingForCollisionsResolution)
+
+        underTest.uiState.test {
+            assertThat(awaitItem().isAskingForCollisionsResolution)
+                .isEqualTo(isAskingForCollisionsResolution)
         }
     }
 }

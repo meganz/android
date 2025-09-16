@@ -22,14 +22,13 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.extensions.getState
-import mega.privacy.android.core.sharedcomponents.parcelable
-import mega.privacy.android.core.sharedcomponents.parcelableArrayList
-import mega.privacy.android.core.sharedcomponents.serializable
 import mega.privacy.android.app.presentation.fileexplorer.model.FileExplorerUiState
 import mega.privacy.android.app.presentation.upload.UploadDestinationActivity
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.sharedcomponents.parcelable
+import mega.privacy.android.core.sharedcomponents.parcelableArrayList
+import mega.privacy.android.core.sharedcomponents.serializable
 import mega.privacy.android.domain.entity.ShareTextInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.AccountDetail
@@ -40,6 +39,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetPathUseCase
@@ -512,14 +512,27 @@ class FileExplorerViewModel @Inject constructor(
     }
 
     /**
+     * Sets whether the app is asking for name collisions resolution.
+     *
+     * @param isAskingForCollisionsResolution True if the app is asking for name collisions resolution,
+     * false otherwise.
+     */
+    fun setIsAskingForCollisionsResolution(isAskingForCollisionsResolution: Boolean) {
+        _uiState.update { it.copy(isAskingForCollisionsResolution = isAskingForCollisionsResolution) }
+    }
+
+    /**
      * Uploads a list of files to the specified destination.
      *
      * @param destination The destination where the files will be uploaded.
+     * @param collidedPaths The list of paths that have name collisions and should be excluded from the upload.
      */
-    fun uploadFiles(destination: Long) {
-        with(uiState.value) {
-            uploadFiles(namesByUriPathValues, NodeId(destination))
-        }
+    fun uploadFiles(destination: Long, collidedPaths: List<String>) {
+        val namesByUriPathValues = uiState.value.documents.filterNot { document ->
+            collidedPaths.any { it == document.uri.value }
+        }.associate { it.uri.value to it.name }
+
+        uploadFiles(namesByUriPathValues, NodeId(destination))
     }
 
     private fun uploadFiles(
@@ -552,6 +565,11 @@ class FileExplorerViewModel @Inject constructor(
      * Get the documents
      */
     fun getDocuments() = uiState.value.documents
+
+    /**
+     * Returns true if the app is asking for name collisions resolution, false otherwise.
+     */
+    fun isAskingForCollisionsResolution() = uiState.value.isAskingForCollisionsResolution
 
     /**
      * Handles Back Navigation logic by checking if the there are scans to be uploaded or not
