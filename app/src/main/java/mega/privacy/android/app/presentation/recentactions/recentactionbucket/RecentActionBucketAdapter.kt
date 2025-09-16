@@ -181,8 +181,12 @@ class RecentActionBucketAdapter(
 
             if (node.selected) {
                 holder.selectedIcon.visibility = View.VISIBLE
+                holder.thumbnailMedia.background = ContextCompat.getDrawable(
+                    context, R.drawable.background_item_grid_selected
+                )
             } else {
                 holder.selectedIcon.visibility = View.GONE
+                holder.thumbnailMedia.background = null
             }
         } else {
             holder.mediaView.visibility = View.GONE
