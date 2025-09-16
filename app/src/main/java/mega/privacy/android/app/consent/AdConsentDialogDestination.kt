@@ -39,11 +39,11 @@ fun NavGraphBuilder.adConsentDialogDestination(
                 val activity = LocalActivity.current
                 EventEffect(
                     event = state.showConsentFormEvent,
-                    onConsumed = viewModel::onConsentFormEventHandled,
+                    onConsumed = viewModel::onConsentFormDisplayed,
                 ) {
                     activity?.let {
                         UserMessagingPlatform.loadAndShowConsentFormIfRequired(it) { error ->
-                            viewModel.onConsentFormShown(error)
+                            viewModel.onConsentSelected(error)
                         }
                     }
                 }

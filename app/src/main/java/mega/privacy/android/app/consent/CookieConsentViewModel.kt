@@ -18,6 +18,7 @@ import javax.inject.Inject
 class CookieConsentViewModel @Inject constructor(
     private val getCookieUrlUseCase: GetCookieUrlUseCase,
     private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase,
+    private val adConsentWrapper: AdConsentWrapper,
 ) : ViewModel() {
 
     val state: StateFlow<CookieConsentState> by lazy {
@@ -28,10 +29,12 @@ class CookieConsentViewModel @Inject constructor(
 
     fun acceptAllCookies() {
         updateCookieSettings(CookieType.entries.toSet())
+        adConsentWrapper.refreshConsent()
     }
 
     fun acceptEssentialCookies() {
         updateCookieSettings(setOf(CookieType.ESSENTIAL))
+        adConsentWrapper.refreshConsent()
     }
 
     private fun updateCookieSettings(types: Set<CookieType>) {

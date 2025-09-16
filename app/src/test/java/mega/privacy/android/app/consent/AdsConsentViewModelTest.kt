@@ -3,10 +3,13 @@ package mega.privacy.android.app.consent
 import android.app.Activity
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.assertWithMessage
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.consent.model.AdsConsentState
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -25,20 +28,21 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AdsConsentViewModelTest {
     private lateinit var underTest: AdsConsentViewModel
 
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
-    private val adConsentFlowWrapper = mock<AdConsentFlowWrapper>()
+    private val adConsentWrapper = mock<AdConsentWrapper>()
     private val setGoogleConsentLoadedUseCase = mock<SetGoogleConsentLoadedUseCase>()
 
     @BeforeEach
     fun setUp() {
         underTest = AdsConsentViewModel(
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            adConsentFlowWrapper = adConsentFlowWrapper,
+            adConsentWrapper = adConsentWrapper,
             setGoogleConsentLoadedUseCase = setGoogleConsentLoadedUseCase,
         )
     }
@@ -47,7 +51,7 @@ class AdsConsentViewModelTest {
     fun tearDown() {
         reset(
             getFeatureFlagValueUseCase,
-            adConsentFlowWrapper,
+            adConsentWrapper,
             setGoogleConsentLoadedUseCase,
         )
     }
@@ -72,7 +76,7 @@ class AdsConsentViewModelTest {
         getFeatureFlagValueUseCase.stub {
             onBlocking { invoke(ApiFeatures.GoogleAdsFeatureFlag) } doReturn true
         }
-        adConsentFlowWrapper.stub {
+        adConsentWrapper.stub {
             on { getCanRequestConsentFlow(any()) } doReturn flow {
                 emit(false)
                 awaitCancellation()
@@ -94,7 +98,7 @@ class AdsConsentViewModelTest {
         getFeatureFlagValueUseCase.stub {
             onBlocking { invoke(ApiFeatures.GoogleAdsFeatureFlag) } doReturn true
         }
-        adConsentFlowWrapper.stub {
+        adConsentWrapper.stub {
             on { getCanRequestConsentFlow(any()) } doReturn flow {
                 emit(true)
                 awaitCancellation()
@@ -112,12 +116,41 @@ class AdsConsentViewModelTest {
     }
 
     @Test
-    fun `test that adConsentHandled event is triggered if onConsentFormEventHandled is called`() =
+    fun `test that showConsentForm event is consumed if onConsentFormDisplayed is called`() =
         runTest {
             getFeatureFlagValueUseCase.stub {
                 onBlocking { invoke(ApiFeatures.GoogleAdsFeatureFlag) } doReturn true
             }
-            adConsentFlowWrapper.stub {
+            adConsentWrapper.stub {
+                on { getCanRequestConsentFlow(any()) } doReturn flow {
+                    emit(true)
+                    awaitCancellation()
+                }
+            }
+
+            underTest.state.test {
+                assertThat(awaitItem()).isInstanceOf(AdsConsentState.Loading::class.java)
+                underTest.onLoaded(mock<Activity>())
+                advanceUntilIdle()
+                val triggeredEvent = awaitItem() as AdsConsentState.Data
+                assertWithMessage("Show consent form is expected to be triggered").that(
+                    triggeredEvent.showConsentFormEvent
+                ).isEqualTo(triggered)
+                underTest.onConsentFormDisplayed()
+                val actual = awaitItem() as AdsConsentState.Data
+                assertThat(actual.adFeatureDisabled).isEqualTo(consumed)
+                assertThat(actual.adConsentHandledEvent).isEqualTo(consumed)
+                assertWithMessage("Show consent form is expected to be consumed").that(actual.showConsentFormEvent).isEqualTo(consumed)
+            }
+        }
+
+    @Test
+    fun `test that adConsentHandled event is triggered if onConsentSelected is called`() =
+        runTest {
+            getFeatureFlagValueUseCase.stub {
+                onBlocking { invoke(ApiFeatures.GoogleAdsFeatureFlag) } doReturn true
+            }
+            adConsentWrapper.stub {
                 on { getCanRequestConsentFlow(any()) } doReturn flow {
                     emit(true)
                     awaitCancellation()
@@ -129,7 +162,7 @@ class AdsConsentViewModelTest {
                 assertThat(initial.adFeatureDisabled).isEqualTo(consumed)
                 assertThat(initial.adConsentHandledEvent).isEqualTo(consumed)
                 assertThat(initial.showConsentFormEvent).isEqualTo(triggered)
-                underTest.onConsentFormEventHandled()
+                underTest.onConsentSelected(null)
                 val actual = awaitItem() as AdsConsentState.Data
                 assertThat(actual.adFeatureDisabled).isEqualTo(consumed)
                 assertThat(actual.adConsentHandledEvent).isEqualTo(triggered)

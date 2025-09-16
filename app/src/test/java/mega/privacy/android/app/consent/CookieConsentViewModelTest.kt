@@ -26,12 +26,14 @@ class CookieConsentViewModelTest {
 
     private val getCookieUrlUseCase = mock<GetCookieUrlUseCase>()
     private val updateCookieSettingsUseCase = mock<UpdateCookieSettingsUseCase>()
+    private val adConsentWrapper = mock<AdConsentWrapper>()
 
     @BeforeEach
     fun setUp() {
         underTest = CookieConsentViewModel(
             getCookieUrlUseCase = getCookieUrlUseCase,
             updateCookieSettingsUseCase = updateCookieSettingsUseCase,
+            adConsentWrapper = adConsentWrapper
         )
     }
 
@@ -40,6 +42,7 @@ class CookieConsentViewModelTest {
         reset(
             getCookieUrlUseCase,
             updateCookieSettingsUseCase,
+            adConsentWrapper,
         )
     }
 
@@ -62,6 +65,7 @@ class CookieConsentViewModelTest {
             underTest.acceptAllCookies()
 
             verify(updateCookieSettingsUseCase).invoke(CookieType.entries.toSet())
+            verify(adConsentWrapper).refreshConsent()
         }
 
     @Test
@@ -70,6 +74,7 @@ class CookieConsentViewModelTest {
             underTest.acceptEssentialCookies()
 
             verify(updateCookieSettingsUseCase).invoke(setOf(CookieType.ESSENTIAL))
+            verify(adConsentWrapper).refreshConsent()
         }
 
 }
