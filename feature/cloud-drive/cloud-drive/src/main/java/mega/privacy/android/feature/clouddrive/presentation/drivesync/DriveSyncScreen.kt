@@ -26,6 +26,8 @@ import mega.android.core.ui.components.tabs.MegaScrollableTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.TabItems
+import mega.android.core.ui.model.menu.MenuActionIconWithClick
+import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
@@ -44,7 +46,6 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.Clou
 import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetViewM3
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.shared.original.core.ui.model.TopAppBarActionWithClick
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
@@ -104,7 +105,7 @@ internal fun DriveSyncScreen(
                     actions = buildList {
                         when {
                             selectedTabIndex == 0 && cloudDriveUiState.items.isNotEmpty() -> add(
-                                TopAppBarActionWithClick(CloudDriveAppBarAction.Search) {
+                                MenuActionIconWithClick(CloudDriveAppBarAction.Search) {
                                     megaNavigator.openSearchActivity(
                                         context = context,
                                         nodeSourceType = cloudDriveViewModel.nodeSourceType,
@@ -114,7 +115,7 @@ internal fun DriveSyncScreen(
                                 })
 
                             selectedTabIndex == 1 -> add(
-                                TopAppBarActionWithClick(
+                                MenuActionIconWithClick(
                                     CloudDriveAppBarAction.More
                                 ) {
                                     showSyncSettings = true

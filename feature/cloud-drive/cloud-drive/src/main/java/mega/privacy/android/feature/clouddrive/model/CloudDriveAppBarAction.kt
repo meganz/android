@@ -2,11 +2,11 @@ package mega.privacy.android.feature.clouddrive.model
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import mega.android.core.ui.model.TopAppBarAction
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.icon.pack.IconPack
 
-sealed interface CloudDriveAppBarAction : TopAppBarAction {
-    data object Search : TopAppBarAction {
+sealed interface CloudDriveAppBarAction : MenuActionWithIcon {
+    data object Search : MenuActionWithIcon {
         override val testTag: String = "cloud_drive_app_bar:search"
 
         @Composable
@@ -17,7 +17,7 @@ sealed interface CloudDriveAppBarAction : TopAppBarAction {
             rememberVectorPainter(IconPack.Medium.Thin.Outline.SearchLarge)
     }
 
-    data object More : TopAppBarAction {
+    data object More : MenuActionWithIcon {
         override val testTag: String = "cloud_drive_app_bar:more"
 
         @Composable

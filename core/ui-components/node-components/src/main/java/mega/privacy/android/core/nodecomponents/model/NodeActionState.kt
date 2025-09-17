@@ -4,6 +4,7 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
@@ -44,6 +45,6 @@ data class NodeActionState(
     val renameNodeRequestEvent: StateEventWithContent<NodeId> = consumed(),
     val shareFolderDialogEvent: StateEventWithContent<List<Long>> = consumed(),
     val shareFolderEvent: StateEventWithContent<List<Long>> = consumed(),
-    val visibleActions: List<NodeSelectionAction> = emptyList(),
-    val availableActions: List<NodeSelectionAction> = emptyList(),
+    val visibleActions: List<MenuActionWithIcon> = emptyList(),
+    val availableActions: List<MenuActionWithIcon> = emptyList(),
 )

@@ -11,15 +11,19 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionActionUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSelectionModeActionMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeSendToChatMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
+import mega.privacy.android.core.nodecomponents.menu.menuaction.CopyMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VersionsMenuAction
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionModeMenuItem
@@ -145,7 +149,6 @@ class NodeOptionsActionViewModelTest {
     private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>()
     private val getNodeAccessPermission = mock<GetNodeAccessPermission>()
     private val checkNodeCanBeMovedToTargetNode = mock<CheckNodeCanBeMovedToTargetNode>()
-    private val nodeSelectionActionUiMapper = mock<NodeSelectionActionUiMapper>()
     private val mockRubbishNode = mock<TypedFileNode> {
         on { id } doReturn NodeId(999L)
     }
@@ -162,7 +165,6 @@ class NodeOptionsActionViewModelTest {
 
     private val mockNodeSelectionMenuItem = mock<NodeSelectionMenuItem<*>>()
     private val mockNodeSelectionModeMenuItem = mock<NodeSelectionModeMenuItem>()
-    private val mockNodeSelectionAction = mock<NodeSelectionAction.Move>()
 
     private fun initViewModel() {
         viewModel = NodeOptionsActionViewModel(
@@ -198,7 +200,6 @@ class NodeOptionsActionViewModelTest {
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
             checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
-            nodeSelectionActionUiMapper = nodeSelectionActionUiMapper,
             rubbishBinOptions = rubbishBinOptions
         )
     }
@@ -219,9 +220,6 @@ class NodeOptionsActionViewModelTest {
                     noNodeInBackups = any()
                 )
             } doReturn listOf(mockNodeSelectionModeMenuItem)
-        }
-        nodeSelectionActionUiMapper.stub {
-            on { invoke(any()) } doReturn mockNodeSelectionAction
         }
         isNodeInBackupsUseCase.stub { onBlocking { invoke(any()) } doReturn false }
         getNodeAccessPermission.stub { onBlocking { invoke(any()) } doReturn AccessPermission.FULL }
@@ -262,13 +260,11 @@ class NodeOptionsActionViewModelTest {
             isNodeInBackupsUseCase,
             getNodeAccessPermission,
             checkNodeCanBeMovedToTargetNode,
-            nodeSelectionActionUiMapper,
             mockRubbishNode,
             mockFileNode,
             mockFolderNode,
             mockNodeSelectionMenuItem,
             mockNodeSelectionModeMenuItem,
-            mockNodeSelectionAction
         )
     }
 
@@ -633,7 +629,6 @@ class NodeOptionsActionViewModelTest {
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
             checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
-            nodeSelectionActionUiMapper = nodeSelectionActionUiMapper,
             rubbishBinOptions = rubbishBinOptions
         )
 
@@ -693,7 +688,6 @@ class NodeOptionsActionViewModelTest {
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
             checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
-            nodeSelectionActionUiMapper = nodeSelectionActionUiMapper,
             rubbishBinOptions = rubbishBinOptions
         )
 
@@ -747,7 +741,6 @@ class NodeOptionsActionViewModelTest {
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
             checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
-            nodeSelectionActionUiMapper = nodeSelectionActionUiMapper,
             rubbishBinOptions = rubbishBinOptions
         )
 
@@ -793,7 +786,6 @@ class NodeOptionsActionViewModelTest {
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
             checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
-            nodeSelectionActionUiMapper = nodeSelectionActionUiMapper,
             rubbishBinOptions = rubbishBinOptions
         )
 
@@ -1018,25 +1010,6 @@ class NodeOptionsActionViewModelTest {
         }
 
     @Test
-    fun `test state flow emits updated state after updateSelectionModeAvailableActions call`() =
-        runTest {
-            initViewModel()
-
-            val selectedNodes = setOf(mockFileNode)
-            val nodeSourceType = NodeSourceType.CLOUD_DRIVE
-
-            viewModel.uiState.test {
-                assertThat(awaitItem().visibleActions).isEmpty()
-
-                viewModel.updateSelectionModeAvailableActions(selectedNodes, nodeSourceType)
-
-                val updatedState = awaitItem()
-                assertThat(updatedState.visibleActions).isNotEmpty()
-                assertThat(updatedState.visibleActions).contains(mockNodeSelectionAction)
-            }
-        }
-
-    @Test
     fun `test updateSelectionModeAvailableActions when node is in backups sets noNodeInBackups to false`() =
         runTest {
             val expected = true
@@ -1068,13 +1041,7 @@ class NodeOptionsActionViewModelTest {
     fun `test updateSelectionModeAvailableActions limits actions to 4 and adds More when there are more than 4 actions`() =
         runTest {
             // Create 5 mock actions to test the "More" functionality
-            val mockAction1 = mock<NodeSelectionAction.Move> { on { testTag } doReturn "action1" }
-            val mockAction2 = mock<NodeSelectionAction.Copy> { on { testTag } doReturn "action2" }
-            val mockAction3 =
-                mock<NodeSelectionAction.RubbishBin> { on { testTag } doReturn "action3" }
-            val mockAction4 =
-                mock<NodeSelectionAction.Download> { on { testTag } doReturn "action4" }
-            val mockAction5 = mock<NodeSelectionAction.Hide> { on { testTag } doReturn "action5" }
+            val (actions, items) = createMockActions(5)
 
             initViewModel()
 
@@ -1087,16 +1054,7 @@ class NodeOptionsActionViewModelTest {
                     noNodeInBackups = any()
 
                 )
-            ).thenReturn(listOf(mock(), mock(), mock(), mock(), mock()))
-
-            whenever(nodeSelectionActionUiMapper(any()))
-                .thenReturn(
-                    mockAction1,
-                    mockAction2,
-                    mockAction3,
-                    mockAction4,
-                    mockAction5
-                )
+            ).thenReturn(items)
 
             val selectedNodes = setOf(mockFileNode)
             val nodeSourceType = NodeSourceType.CLOUD_DRIVE
@@ -1110,10 +1068,10 @@ class NodeOptionsActionViewModelTest {
 
                 // Should have exactly 5 items: first 4 actions + More
                 assertThat(finalState.visibleActions).hasSize(5)
-                assertThat(finalState.visibleActions[0]).isEqualTo(mockAction1)
-                assertThat(finalState.visibleActions[1]).isEqualTo(mockAction2)
-                assertThat(finalState.visibleActions[2]).isEqualTo(mockAction3)
-                assertThat(finalState.visibleActions[3]).isEqualTo(mockAction4)
+                assertThat(finalState.visibleActions[0]).isEqualTo(actions[0])
+                assertThat(finalState.visibleActions[1]).isEqualTo(actions[1])
+                assertThat(finalState.visibleActions[2]).isEqualTo(actions[2])
+                assertThat(finalState.visibleActions[3]).isEqualTo(actions[3])
                 assertThat(finalState.visibleActions[4]).isEqualTo(NodeSelectionAction.More)
             }
         }
@@ -1121,14 +1079,7 @@ class NodeOptionsActionViewModelTest {
     @Test
     fun `test updateSelectionModeAvailableActions shows all actions when there are 4 or fewer actions`() =
         runTest {
-            // Create 3 mock actions to test normal behavior
-            val mockAction1 = mock<NodeSelectionAction.Move> { on { testTag } doReturn "action1" }
-            val mockAction2 = mock<NodeSelectionAction.Copy> { on { testTag } doReturn "action2" }
-            val mockAction3 =
-                mock<NodeSelectionAction.RubbishBin> { on { testTag } doReturn "action3" }
-            val mockAction4 =
-                mock<NodeSelectionAction.Hide> { on { testTag } doReturn "action4" }
-            val mockAction5 = mock<NodeSelectionAction.More> { on { testTag } doReturn "action5" }
+            val (actions, items) = createMockActions(4)
 
             initViewModel()
 
@@ -1140,16 +1091,7 @@ class NodeOptionsActionViewModelTest {
                     allNodeCanBeMovedToTarget = any(),
                     noNodeInBackups = any()
                 )
-            ).thenReturn(listOf(mock(), mock(), mock(), mock(), mock()))
-
-            whenever(nodeSelectionActionUiMapper(any()))
-                .thenReturn(
-                    mockAction1,
-                    mockAction2,
-                    mockAction3,
-                    mockAction4,
-                    mockAction5
-                )
+            ).thenReturn(items)
 
             val selectedNodes = setOf(mockFileNode)
             val nodeSourceType = NodeSourceType.CLOUD_DRIVE
@@ -1161,24 +1103,21 @@ class NodeOptionsActionViewModelTest {
 
                 val finalState = awaitItem()
 
-                // Should have exactly 3 items: all actions, no More
+                // Should have exactly 4 items: all actions, no More
                 assertThat(finalState.visibleActions).hasSize(4)
-                assertThat(finalState.visibleActions[0]).isEqualTo(mockAction1)
-                assertThat(finalState.visibleActions[1]).isEqualTo(mockAction2)
-                assertThat(finalState.visibleActions[2]).isEqualTo(mockAction3)
-                assertThat(finalState.visibleActions[3]).isEqualTo(mockAction4)
+                assertThat(finalState.visibleActions[0]).isEqualTo(actions[0])
+                assertThat(finalState.visibleActions[1]).isEqualTo(actions[1])
+                assertThat(finalState.visibleActions[2]).isEqualTo(actions[2])
+                assertThat(finalState.visibleActions[3]).isEqualTo(actions[3])
                 assertThat(finalState.visibleActions).doesNotContain(NodeSelectionAction.More)
             }
         }
 
     @Test
-    fun `test updateSelectionModeAvailableActions shows all actions without more action when there are 5 actions including more`() =
+    fun `test updateSelectionModeAvailableActions shows all actions without more action when there are 3 actions`() =
         runTest {
             // Create 3 mock actions to test normal behavior
-            val mockAction1 = mock<NodeSelectionAction.Move> { on { testTag } doReturn "action1" }
-            val mockAction2 = mock<NodeSelectionAction.Copy> { on { testTag } doReturn "action2" }
-            val mockAction3 =
-                mock<NodeSelectionAction.RubbishBin> { on { testTag } doReturn "action3" }
+            val (actions, items) = createMockActions(3)
 
             initViewModel()
 
@@ -1190,14 +1129,7 @@ class NodeOptionsActionViewModelTest {
                     allNodeCanBeMovedToTarget = any(),
                     noNodeInBackups = any()
                 )
-            ).thenReturn(listOf(mock(), mock(), mock()))
-
-            whenever(nodeSelectionActionUiMapper(any()))
-                .thenReturn(
-                    mockAction1,
-                    mockAction2,
-                    mockAction3
-                )
+            ).thenReturn(items)
 
             val selectedNodes = setOf(mockFileNode)
             val nodeSourceType = NodeSourceType.CLOUD_DRIVE
@@ -1211,9 +1143,9 @@ class NodeOptionsActionViewModelTest {
 
                 // Should have exactly 3 items: all actions, no More
                 assertThat(finalState.visibleActions).hasSize(3)
-                assertThat(finalState.visibleActions[0]).isEqualTo(mockAction1)
-                assertThat(finalState.visibleActions[1]).isEqualTo(mockAction2)
-                assertThat(finalState.visibleActions[2]).isEqualTo(mockAction3)
+                assertThat(finalState.visibleActions[0]).isEqualTo(actions[0])
+                assertThat(finalState.visibleActions[1]).isEqualTo(actions[1])
+                assertThat(finalState.visibleActions[2]).isEqualTo(actions[2])
                 assertThat(finalState.visibleActions).doesNotContain(NodeSelectionAction.More)
             }
         }
@@ -1221,18 +1153,11 @@ class NodeOptionsActionViewModelTest {
     @Test
     fun `test updateSelectionModeAvailableActions sets both availableActions and visibleActions correctly`() =
         runTest {
-            // Create mock actions
-            val mockAction1 = mock<NodeSelectionAction.Move> { on { testTag } doReturn "action1" }
-            val mockAction2 = mock<NodeSelectionAction.Copy> { on { testTag } doReturn "action2" }
-            val mockAction3 =
-                mock<NodeSelectionAction.Download> { on { testTag } doReturn "action3" }
-            val mockAction4 = mock<NodeSelectionAction.Hide> { on { testTag } doReturn "action4" }
-            val mockAction5 =
-                mock<NodeSelectionAction.RubbishBin> { on { testTag } doReturn "action5" }
+            // Create 5 mock actions to test the More functionality
+            val (actions, items) = createMockActions(5)
 
             initViewModel()
 
-            // Mock 5 actions to test the More functionality
             whenever(
                 nodeSelectionModeActionMapper(
                     options = any(),
@@ -1241,16 +1166,7 @@ class NodeOptionsActionViewModelTest {
                     allNodeCanBeMovedToTarget = any(),
                     noNodeInBackups = any()
                 )
-            ).thenReturn(listOf(mock(), mock(), mock(), mock(), mock()))
-
-            whenever(nodeSelectionActionUiMapper(any()))
-                .thenReturn(
-                    mockAction1,
-                    mockAction2,
-                    mockAction3,
-                    mockAction4,
-                    mockAction5
-                )
+            ).thenReturn(items)
 
             val selectedNodes = setOf(mockFileNode)
             val nodeSourceType = NodeSourceType.CLOUD_DRIVE
@@ -1265,21 +1181,21 @@ class NodeOptionsActionViewModelTest {
                 // Verify availableActions contains all 5 actions (without More)
                 assertThat(finalState.availableActions).hasSize(5)
                 assertThat(finalState.availableActions).containsExactly(
-                    mockAction1,
-                    mockAction2,
-                    mockAction3,
-                    mockAction4,
-                    mockAction5
+                    actions[0],
+                    actions[1],
+                    actions[2],
+                    actions[3],
+                    actions[4]
                 )
                 assertThat(finalState.availableActions).doesNotContain(NodeSelectionAction.More)
 
                 // Verify visibleActions contains first 4 actions + More (since we have 5 > DEFAULT_MAX_VISIBLE_ITEMS)
                 assertThat(finalState.visibleActions).hasSize(5)
                 assertThat(finalState.visibleActions).containsExactly(
-                    mockAction1,
-                    mockAction2,
-                    mockAction3,
-                    mockAction4,
+                    actions[0],
+                    actions[1],
+                    actions[2],
+                    actions[3],
                     NodeSelectionAction.More
                 )
             }
@@ -1289,10 +1205,7 @@ class NodeOptionsActionViewModelTest {
     fun `test updateSelectionModeAvailableActions sets availableActions and visibleActions to same values when actions are 4 or fewer`() =
         runTest {
             // Create 3 mock actions (less than DEFAULT_MAX_VISIBLE_ITEMS)
-            val mockAction1 = mock<NodeSelectionAction.Move> { on { testTag } doReturn "action1" }
-            val mockAction2 = mock<NodeSelectionAction.Copy> { on { testTag } doReturn "action2" }
-            val mockAction3 =
-                mock<NodeSelectionAction.Download> { on { testTag } doReturn "action3" }
+            val (actions, items) = createMockActions(3)
 
             initViewModel()
 
@@ -1304,14 +1217,7 @@ class NodeOptionsActionViewModelTest {
                     allNodeCanBeMovedToTarget = any(),
                     noNodeInBackups = any()
                 )
-            ).thenReturn(listOf(mock(), mock(), mock()))
-
-            whenever(nodeSelectionActionUiMapper(any()))
-                .thenReturn(
-                    mockAction1,
-                    mockAction2,
-                    mockAction3
-                )
+            ).thenReturn(items)
 
             val selectedNodes = setOf(mockFileNode)
             val nodeSourceType = NodeSourceType.CLOUD_DRIVE
@@ -1326,17 +1232,17 @@ class NodeOptionsActionViewModelTest {
                 // Verify availableActions contains all 3 actions
                 assertThat(finalState.availableActions).hasSize(3)
                 assertThat(finalState.availableActions).containsExactly(
-                    mockAction1,
-                    mockAction2,
-                    mockAction3
+                    actions[0],
+                    actions[1],
+                    actions[2]
                 )
 
                 // Verify visibleActions is the same as availableActions (no More action added)
                 assertThat(finalState.visibleActions).hasSize(3)
                 assertThat(finalState.visibleActions).containsExactly(
-                    mockAction1,
-                    mockAction2,
-                    mockAction3
+                    actions[0],
+                    actions[1],
+                    actions[2]
                 )
                 assertThat(finalState.visibleActions).doesNotContain(NodeSelectionAction.More)
 
@@ -1344,6 +1250,29 @@ class NodeOptionsActionViewModelTest {
                 assertThat(finalState.visibleActions).isEqualTo(finalState.availableActions)
             }
         }
+
+    /**
+     * Creates mock actions and their corresponding menu items for testing
+     * @param count Number of mock actions to create
+     * @return Pair of (actions, items) where actions is List<MenuActionWithIcon> and items is List<NodeSelectionModeMenuItem>
+     */
+    private fun createMockActions(count: Int): Pair<List<MenuActionWithIcon>, List<NodeSelectionModeMenuItem>> {
+        val maxCount = count.coerceIn(1, 5)
+        val actions = listOf(
+            mock<MoveMenuAction>(),
+            mock<CopyMenuAction>(),
+            mock<DownloadMenuAction>(),
+            mock<TrashMenuAction>(),
+            mock<HideMenuAction>(),
+        ).take(maxCount)
+        val items = actions
+            .take(maxCount)
+            .map { action ->
+                mock<NodeSelectionModeMenuItem> { on { this.action } doReturn action }
+            }
+
+        return actions to items
+    }
 
     private fun provideNodeType() = Stream.of(
         Arguments.of(

@@ -18,21 +18,27 @@ import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.FlexibleLineListItem
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.CopyMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.ManageLinkMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.icon.pack.IconPack
 
 @Composable
 internal fun NodeMoreOptionsBottomSheet(
-    actions: List<NodeSelectionAction>,
+    actions: List<MenuActionWithIcon>,
     sheetState: SheetState,
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit = {},
-    onActionPressed: ((NodeSelectionAction) -> Unit)? = null,
-    onHelpClicked: ((NodeSelectionAction) -> Unit)? = null,
+    onActionPressed: ((MenuActionWithIcon) -> Unit)? = null,
+    onHelpClicked: ((MenuActionWithIcon) -> Unit)? = null,
 ) {
     MegaModalBottomSheet(
         bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
@@ -56,7 +62,7 @@ internal fun NodeMoreOptionsBottomSheet(
                     )
                 },
                 trailingElement = {
-                    if (action.showHelpButton()) {
+                    if (action is HideMenuAction) {
                         HelpIcon(
                             action = action,
                             contentDescription = "Help for ${action.getDescription()}",
@@ -76,10 +82,10 @@ internal fun NodeMoreOptionsBottomSheet(
 @Composable
 private fun NodeActionIcon(
     modifier: Modifier,
-    action: NodeSelectionAction,
+    action: MenuActionWithIcon,
     contentDescription: String,
 ) {
-    if (action is NodeSelectionAction.RubbishBin) {
+    if (action is TrashMenuAction) {
         MegaIcon(
             modifier = modifier
                 .testTag(ERROR_NODE_ICON_TAG)
@@ -102,9 +108,9 @@ private fun NodeActionIcon(
 
 @Composable
 private fun HelpIcon(
-    action: NodeSelectionAction,
+    action: MenuActionWithIcon,
     contentDescription: String,
-    onHelpClicked: ((NodeSelectionAction) -> Unit)?,
+    onHelpClicked: ((MenuActionWithIcon) -> Unit)?,
 ) {
     MegaIcon(
         modifier = Modifier
@@ -118,20 +124,23 @@ private fun HelpIcon(
 }
 
 @Composable
-private fun NodeSelectionAction.getTextColor(): TextColor = when (this) {
-    is NodeSelectionAction.RubbishBin -> TextColor.Error
+private fun MenuActionWithIcon.getTextColor(): TextColor = when (this) {
+    is TrashMenuAction -> TextColor.Error
     else -> TextColor.Primary
-}
-
-@Composable
-private fun NodeSelectionAction.showHelpButton(): Boolean = when (this) {
-    is NodeSelectionAction.Hide -> true
-    else -> false
 }
 
 @Composable
 @CombinedThemePreviews
 private fun NodeMoreOptionsBottomSheetPreview() {
+    val previewActions = listOf(
+        DownloadMenuAction(),
+        ManageLinkMenuAction(),
+        HideMenuAction(),
+        MoveMenuAction(),
+        CopyMenuAction(),
+        TrashMenuAction()
+    )
+
     AndroidThemeForPreviews {
         val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -140,7 +149,7 @@ private fun NodeMoreOptionsBottomSheetPreview() {
         }
 
         NodeMoreOptionsBottomSheet(
-            actions = NodeSelectionAction.defaults,
+            actions = previewActions,
             sheetState = sheetState,
         )
     }

@@ -32,7 +32,7 @@ import mega.android.core.ui.model.MegaSpanStyle
 import mega.android.core.ui.model.SpanIndicator
 import mega.android.core.ui.model.SpanStyleWithAnnotation
 import mega.android.core.ui.model.TabItems
-import mega.android.core.ui.model.TopAppBarAction
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
 import mega.android.core.ui.theme.AppTheme
@@ -413,7 +413,7 @@ internal fun EmptyTransfersView(
 internal fun TransfersTopBar(
     onBackPress: () -> Unit,
     actions: List<TransferMenuAction>,
-    onActionPressed: (TopAppBarAction) -> Unit,
+    onActionPressed: (MenuActionWithIcon) -> Unit,
 ) {
     MegaTopAppBar(
         navigationType = AppBarNavigationType.Back(onBackPress),
@@ -428,7 +428,7 @@ internal fun SelectActiveTransfersTopBar(
     onClose: () -> Unit,
     selectedAmount: Int,
     actions: List<TransferMenuAction>,
-    onActionPressed: (TopAppBarAction) -> Unit,
+    onActionPressed: (MenuActionWithIcon) -> Unit,
 ) {
     MegaTopAppBar(
         navigationType = AppBarNavigationType.Close(onClose),

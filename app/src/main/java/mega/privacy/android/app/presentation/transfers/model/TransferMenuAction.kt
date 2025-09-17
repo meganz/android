@@ -4,7 +4,8 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
-import mega.android.core.ui.model.TopAppBarAction
+import mega.android.core.ui.model.menu.MenuAction
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.app.R
 import mega.privacy.android.icon.pack.IconPack
 
@@ -12,7 +13,7 @@ import mega.privacy.android.icon.pack.IconPack
  * Transfer menu action.
  * All the actions which may be available in normal mode should be defined here.
  */
-sealed interface TransferMenuAction : TopAppBarAction {
+sealed interface TransferMenuAction : MenuActionWithIcon {
 
     /**
      * Resume transfers
@@ -44,7 +45,8 @@ sealed interface TransferMenuAction : TopAppBarAction {
         testTag = TEST_TAG_MORE_ACTION,
     ), TransferMenuAction {
         @Composable
-        override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical)
+        override fun getIconPainter() =
+            rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical)
     }
 
     /**
@@ -55,7 +57,8 @@ sealed interface TransferMenuAction : TopAppBarAction {
         testTag = TEST_TAG_SELECT_ALL_ACTION,
     ), TransferMenuAction {
         @Composable
-        override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.CheckStack)
+        override fun getIconPainter() =
+            rememberVectorPainter(IconPack.Medium.Thin.Outline.CheckStack)
     }
 
     /**
@@ -88,7 +91,8 @@ sealed interface TransferMenuAction : TopAppBarAction {
         testTag = TEST_TAG_RETRY_ACTION,
     ), TransferMenuAction {
         @Composable
-        override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.RotateCcw)
+        override fun getIconPainter() =
+            rememberVectorPainter(IconPack.Medium.Thin.Outline.RotateCcw)
     }
 
     /**
@@ -98,7 +102,7 @@ sealed interface TransferMenuAction : TopAppBarAction {
     abstract class TransferTopAppBarActionString(
         @StringRes val descriptionRes: Int,
         override val testTag: String,
-    ) : TopAppBarAction {
+    ) : MenuAction {
         @Composable
         override fun getDescription() = stringResource(id = descriptionRes)
     }

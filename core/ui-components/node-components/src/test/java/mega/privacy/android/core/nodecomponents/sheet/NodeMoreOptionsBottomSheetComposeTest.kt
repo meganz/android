@@ -8,6 +8,13 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.delay
+import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.menu.menuaction.CopyMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.ManageLinkMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.nodecomponents.sheet.nodeactions.ERROR_NODE_ICON_TAG
 import mega.privacy.android.core.nodecomponents.sheet.nodeactions.HELP_ICON_TAG
@@ -22,12 +29,20 @@ class NodeMoreOptionsBottomSheetComposeTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
+    val previewActions = listOf(
+        DownloadMenuAction(),
+        ManageLinkMenuAction(),
+        HideMenuAction(),
+        MoveMenuAction(),
+        CopyMenuAction(),
+        TrashMenuAction()
+    )
 
     @OptIn(ExperimentalMaterial3Api::class)
     private fun setContent(
-        options: List<NodeSelectionAction> = emptyList(),
-        onActionPressed: (NodeSelectionAction) -> Unit = {},
-        onHelpClicked: (NodeSelectionAction) -> Unit = {},
+        options: List<MenuActionWithIcon> = emptyList(),
+        onActionPressed: (MenuActionWithIcon) -> Unit = {},
+        onHelpClicked: (MenuActionWithIcon) -> Unit = {},
     ) {
         composeTestRule.setContent {
             val sheetState = rememberModalBottomSheetState(
@@ -51,11 +66,9 @@ class NodeMoreOptionsBottomSheetComposeTest {
 
     @Test
     fun `test that options are displayed correctly`() {
-        val options = NodeSelectionAction.defaults
+        setContent(options = previewActions)
 
-        setContent(options = options)
-
-        options.forEach { option ->
+        previewActions.forEach { option ->
             composeTestRule.onNodeWithTag(option.testTag)
                 .assertExists("Option ${option.testTag} should be displayed")
                 .assertIsDisplayed()
@@ -64,7 +77,7 @@ class NodeMoreOptionsBottomSheetComposeTest {
 
     @Test
     fun `test that help icon is displayed for options with help`() {
-        val option = NodeSelectionAction.defaults.first { it is NodeSelectionAction.Hide }
+        val option = previewActions.first { it is HideMenuAction }
 
         setContent(options = listOf(option))
 
@@ -75,7 +88,7 @@ class NodeMoreOptionsBottomSheetComposeTest {
 
     @Test
     fun `test that error icon is displayed for options with error text color`() {
-        val option = NodeSelectionAction.defaults.first { it is NodeSelectionAction.RubbishBin }
+        val option = previewActions.first { it is TrashMenuAction }
 
         setContent(options = listOf(option))
 
@@ -86,7 +99,7 @@ class NodeMoreOptionsBottomSheetComposeTest {
 
     @Test
     fun `test that regular icon is displayed for options without error text color`() {
-        val option = NodeSelectionAction.defaults.first { it != NodeSelectionAction.RubbishBin }
+        val option = previewActions.first { it !is TrashMenuAction }
 
         setContent(options = listOf(option))
 

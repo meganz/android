@@ -13,6 +13,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.model.menu.MenuActionIconWithClick
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
@@ -26,7 +27,6 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
-import mega.privacy.android.shared.original.core.ui.model.TopAppBarActionWithClick
 
 /**
  * Cloud Drive Screen, used to display contents of a folder
@@ -86,7 +86,7 @@ fun CloudDriveScreen(
                     actions = buildList {
                         if (uiState.items.isNotEmpty()) {
                             add(
-                                TopAppBarActionWithClick(CloudDriveAppBarAction.Search) {
+                                MenuActionIconWithClick(CloudDriveAppBarAction.Search) {
                                     megaNavigator.openSearchActivity(
                                         context = context,
                                         nodeSourceType = viewModel.nodeSourceType,
@@ -99,7 +99,7 @@ fun CloudDriveScreen(
 
                         if (!uiState.isCloudDriveRoot) {
                             add(
-                                TopAppBarActionWithClick(
+                                MenuActionIconWithClick(
                                     CloudDriveAppBarAction.More
                                 ) {
                                     visibleNodeOptionId = uiState.currentFolderId

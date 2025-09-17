@@ -18,7 +18,6 @@ import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.core.nodecomponents.R
-import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionActionUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSelectionModeActionMapper
@@ -135,7 +134,6 @@ class NodeOptionsActionViewModel @Inject constructor(
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode,
-    private val nodeSelectionActionUiMapper: NodeSelectionActionUiMapper,
 ) : ViewModel() {
 
     val uiState: StateFlow<NodeActionState>
@@ -765,8 +763,7 @@ class NodeOptionsActionViewModel @Inject constructor(
                 selectedNodes = selectedNodes.toList(),
                 allNodeCanBeMovedToTarget = canBeMovedToTarget,
                 noNodeInBackups = !anyNodeInBackups
-            ).mapNotNull { nodeSelectionActionUiMapper(it) }
-                .filterNot { it is NodeSelectionAction.More }
+            ).map { it.action }
 
             val visibleActions = if (availableActions.size > DEFAULT_MAX_VISIBLE_ITEMS) {
                 availableActions.take(DEFAULT_MAX_VISIBLE_ITEMS) + NodeSelectionAction.More

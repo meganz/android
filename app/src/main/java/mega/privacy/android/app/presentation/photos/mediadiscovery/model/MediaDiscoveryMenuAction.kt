@@ -3,17 +3,17 @@ package mega.privacy.android.app.presentation.photos.mediadiscovery.model
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
-import mega.android.core.ui.model.TopAppBarAction
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.app.R
 import mega.privacy.android.icon.pack.IconPack
 
 
-sealed interface MediaDiscoveryMenuAction : TopAppBarAction {
+sealed interface MediaDiscoveryMenuAction : MenuActionWithIcon {
 
     /**
      * Filter
      */
-    data object Filter : TopAppBarAction {
+    data object Filter : MenuActionWithIcon {
         override val testTag: String = "media_discovery_app_bar:filter"
 
         @Composable
@@ -27,7 +27,7 @@ sealed interface MediaDiscoveryMenuAction : TopAppBarAction {
     /**
      * More
      */
-    data object More : TopAppBarAction {
+    data object More : MenuActionWithIcon {
         override val testTag: String = "media_discovery_app_bar:more"
 
         @Composable

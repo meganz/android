@@ -18,9 +18,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import mega.android.core.ui.components.toolbar.MegaFloatingToolbar
-import mega.android.core.ui.model.TopAppBarAction
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.nodecomponents.sheet.nodeactions.NodeMoreOptionsBottomSheet
@@ -29,15 +28,14 @@ import mega.privacy.android.domain.entity.node.TypedNode
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NodeSelectionModeBottomBar(
-    availableActions: List<NodeSelectionAction>,
-    visibleActions: List<NodeSelectionAction>,
+    availableActions: List<MenuActionWithIcon>,
+    visibleActions: List<MenuActionWithIcon>,
     visible: Boolean,
     nodeActionHandler: NodeActionHandler,
     selectedNodes: List<TypedNode>,
     isSelecting: Boolean,
     modifier: Modifier = Modifier,
-    viewModel: NodeSelectionModeBottomBarViewModel = hiltViewModel(),
-    onActionPressed: (TopAppBarAction) -> Unit = {},
+    onActionPressed: (MenuActionWithIcon) -> Unit = {},
 ) {
     var showMoreBottomSheet by rememberSaveable { mutableStateOf(false) }
 
@@ -62,16 +60,12 @@ fun NodeSelectionModeBottomBar(
                 onActionPressed = { action ->
                     onActionPressed(action)
 
-                    if (action !is NodeSelectionAction) return@MegaFloatingToolbar
+                    if (action is NodeSelectionAction.More) {
+                        showMoreBottomSheet = true
+                        return@MegaFloatingToolbar
+                    }
 
-                    viewModel.handleAction(
-                        action = action,
-                        selectedNodes = selectedNodes,
-                        nodeActionHandler = nodeActionHandler,
-                        onMoreActionPressed = {
-                            showMoreBottomSheet = true
-                        },
-                    )
+                    nodeActionHandler(action, selectedNodes)
                 }
             )
         }
@@ -86,11 +80,7 @@ fun NodeSelectionModeBottomBar(
             },
             onActionPressed = { action ->
                 onActionPressed(action)
-                viewModel.handleAction(
-                    action = action,
-                    selectedNodes = selectedNodes,
-                    nodeActionHandler = nodeActionHandler,
-                )
+                nodeActionHandler(action, selectedNodes)
                 showMoreBottomSheet = false
             }
         )
