@@ -75,6 +75,7 @@ import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -539,42 +540,6 @@ class NodeOptionsActionViewModel @Inject constructor(
     }
 
     /**
-     * Update select All
-     */
-    fun selectAllClicked() {
-        uiState.update {
-            it.copy(selectAll = triggered)
-        }
-    }
-
-    /**
-     * Consume select All
-     */
-    fun selectAllConsumed() {
-        uiState.update {
-            it.copy(selectAll = consumed)
-        }
-    }
-
-    /**
-     * Update clear All
-     */
-    fun clearAllClicked() {
-        uiState.update {
-            it.copy(clearAll = triggered)
-        }
-    }
-
-    /**
-     * Consume clear All
-     */
-    fun clearAllConsumed() {
-        uiState.update {
-            it.copy(clearAll = consumed)
-        }
-    }
-
-    /**
      * Consumes the event of showing info.
      */
     fun onInfoToShowEventConsumed() {
@@ -632,25 +597,33 @@ class NodeOptionsActionViewModel @Inject constructor(
         nodeContentUriIntentMapper(intent, content, mimeType, isSupported)
     }
 
-    fun handleHiddenNodesOnboardingResult(isOnboarded: Boolean) {
+    fun handleHiddenNodesOnboardingResult(isOnboarded: Boolean, isHidden: Boolean) {
         viewModelScope.launch {
             runCatching {
                 if (isOnboarded) {
                     val selectedNodes = uiState.value.selectedNodes
 
-                    selectedNodes.forEach {
-                        updateNodeSensitiveUseCase(
-                            nodeId = it.id,
-                            isSensitive = true,
-                        )
+                    selectedNodes.forEach { node ->
+                        runCatching {
+                            updateNodeSensitiveUseCase(nodeId = node.id, isSensitive = isHidden)
+                        }.onFailure {
+                            Timber.e(it, "Failed to update node sensitive state for ${node.id}")
+                        }
                     }
                     uiState.update { state ->
                         state.copy(
                             infoToShowEvent = triggered(
-                                LocalizedText.PluralsRes(
-                                    resId = R.plurals.hidden_nodes_result_message,
-                                    quantity = selectedNodes.size,
-                                )
+                                if (isHidden) {
+                                    LocalizedText.PluralsRes(
+                                        resId = R.plurals.hidden_nodes_result_message,
+                                        quantity = selectedNodes.size,
+                                    )
+                                } else {
+                                    LocalizedText.PluralsRes(
+                                        resId = sharedResR.plurals.unhidden_nodes_result_message,
+                                        quantity = selectedNodes.size,
+                                    )
+                                }
                             )
                         )
                     }
@@ -664,7 +637,7 @@ class NodeOptionsActionViewModel @Inject constructor(
             monitorAccountDetailUseCase().first().levelDetail?.accountType
         val isPaid = accountType?.isPaid == true
         val businessStatus =
-            if (isPaid && accountType.isBusinessAccount == true) {
+            if (isPaid && accountType.isBusinessAccount) {
                 getBusinessStatusUseCase()
             } else null
         val isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired

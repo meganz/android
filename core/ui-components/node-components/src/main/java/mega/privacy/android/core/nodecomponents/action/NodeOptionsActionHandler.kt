@@ -104,7 +104,7 @@ internal fun rememberSingleNodeActionHandler(
     val hiddenNodesOnboardingLauncher = rememberLauncherForActivityResult(
         contract = megaActivityResultContract.hiddenNodeOnboardingActivityResultContract
     ) { result ->
-        nodeOptionsActionViewModel.handleHiddenNodesOnboardingResult(result)
+        nodeOptionsActionViewModel.handleHiddenNodesOnboardingResult(result, true)
     }
 
     return remember(
@@ -225,7 +225,7 @@ internal fun rememberMultipleNodesActionHandler(
     val hiddenNodesOnboardingLauncher = rememberLauncherForActivityResult(
         contract = megaActivityResultContract.hiddenNodeOnboardingActivityResultContract
     ) { result ->
-        nodeOptionsActionViewModel.handleHiddenNodesOnboardingResult(result)
+        nodeOptionsActionViewModel.handleHiddenNodesOnboardingResult(result, true)
     }
 
     return remember(

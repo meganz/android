@@ -8,23 +8,20 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
-import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
+import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
-import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
-import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
@@ -42,8 +39,6 @@ class HideBottomSheetMenuItem @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
-    private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
-    private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     private var isPaid: Boolean = false
@@ -105,25 +100,6 @@ class HideBottomSheetMenuItem @Inject constructor(
             return true
 
         return !node.isMarkedSensitive && !node.isSensitiveInherited
-    }
-
-    override fun getOnClickFunction(
-        node: TypedNode,
-        handler: BottomSheetClickHandler,
-    ): () -> Unit = {
-        handler.coroutineScope.launch {
-            // Todo handle analytics tracking
-            //Analytics.tracker.trackEvent(HideNodeMenuItemEvent)
-            val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
-            if (!this@HideBottomSheetMenuItem.isPaid || isBusinessAccountExpired) {
-                handler.actionHandler(menuAction, node)
-            } else if (node.isMarkedSensitive || isHiddenNodesOnboarded) {
-                updateNodeSensitiveUseCase(node.id, true)
-            } else {
-                handler.actionHandler(menuAction, node)
-            }
-        }
-        handler.onDismiss()
     }
 
     private suspend fun isHiddenNodesActive(): Boolean {

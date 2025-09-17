@@ -38,20 +38,4 @@ class SendToChatBottomSheetMenuItem @Inject constructor(
             && isNodeInRubbish.not()
 
     override val groupId = 7
-
-    override fun getOnClickFunction(
-        node: TypedNode,
-        handler: BottomSheetClickHandler
-    ): () -> Unit = {
-        if (node is TypedFileNode) {
-            scope.launch {
-                runCatching {
-                    getNodeToAttachUseCase(node)
-                }.onSuccess { typedNode ->
-                    typedNode?.let { handler.actionHandler(menuAction, it) }
-                }.onFailure { Timber.e(it) }
-            }
-        }
-        handler.onDismiss()
-    }
 }

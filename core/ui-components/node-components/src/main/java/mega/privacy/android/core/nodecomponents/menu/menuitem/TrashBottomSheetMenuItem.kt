@@ -34,24 +34,6 @@ class TrashBottomSheetMenuItem @Inject constructor(
         AccessPermission.FULL,
     ) && isInBackups.not()
 
-    override fun getOnClickFunction(
-        node: TypedNode,
-        handler: BottomSheetClickHandler
-    ): () -> Unit = {
-        handler.onDismiss()
-        val handles = listOf(node.id.longValue)
-        runCatching { nodeHandlesToJsonMapper(handles) }
-            .onSuccess {
-                handler.navigationHandler.navigate(
-                    MoveToRubbishOrDeleteDialogArgs(
-                        isInRubbish = false,
-                        nodeHandles = handles
-                    )
-                )
-            }
-            .onFailure { Timber.e(it) }
-    }
-
     override val isDestructiveAction: Boolean
         get() = true
 

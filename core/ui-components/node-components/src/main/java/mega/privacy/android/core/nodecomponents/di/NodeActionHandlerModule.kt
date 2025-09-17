@@ -6,7 +6,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import mega.privacy.android.core.nodecomponents.action.AvailableOfflineAction
-import mega.privacy.android.core.nodecomponents.action.ClearSelectionAction
 import mega.privacy.android.core.nodecomponents.action.CopyAction
 import mega.privacy.android.core.nodecomponents.action.DeletePermanentAction
 import mega.privacy.android.core.nodecomponents.action.DownloadAction
@@ -18,7 +17,6 @@ import mega.privacy.android.core.nodecomponents.action.MultiNodeAction
 import mega.privacy.android.core.nodecomponents.action.OpenWithAction
 import mega.privacy.android.core.nodecomponents.action.RenameNodeAction
 import mega.privacy.android.core.nodecomponents.action.RestoreAction
-import mega.privacy.android.core.nodecomponents.action.SelectAllAction
 import mega.privacy.android.core.nodecomponents.action.SendToChatAction
 import mega.privacy.android.core.nodecomponents.action.ShareFolderAction
 import mega.privacy.android.core.nodecomponents.action.SingleNodeAction
@@ -90,8 +88,6 @@ object NodeActionHandlerModule {
         copyAction: CopyAction,
         moveAction: MoveAction,
         sendToChatAction: SendToChatAction,
-        selectAllAction: SelectAllAction,
-        clearSelectionAction: ClearSelectionAction,
         restoreAction: RestoreAction,
         hideAction: HideAction,
         moveToRubbishBinAction: MoveToRubbishBinAction,
@@ -106,8 +102,6 @@ object NodeActionHandlerModule {
             copyAction,
             moveAction,
             sendToChatAction,
-            selectAllAction,
-            clearSelectionAction,
             restoreAction,
             hideAction,
             moveToRubbishBinAction,

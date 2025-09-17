@@ -2,7 +2,6 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RenameMenuAction
-import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -25,14 +24,6 @@ class RenameBottomSheetMenuItem @Inject constructor(
         AccessPermission.OWNER,
         AccessPermission.FULL
     ) && isInBackups.not()
-
-    override fun getOnClickFunction(
-        node: TypedNode,
-        handler: BottomSheetClickHandler,
-    ): () -> Unit = {
-        handler.actionHandler(menuAction, node)
-        handler.onDismiss()
-    }
 
     override val groupId = 8
 }

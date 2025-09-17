@@ -39,8 +39,6 @@ data class NodeActionState(
     val outgoingShares: List<ShareData> = emptyList(),
     val contactsData: StateEventWithContent<Triple<List<String>, Boolean, String>> = consumed(),
     val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
-    val selectAll: StateEvent = consumed,
-    val clearAll: StateEvent = consumed,
     val infoToShowEvent: StateEventWithContent<LocalizedText> = consumed(),
     val renameNodeRequestEvent: StateEventWithContent<NodeId> = consumed(),
     val shareFolderDialogEvent: StateEventWithContent<List<Long>> = consumed(),
