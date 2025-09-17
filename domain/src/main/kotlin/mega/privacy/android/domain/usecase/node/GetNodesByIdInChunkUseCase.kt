@@ -32,7 +32,7 @@ class GetNodesByIdInChunkUseCase @Inject constructor(
     ): Flow<Pair<List<TypedNode>, Boolean>> = coroutineScope {
         val sortOrderDiffer = async { getCloudSortOrder() }
         val folderTypeDataDiffer = async { getFolderTypeDataUseCase() }
-        nodeRepository.getNodeChildrenInChunks(
+        nodeRepository.getTypedNodesByIdInChunks(
             nodeId = nodeId,
             order = sortOrderDiffer.await(),
             initialBatchSize = initialBatchSize,

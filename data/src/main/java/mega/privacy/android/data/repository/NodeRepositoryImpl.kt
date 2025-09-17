@@ -279,6 +279,7 @@ internal class NodeRepositoryImpl @Inject constructor(
         megaApiGateway.getNodePathByHandle(nodeId.longValue) ?: ""
     }
 
+    @Deprecated("Use getTypedNodesById")
     override suspend fun getNodeChildren(
         nodeId: NodeId,
         order: SortOrder?,
@@ -1268,7 +1269,34 @@ internal class NodeRepositoryImpl @Inject constructor(
         megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.name
     }
 
-    override suspend fun getNodeChildrenInChunks(
+    override suspend fun getTypedNodesById(
+        nodeId: NodeId,
+        order: SortOrder?,
+        folderTypeData: FolderTypeData?,
+    ): List<TypedNode> = withContext(ioDispatcher) {
+        val token = cancelTokenProvider.getOrCreateCancelToken()
+        val filter = megaSearchFilterMapper(parentHandle = nodeId)
+        val offlineItemsDiffer = async { getAllOfflineNodeHandle() }
+        val megaNodesDiffer = async {
+            megaApiGateway.getChildren(
+                filter,
+                sortOrderIntMapper(order ?: SortOrder.ORDER_NONE),
+                token
+            )
+        }
+        val offlineItems = offlineItemsDiffer.await()
+        val megaNodes = megaNodesDiffer.await()
+
+        megaNodes.mapAsync(getConcurrencyStrategy(megaNodes.size)) { megaNode ->
+            typedNodeMapper(
+                megaNode = megaNode,
+                folderTypeData = folderTypeData,
+                offline = offlineItems[megaNode.handle.toString()]
+            )
+        }
+    }
+
+    override suspend fun getTypedNodesByIdInChunks(
         nodeId: NodeId,
         order: SortOrder?,
         initialBatchSize: Int,
@@ -1284,23 +1312,23 @@ internal class NodeRepositoryImpl @Inject constructor(
         )
 
         // Emit initial batch immediately
-        val initialNodes = allChildren
-            .take(initialBatchSize)
-            .mapAsync(ConcurrencyStrategy.ChunkedParallel(Chunk.Count(40))) { megaNode ->
+        val initialMegaNodes = allChildren.take(initialBatchSize)
+        val initialTypedNodes = initialMegaNodes
+            .mapAsync(getConcurrencyStrategy(initialMegaNodes.size)) { megaNode ->
                 typedNodeMapper(
                     megaNode = megaNode,
                     folderTypeData = folderTypeData,
                     offline = offlineItems[megaNode.handle.toString()]
                 )
             }
-        emit(initialNodes to (allChildren.size > initialBatchSize))
+        emit(initialTypedNodes to (allChildren.size > initialBatchSize))
 
         // If there are more nodes, process them and emit the complete list
         if (allChildren.size > initialBatchSize) {
             // Process remaining nodes in chunks
-            val remainingNodes = allChildren
-                .drop(initialBatchSize)
-                .mapAsync(ConcurrencyStrategy.ChunkedParallel(Chunk.Count(40))) { megaNode ->
+            val remainingMegaNodes = allChildren.drop(initialBatchSize)
+            val remainingTypedNodes = remainingMegaNodes
+                .mapAsync(getConcurrencyStrategy(remainingMegaNodes.size)) { megaNode ->
                     typedNodeMapper(
                         megaNode = megaNode,
                         folderTypeData = folderTypeData,
@@ -1308,7 +1336,19 @@ internal class NodeRepositoryImpl @Inject constructor(
                     )
                 }
             // Second emit: Complete list (initial + remaining) with hasMore = false
-            emit(initialNodes + remainingNodes to false)
+            emit(initialTypedNodes + remainingTypedNodes to false)
         }
     }.flowOn(ioDispatcher)
+
+    /**
+     * Determine concurrency strategy based on the number of nodes to map
+     * @param count
+     * @return ConcurrencyStrategy
+     */
+    private fun getConcurrencyStrategy(count: Int) = when {
+        count <= 100 -> ConcurrencyStrategy.Parallel // Small folders, process in parallel
+        count <= 1000 -> ConcurrencyStrategy.ChunkedParallel(Chunk.Count(20))
+        count <= 5000 -> ConcurrencyStrategy.ChunkedParallel(Chunk.Count(30))
+        else -> ConcurrencyStrategy.ChunkedParallel(Chunk.Count(40)) // Very large folders, larger chunks
+    }
 }

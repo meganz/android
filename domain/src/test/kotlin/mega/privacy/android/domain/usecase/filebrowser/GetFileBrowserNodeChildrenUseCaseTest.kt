@@ -8,8 +8,8 @@ import mega.privacy.android.domain.entity.node.DefaultTypedFolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetFolderTypeDataUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
-import mega.privacy.android.domain.usecase.node.AddNodesTypeUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -23,7 +23,7 @@ class GetFileBrowserNodeChildrenUseCaseTest {
     private val getRootNodeIdUseCase: GetRootNodeIdUseCase = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()
     private val nodeRepository: NodeRepository = mock()
-    private val addNodesTypeUseCase: AddNodesTypeUseCase = mock()
+    private val getFolderTypeDataUseCase: GetFolderTypeDataUseCase = mock()
 
     @Before
     fun setUp() {
@@ -31,7 +31,7 @@ class GetFileBrowserNodeChildrenUseCaseTest {
             getRootNodeIdUseCase = getRootNodeIdUseCase,
             getCloudSortOrder = getCloudSortOrder,
             nodeRepository = nodeRepository,
-            addNodesTypeUseCase = addNodesTypeUseCase,
+            getFolderTypeDataUseCase = getFolderTypeDataUseCase
         )
     }
 
@@ -62,12 +62,11 @@ class GetFileBrowserNodeChildrenUseCaseTest {
             whenever(nodeRepository.getInvalidHandle()).thenReturn(-1L)
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
             whenever(
-                nodeRepository.getNodeChildren(
+                nodeRepository.getTypedNodesById(
                     nodeId = NodeId(handle),
                     getCloudSortOrder()
                 )
             ).thenReturn(nodes)
-            whenever(addNodesTypeUseCase(nodes)).thenReturn(nodes)
             val list = underTest(handle)
             Truth.assertThat(list).isEqualTo(nodes)
         }

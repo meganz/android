@@ -137,7 +137,22 @@ interface NodeRepository {
      * @param order [SortOrder]
      * @return
      */
+    @Deprecated("Use getTypedNodesById")
     suspend fun getNodeChildren(nodeId: NodeId, order: SortOrder? = null): List<UnTypedNode>
+
+    /**
+     * Get node children
+     *
+     * @param nodeId [NodeId]
+     * @param order [SortOrder]
+     * @param folderTypeData [FolderTypeData] Optional data for folder type determination
+     * @return
+     */
+    suspend fun getTypedNodesById(
+        nodeId: NodeId,
+        order: SortOrder? = null,
+        folderTypeData: FolderTypeData? = null,
+    ): List<TypedNode>
 
     /**
      * Get node children in chunks for progressive loading
@@ -152,7 +167,7 @@ interface NodeRepository {
      * @param folderTypeData [FolderTypeData] Optional data for folder type determination
      * @return Flow of pairs containing typed node lists and hasMore flag for progressive loading
      */
-    suspend fun getNodeChildrenInChunks(
+    suspend fun getTypedNodesByIdInChunks(
         nodeId: NodeId,
         order: SortOrder? = null,
         initialBatchSize: Int = 1000,
