@@ -206,6 +206,7 @@ dependencies {
     implementation(project(":feature:payment:payment-snowflake-components"))
     implementation(project(":feature:payment:payment"))
     implementation(project(":feature:home:home"))
+    implementation(project(":feature:notifications:notifications-snowflakes"))
     implementation(project(":core:ui-components:shared-components"))
     implementation(project(":core:navigation-snowflake-components"))
     implementation(project(":core:navigation-contract"))
