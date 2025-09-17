@@ -10,14 +10,15 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.app.R
 import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.transfers.model.completed.CompletedTransferActionsUiState
-import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.FailedTransfersItemClearMenuItemEvent
 import mega.privacy.mobile.analytics.event.FailedTransfersItemRetryMenuItemEvent
 import org.junit.Rule
@@ -107,7 +108,7 @@ class FailedTransferActionsBottomSheetTest {
             onNodeWithTag(TEST_TAG_FAILED_TRANSFER_ACTIONS_PANEL).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_FAILED_TRANSFER).assertIsDisplayed()
             onNodeWithText(fileName).assertIsDisplayed()
-            onNodeWithText(R.string.transfer_cancelled).assertIsDisplayed()
+            onNodeWithText(sharedR.string.transfers_section_cancelled).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_RETRY_ACTION).assertIsDisplayed()
             onNodeWithText(R.string.general_retry).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_CLEAR_FAILED_TRANSFER_ACTION).assertIsDisplayed()

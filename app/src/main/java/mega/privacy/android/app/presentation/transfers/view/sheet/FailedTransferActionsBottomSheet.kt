@@ -11,8 +11,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -27,15 +27,16 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.transfers.model.completed.CompletedTransferActionsUiState
 import mega.privacy.android.app.presentation.transfers.model.completed.CompletedTransferActionsViewModel
 import mega.privacy.android.app.presentation.transfers.view.failed.TEST_TAG_FAILED_TRANSFERS_VIEW
+import mega.privacy.android.core.sharedcomponents.BottomSheetAction
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.core.sharedcomponents.BottomSheetAction
 import mega.privacy.android.feature.transfers.components.FailedTransferBottomSheetHeader
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.FailedTransfersItemClearMenuItemEvent
 import mega.privacy.mobile.analytics.event.FailedTransfersItemRetryMenuItemEvent
 
@@ -108,7 +109,7 @@ fun FailedTransferActionsBottomSheet(
                     error
                 )
             } else {
-                stringResource(R.string.transfer_cancelled)
+                stringResource(sharedR.string.transfers_section_cancelled)
             },
             isError = isError,
             fileTypeResId = fileTypeResId,
