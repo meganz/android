@@ -452,8 +452,6 @@
     <string name="my_account_change_password_newPassword1">Новый пароль</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">Подтверждение нового пароля</string>
-    <!-- the user can get the link and it’s copied to the clipboard -->
-    <string name="file_properties_get_link">Ссылка скопирована в буфер обмена</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Для новой регистрации выйдите из системы</string>
     <!-- menu item -->
@@ -1426,8 +1424,6 @@
     <string name="save_file_system">В файловую систему</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">Пользователи MEGA, просканировавшие ваш QR-код, будут автоматически добавлены в ваш список контактов.</string>
-    <!-- Text shown when it has been copied the QR code link -->
-    <string name="qrcode_link_copied">Ссылка скопирована в буфер обмена</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
     <string name="qrcode_reset_successfully">QR-код перезагружен</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
@@ -2188,8 +2184,6 @@
     <string name="custom_subtitle_of_group_chat">%1$s и ещё %2$d</string>
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
     <string name="message_error_set_title_get_link">Перед тем как создать ссылку на этот чат, вам нужно добавить описание:</string>
-    <!-- success alert when the user copy a chat link to the clipboard -->
-    <string name="chat_link_copied_clipboard">Ссылка скопирована в буфер обмена</string>
     <!-- Message shown when a call starts. -->
     <string name="call_started_messages">Звонок начался</string>
     <!-- Title of the dialog to inform about a SSL error -->
@@ -3006,13 +3000,6 @@
         <item quantity="many">Ссылки отправлены</item>
         <item quantity="other">Ссылки отправлены</item>
     </plurals>
-    <!-- Confirmation shown informing links have been copied to the clipboard -->
-    <plurals name="links_copied_clipboard">
-        <item quantity="one">Ссылка скопирована в буфер обмена</item>
-        <item quantity="few">Ссылки скопированы в буфер обмена</item>
-        <item quantity="many">Ссылки скопированы в буфер обмена</item>
-        <item quantity="other">Ссылки скопированы в буфер обмена</item>
-    </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">Очистить все локальные файлы?</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -3093,8 +3080,6 @@
     <string name="tip_invite_more_participants">Пригласите на встречу больше участников. Проведите вверх, чтобы пригласить.</string>
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">Вы новый организатор</string>
-    <!-- the content of snack bar when copied meeting link-->
-    <string name="copied_meeting_link">Ссылка скопирована в буфер обмена</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Присоединиться к текущей встрече.</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -3550,7 +3535,7 @@
     <!-- Hint the screen is locked in video player page -->
     <string name="video_player_locked_hint">Экран заблокирован</string>
     <!-- Hint that tap to unlock in video player page -->
-    <string name="video_player_unlock_hint">Коснитесь, чтобы разблокировать</string>
+    <string name="video_player_unlock_hint">Нажмите, чтобы разблокировать</string>
     <!-- Label that schedule a meeting -->
     <string name="chat_schedule_meeting">Запланировать встречу</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
@@ -3584,7 +3569,7 @@
     <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_left_to_add_message">Вы уже добавили все свои контакты в этот чат. Если хотите добавить больше участников, сначала пригласите их в свой список контактов.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
-    <string name="media_player_video_snackbar_screenshot_saved">Изображение сохранено в галерею устройства</string>
+    <string name="media_player_video_snackbar_screenshot_saved">Изображение сохранено на устройстве</string>
     <!-- Album creation dialog title -->
     <string name="photos_album_creation_dialog_title">Введите название альбома</string>
     <!-- Album creation input name placeholder -->
@@ -3634,8 +3619,6 @@
     <string name="cloud_drive_media_discovery_banner_ok">Понятно</string>
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">Любой пользователь с этой ссылкой может присоединиться к встрече и просмотреть чат встречи.</string>
-    <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
-    <string name="scheduled_meetings_meeting_link_copied">Ссылка скопирована в буфер обмена</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
         <item quantity="one">Альбом «%s» удалён</item>
@@ -5018,7 +5001,7 @@
         <item quantity="other">%1$d участника ждут подключения к звонку «%2$s».</item>
     </plurals>
     <!-- Title of video option of snapshot-->
-    <string name="media_player_video_option_snapshot_title">Снимок</string>
+    <string name="media_player_video_option_snapshot_title">Съёмка</string>
     <!-- Title of video option of lock-->
     <string name="media_player_video_option_lock_title">Заблокировать</string>
     <!-- Title of video option of zoom to fill-->

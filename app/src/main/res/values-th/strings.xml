@@ -434,8 +434,6 @@
     <string name="my_account_change_password_newPassword1">รหัสผ่านใหม่</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">ยืนยันรหัสผ่านใหม่</string>
-    <!-- the user can get the link and it’s copied to the clipboard -->
-    <string name="file_properties_get_link">คัดลอกลิงก์ไปไว้ที่คลิปบอร์ดแล้ว</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">ออกจากระบบก่อนที่จะสร้างบัญชีใหม่</string>
     <!-- menu item -->
@@ -1333,8 +1331,6 @@
     <string name="save_file_system">ไปยังไฟล์ระบบ</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">ผู้ใช้ MEGA ที่สแกนคิวอาร์โค้ดของคุณ จะถูกเพิ่มลงในรายชื่อผู้ติดต่อของคุณโดยอัตโนมัติ</string>
-    <!-- Text shown when it has been copied the QR code link -->
-    <string name="qrcode_link_copied">คัดลอกลิงก์ไปไว้ที่คลิปบอร์ดแล้ว</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
     <string name="qrcode_reset_successfully">รีเซ็ตคิวอาร์โค้ดแล้ว</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
@@ -2038,8 +2034,6 @@
     <string name="custom_subtitle_of_group_chat">%1$s และอื่น ๆ อีก %2$d รายการ</string>
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
     <string name="message_error_set_title_get_link">ก่อนที่คุณจะสามารถสร้างลิงก์สำหรับการแชทนี้คุณต้องตั้งคำอธิบาย:</string>
-    <!-- success alert when the user copy a chat link to the clipboard -->
-    <string name="chat_link_copied_clipboard">คัดลอกลิงก์ไปไว้ที่คลิปบอร์ดแล้ว</string>
     <!-- Message shown when a call starts. -->
     <string name="call_started_messages">เริ่มการโทร</string>
     <!-- Title of the dialog to inform about a SSL error -->
@@ -2766,10 +2760,6 @@
     <plurals name="links_sent">
         <item quantity="other">ลิงก์ถูกส่งแล้ว</item>
     </plurals>
-    <!-- Confirmation shown informing links have been copied to the clipboard -->
-    <plurals name="links_copied_clipboard">
-        <item quantity="other">คัดลอกลิงก์ไปไว้ที่คลิปบอร์ดแล้ว</item>
-    </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">ล้างไฟล์ออฟไลน์ทั้งหมดหรือไม่</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -2850,8 +2840,6 @@
     <string name="tip_invite_more_participants">เชิญผู้เข้าร่วมประชุมเพิ่มเติม ปัดขึ้นเพื่อเชิญ</string>
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">คุณเป็นผู้จัดการประชุมคนใหม่</string>
-    <!-- the content of snack bar when copied meeting link-->
-    <string name="copied_meeting_link">คัดลอกลิงก์ไปไว้ที่คลิปบอร์ดแล้ว</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">แตะเพื่อเข้าร่วมการประชุมปัจจุบัน</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -3323,7 +3311,7 @@
     <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_left_to_add_message">คุณได้เพิ่มผู้ติดต่อทั้งหมดในแชทนี้แล้ว หากคุณต้องการเพิ่มผู้เข้าร่วมคนอื่น ขั้นแรกให้ส่งคำเชิญเพื่อเพิ่มไปที่รายชื่อผู้ติดต่อของคุณก่อน</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
-    <string name="media_player_video_snackbar_screenshot_saved">บันทึกภาพไว้ในแกลเลอรี่อุปกรณ์ของคุณแล้ว</string>
+    <string name="media_player_video_snackbar_screenshot_saved">รูปภาพที่บันทึกไว้ในอุปกรณ์ของคุณ</string>
     <!-- Album creation dialog title -->
     <string name="photos_album_creation_dialog_title">กรอกชื่ออัลบั้ม</string>
     <!-- Album creation input name placeholder -->
@@ -3370,8 +3358,6 @@
     <string name="cloud_drive_media_discovery_banner_ok">ตกลง เข้าใจแล้ว</string>
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">ทุกคนที่มีลิงก์นี้สามารถเข้าร่วมการประชุมและดูแชทการประชุมได้</string>
-    <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
-    <string name="scheduled_meetings_meeting_link_copied">คัดลอกลิงก์ไปไว้ที่คลิปบอร์ดแล้ว</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
         <item quantity="other">ลบออก %d อัลบั้มแล้ว</item>
@@ -4367,7 +4353,7 @@
         <item quantity="other">มีคนกำลังรอเข้าร่วมสาย “%2$s” อยู่ %1$d คน</item>
     </plurals>
     <!-- Title of video option of snapshot-->
-    <string name="media_player_video_option_snapshot_title">สแนปช็อต</string>
+    <string name="media_player_video_option_snapshot_title">จับภาพ</string>
     <!-- Title of video option of lock-->
     <string name="media_player_video_option_lock_title">ล็อก</string>
     <!-- Title of video option of zoom to fill-->

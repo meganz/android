@@ -434,8 +434,6 @@
     <string name="my_account_change_password_newPassword1">Kata sandi baru</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">Konfirmasi kata sandi baru</string>
-    <!-- the user can get the link and it’s copied to the clipboard -->
-    <string name="file_properties_get_link">Tautan disalin ke papan klip</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Keluar sebelum membuat akun</string>
     <!-- menu item -->
@@ -1333,8 +1331,6 @@
     <string name="save_file_system">Ke sistem file</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">Kontak yang memindai Kode QR anda akan secara otomatis ditambahkan ke daftar kontak anda.</string>
-    <!-- Text shown when it has been copied the QR code link -->
-    <string name="qrcode_link_copied">Tautan disalin ke papan klip</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
     <string name="qrcode_reset_successfully">Atur ulang kode QR</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
@@ -2038,8 +2034,6 @@
     <string name="custom_subtitle_of_group_chat">%1$s dan %2$d lebih</string>
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
     <string name="message_error_set_title_get_link">Sebelum anda dapat membuat tautan untuk obrolan ini, anda perlu menetapkan deskripsi:</string>
-    <!-- success alert when the user copy a chat link to the clipboard -->
-    <string name="chat_link_copied_clipboard">Tautan disalin ke papan klip</string>
     <!-- Message shown when a call starts. -->
     <string name="call_started_messages">Panggilan Dimulai</string>
     <!-- Title of the dialog to inform about a SSL error -->
@@ -2766,10 +2760,6 @@
     <plurals name="links_sent">
         <item quantity="other">Tautan dikirim</item>
     </plurals>
-    <!-- Confirmation shown informing links have been copied to the clipboard -->
-    <plurals name="links_copied_clipboard">
-        <item quantity="other">Tautan disalin ke papan klip</item>
-    </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">Hapus semua file offline?</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -2850,8 +2840,6 @@
     <string name="tip_invite_more_participants">Undang lebih banyak peserta ke pertemuan. Geser ke atas untuk mengundang.</string>
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">Anda adalah tuan rumah baru</string>
-    <!-- the content of snack bar when copied meeting link-->
-    <string name="copied_meeting_link">Tautan disalin ke papan klip</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Ketuk untuk bergabung dengan rapat saat ini.</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -3323,7 +3311,7 @@
     <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_left_to_add_message">Anda telah menambahkan semua kontak anda ke obrolan ini. Jika anda ingin menambahkan lebih banyak peserta, undang mereka terlebih dahulu ke daftar kontak anda.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
-    <string name="media_player_video_snackbar_screenshot_saved">Gambar yang disimpan ke galeri perangkat anda</string>
+    <string name="media_player_video_snackbar_screenshot_saved">Gambar disimpan ke perangkat anda</string>
     <!-- Album creation dialog title -->
     <string name="photos_album_creation_dialog_title">Masukkan nama album</string>
     <!-- Album creation input name placeholder -->
@@ -3370,8 +3358,6 @@
     <string name="cloud_drive_media_discovery_banner_ok">OK, mengerti</string>
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">Siapa pun yang memiliki tautan ini dapat bergabung ke rapat dan melihat obrolan rapat.</string>
-    <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
-    <string name="scheduled_meetings_meeting_link_copied">Tautan disalin ke papan klip</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
         <item quantity="other">%d album dihapus</item>
@@ -4367,7 +4353,7 @@
         <item quantity="other">%1$d peserta sedang menunggu untuk bergabung “%2$s”.</item>
     </plurals>
     <!-- Title of video option of snapshot-->
-    <string name="media_player_video_option_snapshot_title">Cuplikan</string>
+    <string name="media_player_video_option_snapshot_title">Ambil foto</string>
     <!-- Title of video option of lock-->
     <string name="media_player_video_option_lock_title">Kunci</string>
     <!-- Title of video option of zoom to fill-->

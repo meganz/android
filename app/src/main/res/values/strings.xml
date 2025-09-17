@@ -440,8 +440,6 @@
     <string name="my_account_change_password_newPassword1">New password</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">Confirm new password</string>
-    <!-- the user can get the link and it’s copied to the clipboard -->
-    <string name="file_properties_get_link">Copied link to clipboard</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Log out before creating the account</string>
     <!-- menu item -->
@@ -1364,8 +1362,6 @@
     <string name="save_file_system">To file system</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">MEGA users who scan your QR code will be automatically added to your contact list.</string>
-    <!-- Text shown when it has been copied the QR code link -->
-    <string name="qrcode_link_copied">Copied link to clipboard</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
     <string name="qrcode_reset_successfully">QR code reset</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
@@ -2088,8 +2084,6 @@
     <string name="custom_subtitle_of_group_chat">%1$s and %2$d more</string>
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
     <string name="message_error_set_title_get_link">Before you can generate a link for this chat, you need to set a description:</string>
-    <!-- success alert when the user copy a chat link to the clipboard -->
-    <string name="chat_link_copied_clipboard">Copied link to clipboard</string>
     <!-- Message shown when a call starts. -->
     <string name="call_started_messages">Call started</string>
     <!-- Title of the dialog to inform about a SSL error -->
@@ -2846,11 +2840,6 @@
         <item quantity="one">Link sent</item>
         <item quantity="other">Links sent</item>
     </plurals>
-    <!-- Confirmation shown informing links have been copied to the clipboard -->
-    <plurals name="links_copied_clipboard">
-        <item quantity="one">Copied link to clipboard</item>
-        <item quantity="other">Copied links to clipboard</item>
-    </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">Clear all offline files?</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -2931,8 +2920,6 @@
     <string name="tip_invite_more_participants">Invite more participants to the meeting. Swipe up to invite.</string>
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">You are the new host</string>
-    <!-- the content of snack bar when copied meeting link-->
-    <string name="copied_meeting_link">Copied link to clipboard</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Tap to join current meeting.</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -3458,8 +3445,6 @@
     <string name="cloud_drive_media_discovery_banner_ok">OK, got it</string>
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">Anyone with this link can join the meeting and view the meeting chat.</string>
-    <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
-    <string name="scheduled_meetings_meeting_link_copied">Copied link to clipboard</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
         <item quantity="one">“%s” deleted</item>

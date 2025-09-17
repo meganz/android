@@ -384,8 +384,6 @@
     <string name="account_cancellation_instructions_web_browser_description">เนื่องจากคุณสมัครใช้งาน MEGA ในเว็บเบราว์เซอร์ หากต้องการยกเลิกการสมัครใช้งาน คุณต้อง:</string>
     <!-- Label for cancellation instructions on a computer -->
     <string name="account_cancellation_instructions_on_computer">บนคอมพิวเตอร์</string>
-    <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website">1. ไปที่ [A]https://mega.nz[/A] ในเว็บเบราว์เซอร์ของคุณ</string>
     <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
     <string name="account_cancellation_instructions_login_account">2. เข้าสู่ระบบบัญชี MEGA ของคุณ</string>
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
@@ -1180,10 +1178,6 @@
     <string name="free_plan_card_existing_button">ดำเนินการต่อด้วยแผนฟรี</string>
     <!-- Storage feature label for the free plan card, e.g. '20 GB of storage' -->
     <string name="free_plan_card_storage_feature_for_existing_user">พื้นที่เก็บข้อมูล %1$s</string>
-    <!-- Sort by newest shares -->
-    <string name="general_sort_newest_shares">แชร์ใหม่ล่าสุด</string>
-    <!-- Sort by oldest shares -->
-    <string name="general_sort_oldest_shares">แชร์เก่าที่สุด</string>
     <!-- Title for recovery key error dialog -->
     <string name="recovery_key_error_title">ข้อผิดพลาดเกี่ยวกับคีย์การกู้คืน</string>
     <!-- Description for recovery key error dialog -->
@@ -1463,7 +1457,7 @@
         <item quantity="other"></item>
     </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="context_share_correctly_removed">แชร์ได้ถูกลบออกอย่างถูกต้องแล้ว</string>
+    <string name="context_share_correctly_removed">Access removed</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">ใช่</string>
     <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1512,7 +1506,7 @@
     <!-- dialog option continue in alert dialog -->
     <string name="button_continue">ดำเนินการต่อ</string>
     <!--Dialog title when the user selected is not on the contact list when sharing a node -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">ไม่สามารถตรวจสอบผู้ติดต่อได้</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Can’t verify contact</string>
     <!--Dialog description when the user selected is not on the contact list when sharing a node -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">คุณไม่สามารถตรวจสอบ %s ได้เนื่องจากไม่ได้อยู่ในรายชื่อผู้ติดต่อของคุณ รอให้พวกเขาตอบรับคำเชิญของคุณก่อน</string>
     <!-- Answer for confirmation dialog. -->
@@ -1597,4 +1591,14 @@
     <string name="action_sort_by_link">ลิงก์</string>
     <!-- Header of action to sort nodes -->
     <string name="action_sort_by_header">เรียงตาม</string>
+    <!-- Confirmation shown informing link has been copied to the clipboard -->
+    <string name="general_link_copied_clipboard">คัดลอกลิงก์ไปไว้ที่คลิปบอร์ดแล้ว</string>
+    <!-- Confirmation shown informing links have been copied to the clipboard -->
+    <string name="general_links_copied_clipboard">คัดลอกลิงก์ไปไว้ที่คลิปบอร์ดแล้ว</string>
+    <!-- Snackbar message when retry success on failed transfers tab, singular form. -->
+    <string name="transfers_retry_feedback_snackbar_message_singular">Retrying transfer, see the Active tab for progress</string>
+    <!-- Snackbar message when retry success on failed transfers tab, plural form. -->
+    <string name="transfers_retry_feedback_snackbar_message_plural">Retrying transfers, see the Active tab for progress</string>
+    <!--Default file name for scanned documents. Placeholder value is for the current date and time values eg:   Scanned_2025091120323.  -->
+    <string name="document_scanning_default_file_name">Scanned_%1$s</string>
 </resources>

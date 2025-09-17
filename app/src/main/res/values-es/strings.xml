@@ -127,7 +127,7 @@
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">¿Nuevo en MEGA?</string>
     <!-- button that allows the user to create an account -->
-    <string name="create_account">Registra una cuenta de MEGA</string>
+    <string name="create_account">Crear cuenta</string>
     <!-- when the user tries to log in MEGA without typing the email -->
     <string name="error_enter_email">Introduce tu email</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
@@ -446,8 +446,6 @@
     <string name="my_account_change_password_newPassword1">Nueva contraseña</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">Confirma tu nueva contraseña</string>
-    <!-- the user can get the link and it’s copied to the clipboard -->
-    <string name="file_properties_get_link">Enlace copiado al portapapeles</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Cierra sesión antes de crear la cuenta</string>
     <!-- menu item -->
@@ -1395,8 +1393,6 @@
     <string name="save_file_system">En el sistema de archivos</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">Los usuarios de MEGA que escanean tu código QR se añadirán automáticamente a tu lista de contactos.</string>
-    <!-- Text shown when it has been copied the QR code link -->
-    <string name="qrcode_link_copied">Enlace copiado al portapapeles</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
     <string name="qrcode_reset_successfully">Código QR restablecido</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
@@ -2138,8 +2134,6 @@
     <string name="custom_subtitle_of_group_chat">%1$s y %2$d más</string>
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
     <string name="message_error_set_title_get_link">Para generar un enlace del chat, tienes que añadir una descripción primero:</string>
-    <!-- success alert when the user copy a chat link to the clipboard -->
-    <string name="chat_link_copied_clipboard">Enlace copiado al portapapeles</string>
     <!-- Message shown when a call starts. -->
     <string name="call_started_messages">Llamada iniciada</string>
     <!-- Title of the dialog to inform about a SSL error -->
@@ -2513,7 +2507,7 @@
     <!-- Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan -->
     <string name="over_disk_quota_paywall_text_no_warning_dates_info">Te hemos contactado por correo electrónico a %1$s pero sigues teniendo %2$s archivos que ocupan %3$s en tu cuenta de MEGA, lo cual requiere una cuenta %4$s.</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color -->
-    <string name="over_disk_quota_paywall_deletion_warning">[B]Te quedan[M]%s[/M] para ampliar la cuenta[/B]. Después de eso, tus datos estarán sujetos a eliminación.</string>
+    <string name="over_disk_quota_paywall_deletion_warning">[B]Te quedan [M]%s[/M] para ampliar la cuenta[/B]. Después de eso, tus datos estarán sujetos a eliminación.</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning if no data available -->
     <string name="over_disk_quota_paywall_deletion_warning_no_data">[B]Tienes que ampliar tu cuenta[/B]. Actualmente, tus datos están sujetos a eliminación.</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning if no time left. “save” here means safeguard, protect, and not write to disk. -->
@@ -2926,12 +2920,6 @@
         <item quantity="many">Enlaces enviados</item>
         <item quantity="other">Enlaces enviados</item>
     </plurals>
-    <!-- Confirmation shown informing links have been copied to the clipboard -->
-    <plurals name="links_copied_clipboard">
-        <item quantity="one">Enlace copiado al portapapeles</item>
-        <item quantity="many">Enlaces copiados al portapapeles</item>
-        <item quantity="other">Enlaces copiados al portapapeles</item>
-    </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">¿Eliminar todos los archivos sin conexión?</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -3012,8 +3000,6 @@
     <string name="tip_invite_more_participants">Invita a más participantes a la reunión. Desliza hacia arriba para invitar.</string>
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">Eres el nuevo anfitrión</string>
-    <!-- the content of snack bar when copied meeting link-->
-    <string name="copied_meeting_link">Enlace copiado al portapapeles</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Toca para unirte a la reunión.</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -3497,7 +3483,7 @@
     <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_left_to_add_message">Ya has añadido todos tus contactos a este chat. Si quieres añadir más participantes, primero invítalos a tu lista de contactos.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
-    <string name="media_player_video_snackbar_screenshot_saved">Imagen guardada en la galería de tu dispositivo</string>
+    <string name="media_player_video_snackbar_screenshot_saved">Imagen guardada en tu dispositivo</string>
     <!-- Album creation dialog title -->
     <string name="photos_album_creation_dialog_title">Introducir el nombre del álbum</string>
     <!-- Album creation input name placeholder -->
@@ -3546,8 +3532,6 @@
     <string name="cloud_drive_media_discovery_banner_ok">Entendido</string>
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">Los que tengan este enlace podrán unirse a la reunión y ver el chat de la reunión.</string>
-    <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
-    <string name="scheduled_meetings_meeting_link_copied">Enlace copiado al portapapeles</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
         <item quantity="one">“%s” ha sido eliminado</item>
@@ -4801,7 +4785,7 @@
         <item quantity="other">%1$d participantes están esperando para unirse a “%2$s”.</item>
     </plurals>
     <!-- Title of video option of snapshot-->
-    <string name="media_player_video_option_snapshot_title">Snapshot</string>
+    <string name="media_player_video_option_snapshot_title">Capturar</string>
     <!-- Title of video option of lock-->
     <string name="media_player_video_option_lock_title">Bloquear</string>
     <!-- Title of video option of zoom to fill-->

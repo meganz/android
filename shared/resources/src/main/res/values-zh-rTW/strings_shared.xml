@@ -384,8 +384,6 @@
     <string name="account_cancellation_instructions_web_browser_description">這是因為您在網頁瀏覽器中訂閱了MEGA。若要取消訂閱，您需要：</string>
     <!-- Label for cancellation instructions on a computer -->
     <string name="account_cancellation_instructions_on_computer">在電腦上</string>
-    <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website">1.在您的網頁瀏覽器中造訪[A]https://mega.nz[/A]。</string>
     <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
     <string name="account_cancellation_instructions_login_account">2. 登入您的MEGA帳戶。</string>
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
@@ -1180,10 +1178,6 @@
     <string name="free_plan_card_existing_button">繼續使用免費方案</string>
     <!-- Storage feature label for the free plan card, e.g. '20 GB of storage' -->
     <string name="free_plan_card_storage_feature_for_existing_user">%1$s儲存空間</string>
-    <!-- Sort by newest shares -->
-    <string name="general_sort_newest_shares">最新的共享</string>
-    <!-- Sort by oldest shares -->
-    <string name="general_sort_oldest_shares">最舊的共享</string>
     <!-- Title for recovery key error dialog -->
     <string name="recovery_key_error_title">還原金鑰錯誤</string>
     <!-- Description for recovery key error dialog -->
@@ -1463,7 +1457,7 @@
         <item quantity="other"></item>
     </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="context_share_correctly_removed">共享已移除</string>
+    <string name="context_share_correctly_removed">Access removed</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">是</string>
     <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1511,7 +1505,7 @@
     <!-- dialog option continue in alert dialog -->
     <string name="button_continue">繼續</string>
     <!--Dialog title when the user selected is not on the contact list when sharing a node -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">無法驗證聯絡人</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Can’t verify contact</string>
     <!--Dialog description when the user selected is not on the contact list when sharing a node -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">您無法驗證%s，因為他們不在您的聯絡人列表中。請先等待他們接受您的邀請。</string>
     <!-- Answer for confirmation dialog. -->
@@ -1589,9 +1583,19 @@
     <!-- category in sort by action to sort by node label name -->
     <string name="action_sort_by_label">標籤</string>
     <!-- category in sort by action to sort by favorite -->
-    <string name="action_sort_by_favorite">Favorite</string>
+    <string name="action_sort_by_favorite">收藏</string>
     <!-- category in sort by action to sort by link creation date -->
     <string name="action_sort_by_link">連結</string>
     <!-- Header of action to sort nodes -->
     <string name="action_sort_by_header">排序</string>
+    <!-- Confirmation shown informing link has been copied to the clipboard -->
+    <string name="general_link_copied_clipboard">已複製連結到剪貼簿</string>
+    <!-- Confirmation shown informing links have been copied to the clipboard -->
+    <string name="general_links_copied_clipboard">已複製連結到剪貼簿</string>
+    <!-- Snackbar message when retry success on failed transfers tab, singular form. -->
+    <string name="transfers_retry_feedback_snackbar_message_singular">正在重試傳輸，請查看進行中的傳輸分頁瞭解進度</string>
+    <!-- Snackbar message when retry success on failed transfers tab, plural form. -->
+    <string name="transfers_retry_feedback_snackbar_message_plural">正在重試傳輸，請查看進行中的傳輸分頁瞭解進度</string>
+    <!--Default file name for scanned documents. Placeholder value is for the current date and time values eg:   Scanned_2025091120323.  -->
+    <string name="document_scanning_default_file_name">Scanned_%1$s</string>
 </resources>

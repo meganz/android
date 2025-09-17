@@ -384,8 +384,6 @@
     <string name="account_cancellation_instructions_web_browser_description">Ini karena anda berlangganan MEGA di browser web anda. Untuk membatalkan langganan anda, anda harus:</string>
     <!-- Label for cancellation instructions on a computer -->
     <string name="account_cancellation_instructions_on_computer">Di komputer</string>
-    <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website">1. Kunjungi [A]https://mega.nz[/A] di browser web anda.</string>
     <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
     <string name="account_cancellation_instructions_login_account">2. Masuk ke akun MEGA anda.</string>
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
@@ -1180,10 +1178,6 @@
     <string name="free_plan_card_existing_button">Lanjutkan dengan paket gratis</string>
     <!-- Storage feature label for the free plan card, e.g. '20 GB of storage' -->
     <string name="free_plan_card_storage_feature_for_existing_user">%1$s penyimpanan</string>
-    <!-- Sort by newest shares -->
-    <string name="general_sort_newest_shares">Berbagi terbaru</string>
-    <!-- Sort by oldest shares -->
-    <string name="general_sort_oldest_shares">Berbagi tertua</string>
     <!-- Title for recovery key error dialog -->
     <string name="recovery_key_error_title">Kesalahan kunci pemulihan</string>
     <!-- Description for recovery key error dialog -->
@@ -1464,7 +1458,7 @@
         <item quantity="other"></item>
     </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="context_share_correctly_removed">Berbagi telah berhasil dihapus</string>
+    <string name="context_share_correctly_removed">Access removed</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Ya</string>
     <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1513,7 +1507,7 @@
     <!-- dialog option continue in alert dialog -->
     <string name="button_continue">Lanjutkan</string>
     <!--Dialog title when the user selected is not on the contact list when sharing a node -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Tidak dapat memverifikasi kontak</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Can’t verify contact</string>
     <!--Dialog description when the user selected is not on the contact list when sharing a node -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">Anda tidak dapat memverifikasi %s karena mereka tidak ada dalam daftar kontak anda. Tunggu mereka menerima undangan anda terlebih dahulu.</string>
     <!-- Answer for confirmation dialog. -->
@@ -1598,4 +1592,14 @@
     <string name="action_sort_by_link">Tautan</string>
     <!-- Header of action to sort nodes -->
     <string name="action_sort_by_header">Urutkan berdasar</string>
+    <!-- Confirmation shown informing link has been copied to the clipboard -->
+    <string name="general_link_copied_clipboard">Tautan disalin ke papan klip</string>
+    <!-- Confirmation shown informing links have been copied to the clipboard -->
+    <string name="general_links_copied_clipboard">Tautan disalin ke papan klip</string>
+    <!-- Snackbar message when retry success on failed transfers tab, singular form. -->
+    <string name="transfers_retry_feedback_snackbar_message_singular">Retrying transfer, see the Active tab for progress</string>
+    <!-- Snackbar message when retry success on failed transfers tab, plural form. -->
+    <string name="transfers_retry_feedback_snackbar_message_plural">Retrying transfers, see the Active tab for progress</string>
+    <!--Default file name for scanned documents. Placeholder value is for the current date and time values eg:   Scanned_2025091120323.  -->
+    <string name="document_scanning_default_file_name">Scanned_%1$s</string>
 </resources>

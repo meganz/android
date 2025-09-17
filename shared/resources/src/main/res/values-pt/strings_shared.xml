@@ -400,8 +400,6 @@
     <string name="account_cancellation_instructions_web_browser_description">Você assinou o MEGA usando um navegador. Para cancelar a sua assinatura, você precisa fazer o seguinte:</string>
     <!-- Label for cancellation instructions on a computer -->
     <string name="account_cancellation_instructions_on_computer">Usando um computador</string>
-    <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website">1. Acesse [A]https://mega.nz[/A] usando um navegador.</string>
     <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
     <string name="account_cancellation_instructions_login_account">2. Faça login na sua conta do MEGA.</string>
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
@@ -1019,7 +1017,7 @@
     <!-- USP Carousel page 4 description-->
     <string name="carousel_page_description_slide_4">Converse com amigos e familiares, compartilhe fotos ou informação confidencial, faça chamadas de vídeo e agende reuniões: segurança e privacidade garantidas.</string>
     <!-- Create account label-->
-    <string name="general_label_create_account">Criar uma conta no MEGA</string>
+    <string name="general_label_create_account">Criar conta</string>
     <!-- The new feature hidden nodes feature -->
     <string name="hidden_nodes_new_feature">Novo recurso: arquivos e pastas ocultos</string>
     <!-- Hidden nodes: hide files and folders feature -->
@@ -1091,7 +1089,7 @@
     <!-- Title of the tab section for active transfers -->
     <string name="transfers_section_tab_title_active_transfers">Ativas</string>
     <!-- Title of the tab section for failed transfers -->
-    <string name="transfers_section_tab_title_failed_transfers">Canceladas</string>
+    <string name="transfers_section_tab_title_failed_transfers">Falhas</string>
     <!--Text for showing the empty state when there are no transfers. The [A][/A] format marks are to put the text in a different color and style.-->
     <string name="transfers_no_transfers_empty_text">Não há transferências</string>
     <!--Text for showing the empty state when there are no active transfers. The [A][/A] format marks are to put the text in a different color and style.-->
@@ -1214,10 +1212,6 @@
     <string name="free_plan_card_existing_button">Continuar com o plano gratuito</string>
     <!-- Storage feature label for the free plan card, e.g. '20 GB of storage' -->
     <string name="free_plan_card_storage_feature_for_existing_user">%1$s de armazenamento</string>
-    <!-- Sort by newest shares -->
-    <string name="general_sort_newest_shares">Compartilhamentos mais recentes</string>
-    <!-- Sort by oldest shares -->
-    <string name="general_sort_oldest_shares">Compartilhamentos mais antigos</string>
     <!-- Title for recovery key error dialog -->
     <string name="recovery_key_error_title">Erro da chave de recuperação</string>
     <!-- Description for recovery key error dialog -->
@@ -1507,7 +1501,7 @@
         <item quantity="other"></item>
     </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="context_share_correctly_removed">Compartilhamento removido</string>
+    <string name="context_share_correctly_removed">Acesso removido</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Sim</string>
     <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1614,9 +1608,9 @@
     <string name="transfers_retry_failed_snackbar_action">Tentar novamente</string>
     <!-- Snackbar message when retry success on failed transfers tab. -->
     <plurals name="transfers_retry_feedback_snackbar_message">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Tentando fazer a transferência novamente. Consulte a aba Ativas para ver o progresso</item>
+        <item quantity="many">Tentando fazer as transferências novamente. Consulte a aba Ativas para ver o progresso</item>
+        <item quantity="other">Tentando fazer as transferências novamente. Consulte a aba Ativas para ver o progresso</item>
     </plurals>
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">Restaurado para %s</string>
@@ -1659,9 +1653,19 @@
     <!-- category in sort by action to sort by node label name -->
     <string name="action_sort_by_label">Etiqueta</string>
     <!-- category in sort by action to sort by favorite -->
-    <string name="action_sort_by_favorite">Favorite</string>
+    <string name="action_sort_by_favorite">Favoritos</string>
     <!-- category in sort by action to sort by link creation date -->
     <string name="action_sort_by_link">Link</string>
     <!-- Header of action to sort nodes -->
     <string name="action_sort_by_header">Ordenar por</string>
+    <!-- Confirmation shown informing link has been copied to the clipboard -->
+    <string name="general_link_copied_clipboard">Link copiado para a área de transferência</string>
+    <!-- Confirmation shown informing links have been copied to the clipboard -->
+    <string name="general_links_copied_clipboard">Links copiado para a área de transferência</string>
+    <!-- Snackbar message when retry success on failed transfers tab, singular form. -->
+    <string name="transfers_retry_feedback_snackbar_message_singular">Tentando fazer a transferência novamente. Consulte a aba Ativas para ver o progresso</string>
+    <!-- Snackbar message when retry success on failed transfers tab, plural form. -->
+    <string name="transfers_retry_feedback_snackbar_message_plural">Tentando fazer as transferências novamente. Consulte a aba Ativas para ver o progresso</string>
+    <!--Default file name for scanned documents. Placeholder value is for the current date and time values eg:   Scanned_2025091120323.  -->
+    <string name="document_scanning_default_file_name">Scanned_%1$tY%1$tm%1$td%1$tH%1$tM%1$tS</string>
 </resources>

@@ -440,8 +440,6 @@
     <string name="my_account_change_password_newPassword1">Yeni şifre</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">Yeni şifreyi onayla</string>
-    <!-- the user can get the link and it’s copied to the clipboard -->
-    <string name="file_properties_get_link">Bağlantı panoya kopyalandı.</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Hesabı oluşturmadan önce çıkış yapın</string>
     <!-- menu item -->
@@ -664,7 +662,7 @@
     <!-- Summary of the preference Recovery key on Settings section -->
     <string name="backup_second_paragraph">Kurtarma anahtarını dışa aktarmak ve güvenli bir yerde saklamak, veri kaybı olmadan yeni bir şifre belirlemenizi sağlar.</string>
     <!-- Third paragraph of the screen to backup the master key -->
-    <string name="backup_third_paragraph">Harici bir saldırgan yalnızca anahtarınızla hesabınıza erişemez. Şifre sıfırlama, e-postanıza hem anahtar hem de erişim gerektirir.</string>
+    <string name="backup_third_paragraph">Dışarıdan bir saldırgan sadece anahtarınızla hesabınıza erişemez. Şifre sıfırlama işlemi hem anahtarı hem de e-posta hesabınıza erişimi gerektirir.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
     <string name="backup_action">Kurtarma anahtarını panoya kopyalayın veya metin dosyası olarak kaydedin.</string>
     <!-- Action of a button to save something -->
@@ -1160,7 +1158,7 @@
     <!-- Message when an user avatar has been changed successfully -->
     <string name="success_changing_user_avatar">Profil fotoğrafı güncellendi</string>
     <!-- Message when an error ocurred when changing an user avatar -->
-    <string name="error_changing_user_avatar_image_not_available">Hata. Seçilen görsel mevcut değil</string>
+    <string name="error_changing_user_avatar_image_not_available">Hata. Seçilen fotoğraf mevcut değil</string>
     <!-- Message when an error ocurred when changing an user avatar -->
     <string name="error_changing_user_avatar">Profil fotoğrafı değiştirilirken bir hata oluştu</string>
     <!-- Message when an user avatar has been deleted successfully -->
@@ -1364,8 +1362,6 @@
     <string name="save_file_system">Dosya sistemine kaydet</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">QR kodunuzu tarayan MEGA kullanıcıları otomatik olarak kişi listenize eklenecektir.</string>
-    <!-- Text shown when it has been copied the QR code link -->
-    <string name="qrcode_link_copied">Bağlantı panoya kopyalandı</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
     <string name="qrcode_reset_successfully">QR kodu sıfırlandı</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
@@ -1857,7 +1853,7 @@
     <!-- Title of the button in the contact info screen to send a message -->
     <string name="message_button">Mesaj</string>
     <!-- Title of the button in the contact info screen to start a video call -->
-    <string name="video_button">Video</string>
+    <string name="video_button">Görüntülü</string>
     <!-- Title of file explorer to send a link -->
     <string name="title_file_explorer_send_link">Bağlantıyı şuraya gönder&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
@@ -2085,11 +2081,9 @@
         <item quantity="other">%d katılımcı</item>
     </plurals>
     <!--  -->
-    <string name="custom_subtitle_of_group_chat">%1$s ve %2$d daha</string>
+    <string name="custom_subtitle_of_group_chat">%1$s ve %2$d tane daha</string>
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
     <string name="message_error_set_title_get_link">Bu sohbet için bir bağlantı oluşturmadan önce bir açıklama ayarlamanız gerekir:</string>
-    <!-- success alert when the user copy a chat link to the clipboard -->
-    <string name="chat_link_copied_clipboard">Bağlantı panoya kopyalandı</string>
     <!-- Message shown when a call starts. -->
     <string name="call_started_messages">Arama başladı</string>
     <!-- Title of the dialog to inform about a SSL error -->
@@ -2305,8 +2299,8 @@
     <string name="title_bucket">%1$s ve %2$d daha</string>
     <!-- Title of a media recents bucket that only contains some images -->
     <plurals name="title_media_bucket_only_images">
-        <item quantity="one">%d görüntü</item>
-        <item quantity="other">%d görüntü</item>
+        <item quantity="one">%d fotoğraf</item>
+        <item quantity="other">%d fotoğraf</item>
     </plurals>
     <!-- Title of a media recents bucket that only contains some videos -->
     <plurals name="title_media_bucket_only_videos">
@@ -2315,8 +2309,8 @@
     </plurals>
     <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d görüntü&#160;</item>
-        <item quantity="other">%1$d görüntü&#160;</item>
+        <item quantity="one">%1$d fotoğraf&#160;</item>
+        <item quantity="other">%1$d fotoğraf&#160;</item>
     </plurals>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">%s [A]tarafından oluşturuldu[/A]</string>
@@ -2815,7 +2809,7 @@
     <!-- Action to change name -->
     <string name="change_name_action">Adı değiştir</string>
     <!-- Action to add photo -->
-    <string name="add_photo_action">Profil resmini değiştir</string>
+    <string name="add_photo_action">Profil fotoğrafını değiştir</string>
     <!-- Action to add phone number -->
     <string name="add_phone_number_action">Telefon numarası ekle</string>
     <!-- Warning indicating the app needs write permissions to do any action -->
@@ -2845,11 +2839,6 @@
     <plurals name="links_sent">
         <item quantity="one">Bağlantı gönderildi</item>
         <item quantity="other">Bağlantılar gönderildi</item>
-    </plurals>
-    <!-- Confirmation shown informing links have been copied to the clipboard -->
-    <plurals name="links_copied_clipboard">
-        <item quantity="one">Bağlantı panoya kopyalandı</item>
-        <item quantity="other">Bağlantılar panoya kopyalandı</item>
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">Tüm çevrim dışı dosyalar temizlensin mi?</string>
@@ -2931,8 +2920,6 @@
     <string name="tip_invite_more_participants">Toplantıya daha fazla katılımcı davet edin. Davet etmek için yukarı kaydırın.</string>
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">Yeni moderatör sizsiniz</string>
-    <!-- the content of snack bar when copied meeting link-->
-    <string name="copied_meeting_link">Toplantı bağlantısı panoya kopyalandı</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Mevcut toplantıya katılmak için dokunun.</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -2988,9 +2975,9 @@
     <!-- Message informing the fingerprint was enabled successfully -->
     <string name="confirmation_fingerprint_enabled">Parmak iziniz onaylandı</string>
     <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
-    <string name="image_insertion_not_allowed">MEGA burada görüntü eklemeyi desteklemiyor</string>
+    <string name="image_insertion_not_allowed">MEGA burada fotoğrafı eklemeyi desteklemiyor</string>
     <!-- The label under the button of viewing all images screen -->
-    <string name="section_images">Görüntüler</string>
+    <string name="section_images">Fotoğraflar</string>
     <!-- Title of the dialog warning the user about disable file versioning. -->
     <string name="disable_versioning_label">Dosya sürümlemeyi devre dışı bırak</string>
     <!-- Warning of the dialog informing the user about disable file versioning. -->
@@ -3024,9 +3011,9 @@
     <!-- Action button to open a contact link.-->
     <string name="action_open_contact_link">Kişi bağlantısını aç</string>
     <!-- title for the settings to enable high resolution images when on mobile data -->
-    <string name="settings_mobile_data_resoluton_title">Yüksek çözünürlüklü görüntüleri ön izlemek için mobil verileri kullanın</string>
+    <string name="settings_mobile_data_resoluton_title">Yüksek çözünürlüklü fotoğrafları ön izlemek için mobil verileri kullanın</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
-    <string name="settings_mobile_data_resoluton_summary">Ön izleme sırasında yüksek çözünürlüklü görüntüler yüklemek için mobil veri kullanımına izin verin. Devre dışı bırakılırsa orijinal görüntü yalnızca yakınlaştırdığınızda yüklenir.</string>
+    <string name="settings_mobile_data_resoluton_summary">Ön izleme sırasında yüksek çözünürlüklü fotoğraflar yüklemek için mobil veri kullanımına izin verin. Devre dışı bırakılırsa orijinal görüntü yalnızca yakınlaştırdığınızda yüklenir.</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">Yedekleme klasörünüzü siliyorsunuz. Bu işlem, ayarladığınız tüm yedekleri kaldıracaktır. Bunu yapmak istediğinizden emin misiniz?</string>
     <!-- The title of warning dialog for single folder deleting -->
@@ -3100,19 +3087,19 @@
     <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
     <string name="settings_file_management_auto_open_downloaded_file_description">Desteklenmeyen dosya türleri, MEGA uygulaması yerine üçüncü taraf uygulamalarda açılacaktır.</string>
     <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
-    <string name="settings_chat_image_quality">Görüntü kalitesi</string>
+    <string name="settings_chat_image_quality">Fotoğraf kalitesi</string>
     <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
     <string name="automatic_image_quality">Otomatik</string>
     <!-- Text for the automatic option on setting to set up the quality of image files uploaded to the chat -->
-    <string name="automatic_image_quality_text">Mobil verideyken optimize edilmiş görüntüler, Wi-Fi üzerindeyken orijinal boyutlu görüntüler gönderin.</string>
+    <string name="automatic_image_quality_text">Mobil verideyken optimize edilmiş görüntüler, Wi-Fi üzerindeyken orijinal boyutlu fotoğraflar gönderin.</string>
     <!-- Label for the high option on setting to set up the quality of image files uploaded to the chat -->
     <string name="high_image_quality">Orijinal</string>
     <!-- Text for the high option on setting to set up the quality of image files uploaded to the chat -->
-    <string name="high_image_quality_text">Her zaman orijinal boyutlu görüntüler gönderin.</string>
+    <string name="high_image_quality_text">Her zaman orijinal boyutlu fotoğraflar gönderin.</string>
     <!-- Label for the optimised option on setting to set up the quality of image files uploaded to the chat -->
     <string name="optimised_image_quality">Optimize edilmiş</string>
     <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
-    <string name="optimised_image_quality_text">Her zaman optimize edilmiş görüntüler gönderin.</string>
+    <string name="optimised_image_quality_text">Her zaman optimize edilmiş fotoğraflar gönderin.</string>
     <!-- Message shown when one participant joined the call. The placeholder is to include the participant name -->
     <string name="meeting_call_screen_one_participant_joined_call">%1$s katıldı</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
@@ -3348,7 +3335,7 @@
     <!-- Timeline: Empty state for No Media (No Images and Videos) -->
     <string name="timeline_empty_media">[B]Medya[/B] bulunamadı</string>
     <!-- Timeline: Empty state for No Images -->
-    <string name="timeline_empty_images">[B]Görüntü[/B] bulunamadı</string>
+    <string name="timeline_empty_images">[B]Fotoğraf[/B] bulunamadı</string>
     <!-- Timeline: Empty state for No Videos -->
     <string name="timeline_empty_videos">[B]Video[/B] bulunamadı</string>
     <!-- Button to skip asking permissions. -->
@@ -3410,7 +3397,7 @@
     <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_left_to_add_message">Tüm kişilerinizi bu sohbete zaten eklediniz. Daha fazla katılımcı eklemek istiyorsanız önce onları kişiler listenize davet edin.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
-    <string name="media_player_video_snackbar_screenshot_saved">Görüntü cihazınızın galerisine kaydedildi</string>
+    <string name="media_player_video_snackbar_screenshot_saved">Fotoğraf, cihazınıza kaydedildi</string>
     <!-- Album creation dialog title -->
     <string name="photos_album_creation_dialog_title">Albüm adı girin</string>
     <!-- Album creation input name placeholder -->
@@ -3449,17 +3436,15 @@
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_title">Galeri görünümü</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">Yalnızca görüntü veya video içeren klasörleri ızgara görünümünde açın. Ortamı küçük resimlere göre gezinin ve tarihe göre filtreleyin.</string>
+    <string name="settings_media_discovery_view_context">Yalnızca fotoğraf veya video içeren klasörleri ızgara görünümünde açın. Ortamı küçük resimlere göre gezinin ve tarihe göre filtreleyin.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">Bu klasör yalnızca görüntü ve video içerdiği için otomatik olarak galeri görünümünde açtık. Görsel içeriğinizin keyfini daha sürükleyici bir düzende çıkarabilirsiniz. Bunu Ayarlar’dan devre dışı bırakabilirsiniz.</string>
+    <string name="cloud_drive_media_discovery_banner_context">Bu klasör yalnızca fotoğraf ve video içerdiği için otomatik olarak galeri görünümünde açtık. Görsel içeriğinizin keyfini daha sürükleyici bir düzende çıkarabilirsiniz. Bunu Ayarlar’dan devre dışı bırakabilirsiniz.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Ayarlar</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
     <string name="cloud_drive_media_discovery_banner_ok">Tamam</string>
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">Bu bağlantıya sahip herkes toplantıya katılabilir ve toplantı sohbetini görüntüleyebilir.</string>
-    <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
-    <string name="scheduled_meetings_meeting_link_copied">Bağlantı panoya kopyalandı</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
         <item quantity="one">“%s”  silindi</item>
@@ -4260,7 +4245,7 @@
     <!-- Album import error access description -->
     <string name="album_import_error_access_description">Albümün bağlantısı kaldırıldı veya albüm silindi. Bağlantıyı sizinle paylaşan kişiyle iletişime geçin.</string>
     <!-- Call UI button label for answering with audio only -->
-    <string name="calls_answer_audio_button">Ses</string>
+    <string name="calls_answer_audio_button">Sesli</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_label_save_up_to">Yıllık faturalandırma ile %16’ya varan tasarruf edin</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
@@ -4584,7 +4569,7 @@
         <item quantity="other">%1$d katılımcı “%2$s” toplantısına katılmayı bekliyor.</item>
     </plurals>
     <!-- Title of video option of snapshot-->
-    <string name="media_player_video_option_snapshot_title">Anlık görüntü</string>
+    <string name="media_player_video_option_snapshot_title">Yakala</string>
     <!-- Title of video option of lock-->
     <string name="media_player_video_option_lock_title">Kilitle</string>
     <!-- Title of video option of zoom to fill-->
@@ -4594,11 +4579,11 @@
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
     <string name="settings_media_discovery_sub_folder_title">Alt klasörlerde galeri görünümü</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Alt klasörlerdeki görüntüler ve videolar da galeri görünümüne dahil edilecektir</string>
+    <string name="settings_media_discovery_sub_folder_context">Alt klasörlerdeki fotoğraflar ve videolar da galeri görünümüne dahil edilecektir</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">Sonuç yok</string>
     <!-- Description text in empty search screen when images filter selected -->
-    <string name="search_empty_screen_no_images">Görüntü yok</string>
+    <string name="search_empty_screen_no_images">Fotoğraf yok</string>
     <!-- Description text in empty search screen when audio filter selected -->
     <string name="search_empty_screen_no_audio">Ses dosyası yok</string>
     <!-- Description text in empty search screen when video filter selected -->
@@ -4830,11 +4815,11 @@
     <!-- Search drop down chips filter type file type -->
     <string name="search_dropdown_chip_filter_type_file_type">Tür</string>
     <!-- Search drop down chips filter type file type images -->
-    <string name="search_dropdown_chip_filter_type_file_type_images">Görüntüler</string>
+    <string name="search_dropdown_chip_filter_type_file_type_images">Fotoğraflar</string>
     <!-- Search drop down chips filter type file type videos -->
-    <string name="search_dropdown_chip_filter_type_file_type_video">Video</string>
+    <string name="search_dropdown_chip_filter_type_file_type_video">Videolar</string>
     <!-- Search drop down chips filter type file type audio -->
-    <string name="search_dropdown_chip_filter_type_file_type_audio">Ses</string>
+    <string name="search_dropdown_chip_filter_type_file_type_audio">Sesler</string>
     <!-- Search drop down chips filter type file type documents -->
     <string name="search_dropdown_chip_filter_type_file_type_documents">Belgeler</string>
     <!-- Search drop down chips filter type date added -->

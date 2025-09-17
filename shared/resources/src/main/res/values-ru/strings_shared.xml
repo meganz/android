@@ -408,8 +408,6 @@
     <string name="account_cancellation_instructions_web_browser_description">Это связано с тем, что вы подписались на MEGA в браузере. Чтобы отменить подписку, выполните следующие шаги:</string>
     <!-- Label for cancellation instructions on a computer -->
     <string name="account_cancellation_instructions_on_computer">На компьютере</string>
-    <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website">1. Откройте [A]https://mega.nz[/A] в веб-браузере.</string>
     <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
     <string name="account_cancellation_instructions_login_account">2. Войдите в свой аккаунт MEGA.</string>
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
@@ -1204,11 +1202,11 @@
     <!-- State to indicate an achievement has applied -->
     <string name="applied_label">Применено</string>
     <!-- title of the section for start mega vpn free trial in achivements section -->
-    <string name="title_start_mega_vpn_free_trial">Активируйте бесплатную пробную версию MEGA&#160;VPN</string>
+    <string name="title_start_mega_vpn_free_trial">Попробуйте MEGA&#160;VPN бесплатно</string>
     <!-- Text of the section for start mega vpn free trial in achivements section -->
     <string name="text_start_mega_vpn_free_trial">%1$s на диске. Действует постоянно.</string>
     <!-- title of the section for start mega pass free trial in achivements section -->
-    <string name="title_start_mega_pass_free_trial">Активируйте бесплатную пробную версию MEGA&#160;Pass</string>
+    <string name="title_start_mega_pass_free_trial">Попробуйте MEGA&#160;Pass бесплатно</string>
     <!-- Text of the button for install mega vpn in achivements section -->
     <string name="button_text_install_mega_vpn">Установите MEGA&#160;VPN</string>
     <!-- Text of the button for install mega pass in achivements section -->
@@ -1231,10 +1229,6 @@
     <string name="free_plan_card_existing_button">Продолжить</string>
     <!-- Storage feature label for the free plan card, e.g. '20 GB of storage' -->
     <string name="free_plan_card_storage_feature_for_existing_user">%1$s на диске</string>
-    <!-- Sort by newest shares -->
-    <string name="general_sort_newest_shares">От новых к старым</string>
-    <!-- Sort by oldest shares -->
-    <string name="general_sort_oldest_shares">От старых к новым</string>
     <!-- Title for recovery key error dialog -->
     <string name="recovery_key_error_title">Ошибка ключа восстановления</string>
     <!-- Description for recovery key error dialog -->
@@ -1529,7 +1523,7 @@
         <item quantity="other"></item>
     </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="context_share_correctly_removed">Общий доступ удалён</string>
+    <string name="context_share_correctly_removed">Access removed</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Да</string>
     <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1586,7 +1580,7 @@
     <!-- dialog option continue in alert dialog -->
     <string name="button_continue">Продолжить</string>
     <!--Dialog title when the user selected is not on the contact list when sharing a node -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Не удаётся подтвердить контакт</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Can’t verify contact</string>
     <!--Dialog description when the user selected is not on the contact list when sharing a node -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">Вы не можете подтвердить %s, так как его нет в вашем списке контактов. Подождите, пока он сначала примет приглашение.</string>
     <!-- Answer for confirmation dialog. -->
@@ -1671,13 +1665,17 @@
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item restored but %d item wasn’t restored. Try again later.</item>
-        <item quantity="other">1 item restored but %d items weren’t restored. Try again later.</item>
+        <item quantity="one">1 элемент восстановлен, но ещё %d не восстановлен. Попробуйте ещё раз позже.</item>
+        <item quantity="few">1 элемент восстановлен, но ещё %d элемента не восстановлено. Попробуйте ещё раз позже.</item>
+        <item quantity="many">1 элемент восстановлен, но ещё %d элементов не восстановлено. Попробуйте ещё раз позже.</item>
+        <item quantity="other">1 элемент восстановлен, но ещё %d элемента не восстановлено. Попробуйте ещё раз позже.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
-        <item quantity="one">%d item restored but 1 item wasn’t restored. Try again later.</item>
-        <item quantity="other">%d items restored but 1 item wasn’t restored. Try again later.</item>
+        <item quantity="one">%d элемент восстановлен, но ещё 1 не восстановлен. Попробуйте ещё раз позже.</item>
+        <item quantity="few">%d элемента восстановлено, но 1 элемент не восстановлен. Попробуйте ещё раз позже.</item>
+        <item quantity="many">%d элементов восстановлено, но 1 элемент не восстановлен. Попробуйте ещё раз позже.</item>
+        <item quantity="other">%d элемента восстановлено, но 1 элемент не восстановлен. Попробуйте ещё раз позже.</item>
     </plurals>
     <!-- category in sort by action to sort by name -->
     <string name="action_sort_by_name">Имя</string>
@@ -1690,9 +1688,19 @@
     <!-- category in sort by action to sort by node label name -->
     <string name="action_sort_by_label">Метка</string>
     <!-- category in sort by action to sort by favorite -->
-    <string name="action_sort_by_favorite">Favorite</string>
+    <string name="action_sort_by_favorite">Избранное</string>
     <!-- category in sort by action to sort by link creation date -->
     <string name="action_sort_by_link">Ссылка</string>
     <!-- Header of action to sort nodes -->
     <string name="action_sort_by_header">Сортировать по</string>
+    <!-- Confirmation shown informing link has been copied to the clipboard -->
+    <string name="general_link_copied_clipboard">Ссылка скопирована в буфер обмена</string>
+    <!-- Confirmation shown informing links have been copied to the clipboard -->
+    <string name="general_links_copied_clipboard">Ссылки скопированы в буфер обмена</string>
+    <!-- Snackbar message when retry success on failed transfers tab, singular form. -->
+    <string name="transfers_retry_feedback_snackbar_message_singular">Повтор передачи — статус на вкладке «Активные»</string>
+    <!-- Snackbar message when retry success on failed transfers tab, plural form. -->
+    <string name="transfers_retry_feedback_snackbar_message_plural">Повтор передач — статус на вкладке «Активные»</string>
+    <!--Default file name for scanned documents. Placeholder value is for the current date and time values eg:   Scanned_2025091120323.  -->
+    <string name="document_scanning_default_file_name">Scanned_%1$s</string>
 </resources>

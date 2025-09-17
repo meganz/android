@@ -1479,7 +1479,7 @@
         <item quantity="other">These links will not be publicly available anymore</item>
     </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="context_share_correctly_removed">Share removed</string>
+    <string name="context_share_correctly_removed">Access removed</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Yes</string>
     <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1530,7 +1530,7 @@
     <!-- dialog option continue in alert dialog -->
     <string name="button_continue">Continue</string>
     <!--Dialog title when the user selected is not on the contact list when sharing a node -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Cannot verify contact</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Can’t verify contact</string>
     <!--Dialog description when the user selected is not on the contact list when sharing a node -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t verify %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
     <!-- Answer for confirmation dialog. -->

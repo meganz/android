@@ -434,8 +434,6 @@
     <string name="my_account_change_password_newPassword1">新密碼</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">確認新密碼</string>
-    <!-- the user can get the link and it’s copied to the clipboard -->
-    <string name="file_properties_get_link">已複製連結到剪貼簿</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">建立帳戶之前請先登出</string>
     <!-- menu item -->
@@ -1333,8 +1331,6 @@
     <string name="save_file_system">到檔案系統</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">掃描您二維條碼的MEGA用戶將會自動加入至您的聯絡人列表。</string>
-    <!-- Text shown when it has been copied the QR code link -->
-    <string name="qrcode_link_copied">已複製連結到剪貼簿</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
     <string name="qrcode_reset_successfully">重置二維條碼</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
@@ -2038,8 +2034,6 @@
     <string name="custom_subtitle_of_group_chat">還有%1$s和%2$d</string>
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
     <string name="message_error_set_title_get_link">在您生成對話連結之前，您需要先設定描述：</string>
-    <!-- success alert when the user copy a chat link to the clipboard -->
-    <string name="chat_link_copied_clipboard">已複製連結到剪貼簿</string>
     <!-- Message shown when a call starts. -->
     <string name="call_started_messages">通話開始</string>
     <!-- Title of the dialog to inform about a SSL error -->
@@ -2766,10 +2760,6 @@
     <plurals name="links_sent">
         <item quantity="other">連結已發送</item>
     </plurals>
-    <!-- Confirmation shown informing links have been copied to the clipboard -->
-    <plurals name="links_copied_clipboard">
-        <item quantity="other">已複製連結到剪貼簿</item>
-    </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">清除所有離線存取檔案？</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -2850,8 +2840,6 @@
     <string name="tip_invite_more_participants">邀請更多與會者加入會議。向上滑動可邀請。</string>
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">您是新的主持人</string>
-    <!-- the content of snack bar when copied meeting link-->
-    <string name="copied_meeting_link">已複製連結到剪貼簿</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">點擊加入當前會議。</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -3323,7 +3311,7 @@
     <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_left_to_add_message">您已經將所有聯絡人加入此對話。如果您想加入更多與會者，請先邀請他們成為您的聯絡人。</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
-    <string name="media_player_video_snackbar_screenshot_saved">截圖已儲存到您裝置的媒體庫</string>
+    <string name="media_player_video_snackbar_screenshot_saved">影像已儲存到您的裝置</string>
     <!-- Album creation dialog title -->
     <string name="photos_album_creation_dialog_title">輸入相簿名稱</string>
     <!-- Album creation input name placeholder -->
@@ -3370,8 +3358,6 @@
     <string name="cloud_drive_media_discovery_banner_ok">好的，明白了</string>
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">任何擁有此連結的人都可以加入會議並查看會議對話記錄。</string>
-    <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
-    <string name="scheduled_meetings_meeting_link_copied">已複製連結到剪貼簿</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
         <item quantity="other">已刪除%d個相簿</item>
@@ -4367,7 +4353,7 @@
         <item quantity="other">%1$d位與會者正在等待加入「%2$s」。</item>
     </plurals>
     <!-- Title of video option of snapshot-->
-    <string name="media_player_video_option_snapshot_title">快照</string>
+    <string name="media_player_video_option_snapshot_title">拍攝</string>
     <!-- Title of video option of lock-->
     <string name="media_player_video_option_lock_title">鎖定</string>
     <!-- Title of video option of zoom to fill-->

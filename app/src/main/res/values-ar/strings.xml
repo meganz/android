@@ -464,8 +464,6 @@
     <string name="my_account_change_password_newPassword1">كلمة المرور جديدة</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">تأكيد كلمة المرور الجديدة</string>
-    <!-- the user can get the link and it’s copied to the clipboard -->
-    <string name="file_properties_get_link">تم النسخ الى حافظة النصوص</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">قم بتسجيل الخروج قبل إنشاء الحساب</string>
     <!-- menu item -->
@@ -1488,8 +1486,6 @@
     <string name="save_file_system">إلى نظام الملفات</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">مستخدمو ميغا MEGA الذين يقومون بمسح رمز الاستجابة السريعة QR الخاص بك، سيتم إضافتهم إلى قائمة الاتصال الخاصة بك تلقائياً.</string>
-    <!-- Text shown when it has been copied the QR code link -->
-    <string name="qrcode_link_copied">تم النسخ الى حافظة النصوص</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
     <string name="qrcode_reset_successfully">إعادة تعيين رمز الاستجابة السريعة QR</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
@@ -2288,8 +2284,6 @@
     <string name="custom_subtitle_of_group_chat">%1$s و %2$d مزيد</string>
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
     <string name="message_error_set_title_get_link">قبل أن تتمكن من إنشاء رابط لهذه المحادثة، تحتاج إلى تعيين وصف:</string>
-    <!-- success alert when the user copy a chat link to the clipboard -->
-    <string name="chat_link_copied_clipboard">تم النسخ الى حافظة النصوص</string>
     <!-- Message shown when a call starts. -->
     <string name="call_started_messages">المكالمة بدأت</string>
     <!-- Title of the dialog to inform about a SSL error -->
@@ -3166,15 +3160,6 @@
         <item quantity="many">تم إرسال الروابط</item>
         <item quantity="other">تم إرسال الروابط</item>
     </plurals>
-    <!-- Confirmation shown informing links have been copied to the clipboard -->
-    <plurals name="links_copied_clipboard">
-        <item quantity="zero">تم نسخ الرابط الى الحافظة</item>
-        <item quantity="one">تم نسخ الرابط الى الحافظة</item>
-        <item quantity="two">تم نسخ الروابط الى الحافظة</item>
-        <item quantity="few">تم نسخ الروابط الى الحافظة</item>
-        <item quantity="many">تم نسخ الروابط الى الحافظة</item>
-        <item quantity="other">تم نسخ الروابط الى الحافظة</item>
-    </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">مسح كافة الملفات في دون اتصال؟</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -3255,8 +3240,6 @@
     <string name="tip_invite_more_participants">قم بدعوة المزيد من المشاركين إلى الاجتماع. اسحب لأعلى للدعوة.</string>
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">أنت المُضيف الجديد للمكالمة</string>
-    <!-- the content of snack bar when copied meeting link-->
-    <string name="copied_meeting_link">تم النسخ الى حافظة النصوص</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">انقر للانضمام إلى الاجتماع الحالي.</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -3758,7 +3741,7 @@
     <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_left_to_add_message">لقد أضفت بالفعل جميع جهات اتصالك إلى هذه المحادثة. إذا كنت ترغب في إضافة المزيد من المشاركين، قم أولاً بدعوتهم إلى قائمة جهات الاتصال الخاصة بك.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
-    <string name="media_player_video_snackbar_screenshot_saved">تم حفظ الصورة في معرض جهازك</string>
+    <string name="media_player_video_snackbar_screenshot_saved">تم حفظ الصورة على جهازك</string>
     <!-- Album creation dialog title -->
     <string name="photos_album_creation_dialog_title">أدخل اسم الألبوم</string>
     <!-- Album creation input name placeholder -->
@@ -3810,8 +3793,6 @@
     <string name="cloud_drive_media_discovery_banner_ok">حسنًا، فهمت ذلك</string>
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">يمكن لأي شخص لديه هذا الرابط الانضمام إلى الاجتماع و الاطلاع على محادثة الاجتماع.</string>
-    <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
-    <string name="scheduled_meetings_meeting_link_copied">تم النسخ الى حافظة النصوص</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
         <item quantity="zero">تم حذف %d ألبوم</item>
@@ -5452,7 +5433,7 @@
         <item quantity="other">%1$d مشارك ينتظرون الانضمام إلى ”%2$s”.</item>
     </plurals>
     <!-- Title of video option of snapshot-->
-    <string name="media_player_video_option_snapshot_title">لقطة</string>
+    <string name="media_player_video_option_snapshot_title">التقاط</string>
     <!-- Title of video option of lock-->
     <string name="media_player_video_option_lock_title">قفل</string>
     <!-- Title of video option of zoom to fill-->
