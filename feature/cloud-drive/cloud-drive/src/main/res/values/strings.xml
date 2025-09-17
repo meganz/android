@@ -12,4 +12,14 @@
     <string name="warning_share_owner_storage_quota">The file cannot be sent as the target user is over their storage quota.</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_ok">OK</string>
+    <!-- success message when emptying the RB -->
+    <string name="rubbish_bin_emptied">Rubbish bin emptied</string>
+    <!-- error message when emptying the RB -->
+    <string name="rubbish_bin_no_emptied">An error occurred. The Rubbish bin has not been emptied</string>
+    <!-- Menu option title -->
+    <string name="context_clear_rubbish">Empty Rubbish bin</string>
+    <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
+    <string name="clear_rubbish_confirmation">You are about to permanently remove all items from your Rubbish bin.</string>
+    <!-- Button to clear the chat history -->
+    <string name="general_clear">Clear</string>
 </resources>

@@ -3,6 +3,7 @@ package mega.privacy.android.feature.clouddrive.navigation
 import androidx.navigation.NavGraphBuilder
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialog
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.cloudDriveScreen
+import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.rubbishBin
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
@@ -37,5 +38,7 @@ class CloudDriveFeatureDestination : FeatureDestination {
                     )
                 }
             )
+
+            rubbishBin(navigationHandler, transferHandler)
         }
 }

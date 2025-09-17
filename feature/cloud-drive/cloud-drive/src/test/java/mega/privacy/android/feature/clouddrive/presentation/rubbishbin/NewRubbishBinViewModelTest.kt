@@ -1,7 +1,9 @@
-package mega.privacy.android.app.presentation.rubbishbin
+package mega.privacy.android.feature.clouddrive.presentation.rubbishbin
 
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -12,7 +14,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
@@ -41,6 +42,7 @@ import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.node.CleanRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
@@ -85,6 +87,8 @@ class NewRubbishBinViewModelTest {
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val nodeUiItemMapper = mock<NodeUiItemMapper>()
     private val nodeSortConfigurationUiMapper = mock<NodeSortConfigurationUiMapper>()
+    private val cleanRubbishBinUseCase = mock<CleanRubbishBinUseCase>()
+    private val savedStateHandle = mock<SavedStateHandle>()
 
     @BeforeEach
     fun setUp() {
@@ -131,6 +135,8 @@ class NewRubbishBinViewModelTest {
             getNodeByIdUseCase = getNodeByIdUseCase,
             nodeUiItemMapper = nodeUiItemMapper,
             nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
+            cleanRubbishBinUseCase = cleanRubbishBinUseCase,
+            savedStateHandle = savedStateHandle,
         )
     }
 
@@ -146,10 +152,9 @@ class NewRubbishBinViewModelTest {
             assertThat(initial.isInSelectionMode).isFalse()
             assertThat(initial.currentViewType).isEqualTo(ViewType.LIST)
             assertThat(initial.sortConfiguration).isEqualTo(NodeSortConfiguration.default)
-            assertThat(initial.restoreType).isNull()
             assertThat(initial.accountType).isNull()
             assertThat(initial.isBusinessAccountExpired).isFalse()
-            assertThat(initial.hiddenNodeEnabled).isFalse()
+            assertThat(initial.isHiddenNodesEnabled).isFalse()
         }
     }
 
@@ -487,141 +492,13 @@ class NewRubbishBinViewModelTest {
                 isContactVerificationOn = eq(false),
             )
         ).thenReturn(emptyList())
-        underTest.onFolderItemClicked(handle)
-        verify(getRubbishBinNodeChildrenUseCase).invoke(handle)
+        underTest.onFolderItemClicked(NodeId(handle))
+        underTest.uiState.test {
+            assertThat((awaitItem().openFolderEvent as StateEventWithContentTriggered).content).isEqualTo(
+                NodeId(handle)
+            )
+        }
     }
-
-    @Test
-    fun `test that restoring nodes will execute the move functionality when backup nodes are selected`() =
-        runTest {
-            val nodesListItem1 = mock<TypedFolderNode>()
-            val nodesListItem2 = mock<TypedFileNode>()
-            whenever(nodesListItem1.id.longValue).thenReturn(1L)
-            whenever(nodesListItem2.id.longValue).thenReturn(2L)
-
-            whenever(getRubbishBinNodeChildrenUseCase(underTest.uiState.value.currentFolderId.longValue)).thenReturn(
-                listOf(nodesListItem1, nodesListItem2)
-            )
-            val nodeUiItems: List<NodeUiItem<TypedNode>> = listOf(
-                NodeUiItem(node = nodesListItem1, isSelected = false),
-                NodeUiItem(node = nodesListItem2, isSelected = false)
-            )
-            whenever(
-                nodeUiItemMapper(
-                    nodeList = any(),
-                    existingItems = any(),
-                    nodeSourceType = eq(NodeSourceType.RUBBISH_BIN),
-                    isPublicNodes = eq(false),
-                    showPublicLinkCreationTime = eq(false),
-                    highlightedNodeId = eq(null),
-                    highlightedNames = eq(null),
-                    isContactVerificationOn = eq(false),
-                )
-            ).thenReturn(nodeUiItems)
-            whenever(nodeSortConfigurationUiMapper.invoke(any<SortOrder>())).thenReturn(
-                NodeSortConfiguration.default
-            )
-            whenever(isNodeDeletedFromBackupsUseCase(NodeId(any()))).thenReturn(true)
-
-            underTest.refreshNodes()
-            underTest.selectAllNodes()
-            underTest.onRestoreClicked()
-
-            underTest.uiState.test {
-                assertThat(awaitItem().restoreType).isEqualTo(RestoreType.MOVE)
-            }
-        }
-
-    @Test
-    fun `test that restoring nodes will execute the move functionality when backup and non backup nodes are selected`() =
-        runTest {
-            val nodesListItem1 = mock<TypedFolderNode>()
-            val nodesListItem2 = mock<TypedFileNode>()
-            whenever(nodesListItem1.id.longValue).thenReturn(1L)
-            whenever(nodesListItem2.id.longValue).thenReturn(2L)
-
-            whenever(getRubbishBinNodeChildrenUseCase(underTest.uiState.value.currentFolderId.longValue)).thenReturn(
-                listOf(nodesListItem1, nodesListItem2)
-            )
-            val nodeUiItems: List<NodeUiItem<TypedNode>> = listOf(
-                NodeUiItem(node = nodesListItem1, isSelected = false),
-                NodeUiItem(node = nodesListItem2, isSelected = false)
-            )
-            whenever(
-                nodeUiItemMapper(
-                    nodeList = any(),
-                    existingItems = any(),
-                    nodeSourceType = eq(NodeSourceType.RUBBISH_BIN),
-                    isPublicNodes = eq(false),
-                    showPublicLinkCreationTime = eq(false),
-                    highlightedNodeId = eq(null),
-                    highlightedNames = eq(null),
-                    isContactVerificationOn = eq(false),
-                )
-            ).thenReturn(nodeUiItems)
-            whenever(nodeSortConfigurationUiMapper.invoke(any<SortOrder>())).thenReturn(
-                NodeSortConfiguration.default
-            )
-            whenever(isNodeDeletedFromBackupsUseCase(NodeId(1L))).thenReturn(true)
-            whenever(isNodeDeletedFromBackupsUseCase(NodeId(2L))).thenReturn(false)
-
-            underTest.refreshNodes()
-            underTest.selectAllNodes()
-            underTest.onRestoreClicked()
-
-            underTest.uiState.test {
-                assertThat(awaitItem().restoreType).isEqualTo(RestoreType.MOVE)
-            }
-        }
-
-    @Test
-    fun `test that restoring nodes will execute the restore functionality when non backup nodes are selected`() =
-        runTest {
-            val nodesListItem1 = mock<TypedFolderNode>()
-            val nodesListItem2 = mock<TypedFileNode>()
-            whenever(nodesListItem1.id.longValue).thenReturn(1L)
-            whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(getRubbishBinNodeChildrenUseCase(underTest.uiState.value.currentFolderId.longValue)).thenReturn(
-                listOf(nodesListItem1, nodesListItem2)
-            )
-            val nodeUiItems: List<NodeUiItem<TypedNode>> = listOf(
-                NodeUiItem(node = nodesListItem1, isSelected = false),
-                NodeUiItem(node = nodesListItem2, isSelected = false)
-            )
-            whenever(
-                nodeUiItemMapper(
-                    nodeList = any(),
-                    existingItems = any(),
-                    nodeSourceType = eq(NodeSourceType.RUBBISH_BIN),
-                    isPublicNodes = eq(false),
-                    showPublicLinkCreationTime = eq(false),
-                    highlightedNodeId = eq(null),
-                    highlightedNames = eq(null),
-                    isContactVerificationOn = eq(false),
-                )
-            ).thenReturn(nodeUiItems)
-            whenever(nodeSortConfigurationUiMapper.invoke(any<SortOrder>())).thenReturn(
-                NodeSortConfiguration.default
-            )
-            whenever(isNodeDeletedFromBackupsUseCase(NodeId(any()))).thenReturn(false)
-
-            underTest.refreshNodes()
-            underTest.selectAllNodes()
-            underTest.onRestoreClicked()
-
-            underTest.uiState.test {
-                assertThat(awaitItem().restoreType).isEqualTo(RestoreType.RESTORE)
-            }
-        }
-
-    @Test
-    fun `test that acknowledging the restore functionality will reset the restore type`() =
-        runTest {
-            underTest.onRestoreHandled()
-            underTest.uiState.test {
-                assertThat(awaitItem().restoreType).isNull()
-            }
-        }
 
     @Test
     fun `test that account type is updated when monitorAccountDetailUseCase emits`() = runTest {
@@ -646,23 +523,6 @@ class NewRubbishBinViewModelTest {
                 .isEqualTo(newAccountDetail.levelDetail?.accountType)
         }
     }
-
-    @Test
-    fun `test that resetScrollPosition sets resetScrollPositionEvent to triggered`() = runTest {
-        underTest.resetScrollPosition()
-        underTest.uiState.test {
-            assertThat(awaitItem().resetScrollPositionEvent).isEqualTo(triggered)
-        }
-    }
-
-    @Test
-    fun `test that onResetScrollPositionEventConsumed sets resetScrollPositionEvent to consumed`() =
-        runTest {
-            underTest.onResetScrollPositionEventConsumed()
-            underTest.uiState.test {
-                assertThat(awaitItem().resetScrollPositionEvent).isEqualTo(consumed)
-            }
-        }
 
     @Test
     fun `test that setSortConfiguration updates sort configuration and refreshes nodes`() =

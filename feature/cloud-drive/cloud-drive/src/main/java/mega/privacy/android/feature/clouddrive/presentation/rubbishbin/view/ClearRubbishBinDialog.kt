@@ -1,11 +1,11 @@
-package mega.privacy.android.app.presentation.rubbishbin.view
+package mega.privacy.android.feature.clouddrive.presentation.rubbishbin.view
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.privacy.android.app.R
+import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**

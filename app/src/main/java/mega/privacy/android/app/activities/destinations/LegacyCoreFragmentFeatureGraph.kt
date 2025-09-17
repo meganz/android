@@ -8,7 +8,6 @@ import mega.privacy.android.navigation.contract.TransferHandler
 class LegacyCoreFragmentFeatureGraph : FeatureDestination {
     override val navigationGraph: NavGraphBuilder.(NavigationHandler, TransferHandler) -> Unit =
         { navigationHandler, transferHandler ->
-            rubbishBin(navigationHandler)
             legacyMediaDiscoveryScreen(navigationHandler)
             notifications(navigationHandler)
         }

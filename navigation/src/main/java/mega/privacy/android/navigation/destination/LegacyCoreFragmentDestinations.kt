@@ -4,7 +4,9 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object RubbishBin : NavKey
+data class RubbishBin(
+    val handle: Long? = null,
+) : NavKey
 
 @Serializable
 data object Notifications : NavKey
