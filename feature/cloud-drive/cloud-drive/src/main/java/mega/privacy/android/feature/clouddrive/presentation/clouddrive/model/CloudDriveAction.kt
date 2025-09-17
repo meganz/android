@@ -39,11 +39,6 @@ sealed interface CloudDriveAction {
     data object DeselectAllItems : CloudDriveAction
 
     /**
-     * Set hidden nodes onboarded action
-     */
-    data object SetHiddenNodesOnboarded : CloudDriveAction
-
-    /**
      * Navigate to folder event consumed action
      */
     data object NavigateToFolderEventConsumed : CloudDriveAction

@@ -27,7 +27,6 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property openedFileNode The file node that is currently opened
  * @property showHiddenNodes True if hidden nodes should be shown forcefully based on user settings
  * @property isHiddenNodesEnabled True if user is eligible for hidden nodes feature
- * @property isHiddenNodesOnboarded True if the user has been onboarded to hidden nodes feature, show onboarding screen based on it
  * @property isSelecting True if nodes are being selected
  * @property hasMediaItems True if there are media(image, video) items in the current folder
  */
@@ -44,7 +43,6 @@ data class CloudDriveUiState(
     val openedFileNode: TypedFileNode? = null,
     val showHiddenNodes: Boolean = false,
     val isHiddenNodesEnabled: Boolean = false,
-    val isHiddenNodesOnboarded: Boolean = true,
     val gmsDocumentScanner: GmsDocumentScanner? = null,
     val documentScanningError: DocumentScanningError? = null,
     val isSelecting: Boolean = false,

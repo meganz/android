@@ -35,7 +35,6 @@ import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeNameByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
-import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
@@ -59,7 +58,6 @@ class CloudDriveViewModel @Inject constructor(
     private val setViewTypeUseCase: SetViewType,
     private val monitorViewTypeUseCase: MonitorViewType,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase,
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
@@ -106,7 +104,6 @@ class CloudDriveViewModel @Inject constructor(
             is CloudDriveAction.OpenedFileNodeHandled -> onOpenedFileNodeHandled()
             is CloudDriveAction.SelectAllItems -> selectAllItems()
             is CloudDriveAction.DeselectAllItems -> deselectAllItems()
-            is CloudDriveAction.SetHiddenNodesOnboarded -> setHiddenNodesOnboarded()
             is CloudDriveAction.NavigateToFolderEventConsumed -> onNavigateToFolderEventConsumed()
             is CloudDriveAction.NavigateBackEventConsumed -> onNavigateBackEventConsumed()
             is CloudDriveAction.StartDocumentScanning -> prepareDocumentScanner()
@@ -162,7 +159,6 @@ class CloudDriveViewModel @Inject constructor(
                         )
                     }
                 }
-                checkIfHiddenNodeIsOnboarded()
             } else {
                 // Hidden nodes disabled, set loading state to false
                 _uiState.update { state ->
@@ -249,28 +245,6 @@ class CloudDriveViewModel @Inject constructor(
     private suspend fun isHiddenNodeFeatureFlagEnabled(): Boolean = runCatching {
         getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
     }.getOrDefault(false)
-
-    private suspend fun checkIfHiddenNodeIsOnboarded() = runCatching {
-        isHiddenNodesOnboardedUseCase()
-    }.onSuccess { isHiddenNodesOnboarded ->
-        if (!isHiddenNodesOnboarded) {
-            _uiState.update {
-                it.copy(isHiddenNodesOnboarded = false)
-            }
-        }
-    }.onFailure {
-        Timber.e(it, "Failed to check if hidden nodes are onboarded")
-    }
-
-    /**
-     * // TODO: handle from node options bottom sheet's "Hide" action
-     * Mark hidden nodes onboarding has shown
-     */
-    fun setHiddenNodesOnboarded() {
-        _uiState.update {
-            it.copy(isHiddenNodesOnboarded = true)
-        }
-    }
 
     private suspend fun updateTitle() {
         runCatching {
