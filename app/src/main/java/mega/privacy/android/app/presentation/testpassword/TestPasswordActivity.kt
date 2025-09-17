@@ -53,7 +53,8 @@ class TestPasswordActivity : PasscodeActivity() {
     private val logoutViewModel by viewModels<LogoutViewModel>()
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            viewModel.dismissPasswordReminder(false)
+            // Use dismissPasswordReminderAndFinish with timeout protection for back button
+            viewModel.dismissPasswordReminderAndFinish()
         }
     }
     private val downloadFolderActivityResult =

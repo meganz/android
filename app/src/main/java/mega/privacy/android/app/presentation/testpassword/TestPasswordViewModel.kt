@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity.Companion.KEY_IS_LOGOUT
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity.Companion.KEY_TEST_PASSWORD_MODE
@@ -119,6 +120,38 @@ class TestPasswordViewModel @Inject constructor(
                 }
             }.onFailure {
                 _uiState.update { it.copy(isLoading = false) }
+            }
+        }
+    }
+
+    /**
+     * Dismiss password reminder and finish activity with timeout protection
+     * This method ensures the activity finishes even if password reminder check hangs
+     */
+    fun dismissPasswordReminderAndFinish(timeoutMs: Long = 5000) {
+        viewModelScope.launch {
+            // Show loading indicator during the check
+            _uiState.update { it.copy(isLoading = true) }
+
+            val passwordReminderCheckResult = withTimeoutOrNull(timeoutMs) {
+                runCatching {
+                    skipPasswordReminderUseCase()
+
+                    if (uiState.value.isPasswordReminderBlocked) {
+                        blockPasswordReminderUseCase()
+                    }
+                }
+            }
+
+            // Log the result for debugging
+            Timber.d("Password reminder check result: ${if (passwordReminderCheckResult == null) "timeout" else if (passwordReminderCheckResult.isSuccess) "success" else "failure"}")
+
+            // Dismiss loading indicator and trigger finish activity
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    isUserLogout = triggered(false)
+                )
             }
         }
     }

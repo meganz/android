@@ -312,6 +312,140 @@ internal class TestPasswordViewModelTest {
             verify(notifyPasswordCheckedUseCase, never()).invoke()
         }
 
+    // Tests for dismissPasswordReminderAndFinish method with timeout protection
+
+    @Test
+    fun `test that dismissPasswordReminderAndFinish triggers logout event and calls skipPasswordReminderUseCase`() =
+        runTest {
+            // Given
+            // No special setup needed - default state
+
+            // When
+            underTest.dismissPasswordReminderAndFinish()
+
+            // Then
+            underTest.uiState.test {
+                val state = awaitItem() // Get the final state after method execution
+                
+                // Verify final state
+                assertThat(state.isLoading).isFalse()
+                assertThat(state.isUserLogout).isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat((state.isUserLogout as StateEventWithContentTriggered).content).isFalse()
+            }
+
+            verify(skipPasswordReminderUseCase).invoke()
+        }
+
+    @Test
+    fun `test that dismissPasswordReminderAndFinish calls blockPasswordReminderUseCase when password reminder is blocked`() =
+        runTest {
+            // Given
+            underTest.setPasswordReminderBlocked(true)
+
+            // When
+            underTest.dismissPasswordReminderAndFinish()
+
+            // Then
+            underTest.uiState.test {
+                val state = awaitItem() // Get the final state after method execution
+                assertThat(state.isUserLogout).isInstanceOf(StateEventWithContentTriggered::class.java)
+            }
+
+            verify(skipPasswordReminderUseCase).invoke()
+            verify(blockPasswordReminderUseCase).invoke()
+        }
+
+    @Test
+    fun `test that dismissPasswordReminderAndFinish does not call blockPasswordReminderUseCase when password reminder is not blocked`() =
+        runTest {
+            // Given
+            underTest.setPasswordReminderBlocked(false)
+
+            // When
+            underTest.dismissPasswordReminderAndFinish()
+
+            // Then
+            underTest.uiState.test {
+                val state = awaitItem() // Get the final state after method execution
+                assertThat(state.isUserLogout).isInstanceOf(StateEventWithContentTriggered::class.java)
+            }
+
+            verify(skipPasswordReminderUseCase).invoke()
+            verify(blockPasswordReminderUseCase, never()).invoke()
+        }
+
+    @Test
+    fun `test that dismissPasswordReminderAndFinish handles skipPasswordReminderUseCase failure gracefully`() =
+        runTest {
+            // Given
+            whenever(skipPasswordReminderUseCase()).thenAnswer {
+                throw MegaException(errorCode = 123, errorString = "Network error")
+            }
+
+            // When
+            underTest.dismissPasswordReminderAndFinish()
+
+            // Then
+            underTest.uiState.test {
+                val state = awaitItem() // Get the final state after method execution
+                assertThat(state.isLoading).isFalse()
+                assertThat(state.isUserLogout).isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat((state.isUserLogout as StateEventWithContentTriggered).content).isFalse()
+            }
+
+            verify(skipPasswordReminderUseCase).invoke()
+        }
+
+    @Test
+    fun `test that dismissPasswordReminderAndFinish handles timeout gracefully`() =
+        runTest {
+            // Given
+            // Mock skipPasswordReminderUseCase to actually suspend longer than timeout (100ms)
+            whenever(skipPasswordReminderUseCase()).thenAnswer {
+                kotlinx.coroutines.runBlocking {
+                    kotlinx.coroutines.delay(200) // 200ms > 100ms timeout
+                }
+                Unit
+            }
+
+            // When
+            underTest.dismissPasswordReminderAndFinish(timeoutMs = 100) // Use short timeout for fast testing
+
+            // Then
+            underTest.uiState.test {
+                val state = awaitItem() // Get the final state after method execution
+                assertThat(state.isLoading).isFalse()
+                assertThat(state.isUserLogout).isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat((state.isUserLogout as StateEventWithContentTriggered).content).isFalse()
+            }
+
+            verify(skipPasswordReminderUseCase).invoke()
+        }
+
+    @Test
+    fun `test that dismissPasswordReminderAndFinish handles blockPasswordReminderUseCase failure gracefully`() =
+        runTest {
+            // Given
+            underTest.setPasswordReminderBlocked(true)
+            whenever(blockPasswordReminderUseCase()).thenAnswer {
+                throw MegaException(errorCode = 456, errorString = "Block reminder error")
+            }
+
+            // When
+            underTest.dismissPasswordReminderAndFinish()
+
+            // Then
+            underTest.uiState.test {
+                val state = awaitItem() // Get the final state after method execution
+                assertThat(state.isLoading).isFalse()
+                assertThat(state.isUserLogout).isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat((state.isUserLogout as StateEventWithContentTriggered).content).isFalse()
+            }
+
+            verify(skipPasswordReminderUseCase).invoke()
+            verify(blockPasswordReminderUseCase).invoke()
+        }
+
     companion object {
         private val dispatcher = UnconfinedTestDispatcher()
 
