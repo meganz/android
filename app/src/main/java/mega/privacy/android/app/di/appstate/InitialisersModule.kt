@@ -12,6 +12,8 @@ import mega.privacy.android.app.appstate.initialisation.initialisers.PreLoginIni
 import mega.privacy.android.app.appstate.initialisation.postlogin.PurchaseReviewInitialiser
 import mega.privacy.android.app.consent.initialiser.ConsentInitialiser
 import mega.privacy.android.app.sslverification.initialiser.SSLErrorMonitorInitialiser
+import mega.privacy.android.domain.logging.Log
+import mega.privacy.android.domain.logging.Logger
 import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
@@ -29,6 +31,11 @@ class InitialisersModule {
     @IntoSet
     fun provideResetChatSettingsUseCaseInitialiser(resetChatSettingsUseCase: ResetChatSettingsUseCase): AppStartInitialiser =
         AppStartInitialiser { resetChatSettingsUseCase() }
+
+    @Provides
+    @IntoSet
+    fun provideDomainLoggerInitialiser(logger: Logger): AppStartInitialiser =
+        AppStartInitialiser { Log.setLogger(logger) }
 
     @Provides
     @ElementsIntoSet
