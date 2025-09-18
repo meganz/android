@@ -1821,7 +1821,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
             UPLOAD, SAVE -> {
                 Timber.d("mode UPLOAD")
-                if (intent.action == ACTION_SAVE_TO_CLOUD || action == ACTION_UPLOAD_TO_CHAT) {
+                if (intent.action == ACTION_SAVE_TO_CLOUD) {
                     logDocumentScanEvent(isCloudDrive = true)
                 }
                 if (viewModel.isImportingText(intent)) {
