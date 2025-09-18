@@ -296,7 +296,7 @@
             android:configChanges="orientation|screenSize"
             android:exported="false"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="adjustNothing" />
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name=".main.megachat.chat.explorer.ChatExplorerActivity" />
         <activity android:name=".main.megachat.NodeAttachmentHistoryActivity" />
         <activity android:name=".main.CountryCodePickerActivity" />
