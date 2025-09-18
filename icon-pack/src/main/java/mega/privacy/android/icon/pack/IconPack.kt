@@ -104,6 +104,9 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSlidersVert
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSquareImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSync01ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTagSimpleImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTransferArrowsUpDownAltCircleCutoutImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTransferArrowsUpDownAltImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTransferArrowsUpDownAltTriangleCutoutImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTrashImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineUserImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineUserPlusImageVector
@@ -137,6 +140,10 @@ import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineImage04Image
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineListSmallImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineQueueLineImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineSquares4ImageVector
+import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineTransferCheckCircleImageVector
+import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineTransferErrorImageVector
+import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineTransferPauseImageVector
+import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineTransferWarningImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinSolidHeartImageVector
 
 public object IconPack : IconPackInterface {
@@ -420,6 +427,15 @@ public object IconPack : IconPackInterface {
                 override val TagSimple: ImageVector by lazy {
                         createMediumThinOutlineTagSimpleImageVector() }
 
+                override val TransferArrowsUpDownAlt: ImageVector by lazy {
+                        createMediumThinOutlineTransferArrowsUpDownAltImageVector() }
+
+                override val TransferArrowsUpDownAltCircleCutout: ImageVector by lazy {
+                        createMediumThinOutlineTransferArrowsUpDownAltCircleCutoutImageVector() }
+
+                override val TransferArrowsUpDownAltTriangleCutout: ImageVector by lazy {
+                        createMediumThinOutlineTransferArrowsUpDownAltTriangleCutoutImageVector() }
+
                 override val Trash: ImageVector by lazy { createMediumThinOutlineTrashImageVector()
                         }
 
@@ -519,6 +535,18 @@ public object IconPack : IconPackInterface {
 
                 override val Squares4: ImageVector by lazy {
                         createSmallThinOutlineSquares4ImageVector() }
+
+                override val TransferCheckCircle: ImageVector by lazy {
+                        createSmallThinOutlineTransferCheckCircleImageVector() }
+
+                override val TransferError: ImageVector by lazy {
+                        createSmallThinOutlineTransferErrorImageVector() }
+
+                override val TransferPause: ImageVector by lazy {
+                        createSmallThinOutlineTransferPauseImageVector() }
+
+                override val TransferWarning: ImageVector by lazy {
+                        createSmallThinOutlineTransferWarningImageVector() }
             }
 
             public object Solid : IconPackInterface.Small.Thin.Solid {

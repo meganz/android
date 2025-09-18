@@ -27,7 +27,10 @@ fun TransfersWidget(
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
-    EventEffect(event = state.openTransfersSectionEvent, onConsumed = viewModel::onConsumeOpenTransfersSectionEvent) {
+    EventEffect(
+        event = state.openTransfersSectionEvent,
+        onConsumed = viewModel::onConsumeOpenTransfersSectionEvent
+    ) {
         context.startActivity(TransfersActivity.getIntent(context))
     }
     TransfersWidgetViewAnimated(

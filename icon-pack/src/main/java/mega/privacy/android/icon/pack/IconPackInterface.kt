@@ -48,6 +48,10 @@ interface IconPackInterface {
              * small_thin_outline
              */
             interface Outline {
+                val TransferError: ImageVector
+                val TransferWarning: ImageVector
+                val TransferPause: ImageVector
+                val TransferCheckCircle: ImageVector
                 val ArrowUp: ImageVector
                 val ArrowDown: ImageVector
                 val QueueLine: ImageVector
@@ -95,6 +99,9 @@ interface IconPackInterface {
              * medium_thin_outline
              */
             interface Outline {
+                val TransferArrowsUpDownAltTriangleCutout: ImageVector
+                val TransferArrowsUpDownAltCircleCutout: ImageVector
+                val TransferArrowsUpDownAlt: ImageVector
                 val Mega: ImageVector
                 val Plus: ImageVector
                 val PlaySquare: ImageVector
