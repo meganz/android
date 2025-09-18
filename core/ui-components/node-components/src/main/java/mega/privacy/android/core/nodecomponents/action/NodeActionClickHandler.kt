@@ -10,39 +10,68 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.model.menu.MenuAction
+import mega.privacy.android.core.nodecomponents.dialog.contact.CannotVerifyContactDialogArgs
 import mega.privacy.android.core.nodecomponents.dialog.delete.MoveToRubbishOrDeleteDialogArgs
+import mega.privacy.android.core.nodecomponents.dialog.leaveshare.LeaveShareDialogArgs
+import mega.privacy.android.core.nodecomponents.dialog.removelink.RemoveNodeLinkDialogArgs
+import mega.privacy.android.core.nodecomponents.dialog.removeshare.RemoveShareFolderDialogArgs
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.RestoreNodeResultMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AvailableOfflineMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.CopyMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.DeletePermanentlyMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.DisputeTakeDownMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.EditMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.FavouriteMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.GetLinkMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.InfoMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.LabelMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.LeaveShareMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ManageLinkMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.ManageShareFolderMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.OpenWithMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveFavouriteMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveLinkMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveShareMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RenameMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RestoreMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareFolderMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.VerifyMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VersionsMenuAction
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
+import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheet
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
+import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
+import mega.privacy.android.domain.usecase.UpdateNodeFavoriteUseCase
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.chat.GetNodeToAttachUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
+import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
+import mega.privacy.android.domain.usecase.shares.GetNodeShareDataUseCase
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
+import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import java.io.File
@@ -348,23 +377,23 @@ class OpenWithAction @Inject constructor(
     private suspend fun getLocalFileUri(file: File?, context: Context) = runCatching {
         val fileProviderAuthority = context.packageName + ".providers.fileprovider"
         file?.let { getFileUriUseCase(it, fileProviderAuthority) }
-    }.onFailure { Timber.Forest.e("Error getting local file uri: ${it.message}") }.getOrNull()
+    }.onFailure { Timber.e("Error getting local file uri: ${it.message}") }.getOrNull()
 
     private suspend fun getLocalFile(node: TypedFileNode): File? = runCatching {
         getNodePreviewFileUseCase(node)
-    }.onFailure { Timber.Forest.e("Error getting local file path: ${it.message}") }.getOrNull()
+    }.onFailure { Timber.e("Error getting local file path: ${it.message}") }.getOrNull()
 
     private suspend fun getStreamingUri(node: TypedFileNode) = runCatching {
         getStreamingUriStringForNode(node)
-    }.onFailure { Timber.Forest.e("Error getting streaming uri: ${it.message}") }.getOrNull()
+    }.onFailure { Timber.e("Error getting streaming uri: ${it.message}") }.getOrNull()
 
     private suspend fun startHttpServer() = runCatching {
         httpServerStartUseCase()
-    }.onFailure { Timber.Forest.e("Error starting http server: ${it.message}") }.getOrNull()
+    }.onFailure { Timber.e("Error starting http server: ${it.message}") }.getOrNull()
 
     private suspend fun httpServerRunning() = runCatching {
         httpServerIsRunningUseCase()
-    }.onFailure { Timber.Forest.e("Error checking if http server is running: ${it.message}") }
+    }.onFailure { Timber.e("Error checking if http server is running: ${it.message}") }
         .getOrDefault(0)
 
     override fun handle(
@@ -403,7 +432,7 @@ class AvailableOfflineAction @Inject constructor(
                 withContext(NonCancellable) {
                     runCatching {
                         removeOfflineNodeUseCase(nodeId = node.id)
-                    }.onFailure { Timber.Forest.e(it) }
+                    }.onFailure { Timber.e(it) }
                 }
             }
         } else {
@@ -561,6 +590,286 @@ class DeletePermanentAction @Inject constructor(
                         )
                     }
                     .onFailure { Timber.e(it) }
+            }
+        }
+    }
+}
+
+class LeaveShareAction @Inject constructor(
+    private val nodeHandlesToJsonMapper: NodeHandlesToJsonMapper,
+) : SingleNodeAction {
+    override fun canHandle(action: MenuAction): Boolean = action is LeaveShareMenuAction
+
+    override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
+        runCatching {
+            nodeHandlesToJsonMapper(listOf(node.id.longValue))
+        }.onSuccess {
+            provider.navigationHandler?.navigate(
+                LeaveShareDialogArgs(handles = it)
+            )
+        }
+    }
+}
+
+class LabelAction @Inject constructor() : SingleNodeAction {
+    override fun canHandle(action: MenuAction): Boolean = action is LabelMenuAction
+
+    override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
+        provider.navigationHandler?.navigate(ChangeLabelBottomSheet(node.id.longValue))
+    }
+}
+
+class ManageShareFolderAction @Inject constructor(
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val megaNavigator: MegaNavigator,
+) : SingleNodeAction {
+    override fun canHandle(action: MenuAction): Boolean = action is ManageShareFolderMenuAction
+
+    override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
+        provider.coroutineScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
+                megaNavigator.openFileContactListActivity(
+                    provider.context,
+                    node.id.longValue,
+                    node.name
+                )
+            } else {
+                megaNavigator.openFileContactListActivity(provider.context, node.id.longValue)
+            }
+        }
+    }
+}
+
+class InfoAction @Inject constructor(
+    private val megaNavigator: MegaNavigator,
+) : SingleNodeAction {
+    override fun canHandle(action: MenuAction): Boolean = action is InfoMenuAction
+
+    override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
+        megaNavigator.openFileInfoActivity(
+            context = provider.context,
+            handle = node.id.longValue
+        )
+    }
+}
+
+class EditAction @Inject constructor(
+    private val megaNavigator: MegaNavigator,
+) : SingleNodeAction {
+    override fun canHandle(action: MenuAction): Boolean = action is EditMenuAction
+
+    override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
+        megaNavigator.openTextEditorActivity(
+            context = provider.context,
+            currentNodeId = node.id,
+            mode = TextEditorMode.Edit,
+            nodeSourceType = NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
+        )
+    }
+}
+
+class DisputeTakeDownAction @Inject constructor(
+    private val megaNavigator: MegaNavigator,
+) : SingleNodeAction {
+    override fun canHandle(action: MenuAction): Boolean = action is DisputeTakeDownMenuAction
+
+    override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
+        megaNavigator.launchUrl(provider.context, DISPUTE_URL)
+    }
+
+    companion object {
+        private const val DISPUTE_URL: String = "https://mega.io/dispute"
+    }
+}
+
+class VerifyAction @Inject constructor(
+    private val getNodeShareDataUseCase: GetNodeShareDataUseCase,
+    private val megaNavigator: MegaNavigator,
+) : SingleNodeAction {
+    override fun canHandle(action: MenuAction): Boolean = action is VerifyMenuAction
+
+    override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
+        provider.coroutineScope.launch {
+            getNodeShareDataUseCase(node)?.let { data ->
+                if (data.isVerified.not() && data.isPending) {
+                    provider.navigationHandler?.navigate(
+                        CannotVerifyContactDialogArgs(data.user.orEmpty())
+                    )
+                } else {
+                    megaNavigator.openAuthenticityCredentialsActivity(
+                        context = provider.context,
+                        email = data.user.orEmpty(),
+                        isIncomingShares = node.isIncomingShare
+                    )
+                }
+            }
+        }
+    }
+}
+
+class ShareAction @Inject constructor(
+    private val getLocalFilePathUseCase: GetLocalFilePathUseCase,
+    private val exportNodesUseCase: ExportNodeUseCase,
+    private val getFileUriUseCase: GetFileUriUseCase,
+) : SingleNodeAction {
+    override fun canHandle(action: MenuAction): Boolean = action is ShareMenuAction
+
+    override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
+        provider.coroutineScope.launch {
+            withContext(NonCancellable) {
+                val path = runCatching {
+                    getLocalFilePathUseCase(node)
+                }.getOrElse {
+                    Timber.e(it)
+                    null
+                }
+                if (node is TypedFileNode && path != null) {
+                    getLocalFileUri(provider.context, path)?.let {
+                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                            type = node.type.mimeType
+                            putExtra(Intent.EXTRA_STREAM, Uri.parse(it))
+                            putExtra(Intent.EXTRA_SUBJECT, node.name)
+                            addFlags(
+                                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                            )
+                        }
+                        provider.coroutineScope.ensureActive()
+                        provider.context.startActivity(
+                            Intent.createChooser(
+                                shareIntent,
+                                provider.context.getString(sharedResR.string.general_share)
+                            )
+                        )
+                    }
+                } else {
+                    val publicLink = node.exportedData?.publicLink
+                    if (publicLink != null) {
+                        provider.coroutineScope.ensureActive()
+                        startShareIntent(
+                            context = provider.context,
+                            path = publicLink,
+                            name = node.name
+                        )
+                    } else {
+                        val exportPath = exportNodesUseCase(node.id)
+                        provider.coroutineScope.ensureActive()
+                        startShareIntent(
+                            context = provider.context,
+                            path = exportPath,
+                            name = node.name
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun startShareIntent(context: Context, path: String, name: String) {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            putExtra(Intent.EXTRA_SUBJECT, name)
+            putExtra(Intent.EXTRA_TEXT, path)
+            type = "text/plain"
+        }
+        context.startActivity(
+            Intent.createChooser(
+                intent,
+                context.getString(sharedResR.string.general_share)
+            )
+        )
+    }
+
+    private suspend fun getLocalFileUri(context: Context, filePath: String) = runCatching {
+        val fileProviderAuthority = context.packageName + ".providers.fileprovider"
+        getFileUriUseCase(File(filePath), fileProviderAuthority)
+    }.onFailure { Timber.e("Error getting local file uri: ${it.message}") }.getOrNull()
+}
+
+class RemoveShareAction @Inject constructor(
+    private val nodeHandlesToJsonMapper: NodeHandlesToJsonMapper,
+) : SingleNodeAction {
+    override fun canHandle(action: MenuAction): Boolean = action is RemoveShareMenuAction
+
+    override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
+        val nodeList = listOf(node.id.longValue)
+        runCatching { nodeHandlesToJsonMapper(nodeList) }
+            .onSuccess { handles ->
+                provider.navigationHandler?.navigate(
+                    RemoveShareFolderDialogArgs(nodes = handles)
+                )
+            }.onFailure {
+                Timber.e(it)
+            }
+    }
+}
+
+class RemoveLinkAction @Inject constructor(
+    private val nodeHandlesToJsonMapper: NodeHandlesToJsonMapper,
+) : SingleNodeAction {
+    override fun canHandle(action: MenuAction): Boolean = action is RemoveLinkMenuAction
+
+    override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
+        provider.navigationHandler?.navigate(
+            RemoveNodeLinkDialogArgs(
+                nodes = nodeHandlesToJsonMapper(listOf(node.id.longValue))
+            )
+        )
+    }
+}
+
+class GetLinkAction @Inject constructor(
+    private val megaNavigator: MegaNavigator,
+) : SingleNodeAction {
+    override fun canHandle(action: MenuAction): Boolean = action is GetLinkMenuAction
+
+    override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
+        megaNavigator.openGetLinkActivity(
+            context = provider.context,
+            handle = node.id.longValue
+        )
+    }
+}
+
+class UnhideAction @Inject constructor(
+    private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
+) : SingleNodeAction {
+    override fun canHandle(action: MenuAction): Boolean = action is UnhideMenuAction
+
+    override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
+        provider.coroutineScope.launch {
+            runCatching {
+                updateNodeSensitiveUseCase(node.id, false)
+            }.onFailure { Timber.e(it) }
+        }
+    }
+}
+
+class RemoveFavouriteAction @Inject constructor(
+    private val updateNodeFavoriteUseCase: UpdateNodeFavoriteUseCase,
+) : SingleNodeAction {
+    override fun canHandle(action: MenuAction): Boolean = action is RemoveFavouriteMenuAction
+
+    override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
+        provider.coroutineScope.launch {
+            withContext(NonCancellable) {
+                runCatching {
+                    updateNodeFavoriteUseCase(nodeId = node.id, isFavorite = node.isFavourite.not())
+                }.onFailure { Timber.e("Error updating favourite node $it") }
+            }
+        }
+    }
+}
+
+class FavouriteAction @Inject constructor(
+    private val updateNodeFavoriteUseCase: UpdateNodeFavoriteUseCase,
+) : SingleNodeAction {
+    override fun canHandle(action: MenuAction): Boolean = action is FavouriteMenuAction
+
+    override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
+        provider.coroutineScope.launch {
+            withContext(NonCancellable) {
+                runCatching {
+                    updateNodeFavoriteUseCase(nodeId = node.id, isFavorite = node.isFavourite.not())
+                }.onFailure { Timber.e("Error updating favourite node $it") }
             }
         }
     }

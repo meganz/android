@@ -10,14 +10,10 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.LabelMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuitem.components.LabelAccessoryView
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
-import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheet
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.node.GetNodeLabelUseCase
 import javax.inject.Inject
-
-internal const val changeLabelBottomSheetRoute =
-    "search/node_bottom_sheet/change_label_bottom_sheet"
 
 /**
  * Label bottom sheet menu item
@@ -69,14 +65,6 @@ class LabelBottomSheetMenuItem @Inject constructor(
             && isNodeInRubbish.not()
             && accessPermission in setOf(AccessPermission.FULL, AccessPermission.OWNER)
             && isInBackups.not()
-
-    override fun getOnClickFunction(
-        node: TypedNode,
-        handler: BottomSheetClickHandler,
-    ): () -> Unit = {
-        handler.onDismiss()
-        handler.navigationHandler.navigate(ChangeLabelBottomSheet(node.id.longValue))
-    }
 
     override val groupId: Int
         get() = 3

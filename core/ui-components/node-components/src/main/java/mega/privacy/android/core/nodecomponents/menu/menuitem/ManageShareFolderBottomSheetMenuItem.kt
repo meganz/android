@@ -1,16 +1,11 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
-import kotlinx.coroutines.launch
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.extension.isOutShare
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ManageShareFolderMenuAction
-import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.feature_flags.AppFeatures
-import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.domain.usecase.shares.IsOutShareUseCase
 import javax.inject.Inject
 
 /**
@@ -20,8 +15,7 @@ import javax.inject.Inject
  */
 class ManageShareFolderBottomSheetMenuItem @Inject constructor(
     override val menuAction: ManageShareFolderMenuAction,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val megaNavigator: MegaNavigator,
+    private val isOutShareUseCase: IsOutShareUseCase
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
@@ -32,25 +26,7 @@ class ManageShareFolderBottomSheetMenuItem @Inject constructor(
     ) = node.isTakenDown.not()
             && accessPermission == AccessPermission.OWNER
             && isNodeInRubbish.not()
-            && node.isOutShare()
-
-    override fun getOnClickFunction(
-        node: TypedNode,
-        handler: BottomSheetClickHandler,
-    ): () -> Unit = {
-        handler.onDismiss()
-        handler.coroutineScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-                megaNavigator.openFileContactListActivity(
-                    handler.context,
-                    node.id.longValue,
-                    node.name
-                )
-            } else {
-                megaNavigator.openFileContactListActivity(handler.context, node.id.longValue)
-            }
-        }
-    }
+            && isOutShareUseCase(node)
 
     override val groupId = 7
 

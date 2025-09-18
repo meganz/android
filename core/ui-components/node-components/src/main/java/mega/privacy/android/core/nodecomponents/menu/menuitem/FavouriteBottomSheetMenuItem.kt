@@ -1,17 +1,11 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
-import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuaction.FavouriteMenuAction
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.usecase.UpdateNodeFavoriteUseCase
-import timber.log.Timber
 import javax.inject.Inject
-import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 
 /**
  * Favourite bottom sheet menu action
@@ -20,7 +14,6 @@ import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
  */
 class FavouriteBottomSheetMenuItem @Inject constructor(
     override val menuAction: FavouriteMenuAction,
-    private val updateNodeFavoriteUseCase: UpdateNodeFavoriteUseCase,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
@@ -33,21 +26,6 @@ class FavouriteBottomSheetMenuItem @Inject constructor(
             && accessPermission == AccessPermission.OWNER
             && node.isFavourite.not()
             && isInBackups.not()
-
-
-    override fun getOnClickFunction(
-        node: TypedNode,
-        handler: BottomSheetClickHandler
-    ): () -> Unit = {
-        handler.onDismiss()
-        handler.coroutineScope.launch {
-            withContext(NonCancellable) {
-                runCatching {
-                    updateNodeFavoriteUseCase(nodeId = node.id, isFavorite = node.isFavourite.not())
-                }.onFailure { Timber.Forest.e("Error updating favourite node $it") }
-            }
-        }
-    }
 
     override val groupId = 3
 }
