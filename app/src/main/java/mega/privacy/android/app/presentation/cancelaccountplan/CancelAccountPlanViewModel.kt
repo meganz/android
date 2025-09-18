@@ -77,11 +77,7 @@ class CancelAccountPlanViewModel @Inject constructor(
                                 else -> null
                             }
                         accountDetail.levelDetail?.accountType?.let { accountType ->
-                            val planRewindDaysQuota = if (accountType == AccountType.PRO_LITE) {
-                                "90"
-                            } else {
-                                "180"
-                            }
+                            val planRewindDaysQuota = "60"
 
                             val planDetails = getActiveAccountPlanDetails(
                                 accountType = accountType,

@@ -259,8 +259,8 @@ internal class CancelAccountPlanViewModelTest {
     }
 
     private fun provideAccountDetails(): Stream<Arguments> = Stream.of(
-        Arguments.of(AccountType.PRO_LITE, "90"),
-        Arguments.of(AccountType.PRO_I, "180"),
+        Arguments.of(AccountType.PRO_LITE, "60"),
+        Arguments.of(AccountType.PRO_I, "60"),
     )
 
 

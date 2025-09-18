@@ -336,7 +336,7 @@ fun NewChooseAccountScreen(
                         stringResource(id = sharedR.string.pro_plan_benefit_password_protected_links),
                         stringResource(id = sharedR.string.pro_plan_benefit_links_with_expiry_dates),
                         stringResource(id = sharedR.string.pro_plan_benefit_auto_sync_mobile),
-                        stringResource(id = sharedR.string.pro_plan_benefit_rewind_180_days),
+                        stringResource(id = sharedR.string.pro_plan_benefit_rewind_days, 60),
                         stringResource(id = sharedR.string.pro_plan_benefit_host_calls_unlimited),
                         stringResource(id = sharedR.string.pro_plan_benefit_schedule_rubbish_bin_clearing),
                         stringResource(id = sharedR.string.pro_plan_benefit_priority_support),

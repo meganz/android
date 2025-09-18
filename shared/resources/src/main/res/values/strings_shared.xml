@@ -1633,4 +1633,6 @@
     <string name="transfers_retry_feedback_snackbar_message_plural">Retrying transfers, see the Active tab for progress</string>
     <!--Default file name for scanned documents. Placeholder value is for the current date and time values eg:   Scanned_2025091120323.  -->
     <string name="document_scanning_default_file_name">Scanned_%1$s</string>
+    <!-- Benefit: Rewind up to specified days of deleted data -->
+    <string name="pro_plan_benefit_rewind_days">Rewind up to %1$d days of deleted data</string>
 </resources>

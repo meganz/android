@@ -316,7 +316,7 @@ private fun CancelAccountPlanViewPreview() {
                     size = "100",
                     unit = SharedR.string.general_size_giga_byte
                 ),
-                rewindDaysQuota = "90",
+                rewindDaysQuota = "60",
                 isLoading = false
             ),
             accountUiState = AccountStorageUIState(),
