@@ -14,7 +14,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.button.SecondaryNavigationIconButton
-import mega.android.core.ui.components.text.SecondaryTopNavigationButton
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.resources.R
 
@@ -46,7 +45,7 @@ fun ChooseAccountScreenTopBar(
                 onClick = onBack,
             )
         } else {
-            SecondaryTopNavigationButton(
+            MaybeLaterNavigationButton(
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
                     .testTag(TEST_TAG_MAYBE_LATER_BUTTON),
