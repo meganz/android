@@ -16,19 +16,18 @@ import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.nodecomponents.list.previewdata.FolderNodePreviewDataProvider
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
-import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 
 /**
- * This method will show [NodeUiItem] in vertical list using [ThumbnailRequest] to load thumbnails
+ * Composable for showing a list of [NodeUiItem] in a lazy column with optional header for sort and view type
  *
  * @param nodeUiItemList list of [NodeUiItem] to show
  * @param onMenuClick callback to handle menu click
  * @param onItemClicked callback to handle item click
  * @param onLongClick callback to handle long click
  * @param onEnterMediaDiscoveryClick callback to handle media discovery click
- * @param sortOrder the sort order of the list
+ * @param sortConfiguration the sort order of the list
  * @param onSortOrderClick callback to handle sort order click
  * @param onChangeViewTypeClick callback to handle change view type click
  * @param showSortOrder whether to show change sort order button
@@ -54,6 +53,7 @@ fun <T : TypedNode> NodeListView(
     listState: LazyListState,
     showMediaDiscoveryButton: Boolean,
     modifier: Modifier = Modifier,
+    isNextPageLoading: Boolean = false,
     highlightText: String = "",
     showLinkIcon: Boolean = true,
     showChangeViewType: Boolean = true,
@@ -99,6 +99,12 @@ fun <T : TypedNode> NodeListView(
                 onItemClicked = onItemClicked,
                 onLongClicked = onLongClick,
             )
+        }
+
+        if (isNextPageLoading) {
+            items(count = 5, key = { "loading_$it" }) {
+                NodeListViewItemSkeleton()
+            }
         }
     }
 }

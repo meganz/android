@@ -10,7 +10,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
+import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionIconWithClick
@@ -70,7 +70,7 @@ fun CloudDriveScreen(
         viewModel.processAction(DeselectAllItems)
     }
 
-    MegaScaffoldWithTopAppBarScrollBehavior(
+    MegaScaffold(
         topBar = {
             if (uiState.isInSelectionMode) {
                 NodeSelectionModeAppBar(

@@ -93,7 +93,7 @@ private fun NodeListViewSkeleton(
  * Matches exact NodeGridViewItem layout and spacing.
  */
 @Composable
-private fun NodeGridViewSkeleton(
+fun NodeGridViewSkeleton(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
     spanCount: Int = 2,
@@ -169,7 +169,7 @@ private fun NodeHeaderItemSkeleton(
  * Uses exact spacing: horizontal = DSTokens.spacings.s4 (16.dp), vertical = DSTokens.spacings.s3 (12.dp)
  */
 @Composable
-private fun NodeListViewItemSkeleton() {
+fun NodeListViewItemSkeleton() {
     GenericListItem(
         contentPadding = PaddingValues(
             horizontal = DSTokens.spacings.s4,
@@ -231,7 +231,7 @@ private fun NodeListViewItemSkeleton() {
  * Uses exact spacing: DSTokens.spacings.s3 (12.dp) for arrangement
  */
 @Composable
-private fun NodeGridViewItemSkeleton() {
+fun NodeGridViewItemSkeleton() {
     Column(
         modifier = Modifier
             .fillMaxWidth(),

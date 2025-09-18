@@ -68,6 +68,7 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.NavigateToFolderEventConsumed
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.OpenedFileNodeHandled
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import mega.privacy.android.feature.clouddrive.presentation.upload.UploadingFiles
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.camera.CameraArg
@@ -288,11 +289,15 @@ internal fun CloudDriveContent(
 
         else -> NodesView(
             modifier = modifier,
-            listContentPadding = contentPadding,
+            listContentPadding = PaddingValues(
+                top = contentPadding.calculateTopPadding(),
+                bottom = contentPadding.calculateBottomPadding() + 100.dp
+            ),
             listState = listState,
             gridState = gridState,
             spanCount = spanCount,
             items = uiState.items,
+            isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
             isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
             showHiddenNodes = uiState.showHiddenNodes,
             onMenuClicked = { visibleNodeOptionId = it.id },

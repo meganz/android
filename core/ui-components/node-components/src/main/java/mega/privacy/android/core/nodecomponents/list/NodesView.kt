@@ -37,6 +37,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @param onSortOrderClick callback for sort order click
  * @param onChangeViewTypeClicked callback for change view type click
  * @param modifier
+ * @param isNextPageLoading whether to show shimmering skeleton at bottom
  * @param listState the state of the list
  * @param gridState the state of the grid
  * @param spanCount the span count of the grid
@@ -61,6 +62,7 @@ fun <T : TypedNode> NodesView(
     onSortOrderClick: () -> Unit,
     onChangeViewTypeClicked: () -> Unit,
     modifier: Modifier = Modifier,
+    isNextPageLoading: Boolean = false,
     listState: LazyListState = rememberLazyListState(),
     gridState: LazyGridState = rememberLazyGridState(),
     highlightText: String = "",
@@ -101,6 +103,7 @@ fun <T : TypedNode> NodesView(
             modifier = modifier,
             listContentPadding = listContentPadding,
             nodeUiItemList = visibleItems,
+            isNextPageLoading = isNextPageLoading,
             onMenuClick = onMenuClicked,
             onItemClicked = {
                 if (it.isTakenDown && it.node !is FolderNode) {
@@ -128,6 +131,7 @@ fun <T : TypedNode> NodesView(
             modifier = modifier,
             listContentPadding = listContentPadding,
             nodeUiItems = visibleItems,
+            isNextPageLoading = isNextPageLoading,
             onMenuClicked = onMenuClicked,
             onItemClicked = {
                 if (it.isTakenDown && it.node !is FolderNode) {

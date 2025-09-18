@@ -245,7 +245,7 @@ fun NodeGridViewItem(
                         .padding(4.dp)
                         .clip(shape = RoundedCornerShape(size = 3.dp))
                         .background(
-                            color = DSTokens.colors.background.surfaceInverseAccent,
+                            color = DSTokens.colors.background.surfaceTransparent,
                         )
                         .padding(
                             horizontal = DSTokens.spacings.s2,

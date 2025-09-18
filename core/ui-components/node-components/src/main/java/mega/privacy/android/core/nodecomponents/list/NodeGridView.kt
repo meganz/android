@@ -16,18 +16,17 @@ import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVertic
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
-import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedNode
 
 /**
- * NodeGridView
+ * Composable for showing a grid of [NodeUiItem] with optional header for sort and view type
  *
  * @param nodeUiItems List of [NodeUiItem]
- * @param onMenuClick three dots click
+ * @param onMenuClicked three dots click
  * @param onItemClicked on item click
- * @param onLongClick on long item click
+ * @param onLongClicked on long item click
  * @param onEnterMediaDiscoveryClick on enter media discovery click
- * @param sortOrder the sort order of the list
+ * @param sortConfiguration the sort order of the list
  * @param onSortOrderClick on sort order click
  * @param onChangeViewTypeClick on change view type click
  * @param showSortOrder whether to show change sort order button
@@ -53,6 +52,7 @@ fun <T : TypedNode> NodeGridView(
     gridState: LazyGridState,
     showMediaDiscoveryButton: Boolean,
     modifier: Modifier = Modifier,
+    isNextPageLoading: Boolean = false,
     highlightText: String = "",
     spanCount: Int = 2,
     showChangeViewType: Boolean = true,
@@ -103,6 +103,12 @@ fun <T : TypedNode> NodeGridView(
                 onLongClicked = onLongClicked,
                 onMenuClicked = onMenuClicked,
             )
+        }
+
+        if (isNextPageLoading) {
+            items(count = 4, key = { "loading_$it" }) {
+                NodeGridViewItemSkeleton()
+            }
         }
     }
 }

@@ -119,6 +119,7 @@ class CloudDriveViewModel @Inject constructor(
                 folderId
             }
             getNodesByIdInChunkUseCase(folderOrRootNodeId)
+                .catch { Timber.e(it) }
                 .collect { (nodes, hasMore) ->
                     val nodeUiItems = nodeUiItemMapper(
                         nodeList = nodes,
