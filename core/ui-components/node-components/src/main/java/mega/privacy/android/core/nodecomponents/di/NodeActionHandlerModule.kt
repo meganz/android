@@ -5,36 +5,36 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
-import mega.privacy.android.core.nodecomponents.action.AvailableOfflineAction
-import mega.privacy.android.core.nodecomponents.action.CopyAction
-import mega.privacy.android.core.nodecomponents.action.DeletePermanentAction
-import mega.privacy.android.core.nodecomponents.action.DisputeTakeDownAction
-import mega.privacy.android.core.nodecomponents.action.DownloadAction
-import mega.privacy.android.core.nodecomponents.action.EditAction
-import mega.privacy.android.core.nodecomponents.action.FavouriteAction
-import mega.privacy.android.core.nodecomponents.action.GetLinkAction
-import mega.privacy.android.core.nodecomponents.action.HideAction
-import mega.privacy.android.core.nodecomponents.action.InfoAction
-import mega.privacy.android.core.nodecomponents.action.LabelAction
-import mega.privacy.android.core.nodecomponents.action.LeaveShareAction
-import mega.privacy.android.core.nodecomponents.action.ManageLinkAction
-import mega.privacy.android.core.nodecomponents.action.ManageShareFolderAction
-import mega.privacy.android.core.nodecomponents.action.MoveAction
-import mega.privacy.android.core.nodecomponents.action.MoveToRubbishBinAction
-import mega.privacy.android.core.nodecomponents.action.MultiNodeAction
-import mega.privacy.android.core.nodecomponents.action.OpenWithAction
-import mega.privacy.android.core.nodecomponents.action.RemoveFavouriteAction
-import mega.privacy.android.core.nodecomponents.action.RemoveLinkAction
-import mega.privacy.android.core.nodecomponents.action.RemoveShareAction
-import mega.privacy.android.core.nodecomponents.action.RenameNodeAction
-import mega.privacy.android.core.nodecomponents.action.RestoreAction
-import mega.privacy.android.core.nodecomponents.action.SendToChatAction
-import mega.privacy.android.core.nodecomponents.action.ShareAction
-import mega.privacy.android.core.nodecomponents.action.ShareFolderAction
-import mega.privacy.android.core.nodecomponents.action.SingleNodeAction
-import mega.privacy.android.core.nodecomponents.action.UnhideAction
-import mega.privacy.android.core.nodecomponents.action.VerifyAction
-import mega.privacy.android.core.nodecomponents.action.VersionsAction
+import mega.privacy.android.core.nodecomponents.action.clickhandler.AvailableOfflineActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.CopyActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.DeletePermanentActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.DisputeTakeDownActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.DownloadActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.EditActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.FavouriteActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.GetLinkActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.HideActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.InfoActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.LabelActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.LeaveShareActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.ManageLinkActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.ManageShareFolderActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.MoveActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.MoveToRubbishBinActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.MultiNodeAction
+import mega.privacy.android.core.nodecomponents.action.clickhandler.OpenWithActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveFavouriteActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveLinkActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveShareActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.RenameNodeActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.RestoreActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.SendToChatActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.ShareActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.ShareFolderActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.SingleNodeAction
+import mega.privacy.android.core.nodecomponents.action.clickhandler.UnhideActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.VerifyActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.VersionsActionClickHandler
 import javax.inject.Singleton
 
 /**
@@ -53,34 +53,34 @@ object NodeActionHandlerModule {
     @ElementsIntoSet
     @Singleton
     fun provideSingleNodeActionHandlers(
-        versionsAction: VersionsAction,
-        moveAction: MoveAction,
-        copyAction: CopyAction,
-        shareFolderAction: ShareFolderAction,
-        restoreAction: RestoreAction,
-        sendToChatAction: SendToChatAction,
-        openWithAction: OpenWithAction,
-        downloadAction: DownloadAction,
-        availableOfflineAction: AvailableOfflineAction,
-        hideAction: HideAction,
-        renameNodeAction: RenameNodeAction,
-        moveToRubbishBinAction: MoveToRubbishBinAction,
-        manageLinkAction: ManageLinkAction,
-        deletePermanentAction: DeletePermanentAction,
-        leaveShareAction: LeaveShareAction,
-        labelAction: LabelAction,
-        manageShareFolderAction: ManageShareFolderAction,
-        infoAction: InfoAction,
-        editAction: EditAction,
-        disputeTakeDownAction: DisputeTakeDownAction,
-        verifyAction: VerifyAction,
-        shareAction: ShareAction,
-        removeShareAction: RemoveShareAction,
-        removeLinkAction: RemoveLinkAction,
-        getLinkAction: GetLinkAction,
-        unhideAction: UnhideAction,
-        favouriteAction: FavouriteAction,
-        removeFavouriteAction: RemoveFavouriteAction
+        versionsAction: VersionsActionClickHandler,
+        moveAction: MoveActionClickHandler,
+        copyAction: CopyActionClickHandler,
+        shareFolderAction: ShareFolderActionClickHandler,
+        restoreAction: RestoreActionClickHandler,
+        sendToChatAction: SendToChatActionClickHandler,
+        openWithAction: OpenWithActionClickHandler,
+        downloadAction: DownloadActionClickHandler,
+        availableOfflineAction: AvailableOfflineActionClickHandler,
+        hideAction: HideActionClickHandler,
+        renameNodeAction: RenameNodeActionClickHandler,
+        moveToRubbishBinAction: MoveToRubbishBinActionClickHandler,
+        manageLinkAction: ManageLinkActionClickHandler,
+        deletePermanentAction: DeletePermanentActionClickHandler,
+        leaveShareAction: LeaveShareActionClickHandler,
+        labelAction: LabelActionClickHandler,
+        manageShareFolderAction: ManageShareFolderActionClickHandler,
+        infoAction: InfoActionClickHandler,
+        editAction: EditActionClickHandler,
+        disputeTakeDownAction: DisputeTakeDownActionClickHandler,
+        verifyAction: VerifyActionClickHandler,
+        shareAction: ShareActionClickHandler,
+        removeShareAction: RemoveShareActionClickHandler,
+        removeLinkAction: RemoveLinkActionClickHandler,
+        getLinkAction: GetLinkActionClickHandler,
+        unhideAction: UnhideActionClickHandler,
+        favouriteAction: FavouriteActionClickHandler,
+        removeFavouriteAction: RemoveFavouriteActionClickHandler
     ): Set<SingleNodeAction> {
         return setOf(
             versionsAction,
@@ -123,18 +123,18 @@ object NodeActionHandlerModule {
     @ElementsIntoSet
     @Singleton
     fun provideMultipleNodesActionHandlers(
-        openWithAction: OpenWithAction,
-        downloadAction: DownloadAction,
-        availableOfflineAction: AvailableOfflineAction,
-        shareFolderAction: ShareFolderAction,
-        copyAction: CopyAction,
-        moveAction: MoveAction,
-        sendToChatAction: SendToChatAction,
-        restoreAction: RestoreAction,
-        hideAction: HideAction,
-        moveToRubbishBinAction: MoveToRubbishBinAction,
-        manageLinkAction: ManageLinkAction,
-        deletePermanentAction: DeletePermanentAction,
+        openWithAction: OpenWithActionClickHandler,
+        downloadAction: DownloadActionClickHandler,
+        availableOfflineAction: AvailableOfflineActionClickHandler,
+        shareFolderAction: ShareFolderActionClickHandler,
+        copyAction: CopyActionClickHandler,
+        moveAction: MoveActionClickHandler,
+        sendToChatAction: SendToChatActionClickHandler,
+        restoreAction: RestoreActionClickHandler,
+        hideAction: HideActionClickHandler,
+        moveToRubbishBinAction: MoveToRubbishBinActionClickHandler,
+        manageLinkAction: ManageLinkActionClickHandler,
+        deletePermanentAction: DeletePermanentActionClickHandler,
     ): Set<MultiNodeAction> {
         return setOf(
             openWithAction,

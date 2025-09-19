@@ -38,6 +38,33 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VerifyMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VersionsMenuAction
+import mega.privacy.android.core.nodecomponents.action.clickhandler.AvailableOfflineActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.CopyActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.DeletePermanentActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.DisputeTakeDownActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.DownloadActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.EditActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.FavouriteActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.GetLinkActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.HideActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.InfoActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.LabelActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.ManageLinkActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.ManageShareFolderActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.MoveActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.MoveToRubbishBinActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.OpenWithActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveFavouriteActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveLinkActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveShareActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.RenameNodeActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.RestoreActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.SendToChatActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.ShareActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.ShareFolderActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.UnhideActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.VerifyActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.VersionsActionClickHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.NodeId
@@ -84,7 +111,7 @@ import org.mockito.kotlin.whenever
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class NodeActionTypeTest {
+class NodeActionClickHandlerTest {
     private val testScope = TestScope(UnconfinedTestDispatcher())
     private val mockContext = mock<Context>()
     private val mockNavigationHandler = mock<NavigationHandler>()
@@ -214,7 +241,7 @@ class NodeActionTypeTest {
     // VersionsAction Tests
     @Test
     fun `test VersionsAction canHandle returns true for VersionsMenuAction`() {
-        val action = VersionsAction()
+        val action = VersionsActionClickHandler()
         val menuAction = mock<VersionsMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -222,7 +249,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test VersionsAction canHandle returns false for other actions`() {
-        val action = VersionsAction()
+        val action = VersionsActionClickHandler()
         val otherAction = mock<CopyMenuAction>()
 
         assertThat(action.canHandle(otherAction)).isFalse()
@@ -230,7 +257,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test VersionsAction handle calls versionsLauncher with correct node id`() {
-        val action = VersionsAction()
+        val action = VersionsActionClickHandler()
         val menuAction = mock<VersionsMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
@@ -241,7 +268,7 @@ class NodeActionTypeTest {
     // MoveAction Tests
     @Test
     fun `test MoveAction canHandle returns true for MoveMenuAction`() {
-        val action = MoveAction()
+        val action = MoveActionClickHandler()
         val menuAction = mock<MoveMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -249,7 +276,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test MoveAction single node handle calls moveLauncher with correct node id`() {
-        val action = MoveAction()
+        val action = MoveActionClickHandler()
         val menuAction = mock<MoveMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
@@ -259,7 +286,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test MoveAction multiple nodes handle calls moveLauncher with correct node ids`() {
-        val action = MoveAction()
+        val action = MoveActionClickHandler()
         val menuAction = mock<MoveMenuAction>()
         val nodes = listOf(mockFileNode, mockFolderNode)
 
@@ -271,7 +298,7 @@ class NodeActionTypeTest {
     // CopyAction Tests
     @Test
     fun `test CopyAction canHandle returns true for CopyMenuAction`() {
-        val action = CopyAction()
+        val action = CopyActionClickHandler()
         val menuAction = mock<CopyMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -279,7 +306,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test CopyAction single node handle calls copyLauncher with correct node id`() {
-        val action = CopyAction()
+        val action = CopyActionClickHandler()
         val menuAction = mock<CopyMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
@@ -289,7 +316,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test CopyAction multiple nodes handle calls copyLauncher with correct node ids`() {
-        val action = CopyAction()
+        val action = CopyActionClickHandler()
         val menuAction = mock<CopyMenuAction>()
         val nodes = listOf(mockFileNode, mockFolderNode)
 
@@ -301,7 +328,7 @@ class NodeActionTypeTest {
     // ShareFolderAction Tests
     @Test
     fun `test ShareFolderAction canHandle returns true for ShareFolderMenuAction`() {
-        val action = ShareFolderAction()
+        val action = ShareFolderActionClickHandler()
         val menuAction = mock<ShareFolderMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -309,7 +336,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test ShareFolderAction single node handle calls verifyShareFolderAction`() {
-        val action = ShareFolderAction()
+        val action = ShareFolderActionClickHandler()
         val menuAction = mock<ShareFolderMenuAction>()
 
         action.handle(menuAction, mockFolderNode, mockSingleNodeActionProvider)
@@ -319,7 +346,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test ShareFolderAction multiple nodes handle calls verifyShareFolderAction with nodes list`() {
-        val action = ShareFolderAction()
+        val action = ShareFolderActionClickHandler()
         val menuAction = mock<ShareFolderMenuAction>()
         val nodes = listOf(mockFolderNode, mockFileNode)
 
@@ -331,7 +358,7 @@ class NodeActionTypeTest {
     // RestoreAction Tests
     @Test
     fun `test RestoreAction canHandle returns true for RestoreMenuAction`() = runTest {
-        val action = RestoreAction(
+        val action = RestoreActionClickHandler(
             mockCheckNodesNameCollisionUseCase,
             mockRestoreNodesUseCase,
             mockRestoreNodeResultMapper
@@ -343,7 +370,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test RestoreAction single node handle calls checkNodesNameCollisionUseCase`() = runTest {
-        val action = RestoreAction(
+        val action = RestoreActionClickHandler(
             mockCheckNodesNameCollisionUseCase,
             mockRestoreNodesUseCase,
             mockRestoreNodeResultMapper
@@ -361,7 +388,7 @@ class NodeActionTypeTest {
     @Test
     fun `test RestoreAction multiple nodes handle calls checkNodesNameCollisionUseCase with all nodes`() =
         runTest {
-            val action = RestoreAction(
+            val action = RestoreActionClickHandler(
                 mockCheckNodesNameCollisionUseCase,
                 mockRestoreNodesUseCase,
                 mockRestoreNodeResultMapper
@@ -380,7 +407,7 @@ class NodeActionTypeTest {
     // SendToChatAction Tests
     @Test
     fun `test SendToChatAction canHandle returns true for SendToChatMenuAction`() {
-        val action = SendToChatAction(mockGetNodeToAttachUseCase)
+        val action = SendToChatActionClickHandler(mockGetNodeToAttachUseCase)
         val menuAction = mock<SendToChatMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -389,7 +416,7 @@ class NodeActionTypeTest {
     @Test
     fun `test SendToChatAction single node handle calls getNodeToAttachUseCase and sendToChatLauncher for TypedFileNode`() =
         runTest {
-            val action = SendToChatAction(mockGetNodeToAttachUseCase)
+            val action = SendToChatActionClickHandler(mockGetNodeToAttachUseCase)
             val menuAction = mock<SendToChatMenuAction>()
             val mockTypedNode = mock<TypedFileNode> {
                 on { id } doReturn NodeId(123L)
@@ -406,7 +433,7 @@ class NodeActionTypeTest {
     @Test
     fun `test SendToChatAction single node handle does not call sendToChatLauncher for non-TypedFileNode`() =
         runTest {
-            val action = SendToChatAction(mockGetNodeToAttachUseCase)
+            val action = SendToChatActionClickHandler(mockGetNodeToAttachUseCase)
             val menuAction = mock<SendToChatMenuAction>()
 
             action.handle(menuAction, mockFolderNode, mockSingleNodeActionProvider)
@@ -418,7 +445,7 @@ class NodeActionTypeTest {
     @Test
     fun `test SendToChatAction single node handle does not call sendToChatLauncher when getNodeToAttachUseCase returns null`() =
         runTest {
-            val action = SendToChatAction(mockGetNodeToAttachUseCase)
+            val action = SendToChatActionClickHandler(mockGetNodeToAttachUseCase)
             val menuAction = mock<SendToChatMenuAction>()
 
             whenever(mockGetNodeToAttachUseCase(mockFileNode)).thenReturn(null)
@@ -431,7 +458,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test SendToChatAction multiple nodes handle calls sendToChatLauncher with all node ids`() {
-        val action = SendToChatAction(mockGetNodeToAttachUseCase)
+        val action = SendToChatActionClickHandler(mockGetNodeToAttachUseCase)
         val menuAction = mock<SendToChatMenuAction>()
         val nodes = listOf(mockFileNode, mockFolderNode)
 
@@ -443,7 +470,7 @@ class NodeActionTypeTest {
     // OpenWithAction Tests
     @Test
     fun `test OpenWithAction canHandle returns true for OpenWithMenuAction`() {
-        val action = OpenWithAction(
+        val action = OpenWithActionClickHandler(
             mockGetFileUriUseCase,
             mockGetNodePreviewFileUseCase,
             mockHttpServerStartUseCase,
@@ -458,7 +485,7 @@ class NodeActionTypeTest {
     @Test
     fun `test OpenWithAction single node handle calls downloadNodeForPreview for non-TypedFileNode`() =
         runTest {
-            val action = OpenWithAction(
+            val action = OpenWithActionClickHandler(
                 mockGetFileUriUseCase,
                 mockGetNodePreviewFileUseCase,
                 mockHttpServerStartUseCase,
@@ -475,7 +502,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test OpenWithAction multiple nodes handle calls downloadNodeForPreview`() {
-        val action = OpenWithAction(
+        val action = OpenWithActionClickHandler(
             mockGetFileUriUseCase,
             mockGetNodePreviewFileUseCase,
             mockHttpServerStartUseCase,
@@ -493,7 +520,7 @@ class NodeActionTypeTest {
     // DownloadAction Tests
     @Test
     fun `test DownloadAction canHandle returns true for DownloadMenuAction`() {
-        val action = DownloadAction()
+        val action = DownloadActionClickHandler()
         val menuAction = mock<DownloadMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -501,7 +528,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test DownloadAction single node handle calls downloadNode`() {
-        val action = DownloadAction()
+        val action = DownloadActionClickHandler()
         val menuAction = mock<DownloadMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
@@ -511,7 +538,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test DownloadAction multiple nodes handle calls downloadNode`() {
-        val action = DownloadAction()
+        val action = DownloadActionClickHandler()
         val menuAction = mock<DownloadMenuAction>()
         val nodes = listOf(mockFileNode, mockFolderNode)
 
@@ -523,7 +550,7 @@ class NodeActionTypeTest {
     // AvailableOfflineAction Tests
     @Test
     fun `test AvailableOfflineAction canHandle returns true for AvailableOfflineMenuAction`() {
-        val action = AvailableOfflineAction(mockRemoveOfflineNodeUseCase)
+        val action = AvailableOfflineActionClickHandler(mockRemoveOfflineNodeUseCase)
         val menuAction = mock<AvailableOfflineMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -532,7 +559,7 @@ class NodeActionTypeTest {
     @Test
     fun `test AvailableOfflineAction single node handle calls downloadNodeForOffline when node is not available offline`() =
         runTest {
-            val action = AvailableOfflineAction(mockRemoveOfflineNodeUseCase)
+            val action = AvailableOfflineActionClickHandler(mockRemoveOfflineNodeUseCase)
             val menuAction = mock<AvailableOfflineMenuAction>()
             val nodeNotOffline = mock<TypedFileNode> {
                 on { id } doReturn NodeId(123L)
@@ -547,7 +574,7 @@ class NodeActionTypeTest {
     @Test
     fun `test AvailableOfflineAction single node handle calls removeOfflineNodeUseCase when node is available offline`() =
         runTest {
-            val action = AvailableOfflineAction(mockRemoveOfflineNodeUseCase)
+            val action = AvailableOfflineActionClickHandler(mockRemoveOfflineNodeUseCase)
             val menuAction = mock<AvailableOfflineMenuAction>()
             val nodeOffline = mock<TypedFileNode> {
                 on { id } doReturn NodeId(123L)
@@ -561,7 +588,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test AvailableOfflineAction multiple nodes handle calls downloadNodeForOffline`() {
-        val action = AvailableOfflineAction(mockRemoveOfflineNodeUseCase)
+        val action = AvailableOfflineActionClickHandler(mockRemoveOfflineNodeUseCase)
         val menuAction = mock<AvailableOfflineMenuAction>()
         val nodes = listOf(mockFileNode, mockFolderNode)
 
@@ -573,7 +600,7 @@ class NodeActionTypeTest {
     // HideAction Tests
     @Test
     fun `test HideAction canHandle returns true for HideMenuAction`() {
-        val action = HideAction(mockIsHiddenNodesOnboardedUseCase)
+        val action = HideActionClickHandler(mockIsHiddenNodesOnboardedUseCase)
         val menuAction = mock<HideMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -582,7 +609,7 @@ class NodeActionTypeTest {
     @Test
     fun `test HideAction single node handle calls isHiddenNodesOnboardedUseCase and isOnboarding`() =
         runTest {
-            val action = HideAction(mockIsHiddenNodesOnboardedUseCase)
+            val action = HideActionClickHandler(mockIsHiddenNodesOnboardedUseCase)
             val menuAction = mock<HideMenuAction>()
 
             action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
@@ -594,7 +621,7 @@ class NodeActionTypeTest {
     @Test
     fun `test HideAction multiple nodes handle calls isHiddenNodesOnboardedUseCase and isOnboarding`() =
         runTest {
-            val action = HideAction(mockIsHiddenNodesOnboardedUseCase)
+            val action = HideActionClickHandler(mockIsHiddenNodesOnboardedUseCase)
             val menuAction = mock<HideMenuAction>()
             val nodes = listOf(mockFileNode, mockFolderNode)
 
@@ -607,7 +634,7 @@ class NodeActionTypeTest {
     // RenameNodeAction Tests
     @Test
     fun `test RenameNodeAction canHandle returns true for RenameMenuAction`() {
-        val action = RenameNodeAction()
+        val action = RenameNodeActionClickHandler()
         val menuAction = mock<RenameMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -615,7 +642,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test RenameNodeAction handle calls handleRenameNodeRequest`() {
-        val action = RenameNodeAction()
+        val action = RenameNodeActionClickHandler()
         val menuAction = mock<RenameMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
@@ -626,7 +653,7 @@ class NodeActionTypeTest {
     // MoveToRubbishBinAction Tests
     @Test
     fun `test MoveToRubbishBinAction canHandle returns true for TrashMenuAction`() {
-        val action = MoveToRubbishBinAction(mockNodeHandlesToJsonMapper)
+        val action = MoveToRubbishBinActionClickHandler(mockNodeHandlesToJsonMapper)
         val menuAction = mock<TrashMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -635,7 +662,7 @@ class NodeActionTypeTest {
     @Test
     fun `test MoveToRubbishBinAction single node handle calls nodeHandlesToJsonMapper and navigate`() =
         runTest {
-            val action = MoveToRubbishBinAction(mockNodeHandlesToJsonMapper)
+            val action = MoveToRubbishBinActionClickHandler(mockNodeHandlesToJsonMapper)
             val menuAction = mock<TrashMenuAction>()
 
             action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
@@ -652,7 +679,7 @@ class NodeActionTypeTest {
     @Test
     fun `test MoveToRubbishBinAction multiple nodes handle calls nodeHandlesToJsonMapper and navigate`() =
         runTest {
-            val action = MoveToRubbishBinAction(mockNodeHandlesToJsonMapper)
+            val action = MoveToRubbishBinActionClickHandler(mockNodeHandlesToJsonMapper)
             val menuAction = mock<TrashMenuAction>()
             val nodes = listOf(mockFileNode, mockFolderNode)
 
@@ -670,7 +697,7 @@ class NodeActionTypeTest {
     // ManageLinkAction Tests
     @Test
     fun `test ManageLinkAction canHandle returns true for ManageLinkMenuAction`() {
-        val action = ManageLinkAction()
+        val action = ManageLinkActionClickHandler()
         val menuAction = mock<ManageLinkMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -678,7 +705,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test ManageLinkAction single node handle calls openGetLinkActivity with single handle`() {
-        val action = ManageLinkAction()
+        val action = ManageLinkActionClickHandler()
         val menuAction = mock<ManageLinkMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
@@ -691,7 +718,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test ManageLinkAction multiple nodes handle calls openGetLinkActivity with handles array`() {
-        val action = ManageLinkAction()
+        val action = ManageLinkActionClickHandler()
         val menuAction = mock<ManageLinkMenuAction>()
         val nodes = listOf(mockFileNode, mockFolderNode)
 
@@ -706,7 +733,7 @@ class NodeActionTypeTest {
     // DeletePermanentAction Tests
     @Test
     fun `test DeletePermanentAction canHandle returns true for DeletePermanentlyMenuAction`() {
-        val action = DeletePermanentAction(mockNodeHandlesToJsonMapper)
+        val action = DeletePermanentActionClickHandler(mockNodeHandlesToJsonMapper)
         val menuAction = mock<DeletePermanentlyMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -715,7 +742,7 @@ class NodeActionTypeTest {
     @Test
     fun `test DeletePermanentAction single node handle calls nodeHandlesToJsonMapper and navigate`() =
         runTest {
-            val action = DeletePermanentAction(mockNodeHandlesToJsonMapper)
+            val action = DeletePermanentActionClickHandler(mockNodeHandlesToJsonMapper)
             val menuAction = mock<DeletePermanentlyMenuAction>()
 
             action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
@@ -732,7 +759,7 @@ class NodeActionTypeTest {
     @Test
     fun `test DeletePermanentAction multiple nodes handle calls nodeHandlesToJsonMapper and navigate`() =
         runTest {
-            val action = DeletePermanentAction(mockNodeHandlesToJsonMapper)
+            val action = DeletePermanentActionClickHandler(mockNodeHandlesToJsonMapper)
             val menuAction = mock<DeletePermanentlyMenuAction>()
             val nodes = listOf(mockFileNode, mockFolderNode)
 
@@ -751,7 +778,7 @@ class NodeActionTypeTest {
     // LabelAction Tests
     @Test
     fun `test LabelAction canHandle returns true for LabelMenuAction`() {
-        val action = LabelAction()
+        val action = LabelActionClickHandler()
         val menuAction = mock<LabelMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -759,7 +786,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test LabelAction single node handle calls navigationHandler`() {
-        val action = LabelAction()
+        val action = LabelActionClickHandler()
         val menuAction = mock<LabelMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
@@ -770,7 +797,7 @@ class NodeActionTypeTest {
     // ManageShareFolderAction Tests
     @Test
     fun `test ManageShareFolderAction canHandle returns true for ManageShareFolderMenuAction`() {
-        val action = ManageShareFolderAction(mockGetFeatureFlagValueUseCase, mockMegaNavigator)
+        val action = ManageShareFolderActionClickHandler(mockGetFeatureFlagValueUseCase, mockMegaNavigator)
         val menuAction = mock<ManageShareFolderMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -778,7 +805,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test ManageShareFolderAction single node handle calls megaNavigator`() = runTest {
-        val action = ManageShareFolderAction(mockGetFeatureFlagValueUseCase, mockMegaNavigator)
+        val action = ManageShareFolderActionClickHandler(mockGetFeatureFlagValueUseCase, mockMegaNavigator)
         val menuAction = mock<ManageShareFolderMenuAction>()
 
         whenever(mockGetFeatureFlagValueUseCase(any())).thenReturn(true)
@@ -791,7 +818,7 @@ class NodeActionTypeTest {
     // InfoAction Tests
     @Test
     fun `test InfoAction canHandle returns true for InfoMenuAction`() {
-        val action = InfoAction(mockMegaNavigator)
+        val action = InfoActionClickHandler(mockMegaNavigator)
         val menuAction = mock<InfoMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -799,7 +826,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test InfoAction single node handle calls megaNavigator`() {
-        val action = InfoAction(mockMegaNavigator)
+        val action = InfoActionClickHandler(mockMegaNavigator)
         val menuAction = mock<InfoMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
@@ -810,7 +837,7 @@ class NodeActionTypeTest {
     // EditAction Tests
     @Test
     fun `test EditAction canHandle returns true for EditMenuAction`() {
-        val action = EditAction(mockMegaNavigator)
+        val action = EditActionClickHandler(mockMegaNavigator)
         val menuAction = mock<EditMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -818,7 +845,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test EditAction single node handle calls megaNavigator`() {
-        val action = EditAction(mockMegaNavigator)
+        val action = EditActionClickHandler(mockMegaNavigator)
         val menuAction = mock<EditMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
@@ -829,7 +856,7 @@ class NodeActionTypeTest {
     // DisputeTakeDownAction Tests
     @Test
     fun `test DisputeTakeDownAction canHandle returns true for DisputeTakeDownMenuAction`() {
-        val action = DisputeTakeDownAction(mockMegaNavigator)
+        val action = DisputeTakeDownActionClickHandler(mockMegaNavigator)
         val menuAction = mock<DisputeTakeDownMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -837,7 +864,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test DisputeTakeDownAction single node handle calls megaNavigator`() {
-        val action = DisputeTakeDownAction(mockMegaNavigator)
+        val action = DisputeTakeDownActionClickHandler(mockMegaNavigator)
         val menuAction = mock<DisputeTakeDownMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
@@ -848,7 +875,7 @@ class NodeActionTypeTest {
     // VerifyAction Tests
     @Test
     fun `test VerifyAction canHandle returns true for VerifyMenuAction`() {
-        val action = VerifyAction(
+        val action = VerifyActionClickHandler(
             mockGetNodeShareDataUseCase,
             mockMegaNavigator
         )
@@ -859,7 +886,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test VerifyAction single node handle calls getNodeShareDataUseCase`() = runTest {
-        val action = VerifyAction(
+        val action = VerifyActionClickHandler(
             mockGetNodeShareDataUseCase,
             mockMegaNavigator
         )
@@ -880,7 +907,7 @@ class NodeActionTypeTest {
     @Test
     fun `test VerifyAction single node handle navigates to CannotVerifyContactDialog when not verified and pending`() =
         runTest {
-            val action = VerifyAction(
+            val action = VerifyActionClickHandler(
                 mockGetNodeShareDataUseCase,
                 mockMegaNavigator
             )
@@ -901,7 +928,7 @@ class NodeActionTypeTest {
     @Test
     fun `test VerifyAction single node handle opens AuthenticityCredentialsActivity when verified or not pending`() =
         runTest {
-            val action = VerifyAction(
+            val action = VerifyActionClickHandler(
                 mockGetNodeShareDataUseCase,
                 mockMegaNavigator
             )
@@ -921,7 +948,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test VerifyAction single node handle does nothing when no share data`() = runTest {
-        val action = VerifyAction(
+        val action = VerifyActionClickHandler(
             mockGetNodeShareDataUseCase,
             mockMegaNavigator
         )
@@ -939,7 +966,7 @@ class NodeActionTypeTest {
     // ShareAction Tests
     @Test
     fun `test ShareAction canHandle returns true for ShareMenuAction`() {
-        val action = ShareAction(
+        val action = ShareActionClickHandler(
             mockGetLocalFilePathUseCase,
             mockExportNodeUseCase,
             mockGetFileUriUseCase
@@ -951,7 +978,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test ShareAction single node handle calls getLocalFilePathUseCase`() = runTest {
-        val action = ShareAction(
+        val action = ShareActionClickHandler(
             mockGetLocalFilePathUseCase,
             mockExportNodeUseCase,
             mockGetFileUriUseCase
@@ -968,7 +995,7 @@ class NodeActionTypeTest {
     // RemoveShareAction Tests
     @Test
     fun `test RemoveShareAction canHandle returns true for RemoveShareMenuAction`() {
-        val action = RemoveShareAction(mockNodeHandlesToJsonMapper)
+        val action = RemoveShareActionClickHandler(mockNodeHandlesToJsonMapper)
         val menuAction = mock<RemoveShareMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -976,7 +1003,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test RemoveShareAction single node handle calls nodeHandlesToJsonMapper`() {
-        val action = RemoveShareAction(mockNodeHandlesToJsonMapper)
+        val action = RemoveShareActionClickHandler(mockNodeHandlesToJsonMapper)
         val menuAction = mock<RemoveShareMenuAction>()
 
         whenever(mockNodeHandlesToJsonMapper(anyList())).thenReturn("test")
@@ -987,7 +1014,7 @@ class NodeActionTypeTest {
     // RemoveLinkAction Tests
     @Test
     fun `test RemoveLinkAction canHandle returns true for RemoveLinkMenuAction`() {
-        val action = RemoveLinkAction(mockNodeHandlesToJsonMapper)
+        val action = RemoveLinkActionClickHandler(mockNodeHandlesToJsonMapper)
         val menuAction = mock<RemoveLinkMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -995,7 +1022,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test RemoveLinkAction single node handle calls nodeHandlesToJsonMapper`() {
-        val action = RemoveLinkAction(mockNodeHandlesToJsonMapper)
+        val action = RemoveLinkActionClickHandler(mockNodeHandlesToJsonMapper)
         val menuAction = mock<RemoveLinkMenuAction>()
 
         whenever(mockNodeHandlesToJsonMapper(anyList())).thenReturn("test")
@@ -1006,7 +1033,7 @@ class NodeActionTypeTest {
     // GetLinkAction Tests
     @Test
     fun `test GetLinkAction canHandle returns true for GetLinkMenuAction`() {
-        val action = GetLinkAction(mockMegaNavigator)
+        val action = GetLinkActionClickHandler(mockMegaNavigator)
         val menuAction = mock<GetLinkMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -1014,7 +1041,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test GetLinkAction single node handle calls megaNavigator`() {
-        val action = GetLinkAction(mockMegaNavigator)
+        val action = GetLinkActionClickHandler(mockMegaNavigator)
         val menuAction = mock<GetLinkMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
@@ -1025,7 +1052,7 @@ class NodeActionTypeTest {
     // UnhideAction Tests
     @Test
     fun `test UnhideAction canHandle returns true for UnhideMenuAction`() {
-        val action = UnhideAction(mockUpdateNodeSensitiveUseCase)
+        val action = UnhideActionClickHandler(mockUpdateNodeSensitiveUseCase)
         val menuAction = mock<UnhideMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -1033,7 +1060,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test UnhideAction single node handle calls updateNodeSensitiveUseCase`() = runTest {
-        val action = UnhideAction(mockUpdateNodeSensitiveUseCase)
+        val action = UnhideActionClickHandler(mockUpdateNodeSensitiveUseCase)
         val menuAction = mock<UnhideMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
@@ -1044,7 +1071,7 @@ class NodeActionTypeTest {
     // RemoveFavouriteAction Tests
     @Test
     fun `test RemoveFavouriteAction canHandle returns true for RemoveFavouriteMenuAction`() {
-        val action = RemoveFavouriteAction(mockUpdateNodeFavoriteUseCase)
+        val action = RemoveFavouriteActionClickHandler(mockUpdateNodeFavoriteUseCase)
         val menuAction = mock<RemoveFavouriteMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -1053,7 +1080,7 @@ class NodeActionTypeTest {
     @Test
     fun `test RemoveFavouriteAction single node handle calls updateNodeFavoriteUseCase`() =
         runTest {
-            val action = RemoveFavouriteAction(mockUpdateNodeFavoriteUseCase)
+            val action = RemoveFavouriteActionClickHandler(mockUpdateNodeFavoriteUseCase)
             val menuAction = mock<RemoveFavouriteMenuAction>()
 
             action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
@@ -1064,7 +1091,7 @@ class NodeActionTypeTest {
     // FavouriteAction Tests
     @Test
     fun `test FavouriteAction canHandle returns true for FavouriteMenuAction`() {
-        val action = FavouriteAction(mockUpdateNodeFavoriteUseCase)
+        val action = FavouriteActionClickHandler(mockUpdateNodeFavoriteUseCase)
         val menuAction = mock<FavouriteMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -1072,7 +1099,7 @@ class NodeActionTypeTest {
 
     @Test
     fun `test FavouriteAction single node handle calls updateNodeFavoriteUseCase`() = runTest {
-        val action = FavouriteAction(mockUpdateNodeFavoriteUseCase)
+        val action = FavouriteActionClickHandler(mockUpdateNodeFavoriteUseCase)
         val menuAction = mock<FavouriteMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
@@ -1084,20 +1111,20 @@ class NodeActionTypeTest {
     fun `test actions return false for wrong menu action types`() {
         val wrongAction = mock<MenuAction>()
 
-        assertThat(VersionsAction().canHandle(wrongAction)).isFalse()
-        assertThat(MoveAction().canHandle(wrongAction)).isFalse()
-        assertThat(CopyAction().canHandle(wrongAction)).isFalse()
-        assertThat(ShareFolderAction().canHandle(wrongAction)).isFalse()
+        assertThat(VersionsActionClickHandler().canHandle(wrongAction)).isFalse()
+        assertThat(MoveActionClickHandler().canHandle(wrongAction)).isFalse()
+        assertThat(CopyActionClickHandler().canHandle(wrongAction)).isFalse()
+        assertThat(ShareFolderActionClickHandler().canHandle(wrongAction)).isFalse()
         assertThat(
-            RestoreAction(
+            RestoreActionClickHandler(
                 mockCheckNodesNameCollisionUseCase,
                 mockRestoreNodesUseCase,
                 mockRestoreNodeResultMapper
             ).canHandle(wrongAction)
         ).isFalse()
-        assertThat(SendToChatAction(mockGetNodeToAttachUseCase).canHandle(wrongAction)).isFalse()
+        assertThat(SendToChatActionClickHandler(mockGetNodeToAttachUseCase).canHandle(wrongAction)).isFalse()
         assertThat(
-            OpenWithAction(
+            OpenWithActionClickHandler(
                 mockGetFileUriUseCase,
                 mockGetNodePreviewFileUseCase,
                 mockHttpServerStartUseCase,
@@ -1105,40 +1132,40 @@ class NodeActionTypeTest {
                 mockGetStreamingUriStringForNode
             ).canHandle(wrongAction)
         ).isFalse()
-        assertThat(DownloadAction().canHandle(wrongAction)).isFalse()
-        assertThat(AvailableOfflineAction(mockRemoveOfflineNodeUseCase).canHandle(wrongAction)).isFalse()
-        assertThat(HideAction(mockIsHiddenNodesOnboardedUseCase).canHandle(wrongAction)).isFalse()
-        assertThat(RenameNodeAction().canHandle(wrongAction)).isFalse()
-        assertThat(MoveToRubbishBinAction(mockNodeHandlesToJsonMapper).canHandle(wrongAction)).isFalse()
-        assertThat(ManageLinkAction().canHandle(wrongAction)).isFalse()
-        assertThat(DeletePermanentAction(mockNodeHandlesToJsonMapper).canHandle(wrongAction)).isFalse()
-        assertThat(LabelAction().canHandle(wrongAction)).isFalse()
+        assertThat(DownloadActionClickHandler().canHandle(wrongAction)).isFalse()
+        assertThat(AvailableOfflineActionClickHandler(mockRemoveOfflineNodeUseCase).canHandle(wrongAction)).isFalse()
+        assertThat(HideActionClickHandler(mockIsHiddenNodesOnboardedUseCase).canHandle(wrongAction)).isFalse()
+        assertThat(RenameNodeActionClickHandler().canHandle(wrongAction)).isFalse()
+        assertThat(MoveToRubbishBinActionClickHandler(mockNodeHandlesToJsonMapper).canHandle(wrongAction)).isFalse()
+        assertThat(ManageLinkActionClickHandler().canHandle(wrongAction)).isFalse()
+        assertThat(DeletePermanentActionClickHandler(mockNodeHandlesToJsonMapper).canHandle(wrongAction)).isFalse()
+        assertThat(LabelActionClickHandler().canHandle(wrongAction)).isFalse()
         assertThat(
-            ManageShareFolderAction(
+            ManageShareFolderActionClickHandler(
                 mockGetFeatureFlagValueUseCase,
                 mockMegaNavigator
             ).canHandle(wrongAction)
         ).isFalse()
-        assertThat(InfoAction(mockMegaNavigator).canHandle(wrongAction)).isFalse()
-        assertThat(EditAction(mockMegaNavigator).canHandle(wrongAction)).isFalse()
-        assertThat(DisputeTakeDownAction(mockMegaNavigator).canHandle(wrongAction)).isFalse()
+        assertThat(InfoActionClickHandler(mockMegaNavigator).canHandle(wrongAction)).isFalse()
+        assertThat(EditActionClickHandler(mockMegaNavigator).canHandle(wrongAction)).isFalse()
+        assertThat(DisputeTakeDownActionClickHandler(mockMegaNavigator).canHandle(wrongAction)).isFalse()
         assertThat(
-            VerifyAction(mockGetNodeShareDataUseCase, mockMegaNavigator).canHandle(
+            VerifyActionClickHandler(mockGetNodeShareDataUseCase, mockMegaNavigator).canHandle(
                 wrongAction
             )
         ).isFalse()
         assertThat(
-            ShareAction(
+            ShareActionClickHandler(
                 mockGetLocalFilePathUseCase,
                 mockExportNodeUseCase,
                 mockGetFileUriUseCase
             ).canHandle(wrongAction)
         ).isFalse()
-        assertThat(RemoveShareAction(mockNodeHandlesToJsonMapper).canHandle(wrongAction)).isFalse()
-        assertThat(RemoveLinkAction(mockNodeHandlesToJsonMapper).canHandle(wrongAction)).isFalse()
-        assertThat(GetLinkAction(mockMegaNavigator).canHandle(wrongAction)).isFalse()
-        assertThat(UnhideAction(mockUpdateNodeSensitiveUseCase).canHandle(wrongAction)).isFalse()
-        assertThat(RemoveFavouriteAction(mockUpdateNodeFavoriteUseCase).canHandle(wrongAction)).isFalse()
-        assertThat(FavouriteAction(mockUpdateNodeFavoriteUseCase).canHandle(wrongAction)).isFalse()
+        assertThat(RemoveShareActionClickHandler(mockNodeHandlesToJsonMapper).canHandle(wrongAction)).isFalse()
+        assertThat(RemoveLinkActionClickHandler(mockNodeHandlesToJsonMapper).canHandle(wrongAction)).isFalse()
+        assertThat(GetLinkActionClickHandler(mockMegaNavigator).canHandle(wrongAction)).isFalse()
+        assertThat(UnhideActionClickHandler(mockUpdateNodeSensitiveUseCase).canHandle(wrongAction)).isFalse()
+        assertThat(RemoveFavouriteActionClickHandler(mockUpdateNodeFavoriteUseCase).canHandle(wrongAction)).isFalse()
+        assertThat(FavouriteActionClickHandler(mockUpdateNodeFavoriteUseCase).canHandle(wrongAction)).isFalse()
     }
 }

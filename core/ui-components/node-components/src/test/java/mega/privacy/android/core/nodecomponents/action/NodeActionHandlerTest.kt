@@ -1,5 +1,8 @@
 package mega.privacy.android.core.nodecomponents.action
 
+import mega.privacy.android.core.nodecomponents.action.clickhandler.SingleNodeAction
+import mega.privacy.android.core.nodecomponents.action.clickhandler.MultiNodeAction
+
 import androidx.compose.runtime.Composable
 import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.model.menu.MenuAction

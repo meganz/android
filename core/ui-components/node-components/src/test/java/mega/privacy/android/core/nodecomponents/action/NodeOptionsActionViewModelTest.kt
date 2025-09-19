@@ -1,5 +1,8 @@
 package mega.privacy.android.core.nodecomponents.action
 
+import mega.privacy.android.core.nodecomponents.action.clickhandler.SingleNodeAction
+import mega.privacy.android.core.nodecomponents.action.clickhandler.MultiNodeAction
+
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import dagger.Lazy

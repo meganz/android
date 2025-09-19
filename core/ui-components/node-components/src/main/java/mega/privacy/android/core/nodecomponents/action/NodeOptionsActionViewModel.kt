@@ -28,6 +28,8 @@ import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction.Companion.DEFAULT_MAX_VISIBLE_ITEMS
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.action.clickhandler.SingleNodeAction
+import mega.privacy.android.core.nodecomponents.action.clickhandler.MultiNodeAction
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
