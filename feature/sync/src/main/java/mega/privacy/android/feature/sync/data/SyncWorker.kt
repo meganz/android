@@ -19,7 +19,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
-import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
@@ -53,7 +52,6 @@ internal class SyncWorker @AssistedInject constructor(
     private val pauseResumeSyncsBasedOnBatteryAndWiFiUseCase: PauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
     private val isRootNodeExistsUseCase: RootNodeExistsUseCase,
     private val syncPermissionManager: SyncPermissionsManager,
-    private val cookieEnabledCheckWrapper: CookieEnabledCheckWrapper,
 ) : CoroutineWorker(context, workerParams) {
 
     private var monitorNotificationsJob: Job? = null
@@ -119,10 +117,7 @@ internal class SyncWorker @AssistedInject constructor(
                 val result = runCatching { backgroundFastLoginUseCase() }.onFailure {
                     Timber.e(it, "performCompleteFastLogin exception")
                 }
-                if (result.isSuccess) {
-                    Timber.d("Complete Fast Login procedure successful. Get cookies settings after login")
-                    cookieEnabledCheckWrapper.checkEnabledCookies()
-                }
+                Timber.d("Complete Fast Login procedure successful. Get cookies settings after login")
                 result.isSuccess
             } else {
                 isRootNodeExistsUseCase().also { rootNodeExists ->

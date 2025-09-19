@@ -59,7 +59,6 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTA
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOAD_BYTES
 import mega.privacy.android.data.featuretoggle.DataFeatures
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
-import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.VideoQuality
@@ -84,6 +83,7 @@ import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.repository.TimeSystemRepository
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFoldersInRubbishBinUseCase
@@ -182,7 +182,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val broadcastStorageOverQuotaUseCase: BroadcastStorageOverQuotaUseCase,
     private val cameraUploadsNotificationManagerWrapper: CameraUploadsNotificationManagerWrapper,
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase,
-    private val cookieEnabledCheckWrapper: CookieEnabledCheckWrapper,
+    private val isRootNodeExistsUseCase: RootNodeExistsUseCase,
     private val broadcastCameraUploadsSettingsActionUseCase: BroadcastCameraUploadsSettingsActionUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val processCameraUploadsMediaUseCase: ProcessCameraUploadsMediaUseCase,
@@ -1310,14 +1310,17 @@ class CameraUploadsWorker @AssistedInject constructor(
             val result = runCatching { backgroundFastLoginUseCase() }.onFailure {
                 Timber.e(it, "performCompleteFastLogin exception")
             }
-            if (result.isSuccess) {
-                Timber.d("Complete Fast Login procedure successful. Get cookies settings after login")
-                cookieEnabledCheckWrapper.checkEnabledCookies()
-            }
+            Timber.d("Complete Fast Login procedure successful. Get cookies settings after login")
             result.isSuccess
         } else {
             Timber.e("isLoggingIn lock not available, cannot perform backgroundFastLogin. Stop process")
-            false
+            isRootNodeExistsUseCase().also { rootNodeExists ->
+                if (rootNodeExists) {
+                    Timber.d("Root node exists, no need to perform login")
+                } else {
+                    Timber.w("Root node does not exist, login failed in the Camera Uploads Worker")
+                }
+            }
         }
     }
 

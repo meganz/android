@@ -22,7 +22,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
@@ -76,7 +75,6 @@ internal class SyncWorkerTest {
     private val pauseResumeSyncsBasedOnBatteryAndWiFiUseCase: PauseResumeSyncsBasedOnBatteryAndWiFiUseCase =
         mock()
     private val syncPermissionsManager: SyncPermissionsManager = mock()
-    private val cookieEnabledCheckWrapper: CookieEnabledCheckWrapper = mock()
     private val monitorSyncsUseCase: MonitorSyncsUseCase = mock()
 
     @Before
@@ -120,7 +118,6 @@ internal class SyncWorkerTest {
             pauseResumeSyncsBasedOnBatteryAndWiFiUseCase = pauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
             isRootNodeExistsUseCase = isRootNodeExistsUseCase,
             syncPermissionManager = syncPermissionsManager,
-            cookieEnabledCheckWrapper = cookieEnabledCheckWrapper,
         )
     }
 

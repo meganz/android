@@ -51,7 +51,6 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTA
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOAD_BYTES
 import mega.privacy.android.data.featuretoggle.DataFeatures
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
-import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
@@ -75,6 +74,7 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFoldersInRubbishBinUseCase
@@ -207,7 +207,7 @@ internal class CameraUploadsWorkerTest {
     private val cameraUploadsNotificationManagerWrapper: CameraUploadsNotificationManagerWrapper =
         mock()
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase = mock()
-    private val cookieEnabledCheckWrapper: CookieEnabledCheckWrapper = mock()
+    private val isRootNodeExistsUseCase: RootNodeExistsUseCase = mock()
     private val broadcastCameraUploadsSettingsActionUseCase: BroadcastCameraUploadsSettingsActionUseCase =
         mock()
     private var isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
@@ -310,7 +310,7 @@ internal class CameraUploadsWorkerTest {
                 broadcastStorageOverQuotaUseCase = broadcastStorageOverQuotaUseCase,
                 hasMediaPermissionUseCase = hasMediaPermissionUseCase,
                 cameraUploadsNotificationManagerWrapper = cameraUploadsNotificationManagerWrapper,
-                cookieEnabledCheckWrapper = cookieEnabledCheckWrapper,
+                isRootNodeExistsUseCase = isRootNodeExistsUseCase,
                 broadcastCameraUploadsSettingsActionUseCase = broadcastCameraUploadsSettingsActionUseCase,
                 isConnectedToInternetUseCase = isConnectedToInternetUseCase,
                 loginMutex = loginMutex,
