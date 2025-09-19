@@ -58,17 +58,12 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.view.getAppropiateSubTextString
 import mega.privacy.android.app.presentation.notification.model.Notification
+import mega.privacy.android.app.presentation.notification.model.NotificationItemType
 import mega.privacy.android.app.presentation.notification.model.NotificationState
 import mega.privacy.android.app.presentation.notification.view.notificationviewtype.PromoNotificationItemViewM3
 import mega.privacy.android.domain.entity.notifications.PromoNotification
 import mega.privacy.android.feature.notifications.snowflakes.NotificationItemViewM3
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.original.core.ui.controls.notifications.NotificationItemType
-import mega.privacy.android.shared.original.core.ui.controls.notifications.NotificationItemType.Contacts
-import mega.privacy.android.shared.original.core.ui.controls.notifications.NotificationItemType.Custom
-import mega.privacy.android.shared.original.core.ui.controls.notifications.NotificationItemType.IncomingShares
-import mega.privacy.android.shared.original.core.ui.controls.notifications.NotificationItemType.Others
-import mega.privacy.android.shared.original.core.ui.controls.notifications.NotificationItemType.ScheduledMeetings
 
 
 /**
@@ -258,15 +253,6 @@ private fun NotificationListViewM3(
 }
 
 @Composable
-fun NotificationItemType.titleColor() = when (this) {
-    ScheduledMeetings -> TextColor.Error
-    IncomingShares -> TextColor.Warning
-    Contacts -> TextColor.Accent
-    Custom -> TextColor.Error
-    Others -> TextColor.Warning
-}
-
-@Composable
 fun NotificationEmptyViewM3(modifier: Modifier = Modifier) {
     val imageDrawable = iconPackR.drawable.ic_bell_glass
     val textId = R.string.context_empty_notifications
@@ -350,7 +336,7 @@ private fun NotificationViewM3Preview() {
 
     val normalNotification = Notification(
         sectionTitle = { "CONTACTS" },
-        sectionType = Others,
+        sectionType = NotificationItemType.Others,
         title = { "New Contact" },
         titleTextSize = 16.sp,
         description = { "xyz@gmail.com is now a contact" },

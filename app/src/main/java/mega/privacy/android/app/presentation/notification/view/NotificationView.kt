@@ -31,12 +31,12 @@ import androidx.lifecycle.Lifecycle
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.view.getAppropiateSubTextString
 import mega.privacy.android.app.presentation.notification.model.Notification
+import mega.privacy.android.app.presentation.notification.model.NotificationItemType
 import mega.privacy.android.app.presentation.notification.model.NotificationState
 import mega.privacy.android.app.presentation.notification.view.notificationviewtype.PromoNotificationItemView
 import mega.privacy.android.domain.entity.notifications.PromoNotification
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
-import mega.privacy.android.shared.original.core.ui.controls.notifications.NotificationItemType
 import mega.privacy.android.shared.original.core.ui.controls.notifications.NotificationItemView
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -166,7 +166,7 @@ private fun NotificationListView(
                 }
             } else if (notification is Notification) {
                 NotificationItemView(
-                    type = notification.sectionType,
+                    titleColor = notification.sectionType.titleColor(),
                     typeTitle = notification.sectionTitle(context),
                     title = notification.title(context),
                     description = notification.description(context),

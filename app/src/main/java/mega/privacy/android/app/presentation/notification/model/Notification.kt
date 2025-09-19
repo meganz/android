@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.notification.model
 
 import android.content.Context
 import androidx.compose.ui.unit.TextUnit
-import mega.privacy.android.shared.original.core.ui.controls.notifications.NotificationItemType
 
 /**
  * Notification

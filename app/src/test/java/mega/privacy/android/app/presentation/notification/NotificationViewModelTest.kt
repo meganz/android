@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.notification.model.Notification
+import mega.privacy.android.app.presentation.notification.model.NotificationItemType
 import mega.privacy.android.app.presentation.notification.model.mapper.NotificationMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
@@ -20,7 +21,6 @@ import mega.privacy.android.domain.usecase.AcknowledgeUserAlertsUseCase
 import mega.privacy.android.domain.usecase.MonitorUserAlertsUseCase
 import mega.privacy.android.domain.usecase.notifications.GetPromoNotificationsUseCase
 import mega.privacy.android.domain.usecase.notifications.SetLastReadNotificationUseCase
-import mega.privacy.android.shared.original.core.ui.controls.notifications.NotificationItemType
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance

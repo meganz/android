@@ -1,6 +1,5 @@
 package mega.privacy.android.shared.original.core.ui.controls.notifications
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -25,6 +24,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.controls.chip.TagChipStyle
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
@@ -34,34 +35,14 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedTex
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
+import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.TextColor
-
-/**
- * Type of the notification t
- */
-enum class NotificationItemType {
-    Contacts,
-    IncomingShares,
-    ScheduledMeetings,
-    Custom,
-    Others;
-
-    @Composable
-    internal fun titleColor() = when (this) {
-        ScheduledMeetings -> TextColor.Error
-        IncomingShares -> TextColor.Warning
-        Contacts -> TextColor.Accent
-        Custom -> TextColor.Error
-        Others -> TextColor.Warning
-    }
-}
+import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 fun NotificationItemView(
-    type: NotificationItemType,
+    titleColor: TextColor,
     typeTitle: String,
     title: String,
     description: String?,
@@ -71,21 +52,22 @@ fun NotificationItemView(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    Column(modifier = modifier
-        .clickable { onClick() }
-        .background(
-            color = if (isNew) DSTokens.colors.background.pageBackground
-            else DSTokens.colors.background.surface1
-        )
-        .testTag(NOTIFICATION_TEST_TAG)
-        .fillMaxWidth()
-        .wrapContentHeight()) {
+    Column(
+        modifier = modifier
+            .clickable { onClick() }
+            .background(
+                color = if (isNew) DSTokens.colors.background.pageBackground
+                else DSTokens.colors.background.surface1
+            )
+            .testTag(NOTIFICATION_TEST_TAG)
+            .fillMaxWidth()
+            .wrapContentHeight()) {
 
         MegaText(
             modifier = Modifier
                 .padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
                 .testTag(NOTIFICATION_SECTION_TITLE_TEST_TAG),
-            textColor = type.titleColor(),
+            textColor = titleColor,
             text = typeTitle,
             style = MaterialTheme.typography.caption.copy(fontWeight = SemiBold),
             overflow = LongTextBehaviour.Ellipsis(1)
@@ -189,58 +171,30 @@ private val spanStyles = mapOf(
     SpanIndicator('B') to MegaSpanStyle(color = TextColor.Secondary)
 )
 
-/**
- * helper class to help passing all the parameters to tests and previews.
- */
-internal data class NotificationItemDefinition(
-    val type: NotificationItemType,
-    val typeTitle: String,
-    val title: String,
-    val description: String?,
-    val subText: AnnotatedString?,
-    val date: String,
-    val isNew: Boolean,
-)
-
-private class NotificationProvider : PreviewParameterProvider<NotificationItemDefinition> {
-    override val values = NotificationItemType.entries
-        .flatMap { listOf(it to true, it to false) }.map { (section, isNew) ->
-            NotificationItemDefinition(
-                type = section,
-                typeTitle = "Meetings",
-                title = "Title",
-                description = "name@email.com [B]meeting text meeting text meeting text[/B] hi",
-                subText = buildAnnotatedString {
-                    append("Every ")
-                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append("Monday")
-                    }
-                    append(" at ")
-                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append("11 am")
-                    }
-                },
-                date = "11 October 2022 6:46 pm",
-                isNew = isNew,
-            )
-        }.asSequence()
-}
-
 @CombinedTextAndThemePreviews
 @Composable
 private fun NotificationItemViewPreview(
-    @PreviewParameter(NotificationProvider::class) notification: NotificationItemDefinition,
+    @PreviewParameter(BooleanProvider::class) isNew: Boolean,
 ) {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         NotificationItemView(
-            notification.type,
-            notification.typeTitle,
-            notification.title,
-            notification.description,
-            notification.subText,
-            notification.date,
-            notification.isNew,
-        ){}
+            titleColor = TextColor.Secondary,
+            typeTitle = "Meetings",
+            title = "Title",
+            description = "name@email.com [B]meeting text meeting text meeting text[/B] hi",
+            subText = buildAnnotatedString {
+                append("Every ")
+                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("Monday")
+                }
+                append(" at ")
+                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("11 am")
+                }
+            },
+            date = "11 October 2022 6:46 pm",
+            isNew = isNew,
+        ) {}
     }
 }
 
