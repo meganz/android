@@ -294,7 +294,7 @@ private fun onViewInFolder(
     with(completedTransfer) {
         if (completedTransfer.type.isDownloadType()) {
             val isOffline = isOffline == true
-            val path = parentUri.toString().takeUnless { it.isBlank() } ?: path
+            val path = parentUri?.toString()?.takeUnless { it.isBlank() } ?: "file://$path"
 
             Intent(
                 activity,

@@ -63,7 +63,13 @@ class CompletedTransferActionsViewModel @Inject constructor(
      */
     fun checkCompletedTransferActions(completedTransfer: CompletedTransfer) {
         with(completedTransfer) {
-            _uiState.update { state -> state.copy(completedTransfer = this) }
+            _uiState.update { state ->
+                state.copy(
+                    completedTransfer = this,
+                    parentUri = null,
+                    fileUri = null
+                )
+            }
 
             checkShareOption(handle)
 

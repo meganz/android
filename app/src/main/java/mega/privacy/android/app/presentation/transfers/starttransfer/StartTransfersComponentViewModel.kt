@@ -243,17 +243,18 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         var retryUploads = false
         var retryDownloads = false
         var notEnoughStorage = false
-        var shouldPromptToSaveDestination = false
+        var shouldAskDownloadDestinationUseCase = false
         var defaultLocation: String? = null
 
         runCatching { clearActiveTransfersIfFinishedUseCase() }
             .onFailure { Timber.e(it) }
 
         if (transferTriggerEvent.idsAndEvents.values.any { it is TransferTriggerEvent.RetryDownloadNode }) {
-            shouldPromptToSaveDestination = runCatching { shouldPromptToSaveDestinationUseCase() }
-                .getOrDefault(false)
+            shouldAskDownloadDestinationUseCase =
+                runCatching { shouldAskDownloadDestinationUseCase() }
+                    .getOrDefault(false)
 
-            if (shouldPromptToSaveDestination.not()) {
+            if (shouldAskDownloadDestinationUseCase.not()) {
                 defaultLocation = runCatching { getOrCreateDownloadLocationUseCase() }
                     .onFailure { Timber.e(it) }
                     .getOrNull()
@@ -283,7 +284,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                                     null
                                 }
 
-                                shouldPromptToSaveDestination -> event.downloadLocation
+                                shouldAskDownloadDestinationUseCase -> event.downloadLocation
                                 else -> defaultLocation
                             }
                         } else {

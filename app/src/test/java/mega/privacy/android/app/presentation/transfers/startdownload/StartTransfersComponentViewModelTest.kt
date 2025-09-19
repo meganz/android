@@ -1197,7 +1197,7 @@ class StartTransfersComponentViewModelTest {
                 commonStub()
 
                 whenever(getOfflinePathForNodeUseCase(any())) doReturn DESTINATION
-                whenever(shouldPromptToSaveDestinationUseCase()) doReturn true
+                whenever(shouldAskDownloadDestinationUseCase()) doReturn true
 
                 underTest.startTransfer(retryDownloadsEvent)
 
@@ -1265,7 +1265,7 @@ class StartTransfersComponentViewModelTest {
                 commonStub()
 
                 whenever(getOfflinePathForNodeUseCase(any())) doReturn DESTINATION
-                whenever(shouldPromptToSaveDestinationUseCase()) doReturn true
+                whenever(shouldAskDownloadDestinationUseCase()) doReturn true
                 whenever(
                     insertPendingDownloadsForNodesUseCase(
                         retryDownloadEvent.nodes,
