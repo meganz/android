@@ -45,28 +45,14 @@ internal class RemoveAllSharingContactDialogFragment : DialogFragment() {
             val uiState by viewModel.state.collectAsStateWithLifecycle()
             OriginalTheme(isDark = themeMode.isDarkMode()) {
                 val text = if (uiState.numberOfShareFolder == 1) {
-                    pluralStringResource(
-                        R.plurals.confirmation_remove_outgoing_shares,
-                        uiState.numberOfShareContact,
-                        uiState.numberOfShareContact
-                    )
+                    stringResource(sharedR.string.stop_sharing_dialog_title)
                 } else {
-                    pluralStringResource(
-                        R.plurals.alert_remove_several_shares,
-                        uiState.numberOfShareFolder,
-                        uiState.numberOfShareFolder
-                    )
+                    stringResource(sharedR.string.stop_sharing_dialog_title_plurals)
                 }
-                val confirmButtonText = if (uiState.numberOfShareFolder == 1) {
-                    stringResource(id = R.string.general_remove)
-                } else {
-                    stringResource(id = R.string.shared_items_outgoing_unshare_confirm_dialog_button_yes)
-                }
-                val cancelButtonText = if (uiState.numberOfShareFolder == 1) {
+                val confirmButtonText =
+                    stringResource(id = sharedR.string.stop_sharing_dialog_positive_button_text)
+                val cancelButtonText =
                     stringResource(id = sharedR.string.general_dialog_cancel_button)
-                } else {
-                    stringResource(id = R.string.shared_items_outgoing_unshare_confirm_dialog_button_no)
-                }
                 MegaAlertDialog(
                     text = text,
                     confirmButtonText = confirmButtonText,

@@ -36,7 +36,8 @@ sealed interface NodeSelectionAction {
         override val testTag: String = "node_selection_action:selecting"
 
         @Composable
-        override fun getDescription() = stringResource(sharedR.string.general_selecting)
+        override fun getDescription() =
+            stringResource(sharedR.string.app_bar_selection_mode_description)
 
         @Composable
         override fun getIconPainter() =

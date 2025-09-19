@@ -5,7 +5,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.MutableStateFlow
-import mega.privacy.android.app.R
 import mega.privacy.android.app.fromId
 import mega.privacy.android.app.fromPluralId
 import mega.privacy.android.core.nodecomponents.dialog.removeshare.RemoveShareFolderState
@@ -45,19 +44,14 @@ class RemoveToolbarMenuItemShareFolderDialogTest {
                 onDismiss = {}
             )
         }
+        composeTestRule.onNodeWithText(fromId(sharedR.string.stop_sharing_dialog_title_plurals)).assertExists()
+
         composeTestRule.onNodeWithText(
-            fromPluralId(
-                R.plurals.alert_remove_several_shares,
-                2
-            )
+            fromId(sharedR.string.stop_sharing_dialog_positive_button_text)
         ).assertExists()
 
         composeTestRule.onNodeWithText(
-            fromId(R.string.shared_items_outgoing_unshare_confirm_dialog_button_yes)
-        ).assertExists()
-
-        composeTestRule.onNodeWithText(
-            fromId(R.string.shared_items_outgoing_unshare_confirm_dialog_button_no)
+            fromId(sharedR.string.general_dialog_cancel_button)
         ).assertExists()
     }
 
@@ -81,15 +75,10 @@ class RemoveToolbarMenuItemShareFolderDialogTest {
                 onDismiss = {}
             )
         }
-        composeTestRule.onNodeWithText(
-            fromPluralId(
-                R.plurals.confirmation_remove_outgoing_shares,
-                1
-            )
-        ).assertExists()
+        composeTestRule.onNodeWithText(fromId(sharedR.string.stop_sharing_dialog_title)).assertExists()
 
         composeTestRule.onNodeWithText(
-            fromId(R.string.general_remove)
+            fromId(sharedR.string.stop_sharing_dialog_positive_button_text)
         ).assertExists()
 
         composeTestRule.onNodeWithText(
@@ -117,15 +106,10 @@ class RemoveToolbarMenuItemShareFolderDialogTest {
                 onDismiss = {}
             )
         }
-        composeTestRule.onNodeWithText(
-            fromPluralId(
-                R.plurals.confirmation_remove_outgoing_shares,
-                2
-            )
-        ).assertExists()
+        composeTestRule.onNodeWithText(fromId(sharedR.string.stop_sharing_dialog_title)).assertExists()
 
         composeTestRule.onNodeWithText(
-            fromId(R.string.general_remove)
+            fromId(sharedR.string.stop_sharing_dialog_positive_button_text)
         ).assertExists()
 
         composeTestRule.onNodeWithText(

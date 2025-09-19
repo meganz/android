@@ -1524,7 +1524,7 @@ class VideoPlayerViewModel @Inject constructor(
                 }
                 it.moveRequestResult?.let { result ->
                     if (result.isSuccess) {
-                        snackbarMessage.value = sharedResR.string.context_correctly_moved
+                        snackbarMessage.value = sharedResR.string.node_moved_success_message
                     } else {
                         snackbarMessage.value = R.string.context_no_moved
                     }

@@ -51,7 +51,7 @@ sealed class FileInfoJobInProgressState(
      */
     object Moving : FileInfoJobInProgressState(
         progressMessage = R.string.context_moving,
-        successMessage = sharedResR.string.context_correctly_moved,
+        successMessage = sharedResR.string.node_moved_success_message,
         failMessage = R.string.context_no_moved,
     )
 
@@ -153,7 +153,7 @@ sealed class FileInfoJobInProgressState(
          */
         object Remove : ChangeSharePermission(
             progressMessage = R.string.context_removing_contact_folder,
-            successMessage = R.string.context_share_correctly_removed,
+            successMessage = sharedResR.string.stop_sharing_folder_success_message,
             failMessage = R.string.context_no_removed_shared,
         )
     }

@@ -105,23 +105,18 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                                 message = e.getErrorString();
                             } else {
                                 if (error == max_items) {
-                                    message = context.getResources().
-                                            getQuantityString(
-                                                    R.plurals.shared_items_incoming_shares_snackbar_leaving_shares_fail,
-                                                    error, error);
+                                    message = context.getString(mega.privacy.android.shared.resources.R.string.leave_shared_folder_failed_message);
                                 } else {
-                                    String correctlyLeft = context.getResources().getQuantityString(
-                                            R.plurals.shared_items_incoming_shares_snackbar_leaving_shares_success_concat,
-                                            max_items - error, max_items - error);
-                                    String notLeft = context.getResources().getQuantityString(
-                                            R.plurals.shared_items_incoming_shares_snackbar_leaving_shares_fail_concat,
-                                            error, error);
-                                    message = correctlyLeft.concat(notLeft);
+                                    message = context.getResources().getQuantityString(
+                                            mega.privacy.android.shared.resources.R.plurals.leave_shared_folder_partial_success_snackbar_message,
+                                            max_items - error,
+                                            max_items - error
+                                    );
                                 }
                             }
                         } else {
                             message = context.getResources().
-                                    getQuantityString(R.plurals.shared_items_incoming_shares_snackbar_leaving_shares_success,
+                                    getQuantityString(mega.privacy.android.shared.resources.R.plurals.shared_items_incoming_shares_snackbar_leaving_shares_success,
                                             max_items, max_items);
                         }
                     }

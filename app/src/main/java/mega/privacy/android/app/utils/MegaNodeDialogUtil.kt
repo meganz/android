@@ -647,7 +647,7 @@ object MegaNodeDialogUtil {
                                 } else {
                                     snackbarShower.showSnackbar(
                                         activity.getString(
-                                            if (megaError.errorCode == MegaError.API_OK) sharedResR.string.context_correctly_moved
+                                            if (megaError.errorCode == MegaError.API_OK) sharedResR.string.node_moved_success_message
                                             else R.string.context_no_moved
                                         )
                                     )

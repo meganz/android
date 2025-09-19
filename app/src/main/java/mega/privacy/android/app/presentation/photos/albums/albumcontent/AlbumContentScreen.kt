@@ -252,10 +252,9 @@ internal fun AlbumContentScreen(
             }
 
             if (userAlbum != null && albumContentState.isLinkRemoved) {
-                val message = pluralStringResource(
-                    id = sharedResR.plurals.context_link_removal_success,
-                    count = 1,
-                )
+                val message =
+                    stringResource(id = sharedResR.string.link_removed_success_message)
+
                 Snackbar(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)

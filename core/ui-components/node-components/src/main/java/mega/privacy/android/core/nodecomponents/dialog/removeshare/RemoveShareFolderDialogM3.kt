@@ -9,6 +9,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.shared.resources.R as sharedResR
 
@@ -47,28 +48,14 @@ private fun RemoveShareFolderDialogBodyM3(
     onDismiss: () -> Unit,
 ) {
     val text = if (state.numberOfShareFolder == 1) {
-        pluralStringResource(
-            sharedResR.plurals.confirmation_remove_outgoing_shares,
-            state.numberOfShareContact,
-            state.numberOfShareContact
-        )
+        stringResource(sharedResR.string.stop_sharing_dialog_title)
     } else {
-        pluralStringResource(
-            sharedResR.plurals.alert_remove_several_shares,
-            state.numberOfShareFolder,
-            state.numberOfShareFolder
-        )
+        stringResource(sharedResR.string.stop_sharing_dialog_title_plurals)
     }
-    val confirmButtonText = if (state.numberOfShareFolder == 1) {
-        stringResource(id = sharedResR.string.general_remove)
-    } else {
-        stringResource(id = sharedResR.string.shared_items_outgoing_unshare_confirm_dialog_button_yes)
-    }
-    val cancelButtonText = if (state.numberOfShareFolder == 1) {
+    val confirmButtonText =
+        stringResource(id = sharedResR.string.stop_sharing_dialog_positive_button_text)
+    val cancelButtonText =
         stringResource(id = sharedResR.string.general_dialog_cancel_button)
-    } else {
-        stringResource(id = sharedResR.string.shared_items_outgoing_unshare_confirm_dialog_button_no)
-    }
 
     BasicDialog(
         description = text,
@@ -86,12 +73,14 @@ private fun RemoveShareFolderDialogBodyM3(
 @CombinedThemePreviews
 @Composable
 private fun RemoveShareFolderBodyPreview() {
-    RemoveShareFolderDialogBodyM3(
-        state = RemoveShareFolderState(
-            numberOfShareFolder = 1,
-            numberOfShareContact = 3
-        ),
-        onConfirm = {},
-        onDismiss = {}
-    )
+    AndroidThemeForPreviews {
+        RemoveShareFolderDialogBodyM3(
+            state = RemoveShareFolderState(
+                numberOfShareFolder = 1,
+                numberOfShareContact = 3
+            ),
+            onConfirm = {},
+            onDismiss = {}
+        )
+    }
 }

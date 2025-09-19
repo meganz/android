@@ -200,7 +200,7 @@ internal class MediaPlayerViewModelTest {
             )
             advanceUntilIdle()
             underTest.onSnackbarMessage().observeOnce {
-                assertThat(it).isEqualTo(sharedResR.string.context_correctly_moved)
+                assertThat(it).isEqualTo(sharedResR.string.node_moved_success_message)
             }
         }
 

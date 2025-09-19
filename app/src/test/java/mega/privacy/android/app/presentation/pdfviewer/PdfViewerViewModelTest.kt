@@ -240,7 +240,7 @@ internal class PdfViewerViewModelTest {
             advanceUntilIdle()
             underTest.uiState.test {
                 val actual = awaitItem()
-                assertThat(actual.snackBarMessage).isEqualTo(sharedResR.string.context_correctly_moved)
+                assertThat(actual.snackBarMessage).isEqualTo(sharedResR.string.node_moved_success_message)
             }
         }
 

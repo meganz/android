@@ -38,11 +38,7 @@ private fun LeaveShareDialogBody(
     onCancel: () -> Unit,
 ) {
     BasicDialog(
-        description = pluralStringResource(
-            sharedR.plurals.confirmation_leave_share_folder,
-            totalNodes,
-            totalNodes
-        ),
+        description = stringResource(sharedR.string.leave_shared_folder_confirmation_message),
         positiveButtonText = stringResource(id = sharedR.string.general_leave),
         negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onPositiveButtonClicked = onConfirm,

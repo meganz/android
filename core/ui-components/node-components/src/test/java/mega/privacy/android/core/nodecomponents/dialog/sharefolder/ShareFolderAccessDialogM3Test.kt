@@ -40,7 +40,7 @@ class ShareFolderAccessDialogM3Test {
         ).assertExists()
 
         composeTestRule.onNodeWithText(
-            context.getString(sharedResR.string.file_properties_shared_folder_full_access)
+            context.getString(sharedResR.string.share_folder_dialog_full_access_radio_option)
         ).assertExists()
     }
 

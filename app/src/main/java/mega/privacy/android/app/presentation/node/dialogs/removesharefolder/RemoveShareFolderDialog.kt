@@ -1,21 +1,19 @@
 package mega.privacy.android.app.presentation.node.dialogs.removesharefolder
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import mega.privacy.android.app.R
 import mega.privacy.android.core.nodecomponents.dialog.removeshare.RemoveShareFolderState
 import mega.privacy.android.core.nodecomponents.dialog.removeshare.RemoveShareFolderViewModel
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Dialog to remove folder share
@@ -51,28 +49,14 @@ private fun RemoveShareFolderDialogBody(
 ) {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         val text = if (state.numberOfShareFolder == 1) {
-            pluralStringResource(
-                R.plurals.confirmation_remove_outgoing_shares,
-                state.numberOfShareContact,
-                state.numberOfShareContact
-            )
+            stringResource(sharedR.string.stop_sharing_dialog_title)
         } else {
-            pluralStringResource(
-                R.plurals.alert_remove_several_shares,
-                state.numberOfShareFolder,
-                state.numberOfShareFolder
-            )
+            stringResource(sharedR.string.stop_sharing_dialog_title_plurals)
         }
-        val confirmButtonText = if (state.numberOfShareFolder == 1) {
-            stringResource(id = R.string.general_remove)
-        } else {
-            stringResource(id = R.string.shared_items_outgoing_unshare_confirm_dialog_button_yes)
-        }
-        val cancelButtonText = if (state.numberOfShareFolder == 1) {
+        val confirmButtonText =
+            stringResource(id = sharedR.string.stop_sharing_dialog_positive_button_text)
+        val cancelButtonText =
             stringResource(id = sharedR.string.general_dialog_cancel_button)
-        } else {
-            stringResource(id = R.string.shared_items_outgoing_unshare_confirm_dialog_button_no)
-        }
         MegaAlertDialog(
             text = text,
             confirmButtonText = confirmButtonText,

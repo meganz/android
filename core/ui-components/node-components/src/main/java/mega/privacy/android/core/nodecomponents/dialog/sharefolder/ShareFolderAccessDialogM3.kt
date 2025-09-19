@@ -85,7 +85,7 @@ private fun ShareFolderAccessDialogBody(
                 )
             }.toImmutableList(),
         selectedOption = selectedOption,
-        title = SpannableText(stringResource(id = sharedResR.string.dialog_select_permissions)),
+        title = SpannableText(stringResource(id = sharedResR.string.share_folder_dialog_choose_permission_title)),
         onOptionSelected = {
             selectedOption = it
         },
@@ -111,9 +111,9 @@ private fun ShareFolderAccessDialogBody(
 
 private fun AccessPermission.getUiText(context: Context): String =
     when (this) {
-        AccessPermission.READ -> context.getString(sharedResR.string.file_properties_shared_folder_read_only)
-        AccessPermission.READWRITE -> context.getString(sharedResR.string.file_properties_shared_folder_read_write)
-        AccessPermission.FULL -> context.getString(sharedResR.string.file_properties_shared_folder_full_access)
+        AccessPermission.READ -> context.getString(sharedResR.string.share_folder_dialog_read_only_radio_option)
+        AccessPermission.READWRITE -> context.getString(sharedResR.string.share_folder_dialog_read_write_radio_option)
+        AccessPermission.FULL -> context.getString(sharedResR.string.share_folder_dialog_full_access_radio_option)
         else -> ""
     }
 

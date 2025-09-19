@@ -633,7 +633,7 @@ class ImagePreviewViewModel @Inject constructor(
                     setResultMessage(
                         context.getString(
                             if (it.isSuccess)
-                                sharedR.string.context_correctly_moved
+                                sharedR.string.node_moved_success_message
                             else
                                 R.string.context_no_moved
                         )

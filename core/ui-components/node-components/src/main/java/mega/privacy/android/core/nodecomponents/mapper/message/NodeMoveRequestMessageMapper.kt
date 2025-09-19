@@ -228,7 +228,7 @@ class NodeMoveRequestMessageMapper @Inject constructor(
                 when {
                     request.isAllRequestError -> {
                         context.resources.getQuantityString(
-                            sharedResR.plurals.number_incorrectly_restored_from_rubbish,
+                            sharedResR.plurals.node_restored_from_rubbish_bin_error_message,
                             request.count,
                             request.count
                         )
@@ -236,7 +236,7 @@ class NodeMoveRequestMessageMapper @Inject constructor(
 
                     request.isSuccess -> {
                         context.resources.getQuantityString(
-                            sharedResR.plurals.number_correctly_restored_from_rubbish,
+                            sharedResR.plurals.node_restored_from_rubbish_bin_success_message,
                             request.count,
                             request.count
                         )
@@ -245,13 +245,13 @@ class NodeMoveRequestMessageMapper @Inject constructor(
                     else -> {
                         "${
                             context.resources.getQuantityString(
-                                sharedResR.plurals.number_correctly_restored_from_rubbish,
+                                sharedResR.plurals.node_restored_from_rubbish_bin_success_message,
                                 request.count - request.errorCount,
                                 request.count - request.errorCount
                             )
                         }, ${
                             context.resources.getQuantityString(
-                                sharedResR.plurals.number_incorrectly_restored_from_rubbish,
+                                sharedResR.plurals.node_restored_from_rubbish_bin_error_message,
                                 request.errorCount,
                                 request.errorCount
                             )

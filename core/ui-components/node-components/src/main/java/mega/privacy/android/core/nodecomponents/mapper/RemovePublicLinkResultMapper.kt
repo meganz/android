@@ -19,16 +19,15 @@ class RemovePublicLinkResultMapper @Inject constructor(@ApplicationContext priva
      */
     operator fun invoke(result: ResultCount): String =
         if (result.errorCount == 0) {
-            context.resources.getQuantityString(
-                sharedResR.plurals.context_link_removal_success,
-                result.successCount,
-                result.successCount
-            )
+            getSuccessMessage(result.successCount)
         } else {
-            context.resources.getQuantityString(
-                sharedResR.plurals.context_link_removal_error,
-                result.errorCount,
-                result.errorCount
-            )
+            context.getString(sharedResR.string.public_link_node_removal_error_message)
+        }
+
+    private fun getSuccessMessage(count: Int): String =
+        if (count == 1) {
+            context.getString(sharedResR.string.link_removed_success_message)
+        } else {
+            context.getString(sharedResR.string.links_removed_success_message)
         }
 }

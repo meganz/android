@@ -46,10 +46,7 @@ internal class RemovePublicLinkDialogFragment : DialogFragment() {
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             OriginalTheme(isDark = themeMode.isDarkMode()) {
                 MegaAlertDialog(
-                    text = pluralStringResource(
-                        id = R.plurals.remove_links_warning_text,
-                        count = ids.size
-                    ),
+                    text = stringResource(sharedR.string.remove_links_warning_message,),
                     confirmButtonText = stringResource(id = R.string.general_remove),
                     cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
                     onConfirm = {

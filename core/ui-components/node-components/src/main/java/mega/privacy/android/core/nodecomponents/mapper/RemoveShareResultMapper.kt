@@ -21,7 +21,7 @@ class RemoveShareResultMapper(
     constructor(
         @ApplicationContext context: Context,
     ) : this(
-        successString = { context.getString(sharedResR.string.context_share_correctly_removed) },
+        successString = { context.getString(sharedResR.string.stop_sharing_folder_success_message) },
         errorString = { errorCount ->
             context.resources.getQuantityString(
                 sharedResR.plurals.shared_items_outgoing_shares_snackbar_remove_contact_access_failed,

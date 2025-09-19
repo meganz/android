@@ -27,7 +27,7 @@ class RestoreNodeResultMapper @Inject constructor(
                 when {
                     result.errorCount == 0 -> {
                         context.resources.getQuantityString(
-                            sharedResR.plurals.number_correctly_restored_from_rubbish,
+                            sharedResR.plurals.node_restored_from_rubbish_bin_success_message,
                             result.successCount,
                             result.successCount
                         )
@@ -35,38 +35,54 @@ class RestoreNodeResultMapper @Inject constructor(
 
                     result.successCount == 0 -> {
                         context.resources.getQuantityString(
-                            sharedResR.plurals.number_incorrectly_restored_from_rubbish,
+                            sharedResR.plurals.node_restored_from_rubbish_bin_error_message,
                             result.errorCount,
                             result.errorCount
                         )
                     }
 
                     result.errorCount == 1 -> {
-                        context.resources.getQuantityString(
-                            sharedResR.plurals.nodes_correctly_and_node_incorrectly_restored_from_rubbish,
-                            result.successCount,
-                            result.successCount
-                        )
+                        "${
+                            context.resources.getQuantityString(
+                                sharedResR.plurals.node_restored_from_rubbish_bin_error_message,
+                                result.errorCount,
+                                result.errorCount
+                            )
+                        }. ${
+                            context.resources.getQuantityString(
+                                sharedResR.plurals.node_restored_from_rubbish_bin_success_message,
+                                result.successCount,
+                                result.successCount
+                            )
+                        }"
                     }
 
                     result.successCount == 1 -> {
-                        context.resources.getQuantityString(
-                            sharedResR.plurals.node_correctly_and_nodes_incorrectly_restored_from_rubbish,
-                            result.successCount,
-                            result.successCount
-                        )
-                    }
-
-                    else -> {
                         "${
                             context.resources.getQuantityString(
-                                sharedResR.plurals.number_correctly_restored_from_rubbish,
+                                sharedResR.plurals.node_restored_from_rubbish_bin_success_message,
                                 result.successCount,
                                 result.successCount
                             )
                         }. ${
                             context.resources.getQuantityString(
-                                sharedResR.plurals.number_incorrectly_restored_from_rubbish,
+                                sharedResR.plurals.node_restored_from_rubbish_bin_error_message,
+                                result.errorCount,
+                                result.errorCount
+                            )
+                        }"
+                    }
+
+                    else -> {
+                        "${
+                            context.resources.getQuantityString(
+                                sharedResR.plurals.node_restored_from_rubbish_bin_success_message,
+                                result.successCount,
+                                result.successCount
+                            )
+                        }. ${
+                            context.resources.getQuantityString(
+                                sharedResR.plurals.node_restored_from_rubbish_bin_error_message,
                                 result.errorCount,
                                 result.errorCount
                             )
@@ -79,14 +95,14 @@ class RestoreNodeResultMapper @Inject constructor(
                 if (result.successCount == 1) {
                     if (result.destinationFolderName != null) {
                         context.getString(
-                            sharedResR.string.context_correctly_node_restored,
+                            sharedResR.string.node_restored_from_rubbish_bin_to_location,
                             result.destinationFolderName
                         )
                     } else {
-                        context.getString(sharedResR.string.context_correctly_moved)
+                        context.getString(sharedResR.string.node_moved_success_message)
                     }
                 } else {
-                    context.getString(sharedResR.string.context_no_restored)
+                    context.getString(sharedResR.string.node_restore_error_message)
                 }
             }
         }

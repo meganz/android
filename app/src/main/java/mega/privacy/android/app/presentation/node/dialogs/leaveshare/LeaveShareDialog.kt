@@ -40,11 +40,7 @@ private fun LeaveShareDialogBody(
     onCancelClicked: () -> Unit,
 ) {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
-        val title = pluralStringResource(
-            sharedR.plurals.confirmation_leave_share_folder,
-            totalNodes,
-            totalNodes
-        )
+        val title = stringResource(sharedR.string.leave_shared_folder_confirmation_message)
         MegaAlertDialog(
             text = title,
             confirmButtonText = stringResource(id = sharedR.string.general_leave),

@@ -5,7 +5,7 @@ import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
-import mega.privacy.android.shared.resources.R
+import mega.privacy.android.shared.resources.R as sharedResR
 import java.util.Locale
 
 @Composable
@@ -18,7 +18,7 @@ fun NodeSelectionModeAppBar(
     MegaTopAppBar(
         navigationType = AppBarNavigationType.Close(onCancelSelectionClicked),
         title = if (isSelecting) {
-            stringResource(R.string.general_selecting)
+            stringResource(sharedResR.string.app_bar_selection_mode_description)
         } else {
             String.format(Locale.ROOT, "%s", count)
         },

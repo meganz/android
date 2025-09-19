@@ -441,7 +441,7 @@ internal fun CloudDriveContent(
         MegaModalBottomSheet(
             modifier = Modifier.statusBarsPadding(),
             sheetState = nodeOptionSheetState,
-            onDismissRequest = { 
+            onDismissRequest = {
                 visibleNodeOptionId = null
                 onDismissNodeOptionsBottomSheet()
             },
@@ -449,7 +449,7 @@ internal fun CloudDriveContent(
         ) {
             NodeOptionsBottomSheetRoute(
                 navigationHandler = navigationHandler,
-                onDismiss = { 
+                onDismiss = {
                     visibleNodeOptionId = null
                     onDismissNodeOptionsBottomSheet()
                 },

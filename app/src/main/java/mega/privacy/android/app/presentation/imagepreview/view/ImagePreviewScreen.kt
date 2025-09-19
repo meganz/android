@@ -61,7 +61,6 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -210,10 +209,7 @@ internal fun ImagePreviewScreen(
 
         if (showRemoveLinkDialog) {
             MegaAlertDialog(
-                text = pluralStringResource(
-                    id = R.plurals.remove_links_warning_text,
-                    count = 1
-                ),
+                text = stringResource(sharedR.string.remove_links_warning_message),
                 confirmButtonText = stringResource(id = R.string.general_remove),
                 cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
                 onConfirm = {

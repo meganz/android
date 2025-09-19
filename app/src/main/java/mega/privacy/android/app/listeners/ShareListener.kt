@@ -8,6 +8,7 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Listener to interact with Sharing
@@ -86,7 +87,7 @@ class ShareListener(
             }
 
             REMOVE_SHARE_LISTENER -> {
-                context.getString(R.string.context_share_correctly_removed)
+                context.getString(sharedR.string.stop_sharing_folder_success_message)
             }
 
             else -> ""

@@ -28,25 +28,15 @@ class LeaveShareRequestMessageMapper @Inject constructor(
             }
 
             request.isAllRequestError -> {
-                context.resources.getQuantityString(
-                    sharedResR.plurals.shared_items_incoming_shares_snackbar_leaving_shares_fail,
-                    request.errorCount,
-                    request.errorCount
-                )
+                context.getString(sharedResR.string.leave_shared_folder_failed_message)
             }
 
-            else -> "${
+            else -> {
                 context.resources.getQuantityString(
-                    sharedResR.plurals.shared_items_incoming_shares_snackbar_leaving_shares_success_concat,
+                    sharedResR.plurals.leave_shared_folder_partial_success_snackbar_message,
                     request.count,
                     request.count
                 )
-            }${
-                context.resources.getQuantityString(
-                    sharedResR.plurals.shared_items_incoming_shares_snackbar_leaving_shares_fail_concat,
-                    request.errorCount,
-                    request.errorCount
-                )
-            }"
+            }
         }
 }

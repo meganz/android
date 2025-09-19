@@ -220,23 +220,22 @@ class ExportListener constructor(private val context: Context) :
                             Timber.e("Removing link error")
                             Util.showSnackbar(
                                 context,
-                                context.resources.getQuantityString(
-                                    R.plurals.context_link_removal_error,
-                                    numberRemove
-                                )
+                                context.getString(sharedResR.string.public_link_node_removal_error_message)
                             )
                         } else {
                             onExportFinishedListener?.invoke()
                             Util.showSnackbar(
                                 context,
-                                context.resources.getQuantityString(
-                                    sharedResR.plurals.context_link_removal_success,
-                                    numberRemove
-                                )
+                                if (numberRemove == 1) {
+                                    context.getString(sharedResR.string.link_removed_success_message)
+                                } else {
+                                    context.getString(sharedResR.string.links_removed_success_message)
+                                }
                             )
                         }
                     }
                 }
+
                 Constants.ACTION_SHARE_NODE, Constants.ACTION_SHARE_MSG ->
                     request.link?.let { nonNullRequestLink ->
                         Timber.d("The link is created")
@@ -248,7 +247,12 @@ class ExportListener constructor(private val context: Context) :
                         if (exportedLinks == null && numberError == 0) {
                             Timber.d("Start share one item")
                             shareIntent?.let { nonNullShareIntent ->
-                                startShareIntent(context, nonNullShareIntent, nonNullRequestLink, null)
+                                startShareIntent(
+                                    context,
+                                    nonNullShareIntent,
+                                    nonNullRequestLink,
+                                    null
+                                )
                                 onExportFinishedListener?.invoke()
                             }
                             return

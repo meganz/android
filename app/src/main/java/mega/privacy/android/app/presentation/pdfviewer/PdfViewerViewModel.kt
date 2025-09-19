@@ -232,7 +232,7 @@ class PdfViewerViewModel @Inject constructor(
                     _state.update {
                         it.copy(
                             snackBarMessage = if (movementResult.isSuccess)
-                                sharedResR.string.context_correctly_moved
+                                sharedResR.string.node_moved_success_message
                             else
                                 R.string.context_no_moved,
                             shouldFinishActivity = movementResult.isSuccess

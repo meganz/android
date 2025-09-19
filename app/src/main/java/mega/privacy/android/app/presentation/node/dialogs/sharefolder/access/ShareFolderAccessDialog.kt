@@ -62,15 +62,15 @@ private fun ShareFolderAccessDialogBody(
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         ConfirmationDialogWithRadioButtons(
             radioOptions = radioButtonOptions,
-            titleText = stringResource(id = sharedResR.string.dialog_select_permissions),
+            titleText = stringResource(id = sharedResR.string.share_folder_dialog_choose_permission_title),
             onOptionSelected = {
                 onItemSelected(it)
             },
             optionDescriptionMapper = {
                 when (it) {
-                    AccessPermission.READ -> stringResource(id = sharedResR.string.file_properties_shared_folder_read_only)
-                    AccessPermission.READWRITE -> stringResource(id = sharedResR.string.file_properties_shared_folder_read_write)
-                    else -> stringResource(id = sharedResR.string.file_properties_shared_folder_full_access)
+                    AccessPermission.READ -> stringResource(id = sharedResR.string.share_folder_dialog_read_only_radio_option)
+                    AccessPermission.READWRITE -> stringResource(id = sharedResR.string.share_folder_dialog_read_write_radio_option)
+                    else -> stringResource(id = sharedResR.string.share_folder_dialog_full_access_radio_option)
                 }
             },
             onDismissRequest = onDismiss,

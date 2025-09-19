@@ -251,7 +251,7 @@ internal class TextEditorViewModelTest {
             )
             advanceUntilIdle()
             underTest.onSnackBarMessage().observeOnce {
-                assertThat(it).isEqualTo(sharedResR.string.context_correctly_moved)
+                assertThat(it).isEqualTo(sharedResR.string.node_moved_success_message)
             }
         }
 

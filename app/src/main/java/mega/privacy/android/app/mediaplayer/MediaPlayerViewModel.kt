@@ -234,7 +234,7 @@ class MediaPlayerViewModel @Inject constructor(
                 result.moveRequestResult?.let {
                     if (it.isSuccess) {
                         _itemToRemove.value = nodeHandle
-                        snackbarMessage.value = sharedResR.string.context_correctly_moved
+                        snackbarMessage.value = sharedResR.string.node_moved_success_message
                     } else {
                         snackbarMessage.value = R.string.context_no_moved
                     }

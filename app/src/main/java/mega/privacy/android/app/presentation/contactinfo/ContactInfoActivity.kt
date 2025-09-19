@@ -265,7 +265,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             showSnackbar(Constants.SNACKBAR_TYPE, errorText, -1)
         } else {
             val errorText = if (error.errorCode == MegaError.API_OK) {
-                getString(sharedR.string.context_correctly_moved)
+                getString(sharedR.string.node_moved_success_message)
             } else {
                 getString(R.string.context_no_moved)
             }

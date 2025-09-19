@@ -39,10 +39,8 @@ class LeaveShareRequestMessageMapperTest {
                     nodes = emptyList()
                 )
             )
-        val expected = mContext.resources.getQuantityString(
-            sharedResR.plurals.shared_items_incoming_shares_snackbar_leaving_shares_fail,
-            value,
-            value
+        val expected = mContext.getString(
+            sharedResR.string.leave_shared_folder_failed_message
         )
 
         assertThat(underTest).isEqualTo(expected)
@@ -58,19 +56,11 @@ class LeaveShareRequestMessageMapperTest {
                     nodes = emptyList()
                 )
             )
-        val expected = "${
-            mContext.resources.getQuantityString(
-                sharedResR.plurals.shared_items_incoming_shares_snackbar_leaving_shares_success_concat,
-                2,
-                2
-            )
-        }${
-            mContext.resources.getQuantityString(
-                sharedResR.plurals.shared_items_incoming_shares_snackbar_leaving_shares_fail_concat,
-                1,
-                1
-            )
-        }"
+        val expected = mContext.resources.getQuantityString(
+            sharedResR.plurals.leave_shared_folder_partial_success_snackbar_message,
+            2,
+            2
+        )
 
         assertThat(underTest).isEqualTo(expected)
     }

@@ -426,7 +426,7 @@ class ImagePreviewViewModelTest {
             val newParentNode = 158401030174851
             val successMessage = "Move success"
             val context = mock<Context> {
-                on { getString(sharedResR.string.context_correctly_moved) } doReturn successMessage
+                on { getString(sharedResR.string.node_moved_success_message) } doReturn successMessage
             }
             whenever(
                 checkNodesNameCollisionWithActionUseCase(

@@ -18,10 +18,7 @@ fun RemoveNodeLinkDialogM3(
     viewModel: RemoveNodeLinkViewModel = hiltViewModel()
 ) {
     BasicDialog(
-        description = pluralStringResource(
-            id = sharedR.plurals.remove_links_warning_text,
-            count = nodes.size
-        ),
+        description = stringResource(sharedR.string.remove_links_warning_message),
         positiveButtonText = stringResource(id = sharedR.string.general_remove),
         negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onPositiveButtonClicked = {

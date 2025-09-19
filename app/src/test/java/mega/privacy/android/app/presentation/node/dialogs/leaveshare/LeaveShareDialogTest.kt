@@ -4,12 +4,14 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
+import mega.privacy.android.app.fromId
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import mega.privacy.android.app.fromPluralId
 import mega.privacy.android.core.nodecomponents.dialog.leaveshare.LeaveShareDialogViewModel
+import mega.privacy.android.shared.resources.R as sharedR
 
 @RunWith(AndroidJUnit4::class)
 class LeaveShareDialogTest {
@@ -29,10 +31,7 @@ class LeaveShareDialogTest {
             )
         }
         composeTestRule.onNodeWithText(
-            fromPluralId(
-                R.plurals.confirmation_leave_share_folder,
-                2
-            )
+            fromId(sharedR.string.leave_shared_folder_confirmation_message)
         ).assertExists()
     }
 
@@ -46,10 +45,7 @@ class LeaveShareDialogTest {
             )
         }
         composeTestRule.onNodeWithText(
-            fromPluralId(
-                R.plurals.confirmation_leave_share_folder,
-                1
-            )
+            fromId(sharedR.string.leave_shared_folder_confirmation_message)
         ).assertExists()
     }
 }

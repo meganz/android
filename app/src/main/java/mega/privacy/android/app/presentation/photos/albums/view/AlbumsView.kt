@@ -150,10 +150,11 @@ fun AlbumsView(
     }
 
     if (albumsViewState.removedLinksCount > 0) {
-        val snackbarMessage = pluralStringResource(
-            id = sharedR.plurals.context_link_removal_success,
-            count = albumsViewState.removedLinksCount,
-        )
+        val snackbarMessage = if (albumsViewState.removedLinksCount == 1) {
+            stringResource(sharedR.string.link_removed_success_message)
+        } else {
+            stringResource(sharedR.string.links_removed_success_message)
+        }
         LaunchedEffect(Unit) {
             scaffoldState.snackbarHostState.showAutoDurationSnackbar(
                 message = snackbarMessage,

@@ -900,7 +900,7 @@ class TextEditorViewModel @Inject constructor(
                 }
                 result.moveRequestResult?.let {
                     snackBarMessage.value = if (it.isSuccess) {
-                        sharedResR.string.context_correctly_moved
+                        sharedResR.string.node_moved_success_message
                     } else {
                         R.string.context_no_moved
                     }
