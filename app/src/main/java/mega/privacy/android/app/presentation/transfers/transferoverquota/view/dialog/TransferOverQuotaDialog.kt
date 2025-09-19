@@ -22,6 +22,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.transfers.transferoverquota.TransferOverQuotaViewModel
+import mega.privacy.android.app.presentation.transfers.transferoverquota.model.TransferOverQuotaViewState
 import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.TimeUtils
@@ -40,6 +41,30 @@ internal fun TransferOverQuotaDialog(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
+    TransferOverQuotaDialog(
+        uiState = uiState,
+        navigateToUpgradeAccount = {
+            context.megaNavigator.openUpgradeAccount(context)
+        },
+        navigateToLogin = {
+            Intent(context, LoginActivity::class.java).apply {
+                putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }.also { intent -> context.startActivity(intent) }
+        },
+        onDismiss = viewModel::bandwidthOverQuotaDelayConsumed,
+        modifier = modifier
+    )
+}
+
+@Composable
+internal fun TransferOverQuotaDialog(
+    uiState: TransferOverQuotaViewState,
+    navigateToUpgradeAccount: () -> Unit,
+    navigateToLogin: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     uiState.bandwidthOverQuotaDelay?.let { bandwidthOverQuotaDelay ->
         // Countdown timer state
         var overQuotaDelay: Long by rememberSaveable {
@@ -53,7 +78,7 @@ internal fun TransferOverQuotaDialog(
                 overQuotaDelay--
 
                 if (overQuotaDelay == 0L) {
-                    viewModel.bandwidthOverQuotaDelayConsumed()
+                    onDismiss()
                 }
             }
         }
@@ -62,16 +87,9 @@ internal fun TransferOverQuotaDialog(
             isLoggedIn = uiState.isLoggedIn,
             isFreeAccount = uiState.isFreeAccount,
             overQuotaDelay = TimeUtils.getHumanizedTime(overQuotaDelay),
-            onNavigateToUpgradeAccount = {
-                context.megaNavigator.openUpgradeAccount(context)
-            },
-            onNavigateToLogin = {
-                Intent(context, LoginActivity::class.java).apply {
-                    putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                }.also { intent -> context.startActivity(intent) }
-            },
-            onDismiss = viewModel::bandwidthOverQuotaDelayConsumed,
+            navigateToUpgradeAccount = navigateToUpgradeAccount,
+            navigateToLogin = navigateToLogin,
+            onDismiss = onDismiss,
             modifier = modifier
         )
     }
@@ -82,8 +100,8 @@ internal fun TransferOverQuotaDialogContent(
     isLoggedIn: Boolean,
     isFreeAccount: Boolean,
     overQuotaDelay: String,
-    onNavigateToUpgradeAccount: () -> Unit,
-    onNavigateToLogin: () -> Unit,
+    navigateToUpgradeAccount: () -> Unit,
+    navigateToLogin: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -109,9 +127,9 @@ internal fun TransferOverQuotaDialogContent(
         onConfirm = {
             if (isLoggedIn) {
                 Analytics.tracker.trackEvent(TransferOverQuotaUpgradeAccountButtonEvent)
-                onNavigateToUpgradeAccount()
+                navigateToUpgradeAccount()
             } else {
-                onNavigateToLogin()
+                navigateToLogin()
             }
             onDismiss()
         },
@@ -133,8 +151,8 @@ private fun TransferOverQuotaDialogPreview(
                 isLoggedIn = previewState.isLoggedIn,
                 isFreeAccount = previewState.isFreeAccount,
                 overQuotaDelay = "1m 12s",
-                onNavigateToUpgradeAccount = {},
-                onNavigateToLogin = {},
+                navigateToUpgradeAccount = {},
+                navigateToLogin = {},
                 onDismiss = {},
             )
         }

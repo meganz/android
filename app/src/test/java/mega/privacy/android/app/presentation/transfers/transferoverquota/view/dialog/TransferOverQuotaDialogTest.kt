@@ -29,8 +29,8 @@ class TransferOverQuotaDialogTest {
 
     private val analyticsRule = AnalyticsTestRule()
 
-    private val onNavigateToUpgradeAccount = mock<() -> Unit>()
-    private val onNavigateToLogin = mock<() -> Unit>()
+    private val navigateToUpgradeAccount = mock<() -> Unit>()
+    private val navigateToLogin = mock<() -> Unit>()
     private val onDismiss = mock<() -> Unit>()
     private val overQuotaDelay = "1m 12s"
     private val bodyString by lazy {
@@ -113,7 +113,7 @@ class TransferOverQuotaDialogTest {
         composeTestRule.onNodeWithText(sharedR.string.general_upgrade_button).performClick()
 
         assertThat(analyticsRule.events).contains(TransferOverQuotaUpgradeAccountButtonEvent)
-        verify(onNavigateToUpgradeAccount).invoke()
+        verify(navigateToUpgradeAccount).invoke()
         verify(onDismiss).invoke()
     }
 
@@ -124,7 +124,7 @@ class TransferOverQuotaDialogTest {
         composeTestRule.onNodeWithText(R.string.plans_depleted_transfer_overquota).performClick()
 
         assertThat(analyticsRule.events).contains(TransferOverQuotaUpgradeAccountButtonEvent)
-        verify(onNavigateToUpgradeAccount).invoke()
+        verify(navigateToUpgradeAccount).invoke()
         verify(onDismiss).invoke()
     }
 
@@ -135,7 +135,7 @@ class TransferOverQuotaDialogTest {
         composeTestRule.onNodeWithText(sharedR.string.login_text).performClick()
 
         assertThat(analyticsRule.events).doesNotContain(TransferOverQuotaUpgradeAccountButtonEvent)
-        verify(onNavigateToLogin).invoke()
+        verify(navigateToLogin).invoke()
         verify(onDismiss).invoke()
     }
 
@@ -147,8 +147,8 @@ class TransferOverQuotaDialogTest {
 
         assertThat(analyticsRule.events).doesNotContain(TransferOverQuotaUpgradeAccountButtonEvent)
         verify(onDismiss).invoke()
-        verifyNoInteractions(onNavigateToUpgradeAccount)
-        verifyNoInteractions(onNavigateToLogin)
+        verifyNoInteractions(navigateToUpgradeAccount)
+        verifyNoInteractions(navigateToLogin)
     }
 
     private fun initComposeTestRule(isLoggedIn: Boolean = true, isFreeAccount: Boolean = true) {
@@ -157,8 +157,8 @@ class TransferOverQuotaDialogTest {
                 isLoggedIn = isLoggedIn,
                 isFreeAccount = isFreeAccount,
                 overQuotaDelay = overQuotaDelay,
-                onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
-                onNavigateToLogin = onNavigateToLogin,
+                navigateToUpgradeAccount = navigateToUpgradeAccount,
+                navigateToLogin = navigateToLogin,
                 onDismiss = onDismiss,
             )
         }

@@ -7,15 +7,16 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
-import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailScreen
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountRoute
 import mega.privacy.android.app.presentation.login.onboarding.TourScreen
+import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
 
 @Serializable
-data object LoginScreen
+data object LoginScreen : NavKey
 
 internal fun NavGraphBuilder.loginScreen(
     navController: NavController,
