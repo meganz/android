@@ -2,8 +2,10 @@ package mega.privacy.android.feature.clouddrive.presentation.drivesync
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,7 +20,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
@@ -27,7 +28,6 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.TabItems
 import mega.android.core.ui.model.menu.MenuActionIconWithClick
-import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
@@ -90,6 +90,7 @@ internal fun DriveSyncScreen(
         modifier = Modifier
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true },
+        contentWindowInsets = WindowInsets.statusBars,
         topBar = {
             if (cloudDriveUiState.isInSelectionMode) {
                 NodeSelectionModeAppBar(
@@ -156,9 +157,9 @@ internal fun DriveSyncScreen(
                     tabItem = TabItems(stringResource(sharedR.string.general_section_cloud_drive)),
                 ) {
                     CloudDriveContent(
+                        isTabContent = true,
                         navigationHandler = navigationHandler,
                         contentPadding = PaddingValues(
-                            top = 12.dp,
                             bottom = paddingValues.calculateBottomPadding()
                         ),
                         uiState = cloudDriveUiState,

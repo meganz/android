@@ -24,6 +24,7 @@ dependencies {
     implementation(project(":core:ui-components:shared-components"))
     implementation(project(":core:feature-flags"))
     implementation(project(":core:navigation-contract"))
+    implementation(project(":core:analytics:analytics-tracker"))
 
     //core components
     implementation(lib.mega.core.ui)
@@ -46,6 +47,7 @@ dependencies {
     implementation(androidx.hilt.navigation)
     implementation(google.services.mlkit.document.scanner)
     implementation(androidx.navigation3.runtime)
+    implementation(lib.mega.analytics)
 
     //test
     testImplementation(project(":core-test"))

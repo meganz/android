@@ -128,6 +128,7 @@ fun CloudDriveScreen(
         },
         content = { innerPadding ->
             CloudDriveContent(
+                isTabContent = false,
                 navigationHandler = navigationHandler,
                 uiState = uiState,
                 showUploadOptionsBottomSheet = showUploadOptionsBottomSheet,

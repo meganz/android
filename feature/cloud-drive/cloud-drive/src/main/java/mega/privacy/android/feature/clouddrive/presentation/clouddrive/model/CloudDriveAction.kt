@@ -52,4 +52,9 @@ sealed interface CloudDriveAction {
      * Start document scanning action
      */
     data object StartDocumentScanning : CloudDriveAction
+
+    /**
+     * Storage almost full warning dismiss action
+     */
+    data object StorageAlmostFullWarningDismiss : CloudDriveAction
 }

@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.clouddrive.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
+import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
 import mega.privacy.android.shared.original.core.ui.controls.banners.InlineErrorBanner
 import mega.privacy.android.shared.original.core.ui.controls.banners.InlineWarningBanner
 import mega.privacy.android.shared.resources.R

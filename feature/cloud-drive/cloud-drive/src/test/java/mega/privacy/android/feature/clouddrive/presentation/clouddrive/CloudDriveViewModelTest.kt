@@ -18,6 +18,8 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.core.nodecomponents.components.banners.StorageCapacityMapper
+import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
@@ -27,6 +29,7 @@ import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -38,7 +41,10 @@ import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeNameByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
+import mega.privacy.android.domain.usecase.MonitorAlmostFullStorageBannerVisibilityUseCase
+import mega.privacy.android.domain.usecase.SetAlmostFullStorageBannerClosingTimestampUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
@@ -83,6 +89,12 @@ class CloudDriveViewModelTest {
     private val getCloudSortOrderUseCase: GetCloudSortOrder = mock()
     private val setCloudSortOrderUseCase: SetCloudSortOrder = mock()
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = mock()
+    private val storageCapacityMapper: StorageCapacityMapper = mock()
+    private val monitorStorageStateUseCase: MonitorStorageStateUseCase = mock()
+    private val monitorAlmostFullStorageBannerVisibilityUseCase: MonitorAlmostFullStorageBannerVisibilityUseCase =
+        mock()
+    private val setAlmostFullStorageBannerClosingTimestampUseCase: SetAlmostFullStorageBannerClosingTimestampUseCase =
+        mock()
     private val folderNodeHandle = 123L
     private val folderNodeId = NodeId(folderNodeHandle)
 
@@ -112,7 +124,11 @@ class CloudDriveViewModelTest {
             getRootNodeIdUseCase,
             getCloudSortOrderUseCase,
             setCloudSortOrderUseCase,
-            nodeSortConfigurationUiMapper
+            nodeSortConfigurationUiMapper,
+            storageCapacityMapper,
+            monitorStorageStateUseCase,
+            monitorAlmostFullStorageBannerVisibilityUseCase,
+            setAlmostFullStorageBannerClosingTimestampUseCase
         )
     }
 
@@ -132,6 +148,10 @@ class CloudDriveViewModelTest {
         getCloudSortOrderUseCase = getCloudSortOrderUseCase,
         setCloudSortOrderUseCase = setCloudSortOrderUseCase,
         nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
+        storageCapacityMapper = storageCapacityMapper,
+        monitorStorageStateUseCase = monitorStorageStateUseCase,
+        monitorAlmostFullStorageBannerVisibilityUseCase = monitorAlmostFullStorageBannerVisibilityUseCase,
+        setAlmostFullStorageBannerClosingTimestampUseCase = setAlmostFullStorageBannerClosingTimestampUseCase,
         savedStateHandle = SavedStateHandle.Companion.invoke(
             route = CloudDrive(nodeHandle)
         ),
@@ -176,6 +196,11 @@ class CloudDriveViewModelTest {
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
         whenever(monitorNodeUpdatesByIdUseCase(folderNodeId)).thenReturn(flowOf())
         whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
+
+        // Setup storage monitoring mocks
+        whenever(monitorStorageStateUseCase()).thenReturn(flowOf(StorageState.Green))
+        whenever(monitorAlmostFullStorageBannerVisibilityUseCase()).thenReturn(flowOf(true))
+        whenever(storageCapacityMapper(any(), any())).thenReturn(StorageOverQuotaCapacity.DEFAULT)
     }
 
     private suspend fun setupTestDataWithPartialLoad(items: List<TypedNode>) {
@@ -217,6 +242,11 @@ class CloudDriveViewModelTest {
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
         whenever(monitorNodeUpdatesByIdUseCase(folderNodeId)).thenReturn(flowOf())
         whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
+
+        // Setup storage monitoring mocks
+        whenever(monitorStorageStateUseCase()).thenReturn(flowOf(StorageState.Green))
+        whenever(monitorAlmostFullStorageBannerVisibilityUseCase()).thenReturn(flowOf(true))
+        whenever(storageCapacityMapper(any(), any())).thenReturn(StorageOverQuotaCapacity.DEFAULT)
     }
 
     @Test
@@ -1838,5 +1868,187 @@ class CloudDriveViewModelTest {
         // 2. After setting the sort order (refetch)
         verify(getCloudSortOrderUseCase, times(2)).invoke()
         verify(setCloudSortOrderUseCase).invoke(expectedSortOrder)
+    }
+
+    // Storage Over Quota Tests
+
+    @Test
+    fun `test that initial state has default storage capacity`() = runTest {
+        setupTestData(emptyList())
+        val underTest = createViewModel()
+
+        underTest.uiState.test {
+            val initialState = awaitItem()
+            assertThat(initialState.storageCapacity).isEqualTo(StorageOverQuotaCapacity.DEFAULT)
+        }
+    }
+
+    @Test
+    fun `test that monitorStorageOverQuotaCapacity updates storage capacity with FULL state`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(monitorStorageStateUseCase()).thenReturn(flowOf(StorageState.Red))
+            whenever(monitorAlmostFullStorageBannerVisibilityUseCase()).thenReturn(flowOf(true))
+            whenever(storageCapacityMapper(StorageState.Red, true)).thenReturn(
+                StorageOverQuotaCapacity.FULL
+            )
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.storageCapacity).isEqualTo(StorageOverQuotaCapacity.FULL)
+            }
+        }
+
+    @Test
+    fun `test that monitorStorageOverQuotaCapacity updates storage capacity with ALMOST_FULL state`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(monitorStorageStateUseCase()).thenReturn(flowOf(StorageState.Orange))
+            whenever(monitorAlmostFullStorageBannerVisibilityUseCase()).thenReturn(flowOf(true))
+            whenever(storageCapacityMapper(StorageState.Orange, true)).thenReturn(
+                StorageOverQuotaCapacity.ALMOST_FULL
+            )
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.storageCapacity).isEqualTo(StorageOverQuotaCapacity.ALMOST_FULL)
+            }
+        }
+
+    @Test
+    fun `test that monitorStorageOverQuotaCapacity updates storage capacity with DEFAULT when banner should not show`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(monitorStorageStateUseCase()).thenReturn(flowOf(StorageState.Orange))
+            whenever(monitorAlmostFullStorageBannerVisibilityUseCase()).thenReturn(flowOf(false))
+            whenever(storageCapacityMapper(StorageState.Orange, false)).thenReturn(
+                StorageOverQuotaCapacity.DEFAULT
+            )
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.storageCapacity).isEqualTo(StorageOverQuotaCapacity.DEFAULT)
+            }
+        }
+
+    @Test
+    fun `test that monitorStorageOverQuotaCapacity handles Green storage state correctly`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(monitorStorageStateUseCase()).thenReturn(flowOf(StorageState.Green))
+            whenever(monitorAlmostFullStorageBannerVisibilityUseCase()).thenReturn(flowOf(true))
+            whenever(storageCapacityMapper(StorageState.Green, true)).thenReturn(
+                StorageOverQuotaCapacity.DEFAULT
+            )
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.storageCapacity).isEqualTo(StorageOverQuotaCapacity.DEFAULT)
+            }
+        }
+
+    @Test
+    fun `test that StorageAlmostFullWarningDismiss action calls setStorageCapacityAsDefault`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(monitorStorageStateUseCase()).thenReturn(flowOf(StorageState.Orange))
+            whenever(monitorAlmostFullStorageBannerVisibilityUseCase()).thenReturn(flowOf(true))
+            whenever(storageCapacityMapper(StorageState.Orange, true)).thenReturn(
+                StorageOverQuotaCapacity.ALMOST_FULL
+            )
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.processAction(CloudDriveAction.StorageAlmostFullWarningDismiss)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.storageCapacity).isEqualTo(StorageOverQuotaCapacity.DEFAULT)
+            }
+
+            verify(setAlmostFullStorageBannerClosingTimestampUseCase).invoke()
+        }
+
+    @Test
+    fun `test that setStorageCapacityAsDefault updates state and calls use case`() = runTest {
+        setupTestData(emptyList())
+        whenever(monitorStorageStateUseCase()).thenReturn(flowOf(StorageState.Red))
+        whenever(monitorAlmostFullStorageBannerVisibilityUseCase()).thenReturn(flowOf(true))
+        whenever(
+            storageCapacityMapper(
+                StorageState.Red,
+                true
+            )
+        ).thenReturn(StorageOverQuotaCapacity.FULL)
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        // Verify initial state has FULL capacity
+        underTest.uiState.test {
+            val initialState = awaitItem()
+            assertThat(initialState.storageCapacity).isEqualTo(StorageOverQuotaCapacity.FULL)
+
+            underTest.setStorageCapacityAsDefault()
+            val updatedState = awaitItem()
+            assertThat(updatedState.storageCapacity).isEqualTo(StorageOverQuotaCapacity.DEFAULT)
+        }
+
+        advanceUntilIdle()
+        verify(setAlmostFullStorageBannerClosingTimestampUseCase).invoke()
+    }
+
+    @Test
+    fun `test that setAlmostFullStorageBannerClosingTimestampUseCase handles errors gracefully`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(setAlmostFullStorageBannerClosingTimestampUseCase.invoke()).thenThrow(
+                RuntimeException("Failed to set timestamp")
+            )
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            // Should not crash when setting storage capacity as default
+            underTest.processAction(CloudDriveAction.StorageAlmostFullWarningDismiss)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.storageCapacity).isEqualTo(StorageOverQuotaCapacity.DEFAULT)
+            }
+        }
+
+    @Test
+    fun `test that storage monitoring starts immediately on ViewModel creation`() = runTest {
+        setupTestData(emptyList())
+        whenever(monitorStorageStateUseCase()).thenReturn(flowOf(StorageState.Red))
+        whenever(monitorAlmostFullStorageBannerVisibilityUseCase()).thenReturn(flowOf(true))
+        whenever(
+            storageCapacityMapper(
+                StorageState.Red,
+                true
+            )
+        ).thenReturn(StorageOverQuotaCapacity.FULL)
+
+        createViewModel()
+        advanceUntilIdle()
+
+        verify(monitorStorageStateUseCase).invoke()
+        verify(monitorAlmostFullStorageBannerVisibilityUseCase).invoke()
     }
 } 

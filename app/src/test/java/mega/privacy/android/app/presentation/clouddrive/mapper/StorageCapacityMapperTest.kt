@@ -2,7 +2,8 @@ package mega.privacy.android.app.presentation.clouddrive.mapper
 
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
+import mega.privacy.android.core.nodecomponents.components.banners.StorageCapacityMapper
+import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
 import mega.privacy.android.domain.entity.StorageState
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance

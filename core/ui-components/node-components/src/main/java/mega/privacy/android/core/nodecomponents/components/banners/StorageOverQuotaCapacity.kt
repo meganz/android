@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.clouddrive.model
+package mega.privacy.android.core.nodecomponents.components.banners
 
 /**
  * Enum class to represent the storage over quota capacity

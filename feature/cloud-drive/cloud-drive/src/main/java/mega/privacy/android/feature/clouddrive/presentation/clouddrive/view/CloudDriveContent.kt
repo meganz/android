@@ -9,7 +9,10 @@ import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -44,6 +47,8 @@ import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
+import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaBannerM3
+import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
 import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.NewFolderNodeDialog
 import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
 import mega.privacy.android.core.nodecomponents.list.NodesView
@@ -82,6 +87,7 @@ import timber.log.Timber
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun CloudDriveContent(
+    isTabContent: Boolean,
     navigationHandler: NavigationHandler,
     uiState: CloudDriveUiState,
     showUploadOptionsBottomSheet: Boolean,
@@ -270,221 +276,241 @@ internal fun CloudDriveContent(
         }
     }
 
-    when {
-        uiState.isLoading -> {
-            if (shouldShowSkeleton) {
-                NodesViewSkeleton(
-                    contentPadding = contentPadding,
-                    isListView = isListView,
-                    spanCount = spanCount
-                )
-            }
-        }
-
-        uiState.isEmpty -> {
-            CloudDriveEmptyView(
-                isRootCloudDrive = uiState.isCloudDriveRoot
+    Column(
+        modifier = modifier
+            .padding(top = contentPadding.calculateTopPadding()),
+    ) {
+        // Storage Over Quota Banner
+        val isOverQuotaBannerShow = uiState.storageCapacity != StorageOverQuotaCapacity.DEFAULT
+        val topPadding = if (isOverQuotaBannerShow || isTabContent) 12.dp else 0.dp
+        if (isOverQuotaBannerShow) {
+            StorageOverQuotaBannerM3(
+                storageCapacity = uiState.storageCapacity,
+                onStorageAlmostFullWarningDismiss = { onAction(CloudDriveAction.StorageAlmostFullWarningDismiss) },
+                onUpgradeClicked = {
+                    megaNavigator.openUpgradeAccount(context)
+                },
             )
         }
 
-        else -> NodesView(
-            modifier = modifier,
-            listContentPadding = PaddingValues(
-                top = contentPadding.calculateTopPadding(),
-                bottom = contentPadding.calculateBottomPadding() + 100.dp
-            ),
-            listState = listState,
-            gridState = gridState,
-            spanCount = spanCount,
-            items = uiState.items,
-            isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
-            isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
-            showHiddenNodes = uiState.showHiddenNodes,
-            onMenuClicked = { visibleNodeOptionId = it.id },
-            onItemClicked = { onAction(ItemClicked(it)) },
-            onLongClicked = { onAction(ItemLongClicked(it)) },
-            sortConfiguration = uiState.selectedSortConfiguration,
-            isListView = isListView,
-            onSortOrderClick = { showSortBottomSheet = true },
-            onChangeViewTypeClicked = { onAction(ChangeViewTypeClicked) },
-            showMediaDiscoveryButton = uiState.hasMediaItems && !uiState.isCloudDriveRoot,
-            onEnterMediaDiscoveryClick = {
-                navigationHandler.back()
-                navigationHandler.navigate(
-                    MediaDiscovery(
-                        nodeHandle = uiState.currentFolderId.longValue,
-                        nodeName = uiState.title.get(context),
+        when {
+            uiState.isLoading -> {
+                if (shouldShowSkeleton) {
+                    NodesViewSkeleton(
+                        isListView = isListView,
+                        spanCount = spanCount,
+                        contentPadding = PaddingValues(top = topPadding),
                     )
+                }
+            }
+
+            uiState.isEmpty -> {
+                CloudDriveEmptyView(
+                    isRootCloudDrive = uiState.isCloudDriveRoot
                 )
-            },
-            inSelectionMode = uiState.isInSelectionMode,
-        )
-    }
+            }
 
-    EventEffect(
-        event = uiState.navigateToFolderEvent,
-        onConsumed = { onAction(NavigateToFolderEventConsumed) }
-    ) { node ->
-        onNavigateToFolder(node.id, node.name)
-    }
-
-    EventEffect(
-        event = uiState.navigateBack,
-        onConsumed = { onAction(NavigateBackEventConsumed) }
-    ) {
-        onNavigateBack()
-    }
-
-    uiState.openedFileNode?.let { openedFileNode ->
-        HandleNodeAction3(
-            typedFileNode = openedFileNode,
-            snackBarHostState = snackbarHostState,
-            coroutineScope = coroutineScope,
-            onActionHandled = { onAction(OpenedFileNodeHandled) },
-            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
-            onDownloadEvent = onTransfer,
-            sortOrder = uiState.selectedSortOrder
-        )
-    }
-
-    UploadingFiles(
-        nameCollisionLauncher = nameCollisionLauncher,
-        parentNodeId = uiState.currentFolderId,
-        uris = uploadUris,
-        onStartUpload = { transferTriggerEvent ->
-            onTransfer(transferTriggerEvent)
-            uploadUris = emptyList()
-        },
-    )
-
-    if (showUploadOptionsBottomSheet) {
-        UploadOptionsBottomSheet(
-            onUploadFilesClicked = {
-                isUploadFolder = false
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    manualUploadFilesLauncher.launch(POST_NOTIFICATIONS)
-                } else {
-                    runCatching {
-                        openMultipleDocumentLauncher.launch(arrayOf("*/*"))
-                    }.onFailure {
-                        Timber.e(it, "Activity not found")
-                    }
-                }
-            },
-            onUploadFolderClicked = {
-                isUploadFolder = true
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    manualUploadFilesLauncher.launch(POST_NOTIFICATIONS)
-                } else {
-                    runCatching {
-                        uploadFolderLauncher.launch(
-                            Intent.createChooser(
-                                Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-                                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                    .addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION),
-                                null
-                            )
+            else -> NodesView(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                listContentPadding = PaddingValues(
+                    top = topPadding,
+                    bottom = contentPadding.calculateBottomPadding() + 100.dp
+                ),
+                listState = listState,
+                gridState = gridState,
+                spanCount = spanCount,
+                items = uiState.items,
+                isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
+                isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
+                showHiddenNodes = uiState.showHiddenNodes,
+                onMenuClicked = { visibleNodeOptionId = it.id },
+                onItemClicked = { onAction(ItemClicked(it)) },
+                onLongClicked = { onAction(ItemLongClicked(it)) },
+                sortConfiguration = uiState.selectedSortConfiguration,
+                isListView = isListView,
+                onSortOrderClick = { showSortBottomSheet = true },
+                onChangeViewTypeClicked = { onAction(ChangeViewTypeClicked) },
+                showMediaDiscoveryButton = uiState.hasMediaItems && !uiState.isCloudDriveRoot,
+                onEnterMediaDiscoveryClick = {
+                    navigationHandler.back()
+                    navigationHandler.navigate(
+                        MediaDiscovery(
+                            nodeHandle = uiState.currentFolderId.longValue,
+                            nodeName = uiState.title.get(context),
                         )
-                    }.onFailure {
-                        Timber.e(it, "Activity not found")
-                    }
-                }
-            },
-            onScanDocumentClicked = {
-                onAction(CloudDriveAction.StartDocumentScanning)
-            },
-            onCaptureClicked = {
-                cameraPermissionLauncher.launch(arrayOf(CAMERA, RECORD_AUDIO))
-            },
-            onNewFolderClicked = {
-                showNewFolderDialog = true
-            },
-            onNewTextFileClicked = {
-                showNewTextFileDialog = true
-            },
-            onDismissSheet = onDismissUploadOptionsBottomSheet
-        )
-    }
+                    )
+                },
+                inSelectionMode = uiState.isInSelectionMode,
+            )
+        }
 
-    if (showNewFolderDialog) {
-        NewFolderNodeDialog(
-            parentNode = uiState.currentFolderId,
-            onCreateFolder = { folderId ->
-                showNewFolderDialog = false
-                coroutineScope.launch {
-                    if (folderId != null) {
-                        onCreatedNewFolder(folderId)
-                    } else {
-                        snackbarHostState?.showAutoDurationSnackbar(context.getString(R.string.context_folder_no_created))
-                    }
-                }
-            },
-            onDismiss = {
-                showNewFolderDialog = false
-            }
-        )
-    }
+        EventEffect(
+            event = uiState.navigateToFolderEvent,
+            onConsumed = { onAction(NavigateToFolderEventConsumed) }
+        ) { node ->
+            onNavigateToFolder(node.id, node.name)
+        }
 
-    if (showNewTextFileDialog) {
-        NewTextFileNodeDialog(
-            parentNode = uiState.currentFolderId,
-            onDismiss = {
-                showNewTextFileDialog = false
-            }
-        )
-    }
-
-    // Todo: We will remove this, and replace it with NavigationHandler
-    // Temporary solution to show node options bottom sheet, because navigation file
-    // is not yet implemented in node-components module.
-    visibleNodeOptionId?.let { nodeId ->
-        MegaModalBottomSheet(
-            modifier = Modifier.statusBarsPadding(),
-            sheetState = nodeOptionSheetState,
-            onDismissRequest = {
-                visibleNodeOptionId = null
-                onDismissNodeOptionsBottomSheet()
-            },
-            bottomSheetBackground = MegaModalBottomSheetBackground.Surface1
+        EventEffect(
+            event = uiState.navigateBack,
+            onConsumed = { onAction(NavigateBackEventConsumed) }
         ) {
-            NodeOptionsBottomSheetRoute(
-                navigationHandler = navigationHandler,
+            onNavigateBack()
+        }
+
+        uiState.openedFileNode?.let { openedFileNode ->
+            HandleNodeAction3(
+                typedFileNode = openedFileNode,
+                snackBarHostState = snackbarHostState,
+                coroutineScope = coroutineScope,
+                onActionHandled = { onAction(OpenedFileNodeHandled) },
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                onDownloadEvent = onTransfer,
+                sortOrder = uiState.selectedSortOrder
+            )
+        }
+
+        UploadingFiles(
+            nameCollisionLauncher = nameCollisionLauncher,
+            parentNodeId = uiState.currentFolderId,
+            uris = uploadUris,
+            onStartUpload = { transferTriggerEvent ->
+                onTransfer(transferTriggerEvent)
+                uploadUris = emptyList()
+            },
+        )
+
+        if (showUploadOptionsBottomSheet) {
+            UploadOptionsBottomSheet(
+                onUploadFilesClicked = {
+                    isUploadFolder = false
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        manualUploadFilesLauncher.launch(POST_NOTIFICATIONS)
+                    } else {
+                        runCatching {
+                            openMultipleDocumentLauncher.launch(arrayOf("*/*"))
+                        }.onFailure {
+                            Timber.e(it, "Activity not found")
+                        }
+                    }
+                },
+                onUploadFolderClicked = {
+                    isUploadFolder = true
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        manualUploadFilesLauncher.launch(POST_NOTIFICATIONS)
+                    } else {
+                        runCatching {
+                            uploadFolderLauncher.launch(
+                                Intent.createChooser(
+                                    Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+                                        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                        .addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION),
+                                    null
+                                )
+                            )
+                        }.onFailure {
+                            Timber.e(it, "Activity not found")
+                        }
+                    }
+                },
+                onScanDocumentClicked = {
+                    onAction(CloudDriveAction.StartDocumentScanning)
+                },
+                onCaptureClicked = {
+                    cameraPermissionLauncher.launch(arrayOf(CAMERA, RECORD_AUDIO))
+                },
+                onNewFolderClicked = {
+                    showNewFolderDialog = true
+                },
+                onNewTextFileClicked = {
+                    showNewTextFileDialog = true
+                },
+                onDismissSheet = onDismissUploadOptionsBottomSheet
+            )
+        }
+
+        if (showNewFolderDialog) {
+            NewFolderNodeDialog(
+                parentNode = uiState.currentFolderId,
+                onCreateFolder = { folderId ->
+                    showNewFolderDialog = false
+                    coroutineScope.launch {
+                        if (folderId != null) {
+                            onCreatedNewFolder(folderId)
+                        } else {
+                            snackbarHostState?.showAutoDurationSnackbar(context.getString(R.string.context_folder_no_created))
+                        }
+                    }
+                },
                 onDismiss = {
+                    showNewFolderDialog = false
+                }
+            )
+        }
+
+        if (showNewTextFileDialog) {
+            NewTextFileNodeDialog(
+                parentNode = uiState.currentFolderId,
+                onDismiss = {
+                    showNewTextFileDialog = false
+                }
+            )
+        }
+
+        // Todo: We will remove this, and replace it with NavigationHandler
+        // Temporary solution to show node options bottom sheet, because navigation file
+        // is not yet implemented in node-components module.
+        visibleNodeOptionId?.let { nodeId ->
+            MegaModalBottomSheet(
+                modifier = Modifier.statusBarsPadding(),
+                sheetState = nodeOptionSheetState,
+                onDismissRequest = {
                     visibleNodeOptionId = null
                     onDismissNodeOptionsBottomSheet()
                 },
-                nodeId = nodeId.longValue,
-                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
-                onTransfer = onTransfer,
-                actionHandler = nodeActionHandler,
-                nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-            )
+                bottomSheetBackground = MegaModalBottomSheetBackground.Surface1
+            ) {
+                NodeOptionsBottomSheetRoute(
+                    navigationHandler = navigationHandler,
+                    onDismiss = {
+                        visibleNodeOptionId = null
+                        onDismissNodeOptionsBottomSheet()
+                    },
+                    nodeId = nodeId.longValue,
+                    nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                    onTransfer = onTransfer,
+                    actionHandler = nodeActionHandler,
+                    nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+                )
+            }
         }
-    }
 
-    if (showSortBottomSheet) {
-        SortBottomSheet(
-            title = stringResource(sharedR.string.action_sort_by_header),
-            options = NodeSortOption.entries,
-            sheetState = sortBottomSheetState,
-            selectedSort = SortBottomSheetResult(
-                sortOptionItem = uiState.selectedSortConfiguration.sortOption,
-                sortDirection = uiState.selectedSortConfiguration.sortDirection
-            ),
-            onSortOptionSelected = { result ->
-                result?.let {
-                    onSortNodes(
-                        NodeSortConfiguration(
-                            sortOption = it.sortOptionItem,
-                            sortDirection = it.sortDirection
+        if (showSortBottomSheet) {
+            SortBottomSheet(
+                title = stringResource(sharedR.string.action_sort_by_header),
+                options = NodeSortOption.entries,
+                sheetState = sortBottomSheetState,
+                selectedSort = SortBottomSheetResult(
+                    sortOptionItem = uiState.selectedSortConfiguration.sortOption,
+                    sortDirection = uiState.selectedSortConfiguration.sortDirection
+                ),
+                onSortOptionSelected = { result ->
+                    result?.let {
+                        onSortNodes(
+                            NodeSortConfiguration(
+                                sortOption = it.sortOptionItem,
+                                sortDirection = it.sortDirection
+                            )
                         )
-                    )
+                        showSortBottomSheet = false
+                    }
+                },
+                onDismissRequest = {
                     showSortBottomSheet = false
                 }
-            },
-            onDismissRequest = {
-                showSortBottomSheet = false
-            }
-        )
+            )
+        }
     }
 }

@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.core.nodecomponents.components.banners.StorageCapacityMapper
+import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
@@ -25,6 +27,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -35,7 +38,10 @@ import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeNameByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
+import mega.privacy.android.domain.usecase.MonitorAlmostFullStorageBannerVisibilityUseCase
+import mega.privacy.android.domain.usecase.SetAlmostFullStorageBannerClosingTimestampUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
@@ -68,6 +74,10 @@ class CloudDriveViewModel @Inject constructor(
     private val getCloudSortOrderUseCase: GetCloudSortOrder,
     private val setCloudSortOrderUseCase: SetCloudSortOrder,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
+    private val storageCapacityMapper: StorageCapacityMapper,
+    private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
+    private val monitorAlmostFullStorageBannerVisibilityUseCase: MonitorAlmostFullStorageBannerVisibilityUseCase,
+    private val setAlmostFullStorageBannerClosingTimestampUseCase: SetAlmostFullStorageBannerClosingTimestampUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -91,6 +101,7 @@ class CloudDriveViewModel @Inject constructor(
         setupNodesLoading()
         monitorNodeUpdates()
         getCloudSortOrder()
+        monitorStorageOverQuotaCapacity()
     }
 
     /**
@@ -107,6 +118,7 @@ class CloudDriveViewModel @Inject constructor(
             is CloudDriveAction.NavigateToFolderEventConsumed -> onNavigateToFolderEventConsumed()
             is CloudDriveAction.NavigateBackEventConsumed -> onNavigateBackEventConsumed()
             is CloudDriveAction.StartDocumentScanning -> prepareDocumentScanner()
+            is CloudDriveAction.StorageAlmostFullWarningDismiss -> setStorageCapacityAsDefault()
         }
     }
 
@@ -462,5 +474,38 @@ class CloudDriveViewModel @Inject constructor(
      */
     fun onDocumentScanningErrorConsumed() {
         _uiState.update { it.copy(documentScanningError = null) }
+    }
+
+    /**
+     * Monitor storage quota capacity
+     */
+    private fun monitorStorageOverQuotaCapacity() {
+        viewModelScope.launch {
+            combine(
+                monitorStorageStateUseCase().catch { Timber.e(it) },
+                monitorAlmostFullStorageBannerVisibilityUseCase().catch { Timber.e(it) }
+            ) { storageState: StorageState, shouldShow: Boolean ->
+                storageCapacityMapper(
+                    storageState = storageState,
+                    shouldShow = shouldShow
+                )
+            }.collectLatest { storageCapacity ->
+                _uiState.update {
+                    it.copy(storageCapacity = storageCapacity)
+                }
+            }
+        }
+    }
+
+    /**
+     * Reset storage capacity to default and set closing timestamp
+     */
+    fun setStorageCapacityAsDefault() {
+        _uiState.update { it.copy(storageCapacity = StorageOverQuotaCapacity.DEFAULT) }
+        viewModelScope.launch {
+            runCatching {
+                setAlmostFullStorageBannerClosingTimestampUseCase()
+            }.onFailure { Timber.e(it) }
+        }
     }
 }

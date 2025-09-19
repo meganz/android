@@ -3,8 +3,8 @@ package mega.privacy.android.app.presentation.photos.mediadiscovery.model
 import androidx.annotation.StringRes
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
-import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.DEFAULT
+import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
+import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity.DEFAULT
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.MediaListItem

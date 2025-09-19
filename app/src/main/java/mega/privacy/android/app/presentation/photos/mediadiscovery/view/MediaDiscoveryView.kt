@@ -66,7 +66,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
+import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
 import mega.privacy.android.app.presentation.clouddrive.ui.StorageOverQuotaBanner
 import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryGlobalStateViewModel
