@@ -16,6 +16,7 @@ android {
 
 dependencies {
     implementation(project(":core:navigation-contract"))
+    implementation(project(":shared:original-core-ui"))
     implementation(project(":domain"))
     implementation(project(":icon-pack"))
     implementation(project(":shared:resources"))

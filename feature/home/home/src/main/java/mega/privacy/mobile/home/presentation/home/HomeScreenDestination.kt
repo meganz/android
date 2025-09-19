@@ -1,5 +1,6 @@
-package mega.privacy.mobile.home.presentation
+package mega.privacy.mobile.home.presentation.home
 
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation3.runtime.NavKey
@@ -15,6 +16,8 @@ fun NavGraphBuilder.homeScreen(
     onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
     composable<Home> {
+        val viewmodel = hiltViewModel<HomeViewModel>()
+
         HomeScreen()
     }
 }

@@ -1,4 +1,4 @@
-package mega.privacy.mobile.home.presentation
+package mega.privacy.mobile.home.presentation.home
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

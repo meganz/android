@@ -13,8 +13,8 @@ import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 import mega.privacy.mobile.analytics.event.HomeBottomNavigationItemEvent
-import mega.privacy.mobile.home.presentation.Home
-import mega.privacy.mobile.home.presentation.homeScreen
+import mega.privacy.mobile.home.presentation.home.Home
+import mega.privacy.mobile.home.presentation.home.homeScreen
 
 class HomeNavItem : MainNavItem {
     override val destination: NavKey = Home
