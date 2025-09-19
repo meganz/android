@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -201,24 +200,28 @@ internal class SyncFoldersViewModel @Inject constructor(
         }.catch { Timber.e(it) }.launchIn(viewModelScope)
     }
 
-    private fun processSyncsFlow() = monitorSyncsUseCase()
-        .map(syncUiItemMapper::invoke)
-        .distinctUntilChanged()
-        .map { syncs ->
-            val stalledIssues = monitorStalledIssuesUseCase().first()
-            val syncUiItems = syncs.map { sync ->
-                val folderInfo = getCompleteFolderInfoUseCase(sync.megaStorageNodeId)
-                sync.copy(
-                    hasStalledIssues = stalledIssues.any { it.syncId == sync.id },
-                    expanded = _uiState.value.syncUiItems.firstOrNull { it.id == sync.id }?.expanded == true,
-                    numberOfFiles = folderInfo?.numOfFiles ?: 0,
-                    numberOfFolders = folderInfo?.numOfFolders ?: 0,
-                    totalSizeInBytes = folderInfo?.totalSizeInBytes ?: 0L,
-                    creationTime = folderInfo?.creationTime ?: 0L,
-                )
-            }
-            syncUiItems to stalledIssues.size
+    private fun processSyncsFlow() = combine(
+        monitorSyncsUseCase()
+            .map(syncUiItemMapper::invoke)
+            .distinctUntilChanged(),
+        monitorStalledIssuesUseCase().distinctUntilChanged()
+    ) { syncs, stalledIssues ->
+        val syncUiItems = syncs.map { sync ->
+            val folderInfo = getCompleteFolderInfoUseCase(sync.megaStorageNodeId)
+            val hasStalledIssue = stalledIssues.any { it.syncId == sync.id }
+            sync.copy(
+                hasStalledIssues = hasStalledIssue,
+                expanded = _uiState.value.syncUiItems.firstOrNull { it.id == sync.id }?.expanded == true,
+                numberOfFiles = folderInfo?.numOfFiles ?: 0,
+                numberOfFolders = folderInfo?.numOfFolders ?: 0,
+                totalSizeInBytes = folderInfo?.totalSizeInBytes ?: 0L,
+                creationTime = folderInfo?.creationTime ?: 0L,
+            )
         }
+        syncUiItems to stalledIssues.size
+    }.catch {
+        Timber.e(it)
+    }
 
 
     private fun processCameraUploadsFlow() = monitorCameraUploadsStatusInfoUseCase()
@@ -235,7 +238,7 @@ internal class SyncFoldersViewModel @Inject constructor(
                     cuStatusInfo = cuStatusInfo,
                 )?.let { add(it) }
             }
-        }
+        }.catch { Timber.e(it) }
 
     private suspend fun getCameraUploadsOrMediaUploadsSyncUiItem(
         cameraUploadsOrMediaUploadsBackup: Backup?,
