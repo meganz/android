@@ -95,7 +95,7 @@ fun NotificationItemView(
         NotificationTitleRow(
             title = title,
             showNewIcon = isNew,
-            reducedLines = !description.isNullOrBlank()
+            isSingleLine = !description.isNullOrBlank()
         )
 
         if (!description.isNullOrBlank()) {
@@ -147,9 +147,9 @@ fun NotificationItemView(
 private fun NotificationTitleRow(
     title: String,
     showNewIcon: Boolean,
-    reducedLines: Boolean,
+    isSingleLine: Boolean,
 ) {
-    val titleMaxLines = if (reducedLines) 1 else 3
+    val titleMaxLines = if (isSingleLine) 1 else 3
 
     Row(
         modifier = Modifier
