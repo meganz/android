@@ -42,6 +42,7 @@ import mega.privacy.android.app.databinding.SortByHeaderBinding
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.CloudDriveExplorerFragment
 import mega.privacy.android.app.main.DrawerItem
+import mega.privacy.android.app.main.FileExplorerViewModel
 import mega.privacy.android.app.main.IncomingSharesExplorerFragment
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter.Companion.ITEM_VIEW_TYPE_GRID
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter.Companion.ITEM_VIEW_TYPE_HEADER
@@ -63,6 +64,7 @@ import mega.privacy.android.app.utils.TimeUtils.getVideoDuration
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.scaleWidthPx
 import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
@@ -83,8 +85,10 @@ class MegaExplorerAdapter(
     private val recyclerView: RecyclerView,
     private val selectFile: Boolean,
     private val sortByViewModel: SortByHeaderViewModel,
+    private val fileExplorerViewModel: FileExplorerViewModel,
     private val megaApi: MegaApiAndroid,
     private var ioDispatcher: CoroutineDispatcher,
+    private val isFromCameraUploadsSettings: Boolean = false,
 ) : RecyclerView.Adapter<MegaExplorerAdapter.ViewHolderExplorer>(), SectionTitleProvider,
     RotatableAdapter {
 
@@ -623,6 +627,13 @@ class MegaExplorerAdapter(
                                     transformations(BlurTransformation(context, radius = 16f))
                                 }
                             }
+                        }
+
+                        if (isFromCameraUploadsSettings) {
+                            val isSync =
+                                fileExplorerViewModel.getFolderType(node.handle) is FolderType.Sync
+                            itemView.alpha = if (isSync) 0.5f else 1f
+                            itemView.isEnabled = !isSync
                         }
                     }
                     // Save job

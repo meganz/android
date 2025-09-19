@@ -33,6 +33,7 @@ import mega.privacy.android.app.databinding.FragmentFileexplorerlistBinding
 import mega.privacy.android.app.domain.usecase.search.LegacySearchUseCase
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.ACTION_CHOOSE_MEGA_FOLDER_SYNC
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.ACTION_SAVE_TO_CLOUD
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.CLOUD_FRAGMENT
 import mega.privacy.android.app.main.adapters.FileExplorerPagerAdapter.Companion.TAB_POSITION_INCOMING
@@ -310,8 +311,10 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             recyclerView = recyclerView,
             selectFile = selectFile,
             sortByViewModel = sortByHeaderViewModel,
+            fileExplorerViewModel = fileExplorerViewModel,
             ioDispatcher = ioDispatcher,
-            megaApi = megaApi
+            megaApi = megaApi,
+            isFromCameraUploadsSettings = requireActivity().intent?.action == ACTION_CHOOSE_MEGA_FOLDER_SYNC
         )
 
         gridLayoutManager?.let {

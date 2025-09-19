@@ -283,6 +283,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
             recyclerView = recyclerView,
             selectFile = selectFile,
             sortByViewModel = sortByHeaderViewModel,
+            fileExplorerViewModel = fileExplorerViewModel,
             ioDispatcher = ioDispatcher,
             megaApi = megaApi
         )

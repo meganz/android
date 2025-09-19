@@ -41,6 +41,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetFolderTypeByHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetPathUseCase
@@ -74,6 +75,7 @@ class FileExplorerViewModel @Inject constructor(
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val getDocumentsFromSharedUrisUseCase: GetDocumentsFromSharedUrisUseCase,
     private val savedStateHandle: SavedStateHandle,
+    private val getFolderTypeByHandleUseCase: GetFolderTypeByHandleUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileExplorerUiState())
@@ -480,7 +482,7 @@ class FileExplorerViewModel @Inject constructor(
                 filePathsWithNames, chatIds = chatIds.toLongArray()
             )
         }.onFailure {
-            Timber.e("Error attaching files", it)
+            Timber.e(it, "Error attaching files")
         }
     }
 
@@ -491,7 +493,7 @@ class FileExplorerViewModel @Inject constructor(
             .forEach {
                 runCatching {
                     attachNodeUseCase(chatId, it as TypedFileNode)
-                }.onFailure { Timber.e("Error attaching a node", it) }
+                }.onFailure { error -> Timber.e(error, "Error attaching a node") }
             }
     }
 
@@ -601,4 +603,8 @@ class FileExplorerViewModel @Inject constructor(
     fun setShouldFinishScreen(shouldFinishScreen: Boolean) {
         _uiState.update { it.copy(shouldFinishScreen = shouldFinishScreen) }
     }
+
+    internal suspend fun getFolderType(handle: Long) = runCatching {
+        getFolderTypeByHandleUseCase(handle)
+    }.getOrNull()
 }

@@ -12,11 +12,13 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.usecase.GetFolderTypeByHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetPathUseCase
@@ -30,6 +32,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -56,6 +60,7 @@ internal class FileExplorerViewModelTest {
     private val sendChatAttachmentsUseCase = mock<SendChatAttachmentsUseCase>()
     private val getDocumentsFromSharedUrisUseCase = mock<GetDocumentsFromSharedUrisUseCase>()
     private var savedStateHandle = SavedStateHandle(mapOf())
+    private val getFolderTypeByHandleUseCase = mock<GetFolderTypeByHandleUseCase>()
 
     private fun initViewModel() {
         underTest = FileExplorerViewModel(
@@ -72,6 +77,7 @@ internal class FileExplorerViewModelTest {
             monitorShowHiddenItemsUseCase = mock(),
             getDocumentsFromSharedUrisUseCase = getDocumentsFromSharedUrisUseCase,
             savedStateHandle = savedStateHandle,
+            getFolderTypeByHandleUseCase = getFolderTypeByHandleUseCase
         )
     }
 
@@ -87,6 +93,7 @@ internal class FileExplorerViewModelTest {
             getNodeByIdUseCase,
             sendChatAttachmentsUseCase,
             getDocumentsFromSharedUrisUseCase,
+            getFolderTypeByHandleUseCase
         )
     }
 
@@ -395,4 +402,25 @@ internal class FileExplorerViewModelTest {
                 .isEqualTo(isAskingForCollisionsResolution)
         }
     }
+
+    @ParameterizedTest(name = " when folder type is {0}")
+    @MethodSource("provideFolderType")
+    fun `test that the getFolderType returns correctly`(
+        folderType: FolderType,
+    ) = runTest {
+        val testHandle = 1234L
+        whenever(getFolderTypeByHandleUseCase(testHandle)).thenReturn(folderType)
+
+        val actual = underTest.getFolderType(testHandle)
+        assertThat(actual).isEqualTo(folderType)
+    }
+
+    private fun provideFolderType() = listOf(
+        Arguments.of(FolderType.Default),
+        Arguments.of(FolderType.MediaSyncFolder),
+        Arguments.of(FolderType.ChatFilesFolder),
+        Arguments.of(FolderType.RootBackup),
+        Arguments.of(FolderType.ChildBackup),
+        Arguments.of(FolderType.Sync),
+    )
 }
