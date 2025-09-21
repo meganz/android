@@ -12,7 +12,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.compose.content
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -89,13 +91,16 @@ class SharesFragment : Fragment() {
                     managerActivity.openSearchOnHomepage()
                 },
                 onMoreClick = {
-                    managerActivity.showNodeOptionsPanel(
-                        managerActivity.getCurrentParentNode(
+                    lifecycleScope.launch {
+                        val parentNode = managerActivity.getCurrentParentNode(
                             managerActivity.currentParentHandle,
                             Constants.INVALID_VALUE
-                        ),
-                        hideHiddenActions = true
-                    )
+                        )
+                        managerActivity.showNodeOptionsPanel(
+                            parentNode,
+                            hideHiddenActions = true
+                        )
+                    }
                 },
                 onPageSelected = {
                     managerActivity.onShareTabChanged()

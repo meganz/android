@@ -13,9 +13,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import dagger.hilt.android.scopes.ActivityScoped
+import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.camera.InAppCameraLauncher
@@ -247,25 +249,28 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
     }
 
     override fun showNewFolderDialog(typedText: String?) {
-        parentNodeManager.getCurrentParentNode(
-            parentNodeManager.currentParentHandle,
-            Constants.INVALID_VALUE
-        )?.let { parent ->
-            newFolderDialog =
-                showNewFolderDialog(managerActivity, actionNodeCallback, parent, typedText)
+        managerActivity.lifecycleScope.launch {
+            parentNodeManager.getCurrentParentNode(
+                parentNodeManager.currentParentHandle,
+                Constants.INVALID_VALUE
+            )?.let { parent ->
+                newFolderDialog =
+                    showNewFolderDialog(managerActivity, actionNodeCallback, parent, typedText)
+            }
         }
-
     }
 
     override fun showNewTextFileDialog(typedName: String?) {
-        parentNodeManager.getCurrentParentNode(
-            parentNodeManager.currentParentHandle,
-            Constants.INVALID_VALUE
-        )?.let { parent ->
-            newTextFileDialog = showNewTxtFileDialog(
-                managerActivity, parent, typedName,
-                navigationDrawerManager.drawerItem === DrawerItem.HOMEPAGE
-            )
+        managerActivity.lifecycleScope.launch {
+            parentNodeManager.getCurrentParentNode(
+                parentNodeManager.currentParentHandle,
+                Constants.INVALID_VALUE
+            )?.let { parent ->
+                newTextFileDialog = showNewTxtFileDialog(
+                    managerActivity, parent, typedName,
+                    navigationDrawerManager.drawerItem === DrawerItem.HOMEPAGE
+                )
+            }
         }
     }
 }

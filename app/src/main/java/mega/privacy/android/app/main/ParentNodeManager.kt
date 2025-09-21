@@ -4,5 +4,5 @@ import nz.mega.sdk.MegaNode
 
 interface ParentNodeManager {
     val currentParentHandle: Long
-    fun getCurrentParentNode(parentHandle: Long, error: Int): MegaNode?
+    suspend fun getCurrentParentNode(parentHandle: Long, error: Int): MegaNode?
 }

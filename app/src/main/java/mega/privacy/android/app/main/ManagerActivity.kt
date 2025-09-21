@@ -4646,13 +4646,16 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
             R.id.action_more -> {
                 if (fileBrowserViewModel.state().selectedTab != CloudDriveTab.SYNC) {
-                    showNodeOptionsPanel(
-                        getCurrentParentNode(
+                    lifecycleScope.launch {
+                        val parentNode = getCurrentParentNode(
                             currentParentHandle,
                             Constants.INVALID_VALUE
-                        ),
-                        hideHiddenActions = drawerItem == DrawerItem.SHARED_ITEMS
-                    )
+                        )
+                        showNodeOptionsPanel(
+                            parentNode,
+                            hideHiddenActions = drawerItem == DrawerItem.SHARED_ITEMS
+                        )
+                    }
                 } else {
                     Timber.d("Sync settings selected in sync tab")
                     fileBrowserViewModel.showSyncSettings()
@@ -5390,7 +5393,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             return parentHandle
         }
 
-    override fun getCurrentParentNode(parentHandle: Long, error: Int): MegaNode? {
+    override suspend fun getCurrentParentNode(parentHandle: Long, error: Int): MegaNode? {
         var errorString: String? = null
         if (error != -1) {
             errorString = getString(error)
@@ -5400,7 +5403,9 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             Timber.d("%s: parentHandle == -1", errorString)
             return null
         }
-        val parentNode = megaApi.getNodeByHandle(parentHandle)
+        val parentNode = withContext(ioDispatcher) {
+            megaApi.getNodeByHandle(parentHandle)
+        }
         if (parentNode == null && errorString != null) {
             showSnackbar(SNACKBAR_TYPE, errorString, -1)
             Timber.d("%s: parentNode == null", errorString)
@@ -6264,7 +6269,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      *
      * @param entities List<DocumentEntity> containing all the upload info.
      */
-    private fun onIntentProcessed(entities: List<DocumentEntity>) {
+    private suspend fun onIntentProcessed(entities: List<DocumentEntity>) {
         Timber.d("onIntentProcessed")
         val parentNode: MegaNode? = getCurrentParentNode(currentParentHandle, -1)
         if (parentNode == null) {
