@@ -47,11 +47,7 @@ class MonitorImageNodesUseCase @Inject constructor(
 
     private suspend fun populateNodes(nodeIds: List<NodeId>): List<ImageNode> {
         val nodes = nodeIds.mapNotNull { nodeId ->
-            photosRepository.fetchImageNode(
-                nodeId,
-                filterSvg = false,
-                includeThumbnail = false,
-            )
+            photosRepository.fetchImageNode(nodeId, filterSvg = false)
         }
 
         nodesCache.clear()
@@ -77,10 +73,7 @@ class MonitorImageNodesUseCase @Inject constructor(
                 continue
             }
 
-            val newNode = photosRepository.fetchImageNode(
-                nodeId = node.id,
-                includeThumbnail = false,
-            )
+            val newNode = photosRepository.fetchImageNode(nodeId = node.id)
             if (newNode == null) {
                 nodesCache.remove(node.id)
             } else {

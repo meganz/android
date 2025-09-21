@@ -36,6 +36,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.MediaListItem
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.accent_050
@@ -50,6 +51,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AlbumCoverSelectionScreen(
+    fileTypeIconMapper: FileTypeIconMapper,
     viewModel: AlbumCoverSelectionViewModel = viewModel(),
     onBackClicked: () -> Unit = {},
     onCompletion: (message: String) -> Unit = {},
@@ -82,6 +84,7 @@ fun AlbumCoverSelectionScreen(
                             && !state.isBusinessAccountExpired,
                     onPhotoDownload = viewModel::downloadPhoto,
                     onPhotoSelection = viewModel::selectPhoto,
+                    fileTypeIconMapper = fileTypeIconMapper
                 )
 
                 AlbumCoverSelectionFooter(
@@ -138,6 +141,7 @@ private fun AlbumCoverSelectionContent(
     shouldApplySensitiveMode: Boolean,
     onPhotoDownload: PhotoDownload,
     onPhotoSelection: (Photo) -> Unit,
+    fileTypeIconMapper: FileTypeIconMapper,
 ) {
     PhotosGridView(
         currentZoomLevel = ZoomLevel.Grid_3,
@@ -151,6 +155,7 @@ private fun AlbumCoverSelectionContent(
         selectedPhotoIds = setOfNotNull(selectedPhoto?.id),
         mediaListItemList = mediaListItems,
         shouldApplySensitiveMode = shouldApplySensitiveMode,
+        fileTypeIconMapper = fileTypeIconMapper
     )
 }
 

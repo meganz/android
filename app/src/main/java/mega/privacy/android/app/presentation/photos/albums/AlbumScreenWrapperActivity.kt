@@ -35,6 +35,7 @@ import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -77,6 +78,9 @@ class AlbumScreenWrapperActivity : BaseActivity() {
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
 
+    @Inject
+    lateinit var fileTypeIconMapper: FileTypeIconMapper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -106,6 +110,7 @@ class AlbumScreenWrapperActivity : BaseActivity() {
                         setResult(RESULT_OK, data)
                         finish()
                     },
+                    fileTypeIconMapper = fileTypeIconMapper
                 )
             }
 
@@ -119,6 +124,7 @@ class AlbumScreenWrapperActivity : BaseActivity() {
                         setResult(RESULT_OK, data)
                         finish()
                     },
+                    fileTypeIconMapper = fileTypeIconMapper
                 )
             }
 

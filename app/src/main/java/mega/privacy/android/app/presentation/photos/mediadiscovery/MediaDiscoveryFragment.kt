@@ -20,11 +20,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -52,11 +48,8 @@ import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
-import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
-import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -98,6 +91,9 @@ class MediaDiscoveryFragment : Fragment() {
     @Inject
     lateinit var megaNavigator: MegaNavigator
 
+    @Inject
+    lateinit var fileTypeIconMapper: FileTypeIconMapper
+
     internal val addToAlbumLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
@@ -111,7 +107,6 @@ class MediaDiscoveryFragment : Fragment() {
     private val isNewDesign: Boolean by lazy {
         arguments?.getBoolean(IS_NEW_DESIGN, false) ?: false
     }
-    private val nodeOptionsActionViewModel: NodeOptionsActionViewModel by viewModels()
     var navigationHandler: NavigationHandler? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -133,12 +128,6 @@ class MediaDiscoveryFragment : Fragment() {
                 val mode by monitorThemeModeUseCase()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by mediaDiscoveryViewModel.state.collectAsStateWithLifecycle()
-
-                val actionHandler: NodeActionHandler =
-                    rememberNodeActionHandler(nodeOptionsActionViewModel)
-                var visibleNodeOptionId by remember { mutableStateOf<NodeId?>(null) }
-                val nodeOptionSheetState =
-                    rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
                 OriginalTheme(isDark = mode.isDarkMode()) {
                     MegaScaffold(
@@ -182,6 +171,7 @@ class MediaDiscoveryFragment : Fragment() {
                             onUpgradeClicked = {
                                 megaNavigator.openUpgradeAccount(requireContext())
                             },
+                            fileTypeIconMapper = fileTypeIconMapper,
                         )
                     }
                 }

@@ -388,7 +388,8 @@ private val videoMap = arrayOf(
     "mkv",
     "mk3d",
     "movie",
-    "vob"
+    "vob",
+    "ts"
 ).associateWith {
     listOf(
         iconPackR.drawable.ic_video_medium_solid,

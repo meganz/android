@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.compose.main
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -37,6 +38,7 @@ import mega.privacy.android.app.presentation.photos.timeline.viewmodel.getMediaS
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.shouldEnableCUPage
 import mega.privacy.android.app.presentation.photos.view.PhotosBodyView
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.CameraUploadsBusinessAccountDialog
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
@@ -45,6 +47,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.mobile.analytics.event.AlbumSelected
 import mega.privacy.mobile.analytics.event.AlbumSelectedEvent
 
+@SuppressLint("LocalContextResourcesRead")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PhotosScreen(
@@ -54,6 +57,7 @@ fun PhotosScreen(
     timelineViewModel: TimelineViewModel,
     albumsViewModel: AlbumsViewModel,
     photoDownloaderViewModel: PhotoDownloaderViewModel,
+    fileTypeIconMapper: FileTypeIconMapper,
     onEnableCameraUploads: () -> Unit,
     onNavigateAlbumContent: (UIAlbum) -> Unit,
     onNavigateAlbumPhotosSelection: (AlbumId) -> Unit,
@@ -150,6 +154,7 @@ fun PhotosScreen(
                         onUpdateCameraUploadsLimitedAccessState = timelineViewModel::setCameraUploadsLimitedAccess,
                         onZoomIn = onZoomIn,
                         onZoomOut = onZoomOut,
+                        fileTypeIconMapper = fileTypeIconMapper
                     )
                 },
                 emptyView = {

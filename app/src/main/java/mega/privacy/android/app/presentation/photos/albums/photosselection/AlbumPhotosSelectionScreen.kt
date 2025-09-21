@@ -62,6 +62,7 @@ import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhoto
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CAMERA_UPLOAD
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CLOUD_DRIVE
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -84,6 +85,7 @@ import mega.privacy.android.shared.resources.R as sharedResR
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AlbumPhotosSelectionScreen(
+    fileTypeIconMapper: FileTypeIconMapper,
     viewModel: AlbumPhotosSelectionViewModel = viewModel(),
     onBackClicked: () -> Unit = {},
     onCompletion: (albumId: AlbumId, numCommittedPhotos: Int) -> Unit = { _, _ -> },
@@ -224,6 +226,7 @@ fun AlbumPhotosSelectionScreen(
                             }
                         }
                     },
+                    fileTypeIconMapper = fileTypeIconMapper,
                 )
             }
         },
@@ -339,6 +342,7 @@ private fun AlbumPhotosSelectionContent(
     selectedPhotoIds: Set<Long>,
     onPhotoDownload: PhotoDownload,
     onPhotoSelection: (Photo) -> Unit,
+    fileTypeIconMapper: FileTypeIconMapper,
 ) {
     PhotosGridView(
         currentZoomLevel = ZoomLevel.Grid_3,
@@ -352,6 +356,7 @@ private fun AlbumPhotosSelectionContent(
         mediaListItemList = mediaListItems,
         isBlurUnselectItem = selectedPhotoIds.size >= MAX_SELECTION_NUM,
         shouldApplySensitiveMode = shouldApplySensitiveMode,
+        fileTypeIconMapper = fileTypeIconMapper,
     )
 }
 
@@ -377,13 +382,11 @@ private fun SelectLocationDialog(
     onLocationSelected: (TimelinePhotosSource) -> Unit,
     onDialogDismissed: () -> Unit,
 ) {
-    val isLight = MaterialTheme.colors.isLight
-
     Dialog(onDismissRequest = onDialogDismissed) {
         Surface(shape = RoundedCornerShape(4.dp), elevation = 24.dp) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Spacer(modifier = Modifier.size(12.dp))
-                TimelinePhotosSource.values().forEach { location ->
+                TimelinePhotosSource.entries.forEach { location ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()

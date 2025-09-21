@@ -2,6 +2,7 @@
 
 package mega.privacy.android.app.presentation.photos.view
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.text.format.DateFormat.getBestDateTimePattern
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -54,6 +55,7 @@ import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_MONTH
 import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_MONTH_WITH_DAY
 import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_YEAR_WITH_MONTH
 import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyVerticalGrid
 import mega.privacy.android.shared.original.core.ui.theme.white
@@ -63,12 +65,14 @@ import java.time.ZoneId
 import java.util.Date
 import java.util.Locale
 
+@SuppressLint("LocalContextConfigurationRead")
 @Composable
 internal fun PhotosGridView(
     photoDownland: PhotoDownload,
     selectedPhotoIds: Set<Long>,
     mediaListItemList: List<MediaListItem>,
     shouldApplySensitiveMode: Boolean,
+    fileTypeIconMapper: FileTypeIconMapper,
     modifier: Modifier = Modifier,
     currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,
     endSpacing: Dp = 56.dp,
@@ -152,7 +156,8 @@ internal fun PhotosGridView(
                                 downloadPhoto = photoDownland,
                                 alpha = if (isBlurUnselectItem && !isSelected) 0.4f else 1.0f,
                                 shouldApplySensitiveMode = shouldApplySensitiveMode,
-                                showOverlayOnSuccess = false
+                                showOverlayOnSuccess = false,
+                                fileTypeIconMapper = fileTypeIconMapper
                             )
                         }
                     )
@@ -176,7 +181,8 @@ internal fun PhotosGridView(
                                 downloadPhoto = photoDownland,
                                 alpha = if (isBlurUnselectItem && !isSelected) 0.4f else 1.0f,
                                 shouldApplySensitiveMode = shouldApplySensitiveMode,
-                                showOverlayOnSuccess = true
+                                showOverlayOnSuccess = true,
+                                fileTypeIconMapper = fileTypeIconMapper
                             )
                         }
                     )
@@ -262,6 +268,7 @@ internal fun PhotoViewContainer(
     }
 }
 
+@SuppressLint("LocalContextConfigurationRead")
 @Composable
 internal fun Separator(
     currentZoomLevel: ZoomLevel,

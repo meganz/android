@@ -71,8 +71,7 @@ class MonitorRubbishBinNodesUseCase @Inject constructor(
             val newNode = photosRepository.fetchImageNode(
                 nodeId = node.id,
                 filterSvg = false,
-                includeRubbishBin = true,
-                includeThumbnail = false,
+                includeRubbishBin = true
             )
             if (newNode == null) {
                 nodesCache.remove(node.id)

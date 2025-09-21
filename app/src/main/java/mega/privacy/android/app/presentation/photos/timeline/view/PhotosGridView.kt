@@ -33,6 +33,7 @@ import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.view.isDownloadPreview
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyVerticalGrid
 import java.text.SimpleDateFormat
@@ -54,6 +55,7 @@ private enum class PhotoContentType {
 @Composable
 fun PhotosGridView(
     downloadPhoto: PhotoDownload,
+    fileTypeIconMapper: FileTypeIconMapper,
     modifier: Modifier = Modifier,
     timelineViewState: TimelineViewState = TimelineViewState(),
     lazyGridState: LazyGridState = rememberLazyGridState(),
@@ -179,6 +181,7 @@ fun PhotosGridView(
                     onLongPress = onLongPress,
                     downloadPhoto = downloadPhoto,
                     isPreview = isDownloadPreview,
+                    fileTypeIconMapper = fileTypeIconMapper
                 )
             } else if (item is PhotoListItem.Separator) {
                 Text(

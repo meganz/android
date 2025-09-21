@@ -295,14 +295,12 @@ internal class DefaultPhotosRepository @Inject constructor(
         node: MegaNode,
         filterSvg: Boolean = true,
         includeRubbishBin: Boolean = false,
-        includeThumbnail: Boolean = true,
     ): Boolean {
         val fileType = fileTypeInfoMapper(node.name, node.duration)
         return node.isFile
                 && fileType is ImageFileTypeInfo
                 && (fileType !is SvgFileTypeInfo || !filterSvg)
                 && (!nodeRepository.isNodeInRubbishBin(NodeId(node.handle)) || includeRubbishBin)
-                && (node.hasThumbnail() || !includeThumbnail)
     }
 
     private suspend fun isVideoNodeValid(
@@ -313,7 +311,6 @@ internal class DefaultPhotosRepository @Inject constructor(
         return node.isFile
                 && fileType is VideoFileTypeInfo
                 && (!nodeRepository.isNodeInRubbishBin(NodeId(node.handle)) || includeRubbishBin)
-                && node.hasThumbnail()
     }
 
     private fun updatePhotos(
@@ -469,9 +466,8 @@ internal class DefaultPhotosRepository @Inject constructor(
         )
     }
 
-    private suspend fun getMegaNode(nodeId: NodeId): MegaNode? {
-        return megaApiFacade.getMegaNodeByHandle(nodeHandle = nodeId.longValue)
-    }
+    private suspend fun getMegaNode(nodeId: NodeId): MegaNode? =
+        megaApiFacade.getMegaNodeByHandle(nodeHandle = nodeId.longValue)
 
     override suspend fun getPublicLinksCount(): Int = withContext(ioDispatcher) {
         megaApiFacade.getPublicLinks().size
@@ -674,7 +670,7 @@ internal class DefaultPhotosRepository @Inject constructor(
      * Check valid Photo Node, not include Photo nodes that are in rubbish bin or without thumbnail
      */
     private suspend fun MegaNode.isValidPhotoNode() =
-        !nodeRepository.isNodeInRubbishBin(NodeId(handle)) && this.hasThumbnail()
+        !nodeRepository.isNodeInRubbishBin(NodeId(handle))
 
     /**
      * Convert the MegaNode to Image
@@ -867,10 +863,9 @@ internal class DefaultPhotosRepository @Inject constructor(
         nodeId: NodeId,
         filterSvg: Boolean,
         includeRubbishBin: Boolean,
-        includeThumbnail: Boolean,
     ): ImageNode? = withContext(ioDispatcher) {
         getMegaNode(nodeId)?.let { megaNode ->
-            if (isImageNodeValid(megaNode, filterSvg, includeRubbishBin, includeThumbnail) ||
+            if (isImageNodeValid(megaNode, filterSvg, includeRubbishBin) ||
                 isVideoNodeValid(megaNode, includeRubbishBin)
             ) {
                 imageNodeMapper(
@@ -982,7 +977,6 @@ internal class DefaultPhotosRepository @Inject constructor(
                 node = it,
                 filterSvg = false,
                 includeRubbishBin = includeRubbishBin,
-                includeThumbnail = false,
             ) || isVideoNodeValid(
                 node = it,
                 includeRubbishBin = includeRubbishBin,
@@ -1009,9 +1003,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     override suspend fun getImageNodeFromChatMessage(chatId: Long, messageId: Long): ImageNode? =
         withContext(ioDispatcher) {
             getChatNode(chatId, messageId)?.let { megaNode ->
-                if (isImageNodeValid(megaNode, includeThumbnail = false) ||
-                    isVideoNodeValid(megaNode)
-                ) {
+                if (isImageNodeValid(megaNode) || isVideoNodeValid(megaNode)) {
                     imageNodeMapper(
                         megaNode = megaNode,
                         requireSerializedData = true,
@@ -1033,7 +1025,8 @@ internal class DefaultPhotosRepository @Inject constructor(
         try {
             val prefs = getContentConsumptionPreferences()
             sensitivesRetriever(prefs)
-        } catch (t: Throwable) {
+        } catch (e: Throwable) {
+            Timber.e(e)
             false
         }
     }

@@ -40,16 +40,13 @@ class MonitorOfflineImageNodesUseCase @Inject constructor(
     ) = offline.mapAsync {
         if (it.path != path || it.isFolder) return@mapAsync null
         it.handle.toLongOrNull()?.let { handle ->
-            photosRepository.fetchImageNode(
-                nodeId = NodeId(handle),
-                filterSvg = filterSvg,
-                includeThumbnail = false,
-            ) ?: getOfflineFileInformationByIdUseCase(
-                nodeId = NodeId(handle),
-                useOriginalImageAsThumbnail = true
-            )?.let { info ->
-                offlineFileInformationToImageNodeMapper(info, filterSvg)
-            }
+            photosRepository.fetchImageNode(nodeId = NodeId(handle), filterSvg = filterSvg)
+                ?: getOfflineFileInformationByIdUseCase(
+                    nodeId = NodeId(handle),
+                    useOriginalImageAsThumbnail = true
+                )?.let { info ->
+                    offlineFileInformationToImageNodeMapper(info, filterSvg)
+                }
         }
     }.filterNotNull()
 }

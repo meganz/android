@@ -52,17 +52,18 @@ import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_050_white_alpha_050
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun MediaDiscoveryScreen(
+    fileTypeIconMapper: FileTypeIconMapper,
     screenTitle: String? = null,
     viewModel: MediaDiscoveryViewModel = viewModel(),
     mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel = viewModel(),
@@ -186,6 +187,7 @@ fun MediaDiscoveryScreen(
                         },
                         onZoomIn = mediaDiscoveryGlobalStateViewModel::zoomIn,
                         onZoomOut = mediaDiscoveryGlobalStateViewModel::zoomOut,
+                        fileTypeIconMapper = fileTypeIconMapper
                     )
                 } else {
                     EmptyView(uiState.currentMediaType)
@@ -374,9 +376,6 @@ private fun MDHeader(
 private fun tealIconTint() = MaterialTheme.colors.accent_900_accent_050
 
 @Composable
-private fun greyColor() = MaterialTheme.colors.grey_alpha_050_white_alpha_050
-
-@Composable
 private fun blackWhiteIconTint() = MaterialTheme.colors.black_white
 
 @Composable
@@ -396,6 +395,7 @@ private fun MediaDiscoveryContent(
     shouldApplySensitiveMode: Boolean,
     selectedPhotoIds: Set<Long>,
     onPhotoDownload: PhotoDownload,
+    fileTypeIconMapper: FileTypeIconMapper,
     currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,
     selectedTimeBarTab: TimeBarTab = TimeBarTab.All,
     yearsCardList: List<DateCard> = emptyList(),
@@ -428,6 +428,7 @@ private fun MediaDiscoveryContent(
                     selectedPhotoIds = selectedPhotoIds,
                     mediaListItemList = mediaListItems,
                     shouldApplySensitiveMode = shouldApplySensitiveMode,
+                    fileTypeIconMapper = fileTypeIconMapper
                 )
             } else {
                 val dateCards = when (selectedTimeBarTab) {

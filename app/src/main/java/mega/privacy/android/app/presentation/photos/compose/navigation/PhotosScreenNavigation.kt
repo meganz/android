@@ -10,6 +10,7 @@ import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.compose.main.PhotosScreen
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.photos.AlbumId
 
 @Serializable
@@ -21,6 +22,7 @@ internal fun NavGraphBuilder.photosScreen(
     timelineViewModel: TimelineViewModel,
     albumsViewModel: AlbumsViewModel,
     photoDownloaderViewModel: PhotoDownloaderViewModel,
+    fileTypeIconMapper: FileTypeIconMapper,
     onEnableCameraUploads: () -> Unit,
     onNavigateAlbumContent: (UIAlbum) -> Unit,
     onNavigateAlbumPhotosSelection: (AlbumId) -> Unit,
@@ -43,6 +45,7 @@ internal fun NavGraphBuilder.photosScreen(
             onZoomOut = onZoomOut,
             onNavigateCameraUploadsSettings = onNavigateCameraUploadsSettings,
             onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
+            fileTypeIconMapper = fileTypeIconMapper,
         )
     }
 }

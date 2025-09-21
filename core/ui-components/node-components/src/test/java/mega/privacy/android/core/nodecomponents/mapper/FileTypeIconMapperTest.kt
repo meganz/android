@@ -371,7 +371,8 @@ class FileTypeIconMapperTest {
                 "mkv",
                 "mk3d",
                 "movie",
-                "vob"
+                "vob",
+                "ts"
             ).associateWith {
                 listOf(
                     R.drawable.ic_video_medium_solid,

@@ -36,6 +36,7 @@ import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.MegaProgressDialogUtil
 import mega.privacy.android.app.utils.Util.showSnackbar
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -61,11 +62,11 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
     @Inject
     lateinit var megaNavigator: MegaNavigator
 
+    @Inject
+    lateinit var fileTypeIconMapper: FileTypeIconMapper
+
     private val mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel by viewModels()
     private val mediaDiscoveryViewModel: MediaDiscoveryViewModel by viewModels()
-    private val isFromLink: Boolean by lazy(LazyThreadSafetyMode.NONE) {
-        intent.getBooleanExtra(INTENT_KEY_FROM_FOLDER_LINK, true)
-    }
     private val folderName: String? by lazy(LazyThreadSafetyMode.NONE) {
         intent.getStringExtra(INTENT_KEY_CURRENT_FOLDER_NAME)
     }
@@ -102,7 +103,8 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
                             this,
                             storageTargetPreference
                         )
-                    }
+                    },
+                    fileTypeIconMapper = fileTypeIconMapper
                 )
             }
         }

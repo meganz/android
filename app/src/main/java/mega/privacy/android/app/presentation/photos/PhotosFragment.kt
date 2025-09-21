@@ -87,6 +87,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermiss
 import mega.privacy.android.app.utils.permission.PermissionUtils.getNotificationsPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.getPartialMediaPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
@@ -151,6 +152,9 @@ class PhotosFragment : Fragment() {
      */
     @Inject
     lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
+
+    @Inject
+    lateinit var fileTypeIconMapper: FileTypeIconMapper
 
     private val cameraUploadsPermissions: Array<String> by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -230,6 +234,7 @@ class PhotosFragment : Fragment() {
                             onZoomOut = ::handleZoomOut,
                             onNavigateCameraUploadsSettings = ::openCameraUploadsSettings,
                             onChangeCameraUploadsPermissions = ::changeCameraUploadsPermissions,
+                            fileTypeIconMapper = fileTypeIconMapper
                         )
                     }
                 }
@@ -247,7 +252,7 @@ class PhotosFragment : Fragment() {
         Firebase.crashlytics.log("Screen: ${PhotoScreenEvent.eventName}")
         super.onResume()
         checkCameraUploadsPermissions()
-        
+
         // Start photo monitoring when UI is ready (UI-driven lifecycle)
         timelineViewModel.startPhotoMonitoring()
     }

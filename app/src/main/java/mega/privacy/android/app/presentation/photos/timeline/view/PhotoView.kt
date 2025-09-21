@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -52,6 +54,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
@@ -68,6 +71,7 @@ fun PhotoView(
     onLongPress: (Photo) -> Unit,
     downloadPhoto: PhotoDownload,
     isPreview: Boolean,
+    fileTypeIconMapper: FileTypeIconMapper,
     modifier: Modifier = Modifier,
 ) {
     val configuration = LocalConfiguration.current
@@ -125,7 +129,8 @@ fun PhotoView(
                     onClick = { onClick(photo) },
                     onLongClick = { onLongPress(photo) }
                 ),
-            isPreview = isPreview
+            isPreview = isPreview,
+            fileTypeIconMapper = fileTypeIconMapper,
         )
         if (isSelected) {
             SelectedIconView(
@@ -170,6 +175,7 @@ private fun PhotoCoverView(
     currentZoomLevel: ZoomLevel,
     downloadPhoto: PhotoDownload,
     isPreview: Boolean,
+    fileTypeIconMapper: FileTypeIconMapper,
     modifier: Modifier = Modifier,
 ) {
     val spacing = LocalSpacing.current
@@ -184,7 +190,8 @@ private fun PhotoCoverView(
                     isPreview = isPreview,
                     downloadPhoto = downloadPhoto,
                     shouldApplySensitiveMode = shouldApplySensitiveMode,
-                    showOverlayOnSuccess = false
+                    showOverlayOnSuccess = false,
+                    fileTypeIconMapper = fileTypeIconMapper
                 )
                 if (photo.isFavourite) {
                     Image(
@@ -203,7 +210,8 @@ private fun PhotoCoverView(
                     shouldApplySensitiveMode = shouldApplySensitiveMode,
                     isPreview = isPreview,
                     downloadPhoto = downloadPhoto,
-                    showOverlayOnSuccess = true
+                    showOverlayOnSuccess = true,
+                    fileTypeIconMapper = fileTypeIconMapper
                 )
 
                 Text(
@@ -239,6 +247,7 @@ fun PhotoImageView(
     isPreview: Boolean,
     downloadPhoto: PhotoDownload,
     showOverlayOnSuccess: Boolean = false,
+    fileTypeIconMapper: FileTypeIconMapper,
     alpha: Float = DefaultAlpha,
 ) {
     var showOverlayState by remember { mutableStateOf(false) }
@@ -253,13 +262,14 @@ fun PhotoImageView(
             }
         }
     }
+    val defaultIcon = painterResource(fileTypeIconMapper(photo.fileTypeInfo.extension))
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colors.grey_050_grey_700)
     ) {
-        if (!imageState.value.isNullOrBlank()) {
+        imageState.value?.let {
             AsyncImage(
                 model = ImageRequest
                     .Builder(LocalContext.current)
@@ -283,14 +293,22 @@ fun PhotoImageView(
                             .blur(16.dp)
                     }
             )
-            if (showOverlayState)
-                Spacer(
-                    modifier = Modifier
-                        .matchParentSize()
-                        .background(
-                            color = colorResource(id = R.color.grey_alpha_032)
-                        )
-                )
-        }
+        } ?: Image(
+            modifier = Modifier
+                .height(172.dp)
+                .fillMaxWidth()
+                .padding(vertical = 34.dp),
+            painter = defaultIcon,
+            contentDescription = "default icon",
+            contentScale = ContentScale.Fit,
+        )
+        if (showOverlayState)
+            Spacer(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(
+                        color = colorResource(id = R.color.grey_alpha_032)
+                    )
+            )
     }
 }

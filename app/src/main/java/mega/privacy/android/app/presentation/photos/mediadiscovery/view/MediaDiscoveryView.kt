@@ -3,7 +3,6 @@
 package mega.privacy.android.app.presentation.photos.mediadiscovery.view
 
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
@@ -81,6 +80,7 @@ import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
@@ -108,6 +108,7 @@ fun MediaDiscoveryView(
     onModalSheetVisibilityChange: (Boolean) -> Unit,
     onStorageAlmostFullWarningDismiss: () -> Unit,
     onUpgradeClicked: () -> Unit,
+    fileTypeIconMapper: FileTypeIconMapper,
     mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel = viewModel(),
     mediaDiscoveryViewModel: MediaDiscoveryViewModel = viewModel(),
     showSettingDialog: Boolean = false,
@@ -214,7 +215,9 @@ fun MediaDiscoveryView(
                                 }
                             )
                         }
-                    })
+                    },
+                    fileTypeIconMapper = fileTypeIconMapper
+                )
             } else {
                 Box(modifier = Modifier.fillMaxSize()) {
                     if (shouldShowFabButton) {
@@ -380,15 +383,6 @@ private fun SlidersDropDownMenu(
 }
 
 @Composable
-private fun Back() {
-    val onBackPressedDispatcher =
-        LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-    LaunchedEffect(key1 = true) {
-        onBackPressedDispatcher?.onBackPressed()
-    }
-}
-
-@Composable
 private fun HandleFilterDialog(
     mediaDiscoveryViewState: MediaDiscoveryViewState,
     mediaDiscoveryViewModel: MediaDiscoveryViewModel,
@@ -427,6 +421,7 @@ private fun HandleSortByDialog(
 
 @Composable
 private fun MDView(
+    fileTypeIconMapper: FileTypeIconMapper,
     mediaDiscoveryViewState: MediaDiscoveryViewState,
     onOKButtonClicked: () -> Unit,
     onSettingButtonClicked: () -> Unit,
@@ -495,6 +490,7 @@ private fun MDView(
                     shouldApplySensitiveMode = mediaDiscoveryViewState.hiddenNodeEnabled
                             && mediaDiscoveryViewState.accountType?.isPaid == true
                             && !mediaDiscoveryViewState.isBusinessAccountExpired,
+                    fileTypeIconMapper = fileTypeIconMapper
                 )
             } else {
                 val dateCards = when (mediaDiscoveryViewState.selectedTimeBarTab) {

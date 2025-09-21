@@ -68,11 +68,7 @@ class MonitorCloudDriveNodesUseCase @Inject constructor(
                 continue
             }
 
-            val newNode = photosRepository.fetchImageNode(
-                nodeId = node.id,
-                filterSvg = false,
-                includeThumbnail = false,
-            )
+            val newNode = photosRepository.fetchImageNode(nodeId = node.id, filterSvg = false)
             if (newNode == null) {
                 nodesCache.remove(node.id)
             } else {
