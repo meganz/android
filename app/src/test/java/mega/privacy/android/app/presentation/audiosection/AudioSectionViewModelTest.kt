@@ -10,19 +10,31 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.TimberJUnit5Extension
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.audiosection.mapper.AudioUiEntityMapper
 import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.AudioHiddenNodeActionModifierItem
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountSubscriptionCycle
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -31,9 +43,11 @@ import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.audiosection.GetAllAudioUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -43,12 +57,21 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
+import java.io.File
+import java.util.stream.Stream
+import kotlin.time.Duration
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -68,36 +91,56 @@ class AudioSectionViewModelTest {
     private val monitorViewType = mock<MonitorViewType>()
     private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
     private val getNodeContentUriUseCase = mock<GetNodeContentUriUseCase>()
-    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
-        on {
-            invoke()
-        }.thenReturn(flowOf(AccountDetail()))
-    }
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
+    private var accountDetailFlow = MutableSharedFlow<AccountDetail>()
     private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
         onBlocking {
             invoke()
         }.thenReturn(false)
     }
-    private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase> {
-        on {
-            invoke()
-        }.thenReturn(flowOf(false))
-    }
+    private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
-    private val expectedId = NodeId(1)
-    private val expectedAudio: AudioUiEntity = mock {
-        on { id }.thenReturn(expectedId)
-        on { name }.thenReturn("audio name")
+    private val firstDefaultId = NodeId(123L)
+    private val firstDefaultAudioFileNode = mock<FileNode> {
+        on { id } doReturn firstDefaultId
+        on { isIncomingShare } doReturn false
     }
+    private val firstDefaultTypedAudioNode = TypedAudioNode(
+        fileNode = firstDefaultAudioFileNode,
+        duration = Duration.INFINITE
+    )
+    private val expectedFirstAudioUiEntity = newAudioUiEntity(
+        id = firstDefaultId
+    )
+    private val secondDefaultId = NodeId(312L)
+    private val secondDefaultAudioFileNode = mock<FileNode> {
+        on { id } doReturn secondDefaultId
+        on { isIncomingShare } doReturn false
+    }
+    private val secondDefaultTypedAudioNode = TypedAudioNode(
+        fileNode = secondDefaultAudioFileNode,
+        duration = Duration.INFINITE
+    )
+    private val expectedSecondAudioUiEntity = newAudioUiEntity(
+        id = secondDefaultId
+    )
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
+    private val checkNodeCanBeMovedToTargetNode = mock<CheckNodeCanBeMovedToTargetNode>()
+    private val getRubbishBinFolderUseCase = mock<GetRubbishBinFolderUseCase>()
+    private val getNodeAccessUseCase = mock<GetNodeAccessUseCase>()
+    private var showHiddenItemsFlow = MutableSharedFlow<Boolean>()
 
     @BeforeEach
     fun setUp() {
         wheneverBlocking { monitorNodeUpdatesUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorOfflineNodeUpdatesUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorViewType() }.thenReturn(fakeMonitorViewTypeFlow)
-        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+        wheneverBlocking { monitorAccountDetailUseCase() }.thenReturn(accountDetailFlow)
+        wheneverBlocking { monitorShowHiddenItemsUseCase() }.thenReturn(showHiddenItemsFlow)
+        wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(
+            false
+        )
         initUnderTest()
     }
 
@@ -120,11 +163,16 @@ class AudioSectionViewModelTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getNodeContentUriUseCase = getNodeContentUriUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
+            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
+            getRubbishBinFolderUseCase = getRubbishBinFolderUseCase,
+            getNodeAccessUseCase = getNodeAccessUseCase
         )
     }
 
     @AfterEach
     fun resetMocks() {
+        accountDetailFlow = MutableSharedFlow()
+        showHiddenItemsFlow = MutableSharedFlow()
         reset(
             getAllAudioUseCase,
             audioUIEntityMapper,
@@ -135,7 +183,16 @@ class AudioSectionViewModelTest {
             getNodeByIdUseCase,
             setViewType,
             monitorViewType,
-            getNodeContentUriUseCase
+            updateNodeSensitiveUseCase,
+            getNodeContentUriUseCase,
+            monitorAccountDetailUseCase,
+            checkNodeCanBeMovedToTargetNode,
+            getRubbishBinFolderUseCase,
+            getNodeAccessUseCase,
+            isHiddenNodesOnboardedUseCase,
+            monitorShowHiddenItemsUseCase,
+            getFeatureFlagValueUseCase,
+            getBusinessStatusUseCase
         )
     }
 
@@ -148,7 +205,7 @@ class AudioSectionViewModelTest {
             assertThat(initial.sortOrder).isEqualTo(SortOrder.ORDER_NONE)
             assertThat(initial.progressBarShowing).isTrue()
             assertThat(initial.scrollToTop).isFalse()
-            assertThat(initial.selectedAudioHandles).isEmpty()
+            assertThat(initial.selectedNodes).isEmpty()
             assertThat(initial.isInSelection).isFalse()
             assertThat(initial.accountType).isNull()
             assertThat(initial.isHiddenNodesOnboarded).isFalse()
@@ -174,8 +231,33 @@ class AudioSectionViewModelTest {
 
     private suspend fun initAudiosReturned() {
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
-        whenever(getAllAudioUseCase()).thenReturn(listOf(mock(), mock()))
-        whenever(audioUIEntityMapper(any())).thenReturn(expectedAudio)
+        whenever(getRubbishBinFolderUseCase()) doReturn null
+        whenever(getAllAudioUseCase()).thenReturn(
+            listOf(
+                firstDefaultTypedAudioNode,
+                secondDefaultTypedAudioNode
+            )
+        )
+        whenever(
+            audioUIEntityMapper(
+                eq(firstDefaultTypedAudioNode),
+                any(),
+                any()
+            )
+        ).thenReturn(expectedFirstAudioUiEntity)
+        whenever(
+            audioUIEntityMapper(
+                eq(secondDefaultTypedAudioNode),
+                any(),
+                any()
+            )
+        ).thenReturn(expectedSecondAudioUiEntity)
+        whenever(
+            getNodeAccessUseCase(nodeId = firstDefaultId)
+        ) doReturn AccessPermission.UNKNOWN
+        whenever(
+            getNodeAccessUseCase(nodeId = secondDefaultId)
+        ) doReturn AccessPermission.UNKNOWN
     }
 
     @Test
@@ -234,8 +316,8 @@ class AudioSectionViewModelTest {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allAudios.size).isEqualTo(2)
 
-                underTest.onItemLongClicked(expectedAudio, 0)
-                assertThat(awaitItem().selectedAudioHandles.size).isEqualTo(1)
+                underTest.onItemLongClicked(expectedFirstAudioUiEntity, 0)
+                assertThat(awaitItem().selectedNodes.size).isEqualTo(1)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -249,11 +331,11 @@ class AudioSectionViewModelTest {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allAudios.size).isEqualTo(2)
 
-                underTest.onItemLongClicked(expectedAudio, 0)
-                assertThat(awaitItem().selectedAudioHandles.size).isEqualTo(1)
+                underTest.onItemLongClicked(expectedFirstAudioUiEntity, 0)
+                assertThat(awaitItem().selectedNodes.size).isEqualTo(1)
 
-                underTest.onItemClicked(expectedAudio, 1)
-                assertThat(awaitItem().selectedAudioHandles.size).isEqualTo(2)
+                underTest.onItemClicked(expectedFirstAudioUiEntity, 1)
+                assertThat(awaitItem().selectedNodes.size).isEqualTo(2)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -269,7 +351,7 @@ class AudioSectionViewModelTest {
 
                 underTest.selectAllNodes()
                 awaitItem().let { state ->
-                    assertThat(state.selectedAudioHandles.size).isEqualTo(state.allAudios.size)
+                    assertThat(state.selectedNodes.size).isEqualTo(state.allAudios.size)
                 }
                 cancelAndIgnoreRemainingEvents()
             }
@@ -299,6 +381,18 @@ class AudioSectionViewModelTest {
         }
         initAudiosReturned()
         whenever(getAllAudioUseCase()).thenReturn(typedNodes)
+        whenever(
+            getNodeAccessUseCase(nodeId = typedNodes[0].id)
+        ) doReturn AccessPermission.UNKNOWN
+        whenever(
+            getNodeAccessUseCase(nodeId = typedNodes[1].id)
+        ) doReturn AccessPermission.UNKNOWN
+        whenever(
+            getNodeAccessUseCase(nodeId = typedNodes[2].id)
+        ) doReturn AccessPermission.UNKNOWN
+        whenever(
+            getNodeAccessUseCase(nodeId = typedNodes[3].id)
+        ) doReturn AccessPermission.UNKNOWN
 
         underTest.refreshNodes()
         delay(100)
@@ -345,21 +439,359 @@ class AudioSectionViewModelTest {
     @Test
     fun `test that clickedItem is updated correctly when onItemClicked is invoked`() =
         runTest {
-            val expectedAudioNode = mock<TypedAudioNode>() {
-                on { id }.thenReturn(expectedId)
-            }
             initAudiosReturned()
-            whenever(getAllAudioUseCase()).thenReturn(listOf(mock(), expectedAudioNode))
 
-            underTest.state.drop(1).test {
-                underTest.refreshNodes()
-                assertThat(awaitItem().allAudios.size).isEqualTo(2)
+            underTest.refreshNodes()
+            advanceUntilIdle()
+            underTest.onItemClicked(expectedFirstAudioUiEntity, 1)
 
-                underTest.onItemClicked(expectedAudio, 1)
-                assertThat(awaitItem().clickedItem).isEqualTo(expectedAudioNode)
-                cancelAndIgnoreRemainingEvents()
+            underTest.state.test {
+                assertThat(expectMostRecentItem().clickedItem).isEqualTo(firstDefaultTypedAudioNode)
             }
         }
+
+    @ParameterizedTest
+    @EnumSource(AccessPermission::class)
+    fun `test that the correct access permission for an account is set`(
+        accessPermission: AccessPermission,
+    ) = runTest {
+        whenever(getCloudSortOrder()) doReturn SortOrder.ORDER_MODIFICATION_DESC
+        whenever(getAllAudioUseCase()) doReturn listOf(firstDefaultTypedAudioNode)
+        whenever(
+            audioUIEntityMapper(
+                any(),
+                any(),
+                any()
+            )
+        ) doReturn expectedFirstAudioUiEntity.copy(accessPermission = accessPermission)
+        whenever(getRubbishBinFolderUseCase()) doReturn null
+        whenever(
+            getNodeAccessUseCase(nodeId = firstDefaultId)
+        ) doReturn accessPermission
+
+        underTest.refreshNodes()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(
+                expectMostRecentItem().allAudios.first().accessPermission
+            ).isEqualTo(accessPermission)
+        }
+    }
+
+    private fun provideNodeAccessPermissions() = Stream.of(
+        Arguments.of(true, true),
+        Arguments.of(false, false),
+        Arguments.of(true, false),
+        Arguments.of(false, true),
+    )
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that the correct value is set indicating whether the node can be moved to the rubbish bin`(
+        canBeMovedToRubbishBin: Boolean,
+    ) = runTest {
+        whenever(getCloudSortOrder()) doReturn SortOrder.ORDER_MODIFICATION_DESC
+        whenever(getAllAudioUseCase()) doReturn listOf(firstDefaultTypedAudioNode)
+        val accessPermission = AccessPermission.UNKNOWN
+        whenever(getNodeAccessUseCase(nodeId = firstDefaultId)) doReturn accessPermission
+        whenever(
+            audioUIEntityMapper(
+                firstDefaultTypedAudioNode,
+                accessPermission,
+                canBeMovedToRubbishBin
+            )
+        ) doReturn expectedFirstAudioUiEntity.copy(canBeMovedToRubbishBin = canBeMovedToRubbishBin)
+        val rubbishBinNodeId = NodeId(4321L)
+        val rubbishBinNode = if (canBeMovedToRubbishBin) {
+            mock<FileNode> {
+                on { id } doReturn rubbishBinNodeId
+            }
+        } else null
+        whenever(getRubbishBinFolderUseCase()) doReturn rubbishBinNode
+        whenever(
+            checkNodeCanBeMovedToTargetNode(
+                nodeId = firstDefaultId,
+                targetNodeId = rubbishBinNodeId
+            )
+        ) doReturn canBeMovedToRubbishBin
+
+        underTest.refreshNodes()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(
+                expectMostRecentItem().allAudios.first().canBeMovedToRubbishBin
+            ).isEqualTo(canBeMovedToRubbishBin)
+        }
+    }
+
+    @Test
+    fun `test that the hidden node toolbar item is disabled when a selection is made and hidden nodes feature is disabled`() =
+        runTest {
+            initAudiosReturned()
+            whenever(getRubbishBinFolderUseCase()) doReturn null
+            whenever(
+                getFeatureFlagValueUseCase(
+                    ApiFeatures.HiddenNodesInternalRelease
+                )
+            ) doReturn false
+
+            underTest.refreshNodes()
+            underTest.onItemLongClicked(expectedFirstAudioUiEntity, 0)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(
+                    expectMostRecentItem().toolbarActionsModifierItem!!.item.hiddenNodeItem
+                ).isEqualTo(
+                    AudioHiddenNodeActionModifierItem(isEnabled = false)
+                )
+            }
+        }
+
+    @Test
+    fun `test that the hidden node toolbar item can be hidden when a selection is made for free account and hidden nodes feature is enabled`() =
+        runTest {
+            val accountDetail = AccountDetail(
+                levelDetail = AccountLevelDetail(
+                    accountType = AccountType.FREE,
+                    subscriptionStatus = null,
+                    subscriptionRenewTime = 0L,
+                    accountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
+                    proExpirationTime = 0L,
+                    accountPlanDetail = null,
+                    accountSubscriptionDetailList = listOf(),
+                )
+            )
+            accountDetailFlow.emit(accountDetail)
+            initAudiosReturned()
+            whenever(getRubbishBinFolderUseCase()) doReturn null
+            whenever(
+                getFeatureFlagValueUseCase(
+                    ApiFeatures.HiddenNodesInternalRelease
+                )
+            ) doReturn true
+
+            underTest.refreshNodes()
+            advanceUntilIdle()
+            underTest.onItemLongClicked(expectedFirstAudioUiEntity, 0)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(
+                    expectMostRecentItem().toolbarActionsModifierItem!!.item.hiddenNodeItem
+                ).isEqualTo(
+                    AudioHiddenNodeActionModifierItem(
+                        isEnabled = true,
+                        canBeHidden = true
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun `test that the hidden node toolbar item can be hidden when a selection is made for an expired business account and hidden nodes feature is enabled`() =
+        runTest {
+            val accountDetail = AccountDetail(
+                levelDetail = AccountLevelDetail(
+                    accountType = AccountType.BUSINESS,
+                    subscriptionStatus = null,
+                    subscriptionRenewTime = 0L,
+                    accountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
+                    proExpirationTime = 0L,
+                    accountPlanDetail = null,
+                    accountSubscriptionDetailList = listOf(),
+                )
+            )
+            whenever(getBusinessStatusUseCase()) doReturn BusinessAccountStatus.Expired
+            accountDetailFlow.emit(accountDetail)
+            initAudiosReturned()
+            whenever(getRubbishBinFolderUseCase()) doReturn null
+            whenever(
+                getFeatureFlagValueUseCase(
+                    ApiFeatures.HiddenNodesInternalRelease
+                )
+            ) doReturn true
+
+            underTest.refreshNodes()
+            underTest.onItemLongClicked(expectedSecondAudioUiEntity, 1)
+            advanceUntilIdle()
+            underTest.onItemClicked(expectedFirstAudioUiEntity, 0)
+
+            underTest.state.test {
+                assertThat(
+                    expectMostRecentItem().toolbarActionsModifierItem!!.item.hiddenNodeItem
+                ).isEqualTo(
+                    AudioHiddenNodeActionModifierItem(
+                        isEnabled = true,
+                        canBeHidden = true
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun `test that the hidden node toolbar item can be hidden when a selection is made for a not sensitive node and hidden nodes feature is enabled`() =
+        runTest {
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
+            whenever(getRubbishBinFolderUseCase()) doReturn null
+            val nodeId = NodeId(123L)
+            val audioFileNode = mock<FileNode> {
+                on { id } doReturn nodeId
+                on { isSensitiveInherited } doReturn false
+                on { isMarkedSensitive } doReturn false
+            }
+            val audioNode = TypedAudioNode(
+                fileNode = audioFileNode,
+                duration = Duration.INFINITE
+            )
+            whenever(getAllAudioUseCase()) doReturn listOf(audioNode)
+            val uiEntity = newAudioUiEntity()
+            whenever(
+                audioUIEntityMapper(
+                    eq(audioNode),
+                    any(),
+                    any()
+                )
+            ) doReturn uiEntity
+            whenever(
+                getNodeAccessUseCase(nodeId = nodeId)
+            ) doReturn AccessPermission.UNKNOWN
+            whenever(
+                getFeatureFlagValueUseCase(
+                    ApiFeatures.HiddenNodesInternalRelease
+                )
+            ) doReturn true
+
+            underTest.refreshNodes()
+            underTest.onItemLongClicked(uiEntity, 0)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(
+                    expectMostRecentItem().toolbarActionsModifierItem!!.item.hiddenNodeItem
+                ).isEqualTo(
+                    AudioHiddenNodeActionModifierItem(
+                        isEnabled = true,
+                        canBeHidden = true
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun `test that the hidden node toolbar item cannot be hidden when a selection is made with non-hidden criteria`() =
+        runTest {
+            val accountDetail = AccountDetail(
+                levelDetail = AccountLevelDetail(
+                    accountType = AccountType.BUSINESS,
+                    subscriptionStatus = null,
+                    subscriptionRenewTime = 0L,
+                    accountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
+                    proExpirationTime = 0L,
+                    accountPlanDetail = null,
+                    accountSubscriptionDetailList = listOf(),
+                )
+            )
+            whenever(monitorNodeUpdatesUseCase()) doReturn flowOf(NodeUpdate(emptyMap()))
+            whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
+            whenever(getBusinessStatusUseCase()) doReturn BusinessAccountStatus.Active
+            whenever(monitorShowHiddenItemsUseCase()) doReturn flowOf(true)
+            whenever(isHiddenNodesOnboardedUseCase()) doReturn false
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
+            whenever(getRubbishBinFolderUseCase()) doReturn null
+            val nodeId = NodeId(123L)
+            val audioFileNode = mock<FileNode> {
+                on { id } doReturn nodeId
+                on { isSensitiveInherited } doReturn false
+                on { isMarkedSensitive } doReturn true
+            }
+            val audioNode = TypedAudioNode(
+                fileNode = audioFileNode,
+                duration = Duration.INFINITE
+            )
+            whenever(getAllAudioUseCase()) doReturn listOf(audioNode)
+            val uiEntity = newAudioUiEntity(
+                isMarkedSensitive = true,
+                isSensitiveInherited = false
+            )
+            whenever(
+                audioUIEntityMapper(
+                    eq(audioNode),
+                    any(),
+                    any()
+                )
+            ) doReturn uiEntity
+            whenever(
+                getNodeAccessUseCase(nodeId = nodeId)
+            ) doReturn AccessPermission.UNKNOWN
+            whenever(
+                getFeatureFlagValueUseCase(
+                    ApiFeatures.HiddenNodesInternalRelease
+                )
+            ) doReturn true
+
+            initUnderTest()
+            advanceUntilIdle()
+            underTest.refreshNodes()
+            advanceUntilIdle()
+            underTest.onItemLongClicked(uiEntity, 0)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(
+                    expectMostRecentItem().toolbarActionsModifierItem!!.item.hiddenNodeItem
+                ).isEqualTo(
+                    AudioHiddenNodeActionModifierItem(
+                        isEnabled = true,
+                        canBeHidden = false
+                    )
+                )
+            }
+        }
+
+    private fun newAudioUiEntity(
+        id: NodeId = NodeId(1),
+        name: String = "",
+        size: Long = 0L,
+        duration: String? = null,
+        thumbnail: File? = null,
+        fileTypeInfo: FileTypeInfo = UnknownFileTypeInfo(mimeType = "", extension = ""),
+        isFavourite: Boolean = false,
+        isExported: Boolean = false,
+        isTakenDown: Boolean = false,
+        hasVersions: Boolean = false,
+        modificationTime: Long = 0L,
+        label: Int = 0,
+        nodeAvailableOffline: Boolean = false,
+        isSelected: Boolean = false,
+        isMarkedSensitive: Boolean = false,
+        isSensitiveInherited: Boolean = false,
+        isIncomingShare: Boolean = false,
+        accessPermission: AccessPermission = AccessPermission.UNKNOWN,
+        canBeMovedToRubbishBin: Boolean = false,
+    ) = AudioUiEntity(
+        id = id,
+        name = name,
+        size = size,
+        duration = duration,
+        thumbnail = thumbnail,
+        fileTypeInfo = fileTypeInfo,
+        isFavourite = isFavourite,
+        isExported = isExported,
+        isTakenDown = isTakenDown,
+        hasVersions = hasVersions,
+        modificationTime = modificationTime,
+        label = label,
+        nodeAvailableOffline = nodeAvailableOffline,
+        isSelected = isSelected,
+        isMarkedSensitive = isMarkedSensitive,
+        isSensitiveInherited = isSensitiveInherited,
+        isIncomingShare = isIncomingShare,
+        accessPermission = accessPermission,
+        canBeMovedToRubbishBin = canBeMovedToRubbishBin
+    )
 
     companion object {
         @JvmField

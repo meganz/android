@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.audiosection.model
 
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import java.io.File
 
 /**
@@ -41,4 +42,7 @@ data class AudioUiEntity(
     val isSelected: Boolean = false,
     val isMarkedSensitive: Boolean = false,
     val isSensitiveInherited: Boolean = false,
+    val isIncomingShare: Boolean = false,
+    val accessPermission: AccessPermission = AccessPermission.UNKNOWN,
+    val canBeMovedToRubbishBin: Boolean = false,
 )

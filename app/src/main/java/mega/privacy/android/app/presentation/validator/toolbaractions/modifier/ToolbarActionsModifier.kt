@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.validator.toolbaractions.modifier
 
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.AudioToolbarActionsModifierItem
 import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.CloudDriveSyncsToolbarActionsModifierItem
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 
@@ -17,5 +18,9 @@ sealed interface ToolbarActionsModifierItem {
 
     data class CloudDriveSyncs(
         val item: CloudDriveSyncsToolbarActionsModifierItem,
+    ) : ToolbarActionsModifierItem
+
+    data class AudioSection(
+        val item: AudioToolbarActionsModifierItem,
     ) : ToolbarActionsModifierItem
 }

@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.audiosection.model
 
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.SelectedNode
+import mega.privacy.android.app.presentation.validator.toolbaractions.modifier.ToolbarActionsModifierItem
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.TypedAudioNode
@@ -14,7 +16,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property isPendingRefresh
  * @property progressBarShowing the progress bar showing state
  * @property scrollToTop the scroll to top state
- * @property selectedAudioHandles the selected audio handles
+ * @property selectedNodes the selected audio nodes
  * @property isInSelection if list is in selection mode or not
  * @property accountType the account type
  * @property isHiddenNodesOnboarded if is hidden nodes onboarded
@@ -29,11 +31,12 @@ data class AudioSectionState(
     val isPendingRefresh: Boolean = false,
     val progressBarShowing: Boolean = true,
     val scrollToTop: Boolean = false,
-    val selectedAudioHandles: List<Long> = emptyList(),
+    val selectedNodes: List<SelectedNode> = emptyList(),
     val isInSelection: Boolean = false,
     val accountType: AccountType? = null,
     val isHiddenNodesOnboarded: Boolean = false,
     val clickedItem: TypedAudioNode? = null,
     val isBusinessAccountExpired: Boolean = false,
     val hiddenNodeEnabled: Boolean = false,
+    val toolbarActionsModifierItem: ToolbarActionsModifierItem.AudioSection? = null,
 )

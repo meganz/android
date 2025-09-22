@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.audiosection.mapper
 import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.node.TypedAudioNode
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import java.io.File
 import javax.inject.Inject
 
@@ -18,6 +19,8 @@ class AudioUiEntityMapper @Inject constructor(
      */
     operator fun invoke(
         typedAudioNode: TypedAudioNode,
+        accessPermission: AccessPermission,
+        canBeMovedToRubbishBin: Boolean,
     ) = AudioUiEntity(
         id = typedAudioNode.id,
         name = typedAudioNode.name,
@@ -34,5 +37,8 @@ class AudioUiEntityMapper @Inject constructor(
         nodeAvailableOffline = typedAudioNode.isAvailableOffline,
         isMarkedSensitive = typedAudioNode.isMarkedSensitive,
         isSensitiveInherited = typedAudioNode.isSensitiveInherited,
+        isIncomingShare = typedAudioNode.isIncomingShare,
+        accessPermission = accessPermission,
+        canBeMovedToRubbishBin = canBeMovedToRubbishBin
     )
 }

@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -38,12 +39,12 @@ import mega.privacy.android.app.presentation.audiosection.view.AudioSectionCompo
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
-import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
+import mega.privacy.android.app.presentation.validator.toolbaractions.ToolbarActionsValidator
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.AUDIO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.callManager
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.AUDIO_BROWSE_ADAPTER
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -68,16 +69,13 @@ class AudioSectionFragment : Fragment() {
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     /**
-     * Mapper to get options for Action Bar
-     */
-    @Inject
-    lateinit var getOptionsForToolbarMapper: GetOptionsForToolbarMapper
-
-    /**
      * Mega Navigator
      */
     @Inject
     lateinit var megaNavigator: MegaNavigator
+
+    @Inject
+    lateinit var toolbarActionsValidator: ToolbarActionsValidator
 
     private var actionMode: ActionMode? = null
 
@@ -129,7 +127,9 @@ class AudioSectionFragment : Fragment() {
                     )
                 }
             }
-            updateActionModeTitle(count = uiState.selectedAudioHandles.size)
+            LaunchedEffect(uiState.selectedNodes) {
+                updateActionModeTitle(count = uiState.selectedNodes.size)
+            }
         }
     }
 
@@ -187,6 +187,18 @@ class AudioSectionFragment : Fragment() {
                 }
             }
         }
+
+        viewLifecycleOwner.collectFlow(
+            audioSectionViewModel.state
+                .map { it.toolbarActionsModifierItem }
+                .distinctUntilChanged()
+        ) {
+            runCatching {
+                actionMode?.invalidate()
+            }.onFailure {
+                Timber.e(it, "Invalidate error")
+            }
+        }
     }
 
     private fun showSortByPanel() {
@@ -202,7 +214,7 @@ class AudioSectionFragment : Fragment() {
                         managerActivity = requireActivity() as ManagerActivity,
                         childFragmentManager = childFragmentManager,
                         audioSectionViewModel = audioSectionViewModel,
-                        getOptionsForToolbarMapper = getOptionsForToolbarMapper,
+                        toolbarActionsValidator = toolbarActionsValidator
                     ) {
                         disableSelectMode()
                     }
@@ -218,12 +230,6 @@ class AudioSectionFragment : Fragment() {
     private fun updateActionModeTitle(count: Int) {
         if (count == 0) actionMode?.finish()
         actionMode?.title = count.toString()
-
-        runCatching {
-            actionMode?.invalidate()
-        }.onFailure {
-            Timber.e(it, "Invalidate error")
-        }
     }
 
     private fun showOptionsMenuForItem(item: AudioUiEntity) {
@@ -252,9 +258,9 @@ class AudioSectionFragment : Fragment() {
             hiddenNodesOnboardingLauncher.launch(intent)
             activity?.overridePendingTransition(0, 0)
         } else if (isHiddenNodesOnboarded) {
-            val nodes = audioSectionViewModel.getSelectedNodes()
+            val nodes = audioSectionViewModel.state.value.selectedNodes.map { NodeId(it.id) }
             audioSectionViewModel.hideOrUnhideNodes(
-                nodeIds = nodes.map { it.id },
+                nodeIds = nodes,
                 hide = true,
             )
             val message =
@@ -265,7 +271,7 @@ class AudioSectionFragment : Fragment() {
                 )
             Util.showSnackbar(requireActivity(), message)
         } else {
-            tempNodeIds = audioSectionViewModel.getSelectedNodes().map { it.id }
+            tempNodeIds = audioSectionViewModel.state.value.selectedNodes.map { NodeId(it.id) }
             showHiddenNodesOnboarding()
         }
     }

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,18 +18,25 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.audiosection.mapper.AudioUiEntityMapper
 import mega.privacy.android.app.presentation.audiosection.model.AudioSectionState
 import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
-import mega.privacy.android.domain.entity.node.FileNodeContent
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.SelectedNode
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.SelectedNodeType
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.AudioHiddenNodeActionModifierItem
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.AudioToolbarActionsModifierItem
+import mega.privacy.android.app.presentation.validator.toolbaractions.modifier.ToolbarActionsModifierItem.AudioSection
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -37,9 +45,11 @@ import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.audiosection.GetAllAudioUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -69,6 +79,9 @@ class AudioSectionViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode,
+    private val getRubbishBinFolderUseCase: GetRubbishBinFolderUseCase,
+    private val getNodeAccessUseCase: GetNodeAccessUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AudioSectionState())
 
@@ -80,6 +93,7 @@ class AudioSectionViewModel @Inject constructor(
     private val originalData = mutableListOf<TypedAudioNode>()
     private val originalEntities = mutableListOf<AudioUiEntity>()
     private var showHiddenItems: Boolean? = null
+    private var actionModeStateJob: Job? = null
 
     init {
         checkViewType()
@@ -181,8 +195,22 @@ class AudioSectionViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getAudioUiEntityList() =
-        getAllAudioUseCase().updateOriginalData().map { audioUIEntityMapper(it) }
+    private suspend fun getAudioUiEntityList(): List<AudioUiEntity> {
+        val rubbishBinNode = getRubbishBinFolderUseCase()
+        return getAllAudioUseCase().updateOriginalData().map {
+            val accessPermission =
+                getNodeAccessUseCase(nodeId = it.id) ?: AccessPermission.UNKNOWN
+            val canBeMovedToRubbishBin = rubbishBinNode != null && checkNodeCanBeMovedToTargetNode(
+                nodeId = NodeId(longValue = it.id.longValue),
+                targetNodeId = NodeId(longValue = rubbishBinNode.id.longValue)
+            )
+            audioUIEntityMapper(
+                typedAudioNode = it,
+                accessPermission = accessPermission,
+                canBeMovedToRubbishBin = canBeMovedToRubbishBin
+            )
+        }
+    }
 
     private fun List<TypedAudioNode>.updateOriginalData() = also { data ->
         if (originalData.isNotEmpty()) {
@@ -226,7 +254,7 @@ class AudioSectionViewModel @Inject constructor(
         _state.update {
             it.copy(
                 allAudios = audios,
-                selectedAudioHandles = emptyList(),
+                selectedNodes = emptyList(),
                 isInSelection = false
             )
         }
@@ -240,16 +268,25 @@ class AudioSectionViewModel @Inject constructor(
         val audios = _state.value.allAudios.map { item ->
             item.copy(isSelected = true)
         }
-        val selectedHandles = _state.value.allAudios.map { item ->
-            item.id.longValue
+        val selectedNodes = _state.value.allAudios.map { item ->
+            SelectedNode(
+                id = item.id.longValue,
+                type = SelectedNodeType.File,
+                isTakenDown = item.isTakenDown,
+                isExported = item.isExported,
+                isIncomingShare = item.isIncomingShare,
+                accessPermission = item.accessPermission,
+                canBeMovedToRubbishBin = item.canBeMovedToRubbishBin
+            )
         }
         _state.update {
             it.copy(
                 allAudios = audios,
-                selectedAudioHandles = selectedHandles,
+                selectedNodes = selectedNodes,
                 isInSelection = true
             )
         }
+        prepareActionMode()
     }
 
     internal fun onItemClicked(item: AudioUiEntity, index: Int) {
@@ -265,15 +302,16 @@ class AudioSectionViewModel @Inject constructor(
 
     private fun updateAudioItemInSelectionState(item: AudioUiEntity, index: Int) {
         val isSelected = !item.isSelected
-        val selectedHandles = updateSelectedAudioHandles(item, isSelected)
+        val selectedNodes = updateSelectedAudioHandles(item, isSelected)
         val audios = _state.value.allAudios.updateItemSelectedState(index, isSelected)
         _state.update {
             it.copy(
                 allAudios = audios,
-                selectedAudioHandles = selectedHandles,
-                isInSelection = selectedHandles.isNotEmpty()
+                selectedNodes = selectedNodes,
+                isInSelection = selectedNodes.isNotEmpty()
             )
         }
+        prepareActionMode()
     }
 
     private fun List<AudioUiEntity>.updateItemSelectedState(index: Int, isSelected: Boolean) =
@@ -283,27 +321,81 @@ class AudioSectionViewModel @Inject constructor(
             }
         } else this
 
+    private fun prepareActionMode() {
+        actionModeStateJob?.cancel()
+        actionModeStateJob = viewModelScope.launch {
+            val selectedNodes = _state.value.allAudios.filter { audio ->
+                _state.value.selectedNodes.firstOrNull { selectedNode ->
+                    audio.id.longValue == selectedNode.id
+                } != null
+            }
+            if (selectedNodes.isEmpty()) {
+                _state.update { it.copy(toolbarActionsModifierItem = null) }
+                return@launch
+            }
+
+            val hiddenNodeActionModeState = runCatching {
+                getHiddenNodeActionModifierItem(selectedNodes = selectedNodes)
+            }.getOrDefault(defaultValue = AudioHiddenNodeActionModifierItem())
+            _state.update {
+                it.copy(
+                    toolbarActionsModifierItem = AudioSection(
+                        item = AudioToolbarActionsModifierItem(
+                            hiddenNodeItem = hiddenNodeActionModeState
+                        )
+                    )
+                )
+            }
+        }
+    }
+
+    private suspend fun getHiddenNodeActionModifierItem(selectedNodes: List<AudioUiEntity>): AudioHiddenNodeActionModifierItem {
+        val isHiddenNodesEnabled = isHiddenNodesActive()
+        if (!isHiddenNodesEnabled) {
+            return AudioHiddenNodeActionModifierItem(isEnabled = false)
+        }
+
+        val includeSensitiveInheritedNode = selectedNodes.any { it.isSensitiveInherited }
+        val hasNonSensitiveNode = selectedNodes.any { !it.isMarkedSensitive }
+        val isPaid = _state.value.accountType?.isPaid ?: false
+        val canBeHidden =
+            !isPaid || _state.value.isBusinessAccountExpired || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
+        return AudioHiddenNodeActionModifierItem(
+            isEnabled = true,
+            canBeHidden = canBeHidden
+        )
+    }
 
     private fun updateSelectedAudioHandles(item: AudioUiEntity, isSelected: Boolean) =
-        _state.value.selectedAudioHandles.toMutableList().also { selectedHandles ->
+        _state.value.selectedNodes.toMutableList().also { selectedNodes ->
             if (isSelected) {
-                selectedHandles.add(item.id.longValue)
+                selectedNodes.add(
+                    SelectedNode(
+                        id = item.id.longValue,
+                        type = SelectedNodeType.File,
+                        isTakenDown = item.isTakenDown,
+                        isExported = item.isExported,
+                        isIncomingShare = item.isIncomingShare,
+                        accessPermission = item.accessPermission,
+                        canBeMovedToRubbishBin = item.canBeMovedToRubbishBin
+                    )
+                )
             } else {
-                selectedHandles.remove(item.id.longValue)
+                selectedNodes.removeAll { it.id == item.id.longValue }
             }
         }
 
     internal suspend fun getSelectedNodes(): List<TypedNode> =
-        _state.value.selectedAudioHandles.mapNotNull {
+        _state.value.selectedNodes.mapNotNull {
             runCatching {
-                getNodeByIdUseCase(NodeId(it))
+                getNodeByIdUseCase(NodeId(it.id))
             }.getOrNull()
         }
 
     internal suspend fun getSelectedMegaNode(): List<MegaNode> =
-        _state.value.selectedAudioHandles.mapNotNull {
+        _state.value.selectedNodes.mapNotNull {
             runCatching {
-                getNodeByHandle(it)
+                getNodeByHandle(it.id)
             }.getOrNull()
         }
 
