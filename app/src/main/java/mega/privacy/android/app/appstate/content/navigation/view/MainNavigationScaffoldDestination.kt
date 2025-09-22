@@ -2,11 +2,8 @@ package mega.privacy.android.app.appstate.content.navigation.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.getValue
@@ -106,7 +103,6 @@ fun NavGraphBuilder.mainNavigationScaffold(
                             PsaContainer {
                                 NavHost(
                                     modifier = Modifier
-                                        .consumeWindowInsets(WindowInsets.navigationBars)
                                         .fillMaxSize(),
                                     navController = navController,
                                     startDestination = MainGraph,
