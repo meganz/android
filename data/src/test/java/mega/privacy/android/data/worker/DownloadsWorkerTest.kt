@@ -28,7 +28,6 @@ import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersActionGroupFinishNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersActionGroupProgressNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishNotificationSummaryBuilder
-import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
 import mega.privacy.android.data.mapper.transfer.TransfersProgressNotificationSummaryBuilder
 import mega.privacy.android.data.worker.AbstractTransfersWorker.Companion.ON_TRANSFER_UPDATE_REFRESH_MILLIS
@@ -38,7 +37,6 @@ import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfers
 import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.monitoring.CrashReporter
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorActiveAndPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
@@ -83,7 +81,6 @@ class DownloadsWorkerTest {
     private val overQuotaNotificationBuilder = mock<OverQuotaNotificationBuilder>()
     private val clearActiveTransfersIfFinishedUseCase =
         mock<ClearActiveTransfersIfFinishedUseCase>()
-    private val transfersFinishedNotificationMapper = mock<TransfersFinishedNotificationMapper>()
     private val workProgressUpdater = mock<ProgressUpdater>()
     private val setForeground = mock<ForegroundSetter>()
     private val crashReporter = mock<CrashReporter>()
@@ -99,7 +96,6 @@ class DownloadsWorkerTest {
         mock<TransfersActionGroupProgressNotificationBuilder>()
     private val transfersProgressNotificationSummaryBuilder =
         mock<TransfersProgressNotificationSummaryBuilder>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val displayPathFromUriCache = mock<HashMap<String, String>>()
 
     @BeforeAll
@@ -138,7 +134,6 @@ class DownloadsWorkerTest {
             notificationManager = notificationManager,
             correctActiveTransfersUseCase = correctActiveTransfersUseCase,
             clearActiveTransfersIfFinishedUseCase = clearActiveTransfersIfFinishedUseCase,
-            transfersFinishedNotificationMapper = transfersFinishedNotificationMapper,
             crashReporter = crashReporter,
             foregroundSetter = setForeground,
             notificationSamplePeriod = 0L,
@@ -148,7 +143,6 @@ class DownloadsWorkerTest {
             transfersFinishNotificationSummaryBuilder = transfersFinishNotificationSummaryBuilder,
             transfersActionGroupProgressNotificationBuilder = transfersActionGroupProgressNotificationBuilder,
             transfersProgressNotificationSummaryBuilder = transfersProgressNotificationSummaryBuilder,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             loginMutex = mock(),
             displayPathFromUriCache = displayPathFromUriCache,
         )
@@ -168,7 +162,6 @@ class DownloadsWorkerTest {
             notificationManager,
             correctActiveTransfersUseCase,
             clearActiveTransfersIfFinishedUseCase,
-            transfersFinishedNotificationMapper,
             crashReporter,
             setForeground,
             monitorActiveAndPendingTransfersUseCase,
@@ -177,7 +170,6 @@ class DownloadsWorkerTest {
             transfersFinishNotificationSummaryBuilder,
             transfersActionGroupProgressNotificationBuilder,
             transfersProgressNotificationSummaryBuilder,
-            getFeatureFlagValueUseCase,
             displayPathFromUriCache,
         )
     }
@@ -242,69 +234,31 @@ class DownloadsWorkerTest {
     }
 
     @Test
-    fun `test that notification is created when worker starts`() = runTest {
-        val transferTotal: ActiveTransferTotals = mockActiveTransferTotals(true)
-        commonStub(initialTransferTotals = transferTotal)
-        underTest.doWork()
-        verify(transfersNotificationMapper).invoke(transferTotal, false)
-    }
-
-    @Test
-    fun `test that notification is updated when transfer totals are updated`() = runTest {
-        val initial: ActiveTransferTotals = mockActiveTransferTotals(false)
-        val transferTotals = (0..10).map {
-            mockActiveTransferTotals(false)
-        }.plus(mockActiveTransferTotals(true))
-        commonStub(
-            initialTransferTotals = initial,
-            transferTotals = transferTotals,
-        )
-        underTest.doWork()
-        verify(transfersNotificationMapper, atLeastOnce()).invoke(initial, false)
-        transferTotals.forEach {
-            verify(transfersNotificationMapper).invoke(it, false)
-        }
-    }
-
-    @Test
     fun `test that overQuotaNotificationBuilder is invoked when transfers finishes with incomplete transfers and over quota true`() =
         runTest {
             val transferTotal = mockActiveTransferTotals(false)
             commonStub(transferTotals = listOf(transferTotal), transferOverQuota = true)
             underTest.doWork()
             verify(overQuotaNotificationBuilder).invoke(false)
-            verifyNoInteractions(transfersFinishedNotificationMapper)
         }
 
     @Test
-    fun `test that transfersFinishedNotificationMapper is invoked when transfers finishes with incomplete transfers and over quota false`() =
+    fun `test that overQuotaNotificationBuilder is not invoked when transfers finishes with incomplete transfers and over quota false`() =
         runTest {
             val transferTotal = mockActiveTransferTotals(false)
             commonStub(transferTotals = listOf(transferTotal))
             underTest.doWork()
-            verify(transfersFinishedNotificationMapper).invoke(transferTotal)
             verifyNoInteractions(overQuotaNotificationBuilder)
         }
 
     @Test
-    fun `test that transfersFinishedNotificationMapper is invoked when transfer finishes with completed transfers`() =
+    fun `test that overQuotaNotificationBuilder is not invoked when transfer finishes with completed transfers`() =
         runTest {
             val transferTotal = mockActiveTransferTotals(true)
             whenever(transferTotal.totalTransfers).thenReturn(1)
             commonStub(transferTotals = listOf(transferTotal))
             underTest.doWork()
-            verify(transfersFinishedNotificationMapper).invoke(transferTotal)
             verifyNoInteractions(overQuotaNotificationBuilder)
-        }
-
-    @Test
-    fun `test that transfersFinishedNotificationMapper is invoked when worker starts with completed transfers`() =
-        runTest {
-            val initial: ActiveTransferTotals = mockActiveTransferTotals(true)
-            whenever(initial.totalTransfers).thenReturn(1)
-            commonStub(initialTransferTotals = initial, transferTotals = emptyList())
-            underTest.doWork()
-            verify(transfersFinishedNotificationMapper).invoke(initial)
         }
 
     @Test
@@ -318,13 +272,12 @@ class DownloadsWorkerTest {
         }
 
     @Test
-    fun `test that transfersFinishedNotificationMapper is not invoked when transfer finishes with no transfers`() =
+    fun `test that overQuotaNotificationBuilder is not invoked when transfer finishes with no transfers`() =
         runTest {
             val transferTotal = mockActiveTransferTotals(true)
             whenever(transferTotal.totalTransfers).thenReturn(0)
             commonStub(transferTotals = listOf(transferTotal))
             underTest.doWork()
-            verifyNoInteractions(transfersFinishedNotificationMapper)
             verifyNoInteractions(overQuotaNotificationBuilder)
         }
 
@@ -460,7 +413,6 @@ class DownloadsWorkerTest {
         whenever(workProgressUpdater.updateProgress(any(), any(), any()))
             .thenReturn(SettableFuture.create<Void?>().also { it.set(null) })
         whenever(transfersNotificationMapper(any(), any())).thenReturn(mock())
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
     }
 
     private fun mockActiveTransferTotals(

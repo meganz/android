@@ -13,12 +13,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
-import mega.privacy.android.data.featuretoggle.DataFeatures
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersActionGroupFinishNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersActionGroupProgressNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishNotificationSummaryBuilder
-import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
 import mega.privacy.android.data.mapper.transfer.TransfersProgressNotificationSummaryBuilder
 import mega.privacy.android.data.qualifier.DisplayPathFromUriCache
@@ -28,7 +26,6 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorActiveAndPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
@@ -55,13 +52,11 @@ class UploadsWorker @AssistedInject constructor(
     correctActiveTransfersUseCase: CorrectActiveTransfersUseCase,
     clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
     private val transfersNotificationMapper: TransfersNotificationMapper,
-    private val transfersFinishedNotificationMapper: TransfersFinishedNotificationMapper,
     crashReporter: CrashReporter,
     foregroundSetter: ForegroundSetter? = null,
     notificationSamplePeriod: Long? = null,
     private val startAllPendingUploadsUseCase: StartAllPendingUploadsUseCase,
     @LoginMutex loginMutex: Mutex,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val transfersProgressNotificationSummaryBuilder: TransfersProgressNotificationSummaryBuilder,
     private val transfersActionGroupProgressNotificationBuilder: TransfersActionGroupProgressNotificationBuilder,
     private val transfersFinishNotificationSummaryBuilder: TransfersFinishNotificationSummaryBuilder,
@@ -102,9 +97,6 @@ class UploadsWorker @AssistedInject constructor(
         }
     }
 
-    override suspend fun showGroupedNotifications() =
-        getFeatureFlagValueUseCase(DataFeatures.ShowGroupedUploadNotifications)
-
     override suspend fun createProgressSummaryNotification(): Notification =
         transfersProgressNotificationSummaryBuilder(type)
 
@@ -123,9 +115,6 @@ class UploadsWorker @AssistedInject constructor(
         activeTransferTotals: ActiveTransferTotals,
         paused: Boolean,
     ) = transfersNotificationMapper(activeTransferTotals, paused)
-
-    override suspend fun createFinishNotification(activeTransferTotals: ActiveTransferTotals) =
-        transfersFinishedNotificationMapper(activeTransferTotals)
 
     companion object {
         /**

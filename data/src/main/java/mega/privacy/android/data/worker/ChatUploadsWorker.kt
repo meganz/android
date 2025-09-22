@@ -94,6 +94,8 @@ class ChatUploadsWorker @AssistedInject constructor(
         ChatCompressionProgress(0, 0, Progress(0f))
     )
 
+    override suspend fun showGroupedNotifications() = false
+
     override suspend fun createUpdateNotification(
         activeTransferTotals: ActiveTransferTotals,
         paused: Boolean,

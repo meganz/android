@@ -83,12 +83,6 @@ abstract class AbstractTransfersWorker(
     ): Notification
 
     /**
-     * Create the final notification to summarize the work done, null if there's no final notification
-     */
-    open suspend fun createFinishNotification(activeTransferTotals: ActiveTransferTotals): Notification? =
-        null
-
-    /**
      * Event to do extra work on starting the worker, just after correctActiveTransfersUseCase
      */
     open suspend fun onStart() {}
@@ -215,19 +209,11 @@ abstract class AbstractTransfersWorker(
         val lastMonitorOngoingActiveTransfersResult = consumeProgress().lastOrNull()
 
         stopWork(doWorkJob)
-        lastMonitorOngoingActiveTransfersResult?.let { (lastActiveTransferTotals, _, transferOverQuota, storageOverQuota) ->
+        lastMonitorOngoingActiveTransfersResult?.let { (lastActiveTransferTotals, _, _, _) ->
             if (hasCompleted(lastActiveTransferTotals)) {
                 Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Finished Successful: $lastActiveTransferTotals")
-                if (lastActiveTransferTotals.totalTransfers > 0) {
-                    if (showSingleNotification()) {
-                        showFinishNotification(lastActiveTransferTotals)
-                    }
-                }
                 return@withContext Result.success()
             } else {
-                if (!storageOverQuota && !transferOverQuota && showSingleNotification()) {
-                    showFinishNotification(lastActiveTransferTotals)
-                }
                 Timber.d("${this@AbstractTransfersWorker::class.java.simpleName}finished Failure: $lastActiveTransferTotals")
                 return@withContext Result.failure() // To retry in the future
             }
@@ -292,16 +278,10 @@ abstract class AbstractTransfersWorker(
         }
     }
 
-    private suspend fun showFinishNotification(activeTransferTotals: ActiveTransferTotals) =
-        showSingleNotification(
-            createFinishNotification(activeTransferTotals),
-            finalNotificationId,
-        )
-
     private suspend fun showOverQuotaNotification(storageOverQuota: Boolean) =
         showSingleNotification(
             overQuotaNotificationBuilder(storageOverQuota = storageOverQuota),
-            NOTIFICATION_STORAGE_OVERQUOTA
+            NOTIFICATION_STORAGE_OVER_QUOTA
         )
 
     @SuppressLint("MissingPermission")
@@ -320,7 +300,7 @@ abstract class AbstractTransfersWorker(
     /**
      * If true, the notifications for transfers will be shown by each group instead of a single notification for all transfers.
      */
-    open suspend fun showGroupedNotifications() = false
+    open suspend fun showGroupedNotifications() = true
 
     /**
      * Shows a single notification if [showGroupedNotifications] returns false.
@@ -442,7 +422,7 @@ abstract class AbstractTransfersWorker(
          */
         const val PROGRESS_SUMMARY_GROUP = "ProgressSummary"
 
-        private const val NOTIFICATION_STORAGE_OVERQUOTA = 14
+        private const val NOTIFICATION_STORAGE_OVER_QUOTA = 14
 
         /**
          * Multiplier for group notifications to be sure that group notifications don't collide

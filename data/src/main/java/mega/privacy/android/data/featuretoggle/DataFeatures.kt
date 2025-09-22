@@ -31,22 +31,6 @@ enum class DataFeatures(
         "Use Camera Uploads Records",
         true
     ),
-
-    /**
-     * Show a single download finish notifications for each user action
-     */
-    ShowGroupedDownloadNotifications(
-        "Show a single download finish notifications for each user action",
-        true,
-    ),
-
-    /**
-     * Show a single upload progress and finish notifications for each user action
-     */
-    ShowGroupedUploadNotifications(
-        "Show a single upload progress and finish notifications for each user action",
-        true,
-    ),
     ;
 
     companion object : FeatureFlagValueProvider {

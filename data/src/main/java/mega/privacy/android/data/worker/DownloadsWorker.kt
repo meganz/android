@@ -13,12 +13,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
-import mega.privacy.android.data.featuretoggle.DataFeatures
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersActionGroupFinishNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersActionGroupProgressNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishNotificationSummaryBuilder
-import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
 import mega.privacy.android.data.mapper.transfer.TransfersProgressNotificationSummaryBuilder
 import mega.privacy.android.data.qualifier.DisplayPathFromUriCache
@@ -29,7 +27,6 @@ import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorActiveAndPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
@@ -55,7 +52,6 @@ class DownloadsWorker @AssistedInject constructor(
     correctActiveTransfersUseCase: CorrectActiveTransfersUseCase,
     clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
     private val transfersNotificationMapper: TransfersNotificationMapper,
-    private val transfersFinishedNotificationMapper: TransfersFinishedNotificationMapper,
     private val transfersFinishNotificationSummaryBuilder: TransfersFinishNotificationSummaryBuilder,
     private val transfersActionGroupFinishNotificationBuilder: TransfersActionGroupFinishNotificationBuilder,
     private val transfersActionGroupProgressNotificationBuilder: TransfersActionGroupProgressNotificationBuilder,
@@ -65,7 +61,6 @@ class DownloadsWorker @AssistedInject constructor(
     notificationSamplePeriod: Long? = null,
     private val monitorActiveAndPendingTransfersUseCase: MonitorActiveAndPendingTransfersUseCase,
     private val startAllPendingDownloadsUseCase: StartAllPendingDownloadsUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @LoginMutex loginMutex: Mutex,
     @DisplayPathFromUriCache private val displayPathFromUriCache: HashMap<String, String>,
 ) : AbstractTransfersWorker(
@@ -109,12 +104,6 @@ class DownloadsWorker @AssistedInject constructor(
         activeTransferTotals: ActiveTransferTotals,
         paused: Boolean,
     ) = transfersNotificationMapper(activeTransferTotals, paused)
-
-    override suspend fun createFinishNotification(activeTransferTotals: ActiveTransferTotals) =
-        transfersFinishedNotificationMapper(activeTransferTotals)
-
-    override suspend fun showGroupedNotifications() =
-        getFeatureFlagValueUseCase(DataFeatures.ShowGroupedDownloadNotifications)
 
     override suspend fun createFinishSummaryNotification(): Notification =
         transfersFinishNotificationSummaryBuilder(type)
