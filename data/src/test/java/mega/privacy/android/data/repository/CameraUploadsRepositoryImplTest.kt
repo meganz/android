@@ -33,11 +33,15 @@ import mega.privacy.android.data.mapper.camerauploads.CameraUploadsStatusInfoMap
 import mega.privacy.android.data.mapper.camerauploads.HeartbeatStatusIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
+import mega.privacy.android.data.mapper.transfer.InProgressTransferMapper
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
+import mega.privacy.android.domain.entity.transfer.InProgressTransfer
+import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.CameraUploadsRepository
 import nz.mega.sdk.MegaError
@@ -93,6 +97,7 @@ class CameraUploadsRepositoryImplTest {
     private val cameraUploadsSettingsPreferenceGateway: CameraUploadsSettingsPreferenceGateway =
         mock()
     private val cameraUploadsStatusInfoMapper: CameraUploadsStatusInfoMapper = mock()
+    private val inProgressTransferMapper: InProgressTransferMapper = mock()
 
     @BeforeAll
     fun setUp() {
@@ -117,6 +122,7 @@ class CameraUploadsRepositoryImplTest {
             context = mock(),
             cameraUploadsSettingsPreferenceGateway = cameraUploadsSettingsPreferenceGateway,
             cameraUploadsStatusInfoMapper = cameraUploadsStatusInfoMapper,
+            inProgressTransferMapper = inProgressTransferMapper
         )
     }
 
@@ -140,6 +146,7 @@ class CameraUploadsRepositoryImplTest {
             uploadOptionIntMapper,
             cameraUploadsSettingsPreferenceGateway,
             cameraUploadsStatusInfoMapper,
+            inProgressTransferMapper
         )
     }
 
@@ -714,4 +721,64 @@ class CameraUploadsRepositoryImplTest {
             }
         }
     }
+
+    @Test
+    fun `test that monitorCameraUploadsInProgressTransfers emits empty map when no in progress transfers has been added`() =
+        runTest {
+            setUp()
+            underTest.monitorCameraUploadsInProgressTransfers().test {
+                assertThat(awaitItem()).isEqualTo(emptyMap<Int, InProgressTransfer>())
+            }
+        }
+
+    @Test
+    fun `test that in progress transfers flow is updated correctly when updateCameraUploadsInProgressTransfers and removeCameraUploadsInProgressTransfers are called`() =
+        runTest {
+            val uniqueId = 5L
+            val transfer = mock<Transfer> {
+                on { it.uniqueId }.thenReturn(uniqueId)
+                on { it.transferType }.thenReturn(TransferType.CU_UPLOAD)
+                on { it.isFolderTransfer }.thenReturn(false)
+            }
+            val inProgressTransfer = mock<InProgressTransfer.Upload> {
+                on { it.uniqueId }.thenReturn(uniqueId)
+            }
+            whenever(inProgressTransferMapper(transfer)).thenReturn(inProgressTransfer)
+            setUp()
+            underTest.monitorCameraUploadsInProgressTransfers().test {
+                assertThat(awaitItem()).isEmpty()
+                underTest.updateCameraUploadsInProgressTransfers(listOf(transfer))
+
+                assertThat(awaitItem()).containsExactly(uniqueId, inProgressTransfer)
+                underTest.removeCameraUploadsInProgressTransfers(setOf(uniqueId))
+
+                assertThat(awaitItem()).isEmpty()
+            }
+        }
+
+    @Test
+    fun `test that Camera Uploads in progress transfers flow is not updated with no Camera Uploads transfers`() =
+        runTest {
+            val uniqueId = 5L
+            val notCUTransfer = mock<Transfer> {
+                on { it.uniqueId }.thenReturn(uniqueId)
+                on { it.transferType }.thenReturn(TransferType.DOWNLOAD)
+            }
+            val transfer = mock<Transfer> {
+                on { it.uniqueId }.thenReturn(uniqueId)
+                on { it.transferType }.thenReturn(TransferType.CU_UPLOAD)
+                on { it.isFolderTransfer }.thenReturn(false)
+            }
+            val inProgressTransfer = mock<InProgressTransfer.Upload> {
+                on { it.uniqueId }.thenReturn(uniqueId)
+            }
+            whenever(inProgressTransferMapper(transfer)).thenReturn(inProgressTransfer)
+            setUp()
+            underTest.monitorCameraUploadsInProgressTransfers().test {
+                assertThat(awaitItem()).isEmpty()
+                underTest.updateCameraUploadsInProgressTransfers(listOf(transfer, notCUTransfer))
+
+                assertThat(awaitItem()).containsExactly(uniqueId, inProgressTransfer)
+            }
+        }
 }

@@ -2,12 +2,14 @@ package mega.privacy.android.domain.usecase.transfers.active
 
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
 import mega.privacy.android.domain.monitoring.CrashReporter
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import javax.inject.Inject
@@ -21,6 +23,7 @@ class HandleTransferEventUseCase @Inject internal constructor(
     private val transferRepository: TransferRepository,
     private val broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase,
     private val crashReporter: CrashReporter,
+    private val cameraUploadsRepository: CameraUploadsRepository,
 ) : IHandleTransferEventUseCase {
 
     /**
@@ -56,6 +59,17 @@ class HandleTransferEventUseCase @Inject internal constructor(
             pause = true,
         )?.map { it.transfer }?.let {
             transferRepository.updateInProgressTransfers(it)
+            updateCameraUploadsInProgressTransfers(it)
+        }
+    }
+
+    private suspend fun updateCameraUploadsInProgressTransfers(transfers: List<Transfer>) {
+        val cameraUploadsTransfers =
+            transfers.filter { transfer -> transfer.transferType == TransferType.CU_UPLOAD }
+        if (cameraUploadsTransfers.isNotEmpty()) {
+            cameraUploadsRepository.updateCameraUploadsInProgressTransfers(
+                cameraUploadsTransfers
+            )
         }
     }
 
@@ -159,8 +173,19 @@ class HandleTransferEventUseCase @Inject internal constructor(
             .let { completedEventsMap ->
                 if (completedEventsMap.isNotEmpty()) {
                     transferRepository.addCompletedTransfers(completedEventsMap)
+                    removeCameraUploadsInProgressTransfers(completedEventsMap)
                 }
             }
+    }
+
+    private suspend fun removeCameraUploadsInProgressTransfers(events: List<TransferEvent>) {
+        val cameraUploadsEvents =
+            events.filter { it.transfer.transferType == TransferType.CU_UPLOAD }
+        if (cameraUploadsEvents.isNotEmpty()) {
+            cameraUploadsRepository.removeCameraUploadsInProgressTransfers(
+                cameraUploadsEvents.map { it.transfer.uniqueId }.toSet()
+            )
+        }
     }
 }
 

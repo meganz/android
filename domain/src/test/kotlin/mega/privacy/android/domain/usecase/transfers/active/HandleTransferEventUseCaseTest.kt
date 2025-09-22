@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
 import mega.privacy.android.domain.monitoring.CrashReporter
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -39,6 +40,7 @@ class HandleTransferEventUseCaseTest {
     private val broadcastBusinessAccountExpiredUseCase =
         mock<BroadcastBusinessAccountExpiredUseCase>()
     private val crashReporter = mock<CrashReporter>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
 
     @BeforeAll
     fun setUp() {
@@ -46,6 +48,7 @@ class HandleTransferEventUseCaseTest {
             transferRepository = transferRepository,
             broadcastBusinessAccountExpiredUseCase = broadcastBusinessAccountExpiredUseCase,
             crashReporter = crashReporter,
+            cameraUploadsRepository = cameraUploadsRepository,
         )
     }
 
@@ -55,6 +58,7 @@ class HandleTransferEventUseCaseTest {
             transferRepository,
             broadcastBusinessAccountExpiredUseCase,
             crashReporter,
+            cameraUploadsRepository
         )
     }
 
@@ -274,6 +278,21 @@ class HandleTransferEventUseCaseTest {
         verify(transferRepository).updateInProgressTransfers(eq(listOf(transferEvent.transfer)))
     }
 
+    @ParameterizedTest
+    @MethodSource("provideStartPauseUpdateEvents")
+    fun `test that updateCameraUploadsInProgressTransfers in repository is invoked when start, pause or update CU transfer event is received`(
+        transferEvent: TransferEvent,
+    ) = runTest {
+        underTest(transferEvent)
+        if (transferEvent.transfer.transferType == TransferType.CU_UPLOAD) {
+            verify(cameraUploadsRepository).updateCameraUploadsInProgressTransfers(
+                eq(listOf(transferEvent.transfer))
+            )
+        } else {
+            verify(cameraUploadsRepository, never()).updateCameraUploadsInProgressTransfers(any())
+        }
+    }
+
     @Test
     fun `test that invoke calls updateInProgressTransfers with the last event of each transfer when multiple events are send`() =
         runTest {
@@ -300,6 +319,37 @@ class HandleTransferEventUseCaseTest {
                     listOf(
                         events1.last().transfer,
                         events2.last().transfer,
+                        events3.last().transfer,
+                    )
+                )
+            )
+        }
+
+    @Test
+    fun `test that invoke calls updateCameraUploadsInProgressTransfers with the last event of each transfer when multiple CU transfer events are send`() =
+        runTest {
+            val events1 = listOf(
+                mockTransferEvent<TransferEvent.TransferStartEvent>(TransferType.CU_UPLOAD, 1),
+                mockTransferEvent<TransferEvent.TransferPaused>(TransferType.CU_UPLOAD, 1),
+                mockTransferEvent<TransferEvent.TransferUpdateEvent>(TransferType.CU_UPLOAD, 1),
+            )
+            val events2 = listOf(
+                mockTransferEvent<TransferEvent.TransferStartEvent>(TransferType.DOWNLOAD, 2),
+                mockTransferEvent<TransferEvent.TransferPaused>(TransferType.DOWNLOAD, 2) {
+                    on { paused } doReturn true
+                },
+                mockTransferEvent<TransferEvent.TransferPaused>(TransferType.DOWNLOAD, 2) {
+                    on { paused } doReturn false
+                },
+            )
+            val events3 = listOf(
+                mockTransferEvent<TransferEvent.TransferUpdateEvent>(TransferType.CU_UPLOAD, 3),
+            )
+            underTest.invoke(events = (events1 + events2 + events3).toTypedArray())
+            verify(cameraUploadsRepository).updateCameraUploadsInProgressTransfers(
+                eq(
+                    listOf(
+                        events1.last().transfer,
                         events3.last().transfer,
                     )
                 )

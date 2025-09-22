@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
@@ -17,6 +18,8 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
+import mega.privacy.android.domain.entity.transfer.InProgressTransfer
+import mega.privacy.android.domain.entity.transfer.Transfer
 
 /**
  * Repository containing all Camera Uploads related operations
@@ -574,4 +577,25 @@ interface CameraUploadsRepository {
      * @param chargingRequired The new Device charging state
      */
     suspend fun setChargingRequiredToUploadContent(chargingRequired: Boolean)
+
+    /**
+     * Update the camera uploads in progress transfers
+     *
+     * @param transfers List of transfers to be updated
+     */
+    suspend fun updateCameraUploadsInProgressTransfers(transfers: List<Transfer>)
+
+    /**
+     * Monitor the camera uploads in progress transfers
+     *
+     * @return a [MutableStateFlow] containing a map of unique transfer IDs to their corresponding [InProgressTransfer] objects
+     */
+    fun monitorCameraUploadsInProgressTransfers(): Flow<Map<Long, InProgressTransfer>>
+
+    /**
+     * Remove camera uploads in progress transfers
+     *
+     * @param uniqueIds Set of unique IDs of the transfers to be removed
+     */
+    suspend fun removeCameraUploadsInProgressTransfers(uniqueIds: Set<Long>)
 }

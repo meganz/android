@@ -6,9 +6,11 @@ import androidx.work.WorkInfo
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.R
@@ -33,6 +35,7 @@ import mega.privacy.android.data.mapper.camerauploads.CameraUploadsStatusInfoMap
 import mega.privacy.android.data.mapper.camerauploads.HeartbeatStatusIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
+import mega.privacy.android.data.mapper.transfer.InProgressTransferMapper
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
@@ -48,6 +51,9 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAct
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
+import mega.privacy.android.domain.entity.transfer.InProgressTransfer
+import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CameraUploadsRepository
 import nz.mega.sdk.MegaApiJava
@@ -55,11 +61,13 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.coroutines.Continuation
 
 /**
  * Implementation of [CameraUploadsRepository]
  */
+@Singleton
 internal class CameraUploadsRepositoryImpl @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
     private val megaApiGateway: MegaApiGateway,
@@ -81,7 +89,14 @@ internal class CameraUploadsRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val cameraUploadsSettingsPreferenceGateway: CameraUploadsSettingsPreferenceGateway,
     private val cameraUploadsStatusInfoMapper: CameraUploadsStatusInfoMapper,
+    private val inProgressTransferMapper: InProgressTransferMapper,
 ) : CameraUploadsRepository {
+
+    /**
+     * To store in progress Camera Uploads transfers in memory instead of in database
+     */
+    private val cameraUploadsInProgressTransfersFlow =
+        MutableStateFlow<Map<Long, InProgressTransfer>>(emptyMap())
 
     override fun getInvalidHandle(): Long = megaApiGateway.getInvalidHandle()
 
@@ -605,6 +620,33 @@ internal class CameraUploadsRepositoryImpl @Inject constructor(
             cameraUploadsSettingsPreferenceGateway.setChargingRequiredToUploadContent(
                 chargingRequired
             )
+        }
+
+    override suspend fun updateCameraUploadsInProgressTransfers(transfers: List<Transfer>) {
+        withContext(ioDispatcher) {
+            transfers
+                .filter { it.transferType == TransferType.CU_UPLOAD }
+                .associate { originalTransfer ->
+                    val mappedTransfer = inProgressTransferMapper(originalTransfer)
+                    mappedTransfer.uniqueId to mappedTransfer
+                }
+                .takeIf { it.isNotEmpty() }?.let { newInProgressTransfers ->
+                    cameraUploadsInProgressTransfersFlow.update { inProgressTransfers ->
+                        inProgressTransfers + newInProgressTransfers
+                    }
+                }
+        }
+    }
+
+    override fun monitorCameraUploadsInProgressTransfers() = cameraUploadsInProgressTransfersFlow
+
+
+    override suspend fun removeCameraUploadsInProgressTransfers(uniqueIds: Set<Long>) =
+        withContext(ioDispatcher) {
+            if (uniqueIds.isEmpty()) return@withContext
+            cameraUploadsInProgressTransfersFlow.update { inProgressTransfers ->
+                inProgressTransfers.filterKeys { it !in uniqueIds }
+            }
         }
 
     private companion object {
