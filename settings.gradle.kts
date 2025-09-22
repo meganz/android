@@ -50,6 +50,7 @@ include(":core:formatter")
 include(":core:navigation-contract")
 include(":core:navigation-snowflake-components")
 include(":core:ui-components:node-components")
+include(":core:transfers")
 include(":data")
 include(":domain")
 include(":feature:chat")
@@ -111,4 +112,3 @@ fun shouldUsePrebuiltSdk(): Boolean =
     System.getenv("USE_PREBUILT_SDK")?.let { it != "false" } ?: true
 
 fun isServerBuild(): Boolean = System.getenv("BUILD_NUMBER") != null
-

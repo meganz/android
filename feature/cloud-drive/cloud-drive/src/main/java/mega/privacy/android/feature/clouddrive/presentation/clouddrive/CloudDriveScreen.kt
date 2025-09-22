@@ -19,6 +19,7 @@ import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
+import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.model.CloudDriveAppBarAction
@@ -83,6 +84,7 @@ fun CloudDriveScreen(
                 MegaTopAppBar(
                     title = uiState.title.text,
                     navigationType = AppBarNavigationType.Back(onBack),
+                    trailingIcons = { TransfersToolbarWidget() },
                     actions = buildList {
                         if (uiState.items.isNotEmpty()) {
                             add(
