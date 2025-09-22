@@ -38,12 +38,4 @@ interface SnackbarEventQueue {
      * @param attributes The snackbar attributes containing the message and display options
      */
     suspend fun queueMessage(attributes: SnackbarAttributes)
-
-    /**
-     * Closes the snackbar event queue.
-     *
-     * This method should be called when the queue is no longer needed, typically during
-     * the cleanup phase of the application or when the ViewModel is cleared.
-     */
-    fun close(): Boolean
 }

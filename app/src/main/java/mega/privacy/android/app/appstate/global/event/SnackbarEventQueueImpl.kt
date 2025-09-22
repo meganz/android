@@ -41,8 +41,6 @@ class SnackbarEventQueueImpl @Inject constructor(
         }
     }
 
-    override fun close() = _events.close()
-
     private suspend inline fun requireFeatureEnabled(send: () -> Unit) {
         // Await for the feature flag to be evaluated
         if (isSingleActivityEnabled.first { it != null } == true) {

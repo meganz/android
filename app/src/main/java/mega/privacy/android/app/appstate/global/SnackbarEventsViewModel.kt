@@ -53,9 +53,4 @@ class SnackbarEventsViewModel @Inject constructor(
             snackbarEventConsumedSignal.emit(consumed())
         }
     }
-
-    override fun onCleared() {
-        super.onCleared()
-        snackbarEventQueue.close()
-    }
 }
