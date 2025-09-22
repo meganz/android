@@ -64,6 +64,7 @@ fun NewTextFileNodeDialog(
             fileName = newValue
             errorMessage = null
         },
+        isAutoShowKeyboard = true,
         errorText = errorMessage,
         positiveButtonText = stringResource(id = R.string.general_create),
         onPositiveButtonClicked = {

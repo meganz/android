@@ -182,6 +182,7 @@ private fun RenameNodeDialogBody(
             onRenameConfirmed(initialInput)
         },
         onNegativeButtonClicked = onRenameCancelled,
+        isAutoShowKeyboard = true
     )
 }
 
