@@ -57,8 +57,6 @@ internal class SyncGatewayImpl @Inject constructor(
         SharingStarted.WhileSubscribed()
     )
 
-    private var stalledIssuesListener: StalledIssuesReceiver? = null
-
     override suspend fun syncFolderPair(
         syncType: SyncType,
         name: String?,
@@ -126,9 +124,7 @@ internal class SyncGatewayImpl @Inject constructor(
     override suspend fun getSyncStalledIssues(): List<MegaSyncStall>? {
         return if (megaApi.isSyncStalled) {
             suspendCancellableCoroutine { continuation ->
-                stalledIssuesListener = StalledIssuesReceiver { megaSyncStallList ->
-                    megaApi.removeRequestListener(stalledIssuesListener)
-                    stalledIssuesListener = null
+                val stalledIssuesListener = StalledIssuesReceiver { megaSyncStallList ->
                     continuation.resume(megaSyncStallList)
                 }
                 megaApi.requestMegaSyncStallList(stalledIssuesListener)
