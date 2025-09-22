@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -26,15 +27,26 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.extensions.updateItemAt
+import mega.privacy.android.app.features.CloudDriveFeature
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.SelectedNode
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.SelectedNodeType
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.CloudDriveSyncsAddLabelActionModifierItem
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.CloudDriveSyncsAddToActionModifierItem
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.CloudDriveSyncsFavouritesActionModifierItem
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.CloudDriveSyncsHiddenNodeActionModifierItem
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.CloudDriveSyncsToolbarActionsModifierItem
+import mega.privacy.android.app.presentation.validator.toolbaractions.modifier.ToolbarActionsModifierItem.CloudDriveSyncs
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.nodecomponents.components.banners.StorageCapacityMapper
 import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
 import mega.privacy.android.data.mapper.FileDurationMapper
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -42,11 +54,14 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
@@ -66,12 +81,13 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.file.DoesUriPathExistsUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.ShouldEnterMediaDiscoveryModeUseCase
+import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.GetBandwidthOverQuotaDelayUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.IsInTransferOverQuotaUseCase
@@ -124,7 +140,6 @@ class FileBrowserViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isColoredFoldersOnboardingShownUseCase: IsColoredFoldersOnboardingShownUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
-    private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val shouldEnterMediaDiscoveryModeUseCase: ShouldEnterMediaDiscoveryModeUseCase,
     private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
@@ -137,6 +152,9 @@ class FileBrowserViewModel @Inject constructor(
     private val isInTransferOverQuotaUseCase: IsInTransferOverQuotaUseCase,
     private val doesUriPathExistsUseCase: DoesUriPathExistsUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode,
+    private val getRubbishBinFolderUseCase: GetRubbishBinFolderUseCase,
+    private val getNodeAccessUseCase: GetNodeAccessUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -154,6 +172,7 @@ class FileBrowserViewModel @Inject constructor(
     private var showHiddenItems: Boolean = true
     private var cachedStorageState: StorageState? = null
     private var refreshNodesStateJob: Job? = null
+    private var actionModeStateJob: Job? = null
 
     init {
         refreshNodes()
@@ -432,10 +451,12 @@ class FileBrowserViewModel @Inject constructor(
 
             val childrenNodes = getFileBrowserNodeChildrenUseCase(fileBrowserHandle)
             val showMediaDiscoveryIcon = !isRootNode && containsMediaItemUseCase(childrenNodes)
+            val rubbishBinNode = getRubbishBinFolderUseCase()
             val sourceNodeUIItems = getNodeUiItems(
                 nodeList = childrenNodes,
                 highlightedNodeId = highlightedNode,
-                highlightedNames = highlightedNames?.toSet()
+                highlightedNames = highlightedNames?.toSet(),
+                rubbishBinNode = rubbishBinNode
             )
             val nodeUIItems = filterNonSensitiveNodes(sourceNodeUIItems)
             val sortOrder = getCloudSortOrder()
@@ -462,16 +483,17 @@ class FileBrowserViewModel @Inject constructor(
         nodeList: List<TypedNode>,
         highlightedNodeId: NodeId? = null,
         highlightedNames: Set<String>? = null,
+        rubbishBinNode: UnTypedNode?,
     ): List<NodeUIItem<TypedNode>> = withContext(defaultDispatcher) {
         val existingNodeList = state.value.nodesList
-        val selectedHandles = state.value.selectedNodeHandles.toSet()
+        val selectedNodes = state.value.selectedNodes.toSet()
         val existingHighlightedIds = existingNodeList.asSequence()
             .filter { it.isHighlighted }
             .map { it.node.id }
             .toSet()
 
         nodeList.mapIndexed { index, node ->
-            val isSelected = selectedHandles.contains(node.id.longValue)
+            val isSelected = selectedNodes.any { it.id == node.id.longValue }
             val fileDuration = if (node is FileNode) {
                 fileDurationMapper(node.type)?.let { durationInSecondsTextMapper(it) }
             } else null
@@ -479,12 +501,20 @@ class FileBrowserViewModel @Inject constructor(
                     node.id == highlightedNodeId ||
                     highlightedNames?.contains(node.name) == true
             val hasCorrespondingIndex = existingNodeList.size > index
+            val accessPermission =
+                getNodeAccessUseCase(nodeId = node.id) ?: AccessPermission.UNKNOWN
+            val canBeMovedToRubbishBin = rubbishBinNode != null && checkNodeCanBeMovedToTargetNode(
+                nodeId = NodeId(longValue = node.id.longValue),
+                targetNodeId = NodeId(longValue = rubbishBinNode.id.longValue)
+            )
             NodeUIItem(
                 node = node,
                 isSelected = if (hasCorrespondingIndex) isSelected else false,
                 isInvisible = if (hasCorrespondingIndex) existingNodeList[index].isInvisible else false,
                 fileDuration = fileDuration,
                 isHighlighted = isHighlighted,
+                accessPermission = accessPermission,
+                canBeMovedToRubbishBin = canBeMovedToRubbishBin
             )
         }
     }
@@ -683,11 +713,21 @@ class FileBrowserViewModel @Inject constructor(
         val selectedNodeList = selectAllNodesUiList()
         var totalFolderNode = 0
         var totalFileNode = 0
-        val selectedNodeHandle = mutableListOf<Long>()
+        val selectedNodes = mutableListOf<SelectedNode>()
         selectedNodeList.forEach {
             if (it.node is FileNode) totalFolderNode++
             if (it.node is FolderNode) totalFileNode++
-            selectedNodeHandle.add(it.node.id.longValue)
+            selectedNodes.add(
+                SelectedNode(
+                    id = it.node.id.longValue,
+                    type = SelectedNodeType.toSelectedNodeType(it.node),
+                    isTakenDown = it.node.isTakenDown,
+                    isExported = it.node.exportedData != null,
+                    isIncomingShare = it.node.isIncomingShare,
+                    accessPermission = it.accessPermission,
+                    canBeMovedToRubbishBin = it.canBeMovedToRubbishBin
+                )
+            )
         }
         _state.update {
             it.copy(
@@ -695,9 +735,10 @@ class FileBrowserViewModel @Inject constructor(
                 isInSelection = true,
                 selectedFolderNodes = totalFolderNode,
                 selectedFileNodes = totalFileNode,
-                selectedNodeHandles = selectedNodeHandle
+                selectedNodes = selectedNodes
             )
         }
+        prepareActionMode()
     }
 
     /**
@@ -720,7 +761,7 @@ class FileBrowserViewModel @Inject constructor(
                     selectedFileNodes = 0,
                     selectedFolderNodes = 0,
                     isInSelection = false,
-                    selectedNodeHandles = emptyList(),
+                    selectedNodes = persistentListOf(),
                     optionsItemInfo = null
                 )
             }
@@ -792,12 +833,22 @@ class FileBrowserViewModel @Inject constructor(
      */
     private fun updateNodeInSelectionState(nodeUIItem: NodeUIItem<TypedNode>, index: Int) {
         nodeUIItem.isSelected = !nodeUIItem.isSelected
-        val selectedNodeHandle = state.value.selectedNodeHandles.toMutableList()
+        val selectedNodes = state.value.selectedNodes.toMutableList()
         val pair = if (nodeUIItem.isSelected) {
-            selectedNodeHandle.add(nodeUIItem.node.id.longValue)
+            selectedNodes.add(
+                SelectedNode(
+                    id = nodeUIItem.node.id.longValue,
+                    type = SelectedNodeType.toSelectedNodeType(from = nodeUIItem.node),
+                    isTakenDown = nodeUIItem.node.isTakenDown,
+                    isExported = nodeUIItem.node.exportedData != null,
+                    isIncomingShare = nodeUIItem.node.isIncomingShare,
+                    accessPermission = nodeUIItem.accessPermission,
+                    canBeMovedToRubbishBin = nodeUIItem.canBeMovedToRubbishBin
+                )
+            )
             selectNode(nodeUIItem)
         } else {
-            selectedNodeHandle.remove(nodeUIItem.node.id.longValue)
+            selectedNodes.removeAll { it.id == nodeUIItem.node.id.longValue }
             unSelectNode(nodeUIItem)
         }
         val newNodesList = _state.value.nodesList.updateItemAt(index = index, item = nodeUIItem)
@@ -807,10 +858,11 @@ class FileBrowserViewModel @Inject constructor(
                 selectedFolderNodes = pair.second,
                 nodesList = newNodesList,
                 isInSelection = pair.first > 0 || pair.second > 0,
-                selectedNodeHandles = selectedNodeHandle,
+                selectedNodes = selectedNodes,
                 optionsItemInfo = null
             )
         }
+        prepareActionMode()
     }
 
     /**
@@ -845,6 +897,138 @@ class FileBrowserViewModel @Inject constructor(
         return Pair(totalSelectedFileNode, totalSelectedFolderNode)
     }
 
+    private fun prepareActionMode() {
+        actionModeStateJob?.cancel()
+        actionModeStateJob = viewModelScope.launch {
+            val selectedNodeUiItems = _state.value.nodesList.filter { nodeUiItem ->
+                _state.value.selectedNodes.firstOrNull { selectedNode ->
+                    nodeUiItem.id.longValue == selectedNode.id
+                } != null
+            }
+            if (selectedNodeUiItems.isEmpty()) {
+                _state.update { it.copy(toolbarActionsModifierItem = null) }
+                return@launch
+            }
+
+            val hiddenNodeActionModeState = async {
+                runCatching {
+                    getHiddenNodeActionModifierItem(selectedNodes = selectedNodeUiItems)
+                }.getOrDefault(defaultValue = CloudDriveSyncsHiddenNodeActionModifierItem())
+            }
+            val favouritesActionModeState = async {
+                runCatching {
+                    getFavouritesActionModifierItem(selectedNodes = selectedNodeUiItems)
+                }.getOrDefault(defaultValue = CloudDriveSyncsFavouritesActionModifierItem())
+            }
+            val addLabelActionModeState = async {
+                runCatching {
+                    getAddLabelActionModifierItem()
+                }.getOrDefault(defaultValue = CloudDriveSyncsAddLabelActionModifierItem())
+            }
+            val addToActionModeState = getAddToActionModifierItem(
+                selectedNodes = selectedNodeUiItems
+            )
+            _state.update {
+                it.copy(
+                    toolbarActionsModifierItem = CloudDriveSyncs(
+                        item = CloudDriveSyncsToolbarActionsModifierItem(
+                            hiddenNodeItem = hiddenNodeActionModeState.await(),
+                            favouritesItem = favouritesActionModeState.await(),
+                            addToItem = addToActionModeState,
+                            addLabelItem = addLabelActionModeState.await()
+                        )
+                    )
+                )
+            }
+        }
+    }
+
+    private suspend fun getHiddenNodeActionModifierItem(selectedNodes: List<NodeUIItem<TypedNode>>): CloudDriveSyncsHiddenNodeActionModifierItem {
+        val isHiddenNodesEnabled = isHiddenNodesEnabled()
+        if (!isHiddenNodesEnabled) {
+            return CloudDriveSyncsHiddenNodeActionModifierItem(isEnabled = false)
+        }
+
+        val includeSensitiveInheritedNode = selectedNodes.any { it.isSensitiveInherited }
+        val hasNonSensitiveNode = selectedNodes.any { !it.isMarkedSensitive }
+        val isPaid = _state.value.accountType?.isPaid ?: false
+        val canBeHidden =
+            !isPaid || _state.value.isBusinessAccountExpired || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
+        return CloudDriveSyncsHiddenNodeActionModifierItem(
+            isEnabled = true,
+            canBeHidden = canBeHidden
+        )
+    }
+
+    private suspend fun isHiddenNodesEnabled() = runCatching {
+        getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+    }.getOrElse { false }
+
+    private suspend fun getFavouritesActionModifierItem(selectedNodes: List<NodeUIItem<TypedNode>>): CloudDriveSyncsFavouritesActionModifierItem {
+        // Check if the bugfix for allowing favorite in multiple selection is enabled
+        val isFavoriteMultipleSelectionEnabled = isFavoriteMultipleSelectionEnabled()
+        // Only show favorite options when the feature is enabled
+        if (!isFavoriteMultipleSelectionEnabled) {
+            return CloudDriveSyncsFavouritesActionModifierItem(
+                canBeAdded = false,
+                canBeRemoved = false
+            )
+        }
+
+        // Count how many are favorites and how many are not
+        val favouriteCount = selectedNodes.count { it.node.isFavourite }
+        val nonFavouriteCount = selectedNodes.size - favouriteCount
+        return CloudDriveSyncsFavouritesActionModifierItem(
+            canBeAdded = nonFavouriteCount > 0,
+            canBeRemoved = favouriteCount == selectedNodes.size
+        )
+    }
+
+    private suspend fun isFavoriteMultipleSelectionEnabled() = runCatching {
+        getFeatureFlagValueUseCase(CloudDriveFeature.FAVORITE_MULTIPLE_SELECTION)
+    }.getOrElse { false }
+
+    private suspend fun getAddLabelActionModifierItem(): CloudDriveSyncsAddLabelActionModifierItem {
+        // Check if the feature for allowing label in multiple selection is enabled
+        val isLabelMultipleSelectionEnabled = isLabelMultipleSelectionEnabled()
+        // Always show "Add label" when multiple selection is enabled and nodes are selected
+        // The label dialog will handle both adding and removing labels
+        return CloudDriveSyncsAddLabelActionModifierItem(
+            canBeAdded = isLabelMultipleSelectionEnabled
+        )
+    }
+
+    private suspend fun isLabelMultipleSelectionEnabled() = runCatching {
+        getFeatureFlagValueUseCase(CloudDriveFeature.LABEL_MULTIPLE_SELECTION)
+    }.onFailure {
+        Timber.w(it, "Label multi-select flag check failed")
+    }.getOrElse { false }
+
+    private fun getAddToActionModifierItem(selectedNodes: List<NodeUIItem<TypedNode>>): CloudDriveSyncsAddToActionModifierItem {
+        val mediaNodes = selectedNodes.filter {
+            val type = (it.node as? FileNode)?.type
+            type is ImageFileTypeInfo || type is VideoFileTypeInfo
+        }
+        return if (mediaNodes.size == selectedNodes.size) {
+            if (mediaNodes.all { (it.node as? FileNode)?.type is VideoFileTypeInfo }) {
+                CloudDriveSyncsAddToActionModifierItem(
+                    canBeAddedToAlbum = false,
+                    canBeAddedTo = true
+                )
+            } else {
+                CloudDriveSyncsAddToActionModifierItem(
+                    canBeAddedToAlbum = true,
+                    canBeAddedTo = false
+                )
+            }
+        } else {
+            CloudDriveSyncsAddToActionModifierItem(
+                canBeAddedToAlbum = false,
+                canBeAddedTo = false
+            )
+        }
+    }
+
     /**
      * This method will toggle view type
      */
@@ -865,7 +1049,7 @@ class FileBrowserViewModel @Inject constructor(
         viewModelScope.launch {
             val optionsItemInfo = handleOptionClickMapper(
                 item = item,
-                selectedNodeHandle = state.value.selectedNodeHandles
+                selectedNodeHandle = state.value.selectedNodes.map { it.id }
             )
             if (optionsItemInfo.optionClickedType == OptionItems.DOWNLOAD_CLICKED) {
                 _state.update {
@@ -1055,12 +1239,6 @@ class FileBrowserViewModel @Inject constructor(
     fun onCloudDriveSortOrderChanged() {
         setPendingRefreshNodes()
     }
-
-    /**
-     * Check if the current node can be hidden
-     */
-    suspend fun isHidingActionAllowed(nodeId: NodeId): Boolean =
-        isHidingActionAllowedUseCase(nodeId)
 
     /**
      * Reset storage capacity to default

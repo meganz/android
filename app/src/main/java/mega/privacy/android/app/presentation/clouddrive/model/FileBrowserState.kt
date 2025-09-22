@@ -10,6 +10,8 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.SelectedNode
+import mega.privacy.android.app.presentation.validator.toolbaractions.modifier.ToolbarActionsModifierItem
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -31,7 +33,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @property nodesList list of [NodeUIItem]
  * @property sourceNodesList list of [NodeUIItem]
  * @property isInSelection if list is in selection mode or not
- * @property selectedNodeHandles List of selected node handles
+ * @property selectedNodes selected nodes.
  * @property selectedFileNodes number of selected file [NodeUIItem] on Compose
  * @property selectedFolderNodes number of selected folder [NodeUIItem] on Compose
  * @property sortOrder [SortOrder] of current list
@@ -56,6 +58,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @property isBusinessAccountExpired if the business or pro flexi is expired
  * @property hiddenNodeEnabled if hidden node is enabled
  * @property isSyncFolderOpen Indicates if the node to open is from Sync Folders. False by default.
+ * @property toolbarActionsModifierItem representing the available toolbar actions for the screen.
  */
 data class FileBrowserState(
     val currentViewType: ViewType = ViewType.LIST,
@@ -68,7 +71,7 @@ data class FileBrowserState(
     val nodesList: List<NodeUIItem<TypedNode>> = emptyList(),
     val sourceNodesList: List<NodeUIItem<TypedNode>> = emptyList(),
     val isInSelection: Boolean = false,
-    val selectedNodeHandles: List<Long> = emptyList(),
+    val selectedNodes: List<SelectedNode> = emptyList(),
     val selectedFileNodes: Int = 0,
     val selectedFolderNodes: Int = 0,
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
@@ -96,6 +99,7 @@ data class FileBrowserState(
     val isFromSyncTab: Boolean = false,
     val showSyncSettings: Boolean = false,
     val showColoredFoldersOnboarding: Boolean = false,
+    val toolbarActionsModifierItem: ToolbarActionsModifierItem.CloudDriveSyncs? = null,
 ) {
     val hasNoOpenedFolders get() = openedFolderNodeHandles.isEmpty()
 }

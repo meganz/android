@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.data
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
+import mega.privacy.android.domain.entity.shares.AccessPermission
 
 /**
  * This class is used to display list items on screen
@@ -12,6 +13,8 @@ import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
  * @param fileDuration Duration of file
  * @param isHighlighted Node is highlighted because it comes from "Locate" action in notification
  * @property uniqueKey Unique key of the node, to be used in Compose list
+ * @property accessPermission Access permission of the node.
+ * @property canBeMovedToRubbishBin Whether the node can be moved to the rubbish bin.
  * @constructor Create empty Node UI Item
  */
 data class NodeUIItem<T : TypedNode>(
@@ -20,6 +23,8 @@ data class NodeUIItem<T : TypedNode>(
     val isInvisible: Boolean = false,
     val fileDuration: String? = null,
     val isHighlighted: Boolean = false,
+    val accessPermission: AccessPermission = AccessPermission.UNKNOWN,
+    val canBeMovedToRubbishBin: Boolean = false,
 ) : Node by node {
     val uniqueKey =
         "${node.id.longValue}".plus(

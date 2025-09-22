@@ -20,21 +20,25 @@ class ToolbarActionsValidator @Inject constructor(
         val control = CloudStorageOptionControlUtil.Control()
         if (request.selectedNodes.size == 1) {
             val node = request.selectedNodes.first()
-            if (node.isTakenDown.not() && node.accessPermissions.contains(AccessPermission.OWNER)) {
-                if (node.isExported) {
-                    control.manageLink().setVisible(true).showAsAction = SHOW_AS_ACTION_ALWAYS
-                    control.removeLink().isVisible = true
-                } else {
-                    control.link.setVisible(true).showAsAction = SHOW_AS_ACTION_ALWAYS
+            when (node.accessPermission) {
+                AccessPermission.OWNER -> {
+                    if (node.isTakenDown.not()) {
+                        if (node.isExported) {
+                            control.manageLink().setVisible(true).showAsAction =
+                                SHOW_AS_ACTION_ALWAYS
+                            control.removeLink().isVisible = true
+                        } else {
+                            control.link.setVisible(true).showAsAction = SHOW_AS_ACTION_ALWAYS
+                        }
+                    }
+                    control.rename().isVisible = true
                 }
-            }
-            if (node.accessPermissions.contains(AccessPermission.FULL)) {
-                control.rename().isVisible = true
-            }
-        } else if (allHaveOwnerAccessAndNotTakenDown(selectedNodes = request.selectedNodes)) {
-            control.link.apply {
-                isVisible = true
-                showAsAction = SHOW_AS_ACTION_ALWAYS
+
+                AccessPermission.FULL -> {
+                    control.rename().isVisible = true
+                }
+
+                else -> Unit
             }
         }
 
@@ -57,12 +61,6 @@ class ToolbarActionsValidator @Inject constructor(
         )
 
         return control
-    }
-
-    private fun allHaveOwnerAccessAndNotTakenDown(selectedNodes: List<SelectedNode>): Boolean {
-        return selectedNodes.find { node ->
-            !node.accessPermissions.contains(AccessPermission.OWNER) || node.isTakenDown
-        } == null
     }
 
     private fun getValidationFlags(selectedNodes: List<SelectedNode>): ValidationFlags {
@@ -89,6 +87,9 @@ class ToolbarActionsValidator @Inject constructor(
             if (node.isTakenDown || node.type is File || isOutShare(node).not()) {
                 validationFlags.showRemoveShare = false
             }
+            if (node.accessPermission == AccessPermission.OWNER && !node.isTakenDown && selectedNodes.size > 1) {
+                validationFlags.totalNotTakenDownOwnerNode += 1
+            }
         }
         return validationFlags
     }
@@ -107,6 +108,13 @@ class ToolbarActionsValidator @Inject constructor(
         totalSelectedNodes: Int,
         totalNodes: Int,
     ): CloudStorageOptionControlUtil.Control {
+        if (validationFlags.totalNotTakenDownOwnerNode == totalSelectedNodes) {
+            control.link.apply {
+                isVisible = true
+                showAsAction = SHOW_AS_ACTION_ALWAYS
+            }
+        }
+
         control.hide().setVisible(false).showAsAction = MenuItem.SHOW_AS_ACTION_NEVER
         control.unhide().setVisible(false).showAsAction = MenuItem.SHOW_AS_ACTION_NEVER
 
@@ -179,5 +187,6 @@ class ToolbarActionsValidator @Inject constructor(
         var showDownload: Boolean = true,
         var showDispute: Boolean = false,
         var showLeaveShare: Boolean = false,
+        var totalNotTakenDownOwnerNode: Int = 0,
     )
 }

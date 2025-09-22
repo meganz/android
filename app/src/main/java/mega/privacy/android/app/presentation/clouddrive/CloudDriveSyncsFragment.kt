@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
@@ -63,7 +62,6 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.extensions.launchUrl
-import mega.privacy.android.app.features.CloudDriveFeature
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.main.ManagerActivity
@@ -78,13 +76,14 @@ import mega.privacy.android.app.presentation.clouddrive.ui.FileBrowserComposeVie
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
-import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
+import mega.privacy.android.app.presentation.validator.toolbaractions.ToolbarActionsValidator
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.ToolbarActionsRequest
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.Constants
@@ -93,10 +92,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
-import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.VideoFileTypeInfo
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
@@ -104,7 +100,6 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.sync.SyncType
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
@@ -166,18 +161,6 @@ class CloudDriveSyncsFragment : Fragment() {
     @Inject
     lateinit var fileTypeIconMapper: FileTypeIconMapper
 
-    /**
-     * Mapper to get options for Action Bar
-     */
-    @Inject
-    lateinit var getOptionsForToolbarMapper: GetOptionsForToolbarMapper
-
-    /**
-     * App Navigator
-     */
-    @Inject
-    lateinit var appNavigator: MegaNavigator
-
     private val fileBrowserViewModel: FileBrowserViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
     private val syncIssueNotificationViewModel: SyncIssueNotificationViewModel by activityViewModels()
@@ -207,6 +190,9 @@ class CloudDriveSyncsFragment : Fragment() {
      */
     @Inject
     lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
+
+    @Inject
+    lateinit var toolbarActionsValidator: ToolbarActionsValidator
 
     /**
      * onAttach
@@ -269,8 +255,8 @@ class CloudDriveSyncsFragment : Fragment() {
                 }
 
                 // Restore action mode when selection state changes (e.g., after device rotation)
-                LaunchedEffect(uiState.isInSelection, uiState.selectedNodeHandles.size) {
-                    if (uiState.isInSelection && uiState.selectedNodeHandles.isNotEmpty()) {
+                LaunchedEffect(uiState.isInSelection, uiState.selectedNodes.size) {
+                    if (uiState.isInSelection && uiState.selectedNodes.isNotEmpty()) {
                         if (actionMode == null) {
                             actionMode =
                                 (requireActivity() as? AppCompatActivity)?.startSupportActionMode(
@@ -370,7 +356,7 @@ class CloudDriveSyncsFragment : Fragment() {
                                         onOpenMegaFolderClicked = {
                                             coroutineScope.launch {
                                                 fileBrowserViewModel.setIsFromSyncTab(true)
-                                                appNavigator.openNodeInCloudDrive(
+                                                megaNavigator.openNodeInCloudDrive(
                                                     activity,
                                                     nodeHandle = it,
                                                     errorMessage = null,
@@ -432,11 +418,15 @@ class CloudDriveSyncsFragment : Fragment() {
                         }
                     }
                 }
-                performItemOptionsClick(uiState.optionsItemInfo)
-                updateActionModeTitle(
-                    fileCount = uiState.selectedFileNodes,
-                    folderCount = uiState.selectedFolderNodes
-                )
+                LaunchedEffect(uiState.optionsItemInfo) {
+                    performItemOptionsClick(optionsItemInfo = uiState.optionsItemInfo)
+                }
+                LaunchedEffect(uiState.selectedFileNodes, uiState.selectedFolderNodes) {
+                    updateActionModeTitle(
+                        fileCount = uiState.selectedFileNodes,
+                        folderCount = uiState.selectedFolderNodes
+                    )
+                }
                 HandleMediaDiscoveryVisibility(
                     isMediaDiscoveryOpen = uiState.isMediaDiscoveryOpen,
                     isMediaDiscoveryOpenedByIconClick = uiState.isMediaDiscoveryOpenedByIconClick,
@@ -478,7 +468,7 @@ class CloudDriveSyncsFragment : Fragment() {
             uiState = uiState,
             emptyState = getEmptyFolderDrawable(uiState.isFileBrowserEmpty),
             onItemClick = {
-                if (uiState.selectedNodeHandles.isEmpty()) {
+                if (uiState.selectedNodes.isEmpty()) {
                     when (it.node) {
                         is TypedFileNode -> onClickedFile(it.node)
 
@@ -633,12 +623,6 @@ class CloudDriveSyncsFragment : Fragment() {
                 folderCount == 0 -> fileCount.toString()
                 else -> (fileCount + folderCount).toString()
             }
-
-            runCatching {
-                actionMode?.invalidate()
-            }.onFailure {
-                Timber.e(it, "Invalidate error")
-            }
         }
     }
 
@@ -666,6 +650,14 @@ class CloudDriveSyncsFragment : Fragment() {
 
         viewLifecycleOwner.collectFlow(sortByHeaderViewModel.orderChangeState) {
             fileBrowserViewModel.onCloudDriveSortOrderChanged()
+        }
+
+        viewLifecycleOwner.collectFlow(
+            fileBrowserViewModel.state
+                .map { it.toolbarActionsModifierItem }
+                .distinctUntilChanged()
+        ) {
+            actionMode?.invalidate()
         }
     }
 
@@ -711,100 +703,27 @@ class CloudDriveSyncsFragment : Fragment() {
         }
 
         override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
-            val selected =
-                fileBrowserViewModel.state.value.selectedNodeHandles.takeUnless { it.isEmpty() }
-                    ?: return false
-            val nodeList = fileBrowserViewModel.state.value.nodesList
-            menu.findItem(R.id.cab_menu_share_link).title =
-                resources.getQuantityString(sharedR.plurals.label_share_links, selected.size)
-            lifecycleScope.launch {
-                runCatching {
-                    val control = getOptionsForToolbarMapper(
-                        selectedNodeHandleList = fileBrowserViewModel.state.value.selectedNodeHandles,
-                        totalNodes = fileBrowserViewModel.state.value.nodesList.size
-                    )
-                    CloudStorageOptionControlUtil.applyControl(menu, control)
-
-                    handleHiddenNodes(selected, nodeList, menu)
-                    handleAddToAlbum(selected, nodeList, menu)
-                    handleFavourites(selected, nodeList, menu)
-                    handleLabels(selected, nodeList, menu)
-                }.onFailure {
-                    Timber.e(it)
-                }
+            val actionModeState = fileBrowserViewModel.state.value.toolbarActionsModifierItem
+            if (actionModeState == null) {
+                return false
             }
+
+            menu.findItem(R.id.cab_menu_share_link).title = resources.getQuantityString(
+                sharedR.plurals.label_share_links,
+                fileBrowserViewModel.state.value.selectedNodes.size
+            )
+            val control = toolbarActionsValidator(
+                request = ToolbarActionsRequest(
+                    modifierItem = actionModeState,
+                    selectedNodes = fileBrowserViewModel.state.value.selectedNodes,
+                    totalNodes = fileBrowserViewModel.state.value.nodesList.size
+                )
+            )
+            CloudStorageOptionControlUtil.applyControl(
+                menu,
+                control
+            )
             return true
-        }
-
-        private suspend fun isHiddenNodesActive(): Boolean {
-            val result = runCatching {
-                getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-            }
-            return result.getOrNull() ?: false
-        }
-
-        private suspend fun handleHiddenNodes(
-            selected: List<Long>,
-            nodeList: List<NodeUIItem<TypedNode>>,
-            menu: Menu,
-        ) {
-            val isHiddenNodesEnabled = isHiddenNodesActive()
-            if (!isHiddenNodesEnabled) {
-                menu.findItem(R.id.cab_menu_hide)?.isVisible = false
-                menu.findItem(R.id.cab_menu_unhide)?.isVisible = false
-                return
-            }
-
-            val selectedNodes = selected.mapNotNull { nodeId ->
-                nodeList.find { it.id.longValue == nodeId }
-            }
-
-            val isHidingActionAllowed = selected.all {
-                fileBrowserViewModel.isHidingActionAllowed(NodeId(it))
-            }
-
-            if (!isHidingActionAllowed) {
-                menu.findItem(R.id.cab_menu_hide)?.isVisible = false
-                menu.findItem(R.id.cab_menu_unhide)?.isVisible = false
-                return
-            }
-            val includeSensitiveInheritedNode = selectedNodes.any { it.isSensitiveInherited }
-
-            val hasNonSensitiveNode = selectedNodes.any { !it.isMarkedSensitive }
-            val isPaid = fileBrowserViewModel.state.value.accountType?.isPaid ?: false
-            val isBusinessAccountExpired =
-                fileBrowserViewModel.state.value.isBusinessAccountExpired
-
-            menu.findItem(R.id.cab_menu_hide)?.isVisible =
-                !isPaid || isBusinessAccountExpired || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
-            menu.findItem(R.id.cab_menu_unhide)?.isVisible =
-                isPaid && !isBusinessAccountExpired && !hasNonSensitiveNode && !includeSensitiveInheritedNode
-        }
-
-        private fun handleAddToAlbum(
-            selected: List<Long>,
-            nodeList: List<NodeUIItem<TypedNode>>,
-            menu: Menu,
-        ) {
-            val mediaNodes = nodeList
-                .filter { it.id.longValue in selected }
-                .filter {
-                    val type = (it.node as? FileNode)?.type
-                    type is ImageFileTypeInfo || type is VideoFileTypeInfo
-                }
-
-            if (mediaNodes.size == selected.size) {
-                if (mediaNodes.all { (it.node as? FileNode)?.type is VideoFileTypeInfo }) {
-                    menu.findItem(R.id.cab_menu_add_to_album)?.isVisible = false
-                    menu.findItem(R.id.cab_menu_add_to)?.isVisible = true
-                } else {
-                    menu.findItem(R.id.cab_menu_add_to_album)?.isVisible = true
-                    menu.findItem(R.id.cab_menu_add_to)?.isVisible = false
-                }
-            } else {
-                menu.findItem(R.id.cab_menu_add_to_album)?.isVisible = false
-                menu.findItem(R.id.cab_menu_add_to)?.isVisible = false
-            }
         }
 
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
@@ -821,63 +740,6 @@ class CloudDriveSyncsFragment : Fragment() {
                 it.handleShowingAds()
                 actionMode = null
             }
-        }
-
-        private suspend fun handleFavourites(
-            selected: List<Long>,
-            nodeList: List<NodeUIItem<TypedNode>>,
-            menu: Menu,
-        ) {
-            // Check if the bugfix for allowing favorite in multiple selection is enabled
-            val isFavoriteMultipleSelectionEnabled = runCatching {
-                getFeatureFlagValueUseCase(CloudDriveFeature.FAVORITE_MULTIPLE_SELECTION)
-            }.getOrNull() ?: false
-
-            // Only show favorite options when the feature is enabled
-            if (!isFavoriteMultipleSelectionEnabled) {
-                menu.findItem(R.id.cab_menu_add_favourites)?.isVisible = false
-                menu.findItem(R.id.cab_menu_remove_favourites)?.isVisible = false
-                return
-            }
-
-            val selectedNodes = nodeList.filter { it.id.longValue in selected }
-
-            // Count how many are favorites and how many are not
-            val favouriteCount = selectedNodes.count { it.node.isFavourite }
-            val nonFavouriteCount = selectedNodes.size - favouriteCount
-
-            // Show "Add to favourites" if any item is not a favourite
-            menu.findItem(R.id.cab_menu_add_favourites)?.isVisible = nonFavouriteCount > 0
-
-            // Show "Remove from favourites" if all items are favourites
-            menu.findItem(R.id.cab_menu_remove_favourites)?.isVisible =
-                favouriteCount == selectedNodes.size && selectedNodes.isNotEmpty()
-        }
-
-        private suspend fun handleLabels(
-            selected: List<Long>,
-            nodeList: List<NodeUIItem<TypedNode>>,
-            menu: Menu,
-        ) {
-            // Check if the feature for allowing label in multiple selection is enabled
-            val isLabelMultipleSelectionEnabled = runCatching {
-                getFeatureFlagValueUseCase(CloudDriveFeature.LABEL_MULTIPLE_SELECTION)
-            }
-                .onFailure { Timber.w(it, "Label multi-select flag check failed") }
-                .getOrElse { false }
-
-            // Only show label options when the feature is enabled
-            val menuItem = menu.findItem(R.id.cab_menu_add_label)
-            if (!isLabelMultipleSelectionEnabled) {
-                menuItem?.isVisible = false
-                return
-            }
-
-            val selectedNodes = nodeList.filter { it.id.longValue in selected }
-
-            // Always show "Add label" when multiple selection is enabled and nodes are selected
-            // The label dialog will handle both adding and removing labels
-            menuItem?.isVisible = selectedNodes.isNotEmpty()
         }
     }
 
@@ -942,7 +804,8 @@ class CloudDriveSyncsFragment : Fragment() {
                 }
 
                 OptionItems.MOVE_TO_RUBBISH_CLICKED -> {
-                    fileBrowserViewModel.state.value.selectedNodeHandles.takeIf { handles -> handles.isNotEmpty() }
+                    fileBrowserViewModel.state.value.selectedNodes.takeIf { nodes -> nodes.isNotEmpty() }
+                        ?.map { nodes -> nodes.id }
                         ?.let { handles ->
                             ConfirmMoveToRubbishBinDialogFragment.newInstance(handles)
                                 .show(
@@ -993,13 +856,19 @@ class CloudDriveSyncsFragment : Fragment() {
 
                 OptionItems.COPY_CLICKED -> {
                     val nC = NodeController(requireActivity())
-                    nC.chooseLocationToCopyNodes(fileBrowserViewModel.state.value.selectedNodeHandles)
+                    val handles = fileBrowserViewModel.state.value.selectedNodes.map { node ->
+                        node.id
+                    }
+                    nC.chooseLocationToCopyNodes(handles)
                     disableSelectMode()
                 }
 
                 OptionItems.MOVE_CLICKED -> {
                     val nC = NodeController(requireActivity())
-                    nC.chooseLocationToMoveNodes(fileBrowserViewModel.state.value.selectedNodeHandles)
+                    val handles = fileBrowserViewModel.state.value.selectedNodes.map { node ->
+                        node.id
+                    }
+                    nC.chooseLocationToMoveNodes(handles)
                     disableSelectMode()
                 }
 

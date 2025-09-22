@@ -37,7 +37,7 @@ class ToolbarActionsValidatorTest {
                         id = 123L,
                         isTakenDown = false,
                         isExported = true,
-                        accessPermissions = listOf(AccessPermission.OWNER, AccessPermission.FULL)
+                        accessPermission = AccessPermission.OWNER
                     )
                 ),
                 totalNodes = 1
@@ -59,7 +59,7 @@ class ToolbarActionsValidatorTest {
                     newSelectedNode(
                         id = 123L,
                         isTakenDown = false,
-                        accessPermissions = listOf(AccessPermission.OWNER, AccessPermission.FULL)
+                        accessPermission = AccessPermission.OWNER
                     )
                 ),
                 totalNodes = 1
@@ -100,7 +100,7 @@ class ToolbarActionsValidatorTest {
                 selectedNodes = listOf(
                     newSelectedNode(
                         id = 123L,
-                        accessPermissions = listOf(AccessPermission.FULL)
+                        accessPermission = AccessPermission.FULL
                     )
                 ),
                 totalNodes = 1
@@ -132,7 +132,7 @@ class ToolbarActionsValidatorTest {
                     newSelectedNode(
                         id = 123L,
                         isTakenDown = true,
-                        accessPermissions = listOf(AccessPermission.OWNER)
+                        accessPermission = AccessPermission.OWNER
                     )
                 ),
                 totalNodes = 1
@@ -152,11 +152,11 @@ class ToolbarActionsValidatorTest {
                 selectedNodes = listOf(
                     newSelectedNode(
                         id = 123L,
-                        accessPermissions = listOf(AccessPermission.OWNER)
+                        accessPermission = AccessPermission.OWNER
                     ),
                     newSelectedNode(
                         id = 321L,
-                        accessPermissions = listOf(AccessPermission.OWNER)
+                        accessPermission = AccessPermission.OWNER
                     )
                 ),
                 totalNodes = 2
@@ -175,7 +175,7 @@ class ToolbarActionsValidatorTest {
                 selectedNodes = listOf(
                     newSelectedNode(
                         id = 123L,
-                        accessPermissions = listOf(AccessPermission.OWNER)
+                        accessPermission = AccessPermission.OWNER
                     ),
                     newSelectedNode(
                         id = 321L
@@ -196,12 +196,12 @@ class ToolbarActionsValidatorTest {
                 selectedNodes = listOf(
                     newSelectedNode(
                         id = 123L,
-                        accessPermissions = listOf(AccessPermission.OWNER)
+                        accessPermission = AccessPermission.OWNER
                     ),
                     newSelectedNode(
                         id = 321L,
                         isTakenDown = true,
-                        accessPermissions = listOf(AccessPermission.OWNER)
+                        accessPermission = AccessPermission.OWNER
                     )
                 ),
                 totalNodes = 2
@@ -351,7 +351,7 @@ class ToolbarActionsValidatorTest {
                             isShared = false,
                             isPendingShare = false,
                         ),
-                        accessPermissions = listOf(AccessPermission.OWNER, AccessPermission.FULL)
+                        accessPermission = AccessPermission.OWNER
                     )
                 ),
                 totalNodes = 1
@@ -369,7 +369,7 @@ class ToolbarActionsValidatorTest {
                 selectedNodes = listOf(
                     newSelectedNode(
                         id = 123L,
-                        accessPermissions = listOf(AccessPermission.OWNER, AccessPermission.FULL)
+                        accessPermission = AccessPermission.OWNER
                     )
                 ),
                 totalNodes = 1
@@ -494,7 +494,7 @@ class ToolbarActionsValidatorTest {
             selectedNodes = listOf(
                 newSelectedNode(
                     id = 123L,
-                    accessPermissions = listOf(AccessPermission.OWNER, AccessPermission.FULL)
+                    accessPermission = AccessPermission.OWNER
                 )
             ),
             totalNodes = 5
@@ -677,7 +677,7 @@ class ToolbarActionsValidatorTest {
         isTakenDown: Boolean = false,
         isExported: Boolean = false,
         isIncomingShare: Boolean = false,
-        accessPermissions: List<AccessPermission> = emptyList(),
+        accessPermission: AccessPermission = AccessPermission.UNKNOWN,
         canBeMovedToRubbishBin: Boolean = false,
     ) = SelectedNode(
         id = id,
@@ -685,7 +685,7 @@ class ToolbarActionsValidatorTest {
         isTakenDown = isTakenDown,
         isExported = isExported,
         isIncomingShare = isIncomingShare,
-        accessPermissions = accessPermissions,
+        accessPermission = accessPermission,
         canBeMovedToRubbishBin = canBeMovedToRubbishBin,
     )
 }

@@ -21,7 +21,7 @@ data class SelectedNode(
     val isTakenDown: Boolean,
     val isExported: Boolean,
     val isIncomingShare: Boolean,
-    val accessPermissions: List<AccessPermission>,
+    val accessPermission: AccessPermission,
     val canBeMovedToRubbishBin: Boolean,
 )
 
