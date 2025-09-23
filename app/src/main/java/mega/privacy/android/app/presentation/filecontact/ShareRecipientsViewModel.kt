@@ -16,11 +16,11 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.core.nodecomponents.mapper.RemoveShareResultMapper
 import mega.privacy.android.app.presentation.filecontact.model.FileContactListState
-import mega.privacy.android.app.presentation.filecontact.navigation.FileContactInfo
+import mega.privacy.android.core.nodecomponents.mapper.RemoveShareResultMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.domain.entity.node.MoveRequestResult
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.ResultCount
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.shares.ShareRecipient
@@ -28,6 +28,7 @@ import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarning
 import mega.privacy.android.domain.usecase.foldernode.ShareFolderUseCase
 import mega.privacy.android.domain.usecase.shares.GetAllowedSharingPermissionsUseCase
 import mega.privacy.android.domain.usecase.shares.MonitorShareRecipientsUseCase
+import mega.privacy.android.navigation.destination.FileContactInfo
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -42,6 +43,7 @@ internal class ShareRecipientsViewModel @Inject constructor(
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
 ) : ViewModel() {
     private val folderInfo = savedStateHandle.toRoute<FileContactInfo>()
+
     val state: StateFlow<FileContactListState>
         field: MutableStateFlow<FileContactListState> = MutableStateFlow(
             FileContactListState.Loading(
@@ -205,6 +207,9 @@ internal class ShareRecipientsViewModel @Inject constructor(
     }
 
 }
+
+internal val FileContactInfo.folderId: NodeId
+    get() = NodeId(folderHandle)
 
 private fun interface StateTransform {
     operator fun invoke(

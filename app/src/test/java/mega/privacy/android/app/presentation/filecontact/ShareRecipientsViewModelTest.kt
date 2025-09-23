@@ -11,11 +11,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.nodecomponents.mapper.RemoveShareResultMapper
 import mega.privacy.android.app.presentation.filecontact.model.FileContactListState
-import mega.privacy.android.app.presentation.filecontact.navigation.FileContactInfo
-import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.app.triggeredContent
+import mega.privacy.android.core.nodecomponents.mapper.RemoveShareResultMapper
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -24,6 +23,7 @@ import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarning
 import mega.privacy.android.domain.usecase.foldernode.ShareFolderUseCase
 import mega.privacy.android.domain.usecase.shares.GetAllowedSharingPermissionsUseCase
 import mega.privacy.android.domain.usecase.shares.MonitorShareRecipientsUseCase
+import mega.privacy.android.navigation.destination.FileContactInfo
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

@@ -8,6 +8,33 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.menu.MenuAction
+import mega.privacy.android.core.nodecomponents.action.clickhandler.AvailableOfflineActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.CopyActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.DeletePermanentActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.DisputeTakeDownActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.DownloadActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.EditActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.FavouriteActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.GetLinkActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.HideActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.InfoActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.LabelActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.ManageLinkActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.ManageShareFolderActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.MoveActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.MoveToRubbishBinActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.OpenWithActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveFavouriteActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveLinkActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveShareActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.RenameNodeActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.RestoreActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.SendToChatActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.ShareActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.ShareFolderActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.UnhideActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.VerifyActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.VersionsActionClickHandler
 import mega.privacy.android.core.nodecomponents.dialog.delete.MoveToRubbishOrDeleteDialogArgs
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.RestoreNodeResultMapper
@@ -38,33 +65,6 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VerifyMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VersionsMenuAction
-import mega.privacy.android.core.nodecomponents.action.clickhandler.AvailableOfflineActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.CopyActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.DeletePermanentActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.DisputeTakeDownActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.DownloadActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.EditActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.FavouriteActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.GetLinkActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.HideActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.InfoActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.LabelActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.ManageLinkActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.ManageShareFolderActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.MoveActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.MoveToRubbishBinActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.OpenWithActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveFavouriteActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveLinkActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveShareActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.RenameNodeActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.RestoreActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.SendToChatActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.ShareActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.ShareFolderActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.UnhideActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.VerifyActionClickHandler
-import mega.privacy.android.core.nodecomponents.action.clickhandler.VersionsActionClickHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.NodeId
@@ -90,6 +90,7 @@ import mega.privacy.android.domain.usecase.shares.GetNodeShareDataUseCase
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.destination.FileContactInfo
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -138,6 +139,7 @@ class NodeActionClickHandlerTest {
 
     private val mockFileNode = mock<TypedFileNode> {
         on { id } doReturn NodeId(123L)
+        on { name } doReturn "filename"
     }
 
     private val mockFolderNode = mock<TypedFolderNode> {
@@ -797,7 +799,8 @@ class NodeActionClickHandlerTest {
     // ManageShareFolderAction Tests
     @Test
     fun `test ManageShareFolderAction canHandle returns true for ManageShareFolderMenuAction`() {
-        val action = ManageShareFolderActionClickHandler(mockGetFeatureFlagValueUseCase, mockMegaNavigator)
+        val action =
+            ManageShareFolderActionClickHandler(mockGetFeatureFlagValueUseCase, mockMegaNavigator)
         val menuAction = mock<ManageShareFolderMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -805,14 +808,16 @@ class NodeActionClickHandlerTest {
 
     @Test
     fun `test ManageShareFolderAction single node handle calls megaNavigator`() = runTest {
-        val action = ManageShareFolderActionClickHandler(mockGetFeatureFlagValueUseCase, mockMegaNavigator)
+        val action =
+            ManageShareFolderActionClickHandler(mockGetFeatureFlagValueUseCase, mockMegaNavigator)
         val menuAction = mock<ManageShareFolderMenuAction>()
 
         whenever(mockGetFeatureFlagValueUseCase(any())).thenReturn(true)
 
+
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockMegaNavigator).openFileContactListActivity(any(), any(), anyOrNull())
+        verify(mockNavigationHandler).navigate(any<FileContactInfo>())
     }
 
     // InfoAction Tests
@@ -1133,12 +1138,24 @@ class NodeActionClickHandlerTest {
             ).canHandle(wrongAction)
         ).isFalse()
         assertThat(DownloadActionClickHandler().canHandle(wrongAction)).isFalse()
-        assertThat(AvailableOfflineActionClickHandler(mockRemoveOfflineNodeUseCase).canHandle(wrongAction)).isFalse()
+        assertThat(
+            AvailableOfflineActionClickHandler(mockRemoveOfflineNodeUseCase).canHandle(
+                wrongAction
+            )
+        ).isFalse()
         assertThat(HideActionClickHandler(mockIsHiddenNodesOnboardedUseCase).canHandle(wrongAction)).isFalse()
         assertThat(RenameNodeActionClickHandler().canHandle(wrongAction)).isFalse()
-        assertThat(MoveToRubbishBinActionClickHandler(mockNodeHandlesToJsonMapper).canHandle(wrongAction)).isFalse()
+        assertThat(
+            MoveToRubbishBinActionClickHandler(mockNodeHandlesToJsonMapper).canHandle(
+                wrongAction
+            )
+        ).isFalse()
         assertThat(ManageLinkActionClickHandler().canHandle(wrongAction)).isFalse()
-        assertThat(DeletePermanentActionClickHandler(mockNodeHandlesToJsonMapper).canHandle(wrongAction)).isFalse()
+        assertThat(
+            DeletePermanentActionClickHandler(mockNodeHandlesToJsonMapper).canHandle(
+                wrongAction
+            )
+        ).isFalse()
         assertThat(LabelActionClickHandler().canHandle(wrongAction)).isFalse()
         assertThat(
             ManageShareFolderActionClickHandler(
@@ -1165,7 +1182,11 @@ class NodeActionClickHandlerTest {
         assertThat(RemoveLinkActionClickHandler(mockNodeHandlesToJsonMapper).canHandle(wrongAction)).isFalse()
         assertThat(GetLinkActionClickHandler(mockMegaNavigator).canHandle(wrongAction)).isFalse()
         assertThat(UnhideActionClickHandler(mockUpdateNodeSensitiveUseCase).canHandle(wrongAction)).isFalse()
-        assertThat(RemoveFavouriteActionClickHandler(mockUpdateNodeFavoriteUseCase).canHandle(wrongAction)).isFalse()
+        assertThat(
+            RemoveFavouriteActionClickHandler(mockUpdateNodeFavoriteUseCase).canHandle(
+                wrongAction
+            )
+        ).isFalse()
         assertThat(FavouriteActionClickHandler(mockUpdateNodeFavoriteUseCase).canHandle(wrongAction)).isFalse()
     }
 }

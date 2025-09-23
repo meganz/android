@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.filecontact.view
 
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -20,7 +19,6 @@ import de.palm.composestateevents.StateEventWithContentConsumed
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaSnackbar
 import mega.android.core.ui.components.banner.TopWarningBanner
@@ -29,7 +27,6 @@ import mega.android.core.ui.components.surface.ColumnSurface
 import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.contact.contract.AddContactsContract
 import mega.privacy.android.app.presentation.filecontact.model.FileContactListState
 import mega.privacy.android.app.presentation.filecontact.model.SelectionState
 import mega.privacy.android.domain.entity.contacts.ContactData
@@ -46,37 +43,15 @@ internal fun FileContactScreen(
     state: FileContactListState.Data,
     onBackPressed: () -> Unit,
     removeContacts: (List<ShareRecipient>) -> Unit,
-    shareFolder: (List<String>, AccessPermission) -> Unit,
+    addContact: (Long) -> Unit,
     updatePermissions: (List<ShareRecipient>, AccessPermission) -> Unit,
     shareRemovedEventHandled: () -> Unit,
     shareCompletedEventHandled: () -> Unit,
     navigateToInfo: (ShareRecipient) -> Unit,
-    addContactsContract: AddContactsContract,
     coroutineScope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
-    var newShareRecipients: List<String>? by remember { mutableStateOf(null) }
-    val launcher = rememberLauncherForActivityResult(
-        contract = addContactsContract
-    ) { result ->
-        coroutineScope.launch {
-            result?.let {
-                if (result.emails.isNotEmpty()) {
-                    newShareRecipients = result.emails
-                }
-            }
-        }
-    }
-
-    val onShareFolder = {
-        launcher.launch(
-            AddContactsContract.Input(
-                contactType = AddContactsContract.ContactType.All,
-                nodeHandle = listOf(state.folderId.longValue),
-            )
-        )
-    }
 
     var selectedItems by remember { mutableStateOf(emptyList<ShareRecipient>()) }
     val selectionState = SelectionState(
@@ -142,7 +117,7 @@ internal fun FileContactScreen(
                 selectAll = selectAll,
                 deselectAll = deselectAll,
                 changePermissions = changePermissions,
-                shareFolder = onShareFolder,
+                shareFolder = { addContact(state.folderId.longValue) },
                 removeShare = removeShare,
             )
         },
@@ -154,7 +129,7 @@ internal fun FileContactScreen(
         floatingActionButton = {
             PrimaryLargeIconButton(
                 icon = painterResource(id = R.drawable.ic_add_white),
-                onClick = onShareFolder,
+                onClick = { addContact(state.folderId.longValue) },
             )
         }
     ) { paddingValues ->
@@ -181,39 +156,7 @@ internal fun FileContactScreen(
                 selectedItems = selectedItems
             )
 
-            if (newShareRecipients != null) {
-                val onDismiss = { newShareRecipients = null }
-                if (state.accessPermissions.all { it == AccessPermission.READ }) {
-                    val onPositiveButtonClicked: () -> Unit = {
-                        newShareRecipients?.let {
-                            shareFolder(
-                                it,
-                                AccessPermission.READ
-                            )
-                        }
-                        onDismiss()
-                    }
-                    BackupNodeShareWarningDialog(
-                        onPositiveButtonClicked = onPositiveButtonClicked,
-                        onDismiss = onDismiss
-                    )
-                } else {
-                    SetNewSharePermissionBottomSheet(
-                        onDismissSheet = onDismiss,
-                        shareWithPermission = { permission: AccessPermission ->
-                            newShareRecipients?.let {
-                                shareFolder(
-                                    it,
-                                    permission
-                                )
-                            }
-                        },
-                        coroutineScope = coroutineScope
-                    )
-                }
-            }
-
-            updatePermissions?.let {
+            updatePermissions?.let { recipients ->
                 val onDismiss = {
                     updatePermissions = null
                     selectedItems = emptyList()
@@ -227,7 +170,7 @@ internal fun FileContactScreen(
                         onDismissSheet = onDismiss,
                         shareWithPermission = { permission: AccessPermission ->
                             updatePermissions(
-                                it,
+                                recipients,
                                 permission
                             )
                         },
@@ -236,14 +179,14 @@ internal fun FileContactScreen(
                 }
             }
 
-            displayOptionsRecipient?.let {
+            displayOptionsRecipient?.let { recipient ->
                 FileContactListOptionsBottomSheet(
-                    recipient = it,
+                    recipient = recipient,
                     onDismissSheet = { displayOptionsRecipient = null },
-                    navigateToInfo = { navigateToInfo(it) },
-                    updatePermissions = { updatePermissions = listOf(it) },
+                    navigateToInfo = { navigateToInfo(recipient) },
+                    updatePermissions = { updatePermissions = listOf(recipient) },
                     removeShare = {
-                        verifyRemoval = listOf(it)
+                        verifyRemoval = listOf(recipient)
                     },
                     coroutineScope = coroutineScope
                 )
@@ -270,7 +213,10 @@ internal fun FileContactScreen(
             verifyRemoval?.let {
                 VerifyRemovalDialog(
                     selectedItems = it,
-                    onDismiss = { verifyRemoval = null },
+                    onDismiss = {
+                        verifyRemoval = null
+                        selectedItems = emptyList()
+                    },
                     removeContacts = removeContacts
                 )
             }
@@ -315,12 +261,11 @@ private fun FileContactScreenPreview() {
             ),
             onBackPressed = {},
             removeContacts = {},
-            shareFolder = { _, _ -> },
             updatePermissions = { _, _ -> },
             shareRemovedEventHandled = {},
             shareCompletedEventHandled = {},
             navigateToInfo = {},
-            addContactsContract = AddContactsContract(),
+            addContact = {},
             coroutineScope = rememberCoroutineScope(),
             snackbarHostState = remember { SnackbarHostState() },
             modifier = Modifier,

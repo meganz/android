@@ -3,22 +3,27 @@ package mega.privacy.android.app.presentation.filecontact
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
+import kotlinx.coroutines.flow.mapNotNull
+import mega.privacy.android.app.appstate.transfer.AppTransferViewModel
+import mega.privacy.android.app.appstate.transfer.TransferHandlerImpl
 import mega.privacy.android.app.presentation.container.SharedAppContainer
-import mega.privacy.android.app.presentation.filecontact.navigation.FileContactInfo
-import mega.privacy.android.app.presentation.filecontact.navigation.fileContacts
+import mega.privacy.android.app.presentation.filecontact.navigation.FileContactFeatureDestination
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.destination.FileContactInfo
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -30,6 +35,7 @@ internal class FileContactListComposeActivity : AppCompatActivity() {
 
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -44,33 +50,86 @@ internal class FileContactListComposeActivity : AppCompatActivity() {
 
         setContent {
             val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val appTransferViewModel = hiltViewModel<AppTransferViewModel>()
+            val navController = rememberNavController()
+            val navigationHandlerImpl = object : NavigationHandler {
+                override fun back() {
+                    if (!navController.popBackStack()) {
+                        finish()
+                    }
+                }
+
+                override fun navigate(destination: NavKey) {
+                    navController.navigate(destination)
+                }
+
+                override fun backTo(destination: NavKey, inclusive: Boolean) {
+                    navController.popBackStack(destination, inclusive)
+                }
+
+                override fun navigateAndClearBackStack(destination: NavKey) {
+                    navController.navigate(destination) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+
+                override fun navigateAndClearTo(
+                    destination: NavKey,
+                    newParent: NavKey,
+                    inclusive: Boolean,
+                ) {
+                    navController.navigate(destination) {
+                        popUpTo(newParent) { this.inclusive = inclusive }
+                    }
+                }
+
+                override fun <T> returnResult(key: String, value: T) {
+                    navController.previousBackStackEntry?.savedStateHandle?.set(
+                        key = key,
+                        value = value
+                    )
+                    navController.popBackStack()
+                }
+
+                override fun <T> monitorResult(key: String) =
+                    navController.currentBackStackEntryFlow.mapNotNull {
+                        if (it.savedStateHandle.contains(key)) {
+                            val result = it.savedStateHandle.get<T>(key)
+                            it.savedStateHandle.remove<T>(key)
+                            result
+                        } else null
+                    }
+            }
 
             SharedAppContainer(
                 themeMode = themeMode,
                 passcodeCryptObjectFactory = passcodeCryptObjectFactory
             ) {
+                BackHandler(
+                    onBack = {
+                        if (!navController.popBackStack()) {
+                            finish()
+                        }
+                    }
+                )
+
                 NavHost(
-                    navController = rememberNavController(),
+                    navController = navController,
                     startDestination = FileContactInfo(
                         folderHandle = nodeHandle,
                         folderName = nodeName,
                     )
                 ) {
-                    fileContacts(
-                        onNavigateBack = { supportFinishAfterTransition() },
-                        onNavigateToInfo = {
-                            val i = Intent(
-                                this@FileContactListComposeActivity,
-                                ContactInfoActivity::class.java
-                            )
-                            i.putExtra(Constants.NAME, it.email)
-                            startActivity(i)
-                        }
+                    FileContactFeatureDestination().navigationGraph(
+                        this,
+                        navigationHandlerImpl,
+                        TransferHandlerImpl(appTransferViewModel)
                     )
                 }
             }
-        }
 
+
+        }
     }
 
     companion object {
