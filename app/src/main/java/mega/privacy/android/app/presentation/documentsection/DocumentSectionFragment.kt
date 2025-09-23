@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -40,9 +41,9 @@ import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEnt
 import mega.privacy.android.app.presentation.documentsection.view.DocumentSectionComposeView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
-import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
+import mega.privacy.android.app.presentation.validator.toolbaractions.ToolbarActionsValidator
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
@@ -76,11 +77,8 @@ class DocumentSectionFragment : Fragment() {
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
-    /**
-     * Mapper to get options for Action Bar
-     */
     @Inject
-    lateinit var getOptionsForToolbarMapper: GetOptionsForToolbarMapper
+    lateinit var toolbarActionsValidator: ToolbarActionsValidator
 
     private var actionMode: ActionMode? = null
 
@@ -144,7 +142,9 @@ class DocumentSectionFragment : Fragment() {
                     )
                 }
             }
-            updateActionModeTitle(count = uiState.selectedDocumentHandles.size)
+            LaunchedEffect(uiState.selectedNodes) {
+                updateActionModeTitle(count = uiState.selectedNodes.size)
+            }
         }
     }
 
@@ -260,7 +260,7 @@ class DocumentSectionFragment : Fragment() {
                         managerActivity = requireActivity() as ManagerActivity,
                         childFragmentManager = childFragmentManager,
                         documentSectionViewModel = documentSectionViewModel,
-                        getOptionsForToolbarMapper = getOptionsForToolbarMapper
+                        toolbarActionsValidator = toolbarActionsValidator
                     ) {
                         disableSelectMode()
                     }
@@ -278,12 +278,6 @@ class DocumentSectionFragment : Fragment() {
     private fun updateActionModeTitle(count: Int) {
         if (count == 0) actionMode?.finish()
         actionMode?.title = count.toString()
-
-        runCatching {
-            actionMode?.invalidate()
-        }.onFailure {
-            Timber.e(it, "Invalidate error")
-        }
     }
 
     /**
@@ -301,6 +295,18 @@ class DocumentSectionFragment : Fragment() {
                 callManager {
                     it.invalidateOptionsMenu()
                 }
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(
+            documentSectionViewModel.uiState
+                .map { it.toolbarActionsModifierItem }
+                .distinctUntilChanged()
+        ) {
+            runCatching {
+                actionMode?.invalidate()
+            }.onFailure {
+                Timber.e(it, "Invalidate error")
             }
         }
     }
@@ -324,9 +330,9 @@ class DocumentSectionFragment : Fragment() {
             hiddenNodesOnboardingLauncher.launch(intent)
             activity?.overridePendingTransition(0, 0)
         } else if (isHiddenNodesOnboarded) {
-            val nodes = documentSectionViewModel.getSelectedNodes()
+            val nodes = documentSectionViewModel.uiState.value.selectedNodes.map { NodeId(it.id) }
             documentSectionViewModel.hideOrUnhideNodes(
-                nodeIds = nodes.map { it.id },
+                nodeIds = nodes,
                 hide = true,
             )
             val message =
@@ -337,7 +343,7 @@ class DocumentSectionFragment : Fragment() {
                 )
             Util.showSnackbar(requireActivity(), message)
         } else {
-            tempNodeIds = documentSectionViewModel.getSelectedNodes().map { it.id }
+            tempNodeIds = documentSectionViewModel.uiState.value.selectedNodes.map { NodeId(it.id) }
             showHiddenNodesOnboarding()
         }
     }

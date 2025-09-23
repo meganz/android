@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,20 +19,25 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.documentsection.model.DocumentSectionUiState
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntityMapper
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.SelectedNode
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.SelectedNodeType
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.DocumentSectionHiddenNodeActionModifierItem
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.DocumentSectionToolbarActionsModifierItem
+import mega.privacy.android.app.presentation.validator.toolbaractions.modifier.ToolbarActionsModifierItem.DocumentSection
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
-import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -40,9 +46,11 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -65,7 +73,6 @@ class DocumentSectionViewModel @Inject constructor(
     private val monitorViewType: MonitorViewType,
     private val setViewType: SetViewType,
     private val getNodeByHandle: GetNodeByHandle,
-    private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getFingerprintUseCase: GetFingerprintUseCase,
     private val megaApiHttpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
     private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
@@ -78,12 +85,16 @@ class DocumentSectionViewModel @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode,
+    private val getRubbishBinFolderUseCase: GetRubbishBinFolderUseCase,
+    private val getNodeAccessUseCase: GetNodeAccessUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DocumentSectionUiState())
     internal val uiState = _uiState.asStateFlow()
 
     private val originalData = mutableListOf<DocumentUiEntity>()
     private var showHiddenItems: Boolean? = null
+    private var actionModeStateJob: Job? = null
 
     /**
      * Is network connected
@@ -185,8 +196,21 @@ class DocumentSectionViewModel @Inject constructor(
             Timber.e(it)
         }
 
-    private suspend fun getDocumentUIEntityList() = getAllDocumentsUseCase().map {
-        documentUiEntityMapper(it)
+    private suspend fun getDocumentUIEntityList(): List<DocumentUiEntity> {
+        val rubbishBinNode = getRubbishBinFolderUseCase()
+        return getAllDocumentsUseCase().map {
+            val accessPermission =
+                getNodeAccessUseCase(nodeId = it.id) ?: AccessPermission.UNKNOWN
+            val canBeMovedToRubbishBin = rubbishBinNode != null && checkNodeCanBeMovedToTargetNode(
+                nodeId = NodeId(longValue = it.id.longValue),
+                targetNodeId = NodeId(longValue = rubbishBinNode.id.longValue)
+            )
+            documentUiEntityMapper(
+                typedFileNode = it,
+                accessPermission = accessPermission,
+                canBeMovedToRubbishBin = canBeMovedToRubbishBin
+            )
+        }
     }
 
     private fun List<DocumentUiEntity>.updateOriginalData() = also { data ->
@@ -272,16 +296,9 @@ class DocumentSectionViewModel @Inject constructor(
     internal suspend fun getDocumentNodeByHandle(handle: Long) = getNodeByHandle(handle)
 
     internal suspend fun getSelectedMegaNode(): List<MegaNode> =
-        _uiState.value.selectedDocumentHandles.mapNotNull {
+        _uiState.value.selectedNodes.mapNotNull {
             runCatching {
-                getNodeByHandle(it)
-            }.getOrNull()
-        }
-
-    internal suspend fun getSelectedNodes(): List<TypedNode> =
-        _uiState.value.selectedDocumentHandles.mapNotNull {
-            runCatching {
-                getNodeByIdUseCase(NodeId(it))
+                getNodeByHandle(it.id)
             }.getOrNull()
         }
 
@@ -290,7 +307,7 @@ class DocumentSectionViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 allDocuments = documents,
-                selectedDocumentHandles = emptyList(),
+                selectedNodes = emptyList(),
                 actionMode = false
             )
         }
@@ -304,16 +321,25 @@ class DocumentSectionViewModel @Inject constructor(
         val documents = _uiState.value.allDocuments.map { item ->
             item.copy(isSelected = true)
         }
-        val selectedHandles = _uiState.value.allDocuments.map { item ->
-            item.id.longValue
+        val selectedNodes = _uiState.value.allDocuments.map { item ->
+            SelectedNode(
+                id = item.id.longValue,
+                type = SelectedNodeType.File,
+                isTakenDown = item.isTakenDown,
+                isExported = item.isExported,
+                isIncomingShare = item.isIncomingShare,
+                accessPermission = item.accessPermission,
+                canBeMovedToRubbishBin = item.canBeMovedToRubbishBin
+            )
         }
         _uiState.update {
             it.copy(
                 allDocuments = documents,
-                selectedDocumentHandles = selectedHandles,
+                selectedNodes = selectedNodes,
                 actionMode = true
             )
         }
+        prepareActionMode()
     }
 
     internal fun setActionMode(value: Boolean) = _uiState.update { it.copy(actionMode = value) }
@@ -323,23 +349,34 @@ class DocumentSectionViewModel @Inject constructor(
 
     private fun updateDocumentItemInSelectionState(item: DocumentUiEntity, index: Int) {
         val isSelected = !item.isSelected
-        val selectedHandles = updateSelectedDocumentHandles(item, isSelected)
+        val selectedNodes = updateSelectedDocumentHandles(item, isSelected)
         val documents = _uiState.value.allDocuments.updateItemSelectedState(index, isSelected)
         _uiState.update {
             it.copy(
                 allDocuments = documents,
-                selectedDocumentHandles = selectedHandles,
-                actionMode = selectedHandles.isNotEmpty()
+                selectedNodes = selectedNodes,
+                actionMode = selectedNodes.isNotEmpty()
             )
         }
+        prepareActionMode()
     }
 
     private fun updateSelectedDocumentHandles(item: DocumentUiEntity, isSelected: Boolean) =
-        _uiState.value.selectedDocumentHandles.toMutableList().also { selectedHandles ->
+        _uiState.value.selectedNodes.toMutableList().also { selectedNodes ->
             if (isSelected) {
-                selectedHandles.add(item.id.longValue)
+                selectedNodes.add(
+                    SelectedNode(
+                        id = item.id.longValue,
+                        type = SelectedNodeType.File,
+                        isTakenDown = item.isTakenDown,
+                        isExported = item.isExported,
+                        isIncomingShare = item.isIncomingShare,
+                        accessPermission = item.accessPermission,
+                        canBeMovedToRubbishBin = item.canBeMovedToRubbishBin
+                    )
+                )
             } else {
-                selectedHandles.remove(item.id.longValue)
+                selectedNodes.removeAll { it.id == item.id.longValue }
             }
         }
 
@@ -352,6 +389,56 @@ class DocumentSectionViewModel @Inject constructor(
                 list[index] = list[index].copy(isSelected = isSelected)
             }
         } else this
+
+    private fun prepareActionMode() {
+        actionModeStateJob?.cancel()
+        actionModeStateJob = viewModelScope.launch {
+            val selectedNodes = _uiState.value.allDocuments.filter { audio ->
+                _uiState.value.selectedNodes.firstOrNull { selectedNode ->
+                    audio.id.longValue == selectedNode.id
+                } != null
+            }
+            if (selectedNodes.isEmpty()) {
+                _uiState.update { it.copy(toolbarActionsModifierItem = null) }
+                return@launch
+            }
+
+            val hiddenNodeActionModeState = runCatching {
+                getHiddenNodeActionModifierItem(selectedNodes = selectedNodes)
+            }.getOrDefault(defaultValue = DocumentSectionHiddenNodeActionModifierItem())
+            _uiState.update {
+                it.copy(
+                    toolbarActionsModifierItem = DocumentSection(
+                        item = DocumentSectionToolbarActionsModifierItem(
+                            hiddenNodeItem = hiddenNodeActionModeState
+                        )
+                    )
+                )
+            }
+        }
+    }
+
+    private suspend fun getHiddenNodeActionModifierItem(selectedNodes: List<DocumentUiEntity>): DocumentSectionHiddenNodeActionModifierItem {
+        val isHiddenNodesEnabled = isHiddenNodesActive()
+        if (!isHiddenNodesEnabled) {
+            return DocumentSectionHiddenNodeActionModifierItem(isEnabled = false)
+        }
+
+        val isPaid = _uiState.value.accountType?.isPaid ?: false
+        if (!isPaid || _uiState.value.isBusinessAccountExpired) {
+            return DocumentSectionHiddenNodeActionModifierItem(
+                isEnabled = true,
+                canBeHidden = true
+            )
+        }
+
+        val includeSensitiveInheritedNode = selectedNodes.any { it.isSensitiveInherited }
+        val hasNonSensitiveNode = selectedNodes.any { !it.isMarkedSensitive }
+        return DocumentSectionHiddenNodeActionModifierItem(
+            isEnabled = true,
+            canBeHidden = hasNonSensitiveNode && !includeSensitiveInheritedNode
+        )
+    }
 
     internal fun hideOrUnhideNodes(nodeIds: List<NodeId>, hide: Boolean) =
         viewModelScope.launch {

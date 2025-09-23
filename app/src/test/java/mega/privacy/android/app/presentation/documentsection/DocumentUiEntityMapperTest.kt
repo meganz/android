@@ -4,17 +4,19 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntityMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedVideoNode
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.icon.pack.R
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -51,12 +53,27 @@ class DocumentUiEntityMapperTest {
         reset(fileTypeIconMapper)
     }
 
-    @Test
-    fun `test that DocumentUIEntity can be mapped correctly`() = runTest {
-        whenever(fileTypeIconMapper(expectedType.extension)).thenReturn(expectedIcon)
-        val documentUIEntity = underTest(initTypedFileNode())
-        assertMappedDocumentUIEntity(documentUIEntity)
-    }
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that DocumentUIEntity can be mapped correctly`(canBeMovedToRubbishBin: Boolean) =
+        runTest {
+            whenever(
+                fileTypeIconMapper(expectedType.extension)
+            ).thenReturn(expectedIcon)
+            val accessPermission = AccessPermission.entries.random()
+
+            val documentUIEntity = underTest(
+                typedFileNode = initTypedFileNode(),
+                accessPermission = accessPermission,
+                canBeMovedToRubbishBin = canBeMovedToRubbishBin
+            )
+
+            assertMappedDocumentUIEntity(
+                documentUIEntity = documentUIEntity,
+                accessPermission = accessPermission,
+                canBeMovedToRubbishBin = canBeMovedToRubbishBin
+            )
+        }
 
     private fun initTypedFileNode() = mock<TypedVideoNode> {
         on { id }.thenReturn(expectedId)
@@ -74,7 +91,11 @@ class DocumentUiEntityMapperTest {
         on { type }.thenReturn(expectedType)
     }
 
-    private fun assertMappedDocumentUIEntity(documentUIEntity: DocumentUiEntity) {
+    private fun assertMappedDocumentUIEntity(
+        documentUIEntity: DocumentUiEntity,
+        accessPermission: AccessPermission,
+        canBeMovedToRubbishBin: Boolean,
+    ) {
         documentUIEntity.let {
             Assertions.assertAll(
                 "Grouped Assertions of ${DocumentUiEntity::class.simpleName}",
@@ -91,6 +112,8 @@ class DocumentUiEntityMapperTest {
                 { assertThat(it.label).isEqualTo(expectedLabel) },
                 { assertThat(it.fileTypeInfo).isEqualTo(expectedType) },
                 { assertThat(it.icon).isEqualTo(expectedIcon) },
+                { assertThat(it.accessPermission).isEqualTo(accessPermission) },
+                { assertThat(it.canBeMovedToRubbishBin).isEqualTo(canBeMovedToRubbishBin) },
             )
         }
     }

@@ -7,17 +7,18 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkDialogFragment
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.main.dialog.shares.RemoveAllSharingContactDialogFragment
-import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
+import mega.privacy.android.app.presentation.validator.toolbaractions.ToolbarActionsValidator
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.ToolbarActionsRequest
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.shared.resources.R as sharedR
 
 internal class DocumentSectionActionModeCallback(
@@ -25,7 +26,7 @@ internal class DocumentSectionActionModeCallback(
     private val managerActivity: ManagerActivity,
     private val childFragmentManager: FragmentManager,
     private val documentSectionViewModel: DocumentSectionViewModel,
-    private val getOptionsForToolbarMapper: GetOptionsForToolbarMapper,
+    private val toolbarActionsValidator: ToolbarActionsValidator,
     private val onActionModeFinished: () -> Unit,
 ) : ActionMode.Callback {
     override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
@@ -35,42 +36,26 @@ internal class DocumentSectionActionModeCallback(
     }
 
     override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        val selectedHandles = documentSectionViewModel.uiState.value.selectedDocumentHandles
-        val selected = selectedHandles.takeUnless { it.isEmpty() } ?: return false
+        val actionModeState = documentSectionViewModel.uiState.value.toolbarActionsModifierItem
+        if (actionModeState == null) {
+            return false
+        }
         menu?.findItem(R.id.cab_menu_share_link)?.title =
             managerActivity.resources.getQuantityString(
                 sharedR.plurals.label_share_links,
-                selected.size
+                documentSectionViewModel.uiState.value.selectedNodes.size
             )
-        managerActivity.lifecycleScope.launch {
-            val control = getOptionsForToolbarMapper(
-                selectedNodeHandleList = selectedHandles,
+        val control = toolbarActionsValidator(
+            request = ToolbarActionsRequest(
+                modifierItem = actionModeState,
+                selectedNodes = documentSectionViewModel.uiState.value.selectedNodes,
                 totalNodes = documentSectionViewModel.uiState.value.allDocuments.size
             )
-            CloudStorageOptionControlUtil.applyControl(menu, control)
-
-            val selectedNodes = documentSectionViewModel.getSelectedNodes()
-            val isHiddenNodesEnabled = isHiddenNodesActive()
-            val includeSensitiveInheritedNode = selectedNodes.any { it.isSensitiveInherited }
-
-            if (isHiddenNodesEnabled) {
-                val hasNonSensitiveNode = selectedNodes.any { !it.isMarkedSensitive }
-                val isPaid =
-                    documentSectionViewModel.uiState.value.accountType?.isPaid
-                        ?: false
-                val isBusinessAccountExpired =
-                    documentSectionViewModel.uiState.value.isBusinessAccountExpired
-
-                menu?.findItem(R.id.cab_menu_hide)?.isVisible =
-                    !isPaid || isBusinessAccountExpired || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
-
-                menu?.findItem(R.id.cab_menu_unhide)?.isVisible =
-                    isPaid && !isBusinessAccountExpired && !hasNonSensitiveNode && !includeSensitiveInheritedNode
-            } else {
-                menu?.findItem(R.id.cab_menu_hide)?.isVisible = false
-                menu?.findItem(R.id.cab_menu_unhide)?.isVisible = false
-            }
-        }
+        )
+        CloudStorageOptionControlUtil.applyControl(
+            menu,
+            control
+        )
         return true
     }
 
@@ -87,7 +72,7 @@ internal class DocumentSectionActionModeCallback(
         item: MenuItem,
     ) {
         managerActivity.lifecycleScope.launch {
-            val selectedHandles = documentSectionViewModel.uiState.value.selectedDocumentHandles
+            val selectedHandles = documentSectionViewModel.uiState.value.selectedNodes.map { it.id }
 
             when (item.itemId) {
                 R.id.cab_menu_download -> managerActivity.saveNodesToDevice(
@@ -117,8 +102,8 @@ internal class DocumentSectionActionModeCallback(
 
                 R.id.cab_menu_remove_link ->
                     RemovePublicLinkDialogFragment.newInstance(
-                        documentSectionViewModel.getSelectedNodes()
-                            .map { node -> node.id.longValue })
+                        documentSectionViewModel.uiState.value.selectedNodes
+                            .map { node -> node.id })
                         .show(childFragmentManager, RemovePublicLinkDialogFragment.TAG)
 
 
@@ -139,8 +124,8 @@ internal class DocumentSectionActionModeCallback(
 
                 R.id.cab_menu_remove_share ->
                     RemoveAllSharingContactDialogFragment.newInstance(
-                        documentSectionViewModel.getSelectedNodes()
-                            .map { node -> node.id.longValue })
+                        documentSectionViewModel.uiState.value.selectedNodes
+                            .map { node -> node.id })
                         .show(childFragmentManager, RemoveAllSharingContactDialogFragment.TAG)
 
                 R.id.cab_menu_select_all -> documentSectionViewModel.selectAllNodes()
@@ -148,7 +133,8 @@ internal class DocumentSectionActionModeCallback(
                 R.id.cab_menu_hide -> fragment.handleHideNodeClick()
 
                 R.id.cab_menu_unhide -> {
-                    val nodeIds = documentSectionViewModel.getSelectedNodes().map { it.id }
+                    val nodeIds =
+                        documentSectionViewModel.uiState.value.selectedNodes.map { NodeId(it.id) }
                     documentSectionViewModel.hideOrUnhideNodes(
                         nodeIds = nodeIds,
                         hide = false,
@@ -173,12 +159,5 @@ internal class DocumentSectionActionModeCallback(
                 documentSectionViewModel.clearAllSelectedDocuments()
             }
         }
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            managerActivity.getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 }

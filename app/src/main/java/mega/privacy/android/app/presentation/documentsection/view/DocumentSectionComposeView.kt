@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.documentsection.view
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
@@ -37,6 +36,7 @@ import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -125,7 +125,7 @@ internal fun DocumentSectionComposeView(
                             onMenuClick = onMenuClick,
                             onSortOrderClick = onSortOrderClick,
                             onLongClick = onLongClick,
-                            isSelectionMode = uiState.selectedDocumentHandles.isNotEmpty(),
+                            isSelectionMode = uiState.selectedNodes.isNotEmpty(),
                         )
                     } else {
                         DocumentGridView(
@@ -141,7 +141,7 @@ internal fun DocumentSectionComposeView(
                             onMenuClick = onMenuClick,
                             onSortOrderClick = onSortOrderClick,
                             onLongClick = onLongClick,
-                            isSelectionMode = uiState.selectedDocumentHandles.isNotEmpty(),
+                            isSelectionMode = uiState.selectedNodes.isNotEmpty(),
                         )
                     }
                 }

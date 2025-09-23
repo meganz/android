@@ -1,7 +1,8 @@
 package mega.privacy.android.app.presentation.documentsection.model
 
-import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import java.io.File
 import javax.inject.Inject
 
@@ -20,6 +21,8 @@ class DocumentUiEntityMapper @Inject constructor(
      */
     operator fun invoke(
         typedFileNode: TypedFileNode,
+        accessPermission: AccessPermission,
+        canBeMovedToRubbishBin: Boolean,
     ) = DocumentUiEntity(
         id = typedFileNode.id,
         name = typedFileNode.name,
@@ -36,5 +39,8 @@ class DocumentUiEntityMapper @Inject constructor(
         nodeAvailableOffline = typedFileNode.isAvailableOffline,
         isMarkedSensitive = typedFileNode.isMarkedSensitive,
         isSensitiveInherited = typedFileNode.isSensitiveInherited,
+        isIncomingShare = typedFileNode.isIncomingShare,
+        accessPermission = accessPermission,
+        canBeMovedToRubbishBin = canBeMovedToRubbishBin
     )
 }
