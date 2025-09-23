@@ -9,15 +9,14 @@ import mega.privacy.android.feature.transfers.components.widget.TransfersToolbar
  *
  * @property totalSizeAlreadyTransferred
  * @property totalSizeToTransfer
- * @property status
- * @property lastTransfersCancelled flag to indicate that last finished transfers has been cancelled,
- * so transfer status should be [TransfersStatus.Cancelled] until new transfer events are received
+ * @property status [TransfersToolbarWidgetStatus], null means that initial status is still unknown
+ * @property lastTransfersCancelled flag to indicate that last finished transfers has been cancelled
  * @property isTransferError true if there is a transfer error and transfers section has not been visited.
  * @property isOnline true if the device is online
  * @property isUserLoggedIn
  */
 data class TransfersToolabarWidgetUiState(
-    val status: TransfersToolbarWidgetStatus = TransfersToolbarWidgetStatus.Idle,
+    val status: TransfersToolbarWidgetStatus? = null,
     val totalSizeAlreadyTransferred: Long = 0L,
     val totalSizeToTransfer: Long = 0L,
     val lastTransfersCancelled: Boolean = false,

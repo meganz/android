@@ -79,6 +79,11 @@ class TransfersToolbarWidgetViewModelTest {
     }
 
     @Test
+    fun `test that initial status is null`() = runTest {
+        assertThat(underTest.state.value.status).isNull()
+    }
+
+    @Test
     fun `test ui state is updated with correct values when there's a new emission of monitorTransfersStatusFlow`() =
         runTest {
             val pendingDownloads = 5
