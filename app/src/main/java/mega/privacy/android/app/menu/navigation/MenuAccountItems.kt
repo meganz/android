@@ -9,6 +9,7 @@ import mega.privacy.android.navigation.destination.ExampleLegacyScreen
 import mega.privacy.android.navigation.destination.LegacySettings
 import mega.privacy.android.navigation.destination.MyAccount
 import mega.privacy.android.navigation.destination.RubbishBin
+import mega.privacy.android.navigation.destination.Transfers
 import mega.privacy.android.shared.resources.R as sharedR
 
 object CurrentPlanItem : NavDrawerItem.Account(
@@ -49,7 +50,7 @@ object DeviceCentreItem : NavDrawerItem.Account(
 )
 
 object TransfersItem : NavDrawerItem.Account(
-    destination = object : NavKey {},
+    destination = Transfers(),
     icon = IconPack.Medium.Thin.Outline.ArrowsUpDownCircle,
     title = sharedR.string.general_section_transfers
 )

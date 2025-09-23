@@ -214,6 +214,7 @@ dependencies {
     "qaImplementation"(project(":feature:example"))
     "qaImplementation"(project(":feature:cloud-drive:cloud-drive"))
     preBuiltSdkDependency(rootProject.extra)
+    implementation(project(":core:transfers"))
 
     //Test Modules
     testImplementation(project(":core-test"))

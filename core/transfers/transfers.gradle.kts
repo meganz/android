@@ -22,7 +22,9 @@ dependencies {
 
     implementation(project(":icon-pack"))
     implementation(project(":feature:transfers:transfers-snowflake-components"))
+    implementation(project(":core:navigation-contract"))
     implementation(project(":domain"))
+    implementation(project(":navigation"))
     implementation(lib.mega.core.ui)
     implementation(lib.mega.analytics)
     implementation(lib.kotlin.ktx)

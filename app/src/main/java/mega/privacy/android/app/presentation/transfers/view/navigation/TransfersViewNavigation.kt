@@ -5,24 +5,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.transfers.model.TransfersViewModel
 import mega.privacy.android.app.presentation.transfers.view.TransfersView
-
-/**
- * TransfersInfo data class to hold navigation info for the Transfers screen.
- *
- * @param tabIndex The index of the tab to open, if null it will be decided by view model logic
- */
-@Serializable
-class TransfersInfo(val tabIndex: Int? = null)
+import mega.privacy.android.navigation.destination.Transfers
 
 internal fun NavGraphBuilder.transfersScreen(
     onBackPress: () -> Unit,
     onNavigateToStorageSettings: () -> Unit,
     onNavigateToUpgradeAccount: () -> Unit,
 ) {
-    composable<TransfersInfo> {
+    composable<Transfers> {
         val viewModel = hiltViewModel<TransfersViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

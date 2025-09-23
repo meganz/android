@@ -33,6 +33,7 @@ import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
+import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -103,6 +104,9 @@ internal fun DriveSyncScreen(
                 MegaTopAppBar(
                     navigationType = AppBarNavigationType.None,
                     title = stringResource(sharedR.string.general_drive),
+                    trailingIcons = {
+                        TransfersToolbarWidget(navigationHandler)
+                    },
                     actions = buildList {
                         when {
                             selectedTabIndex == 0 && cloudDriveUiState.items.isNotEmpty() -> add(

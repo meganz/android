@@ -6,12 +6,15 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.feature.transfers.components.widget.TransfersToolbarWidgetViewAnimated
+import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.destination.Transfers
 
 /**
  * Widget to show current transfers progress in the toolbar
  */
 @Composable
 fun TransfersToolbarWidget(
+    navigationHandler: NavigationHandler,
     modifier: Modifier = Modifier,
     viewModel: TransfersToolbarWidgetViewModel = hiltViewModel(),
 ) {
@@ -23,8 +26,7 @@ fun TransfersToolbarWidget(
         modifier = modifier,
         onClick = {
             if (state.isUserLoggedIn) {
-                //TODO navigation to transfers:
-                // context.startActivity(TransfersActivity.getIntent(context))
+                navigationHandler.navigate(Transfers())
             }
         },
     )

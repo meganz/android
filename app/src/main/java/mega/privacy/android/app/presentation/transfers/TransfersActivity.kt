@@ -22,12 +22,11 @@ import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.COMPLETED_TAB_INDEX
-import mega.privacy.android.app.presentation.transfers.view.navigation.TransfersInfo
 import mega.privacy.android.app.presentation.transfers.view.navigation.transfersScreen
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.domain.usecase.transfers.errorstatus.IsTransferInErrorStatusUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.Transfers
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
@@ -81,7 +80,7 @@ class TransfersActivity : AppCompatActivity() {
 
                                     NavHost(
                                         navController = rememberNavController(),
-                                        startDestination = TransfersInfo(tabIndex = tabIndex),
+                                        startDestination = Transfers(tabIndex = tabIndex),
                                         modifier = Modifier.navigationBarsPadding()
                                     ) {
                                         transfersScreen(
