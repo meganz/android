@@ -230,6 +230,14 @@ internal fun CloudDriveContent(
         visibleNodeOptionId = visibleParentNodeOptionId
     }
 
+    LaunchedEffect(visibleNodeOptionId) {
+        if (visibleNodeOptionId != null) {
+            nodeOptionSheetState.show()
+        } else {
+            nodeOptionSheetState.hide()
+        }
+    }
+
     EventEffect(
         event = nodeOptionsActionUiState.downloadEvent,
         onConsumed = nodeOptionsActionViewModel::markDownloadEventConsumed,

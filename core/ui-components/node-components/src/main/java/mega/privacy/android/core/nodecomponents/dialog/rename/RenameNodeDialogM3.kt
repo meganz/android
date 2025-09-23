@@ -11,6 +11,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
@@ -158,10 +160,17 @@ private fun RenameNodeDialogBody(
     onRenameConfirmed: (String) -> Unit,
     onRenameCancelled: () -> Unit,
 ) {
-    var initialInput by rememberSaveable { mutableStateOf(nodeName) }
+    var inputValue by rememberSaveable(
+        inputs = arrayOf(nodeName),
+        stateSaver = TextFieldValue.Saver
+    ) {
+        mutableStateOf(value = TextFieldValue(nodeName, TextRange(nodeName.length)))
+    }
 
     LaunchedEffect(nodeName) {
-        initialInput = nodeName
+        val dotIndex = nodeName.lastIndexOf('.')
+        val cursorIndex = if (dotIndex != -1) dotIndex else nodeName.length
+        inputValue = TextFieldValue(nodeName, TextRange(cursorIndex))
     }
 
     BasicInputDialog(
@@ -169,7 +178,7 @@ private fun RenameNodeDialogBody(
         title = stringResource(id = sharedR.string.context_rename),
         positiveButtonText = stringResource(id = sharedR.string.context_rename),
         negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
-        onValueChange = { initialInput = it },
+        onValueChange = { inputValue = it },
         errorText = errorMessage?.let { nonNullErrorMessage ->
             if (nonNullErrorMessage == R.string.invalid_characters_defined) {
                 stringResource(nonNullErrorMessage, NODE_NAME_INVALID_CHARACTERS)
@@ -177,9 +186,9 @@ private fun RenameNodeDialogBody(
                 stringResource(nonNullErrorMessage)
             }
         },
-        inputValue = initialInput,
+        inputValue = inputValue,
         onPositiveButtonClicked = {
-            onRenameConfirmed(initialInput)
+            onRenameConfirmed(inputValue.text)
         },
         onNegativeButtonClicked = onRenameCancelled,
         isAutoShowKeyboard = true
