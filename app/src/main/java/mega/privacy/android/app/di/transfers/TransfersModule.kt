@@ -13,7 +13,6 @@ import mega.privacy.android.app.presentation.transfers.notification.DefaultOverQ
 import mega.privacy.android.app.presentation.transfers.notification.DefaultTransfersActionGroupFinishNotificationBuilder
 import mega.privacy.android.app.presentation.transfers.notification.DefaultTransfersActionGroupProgressNotificationBuilder
 import mega.privacy.android.app.presentation.transfers.notification.DefaultTransfersFinishNotificationSummaryBuilder
-import mega.privacy.android.app.presentation.transfers.notification.DefaultTransfersFinishedNotificationMapper
 import mega.privacy.android.app.presentation.transfers.notification.DefaultTransfersNotificationMapper
 import mega.privacy.android.app.presentation.transfers.notification.DefaultTransfersProgressNotificationSummaryBuilder
 import mega.privacy.android.app.utils.Constants
@@ -22,7 +21,6 @@ import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersActionGroupFinishNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersActionGroupProgressNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishNotificationSummaryBuilder
-import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
 import mega.privacy.android.data.mapper.transfer.TransfersProgressNotificationSummaryBuilder
 import mega.privacy.android.domain.usecase.transfers.active.HandleChatTransferEventsUseCase
@@ -61,12 +59,6 @@ abstract class TransfersModule {
      */
     @Binds
     abstract fun bindOverQuotaNotificationBuilder(builder: DefaultOverQuotaNotificationBuilder): OverQuotaNotificationBuilder
-
-    /**
-     * Binds [TransfersFinishedNotificationMapper] to its default implementation [DefaultTransfersFinishedNotificationMapper]
-     */
-    @Binds
-    abstract fun bindTransfersFinishedNotificationMapper(builder: DefaultTransfersFinishedNotificationMapper): TransfersFinishedNotificationMapper
 
     /**
      * Binds [TransfersFinishNotificationSummaryBuilder] to its default implementation [DefaultTransfersFinishNotificationSummaryBuilder]
