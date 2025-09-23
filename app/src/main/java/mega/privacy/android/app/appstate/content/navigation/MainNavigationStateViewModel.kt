@@ -26,7 +26,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.preference.MonitorStartScreenPreferenceDestinationUseCase
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.qualifier.DefaultStartScreen
-import mega.privacy.android.shared.original.core.ui.utils.asUiStateFlow
+import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import mega.privacy.mobile.navigation.snowflake.model.NavigationItem
 import timber.log.Timber
 import javax.inject.Inject

@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import mega.privacy.android.navigation.contract.dialog.AppDialogEvent
-import mega.privacy.android.shared.original.core.ui.utils.asUiStateFlow
+import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import javax.inject.Inject
 
 @HiltViewModel

@@ -22,7 +22,7 @@ import mega.privacy.android.domain.usecase.chat.RetryConnectionsAndSignalPresenc
 import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.navigation.contract.FeatureDestination
-import mega.privacy.android.shared.original.core.ui.utils.asUiStateFlow
+import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
 

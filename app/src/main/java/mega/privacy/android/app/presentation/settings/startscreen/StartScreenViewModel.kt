@@ -25,7 +25,7 @@ import mega.privacy.android.domain.usecase.preference.SetStartScreenPreferenceDe
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.qualifier.DefaultStartScreen
-import mega.privacy.android.shared.original.core.ui.utils.asUiStateFlow
+import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
