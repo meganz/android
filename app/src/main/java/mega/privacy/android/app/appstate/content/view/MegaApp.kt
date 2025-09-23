@@ -23,11 +23,9 @@ import mega.privacy.android.app.appstate.content.navigation.view.MainNavigationS
 import mega.privacy.android.app.appstate.content.navigation.view.mainNavigationScaffold
 import mega.privacy.android.app.appstate.transfer.AppTransferViewModel
 import mega.privacy.android.app.appstate.transfer.TransferHandlerImpl
-import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.navigation.contract.bottomsheet.MegaBottomSheetNavigationProvider
 import mega.privacy.android.navigation.contract.bottomsheet.rememberBottomSheetNavigator
-import mega.privacy.android.navigation.megaNavigator
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,7 +37,6 @@ fun MegaApp(
     val context = LocalContext.current
     val bottomSheetNavigator = rememberBottomSheetNavigator()
     val navController = rememberNavController(bottomSheetNavigator)
-    val megaNavigator = remember { context.megaNavigator }
     val appTransferViewModel = hiltViewModel<AppTransferViewModel>()
     val navigationHandler = remember { NavigationHandlerImpl(navController) }
     val transferHandler = remember { TransferHandlerImpl(appTransferViewModel) }
@@ -79,12 +76,6 @@ fun MegaApp(
             StartTransferComponent(
                 event = transferState.transferEvent,
                 onConsumeEvent = appTransferViewModel::consumedTransferEvent,
-                navigateToStorageSettings = {
-                    megaNavigator.openSettings(
-                        context,
-                        storageTargetPreference
-                    )
-                }
             )
         }
     }

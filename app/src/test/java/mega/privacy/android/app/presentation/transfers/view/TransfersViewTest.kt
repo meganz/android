@@ -14,6 +14,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_CANCEL_ACTION
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_CLEAR_ACTION
@@ -28,7 +29,6 @@ import mega.privacy.android.app.presentation.transfers.model.image.CompletedTran
 import mega.privacy.android.app.presentation.transfers.model.image.TransferImageUiState
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
-import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -583,7 +583,6 @@ class TransfersViewTest {
             CompositionLocalProvider(LocalViewModelStoreOwner provides viewModelStoreOwner) {
                 TransfersView(
                     onBackPress = {},
-                    onNavigateToStorageSettings = {},
                     onNavigateToUpgradeAccount = {},
                     uiState = uiState,
                     onTabSelected = {},

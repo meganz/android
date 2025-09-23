@@ -24,7 +24,6 @@ class LoadingPreviewInfo(
 
 internal fun NavGraphBuilder.loadingPreviewScreen(
     onBackPress: () -> Unit,
-    navigateToStorageSettings: () -> Unit,
 ) {
     composable<LoadingPreviewInfo> {
         val viewModel = hiltViewModel<LoadingPreviewViewModel>()
@@ -34,7 +33,6 @@ internal fun NavGraphBuilder.loadingPreviewScreen(
             onBackPress = onBackPress,
             uiState = uiState,
             consumeTransferEvent = viewModel::consumeTransferEvent,
-            navigateToStorageSettings = navigateToStorageSettings,
         )
     }
 }

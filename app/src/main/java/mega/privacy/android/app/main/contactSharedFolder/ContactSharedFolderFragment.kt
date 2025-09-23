@@ -27,19 +27,16 @@ import mega.privacy.android.app.main.ContactFileListActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoViewModel
-import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * Fragment for Contact shared Folder
@@ -50,12 +47,6 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
     companion object {
         private const val MAX_SHARED_FOLDER_NUMBER_TO_BE_DISPLAYED = 5
     }
-
-    /**
-     * Mega navigator
-     */
-    @Inject
-    lateinit var megaNavigator: MegaNavigator
 
     private var _binding: FragmentContactSharedFolderListBinding? = null
     private val binding: FragmentContactSharedFolderListBinding
@@ -125,12 +116,6 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
                     activity = activity,
                     transferEventState = startDownloadViewModel.state,
                     onConsumeEvent = startDownloadViewModel::consumeDownloadEvent,
-                    navigateToStorageSettings = {
-                        megaNavigator.openSettings(
-                            requireActivity(),
-                            storageTargetPreference
-                        )
-                    }
                 )
             )
         }

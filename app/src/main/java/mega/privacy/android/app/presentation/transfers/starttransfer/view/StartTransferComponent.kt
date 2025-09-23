@@ -101,7 +101,6 @@ internal fun StartTransferComponent(
     onScanningFinished: (StartTransferEvent) -> Unit = {},
     viewModel: StartTransfersComponentViewModel = hiltViewModel(),
     onCancelNotEnoughSpaceForUploadDialog: () -> Unit = {},
-    navigateToStorageSettings: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -204,7 +203,6 @@ internal fun StartTransferComponent(
         onAskedResumeTransfers = viewModel::setAskedResumeTransfers,
         snackBarHostState = snackBarHostState.orProvided(),
         onScanningFinished = onScanningFinished,
-        navigateToStorageSettings = navigateToStorageSettings,
         onPreviewFile = viewModel::previewFile,
         onPreviewOpened = viewModel::consumePreviewFileOpened,
         onCancelTransferConfirmed = viewModel::cancelTransferConfirmed,
@@ -227,7 +225,6 @@ internal fun createStartTransferView(
     activity: Activity,
     transferEventState: Flow<StateEventWithContent<TransferTriggerEvent>>,
     onConsumeEvent: () -> Unit,
-    navigateToStorageSettings: () -> Unit,
     onCancelNotEnoughSpaceForUploadDialog: () -> Unit = {},
     onScanningFinished: (StartTransferEvent) -> Unit = {},
 ): View = ComposeView(activity).apply {
@@ -246,7 +243,6 @@ internal fun createStartTransferView(
                 snackBarHostState = snackbarHostState,
                 onScanningFinished = onScanningFinished,
                 onCancelNotEnoughSpaceForUploadDialog = onCancelNotEnoughSpaceForUploadDialog,
-                navigateToStorageSettings = navigateToStorageSettings,
             )
         }
     }
@@ -265,7 +261,6 @@ private fun StartTransferComponent(
     onResumeTransfers: () -> Unit,
     onAskedResumeTransfers: () -> Unit,
     snackBarHostState: SnackbarHostStateWrapper?,
-    navigateToStorageSettings: () -> Unit,
     onPreviewFile: (File) -> Unit,
     onPreviewOpened: () -> Unit,
     onCancelTransferConfirmed: () -> Unit,
@@ -347,7 +342,6 @@ private fun StartTransferComponent(
                         event,
                         snackBarHostState,
                         context,
-                        navigateToStorageSettings,
                         retryTransfers,
                     )
                 }
@@ -585,7 +579,6 @@ private suspend fun consumeMessage(
     event: StartTransferEvent.Message,
     snackBarHostState: SnackbarHostStateWrapper?,
     context: Context,
-    navigateToStorageSettings: () -> Unit,
     retryTransfers: (TransferTriggerEvent.RetryTransfers) -> Unit = {},
 ) {
     //show snack bar with an optional action
@@ -596,10 +589,6 @@ private suspend fun consumeMessage(
     if (result == SnackbarResult.ActionPerformed || result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
         event.actionEvent?.let { actionEvent ->
             when (actionEvent) {
-                StartTransferEvent.Message.ActionEvent.GoToFileManagement -> {
-                    navigateToStorageSettings()
-                }
-
                 is StartTransferEvent.Message.ActionEvent.ReRetry -> {
                     retryTransfers(actionEvent.transferTriggerEvent)
                 }

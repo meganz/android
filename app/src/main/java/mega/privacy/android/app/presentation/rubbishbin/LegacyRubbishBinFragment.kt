@@ -41,7 +41,6 @@ import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.app.presentation.rubbishbin.view.RubbishBinComposeView
-import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
@@ -52,7 +51,6 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaChatApiJava
@@ -83,12 +81,6 @@ class LegacyRubbishBinFragment : Fragment() {
      */
     @Inject
     lateinit var fileTypeIconMapper: FileTypeIconMapper
-
-    /**
-     * Mega navigator
-     */
-    @Inject
-    lateinit var megaNavigator: MegaNavigator
 
     private val viewModel: LegacyRubbishBinViewModel by activityViewModels()
     private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
@@ -172,12 +164,6 @@ class LegacyRubbishBinFragment : Fragment() {
                         event = nodeActionState.downloadEvent,
                         onConsumeEvent = nodeActionsViewModel::markDownloadEventConsumed,
                         snackBarHostState = snackbarHostState,
-                        navigateToStorageSettings = {
-                            megaNavigator.openSettings(
-                                requireActivity(),
-                                storageTargetPreference
-                            )
-                        },
                     )
                 }
                 updateActionModeTitle(

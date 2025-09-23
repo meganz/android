@@ -67,7 +67,6 @@ import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectF
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
-import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
@@ -122,7 +121,6 @@ import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -145,9 +143,6 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
 
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
-
-    @Inject
-    lateinit var megaNavigator: MegaNavigator
 
     /**
      * MediaPlayerGateway for video player
@@ -308,12 +303,6 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
                     event = uiState.downloadEvent,
                     onConsumeEvent = videoPlayerViewModel::resetDownloadNode,
                     snackBarHostState = scaffoldState.snackbarHostState,
-                    navigateToStorageSettings = {
-                        megaNavigator.openSettings(
-                            this,
-                            storageTargetPreference
-                        )
-                    }
                 )
 
                 NodeAttachmentView(

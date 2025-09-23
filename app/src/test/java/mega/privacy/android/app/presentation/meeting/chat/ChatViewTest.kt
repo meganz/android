@@ -273,7 +273,6 @@ class ChatViewTest {
                     navigateToReactionInfo = {},
                     navigateToNotSentModal = {},
                     navigateToConversation = {},
-                    navigateToStorageSettings = {},
                 )
             }
         }

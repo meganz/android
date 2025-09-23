@@ -1001,12 +1001,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     }
                     startDownloadViewModel.consumeDownloadEvent()
                 },
-                navigateToStorageSettings = {
-                    megaNavigator.openSettings(
-                        this,
-                        storageTargetPreference
-                    )
-                }
             )
         )
     }

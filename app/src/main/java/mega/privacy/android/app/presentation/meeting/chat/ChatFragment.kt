@@ -42,7 +42,6 @@ import mega.privacy.android.app.presentation.meeting.chat.view.showPermissionNot
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
-import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -173,12 +172,6 @@ internal class ChatFragment : Fragment() {
                                                     coroutineScope,
                                                     scaffoldState.snackbarHostState,
                                                     R.string.chat_attach_pick_from_camera_deny_permission
-                                                )
-                                            },
-                                            navigateToStorageSettings = {
-                                                megaNavigator.openSettings(
-                                                    requireActivity(),
-                                                    storageTargetPreference
                                                 )
                                             },
                                             enablePasscodeCheck = { passcodeEnabled = true }

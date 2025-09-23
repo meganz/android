@@ -77,7 +77,6 @@ import mega.privacy.mobile.analytics.event.TransfersSectionScreenEvent
 @Composable
 internal fun TransfersView(
     onBackPress: () -> Unit,
-    onNavigateToStorageSettings: () -> Unit,
     onNavigateToUpgradeAccount: () -> Unit,
     uiState: TransfersUiState,
     onTabSelected: (Int) -> Unit,
@@ -383,7 +382,6 @@ internal fun TransfersView(
             event = uiState.startEvent,
             onConsumeEvent = onConsumeStartEvent,
             areTransferOverQuotaWarningsAllowed = false,
-            navigateToStorageSettings = onNavigateToStorageSettings,
         )
     }
 }
@@ -445,7 +443,6 @@ private fun TransfersViewPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         TransfersView(
             onBackPress = {},
-            onNavigateToStorageSettings = {},
             onNavigateToUpgradeAccount = {},
             uiState = TransfersUiState(),
             onTabSelected = {},

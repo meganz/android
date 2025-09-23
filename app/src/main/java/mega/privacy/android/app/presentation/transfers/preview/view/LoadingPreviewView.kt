@@ -49,7 +49,6 @@ internal fun LoadingPreviewView(
     onBackPress: () -> Unit,
     uiState: LoadingPreviewState,
     consumeTransferEvent: () -> Unit,
-    navigateToStorageSettings: () -> Unit,
 ) {
     val scaffoldState = rememberScaffoldState()
 
@@ -135,7 +134,6 @@ internal fun LoadingPreviewView(
             event = uiState.transferEvent,
             onConsumeEvent = consumeTransferEvent,
             snackBarHostState = scaffoldState.snackbarHostState,
-            navigateToStorageSettings = navigateToStorageSettings,
         )
     }
 }
@@ -152,7 +150,6 @@ private fun LoadingPreviewViewPreview() {
                 progress = Progress(0.3f),
             ),
             consumeTransferEvent = {},
-            navigateToStorageSettings = {},
         )
     }
 }

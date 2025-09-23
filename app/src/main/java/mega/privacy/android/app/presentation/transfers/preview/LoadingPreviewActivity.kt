@@ -17,13 +17,11 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
-import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.preview.model.LoadingPreviewViewModel
 import mega.privacy.android.app.presentation.transfers.preview.view.LoadingPreviewInfo
 import mega.privacy.android.app.presentation.transfers.preview.view.loadingPreviewScreen
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
@@ -44,12 +42,6 @@ class LoadingPreviewActivity : AppCompatActivity() {
      */
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
-
-    /**
-     * The centralized navigator in the :app module
-     */
-    @Inject
-    lateinit var megaNavigator: MegaNavigator
 
     private val viewModel by viewModels<LoadingPreviewViewModel>()
 
@@ -86,12 +78,6 @@ class LoadingPreviewActivity : AppCompatActivity() {
                             ) {
                                 loadingPreviewScreen(
                                     onBackPress = { supportFinishAfterTransition() },
-                                    navigateToStorageSettings = {
-                                        megaNavigator.openSettings(
-                                            this@LoadingPreviewActivity,
-                                            storageTargetPreference
-                                        )
-                                    },
                                 )
                             }
                         }

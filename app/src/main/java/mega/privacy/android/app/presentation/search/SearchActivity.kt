@@ -63,7 +63,6 @@ import mega.privacy.android.app.presentation.search.navigation.searchForeignNode
 import mega.privacy.android.app.presentation.search.navigation.searchOverQuotaDialog
 import mega.privacy.android.app.presentation.search.navigation.shareFolderAccessDialog
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
-import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.presentation.transfers.widget.TransfersWidget
@@ -306,12 +305,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                         event = nodeActionState.downloadEvent,
                         onConsumeEvent = nodeActionsViewModel::markDownloadEventConsumed,
                         snackBarHostState = snackbarHostState,
-                        navigateToStorageSettings = {
-                            megaNavigator.openSettings(
-                                this,
-                                storageTargetPreference
-                            )
-                        },
                     )
                 }
 

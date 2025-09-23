@@ -49,7 +49,6 @@ import mega.privacy.android.app.presentation.fileinfo.view.ExtraActionDialog
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoScreen
 import mega.privacy.android.app.presentation.node.dialogs.leaveshare.LeaveShareDialog
 import mega.privacy.android.app.presentation.security.PasscodeCheck
-import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.tags.TagsActivity
 import mega.privacy.android.app.presentation.tags.TagsActivity.Companion.NODE_ID
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
@@ -78,7 +77,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.feature_flags.AppFeatures
-import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
@@ -103,12 +101,6 @@ class FileInfoActivity : BaseActivity() {
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
-
-    /**
-     * Mega navigator
-     */
-    @Inject
-    lateinit var megaNavigator: MegaNavigator
 
     @Inject
     lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
@@ -231,12 +223,6 @@ class FileInfoActivity : BaseActivity() {
                     uiState.downloadEvent,
                     { viewModel.consumeDownloadEvent() },
                     snackBarHostState = snackBarHostState,
-                    navigateToStorageSettings = {
-                        megaNavigator.openSettings(
-                            this,
-                            storageTargetPreference
-                        )
-                    },
                 )
                 NodeAttachmentView(
                     nodeAttachmentViewModel

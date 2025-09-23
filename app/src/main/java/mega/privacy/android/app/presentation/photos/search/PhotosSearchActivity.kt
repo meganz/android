@@ -46,7 +46,6 @@ import mega.privacy.android.app.presentation.search.navigation.renameDialogNavig
 import mega.privacy.android.app.presentation.search.navigation.searchForeignNodeDialog
 import mega.privacy.android.app.presentation.search.navigation.searchOverQuotaDialog
 import mega.privacy.android.app.presentation.search.searchRoute
-import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
@@ -65,7 +64,6 @@ import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
-import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -79,9 +77,6 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
 
     @Inject
     lateinit var fileTypeIconMapper: FileTypeIconMapper
-
-    @Inject
-    lateinit var megaNavigator: MegaNavigator
 
     @Inject
     lateinit var listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper
@@ -179,12 +174,6 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
                     event = nodeActionState.downloadEvent,
                     onConsumeEvent = nodeActionsViewModel::markDownloadEventConsumed,
                     snackBarHostState = snackbarHostState,
-                    navigateToStorageSettings = {
-                        megaNavigator.openSettings(
-                            this,
-                            storageTargetPreference
-                        )
-                    },
                 )
 
                 EventEffect(

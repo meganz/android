@@ -118,10 +118,6 @@ sealed interface StartTransferEvent {
          * The one off event to be triggered with the [action], if [action] is null this parameter will be ignored
          */
         sealed interface ActionEvent {
-            /**
-             * The user have chosen to go to settings to file management (from no sufficient disk space snack bar action)
-             */
-            data object GoToFileManagement : ActionEvent
 
             /**
              * Retry a failed transfer that has already been retried but failed again
@@ -135,21 +131,17 @@ sealed interface StartTransferEvent {
         /**
          * Not sufficient space for save the node, either for offline or an ordinary download
          */
-        data object NotSufficientSpace : MessageStringRes(
-            R.string.error_not_enough_free_space,
-            R.string.action_settings,
-            ActionEvent.GoToFileManagement
-        )
+        data object NotSufficientSpace : MessageStringRes(R.string.error_not_enough_free_space)
 
         /**
          * Transfer cancelled by user action
          */
-        data object TransferCancelled : MessageStringRes(R.string.transfers_cancelled, null, null)
+        data object TransferCancelled : MessageStringRes(R.string.transfers_cancelled)
 
         /**
          * Copy uri has finished
          */
-        data object FinishCopyUri : MessageStringRes(R.string.copy_already_downloaded, null, null)
+        data object FinishCopyUri : MessageStringRes(R.string.copy_already_downloaded)
 
         /**
          * Text file upload has finished
@@ -165,7 +157,7 @@ sealed interface StartTransferEvent {
                 isEditMode -> R.string.file_update_failed
                 isCloudFile -> R.string.text_editor_creation_error
                 else -> R.string.file_creation_failed
-            }, null, null
+            }
         )
 
         /**

@@ -77,7 +77,6 @@ class LoadingPreviewViewTest {
                     onBackPress = {},
                     uiState = uiState,
                     consumeTransferEvent = {},
-                    navigateToStorageSettings = {},
                 )
             }
         }

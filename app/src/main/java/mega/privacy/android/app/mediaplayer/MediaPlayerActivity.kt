@@ -9,7 +9,6 @@ import androidx.navigation.NavController
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
-import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
@@ -22,10 +21,8 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_HANDLES
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_TO
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatMessage
-import javax.inject.Inject
 
 /**
  * Media player Activity
@@ -41,24 +38,12 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
 
     internal lateinit var navController: NavController
 
-    /**
-     * Mega navigator
-     */
-    @Inject
-    lateinit var megaNavigator: MegaNavigator
-
     protected fun addStartDownloadTransferView(root: ViewGroup) {
         root.addView(
             createStartTransferView(
                 activity = this,
                 transferEventState = startDownloadViewModel.state,
                 onConsumeEvent = startDownloadViewModel::consumeDownloadEvent,
-                navigateToStorageSettings = {
-                    megaNavigator.openSettings(
-                        this,
-                        storageTargetPreference
-                    )
-                }
             )
         )
     }

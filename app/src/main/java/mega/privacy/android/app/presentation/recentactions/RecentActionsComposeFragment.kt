@@ -36,7 +36,6 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.recentactions.view.RecentActionsView
-import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.ColorUtils
@@ -48,7 +47,6 @@ import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import javax.inject.Inject
@@ -69,11 +67,6 @@ class RecentActionsComposeFragment : Fragment() {
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
-    /**
-     * Mega navigator
-     */
-    @Inject
-    lateinit var megaNavigator: MegaNavigator
     /**
      * onCreateView
      */
@@ -146,12 +139,6 @@ class RecentActionsComposeFragment : Fragment() {
                         event = nodeActionState.downloadEvent,
                         onConsumeEvent = nodeActionsViewModel::markDownloadEventConsumed,
                         snackBarHostState = snackbarHostState,
-                        navigateToStorageSettings = {
-                            megaNavigator.openSettings(
-                                requireActivity(),
-                                storageTargetPreference
-                            )
-                        },
                     )
                     LegacySnackBarWrapper(snackbarHostState = snackbarHostState, activity)
                     clickedFile?.let {

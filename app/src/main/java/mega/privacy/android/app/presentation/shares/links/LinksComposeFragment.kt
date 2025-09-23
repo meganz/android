@@ -47,7 +47,6 @@ import mega.privacy.android.app.presentation.manager.model.Tab
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
-import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.shares.SharesActionListener
 import mega.privacy.android.app.presentation.shares.links.view.LinksView
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
@@ -69,7 +68,6 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
@@ -102,12 +100,6 @@ class LinksComposeFragment : Fragment() {
      */
     @Inject
     lateinit var fileTypeIconMapper: FileTypeIconMapper
-
-    /**
-     * Mega navigator
-     */
-    @Inject
-    lateinit var megaNavigator: MegaNavigator
 
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
@@ -208,12 +200,6 @@ class LinksComposeFragment : Fragment() {
                             disableSelectMode()
                         },
                         snackBarHostState = snackbarHostState,
-                        navigateToStorageSettings = {
-                            megaNavigator.openSettings(
-                                requireActivity(),
-                                storageTargetPreference
-                            )
-                        },
                     )
                 }
 

@@ -80,7 +80,6 @@ import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.qrcode.findActivity
-import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.presentation.validator.toolbaractions.ToolbarActionsValidator
 import mega.privacy.android.app.presentation.validator.toolbaractions.model.ToolbarActionsRequest
@@ -386,12 +385,6 @@ class CloudDriveSyncsFragment : Fragment() {
                                 disableSelectMode()
                             },
                             snackBarHostState = snackbarHostState,
-                            navigateToStorageSettings = {
-                                megaNavigator.openSettings(
-                                    requireActivity(),
-                                    storageTargetPreference
-                                )
-                            },
                         )
                     }
 

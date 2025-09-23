@@ -95,13 +95,13 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_087_white_alpha_087
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * View to render the QR code Screen, including toolbar, content, etc.
@@ -131,7 +131,6 @@ internal fun QRCodeView(
     onUploadFileConsumed: () -> Unit,
     onScanCancelConsumed: () -> Unit,
     onUploadEventConsumed: () -> Unit,
-    navigateToStorageSettings: () -> Unit,
     navigateToQrSettings: () -> Unit,
     qrCodeMapper: QRCodeMapper,
 ) {
@@ -201,7 +200,6 @@ internal fun QRCodeView(
         event = viewState.uploadEvent,
         onConsumeEvent = onUploadEventConsumed,
         snackBarHostState = snackBarHostState,
-        navigateToStorageSettings = navigateToStorageSettings,
     )
 
     Scaffold(
@@ -712,7 +710,6 @@ private fun PreviewQRCodeView() {
             onUploadFileConsumed = { },
             onScanCancelConsumed = { },
             onUploadEventConsumed = { },
-            navigateToStorageSettings = {},
             navigateToQrSettings = {},
         ) { _, _, _, _, _ ->
             Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888)

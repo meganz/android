@@ -68,7 +68,6 @@ import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectF
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
-import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -86,7 +85,6 @@ import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ImagePreviewGetLinkMenuItemEvent
@@ -110,12 +108,6 @@ class ImagePreviewActivity : BaseActivity() {
 
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
-
-    /**
-     * Mega navigator
-     */
-    @Inject
-    lateinit var megaNavigator: MegaNavigator
 
     private val selectMoveFolderLauncher: ActivityResultLauncher<LongArray> =
         registerForActivityResult(
@@ -216,12 +208,6 @@ class ImagePreviewActivity : BaseActivity() {
                                 onClickRemove = ::removeNode,
                                 onClickMoveToRubbishBin = ::moveNodeToRubbishBin,
                                 onClickAddToAlbum = ::addToAlbum,
-                                navigateToStorageSettings = {
-                                    megaNavigator.openSettings(
-                                        this,
-                                        storageTargetPreference
-                                    )
-                                }
                             )
 
                             NodeAttachmentView(

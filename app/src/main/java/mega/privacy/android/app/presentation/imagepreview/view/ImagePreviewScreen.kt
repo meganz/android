@@ -136,7 +136,6 @@ internal fun ImagePreviewScreen(
     onClickRemove: (ImageNode) -> Unit = {},
     onClickMoveToRubbishBin: (ImageNode) -> Unit = {},
     onClickAddToAlbum: (ImageNode) -> Unit = {},
-    navigateToStorageSettings: () -> Unit,
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     val imageNodes = viewState.imageNodes
@@ -480,7 +479,6 @@ internal fun ImagePreviewScreen(
             event = viewState.transferEvent,
             onConsumeEvent = viewModel::consumeTransferEvent,
             snackBarHostState = scaffoldState.snackbarHostState,
-            navigateToStorageSettings = navigateToStorageSettings,
         )
     }
 }

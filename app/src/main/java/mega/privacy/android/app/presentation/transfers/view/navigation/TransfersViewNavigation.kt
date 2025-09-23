@@ -11,7 +11,6 @@ import mega.privacy.android.navigation.destination.Transfers
 
 internal fun NavGraphBuilder.transfersScreen(
     onBackPress: () -> Unit,
-    onNavigateToStorageSettings: () -> Unit,
     onNavigateToUpgradeAccount: () -> Unit,
 ) {
     composable<Transfers> {
@@ -20,7 +19,6 @@ internal fun NavGraphBuilder.transfersScreen(
 
         TransfersView(
             onBackPress = onBackPress,
-            onNavigateToStorageSettings = onNavigateToStorageSettings,
             onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
             uiState = uiState,
             onTabSelected = viewModel::updateSelectedTab,

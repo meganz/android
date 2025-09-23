@@ -81,7 +81,6 @@ import mega.privacy.android.app.presentation.documentscanner.dialogs.DiscardScan
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginActivity
-import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.presentation.upload.UploadDestinationActivity
@@ -120,7 +119,6 @@ import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenU
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.feature_flags.AppFeatures
-import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToCloudDriveEvent
@@ -196,12 +194,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     @Inject
     @IoDispatcher
     lateinit var ioDispatcher: CoroutineDispatcher
-
-    /**
-     * Mega navigator
-     */
-    @Inject
-    lateinit var megaNavigator: MegaNavigator
 
     private val viewModel by viewModels<FileExplorerViewModel>()
 
@@ -2716,12 +2708,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 activity = this,
                 transferEventState = viewModel.uiState.map { it.uploadEvent },
                 onConsumeEvent = viewModel::consumeUploadEvent,
-                navigateToStorageSettings = {
-                    megaNavigator.openSettings(
-                        this,
-                        storageTargetPreference
-                    )
-                }
             ) { startTransferEvent ->
                 if (viewModel.isAskingForCollisionsResolution()) {
                     //Not ready to finish yet

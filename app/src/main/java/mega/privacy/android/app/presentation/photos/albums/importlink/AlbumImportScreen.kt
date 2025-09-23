@@ -92,6 +92,7 @@ import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.AlbumImportInputDecryptionKeyDialogEvent
 import mega.privacy.mobile.analytics.event.AlbumImportSaveToCloudDriveButtonEvent
 import mega.privacy.mobile.analytics.event.AlbumImportSaveToDeviceButtonEvent
@@ -101,7 +102,6 @@ import mega.privacy.mobile.analytics.event.AlbumsStorageOverQuotaUpgradeAccountB
 import mega.privacy.mobile.analytics.event.ImportAlbumContentLoadedEvent
 import mega.privacy.mobile.analytics.event.PhotoItemSelected
 import mega.privacy.mobile.analytics.event.PhotoItemSelectedEvent
-import mega.privacy.android.shared.resources.R as sharedResR
 
 private typealias ImageDownloader = (
     isPreview: Boolean,
@@ -117,7 +117,6 @@ internal fun AlbumImportScreen(
     onNavigateFileExplorer: () -> Unit,
     onUpgradeAccount: () -> Unit,
     onBack: (isBackToHome: Boolean) -> Unit,
-    navigateToStorageSettings: () -> Unit,
 ) {
     val isLight = MaterialTheme.colors.isLight
     val state by albumImportViewModel.stateFlow.collectAsStateWithLifecycle()
@@ -324,7 +323,6 @@ internal fun AlbumImportScreen(
                 event = state.downloadEvent,
                 onConsumeEvent = albumImportViewModel::consumeDownloadEvent,
                 snackBarHostState = scaffoldState.snackbarHostState,
-                navigateToStorageSettings = navigateToStorageSettings,
             )
         },
     )

@@ -19,7 +19,6 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
-import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.COMPLETED_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.navigation.transfersScreen
@@ -85,12 +84,6 @@ class TransfersActivity : AppCompatActivity() {
                                     ) {
                                         transfersScreen(
                                             onBackPress = { supportFinishAfterTransition() },
-                                            onNavigateToStorageSettings = {
-                                                megaNavigator.openSettings(
-                                                    this@TransfersActivity,
-                                                    storageTargetPreference
-                                                )
-                                            },
                                             onNavigateToUpgradeAccount = {
                                                 megaNavigator.openUpgradeAccount(this@TransfersActivity)
                                             }

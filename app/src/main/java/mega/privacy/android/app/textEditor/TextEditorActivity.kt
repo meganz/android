@@ -43,7 +43,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
@@ -55,7 +54,6 @@ import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
-import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
@@ -103,8 +101,8 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
-import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.TextEditorCloseMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.TextEditorCopyMenuItemEvent
 import mega.privacy.mobile.analytics.event.TextEditorDownloadMenuToolbarEvent
@@ -126,7 +124,6 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import java.io.File
-import javax.inject.Inject
 import kotlin.math.roundToInt
 
 /**
@@ -145,12 +142,6 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         private const val STATE_SHOWN = 0
         private const val STATE_HIDDEN = 1
     }
-
-    /**
-     * Mega navigator
-     */
-    @Inject
-    lateinit var megaNavigator: MegaNavigator
 
     private val viewModel by viewModels<TextEditorViewModel>()
     private val nodeAttachmentViewModel by viewModels<NodeAttachmentViewModel>()
@@ -834,12 +825,6 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                         finish()
                     }
                 },
-                navigateToStorageSettings = {
-                    megaNavigator.openSettings(
-                        this,
-                        storageTargetPreference
-                    )
-                }
             )
         )
     }

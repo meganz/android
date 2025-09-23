@@ -61,7 +61,6 @@ import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.security.PasscodeCheck
-import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
@@ -91,7 +90,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.navigation.ExtraConstant
-import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.DocumentPreviewHideNodeMenuItemEvent
 import nz.mega.sdk.MegaApiAndroid
@@ -142,12 +140,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     @ApplicationScope
     @Inject
     lateinit var applicationScope: CoroutineScope
-
-    /**
-     * Mega navigator
-     */
-    @Inject
-    lateinit var megaNavigator: MegaNavigator
 
     private lateinit var binding: ActivityPdfviewerBinding
 
@@ -510,12 +502,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 activity = this,
                 transferEventState = startDownloadViewModel.state,
                 onConsumeEvent = startDownloadViewModel::consumeDownloadEvent,
-                navigateToStorageSettings = {
-                    megaNavigator.openSettings(
-                        this,
-                        storageTargetPreference
-                    )
-                }
             )
         )
     }

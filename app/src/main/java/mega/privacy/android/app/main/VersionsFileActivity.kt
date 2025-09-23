@@ -39,7 +39,6 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNo
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
-import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.presentation.versions.VersionsFileViewModel
@@ -206,12 +205,6 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 activity = this,
                 transferEventState = startDownloadViewModel.state,
                 onConsumeEvent = startDownloadViewModel::consumeDownloadEvent,
-                navigateToStorageSettings = {
-                    megaNavigator.openSettings(
-                        this,
-                        storageTargetPreference
-                    )
-                }
             )
         )
     }

@@ -60,7 +60,6 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.ChatImageNodeF
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
-import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
@@ -79,7 +78,6 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.navigation.ExtraConstant
-import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
@@ -104,9 +102,6 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
 
     @Inject
     lateinit var copyRequestMessageMapper: CopyRequestMessageMapper
-
-    @Inject
-    lateinit var megaNavigator: MegaNavigator
 
     private val viewModel by viewModels<NodeAttachmentHistoryViewModel>()
     private val startDownloadViewModel by viewModels<StartDownloadViewModel>()
@@ -434,9 +429,6 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                 startDownloadViewModel.state,
                 {
                     startDownloadViewModel.consumeDownloadEvent()
-                },
-                {
-                    megaNavigator.openSettings(this, storageTargetPreference)
                 },
                 { }
             )

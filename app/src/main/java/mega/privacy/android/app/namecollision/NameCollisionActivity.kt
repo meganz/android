@@ -30,7 +30,6 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.namecollision.data.toDomainEntity
 import mega.privacy.android.app.namecollision.data.toUiEntity
-import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
@@ -47,9 +46,7 @@ import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionRe
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.navigation.MegaNavigator
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * Activity for showing name collisions and resolving them as per user's choices.
@@ -61,12 +58,6 @@ class NameCollisionActivity : PasscodeActivity() {
     private lateinit var binding: ActivityNameCollisionBinding
 
     private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
-
-    /**
-     * Mega navigator
-     */
-    @Inject
-    lateinit var megaNavigator: MegaNavigator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -165,12 +156,6 @@ class NameCollisionActivity : PasscodeActivity() {
                 activity = this,
                 transferEventState = viewModel.uiState.map { it.uploadEvent },
                 onConsumeEvent = { },
-                navigateToStorageSettings = {
-                    megaNavigator.openSettings(
-                        this,
-                        storageTargetPreference
-                    )
-                }
             ) { transferEvent ->
                 ((transferEvent as StartTransferEvent.FinishUploadProcessing).triggerEvent as TransferTriggerEvent.StartUpload.CollidedFiles).let {
                     setResult(

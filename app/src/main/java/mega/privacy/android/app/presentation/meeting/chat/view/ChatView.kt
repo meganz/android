@@ -154,7 +154,6 @@ import mega.privacy.mobile.analytics.event.ChatMessageLongPressedEvent
  * @param navigateToNotSentModal
  * @param navigateToConversation
  * @param navHostController
- * @param navigateToStorageSettings
  */
 @OptIn(
     ExperimentalPermissionsApi::class,
@@ -217,7 +216,6 @@ internal fun ChatView(
     navigateToNotSentModal: () -> Unit,
     navigateToConversation: (Long) -> Unit,
     navHostController: androidx.navigation.NavHostController,
-    navigateToStorageSettings: () -> Unit,
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -601,7 +599,6 @@ internal fun ChatView(
             event = uiState.downloadEvent,
             onConsumeEvent = consumeDownloadEvent,
             snackBarHostState = scaffoldState.snackbarHostState,
-            navigateToStorageSettings = navigateToStorageSettings,
         )
 
         if (isStartingCall && callInThisChat != null) {
@@ -686,7 +683,6 @@ private fun ChatViewPreview() {
             navigateToNotSentModal = {},
             navigateToConversation = {},
             navHostController = rememberNavController(),
-            navigateToStorageSettings = {},
         )
     }
 }

@@ -39,7 +39,6 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetc
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
-import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.Constants
@@ -159,12 +158,6 @@ class FileLinkComposeActivity : PasscodeActivity(),
                     event = uiState.downloadEvent,
                     onConsumeEvent = viewModel::resetDownloadFile,
                     snackBarHostState = snackBarHostState,
-                    navigateToStorageSettings = {
-                        megaNavigator.openSettings(
-                            this,
-                            storageTargetPreference
-                        )
-                    }
                 )
                 EventEffect(
                     event = uiState.askForDecryptionKeyDialogEvent,
