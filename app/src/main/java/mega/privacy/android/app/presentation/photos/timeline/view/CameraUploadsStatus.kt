@@ -167,9 +167,9 @@ fun CameraUploadsNoFullAccessBanner(
     }
 
     CameraUploadsBanner(
-        modifier = modifier.clickable {
-            onClick()
-        }.testTag(TIMELINE_CAMERA_UPLOADS_NO_FULL_ACCESS_BANNER_TEST_TAG),
+        modifier = modifier
+            .clickable { onClick() }
+            .testTag(TIMELINE_CAMERA_UPLOADS_NO_FULL_ACCESS_BANNER_TEST_TAG),
         statusIcon = R.drawable.ic_cu_status_warning,
         title = stringResource(sharedR.string.camera_uploads_banner_complete_title),
         description = description,
@@ -192,9 +192,9 @@ fun EnableCameraUploadsBanner(
     onClick: () -> Unit = {},
 ) {
     CameraUploadsBanner(
-        modifier = modifier.clickable {
-            onClick()
-        }.testTag(TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_TEST_TAG),
+        modifier = modifier
+            .clickable { onClick() }
+            .testTag(TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_TEST_TAG),
         statusIcon = R.drawable.ic_cu_status,
         title = stringResource(R.string.settings_camera_upload_on),
         description = stringResource(id = R.string.enable_cu_subtitle),
@@ -225,10 +225,14 @@ fun CameraUploadsCheckingUploadsBanner(
 @Composable
 fun CameraUploadsPendingCountBanner(
     count: Int,
+    isTransferScreenAvailable: Boolean,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit,
 ) {
     CameraUploadsBanner(
-        modifier = modifier.testTag(TIMELINE_CAMERA_UPLOADS_PENDING_COUNT_BANNER_TEST_TAG),
+        modifier = modifier
+            .clickable { onClick() }
+            .testTag(TIMELINE_CAMERA_UPLOADS_PENDING_COUNT_BANNER_TEST_TAG),
         statusIcon = R.drawable.ic_cu_status_uploading,
         title = stringResource(
             sharedR.string.camera_uploads_banner_uploading_pending_count_text,
@@ -236,13 +240,15 @@ fun CameraUploadsPendingCountBanner(
         ),
         description = null,
         endIcon = {
-            MegaIcon(
-                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight),
-                contentDescription = "Camera uploads banner end icon",
-                modifier = Modifier
-                    .size(24.dp),
-                tint = IconColor.Primary,
-            )
+            if (isTransferScreenAvailable) {
+                MegaIcon(
+                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight),
+                    contentDescription = "Camera uploads banner end icon",
+                    modifier = Modifier
+                        .size(24.dp),
+                    tint = IconColor.Primary,
+                )
+            }
         }
     )
 }

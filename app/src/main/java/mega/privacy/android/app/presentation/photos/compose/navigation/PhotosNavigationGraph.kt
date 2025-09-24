@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.photos.compose.navigation
 
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.navigation
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
@@ -16,6 +17,7 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 internal object PhotosNavigationGraph
 
 internal fun NavGraphBuilder.photosNavigationGraph(
+    navHostController: NavHostController,
     viewComposeCoordinator: PhotosViewComposeCoordinator,
     photosViewModel: PhotosViewModel,
     timelineViewModel: TimelineViewModel,
@@ -47,6 +49,15 @@ internal fun NavGraphBuilder.photosNavigationGraph(
             onNavigateCameraUploadsSettings = onNavigateCameraUploadsSettings,
             onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
             fileTypeIconMapper = fileTypeIconMapper,
+            onNavigateCameraUploadsTransferScreen = {
+                navHostController.navigate(CameraUploadsTransferScreen)
+            },
+        )
+
+        cameraUploadsTransferScreen(
+            timelineViewModel = timelineViewModel,
+            navHostController = navHostController,
+            onSettingOptionClick = onNavigateCameraUploadsSettings
         )
     }
 }

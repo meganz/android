@@ -97,6 +97,7 @@ fun TimelineView(
     onChangeCameraUploadsPermissions: () -> Unit = {},
     onUpdateCameraUploadsLimitedAccessState: (Boolean) -> Unit = {},
     onEnableCameraUploads: () -> Unit = {},
+    onPendingCountBannerClick: () -> Unit = {},
     clearCameraUploadsMessage: () -> Unit = {},
     clearCameraUploadsChangePermissionsMessage: () -> Unit = {},
     clearCameraUploadsCompletedMessage: () -> Unit = {},
@@ -276,6 +277,7 @@ fun TimelineView(
                             onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
                             onUpdateCameraUploadsLimitedAccessState = onUpdateCameraUploadsLimitedAccessState,
                             onEnableCameraUploads = onEnableCameraUploads,
+                            onNavigateToCameraUploadsTransferScreen = onPendingCountBannerClick
                         )
                     }
                 } else {
@@ -302,6 +304,7 @@ private fun HandlePhotosGridView(
     onChangeCameraUploadsPermissions: () -> Unit,
     onUpdateCameraUploadsLimitedAccessState: (Boolean) -> Unit,
     onEnableCameraUploads: () -> Unit,
+    onNavigateToCameraUploadsTransferScreen: () -> Unit,
 ) {
     var isBannerShown by remember { mutableStateOf(false) }
     var isWarningBannerShown by remember { mutableStateOf(false) }
@@ -368,7 +371,13 @@ private fun HandlePhotosGridView(
                         CameraUploadsBanner(
                             bannerType = bannerType,
                             pendingCount = pendingCount,
+                            isTransferScreenAvailable = timelineViewState.isCameraUploadsTransferScreenEnabled,
                             onEnableCameraUploads = onEnableCameraUploads,
+                            onNavigateToCameraUploadsTransferScreen = {
+                                if (timelineViewState.isCameraUploadsTransferScreenEnabled) {
+                                    onNavigateToCameraUploadsTransferScreen()
+                                }
+                            },
                         )
                     }
                 }
@@ -589,17 +598,21 @@ private fun CameraUploadsWarningBanner(
 private fun CameraUploadsBanner(
     bannerType: CameraUploadsBannerType,
     pendingCount: Int,
+    isTransferScreenAvailable: Boolean,
     onEnableCameraUploads: () -> Unit,
+    onNavigateToCameraUploadsTransferScreen: () -> Unit,
 ) {
     when (bannerType) {
         CameraUploadsBannerType.EnableCameraUploads ->
             EnableCameraUploadsBanner(onClick = onEnableCameraUploads)
 
-        CameraUploadsBannerType.CheckingUploads ->
-            CameraUploadsCheckingUploadsBanner()
-
+        CameraUploadsBannerType.CheckingUploads -> CameraUploadsCheckingUploadsBanner()
         CameraUploadsBannerType.PendingCount ->
-            CameraUploadsPendingCountBanner(pendingCount)
+            CameraUploadsPendingCountBanner(
+                count = pendingCount,
+                isTransferScreenAvailable = isTransferScreenAvailable,
+                onClick = onNavigateToCameraUploadsTransferScreen
+            )
 
         else -> {}
     }

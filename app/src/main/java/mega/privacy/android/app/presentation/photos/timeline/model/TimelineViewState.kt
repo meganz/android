@@ -42,7 +42,6 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property cuUploadsVideos                            True if videos is selected as being uploaded
  * @property cuUseCellularConnection                    True if use cellular connection is selected
  * @property selectedPhotoCount                         Selected photo count
- * @property selectedPhoto                              Selected photo
  * @property shouldTriggerCameraUploads                 True if Camera Uploads can be triggered
  * @property shouldShowBusinessAccountPrompt            True if the Business Account prompt should be shown
  * @property shouldTriggerMediaPermissionsDeniedLogic   True if certain logic should be executed when Media Permissions are denied
@@ -62,6 +61,7 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property isBusinessAccountExpired                   True if the Business or Pro Flexi plan has expired
  * @property hiddenNodeEnabled                          True if the Hidden Nodes feature is enabled
  * @property isCameraUploadsBannerImprovementEnabled    True if the Camera Uploads Banner Improvement feature is enabled
+ * @property isCameraUploadsTransferScreenEnabled       True if the Camera Uploads Transfer Screen feature is enabled
  */
 data class TimelineViewState(
     val photos: List<Photo> = emptyList(),
@@ -112,5 +112,6 @@ data class TimelineViewState(
     val isHiddenNodesOnboarded: Boolean = false,
     val isBusinessAccountExpired: Boolean = false,
     val hiddenNodeEnabled: Boolean = false,
-    val isCameraUploadsBannerImprovementEnabled: Boolean = false
+    val isCameraUploadsBannerImprovementEnabled: Boolean = false,
+    val isCameraUploadsTransferScreenEnabled: Boolean = false
 )

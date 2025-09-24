@@ -65,6 +65,7 @@ fun PhotosScreen(
     onZoomOut: () -> Unit,
     onNavigateCameraUploadsSettings: () -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
+    onNavigateCameraUploadsTransferScreen: () -> Unit
 ) {
     val photosViewState by photosViewModel.state.collectAsStateWithLifecycle()
     val timelineViewState by timelineViewModel.state.collectAsStateWithLifecycle()
@@ -135,6 +136,7 @@ fun PhotosScreen(
                 onCardClick = timelineViewModel::onCardClick,
                 onTimeBarTabSelected = timelineViewModel::onTimeBarTabSelected,
                 onEnableCameraUploads = onNavigateCameraUploadsSettings,
+                onPendingCountBannerClick = onNavigateCameraUploadsTransferScreen,
                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
                 onUpdateCameraUploadsLimitedAccessState = timelineViewModel::setCameraUploadsLimitedAccess,
                 enableCUView = {

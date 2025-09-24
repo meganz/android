@@ -222,6 +222,7 @@ class PhotosFragment : Fragment() {
                         startDestination = PhotosNavigationGraph
                     ) {
                         photosNavigationGraph(
+                            navHostController = navHostController,
                             viewComposeCoordinator = viewComposeCoordinator,
                             photosViewModel = photosViewModel,
                             timelineViewModel = timelineViewModel,

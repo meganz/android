@@ -6,7 +6,6 @@ import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -71,10 +70,10 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 
@@ -814,6 +813,28 @@ internal class TimelineViewModelTest {
         }
     }
 
+    @ParameterizedTest(name = "when isCameraUploadsTransferScreenEnabled is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isCameraUploadsTransferScreenEnabled is updated as expected`(
+        isEnabled: Boolean,
+    ) = runTest {
+        // Set up default feature flags first
+        getFeatureFlagValueUseCase.stub {
+            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
+            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
+        }
+        whenever(getFeatureFlagValueUseCase(AppFeatures.CameraUploadsTransferScreen))
+            .thenReturn(isEnabled)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isCameraUploadsTransferScreenEnabled).isEqualTo(isEnabled)
+        }
+    }
+
     @Test
     fun `test that photo monitoring does not start automatically in init when UI-driven lifecycle is enabled`() =
         runTest {
@@ -825,8 +846,8 @@ internal class TimelineViewModelTest {
             advanceUntilIdle()
 
             // Then: Verify that monitoring use cases are NOT called in init when UI-driven lifecycle is enabled
-            verify(getTimelinePhotosUseCase, never()).invoke()
-            verify(monitorPaginatedTimelinePhotosUseCase, never()).invoke()
+            verifyNoInteractions(getTimelinePhotosUseCase)
+            verifyNoInteractions(monitorPaginatedTimelinePhotosUseCase)
 
             underTest.state.test {
                 val initialState = awaitItem()
@@ -847,7 +868,7 @@ internal class TimelineViewModelTest {
 
             // Then: Verify that monitoring use case IS called in init when UI-driven lifecycle is disabled
             verify(getTimelinePhotosUseCase, atLeast(1)).invoke()
-            verify(monitorPaginatedTimelinePhotosUseCase, never()).invoke()
+            verifyNoInteractions(monitorPaginatedTimelinePhotosUseCase)
 
             underTest.state.test {
                 val state = awaitItem()
@@ -875,7 +896,7 @@ internal class TimelineViewModelTest {
 
             // Then: Verify that monitoring use case IS called when startPhotoMonitoring is invoked
             verify(getTimelinePhotosUseCase, atLeast(1)).invoke()
-            verify(monitorPaginatedTimelinePhotosUseCase, never()).invoke()
+            verifyNoInteractions(monitorPaginatedTimelinePhotosUseCase)
 
             underTest.state.test {
                 val state = awaitItem()
@@ -897,7 +918,7 @@ internal class TimelineViewModelTest {
 
             // Then: Verify that monitoring use cases are called in init but NOT called again by startPhotoMonitoring in disabled mode
             verify(getTimelinePhotosUseCase, atLeast(1)).invoke() // Called in init
-            verify(monitorPaginatedTimelinePhotosUseCase, never()).invoke()
+            verifyNoInteractions(monitorPaginatedTimelinePhotosUseCase)
 
             underTest.state.test {
                 val state = awaitItem()
@@ -934,7 +955,7 @@ internal class TimelineViewModelTest {
             // Then: Only one monitoring method should be called (duplicates prevented)
             // Since TimelinePhotosPagination is not set, it defaults to false, so getTimelinePhotosUseCase is called
             verify(getTimelinePhotosUseCase).invoke()
-            verify(monitorPaginatedTimelinePhotosUseCase, never()).invoke()
+            verifyNoInteractions(monitorPaginatedTimelinePhotosUseCase)
         }
 
     @Test
@@ -952,7 +973,7 @@ internal class TimelineViewModelTest {
 
             // Then: Verify that monitoring use cases are called in init but NOT called again by multiple startPhotoMonitoring calls in disabled mode
             verify(getTimelinePhotosUseCase, atLeast(1)).invoke() // Called in init
-            verify(monitorPaginatedTimelinePhotosUseCase, never()).invoke()
+            verifyNoInteractions(monitorPaginatedTimelinePhotosUseCase)
 
             underTest.state.test {
                 val state = awaitItem()
@@ -979,7 +1000,7 @@ internal class TimelineViewModelTest {
 
         // Then: Verify that monitoring use case IS called when feature flag throws exception (defaults to enabled)
         verify(getTimelinePhotosUseCase, atLeast(1)).invoke()
-        verify(monitorPaginatedTimelinePhotosUseCase, never()).invoke()
+        verifyNoInteractions(monitorPaginatedTimelinePhotosUseCase)
 
         underTest.state.test {
             val state = awaitItem()
@@ -1004,7 +1025,7 @@ internal class TimelineViewModelTest {
 
         // Then: Verify that monitoring use case IS called when feature flag returns null (defaults to enabled)
         verify(getTimelinePhotosUseCase, atLeast(1)).invoke()
-        verify(monitorPaginatedTimelinePhotosUseCase, never()).invoke()
+        verifyNoInteractions(monitorPaginatedTimelinePhotosUseCase)
 
         underTest.state.test {
             val state = awaitItem()

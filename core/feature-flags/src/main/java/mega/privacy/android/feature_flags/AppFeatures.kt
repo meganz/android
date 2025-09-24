@@ -16,6 +16,11 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
 
+    CameraUploadsTransferScreen(
+        "Enable Camera Uploads transfer screen",
+        false
+    ),
+
     /**
      * UI-driven photo monitoring lifecycle
      */

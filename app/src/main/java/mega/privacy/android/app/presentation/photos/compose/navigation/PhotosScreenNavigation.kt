@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.photos.compose.navigation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.PhotosViewComposeCoordinator
@@ -14,7 +15,7 @@ import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.photos.AlbumId
 
 @Serializable
-internal object PhotosScreen
+internal object PhotosScreen : NavKey
 
 internal fun NavGraphBuilder.photosScreen(
     viewComposeCoordinator: PhotosViewComposeCoordinator,
@@ -30,6 +31,7 @@ internal fun NavGraphBuilder.photosScreen(
     onZoomOut: () -> Unit,
     onNavigateCameraUploadsSettings: () -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
+    onNavigateCameraUploadsTransferScreen: () -> Unit,
 ) {
     composable<PhotosScreen> {
         PhotosScreen(
@@ -46,6 +48,7 @@ internal fun NavGraphBuilder.photosScreen(
             onNavigateCameraUploadsSettings = onNavigateCameraUploadsSettings,
             onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
             fileTypeIconMapper = fileTypeIconMapper,
+            onNavigateCameraUploadsTransferScreen = onNavigateCameraUploadsTransferScreen
         )
     }
 }
