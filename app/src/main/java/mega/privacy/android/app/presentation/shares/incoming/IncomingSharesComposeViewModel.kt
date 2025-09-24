@@ -18,6 +18,14 @@ import mega.privacy.android.app.presentation.clouddrive.OptionItems
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.SelectedNode
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.SelectedNodeType
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.SelectedNodeType.File
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.IncomingSharesCopyActionModifierItem
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.IncomingSharesMoveActionModifierItem
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.IncomingSharesRenameActionModifierItem
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.IncomingSharesToolbarActionsModifierItem
+import mega.privacy.android.app.presentation.validator.toolbaractions.modifier.ToolbarActionsModifierItem.IncomingShares
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.node.FileNode
@@ -28,8 +36,10 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
@@ -43,6 +53,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingShareParentUserEmailUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingSharesChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -98,6 +109,8 @@ class IncomingSharesComposeViewModel @Inject constructor(
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase,
     private val getIncomingShareParentUserEmailUseCase: GetIncomingShareParentUserEmailUseCase,
+    private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode,
+    private val getRubbishBinFolderUseCase: GetRubbishBinFolderUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(IncomingSharesState())
@@ -108,6 +121,7 @@ class IncomingSharesComposeViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     private var refreshNodesJob: Job? = null
+    private var actionModeStateJob: Job? = null
 
     init {
         checkContactVerification()
@@ -278,11 +292,6 @@ class IncomingSharesComposeViewModel @Inject constructor(
         setPendingRefreshNodes()
     }
 
-    /**
-     * Returns the count of nodes in the current folder
-     */
-    fun getNodeCount() = _state.value.nodesList.size
-
     private fun setPendingRefreshNodes() {
         _state.update { it.copy(isPendingRefresh = true) }
     }
@@ -388,7 +397,7 @@ class IncomingSharesComposeViewModel @Inject constructor(
     /**
      * This will map list of [Node] to [NodeUIItem]
      */
-    private fun getNodeUiItems(
+    private suspend fun getNodeUiItems(
         nodeList: List<ShareNode>,
         highlightedNames: List<String>? = null,
     ): List<NodeUIItem<ShareNode>> {
@@ -396,19 +405,27 @@ class IncomingSharesComposeViewModel @Inject constructor(
             val existingHighlightedIds = state.value.nodesList
                 .filter { it.isHighlighted }
                 .map { it.node.id }
+            val rubbishBinNode = getRubbishBinFolderUseCase()
             return nodeList.mapIndexed { index, node ->
-                val isSelected = selectedNodes.find { it.id.longValue == node.id.longValue } != null
+                val isSelected = selectedNodes.find { it.id == node.id.longValue } != null
                 val fileDuration = if (node is FileNode) {
                     fileDurationMapper(node.type)?.let { durationInSecondsTextMapper(it) }
                 } else null
                 val isHighlighted = existingHighlightedIds.contains(node.id)
                         || highlightedNames?.contains(node.name) == true
+                val canBeMovedToRubbishBin =
+                    rubbishBinNode != null && checkNodeCanBeMovedToTargetNode(
+                        nodeId = NodeId(longValue = node.id.longValue),
+                        targetNodeId = NodeId(longValue = rubbishBinNode.id.longValue)
+                    )
                 NodeUIItem(
                     node = node,
                     isSelected = if (nodesList.size > index) isSelected else false,
                     isInvisible = if (nodesList.size > index) nodesList[index].isInvisible else false,
                     fileDuration = fileDuration,
-                    isHighlighted = isHighlighted
+                    isHighlighted = isHighlighted,
+                    accessPermission = node.shareData?.access ?: AccessPermission.UNKNOWN,
+                    canBeMovedToRubbishBin = canBeMovedToRubbishBin
                 )
             }
         }
@@ -516,8 +533,18 @@ class IncomingSharesComposeViewModel @Inject constructor(
         val updatedState = _state.value.nodesList.map {
             it.copy(isSelected = true)
         }
-        val selectedNodes = updatedState.map { it.node }.toSet()
-        val totalSelectedFiles = updatedState.filterIsInstance<FileNode>().size
+        val selectedNodes = updatedState.map {
+            SelectedNode(
+                id = it.node.id.longValue,
+                type = SelectedNodeType.toSelectedNodeType(it.node),
+                isTakenDown = it.node.isTakenDown,
+                isExported = it.node.exportedData != null,
+                isIncomingShare = it.node.isIncomingShare,
+                accessPermission = it.accessPermission,
+                canBeMovedToRubbishBin = it.canBeMovedToRubbishBin
+            )
+        }.toSet()
+        val totalSelectedFiles = updatedState.filter { it.node is FileNode }.size
         val totalSelectedFolders = selectedNodes.size - totalSelectedFiles
 
         _state.update {
@@ -529,6 +556,7 @@ class IncomingSharesComposeViewModel @Inject constructor(
                 totalSelectedFolderNodes = totalSelectedFolders,
             )
         }
+        prepareActionMode()
     }
 
     /**
@@ -593,14 +621,24 @@ class IncomingSharesComposeViewModel @Inject constructor(
     private fun updateNodeInSelectionState(nodeUIItem: NodeUIItem<ShareNode>, index: Int) {
         nodeUIItem.isSelected = !nodeUIItem.isSelected
         val selectedNodes = state.value.selectedNodes.toMutableSet()
-        if (state.value.selectedNodes.contains(nodeUIItem.node)) {
-            selectedNodes.remove(nodeUIItem.node)
+        if (nodeUIItem.isSelected) {
+            selectedNodes.add(
+                SelectedNode(
+                    id = nodeUIItem.node.id.longValue,
+                    type = SelectedNodeType.toSelectedNodeType(from = nodeUIItem.node),
+                    isTakenDown = nodeUIItem.node.isTakenDown,
+                    isExported = nodeUIItem.node.exportedData != null,
+                    isIncomingShare = nodeUIItem.node.isIncomingShare,
+                    accessPermission = nodeUIItem.accessPermission,
+                    canBeMovedToRubbishBin = nodeUIItem.canBeMovedToRubbishBin
+                )
+            )
         } else {
-            selectedNodes.add(nodeUIItem.node)
+            selectedNodes.removeAll { it.id == nodeUIItem.node.id.longValue }
         }
         val newNodesList =
             _state.value.nodesList.updateItemAt(index = index, item = nodeUIItem)
-        val totalSelectedFiles = selectedNodes.filterIsInstance<FileNode>().size
+        val totalSelectedFiles = selectedNodes.filter { it.type is File }.size
         val totalSelectedFolders = selectedNodes.size - totalSelectedFiles
 
         _state.update {
@@ -612,6 +650,43 @@ class IncomingSharesComposeViewModel @Inject constructor(
                 selectedNodes = selectedNodes,
                 optionsItemInfo = null
             )
+        }
+        prepareActionMode()
+    }
+
+    private fun prepareActionMode() {
+        actionModeStateJob?.cancel()
+        actionModeStateJob = viewModelScope.launch {
+            if (_state.value.selectedNodes.isEmpty()) {
+                _state.update { it.copy(toolbarActionsModifierItem = null) }
+                return@launch
+            }
+
+            val isSingleNodeSelectedWithFullPermission =
+                _state.value.selectedNodes.size == 1 && _state.value.selectedNodes.first().accessPermission == AccessPermission.FULL
+            val renameActionModeState = IncomingSharesRenameActionModifierItem(
+                isEnabled = isSingleNodeSelectedWithFullPermission
+            )
+            val nonRootNodesPermission =
+                !_state.value.isInRootLevel && _state.value.selectedNodes.all { it.accessPermission == AccessPermission.FULL }
+            val moveActionModeState = IncomingSharesMoveActionModifierItem(
+                isEnabled = nonRootNodesPermission
+            )
+            val areAllNotTakenDown = _state.value.selectedNodes.all { it.isTakenDown.not() }
+            val copyActionModeState = IncomingSharesCopyActionModifierItem(
+                isEnabled = areAllNotTakenDown
+            )
+            _state.update {
+                it.copy(
+                    toolbarActionsModifierItem = IncomingShares(
+                        item = IncomingSharesToolbarActionsModifierItem(
+                            renameItem = renameActionModeState,
+                            moveItem = moveActionModeState,
+                            copyItem = copyActionModeState
+                        )
+                    )
+                )
+            }
         }
     }
 
@@ -703,17 +778,4 @@ class IncomingSharesComposeViewModel @Inject constructor(
     fun consumeShowLeaveShareConfirmationDialog() {
         _state.update { it.copy(showConfirmLeaveShareEvent = consumed()) }
     }
-
-    /**
-     * Checks if the User has left the Folder that was immediately accessed
-     *
-     * @return true if the User left the accessed Folder
-     */
-    fun isAccessedFolderExited() = _state.value.isAccessedFolderExited
-
-    /**
-     * Resets the value of [IncomingSharesState.isAccessedFolderExited]
-     */
-    fun resetIsAccessedFolderExited() =
-        _state.update { it.copy(isAccessedFolderExited = false) }
 }

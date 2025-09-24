@@ -20,10 +20,15 @@ import mega.privacy.android.app.presentation.clouddrive.OptionItems
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.IncomingSharesCopyActionModifierItem
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.IncomingSharesMoveActionModifierItem
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.IncomingSharesRenameActionModifierItem
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.mapper.FileDurationMapper
+import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
@@ -32,7 +37,9 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.shares.ShareFileNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
@@ -46,6 +53,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingShareParentUserEmailUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingSharesChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -56,8 +64,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -94,6 +104,8 @@ class IncomingSharesComposeViewModelTest {
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getIncomingShareParentUserEmailUseCase =
         mock<GetIncomingShareParentUserEmailUseCase>()
+    private val checkNodeCanBeMovedToTargetNode = mock<CheckNodeCanBeMovedToTargetNode>()
+    private val getRubbishBinFolderUseCase = mock<GetRubbishBinFolderUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -124,7 +136,9 @@ class IncomingSharesComposeViewModelTest {
             getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
             areCredentialsVerifiedUseCase = areCredentialsVerifiedUseCase,
             getIncomingShareParentUserEmailUseCase = getIncomingShareParentUserEmailUseCase,
-            getNodeByIdUseCase = getNodeByIdUseCase
+            getNodeByIdUseCase = getNodeByIdUseCase,
+            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
+            getRubbishBinFolderUseCase = getRubbishBinFolderUseCase
         )
     }
 
@@ -374,12 +388,18 @@ class IncomingSharesComposeViewModelTest {
     @Test
     fun `test that the sizes of both selected node handles and the nodes are equal when selecting all nodes`() =
         runTest {
-            whenever(getIncomingSharesChildrenNodeUseCase(underTest.state.value.currentHandle)).thenReturn(
-                listOf<ShareFolderNode>(mock(), mock())
-            )
+            val firstNode = mock<ShareFolderNode> { on { id } doReturn NodeId(123L) }
+            val secondNode = mock<ShareFolderNode> { on { id } doReturn NodeId(234L) }
+            whenever(
+                getIncomingSharesChildrenNodeUseCase(
+                    underTest.state.value.currentHandle
+                )
+            ) doReturn listOf(firstNode, secondNode)
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+
             underTest.refreshNodes()
             underTest.selectAllNodes()
+
             assertThat(underTest.state.value.nodesList.size)
                 .isEqualTo(underTest.state.value.selectedNodeHandles.size)
         }
@@ -585,6 +605,304 @@ class IncomingSharesComposeViewModelTest {
             }
         }
 
+    @ParameterizedTest
+    @EnumSource(AccessPermission::class)
+    fun `test that the correct access permission for an account is set`(accessPermission: AccessPermission) =
+        runTest {
+            val sharedData = newShareData(access = accessPermission)
+            val node = mock<ShareFileNode> {
+                on { id } doReturn NodeId(1L)
+                on { shareData } doReturn sharedData
+            }
+            whenever(
+                getIncomingSharesChildrenNodeUseCase(
+                    underTest.state.value.currentHandle
+                )
+            ) doReturn listOf(node)
+            whenever(getCloudSortOrder()) doReturn SortOrder.ORDER_NONE
+            whenever(getRubbishBinFolderUseCase()) doReturn null
+
+            underTest.refreshNodes()
+
+            underTest.state.test {
+                assertThat(
+                    expectMostRecentItem().nodesList.first().accessPermission
+                ).isEqualTo(accessPermission)
+            }
+        }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that the correct value is set indicating whether the node can be moved to the rubbish bin`(
+        canBeMovedToRubbishBin: Boolean,
+    ) = runTest {
+        val node = mock<ShareFileNode> {
+            on { id } doReturn NodeId(1L)
+        }
+        whenever(
+            getIncomingSharesChildrenNodeUseCase(
+                underTest.state.value.currentHandle
+            )
+        ) doReturn listOf(node)
+        val rubbishBinNode = if (canBeMovedToRubbishBin) {
+            mock<FileNode>()
+        } else null
+        whenever(getRubbishBinFolderUseCase()) doReturn rubbishBinNode
+        whenever(
+            checkNodeCanBeMovedToTargetNode(
+                nodeId = any(),
+                targetNodeId = any()
+            )
+        ) doReturn canBeMovedToRubbishBin
+
+        underTest.refreshNodes()
+
+        underTest.state.test {
+            assertThat(
+                expectMostRecentItem().nodesList.first().canBeMovedToRubbishBin
+            ).isEqualTo(canBeMovedToRubbishBin)
+        }
+    }
+
+    @Test
+    fun `test that the rename action mode state is enabled when a single node with full access is selected`() =
+        runTest {
+            val sharedData = newShareData(access = AccessPermission.FULL)
+            val node = mock<ShareFolderNode> {
+                on { id } doReturn NodeId(123L)
+                on { shareData } doReturn sharedData
+            }
+            whenever(
+                getIncomingSharesChildrenNodeUseCase(
+                    underTest.state.value.currentHandle
+                )
+            ) doReturn listOf(node)
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+
+            underTest.refreshNodes()
+            underTest.selectAllNodes()
+
+            underTest.state.test {
+                assertThat(
+                    expectMostRecentItem().toolbarActionsModifierItem!!.item.renameItem
+                ).isEqualTo(
+                    IncomingSharesRenameActionModifierItem(
+                        isEnabled = true
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun `test that the rename action mode state is disabled when a single node without full access is selected`() =
+        runTest {
+            val sharedData = newShareData(access = AccessPermission.UNKNOWN)
+            val node = mock<ShareFolderNode> {
+                on { id } doReturn NodeId(123L)
+                on { shareData } doReturn sharedData
+            }
+            whenever(
+                getIncomingSharesChildrenNodeUseCase(
+                    underTest.state.value.currentHandle
+                )
+            ) doReturn listOf(node)
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+
+            underTest.refreshNodes()
+            underTest.selectAllNodes()
+
+            underTest.state.test {
+                assertThat(
+                    expectMostRecentItem().toolbarActionsModifierItem!!.item.renameItem
+                ).isEqualTo(
+                    IncomingSharesRenameActionModifierItem(
+                        isEnabled = false
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun `test that the rename action mode state is disabled when multiple nodes are selected`() =
+        runTest {
+            val sharedData = newShareData(access = AccessPermission.UNKNOWN)
+            val firstNode = mock<ShareFolderNode> {
+                on { id } doReturn NodeId(123L)
+                on { shareData } doReturn sharedData
+            }
+            val secondNode = mock<ShareFolderNode> {
+                on { id } doReturn NodeId(234L)
+            }
+            whenever(
+                getIncomingSharesChildrenNodeUseCase(
+                    underTest.state.value.currentHandle
+                )
+            ) doReturn listOf(firstNode, secondNode)
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+
+            underTest.refreshNodes()
+            underTest.selectAllNodes()
+
+            underTest.state.test {
+                assertThat(
+                    expectMostRecentItem().toolbarActionsModifierItem!!.item.renameItem
+                ).isEqualTo(
+                    IncomingSharesRenameActionModifierItem(
+                        isEnabled = false
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun `test that the move action mode state is enabled when all selected nodes have full access and currently not in root level`() =
+        runTest {
+            val sharedData = newShareData(access = AccessPermission.FULL)
+            val node = mock<ShareFolderNode> {
+                on { id } doReturn NodeId(123L)
+                on { shareData } doReturn sharedData
+            }
+            whenever(
+                getIncomingSharesChildrenNodeUseCase(
+                    node.id.longValue
+                )
+            ) doReturn listOf(node)
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+
+            underTest.setCurrentHandle(node.id.longValue)
+            underTest.refreshNodes()
+            underTest.selectAllNodes()
+
+            underTest.state.test {
+                assertThat(
+                    expectMostRecentItem().toolbarActionsModifierItem!!.item.moveItem
+                ).isEqualTo(
+                    IncomingSharesMoveActionModifierItem(
+                        isEnabled = true
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun `test that the move action mode state is disabled when currently is in root level`() =
+        runTest {
+            val sharedData = newShareData(access = AccessPermission.FULL)
+            val node = mock<ShareFolderNode> {
+                on { id } doReturn NodeId(123L)
+                on { shareData } doReturn sharedData
+            }
+            whenever(
+                getIncomingSharesChildrenNodeUseCase(
+                    underTest.state.value.currentHandle
+                )
+            ) doReturn listOf(node)
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+
+            underTest.setCurrentHandle(-1L)
+            underTest.refreshNodes()
+            underTest.selectAllNodes()
+
+            underTest.state.test {
+                assertThat(
+                    expectMostRecentItem().toolbarActionsModifierItem!!.item.moveItem
+                ).isEqualTo(
+                    IncomingSharesMoveActionModifierItem(
+                        isEnabled = false
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun `test that the move action mode state is disabled when not all the selected nodes have full access`() =
+        runTest {
+            val sharedData = newShareData(access = AccessPermission.UNKNOWN)
+            val node = mock<ShareFolderNode> {
+                on { id } doReturn NodeId(123L)
+                on { shareData } doReturn sharedData
+            }
+            whenever(
+                getIncomingSharesChildrenNodeUseCase(
+                    underTest.state.value.currentHandle
+                )
+            ) doReturn listOf(node)
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+
+            underTest.refreshNodes()
+            underTest.selectAllNodes()
+
+            underTest.state.test {
+                assertThat(
+                    expectMostRecentItem().toolbarActionsModifierItem!!.item.moveItem
+                ).isEqualTo(
+                    IncomingSharesMoveActionModifierItem(
+                        isEnabled = false
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun `test that the copy action mode state is enabled when all selected nodes are not taken down`() =
+        runTest {
+            val node = mock<ShareFolderNode> {
+                on { id } doReturn NodeId(123L)
+                on { isTakenDown } doReturn false
+            }
+            whenever(
+                getIncomingSharesChildrenNodeUseCase(
+                    underTest.state.value.currentHandle
+                )
+            ) doReturn listOf(node)
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+
+            underTest.refreshNodes()
+            underTest.selectAllNodes()
+
+            underTest.state.test {
+                assertThat(
+                    expectMostRecentItem().toolbarActionsModifierItem!!.item.copyItem
+                ).isEqualTo(
+                    IncomingSharesCopyActionModifierItem(
+                        isEnabled = true
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun `test that the copy action mode state is disabled when any of the selected nodes are taken down`() =
+        runTest {
+            val firstNode = mock<ShareFolderNode> {
+                on { id } doReturn NodeId(123L)
+                on { isTakenDown } doReturn false
+            }
+            val secondNode = mock<ShareFolderNode> {
+                on { id } doReturn NodeId(123L)
+                on { isTakenDown } doReturn true
+            }
+            whenever(
+                getIncomingSharesChildrenNodeUseCase(
+                    underTest.state.value.currentHandle
+                )
+            ) doReturn listOf(firstNode, secondNode)
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+
+            underTest.refreshNodes()
+            underTest.selectAllNodes()
+
+            underTest.state.test {
+                assertThat(
+                    expectMostRecentItem().toolbarActionsModifierItem!!.item.copyItem
+                ).isEqualTo(
+                    IncomingSharesCopyActionModifierItem(
+                        isEnabled = false
+                    )
+                )
+            }
+        }
+
     private suspend fun stubCommon() {
         whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)
         whenever(monitorViewType()).thenReturn(emptyFlow())
@@ -623,7 +941,31 @@ class IncomingSharesComposeViewModelTest {
             getContactVerificationWarningUseCase,
             areCredentialsVerifiedUseCase,
             getIncomingShareParentUserEmailUseCase,
-            getNodeByIdUseCase
+            getNodeByIdUseCase,
+            checkNodeCanBeMovedToTargetNode,
+            getRubbishBinFolderUseCase
         )
     }
+
+    private fun newShareData(
+        user: String? = null,
+        userFullName: String? = null,
+        nodeHandle: Long = 0L,
+        access: AccessPermission = AccessPermission.UNKNOWN,
+        timeStamp: Long = 0L,
+        isPending: Boolean = false,
+        isVerified: Boolean = false,
+        isContactCredentialsVerified: Boolean = false,
+        count: Int = 0,
+    ) = ShareData(
+        user = user,
+        userFullName = userFullName,
+        nodeHandle = nodeHandle,
+        access = access,
+        timeStamp = timeStamp,
+        isPending = isPending,
+        isVerified = isVerified,
+        isContactCredentialsVerified = isContactCredentialsVerified,
+        count = count
+    )
 }

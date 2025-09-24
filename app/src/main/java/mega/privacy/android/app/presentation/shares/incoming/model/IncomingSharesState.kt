@@ -5,6 +5,8 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.SelectedNode
+import mega.privacy.android.app.presentation.validator.toolbaractions.modifier.ToolbarActionsModifierItem
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -52,7 +54,7 @@ data class IncomingSharesState(
     val isPendingRefresh: Boolean = false,
     val nodesList: List<NodeUIItem<ShareNode>> = emptyList(),
     val isInSelection: Boolean = false,
-    val selectedNodes: Set<ShareNode> = emptySet(),
+    val selectedNodes: Set<SelectedNode> = emptySet(),
     val totalSelectedFileNodes: Int = 0,
     val totalSelectedFolderNodes: Int = 0,
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
@@ -65,8 +67,9 @@ data class IncomingSharesState(
     val isContactVerificationOn: Boolean = false,
     val showContactNotVerifiedBanner: Boolean = false,
     val showConfirmLeaveShareEvent: StateEventWithContent<List<Long>> = consumed(),
+    val toolbarActionsModifierItem: ToolbarActionsModifierItem.IncomingShares? = null,
 ) {
     val isIncomingSharesEmpty: Boolean get() = currentHandle == -1L && nodesList.isEmpty()
     val isInRootLevel: Boolean = currentHandle == -1L
-    val selectedNodeHandles: List<Long> = selectedNodes.map { it.id.longValue }
+    val selectedNodeHandles: List<Long> = selectedNodes.map { it.id }
 }
