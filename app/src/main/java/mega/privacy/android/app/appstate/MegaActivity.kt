@@ -7,9 +7,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -76,6 +78,9 @@ class MegaActivity : AppCompatActivity() {
             val appDialogViewModel = hiltViewModel<AppDialogViewModel>()
 
             val state by viewModel.state.collectAsStateWithLifecycle()
+            var handledState by rememberSaveable {
+                mutableStateOf<GlobalState?>(null)
+            }
             val dialogEvents by appDialogViewModel.dialogEvents.collectAsStateWithLifecycle()
 
             val snackbarEventsViewModel = viewModel<SnackbarEventsViewModel>()
@@ -86,7 +91,8 @@ class MegaActivity : AppCompatActivity() {
             // This is used to recompose the LoginGraph when new login request is made
             keepSplashScreen = state is GlobalState.Loading
 
-            LaunchedEffect(state) {
+            if (handledState != state) {
+                handledState = state
                 when (val currentState = state) {
                     is GlobalState.Loading -> {}
                     is GlobalState.LoggedIn -> {
@@ -167,7 +173,6 @@ class MegaActivity : AppCompatActivity() {
                             appDialogViewModel::eventHandled
                         )
                     }
-
                 }
             }
         }

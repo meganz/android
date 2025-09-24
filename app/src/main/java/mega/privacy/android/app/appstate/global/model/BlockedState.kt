@@ -1,6 +1,10 @@
 package mega.privacy.android.app.appstate.global.model
 
-sealed interface BlockedState {
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+sealed interface BlockedState : Parcelable {
     data class NotBlocked(val session: String?) : BlockedState
     data class Copyright(val text: String) : BlockedState
     data class TermsOfService(val text: String) : BlockedState
