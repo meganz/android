@@ -643,11 +643,11 @@ private fun ActionsSection(
                 OutlinedButton(
                     onClick = { onCopyLink(processedLink) },
                     shape = RoundedCornerShape(4.dp),
-                    border = BorderStroke(1.dp, accent_900),
+                    border = BorderStroke(1.dp, MaterialTheme.colors.secondary),
                     content = {
                         Text(
                             text = stringResource(id = R.string.button_copy_link),
-                            color = accent_900,
+                            color = MaterialTheme.colors.secondary,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.W500,
                             style = MaterialTheme.typography.button,
@@ -661,11 +661,11 @@ private fun ActionsSection(
                     OutlinedButton(
                         onClick = { onCopyKey(key) },
                         shape = RoundedCornerShape(4.dp),
-                        border = BorderStroke(1.dp, accent_900),
+                        border = BorderStroke(1.dp, MaterialTheme.colors.secondary),
                         content = {
                             Text(
                                 text = stringResource(id = R.string.button_copy_key),
-                                color = accent_900,
+                                color = MaterialTheme.colors.secondary,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.W500,
                                 style = MaterialTheme.typography.button,
