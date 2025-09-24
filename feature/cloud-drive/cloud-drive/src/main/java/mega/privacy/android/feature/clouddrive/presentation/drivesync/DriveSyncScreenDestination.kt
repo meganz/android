@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveViewModel
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -20,6 +21,7 @@ fun NavGraphBuilder.driveSyncScreen(
     setNavigationVisibility: (Boolean) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     onRenameNode: (NodeId) -> Unit,
+    openSearch: (Boolean, Long, NodeSourceType) -> Unit,
 ) {
     composable<DriveSync> {
         val viewModel = hiltViewModel<DriveSyncViewModel>()
@@ -32,7 +34,8 @@ fun NavGraphBuilder.driveSyncScreen(
             onCreatedNewFolder = onCreatedNewFolder,
             setNavigationItemVisibility = setNavigationVisibility,
             onTransfer = onTransfer,
-            onRenameNode = onRenameNode
+            onRenameNode = onRenameNode,
+            openSearch = openSearch
         )
     }
 }

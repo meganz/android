@@ -1,9 +1,7 @@
 package mega.privacy.android.feature.clouddrive.presentation.rubbishbin
 
-import android.app.Activity
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -79,6 +77,7 @@ fun RubbishBinScreen(
     navigationHandler: NavigationHandler,
     onTransfer: (TransferTriggerEvent) -> Unit,
     onFolderClick: (NodeId) -> Unit,
+    openSearch: (Boolean, Long) -> Unit,
     viewModel: NewRubbishBinViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -102,17 +101,6 @@ fun RubbishBinScreen(
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
 
-    val searchResultLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                // TODO Hai
-//                val handle = result.data?.getLongExtra(
-//                    SearchActivity.SEARCH_NODE_HANDLE,
-//                    INVALID_HANDLE
-//                ) ?: INVALID_HANDLE
-//                viewModel.onFolderItemClicked(NodeId(handle))
-            }
-        }
 
     val nameCollisionLauncher = rememberLauncherForActivityResult(
         contract = megaResultContract.nameCollisionActivityContract
@@ -199,13 +187,10 @@ fun RubbishBinScreen(
                     maxActionsToShow = if (isRootDirectory) 1 else 2,
                     actions = buildList {
                         add(MenuActionIconWithClick(RubbishBinAppBarAction.Search()) {
-//                            val searchActivityIntent = SearchActivity.getIntent(
-//                                context = context,
-//                                isFirstNavigationLevel = isFirstNavigationLevel,
-//                                nodeSourceType = NodeSourceType.RUBBISH_BIN,
-//                                parentHandle = uiState.currentFolderId.longValue
-//                            )
-//                            searchResultLauncher.launch(searchActivityIntent)
+                            openSearch(
+                                isRootDirectory,
+                                uiState.currentFolderId.longValue,
+                            )
                         })
                         if (isRootDirectory) {
                             add(

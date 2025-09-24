@@ -7,7 +7,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
@@ -21,6 +20,7 @@ import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSel
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.model.CloudDriveAppBarAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.DeselectAllItems
@@ -47,11 +47,11 @@ fun CloudDriveScreen(
     onCreatedNewFolder: (NodeId) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     onRenameNode: (NodeId) -> Unit,
+    openSearch: (Boolean, Long, NodeSourceType) -> Unit,
     viewModel: CloudDriveViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showUploadOptionsBottomSheet by remember { mutableStateOf(false) }
-    val context = LocalContext.current
     val megaNavigator = rememberMegaNavigator()
     val nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel()
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
@@ -62,10 +62,6 @@ fun CloudDriveScreen(
     )
     // Controls the visibility of the Node Options Bottom Sheet on CloudDriveContent
     var visibleNodeOptionId: NodeId? by remember { mutableStateOf(null) }
-
-    BackHandler(enabled = uiState.isInSelectionMode) {
-        viewModel.processAction(DeselectAllItems)
-    }
 
     BackHandler(enabled = uiState.isInSelectionMode) {
         viewModel.processAction(DeselectAllItems)
@@ -89,11 +85,10 @@ fun CloudDriveScreen(
                         if (uiState.items.isNotEmpty()) {
                             add(
                                 MenuActionIconWithClick(CloudDriveAppBarAction.Search) {
-                                    megaNavigator.openSearchActivity(
-                                        context = context,
-                                        nodeSourceType = viewModel.nodeSourceType,
-                                        parentHandle = uiState.currentFolderId.longValue,
-                                        isFirstNavigationLevel = false
+                                    openSearch(
+                                        false,
+                                        uiState.currentFolderId.longValue,
+                                        viewModel.nodeSourceType
                                     )
                                 }
                             )

@@ -6,6 +6,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialog
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.feature.clouddrive.presentation.drivesync.DriveSync
 import mega.privacy.android.feature.clouddrive.presentation.drivesync.driveSyncScreen
 import mega.privacy.android.icon.pack.IconPack
@@ -15,6 +16,7 @@ import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.CloudDrive
+import mega.privacy.android.navigation.destination.SearchNode
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 import mega.privacy.mobile.analytics.event.CloudDriveBottomNavigationItemEvent
@@ -46,6 +48,15 @@ class DriveSyncNavItem : MainNavItem {
                 onRenameNode = { nodeId ->
                     navigationHandler.navigate(
                         RenameNodeDialog(nodeId = nodeId.longValue)
+                    )
+                },
+                openSearch = { isFirstNavigationLevel, parentHandle, nodeSourceType ->
+                    navigationHandler.navigate(
+                        SearchNode(
+                            isFirstNavigationLevel = isFirstNavigationLevel,
+                            nodeSourceType = nodeSourceType,
+                            parentHandle = parentHandle
+                        )
                     )
                 }
             )

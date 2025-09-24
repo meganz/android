@@ -35,6 +35,7 @@ import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSel
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.model.CloudDriveAppBarAction
@@ -66,6 +67,7 @@ internal fun DriveSyncScreen(
     setNavigationItemVisibility: (Boolean) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     onRenameNode: (NodeId) -> Unit,
+    openSearch: (Boolean, Long, NodeSourceType) -> Unit,
     viewModel: DriveSyncViewModel = hiltViewModel(),
     cloudDriveViewModel: CloudDriveViewModel = hiltViewModel(),
 ) {
@@ -111,11 +113,10 @@ internal fun DriveSyncScreen(
                         when {
                             selectedTabIndex == 0 && cloudDriveUiState.items.isNotEmpty() -> add(
                                 MenuActionIconWithClick(CloudDriveAppBarAction.Search) {
-                                    megaNavigator.openSearchActivity(
-                                        context = context,
-                                        nodeSourceType = cloudDriveViewModel.nodeSourceType,
-                                        parentHandle = cloudDriveUiState.currentFolderId.longValue,
-                                        isFirstNavigationLevel = true
+                                    openSearch(
+                                        true,
+                                        cloudDriveUiState.currentFolderId.longValue,
+                                        cloudDriveViewModel.nodeSourceType
                                     )
                                 })
 

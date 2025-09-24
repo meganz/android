@@ -3,6 +3,7 @@ package mega.privacy.android.app.activities.destinations
 import androidx.navigation.NavGraphBuilder
 import mega.privacy.android.app.presentation.chat.navigation.chatLegacyDestination
 import mega.privacy.android.app.presentation.contact.navigation.contactsLegacyDestination
+import mega.privacy.android.app.presentation.search.navigation.searchLegacyDestination
 import mega.privacy.android.app.presentation.settings.cookieSettingsNavigationDestination
 import mega.privacy.android.feature.payment.upgradeAccount
 import mega.privacy.android.navigation.contract.FeatureDestination
@@ -18,6 +19,7 @@ class LegacyCoreActivityFeatureGraph : FeatureDestination {
             achievement(navigationHandler::back)
             webDestinations(navigationHandler::back)
             cookieSettingsNavigationDestination(navigationHandler::back)
+            searchLegacyDestination(navigationHandler::back)
             contactsLegacyDestination(navigationHandler::back)
             chatLegacyDestination(navigationHandler::back)
         }
