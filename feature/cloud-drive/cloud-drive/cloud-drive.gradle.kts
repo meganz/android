@@ -22,6 +22,7 @@ dependencies {
     lintChecks(project(":lint"))
 
     implementation(project(":core:ui-components:node-components"))
+    implementation(project(":core:ui-components:shared-components"))
     implementation(project(":core:transfers"))
     implementation(project(":core:formatter"))
     implementation(project(":core:analytics:analytics-tracker"))

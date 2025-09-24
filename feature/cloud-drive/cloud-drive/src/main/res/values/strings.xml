@@ -22,4 +22,8 @@
     <string name="clear_rubbish_confirmation">You are about to permanently remove all items from your Rubbish bin.</string>
     <!-- Button to clear the chat history -->
     <string name="general_clear">Clear</string>
+    <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
+    <string name="context_empty_rubbish_bin">[B]Empty [/B][A]Rubbish bin[/A]</string>
+    <!-- Empty state text that indicates that a folder is currently empty -->
+    <string name="file_browser_empty_folder_new">[B]Empty[/B][A] Folder[/A]</string>
 </resources>

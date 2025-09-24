@@ -19,6 +19,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -50,13 +52,16 @@ import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetRoute
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
+import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.HandleNodeOptionEvent
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.view.ClearRubbishBinDialog
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.view.RubbishBinAppBarAction
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
@@ -139,7 +144,7 @@ fun RubbishBinScreen(
         }
     }
 
-    val isFirstNavigationLevel = uiState.parentFolderId == null
+    val isRootDirectory = uiState.parentFolderId == null
     var shouldShowSkeleton by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.isLoading) {
@@ -191,7 +196,7 @@ fun RubbishBinScreen(
                         is LocalizedText.Literal -> uiState.title.text
                         else -> stringResource(sharedR.string.general_section_rubbish_bin)
                     },
-                    maxActionsToShow = if (isFirstNavigationLevel) 1 else 2,
+                    maxActionsToShow = if (isRootDirectory) 1 else 2,
                     actions = buildList {
                         add(MenuActionIconWithClick(RubbishBinAppBarAction.Search()) {
 //                            val searchActivityIntent = SearchActivity.getIntent(
@@ -202,7 +207,7 @@ fun RubbishBinScreen(
 //                            )
 //                            searchResultLauncher.launch(searchActivityIntent)
                         })
-                        if (isFirstNavigationLevel) {
+                        if (isRootDirectory) {
                             add(
                                 MenuActionIconWithClick(RubbishBinAppBarAction.Empty()) {
                                     showClearRubbishBinDialog = true
@@ -239,6 +244,27 @@ fun RubbishBinScreen(
                         spanCount = spanCount
                     )
                 }
+            }
+
+            uiState.items.isEmpty() -> {
+                MegaEmptyView(
+                    modifier = Modifier
+                        .testTag(NODES_EMPTY_VIEW_VISIBLE),
+                    imagePainter = painterResource(
+                        if (isRootDirectory) {
+                            iconPackR.drawable.ic_empty_trash_glass
+                        } else {
+                            iconPackR.drawable.ic_empty_folder_glass
+                        }
+                    ),
+                    text = stringResource(
+                        if (isRootDirectory) {
+                            R.string.context_empty_rubbish_bin
+                        } else {
+                            R.string.file_browser_empty_folder_new
+                        }
+                    )
+                )
             }
 
             else -> {
@@ -341,3 +367,8 @@ fun RubbishBinScreen(
         )
     }
 }
+
+/**
+ * Test tag for empty view in nodes screen
+ */
+const val NODES_EMPTY_VIEW_VISIBLE = "rubbish_bin_screen:empty_view"
