@@ -26,4 +26,16 @@
     <string name="context_empty_rubbish_bin">[B]Empty [/B][A]Rubbish bin[/A]</string>
     <!-- Empty state text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder_new">[B]Empty[/B][A] Folder[/A]</string>
+
+
+    <!-- Start of shares screen strings -->
+    <!-- title of the screen that shows all the shared items -->
+    <string name="title_shared_items">Shared items</string>
+    <!-- Capital letters. Incoming shared folders. The title of a tab -->
+    <string name="tab_incoming_shares">Incoming</string>
+    <!-- Capital letters. Outgoing shared folders. The title of a tab -->
+    <string name="tab_outgoing_shares">Outgoing</string>
+    <!-- Capital letters. Files with link. The title of a tab -->
+    <string name="tab_links_shares">Links</string>
+    <!-- End of shares screen strings -->
 </resources>

@@ -9,6 +9,7 @@ import mega.privacy.android.navigation.destination.ExampleLegacyScreen
 import mega.privacy.android.navigation.destination.LegacySettings
 import mega.privacy.android.navigation.destination.MyAccount
 import mega.privacy.android.navigation.destination.RubbishBin
+import mega.privacy.android.navigation.destination.Shares
 import mega.privacy.android.navigation.destination.Transfers
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -38,7 +39,7 @@ object AchievementsItem : NavDrawerItem.Account(
 )
 
 object SharedItemsItem : NavDrawerItem.Account(
-    destination = object : NavKey {},
+    destination = Shares,
     icon = IconPack.Medium.Thin.Outline.FolderUsers,
     title = sharedR.string.video_section_videos_location_option_shared_items
 )

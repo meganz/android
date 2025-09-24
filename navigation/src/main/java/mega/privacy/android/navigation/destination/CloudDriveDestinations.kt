@@ -22,3 +22,9 @@ data class CloudDrive(
     val highlightedNodeHandle: Long? = null,
     val highlightedNodeNames: List<String>? = null,
 ) : NavKey
+
+/**
+ * Shares route args
+ */
+@Serializable
+data object Shares : NavKey
