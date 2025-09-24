@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import java.util.concurrent.ConcurrentHashMap
 import mega.privacy.android.data.extensions.getChatRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -82,9 +83,9 @@ internal class CallRepositoryImpl @Inject constructor(
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
 ) : CallRepository {
 
-    private val fakeIncomingCalls = mutableMapOf<Long, FakeIncomingCallState>()
-    private val fakeIncomingCallsFlow = MutableSharedFlow<MutableMap<Long, FakeIncomingCallState>>()
-    private val hangingCallIds = mutableSetOf<Long>()
+    private val fakeIncomingCalls = ConcurrentHashMap<Long, FakeIncomingCallState>()
+    private val fakeIncomingCallsFlow = MutableSharedFlow<Map<Long, FakeIncomingCallState>>()
+    private val hangingCallIds = ConcurrentHashMap.newKeySet<Long>()
 
     private val monitorCallRecordingConsentEvent: MutableStateFlow<Boolean?> =
         MutableStateFlow(null)
@@ -837,11 +838,12 @@ internal class CallRepositoryImpl @Inject constructor(
 
     override suspend fun addFakeIncomingCall(chatId: Long, type: FakeIncomingCallState) {
         fakeIncomingCalls[chatId] = type
-        fakeIncomingCallsFlow.emit(fakeIncomingCalls)
+        fakeIncomingCallsFlow.emit(HashMap(fakeIncomingCalls))
     }
 
     override suspend fun removeFakeIncomingCall(chatId: Long) {
         fakeIncomingCalls.remove(chatId)
+        fakeIncomingCallsFlow.emit(HashMap(fakeIncomingCalls))
     }
 
     override suspend fun getFakeIncomingCall(chatId: Long): FakeIncomingCallState? =

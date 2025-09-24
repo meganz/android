@@ -647,7 +647,7 @@ interface CallRepository {
      *
      * @return Flow of Map.
      */
-    fun monitorFakeIncomingCall(): Flow<MutableMap<Long, FakeIncomingCallState>>
+    fun monitorFakeIncomingCall(): Flow<Map<Long, FakeIncomingCallState>>
 
     /**
      * Add fake incoming call

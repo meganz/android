@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
-import mega.privacy.android.domain.entity.call.CallCompositionChanges
 import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.CallPushMessageNotificationActionType
@@ -91,7 +90,6 @@ class MonitorCallPushNotificationUseCase @Inject constructor(
                     val call = callRepository.getChatCall(chatId)
                     val isNotification =
                         callRepository.getFakeIncomingCall(chatId = chatId) == FakeIncomingCallState.Notification
-
                     if (isNotification) {
                         result[chatId] =
                             when {
@@ -167,16 +165,16 @@ class MonitorCallPushNotificationUseCase @Inject constructor(
                         }
                     }
 
-                    if (contains(ChatCallChanges.CallComposition) &&
-                        call.callCompositionChange == CallCompositionChanges.Added &&
-                        call.peerIdParticipants?.contains(getMyUserHandleUseCase()) == true
-                    ) {
-                        result[call.chatId] =
-                            CallPushMessageNotificationActionType.Remove
+                    // Monitor call composition changes to detect when user joins from another device
+                    if (call.peerIdParticipants?.contains(getMyUserHandleUseCase()) == true) {
+                        // User joined the call from another device while this device shows notification
+                        setFakeIncomingCallUseCase(
+                            chatId = call.chatId,
+                            type = FakeIncomingCallState.Remove
+                        )
+                        result[call.chatId] = CallPushMessageNotificationActionType.Remove
                     }
                 }
-
-
                 result
             }.filter { it.isNotEmpty() }
 }

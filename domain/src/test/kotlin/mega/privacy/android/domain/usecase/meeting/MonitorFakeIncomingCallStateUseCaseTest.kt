@@ -18,7 +18,6 @@ class MonitorFakeIncomingCallStateUseCaseTest {
     private val callRepository = mock<CallRepository>()
     private val setFakeIncomingCallUseCase = mock<SetFakeIncomingCallStateUseCase>()
     private lateinit var underTest: MonitorFakeIncomingCallStateUseCase
-    val map: MutableMap<Long, FakeIncomingCallState> = mutableMapOf()
 
     @BeforeEach
     internal fun setUp() {
@@ -27,11 +26,11 @@ class MonitorFakeIncomingCallStateUseCaseTest {
 
     @Test
     fun `test that it emits value when invoked `() = runTest {
-        map[123] = FakeIncomingCallState.Notification
-        whenever(callRepository.monitorFakeIncomingCall()).thenReturn(flowOf(map))
+        val testMap = mapOf(123L to FakeIncomingCallState.Notification)
+        whenever(callRepository.monitorFakeIncomingCall()).thenReturn(flowOf(testMap))
         underTest().test {
             setFakeIncomingCallUseCase(chatId = 123, FakeIncomingCallState.Notification)
-            Truth.assertThat(awaitItem()).isEqualTo(map)
+            Truth.assertThat(awaitItem()).isEqualTo(testMap)
             cancelAndIgnoreRemainingEvents()
         }
     }
