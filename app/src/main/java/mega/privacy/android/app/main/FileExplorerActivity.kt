@@ -1246,7 +1246,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }
 
                 CHAT_TAB -> {
-                    searchMenuItem?.isVisible = true
+                    chatExplorer = chatExplorerFragment
+                    searchMenuItem?.isVisible = chatExplorer != null
+                            && chatExplorer?.isListEmpty == false
                     createFolderMenuItem?.isVisible = false
                     newChatMenuItem?.isVisible = false
                 }
@@ -1284,8 +1286,10 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         }
 
                         CHAT_FRAGMENT -> {
+                            chatExplorer = chatExplorerFragment
                             newChatMenuItem?.isVisible = false
-                            searchMenuItem?.isVisible = true
+                            searchMenuItem?.isVisible = chatExplorer != null
+                                    && chatExplorer?.isListEmpty == false
                         }
                     }
                 }

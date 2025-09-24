@@ -20,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -629,5 +630,9 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
     public void search(String s) {
         viewModel.search(s);
+    }
+
+    public boolean isListEmpty() {
+        return viewModel.isListEmpty();
     }
 }

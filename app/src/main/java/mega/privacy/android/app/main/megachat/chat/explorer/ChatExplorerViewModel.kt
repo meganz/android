@@ -1,6 +1,7 @@
 package mega.privacy.android.app.main.megachat.chat.explorer
 
 import android.util.SparseBooleanArray
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,21 +11,19 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.main.model.chat.explorer.ChatExplorerSearchUiState
 import mega.privacy.android.app.main.model.chat.explorer.ChatExplorerUiState
 import mega.privacy.android.app.presentation.contact.mapper.UserContactMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
-import mega.privacy.android.domain.entity.ChatRoomPermission
-import mega.privacy.android.shared.resources.R as sharedR
-import androidx.lifecycle.SavedStateHandle
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.contacts.UserChatStatus.Busy
 import mega.privacy.android.domain.entity.contacts.UserChatStatus.Invalid
 import mega.privacy.android.domain.entity.contacts.UserChatStatus.Online
 import mega.privacy.android.domain.entity.contacts.UserContact
 import mega.privacy.android.domain.entity.user.UserId
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.chat.GetActiveChatListItemsUseCase
 import mega.privacy.android.domain.usecase.chat.GetArchivedChatListItemsUseCase
@@ -36,6 +35,7 @@ import mega.privacy.android.domain.usecase.contact.GetUserUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorContactByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
@@ -397,6 +397,8 @@ class ChatExplorerViewModel @Inject constructor(
             )
         }
     }
+
+    fun isListEmpty() = _uiState.value.items?.isEmpty() ?: true
 
     companion object {
         private const val RECENT_CHATS_MAX_SIZE = 6
