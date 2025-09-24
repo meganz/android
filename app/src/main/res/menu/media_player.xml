@@ -12,7 +12,7 @@
 
     <item
         android:id="@+id/properties"
-        android:icon="@drawable/ic_alert_circle_medium_thin_outline"
+        android:icon="@drawable/ic_info_medium_thin_outline"
         android:orderInCategory="105"
         android:title="@string/general_file_info"
         app:iconTint="?attr/colorControlNormal"

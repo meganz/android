@@ -231,7 +231,7 @@ internal fun ImagePreviewBottomSheet(
             ) {
                 if (isInfoMenuVisible) {
                     MenuActionListTile(
-                        icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.AlertCircle),
+                        icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Info),
                         text = stringResource(id = R.string.general_info),
                         onActionClicked = onClickInfo,
                         dividerType = null,
