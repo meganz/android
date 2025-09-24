@@ -20,7 +20,8 @@ internal class EditMessageAction(
 ) {
 
     override fun shouldDisplayFor(messages: Set<TypedMessage>): Boolean =
-        messages.size == 1 && messages.first().let { it.isEditable && it !is LocationMessage }
+        messages.size == 1 && messages.first()
+            .let { it.isEditable && it.isMine && it !is LocationMessage }
 
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {

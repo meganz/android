@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
@@ -19,7 +20,6 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import mega.privacy.android.analytics.test.AnalyticsTestRule
 
 @RunWith(AndroidJUnit4::class)
 class EditMessageActionTest {
@@ -42,23 +42,50 @@ class EditMessageActionTest {
     }
 
     @Test
-    fun `test that action applies to editable, non location messages`() {
+    fun `test that action applies to editable, non location messages that are mine`() {
         assertThat(underTest.appliesTo(setOf(mock<NormalMessage> {
             on { isEditable } doReturn true
+            on { isMine } doReturn true
         }))).isTrue()
     }
 
     @Test
-    fun `test that action does not apply to editable, location messages`() {
-        assertThat(underTest.appliesTo(setOf(mock<LocationMessage> {
-            on { isEditable } doReturn true
+    fun `test that action does not apply to non editable, non location messages that are mine`() {
+        assertThat(underTest.appliesTo(setOf(mock<NormalMessage> {
+            on { isEditable } doReturn false
+            on { isMine } doReturn true
         }))).isFalse()
     }
 
     @Test
-    fun `test that action does not apply to non editable messages`() {
+    fun `test that action does not apply to editable, non location messages that are not mine`() {
         assertThat(underTest.appliesTo(setOf(mock<NormalMessage> {
+            on { isEditable } doReturn true
+            on { isMine } doReturn false
+        }))).isFalse()
+    }
+
+    @Test
+    fun `test that action does not apply to editable, location messages that are mine`() {
+        assertThat(underTest.appliesTo(setOf(mock<LocationMessage> {
+            on { isEditable } doReturn true
+            on { isMine } doReturn true
+        }))).isFalse()
+    }
+
+    @Test
+    fun `test that action does not apply to editable, location messages that are not mine`() {
+        assertThat(underTest.appliesTo(setOf(mock<LocationMessage> {
+            on { isEditable } doReturn true
+            on { isMine } doReturn false
+        }))).isFalse()
+    }
+
+    @Test
+    fun `test that action does not apply to non editable, location messages that are mine`() {
+        assertThat(underTest.appliesTo(setOf(mock<LocationMessage> {
             on { isEditable } doReturn false
+            on { isMine } doReturn true
         }))).isFalse()
     }
 
