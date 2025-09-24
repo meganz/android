@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.notification.model
 
 import android.content.Context
 import androidx.compose.ui.unit.TextUnit
+import androidx.navigation3.runtime.NavKey
 
 /**
  * Notification
@@ -27,4 +28,5 @@ data class Notification(
     val dateText: (Context) -> String,
     val isNew: Boolean,
     val onClick: (NotificationNavigationHandler) -> Unit,
+    val destination: NavKey?,
 )

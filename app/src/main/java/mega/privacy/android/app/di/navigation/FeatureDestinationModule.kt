@@ -8,6 +8,7 @@ import dagger.multibindings.IntoSet
 import mega.privacy.android.app.activities.destinations.LegacyCoreActivityFeatureGraph
 import mega.privacy.android.app.activities.destinations.LegacyCoreFragmentFeatureGraph
 import mega.privacy.android.app.presentation.filecontact.navigation.FileContactFeatureDestination
+import mega.privacy.android.app.presentation.notification.navigation.NotificationsFeatureDestination
 import mega.privacy.android.navigation.contract.FeatureDestination
 
 @Module
@@ -27,4 +28,10 @@ class FeatureDestinationModule {
     @Provides
     @IntoSet
     fun provideFileContactFeatureDestination(): FeatureDestination = FileContactFeatureDestination()
+
+
+    @Provides
+    @IntoSet
+    fun provideNotificationsFeatureDestination(): FeatureDestination =
+        NotificationsFeatureDestination()
 }

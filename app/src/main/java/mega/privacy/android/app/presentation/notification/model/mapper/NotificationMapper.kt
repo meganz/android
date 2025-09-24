@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.notification.model.mapper
 import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.presentation.notification.model.extensions.dateText
 import mega.privacy.android.app.presentation.notification.model.extensions.description
+import mega.privacy.android.app.presentation.notification.model.extensions.destination
 import mega.privacy.android.app.presentation.notification.model.extensions.onClick
 import mega.privacy.android.app.presentation.notification.model.extensions.schedMeetingNotification
 import mega.privacy.android.app.presentation.notification.model.extensions.sectionType
@@ -33,5 +34,6 @@ class NotificationMapper @Inject constructor() {
         dateText = alert.dateText(),
         isNew = !alert.seen,
         onClick = alert.onClick(),
+        destination = alert.destination()
     )
 }

@@ -1,13 +1,13 @@
-package mega.privacy.android.app.activities.destinations
+package mega.privacy.android.app.presentation.notification.navigation
 
 import androidx.navigation.NavGraphBuilder
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 
-class LegacyCoreFragmentFeatureGraph : FeatureDestination {
+class NotificationsFeatureDestination : FeatureDestination {
     override val navigationGraph: NavGraphBuilder.(NavigationHandler, TransferHandler) -> Unit =
         { navigationHandler, transferHandler ->
-            legacyMediaDiscoveryScreen(navigationHandler)
+            notifications(navigationHandler)
         }
 }

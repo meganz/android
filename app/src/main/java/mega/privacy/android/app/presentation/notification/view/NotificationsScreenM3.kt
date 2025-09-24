@@ -19,7 +19,9 @@ fun NotificationsScreenM3(
     NotificationViewM3(
         state = uiState,
         onNotificationClick = { notification ->
-            //todo handle notification click
+            notification.destination?.let {
+                navigationHandler.navigate(it)
+            }
         },
         onPromoNotificationClick = { promoNotification ->
             //todo handle promoNotification click

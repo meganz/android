@@ -33,8 +33,9 @@ class NotificationViewM3Test {
         schedMeetingNotification = null,
         dateText = { "11 October 2022 6:46 pm" },
         isNew = true,
-    ) {}
-
+        onClick = {},
+        destination = null
+    )
     private val promoNotification = PromoNotification(
         promoID = 1,
         title = "Title",

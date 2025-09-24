@@ -99,9 +99,9 @@ fun NotificationViewM3(
         val allNotifications = state.promoNotifications + state.notifications
         if (allNotifications.isNotEmpty()) {
             NotificationListViewM3(
-                modifier,
-                state,
-                innerPadding,
+                modifier = modifier,
+                state = state,
+                contentPadding = innerPadding,
                 allNotifications = allNotifications,
                 onNotificationClick = { notification: Notification ->
                     onNotificationClick(
@@ -342,8 +342,8 @@ private fun NotificationViewM3Preview() {
         description = { "xyz@gmail.com is now a contact" },
         schedMeetingNotification = null,
         dateText = { "11 October 2022 6:46 pm" },
-        isNew = true,
-    ) {}
+        isNew = true, onClick = {}, destination = null
+    )
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         NotificationViewM3(
             state = NotificationState(

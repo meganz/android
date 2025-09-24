@@ -3,6 +3,7 @@ package mega.privacy.android.feature.notifications.snowflakes
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -13,6 +14,8 @@ import mega.android.core.ui.theme.values.TextColor
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 class NotificationItemViewM3Test {
@@ -28,6 +31,7 @@ class NotificationItemViewM3Test {
         subText: AnnotatedString? = null,
         date: String = "11 October 2022 6:46 pm",
         isNew: Boolean = false,
+        onClick: () -> Unit = {},
     ) {
         composeRule.setContent {
             NotificationItemViewM3(
@@ -38,7 +42,7 @@ class NotificationItemViewM3Test {
                 subText = subText,
                 date = date,
                 isNew = isNew,
-                onClick = {}
+                onClick = onClick
             )
         }
     }
@@ -359,5 +363,17 @@ class NotificationItemViewM3Test {
             .assertDoesNotExist()
         composeRule.onNodeWithTag(NOTIFICATION_ITEM_VIEW_SUB_TEXT_M3_TEST_TAG).assertDoesNotExist()
         composeRule.onNodeWithTag(NOTIFICATION_ITEM_VIEW_NEW_M3_TEST_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that clicking on notification item calls onClick lambda`() {
+        val onClick: () -> Unit = mock()
+
+        setupRule(onClick = onClick)
+
+        composeRule.onNodeWithTag(NOTIFICATION_ITEM_VIEW_M3_TEST_TAG, useUnmergedTree = true)
+            .performClick()
+
+        verify(onClick).invoke()
     }
 }

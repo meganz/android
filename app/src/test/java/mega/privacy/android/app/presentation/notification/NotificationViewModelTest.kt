@@ -105,7 +105,9 @@ class NotificationViewModelTest {
             schedMeetingNotification = null,
             dateText = { "" },
             isNew = true,
-        ) {}
+            onClick = {},
+            destination = null
+        )
 
         val expectedPromoNotification = PromoNotification(
             promoID = 1,
@@ -148,7 +150,9 @@ class NotificationViewModelTest {
             schedMeetingNotification = null,
             dateText = { "" },
             isNew = true,
-        ) {}
+            onClick = {},
+            destination = null
+        )
         val newNotification = initialNotification.copy(title = { "New title" })
         whenever(notificationMapper(initialAlert)).thenReturn(initialNotification)
         whenever(notificationMapper(newAlert)).thenReturn(newNotification)

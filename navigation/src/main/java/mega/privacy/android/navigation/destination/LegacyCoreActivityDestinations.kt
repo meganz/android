@@ -17,6 +17,12 @@ data object Achievement : NavKey
 data class WebSite(val url: String) : NavKey
 
 @Serializable
+data object Contacts : NavKey
+
+@Serializable
+data class Chat(val chatId: Long, val action: String?) : NavKey
+
+@Serializable
 data class AddContactToShare(
     val contactType: ContactType,
     val nodeHandle: List<Long>,

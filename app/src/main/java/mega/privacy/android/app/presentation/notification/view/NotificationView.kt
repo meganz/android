@@ -246,8 +246,8 @@ private fun NotificationViewPreview() {
         description = { "xyz@gmail.com is now a contact" },
         schedMeetingNotification = null,
         dateText = { "11 October 2022 6:46 pm" },
-        isNew = true,
-    ) {}
+        isNew = true, onClick = {}, destination = null
+    )
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         NotificationView(
             state = NotificationState(
