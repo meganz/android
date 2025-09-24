@@ -572,6 +572,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                         OUTGOING_SHARES_ADAPTER,
                         LINKS_ADAPTER
                     )
+                    val isIncomingSharedItems = adapterType == INCOMING_SHARES_ADAPTER
                     if (megaApi.isInRubbish(node)) {
                         menu.toggleAllMenuItemsVisibility(false)
                         menu.findItem(R.id.action_remove).isVisible = true
@@ -626,6 +627,9 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                     val isNodeInBackups = viewModel.uiState.value.isNodeInBackups
                     val isBusinessAccountExpired = viewModel.uiState.value.isBusinessAccountExpired
 
+                    // Hide share menu for incoming shared items
+                    val shouldShowShare = !isIncomingSharedItems && !isInShare;
+
                     val shouldShowHideNode = when {
                         !isHiddenNodesEnabled || isInShare || isInSharedItems || isNodeInBackups -> false
                         isPaidAccount && !isBusinessAccountExpired && ((node != null && node.isMarkedSensitive) || isSensitiveInherited) -> false
@@ -645,7 +649,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                     menu.findItem(R.id.action_unhide)?.isVisible = shouldShowUnhideNode
 
                     menu.findItem(R.id.action_save).isVisible = false
-                    menu.findItem(R.id.action_share).isVisible = isNotInShare
+                    menu.findItem(R.id.action_share).isVisible = shouldShowShare
                 }
             }
         } else {
