@@ -56,6 +56,10 @@ sealed interface NodeSelectionAction {
         @Composable
         override fun getIconPainter() =
             rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical)
+
+        // To ensure this action is always at the end
+        override val orderInCategory: Int
+            get() = 999999
     }
 
     companion object {

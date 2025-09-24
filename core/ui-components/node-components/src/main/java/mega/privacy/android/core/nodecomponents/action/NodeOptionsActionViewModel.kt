@@ -8,7 +8,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -18,6 +20,8 @@ import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.core.nodecomponents.action.clickhandler.MultiNodeAction
+import mega.privacy.android.core.nodecomponents.action.clickhandler.SingleNodeAction
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSelectionModeActionMapper
@@ -28,8 +32,6 @@ import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction.Companion.DEFAULT_MAX_VISIBLE_ITEMS
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
-import mega.privacy.android.core.nodecomponents.action.clickhandler.SingleNodeAction
-import mega.privacy.android.core.nodecomponents.action.clickhandler.MultiNodeAction
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -143,6 +145,7 @@ class NodeOptionsActionViewModel @Inject constructor(
         field = MutableStateFlow(NodeActionState())
 
     private var rubbishBinNode: UnTypedNode? = null
+    private var updateSelectionJob: Job? = null
 
     init {
         getRubbishBinNode()
@@ -311,17 +314,14 @@ class NodeOptionsActionViewModel @Inject constructor(
                 val filteredFolderNodes = nodes.filterIsInstance<TypedFolderNode>()
 
                 filteredFolderNodes.forEach { folderNode ->
-                    runCatching { createShareKeyUseCase(folderNode) }.onFailure { Timber.e(it) }
+                    runCatching { createShareKeyUseCase(folderNode) }
                 }
 
                 val hasBackUpNodes = filteredFolderNodes
                     .any { folderNode ->
                         runCatching {
                             checkBackupNodeTypeUseCase(folderNode) != BackupNodeType.NonBackupNode
-                        }.getOrElse {
-                            Timber.e(it)
-                            false
-                        }
+                        }.getOrDefault(false)
                     }
 
                 val nodeIds = filteredFolderNodes.map { it.id.longValue }
@@ -359,10 +359,7 @@ class NodeOptionsActionViewModel @Inject constructor(
             val isFromBackups = uiState.value.selectedNodes.find {
                 runCatching {
                     checkBackupNodeTypeUseCase(it) != BackupNodeType.NonBackupNode
-                }.getOrElse {
-                    Timber.e(it)
-                    false
-                }
+                }.getOrDefault(false)
             }
             runCatching {
                 nodeHandlesToJsonMapper(nodeHandle)
@@ -404,8 +401,6 @@ class NodeOptionsActionViewModel @Inject constructor(
                 val chatIdsFromUserHandles = userHandles.map { userHandle ->
                     runCatching {
                         get1On1ChatIdUseCase(userHandle)
-                    }.onFailure {
-                        Timber.e(it)
                     }.getOrNull()
                 }.filterNotNull()
                 val allChatIds = chatIdsFromUserHandles + chatIds.toList()
@@ -608,8 +603,6 @@ class NodeOptionsActionViewModel @Inject constructor(
                     selectedNodes.forEach { node ->
                         runCatching {
                             updateNodeSensitiveUseCase(nodeId = node.id, isSensitive = isHidden)
-                        }.onFailure {
-                            Timber.e(it, "Failed to update node sensitive state for ${node.id}")
                         }
                     }
                     uiState.update { state ->
@@ -706,7 +699,8 @@ class NodeOptionsActionViewModel @Inject constructor(
         selectedNodes: Set<TypedNode>,
         nodeSourceType: NodeSourceType,
     ) {
-        viewModelScope.launch {
+        updateSelectionJob?.cancel()
+        updateSelectionJob = viewModelScope.launch {
             updateSelectedNodes(selectedNodes.toList())
 
             Timber.d("Update state called with ${selectedNodes.size} nodes")
@@ -739,6 +733,7 @@ class NodeOptionsActionViewModel @Inject constructor(
                 allNodeCanBeMovedToTarget = canBeMovedToTarget,
                 noNodeInBackups = !anyNodeInBackups
             ).map { it.action }
+                .sortedBy { it.orderInCategory }
 
             val visibleActions = if (availableActions.size > DEFAULT_MAX_VISIBLE_ITEMS) {
                 availableActions.take(DEFAULT_MAX_VISIBLE_ITEMS) + NodeSelectionAction.More
@@ -752,7 +747,6 @@ class NodeOptionsActionViewModel @Inject constructor(
                     availableActions = availableActions
                 )
             }
-            Timber.d("Visible actions: $visibleActions, Available actions: $availableActions")
         }
     }
 
@@ -763,28 +757,20 @@ class NodeOptionsActionViewModel @Inject constructor(
             selectedNodes.any { node ->
                 checkNodeCanBeMovedToTargetNode(nodeId = node.id, targetNodeId = rubbishBinNode.id)
             }
-        }.getOrElse {
-            Timber.e(it)
-            true
-        }
+        }.getOrDefault(true)
     } ?: true
 
     private suspend fun hasFullAccessPermission(selectedNodes: Set<TypedNode>): Boolean {
         return runCatching {
             selectedNodes.all { getNodeAccessPermission(it.id) == AccessPermission.FULL }
-        }.onFailure {
-            Timber.e(it)
         }.getOrDefault(false)
     }
 
-    private suspend fun anyNodesInBackups(selectedNodes: Set<TypedNode>) =
+    private suspend fun anyNodesInBackups(selectedNodes: Set<TypedNode>): Boolean =
         selectedNodes.any {
             runCatching {
                 isNodeInBackupsUseCase(handle = it.id.longValue)
-            }.getOrElse { e ->
-                Timber.e(e)
-                false
-            }
+            }.getOrDefault(false)
         }
 
     private fun getOptions(nodeSourceType: NodeSourceType) =
