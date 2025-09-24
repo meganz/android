@@ -5,12 +5,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.tabs.LocalTabContentModifier
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
@@ -40,9 +40,11 @@ private fun StalledIssuesScreenContent(
     modifier: Modifier,
     moreClicked: (StalledIssueUiItem) -> Unit,
 ) {
+    val modifierList = LocalTabContentModifier.current ?: Modifier
     LazyColumn(
-        state = LazyListState(),
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .then(modifierList),
         contentPadding = PaddingValues(bottom = if (stalledIssues.isEmpty()) 0.dp else BOTTOM_PADDING.dp),
     ) {
         if (stalledIssues.isEmpty()) {

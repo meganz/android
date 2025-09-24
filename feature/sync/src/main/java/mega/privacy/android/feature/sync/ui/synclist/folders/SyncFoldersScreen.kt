@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
@@ -28,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.tabs.LocalTabContentModifier
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.node.NodeId
@@ -71,11 +71,11 @@ internal fun SyncFoldersScreen(
     onLocalFolderSelected: (SyncUiItem, Uri) -> Unit = { _, _ -> },
 ) {
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
+        val modifierList = LocalTabContentModifier.current ?: Modifier
         LazyColumn(
-            state = rememberLazyListState(),
-            modifier = modifier.fillMaxSize(),
+            modifier = modifierList.fillMaxSize(),
             contentPadding = PaddingValues(
                 top = 8.dp,
                 bottom = if (syncUiItems.isEmpty()) 0.dp else BOTTOM_PADDING.dp

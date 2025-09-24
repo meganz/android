@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.tabs.LocalTabContentModifier
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.ui.model.SolvedIssueUiItem
 import mega.privacy.android.feature.sync.ui.synclist.BOTTOM_PADDING
@@ -21,8 +22,9 @@ import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
 internal fun SyncSolvedIssuesScreen(solvedIssues: List<SolvedIssueUiItem>) {
+    val modifierList = LocalTabContentModifier.current ?: Modifier
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().then(modifierList),
         contentPadding = PaddingValues(bottom = if (solvedIssues.isEmpty()) 0.dp else BOTTOM_PADDING.dp),
         content = {
             if (solvedIssues.isEmpty()) {

@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,8 +46,8 @@ internal fun ActiveTransfersView(
     onActiveTransferSelected: (InProgressTransfer) -> Unit,
     onUpgradeClick: () -> Unit,
     onConsumeQuotaWarning: () -> Unit,
-    lazyListState: LazyListState,
     modifier: Modifier = Modifier,
+    lazyListState: LazyListState = rememberLazyListState(),
 ) {
     val selectMode = remember(selectedActiveTransfersIds) { selectedActiveTransfersIds != null }
     var draggedTransfer by remember { mutableStateOf<InProgressTransfer?>(null) }

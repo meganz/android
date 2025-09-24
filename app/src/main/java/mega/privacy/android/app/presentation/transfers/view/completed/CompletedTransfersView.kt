@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,8 +39,8 @@ internal fun CompletedTransfersView(
     completedTransfers: ImmutableList<CompletedTransfer>,
     selectedCompletedTransfersIds: ImmutableList<Int>?,
     onCompletedTransferSelected: (CompletedTransfer) -> Unit,
-    lazyListState: LazyListState,
     modifier: Modifier = Modifier,
+    lazyListState: LazyListState = rememberLazyListState(),
 ) {
     val selectMode =
         remember(selectedCompletedTransfersIds) { selectedCompletedTransfersIds != null }

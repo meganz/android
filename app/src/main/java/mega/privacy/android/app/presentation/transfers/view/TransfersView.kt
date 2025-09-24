@@ -267,9 +267,9 @@ internal fun TransfersView(
                 hideTabs = isInSelectTransfersMode,
                 pagerScrollEnabled = false,
                 cells = {
-                    addTextTabWithLazyListState(
+                    addTextTabWithScrollableContent(
                         tabItem = TabItems(stringResource(id = sharedR.string.transfers_section_tab_title_active_transfers)),
-                    ) { _, listState, modifier ->
+                    ) { _, modifier ->
                         ActiveTransfersView(
                             activeTransfers = activeTransfers,
                             isTransferOverQuota = isTransferOverQuota,
@@ -288,27 +288,24 @@ internal fun TransfersView(
                             selectedActiveTransfersIds = selectedActiveTransfersIds,
                             onUpgradeClick = onNavigateToUpgradeAccount,
                             onConsumeQuotaWarning = onConsumeQuotaWarning,
-                            lazyListState = listState,
                             modifier = modifier,
                         )
                     }
-                    addTextTabWithLazyListState(
+                    addTextTabWithScrollableContent(
                         tabItem = TabItems(stringResource(id = R.string.title_tab_completed_transfers)),
-                    ) { _, listState, modifier ->
+                    ) { _, modifier ->
                         CompletedTransfersView(
                             completedTransfers = completedTransfers,
-                            lazyListState = listState,
                             onCompletedTransferSelected = onCompletedTransferSelected,
                             selectedCompletedTransfersIds = selectedCompletedTransfersIds,
                             modifier = modifier,
                         )
                     }
-                    addTextTabWithLazyListState(
+                    addTextTabWithScrollableContent(
                         tabItem = TabItems(stringResource(id = sharedR.string.transfers_section_tab_title_failed_transfers)),
-                    ) { _, listState, modifier ->
+                    ) { _, modifier ->
                         FailedTransfersView(
                             failedTransfers = failedTransfers,
-                            lazyListState = listState,
                             onFailedTransferSelected = onFailedTransferSelected,
                             selectedFailedTransfersIds = selectedFailedTransfersIds,
                             onRetryTransfer = {

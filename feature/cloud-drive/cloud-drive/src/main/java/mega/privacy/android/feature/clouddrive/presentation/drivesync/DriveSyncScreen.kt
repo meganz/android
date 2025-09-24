@@ -157,9 +157,9 @@ internal fun DriveSyncScreen(
             hideTabs = cloudDriveUiState.isInSelectionMode,
             pagerScrollEnabled = !cloudDriveUiState.isInSelectionMode,
             cells = {
-                addTextTab(
+                addTextTabWithScrollableContent(
                     tabItem = TabItems(stringResource(sharedR.string.general_section_cloud_drive)),
-                ) {
+                ) { _, modifier ->
                     CloudDriveContent(
                         isTabContent = true,
                         navigationHandler = navigationHandler,
@@ -180,9 +180,10 @@ internal fun DriveSyncScreen(
                         onSortNodes = cloudDriveViewModel::setCloudSortOrder,
                         nodeOptionsActionViewModel = nodeOptionsActionViewModel,
                         nodeActionHandler = nodeActionHandler,
+                        modifier = modifier,
                     )
                 }
-                addTextTab(
+                addTextTabWithProvidedScrollableModifier(
                     tabItem = TabItems(stringResource(sharedR.string.general_syncs)),
                 ) {
                     SyncListRoute(
