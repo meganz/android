@@ -69,16 +69,6 @@ class NodeSortConfigurationUiMapper @Inject constructor() {
                 SortDirection.Descending
             )
 
-            SortOrder.ORDER_LINK_CREATION_ASC -> NodeSortConfiguration(
-                NodeSortOption.Link,
-                SortDirection.Ascending
-            )
-
-            SortOrder.ORDER_LINK_CREATION_DESC -> NodeSortConfiguration(
-                NodeSortOption.Link,
-                SortDirection.Descending
-            )
-
             else -> NodeSortConfiguration(NodeSortOption.Name, SortDirection.Ascending)
         }
 
@@ -92,7 +82,6 @@ class NodeSortConfigurationUiMapper @Inject constructor() {
             NodeSortOption.Created -> if (isAscending) SortOrder.ORDER_CREATION_ASC else SortOrder.ORDER_CREATION_DESC
             NodeSortOption.Modified -> if (isAscending) SortOrder.ORDER_MODIFICATION_ASC else SortOrder.ORDER_MODIFICATION_DESC
             NodeSortOption.Size -> if (isAscending) SortOrder.ORDER_SIZE_ASC else SortOrder.ORDER_SIZE_DESC
-            NodeSortOption.Link -> if (isAscending) SortOrder.ORDER_LINK_CREATION_ASC else SortOrder.ORDER_LINK_CREATION_DESC
         }
     }
 }

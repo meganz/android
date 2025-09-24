@@ -56,8 +56,6 @@ class NodeSortConfigurationUiMapperTest {
             SortOrder.ORDER_MODIFICATION_DESC,
             SortOrder.ORDER_SIZE_ASC,
             SortOrder.ORDER_SIZE_DESC,
-            SortOrder.ORDER_LINK_CREATION_ASC,
-            SortOrder.ORDER_LINK_CREATION_DESC
         )
 
         allSortOrders.forEach { sortOrder ->
@@ -118,14 +116,6 @@ class NodeSortConfigurationUiMapperTest {
                 SortOrder.ORDER_SIZE_DESC,
                 NodeSortConfiguration(NodeSortOption.Size, SortDirection.Descending)
             ),
-            Arguments.of(
-                SortOrder.ORDER_LINK_CREATION_ASC,
-                NodeSortConfiguration(NodeSortOption.Link, SortDirection.Ascending)
-            ),
-            Arguments.of(
-                SortOrder.ORDER_LINK_CREATION_DESC,
-                NodeSortConfiguration(NodeSortOption.Link, SortDirection.Descending)
-            )
         )
 
         @JvmStatic
@@ -178,14 +168,6 @@ class NodeSortConfigurationUiMapperTest {
                 NodeSortConfiguration(NodeSortOption.Size, SortDirection.Descending),
                 SortOrder.ORDER_SIZE_DESC
             ),
-            Arguments.of(
-                NodeSortConfiguration(NodeSortOption.Link, SortDirection.Ascending),
-                SortOrder.ORDER_LINK_CREATION_ASC
-            ),
-            Arguments.of(
-                NodeSortConfiguration(NodeSortOption.Link, SortDirection.Descending),
-                SortOrder.ORDER_LINK_CREATION_DESC
-            )
         )
     }
 }

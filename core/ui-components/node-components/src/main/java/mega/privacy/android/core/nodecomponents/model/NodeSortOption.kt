@@ -14,8 +14,7 @@ enum class NodeSortOption(
     Label(sharedR.string.action_sort_by_label),
     Created(sharedR.string.action_sort_by_created),
     Modified(sharedR.string.action_sort_by_modified),
-    Size(sharedR.string.action_sort_by_size),
-    Link(sharedR.string.action_sort_by_link);
+    Size(sharedR.string.action_sort_by_size);
 }
 
 data class NodeSortConfiguration(
