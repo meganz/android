@@ -1481,7 +1481,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         rootNode = megaApi.rootNode
         if (rootNode == null || LoginActivity.isBackFromLoginPage || isHeartBeatAlive) {
             Timber.d("Action: %s", intent?.action)
-            if (!handleRedirectIntentActions(intent)) {
+            if (savedInstanceState != null || !handleRedirectIntentActions(intent)) {
                 refreshSession()
             }
             return true
