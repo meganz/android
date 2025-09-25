@@ -103,6 +103,7 @@ internal data class FileInfoViewState(
     val isPhoto: Boolean = false,
     val accountDeactivatedStatus: AccountDeactivatedStatus? = null,
     val leaveFolderNodeIds: List<Long>? = null,
+    val isDecrypted: Boolean = true
 ) {
 
     /**
@@ -127,6 +128,7 @@ internal data class FileInfoViewState(
         descriptionText = typedNode.description.orEmpty(),
         hasPreview = (typedNode as? TypedFileNode)?.hasPreview == true,
         tags = typedNode.tags.orEmpty(),
+        isDecrypted = typedNode.isNodeKeyDecrypted
     )
 
 

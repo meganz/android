@@ -29,7 +29,8 @@ internal fun FileInfoHeader(
     accessPermissionDescription: Int?,
 ) = CollapsibleHeaderWithTitle(
     appBarType = AppBarType.BACK_NAVIGATION,
-    title = title
+    title = title,
+    modifier = Modifier.testTag(TEST_TAG_FILE_INFO_HEADER)
 ) { titleConstrainedLayoutReference ->
     val (icon, permission) = createRefs()
     if (iconResource != null) {
@@ -85,3 +86,4 @@ private fun FileInfoHeaderPreview(
 
 internal const val TEST_TAG_ICON = "TestTagIcon"
 internal const val TEST_TAG_ACCESS = "TestTagAccess"
+internal const val TEST_TAG_FILE_INFO_HEADER = "file_info_header"
