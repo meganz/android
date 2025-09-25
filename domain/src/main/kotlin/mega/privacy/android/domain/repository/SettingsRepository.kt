@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.CallsMeetingReminders
 import mega.privacy.android.domain.entity.CallsSoundEnabledState
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.entity.preference.StartScreen
@@ -557,4 +558,27 @@ interface SettingsRepository {
      * @param shown true if onboarding has been shown, false otherwise
      */
     suspend fun setColoredFoldersOnboardingShown(shown: Boolean)
+
+    /**
+     * Monitor enabled home screen widget configuration
+     *
+     * @return latest widget configuration
+     */
+    fun monitorHomeScreenWidgetConfiguration(): Flow<List<HomeWidgetConfiguration>>
+
+    /**
+     * Update home screen widget configurations
+     * This method allows updating the configuration of several widgets at once,
+     * inserting missing values and updating existing ones
+     *
+     * @param configurations List of widget configurations to update
+     */
+    suspend fun updateHomeScreenWidgetConfiguration(configurations: List<HomeWidgetConfiguration>)
+
+    /**
+     * Delete a home screen widget configuration
+     *
+     * @param widgetIdentifier the identifier of the widget to delete
+     */
+    suspend fun deleteHomeScreenWidgetConfiguration(widgetIdentifier: String)
 }

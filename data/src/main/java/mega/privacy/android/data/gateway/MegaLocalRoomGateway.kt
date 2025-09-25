@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
+import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
@@ -668,4 +669,32 @@ interface MegaLocalRoomGateway {
      * @return a flow of list of [MediaPlaybackInfo] filtered by audio media type
      */
     suspend fun monitorAudioPlaybackInfos(): Flow<List<MediaPlaybackInfo>>
+
+    /**
+     * Insert or update home screen widget configuration
+     *
+     * @param entity
+     */
+    suspend fun insertOrUpdateHomeScreenWidgetConfiguration(entity: HomeWidgetConfiguration)
+
+    /**
+     * Insert or update home screen widget configurations
+     *
+     * @param entities
+     */
+    suspend fun insertOrUpdateHomeScreenWidgetConfigurations(entities: List<HomeWidgetConfiguration>)
+
+    /**
+     * Monitor home screen widget configurations
+     *
+     * @return a flow of list of [HomeWidgetConfiguration]
+     */
+    fun monitorHomeScreenWidgetConfigurations(): Flow<List<HomeWidgetConfiguration>>
+
+    /**
+     * Delete home screen widget configuration
+     *
+     * @param widgetIdentifier
+     */
+    suspend fun deleteHomeScreenWidgetConfiguration(widgetIdentifier: String)
 }

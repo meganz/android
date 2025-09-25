@@ -25,6 +25,7 @@ import mega.privacy.android.data.extensions.hasParam
 import mega.privacy.android.data.extensions.isTypeWithParam
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
@@ -40,6 +41,7 @@ import mega.privacy.android.domain.entity.CallsMeetingReminders
 import mega.privacy.android.domain.entity.CallsSoundEnabledState
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_KEY_ANDROID
@@ -100,6 +102,7 @@ internal class DefaultSettingsRepository @Inject constructor(
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway,
     private val myAccountInfoFacade: AccountInfoWrapper,
     @FileVersionsOption private val fileVersionsOptionCache: Cache<Boolean>,
+    private val megaLocalRoomGateway: MegaLocalRoomGateway,
 ) : SettingsRepository {
     private val showHiddenNodesFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
@@ -659,6 +662,21 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun setColoredFoldersOnboardingShown(shown: Boolean) {
         withContext(ioDispatcher) {
             appPreferencesGateway.putBoolean(COLORED_FOLDERS_ONBOARDING_SHOWN_KEY, shown)
+        }
+    }
+
+    override fun monitorHomeScreenWidgetConfiguration(): Flow<List<HomeWidgetConfiguration>> =
+        megaLocalRoomGateway.monitorHomeScreenWidgetConfigurations()
+            .flowOn(ioDispatcher)
+
+    override suspend fun updateHomeScreenWidgetConfiguration(configurations: List<HomeWidgetConfiguration>) =
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.insertOrUpdateHomeScreenWidgetConfigurations(configurations)
+        }
+
+    override suspend fun deleteHomeScreenWidgetConfiguration(widgetIdentifier: String){
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.deleteHomeScreenWidgetConfiguration(widgetIdentifier)
         }
     }
 

@@ -8,7 +8,7 @@ object MegaDatabaseConstant {
     /**
      * Database Version
      */
-    const val DATABASE_VERSION = 112
+    const val DATABASE_VERSION = 113
 
     /**
      * Database Name
@@ -99,4 +99,9 @@ object MegaDatabaseConstant {
      * Table for media playback info
      */
     const val TABLE_MEDIA_PLAYBACK_INFO = "media_playback_info"
+
+    /**
+     * Table for home widget configuration
+     */
+    const val TABLE_HOME_WIDGET_CONFIGURATION = "home_widget_configuration"
 }

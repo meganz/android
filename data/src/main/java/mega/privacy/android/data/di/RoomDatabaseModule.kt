@@ -24,6 +24,7 @@ import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.dao.HomeWidgetConfigurationDao
 import mega.privacy.android.data.database.dao.LastPageViewedInPdfDao
 import mega.privacy.android.data.database.dao.MediaPlaybackInfoDao
 import mega.privacy.android.data.database.dao.OfflineDao
@@ -237,4 +238,8 @@ internal object RoomDatabaseModule {
     @Singleton
     internal fun provideMediaPlaybackInfoDao(database: MegaDatabase): MediaPlaybackInfoDao =
         database.mediaPlaybackInfoDao()
+
+    @Provides
+    fun provideHomeWidgetConfigurationDao(database: MegaDatabase): HomeWidgetConfigurationDao =
+        database.homeWidgetConfigurationDao()
 }

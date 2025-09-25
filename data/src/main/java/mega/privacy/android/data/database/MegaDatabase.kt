@@ -15,6 +15,7 @@ import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.dao.HomeWidgetConfigurationDao
 import mega.privacy.android.data.database.dao.LastPageViewedInPdfDao
 import mega.privacy.android.data.database.dao.MediaPlaybackInfoDao
 import mega.privacy.android.data.database.dao.OfflineDao
@@ -31,6 +32,7 @@ import mega.privacy.android.data.database.entity.ChatPendingChangesEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntityLegacy
 import mega.privacy.android.data.database.entity.ContactEntity
+import mega.privacy.android.data.database.entity.HomeWidgetConfigurationEntity
 import mega.privacy.android.data.database.entity.LastPageViewedInPdfEntity
 import mega.privacy.android.data.database.entity.MediaPlaybackInfoEntity
 import mega.privacy.android.data.database.entity.OfflineEntity
@@ -64,6 +66,7 @@ import timber.log.Timber
         SyncShownNotificationEntity::class,
         LastPageViewedInPdfEntity::class,
         MediaPlaybackInfoEntity::class,
+        HomeWidgetConfigurationEntity::class,
     ],
     version = MegaDatabaseConstant.DATABASE_VERSION,
     exportSchema = true,
@@ -101,6 +104,7 @@ import timber.log.Timber
         AutoMigration(106, 107),
         AutoMigration(108, 109),
         AutoMigration(109, 110),
+        AutoMigration(112, 113),
     ],
 )
 internal abstract class MegaDatabase : RoomDatabase() {
@@ -133,6 +137,8 @@ internal abstract class MegaDatabase : RoomDatabase() {
     abstract fun lastPageViewedInPdfDao(): LastPageViewedInPdfDao
 
     abstract fun mediaPlaybackInfoDao(): MediaPlaybackInfoDao
+
+    abstract fun homeWidgetConfigurationDao(): HomeWidgetConfigurationDao
 
     companion object {
 

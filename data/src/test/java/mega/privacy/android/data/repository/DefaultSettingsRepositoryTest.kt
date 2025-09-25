@@ -5,6 +5,8 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -12,6 +14,7 @@ import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
@@ -20,6 +23,7 @@ import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.mapper.StartScreenMapper
+import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
 import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaAccountDetails
@@ -39,6 +43,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -69,6 +74,7 @@ internal class DefaultSettingsRepositoryTest {
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway = mock()
     private val fileVersionsOptionCache: Cache<Boolean> = mock()
     private val myAccountInfoFacade: AccountInfoWrapper = mock()
+    private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
 
     @BeforeAll
     fun setUp() {
@@ -86,7 +92,8 @@ internal class DefaultSettingsRepositoryTest {
             startScreenMapper = startScreenMapper,
             fileManagementPreferencesGateway = fileManagementPreferencesGateway,
             fileVersionsOptionCache = fileVersionsOptionCache,
-            myAccountInfoFacade = myAccountInfoFacade
+            myAccountInfoFacade = myAccountInfoFacade,
+            megaLocalRoomGateway = megaLocalRoomGateway
         )
     }
 
@@ -105,6 +112,7 @@ internal class DefaultSettingsRepositoryTest {
             startScreenMapper,
             fileManagementPreferencesGateway,
             fileVersionsOptionCache,
+            megaLocalRoomGateway,
         )
     }
 
@@ -499,6 +507,23 @@ internal class DefaultSettingsRepositoryTest {
             underTest.monitorStartScreenPreferenceDestination().test {
                 assertThat(awaitItem()).isEqualTo(expected)
                 awaitComplete()
+            }
+        }
+
+    @Test
+    fun `test that monitorHomeScreenWidgetConfiguration returns the values from the gateway`() =
+        runTest {
+            val expected = listOf(mock<HomeWidgetConfiguration>())
+            megaLocalRoomGateway.stub {
+                on { monitorHomeScreenWidgetConfigurations() }.thenReturn(flow {
+                    emit(expected)
+                    awaitCancellation()
+                }
+                )
+            }
+
+            underTest.monitorHomeScreenWidgetConfiguration().test {
+                assertThat(awaitItem()).isEqualTo(expected)
             }
         }
 }

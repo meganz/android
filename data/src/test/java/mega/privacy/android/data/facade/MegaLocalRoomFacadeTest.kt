@@ -14,6 +14,7 @@ import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.dao.HomeWidgetConfigurationDao
 import mega.privacy.android.data.database.dao.LastPageViewedInPdfDao
 import mega.privacy.android.data.database.dao.MediaPlaybackInfoDao
 import mega.privacy.android.data.database.dao.OfflineDao
@@ -43,6 +44,7 @@ import mega.privacy.android.data.mapper.chat.ChatRoomPendingChangesEntityMapper
 import mega.privacy.android.data.mapper.chat.ChatRoomPendingChangesModelMapper
 import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
+import mega.privacy.android.data.mapper.home.HomeWidgetConfigurationMapper
 import mega.privacy.android.data.mapper.offline.OfflineEntityMapper
 import mega.privacy.android.data.mapper.offline.OfflineModelMapper
 import mega.privacy.android.data.mapper.pdf.LastPageViewedInPdfEntityMapper
@@ -137,6 +139,8 @@ internal class MegaLocalRoomFacadeTest {
     private val mediaPlaybackInfoEntityMapper: MediaPlaybackInfoEntityMapper = mock()
     private val mediaPlaybackInfoMapper: MediaPlaybackInfoMapper = mock()
     private val transferStateIntMapper = mock<TransferStateIntMapper>()
+    private val homeWidgetConfigurationDao = mock<HomeWidgetConfigurationDao>()
+    private val homeWidgetConfigurationMapper = mock<HomeWidgetConfigurationMapper>()
 
     @BeforeAll
     fun setUp() {
@@ -180,6 +184,8 @@ internal class MegaLocalRoomFacadeTest {
             mediaPlaybackInfoEntityMapper = mediaPlaybackInfoEntityMapper,
             mediaPlaybackInfoMapper = mediaPlaybackInfoMapper,
             transferStateIntMapper = transferStateIntMapper,
+            homeWidgetConfigurationDao = { homeWidgetConfigurationDao },
+            homeWidgetConfigurationMapper = homeWidgetConfigurationMapper,
         )
     }
 
@@ -217,6 +223,8 @@ internal class MegaLocalRoomFacadeTest {
             mediaPlaybackInfoMapper,
             mediaPlaybackInfoEntityMapper,
             transferStateIntMapper,
+            homeWidgetConfigurationDao,
+            homeWidgetConfigurationMapper,
         )
     }
 
