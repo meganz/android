@@ -11,11 +11,13 @@ import android.view.ViewGroup;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.lifecycle.ViewModelProvider;
 import kotlin.Unit;
 import mega.privacy.android.analytics.Analytics;
 import mega.privacy.android.app.R;
@@ -39,6 +41,7 @@ public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFra
     private List<MegaNode> nodes = new ArrayList<>();
     private boolean isMultipleSelection = false;
     private NodeLabelBottomSheetDialogFragmentViewModel viewModel;
+    private boolean isUpdatingProgrammatically = false;
 
     /**
      * Creates a new instance of the Fragment for a single node
@@ -110,49 +113,86 @@ public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFra
         viewModel = new ViewModelProvider(this).get(NodeLabelBottomSheetDialogFragmentViewModel.class);
 
         setTextResourcesForLabel();
+        setupLiveDataObservers();
 
         isMultipleSelection = arguments.getBoolean(IS_MULTIPLE_SELECTION, false);
-        
+
         if (isMultipleSelection) {
             long[] handles = arguments.getLongArray(NODE_HANDLES);
             if (handles != null) {
-                // Use ViewModel to load nodes with callback (moves API call to background thread)
-                viewModel.loadMegaNodes(handles, megaApi, (megaNodes) -> {
-                    nodes.addAll(megaNodes);
-                    // Ensure UI updates run on main thread
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(this::showMultipleNodesLabel);
-                    }
-                    return kotlin.Unit.INSTANCE;
-                });
+                // Use ViewModel to load nodes with LiveData
+                viewModel.loadNodes(handles, megaApi);
             }
         } else {
             long nodeHandle = arguments.getLong(HANDLE, INVALID_HANDLE);
-            
-            // Use ViewModel to load node with callback (moves API call to background thread)
-            viewModel.loadMegaNode(nodeHandle, megaApi, (megaNode) -> {
-                if (megaNode != null) {
-                    node = megaNode;
-                    // Ensure UI updates run on main thread
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(this::showCurrentNodeLabel);
-                    }
-                }
-                return kotlin.Unit.INSTANCE;
-            });
+
+            // Use ViewModel to load node with LiveData
+            viewModel.loadNode(nodeHandle, megaApi);
         }
 
-        binding.radioGroupLabel.setOnCheckedChangeListener((group, checkedId) ->
-        {
-            updateNodeLabel(checkedId);
-            if (isMultipleSelection) {
-                getParentFragmentManager().setFragmentResult("labels_applied", Bundle.EMPTY);
+        binding.radioGroupLabel.setOnCheckedChangeListener((group, checkedId) -> {
+            // Only update when user manually selects, not during programmatic updates
+            if (!isUpdatingProgrammatically) {
+                updateNodeLabel(checkedId);
+                if (isMultipleSelection) {
+                    getParentFragmentManager().setFragmentResult("labels_applied", Bundle.EMPTY);
+                }
             }
         });
 
         super.onViewCreated(view, savedInstanceState);
     }
 
+    /**
+     * Sets up LiveData observers for ViewModel operations
+     */
+    private void setupLiveDataObservers() {
+        // Observer for single node loading
+        viewModel.getNodeLoadResult().observe(this, result -> {
+            if (result instanceof NodeLoadResult.Success) {
+                NodeLoadResult.Success success = (NodeLoadResult.Success) result;
+                node = success.getNode();
+                showCurrentNodeLabel();
+            } else if (result instanceof NodeLoadResult.Error) {
+                NodeLoadResult.Error error = (NodeLoadResult.Error) result;
+                Timber.e(error.getException(), "Failed to load node");
+            }
+        });
+
+        // Observer for multiple nodes loading
+        viewModel.getNodesLoadResult().observe(this, result -> {
+            if (result instanceof NodesLoadResult.Success) {
+                NodesLoadResult.Success success = (NodesLoadResult.Success) result;
+                nodes.clear();
+                nodes.addAll(success.getNodes());
+                showMultipleNodesLabel();
+            } else if (result instanceof NodesLoadResult.Error error) {
+                Timber.e(error.getException(), "Failed to load nodes");
+            }
+        });
+
+        // Observer for single node label update
+        viewModel.getLabelUpdateResult().observe(this, result -> {
+            if (result instanceof LabelUpdateResult.Success) {
+                dismiss();
+            } else if (result instanceof LabelUpdateResult.Error error) {
+                Timber.e(error.getException(), "Failed to update node label");
+                // Still dismiss dialog to prevent UI from hanging
+                dismiss();
+            }
+        });
+
+        // Observer for multiple nodes label update
+        viewModel.getMultipleLabelsUpdateResult().observe(this, result -> {
+            if (result instanceof LabelUpdateResult.Success) {
+                dismiss();
+            } else if (result instanceof LabelUpdateResult.Error error) {
+                Timber.e(error.getException(), "Failed to update multiple node labels");
+                // Still dismiss dialog to prevent UI from hanging
+                dismiss();
+            }
+        });
+    }
 
     private void setTextResourcesForLabel() {
         binding.radioLabelRed.setText(mega.privacy.android.shared.resources.R.string.label_red);
@@ -168,8 +208,10 @@ public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFra
         @IdRes int radioButtonResId = getRadioButtonResIdForLabel(node.getLabel());
 
         if (binding.radioGroupLabel.getCheckedRadioButtonId() != radioButtonResId) {
+            isUpdatingProgrammatically = true;
             binding.radioGroupLabel.check(radioButtonResId);
             binding.radioRemove.setVisibility(View.VISIBLE);
+            isUpdatingProgrammatically = false;
         }
     }
 
@@ -181,20 +223,22 @@ public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFra
                 labeledCount++;
             }
         }
-        
+
         // Show remove option if any nodes have labels
         if (labeledCount > 0) {
             binding.radioRemove.setVisibility(View.VISIBLE);
         }
-        
+
         // If ALL nodes have the same label, pre-select this option
         NodeLabel uniformLabel = viewModel.getUniformLabelFromMegaNodes(nodes);
         if (uniformLabel != null) {
             int labelInt = viewModel.getIntFromNodeLabel(uniformLabel);
             @IdRes int radioButtonResId = getRadioButtonResIdForLabel(labelInt);
             if (binding.radioGroupLabel.getCheckedRadioButtonId() != radioButtonResId) {
+                isUpdatingProgrammatically = true;
                 binding.radioGroupLabel.check(radioButtonResId);
                 binding.radioRemove.setVisibility(View.VISIBLE);
+                isUpdatingProgrammatically = false;
             }
         }
     }
@@ -206,7 +250,7 @@ public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFra
     private void updateNodeLabel(int checkedId) {
         boolean isRemoveLabel = (checkedId == R.id.radio_remove);
         NodeLabel nodeLabel = null;
-        
+
         if (checkedId == R.id.radio_label_red) {
             nodeLabel = NodeLabel.RED;
         } else if (checkedId == R.id.radio_label_orange) {
@@ -223,21 +267,20 @@ public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFra
             nodeLabel = NodeLabel.GREY;
         }
 
+        // Apply label updates using LiveData
         if (isMultipleSelection) {
             // Apply label to all selected nodes using ViewModel
             List<Long> nodeHandles = new ArrayList<>();
             for (MegaNode node : nodes) {
                 nodeHandles.add(node.getHandle());
             }
-            viewModel.updateMultipleNodeLabelsByHandles(nodeHandles, isRemoveLabel ? null : nodeLabel);
+            // Use LiveData method
+            viewModel.updateMultipleNodeLabels(nodeHandles, isRemoveLabel ? null : nodeLabel);
         } else {
             // Apply label to single node using ViewModel
-            viewModel.updateNodeLabelByHandle(node.getHandle(), isRemoveLabel ? null : nodeLabel);
+            // Use LiveData method
+            viewModel.updateNodeLabel(node.getHandle(), isRemoveLabel ? null : nodeLabel);
         }
-
-        // Dismiss the dialog after initiating the operation
-        // The ViewModel handles the actual API calls, error handling, and analytics
-        dismiss();
     }
 
 

@@ -1,9 +1,17 @@
 package mega.privacy.android.app.modalbottomsheet.nodelabel
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.NodeId
@@ -14,6 +22,34 @@ import mega.privacy.mobile.analytics.event.LabelRemovedMenuItemEvent
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
+
+/**
+ * Sealed class representing the result of loading a single node
+ */
+sealed class NodeLoadResult {
+    data class Success(val node: MegaNode) : NodeLoadResult()
+    data class Error(val exception: Throwable) : NodeLoadResult()
+    object Loading : NodeLoadResult()
+}
+
+/**
+ * Sealed class representing the result of loading multiple nodes
+ */
+sealed class NodesLoadResult {
+    data class Success(val nodes: List<MegaNode>) : NodesLoadResult()
+    data class Error(val exception: Throwable) : NodesLoadResult()
+    object Loading : NodesLoadResult()
+}
+
+/**
+ * Sealed class representing the result of updating node labels
+ */
+sealed class LabelUpdateResult {
+    object Success : LabelUpdateResult()
+    data class Error(val exception: Throwable) : LabelUpdateResult()
+    object Loading : LabelUpdateResult()
+}
 
 /**
  * ViewModel for managing node labeling operations in the NodeLabelBottomSheetDialogFragment.
@@ -24,102 +60,230 @@ class NodeLabelBottomSheetDialogFragmentViewModel @Inject constructor(
     private val updateNodeLabelUseCase: UpdateNodeLabelUseCase,
 ) : ViewModel() {
 
+    // LiveData for single node loading
+    private val _nodeLoadResult = MutableLiveData<NodeLoadResult>()
+
     /**
-     * Loads a single node by handle and converts it to MegaNode with callback (for Java compatibility)
+     * LiveData that emits the result of loading a single node.
+     *
+     * @see NodeLoadResult for possible states (Loading, Success, Error)
+     */
+    val nodeLoadResult: LiveData<NodeLoadResult> = _nodeLoadResult
+
+    // LiveData for multiple nodes loading
+    private val _nodesLoadResult = MutableLiveData<NodesLoadResult>()
+
+    /**
+     * LiveData that emits the result of loading multiple nodes.
+     *
+     * @see NodesLoadResult for possible states (Loading, Success, Error)
+     */
+    val nodesLoadResult: LiveData<NodesLoadResult> = _nodesLoadResult
+
+    // LiveData for single node label update
+    private val _labelUpdateResult = MutableLiveData<LabelUpdateResult>()
+
+    /**
+     * LiveData that emits the result of updating a single node's label.
+     *
+     * @see LabelUpdateResult for possible states (Loading, Success, Error)
+     */
+    val labelUpdateResult: LiveData<LabelUpdateResult> = _labelUpdateResult
+
+    // LiveData for multiple nodes label update
+    private val _multipleLabelsUpdateResult = MutableLiveData<LabelUpdateResult>()
+
+    /**
+     * LiveData that emits the result of updating multiple nodes' labels.
+     *
+     * @see LabelUpdateResult for possible states (Loading, Success, Error)
+     */
+    val multipleLabelsUpdateResult: LiveData<LabelUpdateResult> = _multipleLabelsUpdateResult
+
+
+    /**
+     * Loads a single node by handle using LiveData (preferred method)
      *
      * @param nodeHandle The handle of the node to load
      * @param megaApi The MegaApi instance to convert UnTypedNode to MegaNode
-     * @param callback Callback to receive the MegaNode result
+     * @param dispatcher The dispatcher to use for JNI calls (defaults to IO)
      */
-    fun loadMegaNode(
+    @JvmOverloads
+    fun loadNode(
         nodeHandle: Long,
         megaApi: nz.mega.sdk.MegaApiAndroid,
-        callback: (MegaNode?) -> Unit,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
     ) {
+        _nodeLoadResult.value = NodeLoadResult.Loading
+
         viewModelScope.launch {
-            callback(megaApi.getNodeByHandle(nodeHandle))
+            runCatching {
+                withContext(dispatcher) {
+                    megaApi.getNodeByHandle(nodeHandle)
+                }
+            }.onSuccess { node ->
+                _nodeLoadResult.value = if (node != null) {
+                    NodeLoadResult.Success(node)
+                } else {
+                    NodeLoadResult.Error(Exception("Node not found for handle: $nodeHandle"))
+                }
+            }.onFailure { exception ->
+                _nodeLoadResult.value = NodeLoadResult.Error(exception)
+            }
         }
     }
 
+
     /**
-     * Loads multiple nodes by handles and converts them to MegaNodes with callback (for Java compatibility)
+     * Loads multiple nodes by handles using LiveData (preferred method)
      *
      * @param nodeHandles Array of node handles to load
      * @param megaApi The MegaApi instance to convert UnTypedNode to MegaNode
-     * @param callback Callback to receive the MegaNode results
+     * @param dispatcher The dispatcher to use for JNI calls (defaults to IO)
      */
-    fun loadMegaNodes(
+    @JvmOverloads
+    fun loadNodes(
         nodeHandles: LongArray,
         megaApi: nz.mega.sdk.MegaApiAndroid,
-        callback: (List<MegaNode>) -> Unit,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
     ) {
+        _nodesLoadResult.value = NodesLoadResult.Loading
+
         viewModelScope.launch {
-            val megaNodes = nodeHandles.map { nodeHandle ->
-                megaApi.getNodeByHandle(nodeHandle)
-            }.filterNotNull()
-            callback(megaNodes)
+            runCatching {
+                withContext(dispatcher) {
+                    nodeHandles.map { nodeHandle ->
+                        megaApi.getNodeByHandle(nodeHandle)
+                    }.filterNotNull()
+                }
+            }.onSuccess { nodes ->
+                _nodesLoadResult.value = NodesLoadResult.Success(nodes)
+            }.onFailure { exception ->
+                _nodesLoadResult.value = NodesLoadResult.Error(exception)
+            }
         }
     }
 
     /**
-     * Updates the label for a single node
+     * Suspending version of updateNodeLabel (internal use and testing)
      *
      * @param nodeId The ID of the node to update
      * @param label The new label to apply, or null to remove the label
      */
-    fun updateNodeLabel(nodeId: NodeId, label: NodeLabel?) {
-        viewModelScope.launch {
-            runCatching {
-                updateNodeLabelUseCase(nodeId, label)
-            }.onSuccess {
-                trackAnalytics(label != null)
-            }.onFailure { exception ->
-                Timber.e(exception, "Failed to update node label")
+    internal suspend fun updateNodeLabelSuspend(nodeId: NodeId, label: NodeLabel?) {
+        runCatching {
+            updateNodeLabelUseCase(nodeId, label)
+        }.onSuccess {
+            trackAnalytics(label != null)
+        }.onFailure { exception ->
+            when (exception) {
+                is CancellationException -> {
+                    // Don't log cancellation as an error - it's expected when the user navigates away
+                    Timber.d("Label update cancelled for node ${nodeId.longValue} - user likely navigated away")
+                }
+
+                else -> {
+                    Timber.e(exception, "Failed to update node label")
+                }
             }
         }
     }
 
+
     /**
-     * Updates the label for a single node (Java-compatible version)
+     * Updates the label for a single node using LiveData (preferred method)
      *
      * @param nodeHandle The handle of the node to update
      * @param label The new label to apply, or null to remove the label
      */
-    @JvmName("updateNodeLabelByHandle")
     fun updateNodeLabel(nodeHandle: Long, label: NodeLabel?) {
-        updateNodeLabel(NodeId(nodeHandle), label)
-    }
+        _labelUpdateResult.value = LabelUpdateResult.Loading
 
-    /**
-     * Updates the label for multiple nodes
-     *
-     * @param nodeIds List of node IDs to update
-     * @param label The new label to apply, or null to remove the label
-     */
-    fun updateMultipleNodeLabels(nodeIds: List<NodeId>, label: NodeLabel?) {
         viewModelScope.launch {
             runCatching {
-                nodeIds.forEach { nodeId ->
-                    updateNodeLabelUseCase(nodeId, label)
+                withTimeout(5.seconds) { // 5 second timeout
+                    updateNodeLabelSuspend(NodeId(nodeHandle), label)
                 }
             }.onSuccess {
-                trackAnalytics(label != null)
+                _labelUpdateResult.value = LabelUpdateResult.Success
             }.onFailure { exception ->
-                Timber.e(exception, "Failed to update multiple node labels")
+                Timber.e(exception, "Failed to update node label for handle: $nodeHandle")
+                _labelUpdateResult.value = LabelUpdateResult.Error(exception)
             }
         }
     }
 
     /**
-     * Updates the label for multiple nodes (Java-compatible version)
+     * Suspending version of updateMultipleNodeLabels (internal use and testing)
+     *
+     * @param nodeIds List of node IDs to update
+     * @param label The new label to apply, or null to remove the label
+     */
+    internal suspend fun updateMultipleNodeLabelsSuspend(nodeIds: List<NodeId>, label: NodeLabel?) {
+        var successCount = 0
+        var failureCount = 0
+
+        nodeIds.forEach { nodeId ->
+            runCatching {
+                updateNodeLabelUseCase(nodeId, label)
+            }.onSuccess {
+                successCount++
+            }.onFailure { exception ->
+                when (exception) {
+                    is CancellationException -> {
+                        // Don't count cancellation as a failure - it's expected when the user navigates away
+                        Timber.d("Label update cancelled for node ${nodeId.longValue} - user likely navigated away")
+                    }
+
+                    else -> {
+                        failureCount++
+                        Timber.e(
+                            exception,
+                            "Failed to update label for node ${nodeId.longValue}"
+                        )
+                    }
+                }
+            }
+        }
+
+        // Track analytics if at least one node was updated successfully
+        if (successCount > 0) {
+            trackAnalytics(label != null)
+        }
+
+        // Log summary
+        if (failureCount > 0) {
+            Timber.w("Label update completed: $successCount successful, $failureCount failed")
+        }
+    }
+
+
+    /**
+     * Updates the label for multiple nodes using LiveData (preferred method)
      *
      * @param nodeHandles List of node handles to update
      * @param label The new label to apply, or null to remove the label
      */
-    @JvmName("updateMultipleNodeLabelsByHandles")
     fun updateMultipleNodeLabels(nodeHandles: List<Long>, label: NodeLabel?) {
-        updateMultipleNodeLabels(nodeHandles.map { NodeId(it) }, label)
+        _multipleLabelsUpdateResult.value = LabelUpdateResult.Loading
+
+        viewModelScope.launch {
+            runCatching {
+                withTimeout(10.seconds) { // 10 second timeout for multiple operations
+                    updateMultipleNodeLabelsSuspend(nodeHandles.map { NodeId(it) }, label)
+                }
+            }.onSuccess {
+                _multipleLabelsUpdateResult.value = LabelUpdateResult.Success
+            }.onFailure { exception ->
+                Timber.e(
+                    exception,
+                    "Failed to update multiple node labels for handles: $nodeHandles"
+                )
+                _multipleLabelsUpdateResult.value = LabelUpdateResult.Error(exception)
+            }
+        }
     }
+
 
     /**
      * Converts MegaNode label integer to NodeLabel enum
@@ -166,7 +330,7 @@ class NodeLabelBottomSheetDialogFragmentViewModel @Inject constructor(
      */
     @JvmName("hasLabelUnTypedNode")
     fun hasLabel(node: UnTypedNode): Boolean =
-        node.label != MegaNode.NODE_LBL_UNKNOWN && node.label > 0
+        node.nodeLabel != null
 
     /**
      * Checks if a node has any label (MegaNode compatibility)
@@ -188,9 +352,9 @@ class NodeLabelBottomSheetDialogFragmentViewModel @Inject constructor(
     fun getUniformLabel(nodes: List<UnTypedNode>): NodeLabel? {
         if (nodes.isEmpty()) return null
 
-        val firstLabel = getNodeLabelFromInt(nodes.first().label) ?: return null
+        val firstLabel = nodes.first().nodeLabel ?: return null
 
-        return if (nodes.all { getNodeLabelFromInt(it.label) == firstLabel }) {
+        return if (nodes.all { it.nodeLabel == firstLabel }) {
             firstLabel
         } else {
             null
@@ -231,3 +395,4 @@ class NodeLabelBottomSheetDialogFragmentViewModel @Inject constructor(
         )
     }
 }
+
