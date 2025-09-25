@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.transfers.view
 
+import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
@@ -119,6 +120,13 @@ internal fun TransfersView(
     LaunchedEffect(Unit) {
         Analytics.tracker.trackEvent(TransfersSectionScreenEvent)
     }
+
+    BackHandler(
+        enabled = isInSelectTransfersMode,
+        onBack = {
+            onSelectTransfersClose()
+        },
+    )
 
     @OptIn(ExperimentalMaterial3Api::class)
     MegaScaffoldWithTopAppBarScrollBehavior(

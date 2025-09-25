@@ -10,6 +10,7 @@ import androidx.compose.ui.test.performClick
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.collections.immutable.toImmutableList
@@ -569,6 +570,24 @@ class TransfersViewTest {
         assertThat(analyticsRule.events).contains(FailedTransfersTabEvent)
     }
 
+    @Test
+    fun `test that selection mode is disabled when back is pressed`() {
+        val onSelectTransfersClose = mock<() -> Unit>()
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = COMPLETED_TAB_INDEX,
+                failedTransfers = failedTransfers,
+                completedTransfers = completedTransfers,
+                selectedActiveTransfersIds = mock(), //this sets selection mode on
+            ),
+            onSelectTransfersClose = onSelectTransfersClose,
+        )
+
+        Espresso.pressBack()
+
+        verify(onSelectTransfersClose).invoke()
+    }
+
     private fun initComposeTestRule(
         uiState: TransfersUiState,
         onSelectAllActiveTransfers: () -> Unit = {},
@@ -578,6 +597,7 @@ class TransfersViewTest {
         onSelectAllFailedTransfers: () -> Unit = {},
         onClearSelectedFailedTransfers: () -> Unit = {},
         onRetrySelectedFailedTransfers: () -> Unit = {},
+        onSelectTransfersClose: () -> Unit = {},
     ) {
         composeTestRule.setContent {
             CompositionLocalProvider(LocalViewModelStoreOwner provides viewModelStoreOwner) {
@@ -599,7 +619,7 @@ class TransfersViewTest {
                     onSelectActiveTransfers = {},
                     onSelectCompletedTransfers = {},
                     onSelectFailedTransfers = {},
-                    onSelectTransfersClose = {},
+                    onSelectTransfersClose = onSelectTransfersClose,
                     onActiveTransferSelected = {},
                     onCompletedTransferSelected = {},
                     onFailedTransferSelected = {},
