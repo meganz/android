@@ -695,6 +695,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             }
 
             setLineNumberEnabled(viewModel.shouldShowLineNumbers())
+            background = null // Remove any default background/shadow
         }
 
         binding.contentText.apply {
