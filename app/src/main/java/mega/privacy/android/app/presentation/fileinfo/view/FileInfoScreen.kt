@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.fileinfo.view
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Address
@@ -39,6 +38,7 @@ import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarForCollapsibleHeader
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
@@ -149,7 +149,7 @@ internal fun FileInfoScreen(
                     } else {
                         AppBarForCollapsibleHeader(
                             appBarType = AppBarType.BACK_NAVIGATION,
-                            title = viewState.title,
+                            title = getTitle(viewState),
                             modifier = Modifier.testTag(TEST_TAG_TOP_APPBAR),
                             actions = viewState.actions,
                             onNavigationPressed = onBackPressed,
@@ -162,7 +162,7 @@ internal fun FileInfoScreen(
             },
             header = {
                 FileInfoHeader(
-                    title = viewState.title,
+                    title = getTitle(viewState),
                     iconResource = viewState.iconResource?.takeIf { !viewState.hasPreview },
                     accessPermissionDescription = viewState.accessPermission.description()
                         ?.takeIf { viewState.isIncomingSharedNode },
@@ -200,6 +200,14 @@ internal fun FileInfoScreen(
         }
     }
 }
+
+@Composable
+private fun getTitle(viewState: FileInfoViewState): String =
+    if (viewState.isDecrypted) viewState.title else if (viewState.isFile) pluralStringResource(
+        id = R.plurals.cloud_drive_undecrypted_file,
+        count = 1
+    )
+    else stringResource(id = R.string.shared_items_verify_credentials_undecrypted_folder)
 
 @SuppressLint("UnrememberedMutableState")
 @CombinedThemePreviews
