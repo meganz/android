@@ -1,9 +1,13 @@
 package mega.privacy.android.app.modalbottomsheet.nodelabel
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.Observer
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -14,6 +18,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.usecase.UpdateNodeLabelUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import nz.mega.sdk.MegaNode
+import org.junit.Rule
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -30,6 +35,9 @@ import org.mockito.kotlin.whenever
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NodeLabelBottomSheetDialogFragmentViewModelTest {
+
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var underTest: NodeLabelBottomSheetDialogFragmentViewModel
 
@@ -52,94 +60,72 @@ class NodeLabelBottomSheetDialogFragmentViewModelTest {
     ): UnTypedNode {
         return mock<FolderNode> {
             on { this.id } doReturn NodeId(id)
-            on { this.label } doReturn label
+            on { this.nodeLabel } doReturn when (label) {
+                MegaNode.NODE_LBL_RED -> NodeLabel.RED
+                MegaNode.NODE_LBL_ORANGE -> NodeLabel.ORANGE
+                MegaNode.NODE_LBL_YELLOW -> NodeLabel.YELLOW
+                MegaNode.NODE_LBL_GREEN -> NodeLabel.GREEN
+                MegaNode.NODE_LBL_BLUE -> NodeLabel.BLUE
+                MegaNode.NODE_LBL_PURPLE -> NodeLabel.PURPLE
+                MegaNode.NODE_LBL_GREY -> NodeLabel.GREY
+                else -> null
+            }
             on { this.name } doReturn name
         }
     }
 
     @Test
-    fun `test updateNodeLabel with NodeId adds label successfully`() = runTest {
+    fun `test updateNodeLabelSuspend with NodeId adds label successfully`() = runTest {
         // Given
         val nodeId = NodeId(12345L)
         val label = NodeLabel.RED
         whenever(updateNodeLabelUseCase(nodeId, label)).thenReturn(Unit)
 
         // When
-        underTest.updateNodeLabel(nodeId, label)
+        underTest.updateNodeLabelSuspend(nodeId, label)
 
         // Then
         verify(updateNodeLabelUseCase).invoke(nodeId, label)
     }
 
     @Test
-    fun `test updateNodeLabel with NodeId removes label successfully`() = runTest {
+    fun `test updateNodeLabelSuspend with NodeId removes label successfully`() = runTest {
         // Given
         val nodeId = NodeId(12345L)
         whenever(updateNodeLabelUseCase(nodeId, null)).thenReturn(Unit)
 
         // When
-        underTest.updateNodeLabel(nodeId, null)
+        underTest.updateNodeLabelSuspend(nodeId, null)
 
         // Then
         verify(updateNodeLabelUseCase).invoke(nodeId, null)
     }
 
     @Test
-    fun `test updateNodeLabel with Long handle adds label successfully`() = runTest {
-        // Given
-        val nodeHandle = 12345L
-        val label = NodeLabel.BLUE
-        whenever(updateNodeLabelUseCase(NodeId(nodeHandle), label)).thenReturn(Unit)
+    fun `test updateMultipleNodeLabelsSuspend with NodeId list adds labels successfully`() =
+        runTest {
+            // Given
+            val nodeIds = listOf(NodeId(12345L), NodeId(67890L), NodeId(11111L))
+            val label = NodeLabel.GREEN
+            whenever(updateNodeLabelUseCase(any(), any())).thenReturn(Unit)
 
-        // When
-        underTest.updateNodeLabel(nodeHandle, label)
+            // When
+            underTest.updateMultipleNodeLabelsSuspend(nodeIds, label)
 
-        // Then
-        verify(updateNodeLabelUseCase).invoke(NodeId(nodeHandle), label)
-    }
-
-    @Test
-    fun `test updateMultipleNodeLabels with NodeId list adds labels successfully`() = runTest {
-        // Given
-        val nodeIds = listOf(NodeId(12345L), NodeId(67890L), NodeId(11111L))
-        val label = NodeLabel.GREEN
-        whenever(updateNodeLabelUseCase(any(), any())).thenReturn(Unit)
-
-        // When
-        underTest.updateMultipleNodeLabels(nodeIds, label)
-
-        // Then
-        nodeIds.forEach { nodeId ->
-            verify(updateNodeLabelUseCase).invoke(nodeId, label)
+            // Then
+            nodeIds.forEach { nodeId ->
+                verify(updateNodeLabelUseCase).invoke(nodeId, label)
+            }
         }
-    }
 
     @Test
-    fun `test updateMultipleNodeLabels with Long handles adds labels successfully`() = runTest {
+    fun `test updateMultipleNodeLabelsSuspend with empty list does not call use case`() = runTest {
         // Given
-        val nodeHandles = listOf(12345L, 67890L, 11111L)
-        val label = NodeLabel.PURPLE
-        whenever(updateNodeLabelUseCase(any(), any())).thenReturn(Unit)
-
-        // When
-        underTest.updateMultipleNodeLabels(nodeHandles, label)
-
-
-        // Then
-        nodeHandles.forEach { handle ->
-            verify(updateNodeLabelUseCase).invoke(NodeId(handle), label)
-        }
-    }
-
-    @Test
-    fun `test updateMultipleNodeLabels with empty list does not call use case`() = runTest {
-        // Given
-        val nodeHandles = emptyList<Long>()
+        val nodeIds = emptyList<NodeId>()
         val label = NodeLabel.YELLOW
 
         // When
-        underTest.updateMultipleNodeLabels(nodeHandles, label)
-
+        underTest.updateMultipleNodeLabelsSuspend(nodeIds, label)
 
         // Then
         verify(updateNodeLabelUseCase, never()).invoke(any(), any())
@@ -275,7 +261,7 @@ class NodeLabelBottomSheetDialogFragmentViewModelTest {
     }
 
     @Test
-    fun `test error handling when updateNodeLabelUseCase throws exception`() = runTest {
+    fun `test error handling when updateNodeLabelSuspend throws exception`() = runTest {
         // Given
         val nodeId = NodeId(12345L)
         val label = NodeLabel.RED
@@ -283,7 +269,7 @@ class NodeLabelBottomSheetDialogFragmentViewModelTest {
         whenever(updateNodeLabelUseCase(nodeId, label)).thenThrow(exception)
 
         // When
-        underTest.updateNodeLabel(nodeId, label)
+        underTest.updateNodeLabelSuspend(nodeId, label)
 
         // Then
         verify(updateNodeLabelUseCase).invoke(nodeId, label)
@@ -291,7 +277,7 @@ class NodeLabelBottomSheetDialogFragmentViewModelTest {
     }
 
     @Test
-    fun `test error handling when updateMultipleNodeLabels throws exception`() = runTest {
+    fun `test error handling when updateMultipleNodeLabelsSuspend throws exception`() = runTest {
         // Given
         val nodeIds = listOf(NodeId(12345L), NodeId(67890L))
         val label = NodeLabel.GREEN
@@ -299,12 +285,76 @@ class NodeLabelBottomSheetDialogFragmentViewModelTest {
         whenever(updateNodeLabelUseCase(any(), any())).thenThrow(exception)
 
         // When
-        underTest.updateMultipleNodeLabels(nodeIds, label)
-
+        underTest.updateMultipleNodeLabelsSuspend(nodeIds, label)
 
         // Then
+        // Both nodes should be attempted even if they fail
         verify(updateNodeLabelUseCase).invoke(NodeId(12345L), label)
-        // Analytics should not be tracked when the operation fails
+        verify(updateNodeLabelUseCase).invoke(NodeId(67890L), label)
+        // Analytics should not be tracked when all operations fail
+        verify(analyticsTracker, never()).trackEvent(any())
+    }
+
+    @Test
+    fun `test partial success when updateMultipleNodeLabelsSuspend has mixed results`() = runTest {
+        // Given
+        val nodeIds = listOf(NodeId(12345L), NodeId(67890L), NodeId(11111L))
+        val label = NodeLabel.BLUE
+        val exception = RuntimeException("API error")
+
+        // First node succeeds, second fails, third succeeds
+        whenever(updateNodeLabelUseCase(NodeId(12345L), label)).thenReturn(Unit)
+        whenever(updateNodeLabelUseCase(NodeId(67890L), label)).thenThrow(exception)
+        whenever(updateNodeLabelUseCase(NodeId(11111L), label)).thenReturn(Unit)
+
+        // When
+        underTest.updateMultipleNodeLabelsSuspend(nodeIds, label)
+
+        // Then
+        // All nodes should be attempted
+        verify(updateNodeLabelUseCase).invoke(NodeId(12345L), label)
+        verify(updateNodeLabelUseCase).invoke(NodeId(67890L), label)
+        verify(updateNodeLabelUseCase).invoke(NodeId(11111L), label)
+        // Analytics should be tracked since at least one succeeded
+        verify(analyticsTracker).trackEvent(any())
+    }
+
+    @Test
+    fun `test cancellation handling in updateMultipleNodeLabelsSuspend`() = runTest {
+        // Given
+        val nodeIds = listOf(NodeId(12345L), NodeId(67890L))
+        val label = NodeLabel.RED
+        val cancellationException = CancellationException("Job was cancelled")
+
+        // First node succeeds, second gets cancelled
+        whenever(updateNodeLabelUseCase(NodeId(12345L), label)).thenReturn(Unit)
+        whenever(updateNodeLabelUseCase(NodeId(67890L), label)).thenThrow(cancellationException)
+
+        // When
+        underTest.updateMultipleNodeLabelsSuspend(nodeIds, label)
+
+        // Then
+        // Both nodes should be attempted
+        verify(updateNodeLabelUseCase).invoke(NodeId(12345L), label)
+        verify(updateNodeLabelUseCase).invoke(NodeId(67890L), label)
+        // Analytics should be tracked since the first node succeeded
+        verify(analyticsTracker).trackEvent(any())
+    }
+
+    @Test
+    fun `test cancellation handling in updateNodeLabelSuspend`() = runTest {
+        // Given
+        val nodeId = NodeId(12345L)
+        val label = NodeLabel.GREEN
+        val cancellationException = CancellationException("Job was cancelled")
+        whenever(updateNodeLabelUseCase(nodeId, label)).thenThrow(cancellationException)
+
+        // When
+        underTest.updateNodeLabelSuspend(nodeId, label)
+
+        // Then
+        verify(updateNodeLabelUseCase).invoke(nodeId, label)
+        // Analytics should not be tracked when cancelled
         verify(analyticsTracker, never()).trackEvent(any())
     }
 
