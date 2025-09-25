@@ -4,6 +4,7 @@ import mega.privacy.android.app.presentation.validator.toolbaractions.model.modi
 import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.CloudDriveSyncsToolbarActionsModifierItem
 import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.DocumentSectionToolbarActionsModifierItem
 import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.IncomingSharesToolbarActionsModifierItem
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.OutgoingSharesToolbarActionsModifierItem
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 
 interface ToolbarActionsModifier {
@@ -32,5 +33,9 @@ sealed interface ToolbarActionsModifierItem {
 
     data class IncomingShares(
         val item: IncomingSharesToolbarActionsModifierItem,
+    ) : ToolbarActionsModifierItem
+
+    data class OutgoingShares(
+        val item: OutgoingSharesToolbarActionsModifierItem,
     ) : ToolbarActionsModifierItem
 }

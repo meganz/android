@@ -27,11 +27,11 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEvent
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
@@ -50,7 +50,6 @@ import mega.privacy.android.app.presentation.clouddrive.OptionItems
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
@@ -58,6 +57,8 @@ import mega.privacy.android.app.presentation.shares.SharesActionListener
 import mega.privacy.android.app.presentation.shares.outgoing.ui.OutgoingSharesView
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
+import mega.privacy.android.app.presentation.validator.toolbaractions.ToolbarActionsValidator
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.ToolbarActionsRequest
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.Constants
@@ -66,10 +67,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
-import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.VideoFileTypeInfo
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -114,10 +112,10 @@ class OutgoingSharesComposeFragment : Fragment() {
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     /**
-     * Mapper to get options for Action Bar
+     * Toolbar actions validator
      */
     @Inject
-    lateinit var getOptionsForToolbarMapper: GetOptionsForToolbarMapper
+    lateinit var toolbarActionsValidator: ToolbarActionsValidator
 
     /**
      * Mapper to get file type icon
@@ -355,12 +353,6 @@ class OutgoingSharesComposeFragment : Fragment() {
                 folderCount == 0 -> fileCount.toString()
                 else -> (fileCount + folderCount).toString()
             }
-
-            runCatching {
-                actionMode?.invalidate()
-            }.onFailure {
-                Timber.e(it, "Invalidate error")
-            }
         }
     }
 
@@ -382,6 +374,14 @@ class OutgoingSharesComposeFragment : Fragment() {
 
         viewLifecycleOwner.collectFlow(sortByHeaderViewModel.orderChangeState) {
             viewModel.onSortOrderChanged()
+        }
+
+        viewLifecycleOwner.collectFlow(
+            viewModel.state
+                .map { it.toolbarActionsModifierItem }
+                .distinctUntilChanged()
+        ) {
+            actionMode?.invalidate()
         }
     }
 
@@ -441,62 +441,26 @@ class OutgoingSharesComposeFragment : Fragment() {
         }
 
         override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
-            val selected =
-                viewModel.state.value.selectedNodes.takeUnless { it.isEmpty() }
-                    ?: return false
-            menu.findItem(R.id.cab_menu_share_link).title =
-                resources.getQuantityString(sharedR.plurals.label_share_links, selected.size)
-            lifecycleScope.launch {
-                val control = getOptionsForToolbarMapper(
-                    selectedNodeHandleList = viewModel.state.value.selectedNodeHandles,
+            val actionModeState = viewModel.state.value.toolbarActionsModifierItem
+            if (actionModeState == null) {
+                return false
+            }
+
+            menu.findItem(R.id.cab_menu_share_link).title = resources.getQuantityString(
+                sharedR.plurals.label_share_links,
+                viewModel.state.value.selectedNodes.size
+            )
+            val control = toolbarActionsValidator(
+                request = ToolbarActionsRequest(
+                    modifierItem = actionModeState,
+                    selectedNodes = viewModel.state.value.selectedNodes.toList(),
                     totalNodes = viewModel.state.value.nodesList.size
                 )
-                // Slight customization for outgoing shares page
-                control.move().isVisible = false
-                control.hide().isVisible = false
-                control.unhide().isVisible = false
-                val areAllNotTakenDown = selected.any { it.isTakenDown.not() }
-                if (areAllNotTakenDown) {
-                    if (viewModel.state.value.isInRootLevel) {
-                        control.removeShare().setVisible(true).showAsAction =
-                            MenuItem.SHOW_AS_ACTION_ALWAYS
-                    }
-                    control.shareOut().setVisible(true).showAsAction =
-                        MenuItem.SHOW_AS_ACTION_ALWAYS
-
-                    if (selected.size > 1) {
-                        control.manageLink().setVisible(false)
-                        control.removeLink().setVisible(false)
-                        control.link.setVisible(false)
-                    }
-                    control.copy().isVisible = true
-                    if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
-                        control.copy().showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
-                    } else {
-                        control.copy().showAsAction = MenuItem.SHOW_AS_ACTION_NEVER
-                    }
-                }
-
-                val mediaNodes = selected
-                    .filter {
-                        val type = (it as? FileNode)?.type
-                        type is ImageFileTypeInfo || type is VideoFileTypeInfo
-                    }
-                if (mediaNodes.size == selected.size) {
-                    if (mediaNodes.all { (it as? FileNode)?.type is VideoFileTypeInfo }) {
-                        control.addToAlbum().isVisible = false
-                        control.addTo().isVisible = true
-                    } else {
-                        control.addToAlbum().isVisible = true
-                        control.addTo().isVisible = false
-                    }
-                } else {
-                    control.addToAlbum().isVisible = false
-                    control.addTo().isVisible = false
-                }
-
-                CloudStorageOptionControlUtil.applyControl(menu, control)
-            }
+            )
+            CloudStorageOptionControlUtil.applyControl(
+                menu,
+                control
+            )
             return true
         }
 

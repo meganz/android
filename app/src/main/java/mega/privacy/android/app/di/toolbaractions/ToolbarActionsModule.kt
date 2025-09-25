@@ -9,6 +9,7 @@ import mega.privacy.android.app.presentation.validator.toolbaractions.modifier.A
 import mega.privacy.android.app.presentation.validator.toolbaractions.modifier.CloudDriveSyncsToolbarActionsModifier
 import mega.privacy.android.app.presentation.validator.toolbaractions.modifier.DocumentSectionToolbarActionsModifier
 import mega.privacy.android.app.presentation.validator.toolbaractions.modifier.IncomingSharesToolbarActionsModifier
+import mega.privacy.android.app.presentation.validator.toolbaractions.modifier.OutgoingSharesToolbarActionsModifier
 import mega.privacy.android.app.presentation.validator.toolbaractions.modifier.ToolbarActionsModifier
 
 @Module
@@ -30,4 +31,8 @@ interface ToolbarActionsModule {
     @Binds
     @IntoSet
     fun bindIncomingSharesToolbarActionsModifier(impl: IncomingSharesToolbarActionsModifier): ToolbarActionsModifier
+
+    @Binds
+    @IntoSet
+    fun bindOutgoingSharesToolbarActionsModifier(impl: OutgoingSharesToolbarActionsModifier): ToolbarActionsModifier
 }

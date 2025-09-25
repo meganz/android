@@ -20,12 +20,15 @@ import mega.privacy.android.app.presentation.clouddrive.OptionItems
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.OutgoingSharesAddToActionModifierItem
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.SvgFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
@@ -34,6 +37,9 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.shares.ShareFileNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
@@ -41,10 +47,12 @@ import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
 import mega.privacy.android.domain.usecase.shares.GetOutgoingSharesChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -53,6 +61,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
@@ -61,6 +72,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -87,6 +99,9 @@ class OutgoingSharesComposeViewModelTest {
     private val monitorContactUpdatesUseCase = mock<MonitorContactUpdates>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>()
+    private val checkNodeCanBeMovedToTargetNode = mock<CheckNodeCanBeMovedToTargetNode>()
+    private val getRubbishBinFolderUseCase = mock<GetRubbishBinFolderUseCase>()
+    private val getNodeAccessUseCase = mock<GetNodeAccessUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -114,7 +129,10 @@ class OutgoingSharesComposeViewModelTest {
             durationInSecondsTextMapper = durationInSecondsTextMapper,
             monitorContactUpdatesUseCase = monitorContactUpdatesUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
-            getContactVerificationWarningUseCase = getContactVerificationWarningUseCase
+            getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
+            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
+            getRubbishBinFolderUseCase = getRubbishBinFolderUseCase,
+            getNodeAccessUseCase = getNodeAccessUseCase
         )
     }
 
@@ -387,8 +405,10 @@ class OutgoingSharesComposeViewModelTest {
     @Test
     fun `test that the sizes of both selected node handles and the nodes are equal when selecting all nodes`() =
         runTest {
+            val firstNode = mock<ShareFolderNode> { on { id } doReturn NodeId(123L) }
+            val secondNode = mock<ShareFolderNode> { on { id } doReturn NodeId(234L) }
             whenever(getOutgoingSharesChildrenNodeUseCase(underTest.state.value.currentHandle)).thenReturn(
-                listOf<ShareFolderNode>(mock(), mock())
+                listOf(firstNode, secondNode)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             underTest.refreshNodes()
@@ -540,6 +560,360 @@ class OutgoingSharesComposeViewModelTest {
         }
     }
 
+    @ParameterizedTest
+    @EnumSource(AccessPermission::class)
+    fun `test that the correct access permission for an account is set`(accessPermission: AccessPermission) =
+        runTest {
+            val sharedData = newShareData(access = accessPermission)
+            val node = mock<ShareFileNode> {
+                on { id } doReturn NodeId(1L)
+                on { shareData } doReturn sharedData
+            }
+            whenever(
+                getOutgoingSharesChildrenNodeUseCase(
+                    underTest.state.value.currentHandle
+                )
+            ) doReturn listOf(node)
+            whenever(getCloudSortOrder()) doReturn SortOrder.ORDER_NONE
+            whenever(getRubbishBinFolderUseCase()) doReturn null
+            whenever(
+                getNodeAccessUseCase(nodeId = node.id)
+            ) doReturn accessPermission
+
+            underTest.refreshNodes()
+
+            underTest.state.test {
+                assertThat(
+                    expectMostRecentItem().nodesList.first().accessPermission
+                ).isEqualTo(accessPermission)
+            }
+        }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that the correct value is set indicating whether the node can be moved to the rubbish bin`(
+        canBeMovedToRubbishBin: Boolean,
+    ) = runTest {
+        val node = mock<ShareFileNode> {
+            on { id } doReturn NodeId(1L)
+        }
+        whenever(
+            getOutgoingSharesChildrenNodeUseCase(
+                underTest.state.value.currentHandle
+            )
+        ) doReturn listOf(node)
+        val rubbishBinNode = if (canBeMovedToRubbishBin) {
+            mock<FileNode>()
+        } else null
+        whenever(getRubbishBinFolderUseCase()) doReturn rubbishBinNode
+        whenever(
+            checkNodeCanBeMovedToTargetNode(
+                nodeId = any(),
+                targetNodeId = any()
+            )
+        ) doReturn canBeMovedToRubbishBin
+        whenever(
+            getNodeAccessUseCase(nodeId = any())
+        ) doReturn AccessPermission.UNKNOWN
+
+        underTest.refreshNodes()
+
+        underTest.state.test {
+            assertThat(
+                expectMostRecentItem().nodesList.first().canBeMovedToRubbishBin
+            ).isEqualTo(canBeMovedToRubbishBin)
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that the correct taken-down nodes validations are successfully set when a selection is made`(
+        areAllTakenDown: Boolean,
+    ) = runTest {
+        val node = mock<ShareFileNode> {
+            on { id } doReturn NodeId(1L)
+            on { isTakenDown } doReturn areAllTakenDown
+        }
+        whenever(
+            getOutgoingSharesChildrenNodeUseCase(
+                underTest.state.value.currentHandle
+            )
+        ) doReturn listOf(node)
+        whenever(getRubbishBinFolderUseCase()) doReturn null
+        whenever(
+            checkNodeCanBeMovedToTargetNode(
+                nodeId = any(),
+                targetNodeId = any()
+            )
+        ) doReturn false
+        whenever(
+            getNodeAccessUseCase(nodeId = any())
+        ) doReturn AccessPermission.UNKNOWN
+
+        underTest.refreshNodes()
+        underTest.onLongItemClicked(
+            NodeUIItem(
+                node = node,
+                isSelected = false,
+                isInvisible = false
+            )
+        )
+
+        underTest.state.test {
+            assertThat(
+                expectMostRecentItem().toolbarActionsModifierItem!!.item.areAllNotTakenDown
+            ).isEqualTo(!areAllTakenDown)
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = [123L, -1L])
+    fun `test that the correct root level value is set for toolbar actions`(currentHandle: Long) =
+        runTest {
+            val node = mock<ShareFileNode> {
+                on { id } doReturn NodeId(123L)
+            }
+            whenever(
+                getOutgoingSharesChildrenNodeUseCase(
+                    currentHandle
+                )
+            ) doReturn listOf(node)
+            whenever(getRubbishBinFolderUseCase()) doReturn null
+            whenever(
+                checkNodeCanBeMovedToTargetNode(
+                    nodeId = any(),
+                    targetNodeId = any()
+                )
+            ) doReturn false
+            whenever(
+                getNodeAccessUseCase(nodeId = any())
+            ) doReturn AccessPermission.UNKNOWN
+
+            underTest.setCurrentHandle(currentHandle)
+            underTest.refreshNodes()
+            underTest.onLongItemClicked(
+                NodeUIItem(
+                    node = node,
+                    isSelected = false,
+                    isInvisible = false
+                )
+            )
+
+            underTest.state.test {
+                assertThat(
+                    expectMostRecentItem().toolbarActionsModifierItem!!.item.isRootLevel
+                ).isEqualTo(currentHandle == -1L)
+            }
+        }
+
+    @Test
+    fun `test that all link toolbar options are not hidden when total selected nodes is 1`() =
+        runTest {
+            val node = mock<ShareFileNode> {
+                on { id } doReturn NodeId(123L)
+            }
+            whenever(
+                getOutgoingSharesChildrenNodeUseCase(
+                    underTest.state.value.currentHandle
+                )
+            ) doReturn listOf(node)
+            whenever(getRubbishBinFolderUseCase()) doReturn null
+            whenever(
+                checkNodeCanBeMovedToTargetNode(
+                    nodeId = any(),
+                    targetNodeId = any()
+                )
+            ) doReturn false
+            whenever(
+                getNodeAccessUseCase(nodeId = any())
+            ) doReturn AccessPermission.UNKNOWN
+
+            underTest.refreshNodes()
+            underTest.selectAllNodes()
+
+            underTest.state.test {
+                assertThat(
+                    expectMostRecentItem().toolbarActionsModifierItem!!.item.shouldHideLink
+                ).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that all link toolbar options are hidden when total selected nodes is greater than 1`() =
+        runTest {
+            val firstNode = mock<ShareFileNode> {
+                on { id } doReturn NodeId(123L)
+            }
+            val secondNode = mock<ShareFileNode> {
+                on { id } doReturn NodeId(234L)
+            }
+            whenever(
+                getOutgoingSharesChildrenNodeUseCase(
+                    underTest.state.value.currentHandle
+                )
+            ) doReturn listOf(firstNode, secondNode)
+            whenever(getRubbishBinFolderUseCase()) doReturn null
+            whenever(
+                checkNodeCanBeMovedToTargetNode(
+                    nodeId = any(),
+                    targetNodeId = any()
+                )
+            ) doReturn false
+            whenever(
+                getNodeAccessUseCase(nodeId = any())
+            ) doReturn AccessPermission.UNKNOWN
+
+            underTest.refreshNodes()
+            underTest.selectAllNodes()
+
+            underTest.state.test {
+                assertThat(
+                    expectMostRecentItem().toolbarActionsModifierItem!!.item.shouldHideLink
+                ).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that the add to toolbar item is not displayed when no media node is selected`() =
+        runTest {
+            val node = mock<ShareFileNode> {
+                on { id } doReturn NodeId(1L)
+            }
+            whenever(
+                getOutgoingSharesChildrenNodeUseCase(
+                    underTest.state.value.currentHandle
+                )
+            ) doReturn listOf(node)
+            whenever(getRubbishBinFolderUseCase()) doReturn null
+            whenever(
+                getNodeAccessUseCase(nodeId = node.id)
+            ) doReturn AccessPermission.UNKNOWN
+
+            underTest.refreshNodes()
+            underTest.onLongItemClicked(
+                NodeUIItem(
+                    node = node,
+                    isSelected = false,
+                    isInvisible = false
+                )
+            )
+            underTest.onItemClicked(
+                NodeUIItem(
+                    node = node,
+                    isSelected = false,
+                    isInvisible = false
+                )
+            )
+
+            underTest.state.test {
+                assertThat(
+                    expectMostRecentItem().toolbarActionsModifierItem!!.item.addToItem
+                ).isEqualTo(
+                    OutgoingSharesAddToActionModifierItem(
+                        canBeAddedToAlbum = false,
+                        canBeAddedTo = false
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun `test that the add to toolbar item is displayed correctly when all selected nodes are videos`() =
+        runTest {
+            val node = mock<ShareFileNode> {
+                on { id } doReturn NodeId(1L)
+                on { type } doReturn VideoFileTypeInfo(
+                    mimeType = "video",
+                    extension = "svg",
+                    duration = Duration.INFINITE
+                )
+            }
+            whenever(
+                getOutgoingSharesChildrenNodeUseCase(
+                    underTest.state.value.currentHandle
+                )
+            ) doReturn listOf(node)
+            whenever(getRubbishBinFolderUseCase()) doReturn null
+            whenever(
+                getNodeAccessUseCase(nodeId = node.id)
+            ) doReturn AccessPermission.UNKNOWN
+
+            underTest.refreshNodes()
+            underTest.onLongItemClicked(
+                NodeUIItem(
+                    node = node,
+                    isSelected = false,
+                    isInvisible = false
+                )
+            )
+            underTest.onItemClicked(
+                NodeUIItem(
+                    node = node,
+                    isSelected = false,
+                    isInvisible = false
+                )
+            )
+
+            underTest.state.test {
+                assertThat(
+                    expectMostRecentItem().toolbarActionsModifierItem!!.item.addToItem
+                ).isEqualTo(
+                    OutgoingSharesAddToActionModifierItem(
+                        canBeAddedToAlbum = false,
+                        canBeAddedTo = true
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun `test that the add to toolbar item is displayed correctly when all selected nodes are media but not videos`() =
+        runTest {
+            val node = mock<ShareFileNode> {
+                on { id } doReturn NodeId(1L)
+                on { type } doReturn SvgFileTypeInfo(
+                    mimeType = "image",
+                    extension = "svg"
+                )
+            }
+            whenever(
+                getOutgoingSharesChildrenNodeUseCase(
+                    underTest.state.value.currentHandle
+                )
+            ) doReturn listOf(node)
+            whenever(getRubbishBinFolderUseCase()) doReturn null
+            whenever(
+                getNodeAccessUseCase(nodeId = node.id)
+            ) doReturn AccessPermission.UNKNOWN
+
+            underTest.refreshNodes()
+            underTest.onLongItemClicked(
+                NodeUIItem(
+                    node = node,
+                    isSelected = false,
+                    isInvisible = false
+                )
+            )
+            underTest.onItemClicked(
+                NodeUIItem(
+                    node = node,
+                    isSelected = false,
+                    isInvisible = false
+                )
+            )
+
+            underTest.state.test {
+                assertThat(
+                    expectMostRecentItem().toolbarActionsModifierItem!!.item.addToItem
+                ).isEqualTo(
+                    OutgoingSharesAddToActionModifierItem(
+                        canBeAddedToAlbum = true,
+                        canBeAddedTo = false
+                    )
+                )
+            }
+        }
+
     private suspend fun onDownloadOptionClick() {
         val menuItem = mock<MenuItem>()
         val optionsItemInfo =
@@ -578,7 +952,32 @@ class OutgoingSharesComposeViewModelTest {
             fileDurationMapper,
             monitorOfflineNodeUpdatesUseCase,
             monitorConnectivityUseCase,
-            getNodeByIdUseCase
+            getNodeByIdUseCase,
+            checkNodeCanBeMovedToTargetNode,
+            getRubbishBinFolderUseCase,
+            getNodeAccessUseCase
         )
     }
+
+    private fun newShareData(
+        user: String? = null,
+        userFullName: String? = null,
+        nodeHandle: Long = 0L,
+        access: AccessPermission = AccessPermission.UNKNOWN,
+        timeStamp: Long = 0L,
+        isPending: Boolean = false,
+        isVerified: Boolean = false,
+        isContactCredentialsVerified: Boolean = false,
+        count: Int = 0,
+    ) = ShareData(
+        user = user,
+        userFullName = userFullName,
+        nodeHandle = nodeHandle,
+        access = access,
+        timeStamp = timeStamp,
+        isPending = isPending,
+        isVerified = isVerified,
+        isContactCredentialsVerified = isContactCredentialsVerified,
+        count = count
+    )
 }

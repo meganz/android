@@ -5,10 +5,12 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.SelectedNode
+import mega.privacy.android.app.presentation.validator.toolbaractions.modifier.ToolbarActionsModifierItem
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 
 /**
  * OutgoingSharesCompose UI state
@@ -52,7 +54,7 @@ data class OutgoingSharesState(
     val isPendingRefresh: Boolean = false,
     val nodesList: List<NodeUIItem<ShareNode>> = emptyList(),
     val isInSelection: Boolean = false,
-    val selectedNodes: Set<ShareNode> = emptySet(),
+    val selectedNodes: Set<SelectedNode> = emptySet(),
     val totalSelectedFileNodes: Int = 0,
     val totalSelectedFolderNodes: Int = 0,
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
@@ -64,9 +66,10 @@ data class OutgoingSharesState(
     val openedFolderNodeHandles: Set<Long> = emptySet(),
     val openAuthenticityCredentials: StateEventWithContent<String> = consumed(),
     val verifyContactDialog: String? = null,
-    val isContactVerificationOn: Boolean = false
+    val isContactVerificationOn: Boolean = false,
+    val toolbarActionsModifierItem: ToolbarActionsModifierItem.OutgoingShares? = null,
 ) {
     val isOutgoingSharesEmpty: Boolean = currentHandle == -1L && nodesList.isEmpty()
     val isInRootLevel: Boolean = currentHandle == -1L
-    val selectedNodeHandles: List<Long> = selectedNodes.map { it.id.longValue }
+    val selectedNodeHandles: List<Long> = selectedNodes.map { it.id }
 }
