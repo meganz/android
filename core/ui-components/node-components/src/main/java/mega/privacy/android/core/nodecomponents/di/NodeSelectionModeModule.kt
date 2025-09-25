@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.CopySelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.DownloadSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.HideSelectionMenuItem
@@ -34,7 +35,7 @@ abstract class NodeSelectionModeModule {
             rubbishBinSelectionMenuAction: RubbishBinSelectionMenuItem,
             manageLinkSelectionMenuAction: ManageLinkSelectionMenuItem,
             downloadSelectionMenuItem: DownloadSelectionMenuItem,
-        ): Set<NodeSelectionMenuItem<*>> = setOf(
+        ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
             copySelectionModeMenuAction,
             hideSelectionModeMenuAction,
             moveSelectionModeMenuAction,
@@ -50,7 +51,7 @@ abstract class NodeSelectionModeModule {
         fun provideRubbishBinToolbarItems(
             deletePermanentlySelectionMenuItem: DeletePermanentlySelectionMenuItem,
             restoreSelectionMenuItem: RestoreSelectionMenuItem,
-        ): Set<NodeSelectionMenuItem<*>> = setOf(
+        ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
             deletePermanentlySelectionMenuItem,
             restoreSelectionMenuItem,
         )

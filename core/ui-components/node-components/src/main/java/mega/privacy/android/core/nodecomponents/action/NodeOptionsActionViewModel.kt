@@ -3,14 +3,12 @@ package mega.privacy.android.core.nodecomponents.action
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.Lazy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -25,13 +23,13 @@ import mega.privacy.android.core.nodecomponents.action.clickhandler.SingleNodeAc
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSelectionModeActionMapper
+import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeSendToChatMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction.Companion.DEFAULT_MAX_VISIBLE_ITEMS
-import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -56,8 +54,6 @@ import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.qualifier.features.CloudDrive
-import mega.privacy.android.domain.qualifier.features.RubbishBin
 import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
@@ -132,8 +128,7 @@ class NodeOptionsActionViewModel @Inject constructor(
     private val createShareKeyUseCase: CreateShareKeyUseCase,
     private val snackBarHandler: SnackBarHandler,
     @ApplicationScope private val applicationScope: CoroutineScope,
-    @CloudDrive private val cloudDriveOptions: Lazy<Set<@JvmSuppressWildcards NodeSelectionMenuItem<*>>>,
-    @RubbishBin private val rubbishBinOptions: Lazy<Set<@JvmSuppressWildcards NodeSelectionMenuItem<*>>>,
+    private val nodeMenuProviderRegistry: NodeMenuProviderRegistry,
     private val nodeSelectionModeActionMapper: NodeSelectionModeActionMapper,
     private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
@@ -704,7 +699,7 @@ class NodeOptionsActionViewModel @Inject constructor(
             updateSelectedNodes(selectedNodes.toList())
 
             Timber.d("Update state called with ${selectedNodes.size} nodes")
-            val options = getOptions(nodeSourceType)
+            val options = nodeMenuProviderRegistry.getSelectionModeOptions(nodeSourceType)
             if (options.isEmpty()) {
                 Timber.w("No options available for node source type: $nodeSourceType")
                 uiState.update { it.copy(visibleActions = emptyList()) }
@@ -771,13 +766,5 @@ class NodeOptionsActionViewModel @Inject constructor(
             runCatching {
                 isNodeInBackupsUseCase(handle = it.id.longValue)
             }.getOrDefault(false)
-        }
-
-    private fun getOptions(nodeSourceType: NodeSourceType) =
-        when (nodeSourceType) {
-            NodeSourceType.CLOUD_DRIVE -> cloudDriveOptions.get()
-            NodeSourceType.RUBBISH_BIN -> rubbishBinOptions.get()
-            // Update when other source types are supported
-            else -> emptySet()
         }
 }

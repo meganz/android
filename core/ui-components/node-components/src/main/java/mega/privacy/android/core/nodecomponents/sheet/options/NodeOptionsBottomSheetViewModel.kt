@@ -2,7 +2,6 @@ package mega.privacy.android.core.nodecomponents.sheet.options
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.Lazy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -14,26 +13,18 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.SnackbarAttributes
-import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetActionMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
-import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.domain.qualifier.features.Backups
-import mega.privacy.android.domain.qualifier.features.CloudDrive
-import mega.privacy.android.domain.qualifier.features.IncomingShares
-import mega.privacy.android.domain.qualifier.features.Links
-import mega.privacy.android.domain.qualifier.features.OutgoingShares
-import mega.privacy.android.domain.qualifier.features.RubbishBin
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -56,12 +47,7 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val nodeUiItemMapper: NodeUiItemMapper,
     private val snackbarEventQueue: SnackbarEventQueue,
-    @CloudDrive private val cloudDriveBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
-    @RubbishBin private val rubbishBinBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
-    @IncomingShares private val incomingSharesBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
-    @OutgoingShares private val outgoingSharesBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
-    @Links private val linksBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
-    @Backups private val backupsBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
+    private val nodeMenuProviderRegistry: NodeMenuProviderRegistry,
 ) : ViewModel() {
 
     internal val uiState: StateFlow<NodeBottomSheetState>
@@ -88,7 +74,7 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
      */
     fun getBottomSheetOptions(nodeId: Long, nodeSourceType: NodeSourceType) {
         viewModelScope.launch {
-            val bottomSheetOptions = getOptionsForSourceType(nodeSourceType)
+            val bottomSheetOptions = nodeMenuProviderRegistry.getBottomSheetOptions(nodeSourceType)
 
             uiState.update {
                 it.copy(
@@ -139,13 +125,4 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
         uiState.update { it.copy(error = consumed()) }
     }
 
-    private fun getOptionsForSourceType(nodeSourceType: NodeSourceType): Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<*>> =
-        when (nodeSourceType) {
-            NodeSourceType.INCOMING_SHARES -> incomingSharesBottomSheetOptions
-            NodeSourceType.OUTGOING_SHARES -> outgoingSharesBottomSheetOptions
-            NodeSourceType.LINKS -> linksBottomSheetOptions
-            NodeSourceType.RUBBISH_BIN -> rubbishBinBottomSheetOptions
-            NodeSourceType.BACKUPS -> backupsBottomSheetOptions
-            else -> cloudDriveBottomSheetOptions
-        }.get()
 }

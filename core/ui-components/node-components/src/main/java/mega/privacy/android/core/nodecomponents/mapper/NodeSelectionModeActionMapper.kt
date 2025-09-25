@@ -1,5 +1,6 @@
 package mega.privacy.android.core.nodecomponents.mapper
 
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionModeMenuItem
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -20,7 +21,7 @@ class NodeSelectionModeActionMapper @Inject constructor() {
      * @param allNodeCanBeMovedToTarget checks if node can be moved to rubbish bin
      */
     suspend operator fun invoke(
-        options: Set<@JvmSuppressWildcards NodeSelectionMenuItem<*>>,
+        options: Set<@JvmSuppressWildcards NodeSelectionMenuItem<MenuActionWithIcon>>,
         hasNodeAccessPermission: Boolean,
         selectedNodes: List<TypedNode>,
         allNodeCanBeMovedToTarget: Boolean,

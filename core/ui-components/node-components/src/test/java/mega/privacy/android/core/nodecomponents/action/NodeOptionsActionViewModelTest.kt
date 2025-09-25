@@ -5,7 +5,6 @@ import mega.privacy.android.core.nodecomponents.action.clickhandler.MultiNodeAct
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import dagger.Lazy
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
@@ -30,6 +29,7 @@ import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionModeMenuItem
+import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
@@ -143,15 +143,12 @@ class NodeOptionsActionViewModelTest {
     private val singleNodeActionHandlers = setOf(mockSingleNodeActionHandler)
     private val multipleNodesActionHandlers = setOf(mockMultiNodeActionHandler)
 
-    private val cloudDriveOptions =
-        mock<Lazy<Set<@JvmSuppressWildcards NodeSelectionMenuItem<*>>>>()
-    private val rubbishBinOptions =
-        mock<Lazy<Set<@JvmSuppressWildcards NodeSelectionMenuItem<*>>>>()
     private val nodeSelectionModeActionMapper = mock<NodeSelectionModeActionMapper>()
     private val getRubbishNodeUseCase = mock<GetRubbishNodeUseCase>()
     private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>()
     private val getNodeAccessPermission = mock<GetNodeAccessPermission>()
     private val checkNodeCanBeMovedToTargetNode = mock<CheckNodeCanBeMovedToTargetNode>()
+    private val nodeMenuProviderRegistry = mock<NodeMenuProviderRegistry>()
     private val mockRubbishNode = mock<TypedFileNode> {
         on { id } doReturn NodeId(999L)
     }
@@ -166,7 +163,7 @@ class NodeOptionsActionViewModelTest {
         on { isTakenDown } doReturn false
     }
 
-    private val mockNodeSelectionMenuItem = mock<NodeSelectionMenuItem<*>>()
+    private val mockNodeSelectionMenuItem = mock<NodeSelectionMenuItem<MenuActionWithIcon>>()
     private val mockNodeSelectionModeMenuItem = mock<NodeSelectionModeMenuItem>()
 
     private fun initViewModel() {
@@ -189,6 +186,8 @@ class NodeOptionsActionViewModelTest {
             getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
             getNodePreviewFileUseCase = getNodePreviewFileUseCase,
             applicationScope = applicationScope,
+            nodeMenuProviderRegistry = nodeMenuProviderRegistry,
+            nodeSelectionModeActionMapper = nodeSelectionModeActionMapper,
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
             get1On1ChatIdUseCase = get1On1ChatIdUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
@@ -197,19 +196,16 @@ class NodeOptionsActionViewModelTest {
             singleNodeActionHandlers = singleNodeActionHandlers,
             multipleNodesActionHandlers = multipleNodesActionHandlers,
             createShareKeyUseCase = createShareKeyUseCase,
-            cloudDriveOptions = cloudDriveOptions,
-            nodeSelectionModeActionMapper = nodeSelectionModeActionMapper,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
             checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
-            rubbishBinOptions = rubbishBinOptions
         )
     }
 
     @BeforeEach
     fun setUpNodeSelectionModeTests() {
-        whenever(cloudDriveOptions.get()).thenReturn(setOf(mockNodeSelectionMenuItem))
+        whenever(nodeMenuProviderRegistry.getSelectionModeOptions(any())).thenReturn(setOf(mockNodeSelectionMenuItem))
         getRubbishNodeUseCase.stub {
             onBlocking { invoke() } doReturn mockRubbishNode
         }
@@ -257,7 +253,6 @@ class NodeOptionsActionViewModelTest {
             createShareKeyUseCase,
             mockSingleNodeActionHandler,
             mockMultiNodeActionHandler,
-            cloudDriveOptions,
             nodeSelectionModeActionMapper,
             getRubbishNodeUseCase,
             isNodeInBackupsUseCase,
@@ -617,6 +612,8 @@ class NodeOptionsActionViewModelTest {
             getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
             getNodePreviewFileUseCase = getNodePreviewFileUseCase,
             applicationScope = applicationScope,
+            nodeMenuProviderRegistry = nodeMenuProviderRegistry,
+            nodeSelectionModeActionMapper = nodeSelectionModeActionMapper,
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
             get1On1ChatIdUseCase = get1On1ChatIdUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
@@ -626,13 +623,10 @@ class NodeOptionsActionViewModelTest {
             multipleNodesActionHandlers = multipleNodesActionHandlers,
             createShareKeyUseCase = createShareKeyUseCase,
             snackBarHandler = snackBarHandler,
-            cloudDriveOptions = cloudDriveOptions,
-            nodeSelectionModeActionMapper = nodeSelectionModeActionMapper,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
-            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
-            rubbishBinOptions = rubbishBinOptions
+            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode
         )
 
         val mockAction = mock<VersionsMenuAction>()
@@ -676,6 +670,8 @@ class NodeOptionsActionViewModelTest {
             getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
             getNodePreviewFileUseCase = getNodePreviewFileUseCase,
             applicationScope = applicationScope,
+            nodeMenuProviderRegistry = nodeMenuProviderRegistry,
+            nodeSelectionModeActionMapper = nodeSelectionModeActionMapper,
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
             get1On1ChatIdUseCase = get1On1ChatIdUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
@@ -685,13 +681,10 @@ class NodeOptionsActionViewModelTest {
             multipleNodesActionHandlers = multipleHandlers,
             createShareKeyUseCase = createShareKeyUseCase,
             snackBarHandler = snackBarHandler,
-            cloudDriveOptions = cloudDriveOptions,
-            nodeSelectionModeActionMapper = nodeSelectionModeActionMapper,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
-            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
-            rubbishBinOptions = rubbishBinOptions
+            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode
         )
 
         val mockAction = mock<MoveMenuAction>()
@@ -729,6 +722,8 @@ class NodeOptionsActionViewModelTest {
             getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
             getNodePreviewFileUseCase = getNodePreviewFileUseCase,
             applicationScope = applicationScope,
+            nodeMenuProviderRegistry = nodeMenuProviderRegistry,
+            nodeSelectionModeActionMapper = nodeSelectionModeActionMapper,
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
             get1On1ChatIdUseCase = get1On1ChatIdUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
@@ -738,13 +733,10 @@ class NodeOptionsActionViewModelTest {
             multipleNodesActionHandlers = multipleNodesActionHandlers,
             createShareKeyUseCase = createShareKeyUseCase,
             snackBarHandler = snackBarHandler,
-            cloudDriveOptions = cloudDriveOptions,
-            nodeSelectionModeActionMapper = nodeSelectionModeActionMapper,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
-            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
-            rubbishBinOptions = rubbishBinOptions
+            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode
         )
 
         val mockAction = mock<VersionsMenuAction>()
@@ -774,6 +766,8 @@ class NodeOptionsActionViewModelTest {
             getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
             getNodePreviewFileUseCase = getNodePreviewFileUseCase,
             applicationScope = applicationScope,
+            nodeMenuProviderRegistry = nodeMenuProviderRegistry,
+            nodeSelectionModeActionMapper = nodeSelectionModeActionMapper,
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
             get1On1ChatIdUseCase = get1On1ChatIdUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
@@ -783,13 +777,10 @@ class NodeOptionsActionViewModelTest {
             multipleNodesActionHandlers = emptySet(),
             createShareKeyUseCase = createShareKeyUseCase,
             snackBarHandler = snackBarHandler,
-            cloudDriveOptions = cloudDriveOptions,
-            nodeSelectionModeActionMapper = nodeSelectionModeActionMapper,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
-            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
-            rubbishBinOptions = rubbishBinOptions
+            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode
         )
 
         assertThrows<IllegalArgumentException> {

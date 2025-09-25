@@ -10,6 +10,7 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetActionMapp
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -54,26 +55,23 @@ class NodeOptionsBottomSheetViewModelTest {
 
     private val nodeUiItemMapper: NodeUiItemMapper = mock()
     private val snackbarEventQueue: SnackbarEventQueue = mock()
+    private val nodeMenuProviderRegistry = mock<NodeMenuProviderRegistry>()
 
     @BeforeEach
     fun initViewModel() {
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
+        whenever(nodeMenuProviderRegistry.getBottomSheetOptions(any())).thenReturn(emptySet())
 
         viewModel = NodeOptionsBottomSheetViewModel(
             nodeBottomSheetActionMapper = nodeBottomSheetActionMapper,
-            cloudDriveBottomSheetOptions = { emptySet() },
-            rubbishBinBottomSheetOptions = { emptySet() },
-            incomingSharesBottomSheetOptions = { emptySet() },
-            outgoingSharesBottomSheetOptions = { emptySet() },
-            linksBottomSheetOptions = { emptySet() },
-            backupsBottomSheetOptions = { emptySet() },
             getNodeAccessPermission = getNodeAccessPermission,
             isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             nodeUiItemMapper = nodeUiItemMapper,
-            snackbarEventQueue = snackbarEventQueue
+            snackbarEventQueue = snackbarEventQueue,
+            nodeMenuProviderRegistry = nodeMenuProviderRegistry
         )
     }
 
