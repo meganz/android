@@ -305,7 +305,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 ) { dialog: DialogInterface, item: Int ->
                     viewLifecycleOwner.lifecycleScope.launch {
                         viewModel.initShareKey(node)
-                        NodeController(requireContext()).shareFolder(node, selectedContacts, item)
+                        NodeController(requireActivity()).shareFolder(node, selectedContacts, item)
                         folderHandle = null
                         selectedContacts = null
 
