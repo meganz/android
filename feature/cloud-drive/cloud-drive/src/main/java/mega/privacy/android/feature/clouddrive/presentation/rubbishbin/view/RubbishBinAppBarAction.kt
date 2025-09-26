@@ -7,12 +7,11 @@ import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.icon.pack.IconPack
-import javax.inject.Inject
 
 sealed interface RubbishBinAppBarAction : MenuAction {
-    class Empty @Inject constructor(
-        override val orderInCategory: Int = 95,
-    ) : MenuActionWithIcon {
+    object Empty : MenuActionWithIcon {
+        override val orderInCategory: Int = 95
+
         @Composable
         override fun getIconPainter() =
             rememberVectorPainter(IconPack.Medium.Thin.Outline.X)
@@ -23,9 +22,8 @@ sealed interface RubbishBinAppBarAction : MenuAction {
         override val testTag: String = "rubbish_bin_app_bar:empty_bin"
     }
 
-    class Search @Inject constructor(
-        override val orderInCategory: Int = 95,
-    ) : MenuActionWithIcon {
+    object Search : MenuActionWithIcon {
+        override val orderInCategory: Int = 95
 
         @Composable
         override fun getIconPainter() =
@@ -37,9 +35,8 @@ sealed interface RubbishBinAppBarAction : MenuAction {
         override val testTag: String = "rubbish_bin_app_bar:search"
     }
 
-    class More @Inject constructor(
-        override val orderInCategory: Int = 100,
-    ) : MenuActionWithIcon {
+    object More : MenuActionWithIcon {
+        override val orderInCategory: Int = 100
 
         @Composable
         override fun getIconPainter() =

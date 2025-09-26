@@ -40,10 +40,10 @@ import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 internal fun SharesScreen(
     navigationHandler: NavigationHandler,
     onTransfer: (TransferTriggerEvent) -> Unit,
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel()
 ) {
     val megaNavigator = rememberMegaNavigator()
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
-    val nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel()
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val nodeActionHandler = rememberNodeActionHandler(
         navigationHandler = navigationHandler,

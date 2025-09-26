@@ -61,6 +61,7 @@ import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -214,9 +215,19 @@ internal fun CloudDriveContent(
     HandleNodeOptionEvent(
         megaNavigator = megaNavigator,
         nodeActionState = nodeActionState,
-        nodeOptionsActionViewModel = nodeOptionsActionViewModel,
         nameCollisionLauncher = nameCollisionLauncher,
         snackbarHostState = snackbarHostState,
+        onNodeNameCollisionResultHandled = nodeOptionsActionViewModel::markHandleNodeNameCollisionResult,
+        onInfoToShowEventConsumed = nodeOptionsActionViewModel::onInfoToShowEventConsumed,
+        onForeignNodeDialogShown = nodeOptionsActionViewModel::markForeignNodeDialogShown,
+        onQuotaDialogShown = nodeOptionsActionViewModel::markQuotaDialogShown,
+        onHandleNodesWithoutConflict = { collisionType, nodes ->
+            when (collisionType) {
+                NodeNameCollisionType.MOVE -> nodeOptionsActionViewModel.moveNodes(nodes)
+                NodeNameCollisionType.COPY -> nodeOptionsActionViewModel.copyNodes(nodes)
+                else -> { /* No-op for other types */ }
+            }
+        },
     )
     var visibleNodeOptionId by remember { mutableStateOf(visibleParentNodeOptionId) }
     val nodeOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)

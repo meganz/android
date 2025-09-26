@@ -27,7 +27,7 @@ kotlinx-collections-immutable = "0.3.7"
 commonmark-java = "0.24.0"
 ucropnedit = "4.1.5"
 sqlcipher = "4.9.0"
-
+slack-compose-lints = "1.4.2"
 
 [libraries]
 bannerviewpager = { module = "com.github.zhpanvip:BannerViewPager", version.ref = "bannerviewpager" }
@@ -83,6 +83,7 @@ kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotli
 commonmark-java = {module = "org.commonmark:commonmark", version.ref = "commonmark-java"}
 ucropnedit = { module = "com.github.jens-muenker.mega:ucropnedit", version.ref = "ucropnedit" }
 sqlcipher = { module = "net.zetetic:sqlcipher-android", version.ref = "sqlcipher" }
+slack-compose-lints = { module = "com.slack.lint.compose:compose-lint-checks", version.ref = "slack-compose-lints" }
 
 [bundles]
 logging = ["logging-slf4j", "logging-logback", "logging-timber"]

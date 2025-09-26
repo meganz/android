@@ -70,6 +70,7 @@ internal fun DriveSyncScreen(
     openSearch: (Boolean, Long, NodeSourceType) -> Unit,
     viewModel: DriveSyncViewModel = hiltViewModel(),
     cloudDriveViewModel: CloudDriveViewModel = hiltViewModel(),
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel()
 ) {
     val cloudDriveUiState by cloudDriveViewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -77,7 +78,6 @@ internal fun DriveSyncScreen(
     var showUploadOptionsBottomSheet by remember { mutableStateOf(false) }
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showSyncSettings by rememberSaveable { mutableStateOf(false) }
-    val nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel()
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val nodeActionHandler = rememberNodeActionHandler(
         navigationHandler = navigationHandler,
@@ -236,7 +236,9 @@ internal fun DriveSyncScreen(
     // Handle scan document functionality
     CloudDriveScanDocumentHandler(
         cloudDriveUiState = cloudDriveUiState,
-        cloudDriveViewModel = cloudDriveViewModel,
+        onDocumentScannerFailedToOpen = cloudDriveViewModel::onDocumentScannerFailedToOpen,
+        onGmsDocumentScannerConsumed = cloudDriveViewModel::onGmsDocumentScannerConsumed,
+        onDocumentScanningErrorConsumed = cloudDriveViewModel::onDocumentScanningErrorConsumed,
     )
 
     SyncSettingsBottomSheetViewM3(shouldShowBottomSheet = showSyncSettings) {

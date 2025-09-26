@@ -10,7 +10,7 @@ plugins {
 
 android {
     lint {
-        disable += "CoroutineCreationDuringComposition"
+        disable += listOf("CoroutineCreationDuringComposition", "ComposeUnstableCollections")
         abortOnError = true
     }
     namespace = "mega.privacy.android.feature.clouddrive"
@@ -20,6 +20,7 @@ dependencies {
     preBuiltSdkDependency(rootProject.extra)
 
     lintChecks(project(":lint"))
+    lintChecks(lib.slack.compose.lints)
 
     implementation(project(":core:ui-components:node-components"))
     implementation(project(":core:ui-components:shared-components"))

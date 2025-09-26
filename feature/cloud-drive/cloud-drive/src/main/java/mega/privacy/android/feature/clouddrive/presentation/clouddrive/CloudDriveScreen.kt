@@ -49,11 +49,11 @@ fun CloudDriveScreen(
     onRenameNode: (NodeId) -> Unit,
     openSearch: (Boolean, Long, NodeSourceType) -> Unit,
     viewModel: CloudDriveViewModel = hiltViewModel(),
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showUploadOptionsBottomSheet by remember { mutableStateOf(false) }
     val megaNavigator = rememberMegaNavigator()
-    val nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel()
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val nodeActionHandler = rememberNodeActionHandler(
         navigationHandler = navigationHandler,
@@ -148,6 +148,8 @@ fun CloudDriveScreen(
 
     CloudDriveScanDocumentHandler(
         cloudDriveUiState = uiState,
-        cloudDriveViewModel = viewModel,
+        onDocumentScannerFailedToOpen = viewModel::onDocumentScannerFailedToOpen,
+        onGmsDocumentScannerConsumed = viewModel::onGmsDocumentScannerConsumed,
+        onDocumentScanningErrorConsumed = viewModel::onDocumentScanningErrorConsumed,
     )
 }

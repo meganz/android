@@ -52,6 +52,7 @@ import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -73,12 +74,13 @@ import kotlin.time.Duration.Companion.milliseconds
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RubbishBinScreen(
+internal fun RubbishBinScreen(
     navigationHandler: NavigationHandler,
     onTransfer: (TransferTriggerEvent) -> Unit,
     onFolderClick: (NodeId) -> Unit,
     openSearch: (Boolean, Long) -> Unit,
     viewModel: NewRubbishBinViewModel = hiltViewModel(),
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val megaNavigator = rememberMegaNavigator()
@@ -88,7 +90,6 @@ fun RubbishBinScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = LocalSnackBarHostState.current
     val coroutineScope = rememberCoroutineScope()
-    val nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel()
     val actionHandler: NodeActionHandler = rememberNodeActionHandler(
         viewModel = nodeOptionsActionViewModel,
         navigationHandler = navigationHandler
@@ -154,9 +155,21 @@ fun RubbishBinScreen(
     HandleNodeOptionEvent(
         megaNavigator = megaNavigator,
         nodeActionState = nodeActionState,
-        nodeOptionsActionViewModel = nodeOptionsActionViewModel,
         nameCollisionLauncher = nameCollisionLauncher,
         snackbarHostState = snackbarHostState,
+        onNodeNameCollisionResultHandled = nodeOptionsActionViewModel::markHandleNodeNameCollisionResult,
+        onInfoToShowEventConsumed = nodeOptionsActionViewModel::onInfoToShowEventConsumed,
+        onForeignNodeDialogShown = nodeOptionsActionViewModel::markForeignNodeDialogShown,
+        onQuotaDialogShown = nodeOptionsActionViewModel::markQuotaDialogShown,
+        onHandleNodesWithoutConflict = { collisionType, nodes ->
+            when (collisionType) {
+                NodeNameCollisionType.MOVE -> nodeOptionsActionViewModel.moveNodes(nodes)
+                NodeNameCollisionType.COPY -> nodeOptionsActionViewModel.copyNodes(nodes)
+                else -> {
+                    /* No-op for other types */
+                }
+            }
+        },
     )
 
     MegaScaffoldWithTopAppBarScrollBehavior(
@@ -186,7 +199,7 @@ fun RubbishBinScreen(
                     },
                     maxActionsToShow = if (isRootDirectory) 1 else 2,
                     actions = buildList {
-                        add(MenuActionIconWithClick(RubbishBinAppBarAction.Search()) {
+                        add(MenuActionIconWithClick(RubbishBinAppBarAction.Search) {
                             openSearch(
                                 isRootDirectory,
                                 uiState.currentFolderId.longValue,
@@ -194,13 +207,13 @@ fun RubbishBinScreen(
                         })
                         if (isRootDirectory) {
                             add(
-                                MenuActionIconWithClick(RubbishBinAppBarAction.Empty()) {
+                                MenuActionIconWithClick(RubbishBinAppBarAction.Empty) {
                                     showClearRubbishBinDialog = true
                                 },
                             )
                         } else {
                             add(
-                                MenuActionIconWithClick(RubbishBinAppBarAction.More()) {
+                                MenuActionIconWithClick(RubbishBinAppBarAction.More) {
                                     visibleNodeOptionId = uiState.currentFolderId
                                 },
                             )

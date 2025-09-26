@@ -25,3 +25,4 @@ fun NavGraphBuilder.searchLegacyDestination(
         }
     }
 }
+

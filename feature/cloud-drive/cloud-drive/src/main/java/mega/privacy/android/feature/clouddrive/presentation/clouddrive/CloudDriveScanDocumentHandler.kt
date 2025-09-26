@@ -22,11 +22,18 @@ import timber.log.Timber
 
 /**
  * Shared component for handling scan document functionality in Cloud Drive screens
+ *
+ * @param cloudDriveUiState Current UI state containing scanner and error information
+ * @param onDocumentScannerFailedToOpen Callback when document scanner fails to open
+ * @param onGmsDocumentScannerConsumed Callback when GMS document scanner is consumed
+ * @param onDocumentScanningErrorConsumed Callback when document scanning error is acknowledged
  */
 @Composable
 fun CloudDriveScanDocumentHandler(
     cloudDriveUiState: CloudDriveUiState,
-    cloudDriveViewModel: CloudDriveViewModel,
+    onDocumentScannerFailedToOpen: () -> Unit,
+    onGmsDocumentScannerConsumed: () -> Unit,
+    onDocumentScanningErrorConsumed: () -> Unit,
 ) {
     val context = LocalContext.current
     val activity = LocalActivity.current
@@ -76,10 +83,10 @@ fun CloudDriveScanDocumentHandler(
                             exception,
                             "An error occurred when attempting to run the ML Kit Document Scanner from Cloud Drive",
                         )
-                        cloudDriveViewModel.onDocumentScannerFailedToOpen()
+                        onDocumentScannerFailedToOpen()
                     }
             }
-            cloudDriveViewModel.onGmsDocumentScannerConsumed()
+            onGmsDocumentScannerConsumed()
         }
     }
 
@@ -87,8 +94,8 @@ fun CloudDriveScanDocumentHandler(
     cloudDriveUiState.documentScanningError?.let { errorType ->
         CloudDriveDocumentScanningErrorDialog(
             documentScanningError = errorType,
-            onErrorAcknowledged = cloudDriveViewModel::onDocumentScanningErrorConsumed,
-            onErrorDismissed = cloudDriveViewModel::onDocumentScanningErrorConsumed
+            onErrorAcknowledged = onDocumentScanningErrorConsumed,
+            onErrorDismissed = onDocumentScanningErrorConsumed
         )
     }
 }
