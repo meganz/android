@@ -650,8 +650,9 @@ class FolderLinkViewModelTest {
         val rootNode = mock<TypedFolderNode>()
         val childNode = mock<TypedFileNode>()
         val childrenNodes = listOf(childNode)
+        val importNode = mock<TypedFolderNode>()
         val node =
-            NodeUIItem<TypedNode>(mock<TypedFolderNode>(), isSelected = false, isInvisible = false)
+            NodeUIItem<TypedNode>(importNode, isSelected = false, isInvisible = false)
         val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
             on { this.rootNode }.thenReturn(rootNode)
             on { this.childrenNodes }.thenReturn(childrenNodes)
@@ -665,7 +666,7 @@ class FolderLinkViewModelTest {
             underTest.handleImportClick(node)
             val newValue = expectMostRecentItem()
             assertThat(newValue.selectImportLocation).isEqualTo(triggered)
-            assertThat(newValue.importNode).isEqualTo(node)
+            assertThat(newValue.importNode).isEqualTo(importNode)
         }
     }
 

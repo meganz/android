@@ -5,8 +5,8 @@ import androidx.annotation.StringRes
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusDialogState
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusDialogState
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -61,7 +61,7 @@ data class FolderLinkState(
     val currentViewType: ViewType = ViewType.LIST,
     val title: String = "",
     val selectedNodeCount: Int = 0,
-    val importNode: NodeUIItem<TypedNode>? = null,
+    val importNode: TypedNode? = null,
     @StringRes val snackBarMessage: Int = -1,
     val moreOptionNode: NodeUIItem<TypedNode>? = null,
     val storageStatusDialogState: StorageStatusDialogState? = null,

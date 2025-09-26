@@ -216,7 +216,7 @@ internal fun FolderLinkView(
                                 .height(48.dp)
                                 .background(MaterialTheme.colors.grey_020_grey_700),
                             hasDbCredentials = state.hasDbCredentials,
-                            onImportClicked = onImportClicked,
+                            onImportClicked = { onImportClicked(null) },
                             onSaveToDeviceClicked = { onSaveToDeviceClicked(null) }
                         )
                     }

@@ -686,8 +686,10 @@ class FolderLinkViewModel @Inject constructor(
      * @param node  Node for which import is clicked
      */
     fun handleImportClick(node: NodeUIItem<TypedNode>?) {
-        state.value.rootNode?.let {
-            _state.update { it.copy(importNode = node, selectImportLocation = triggered) }
+        (node?.node
+            ?: state.value.parentNode
+            ?: state.value.rootNode)?.let { importNode ->
+            _state.update { it.copy(importNode = importNode, selectImportLocation = triggered) }
         }
     }
 
