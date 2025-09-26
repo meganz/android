@@ -373,7 +373,7 @@
     <!-- Step 1: instruction step no.1 to Open the settings App to cancel the subscription from iOS device-->
     <string name="account_cancellation_instructions_open_settings">1. [A]Ayarlar[/A] uygulamasını açın.</string>
     <!-- Step 2: instruction step no.2 to Tap on the name in the iOS device-->
-    <string name="account_cancellation_instructions_tap_on_name">2. Adınıza dokunun.</string>
+    <string name="account_cancellation_instructions_tap_on_name">2. İsminize dokunun.</string>
     <!-- Step 3: instruction step no.3 to Select subscriptions section in the iOS device-->
     <string name="account_cancellation_instructions_select_subscriptions">3. [A]Abonelikler[/A]’e dokunun.</string>
     <!-- Step 4: instruction step no.4 to Select MEGA subscription in the iOS device -->
@@ -423,7 +423,7 @@
     <!-- Dialog cancel option -->
     <string name="general_dialog_cancel_button">İptal</string>
     <!-- Create new folder dialog error message shown when the user tries to an empty folder name -->
-    <string name="create_new_folder_dialog_error_message_empty_folder_name">Bir klasör ismi girin</string>
+    <string name="create_new_folder_dialog_error_message_empty_folder_name">Bir klasör adı girin</string>
     <!-- Create new folder dialog error message shown when folder cannot be created because there is already one with the same name -->
     <string name="create_new_folder_dialog_error_existing_folder">Aynı ada sahip bir klasör zaten mevcut</string>
     <!-- Error message when the user writes a character not allowed for naming a file or folder -->
@@ -939,9 +939,9 @@
     <!-- Snackbar text to inform the user that download started -->
     <string name="transfers_download_started_snackbar">İndirme başladı. Ayrıntılar için bildirime bakın.</string>
     <!--Sign Up page text field input first name error message when empty-->
-    <string name="sign_up_first_name_text_field_error_message">Bir ad girin</string>
+    <string name="sign_up_first_name_text_field_error_message">Bir isim girin</string>
     <!--Sign Up page text field input last name error message when empty-->
-    <string name="sign_up_last_name_text_field_error_message">Bir soyadı girin</string>
+    <string name="sign_up_last_name_text_field_error_message">Bir soy ismi girin</string>
     <!--Sign Up page text field input email error message when more than 190 characters-->
     <string name="sign_up_email_text_field_char_limit_exceed_error">190 karakter veya daha az olmalıdır</string>
     <!--Sign Up page message to be shown when password is less than 8 characters-->
@@ -1184,9 +1184,9 @@
     <!-- text of how it works for mega pass free trial in achivements section -->
     <string name="text_how_it_works_mega_pass_free_trial">MEGA&#160;Pass uygulamasını yükleyin, MEGA hesabınızla giriş yapın ve ücretsiz denemenizi başlatın. Ücretsiz denemenize başladıktan sonra bonus depolama alanınız otomatik olarak eklenir.</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">MEGA&#160;VPN ücretsiz deneme sürümünü başlattığınız için %1$s depolama alanı aldınız</string>
+    <string name="text_received_mega_vpn_free_trial">MEGA&#160;VPN ücretsiz denemesini başlattığınız için %1$s depolama alanı aldınız</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">MEGA&#160;Pass ücretsiz deneme sürümünü başlattığınız için %1$s depolama alanı aldınız</string>
+    <string name="text_received_mega_pass_free_trial">MEGA&#160;Pass ücretsiz denemesini başlattığınız için %1$s depolama alanı aldınız</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">Bazı klasörler senkronize edilemez veya yedeklenemez çünkü MEGA uygulaması, yerel klasörlere erişim izinlerini kaybetti. Her etkilenen klasör için izinleri yeniden eklemek üzere Devam ettir’e dokunun.</string>
     <!-- Title for the free plan card when the user is an existing account -->
@@ -1608,7 +1608,7 @@
         <item quantity="other">%d öğe geri yüklendi ancak 1 öğe geri yüklenemedi. Daha sonra tekrar deneyin.</item>
     </plurals>
     <!-- category in sort by action to sort by name -->
-    <string name="action_sort_by_name">İsim</string>
+    <string name="action_sort_by_name">Ad</string>
     <!-- category in sort by action to sort by file size -->
     <string name="action_sort_by_size">Boyut</string>
     <!-- category in sort by action to sort by modified date -->
@@ -1632,5 +1632,58 @@
     <!-- Snackbar message when retry success on failed transfers tab, plural form. -->
     <string name="transfers_retry_feedback_snackbar_message_plural">Aktarımlar yeniden deniyor, ilerlemeyi Etkin sekmesinde görebilirsiniz</string>
     <!--Default file name for scanned documents. Placeholder value is for the current date and time values eg:   Scanned_2025091120323.  -->
-    <string name="document_scanning_default_file_name">Taranan_%1$tY%1$tm%1$td%1$tH%1$tM%1$tS</string>
+    <string name="document_scanning_default_file_name">Taranmış_%1$s</string>
+    <!-- Benefit: Rewind up to specified days of deleted data -->
+    <string name="pro_plan_benefit_rewind_days">Silinen verileri %1$d güne kadar geri sarma imkanı</string>
+    <!-- Error message when removing 1 or more public links from nodes. -->
+    <string name="public_link_node_removal_error_message">Bağlantı kaldırma başarısız oldu, daha sonra tekrar deneyin</string>
+    <!-- Warning that appears prior to remove links of files-->
+    <string name="remove_links_warning_message">Bir bağlantıyı kaldırmak, içeriğinin artık herkese açık olmayacağı anlamına gelir</string>
+    <!-- Success message after removing a share of a folder. a contact has no access to the folder now -->
+    <string name="stop_sharing_folder_success_message">Klasör paylaşımı durduruldu</string>
+    <!-- Positive button text for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="stop_sharing_dialog_positive_button_text">Paylaşımı durdur</string>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <string name="leave_shared_folder_failed_message">Bir veya daha fazla paylaşılan klasörden çıkılamadı</string>
+    <!-- Confirmation message before leaving incoming shared folders -->
+    <string name="leave_shared_folder_confirmation_message">Paylaşılan bir klasörden ayrılmak, onu bir daha göremeyeceğiniz anlamına gelir</string>
+    <!-- Message when a single public link is removed successfully. -->
+    <string name="link_removed_success_message">Bağlantı kaldırıldı</string>
+    <!-- Message when a single public link is removed successfully. -->
+    <string name="links_removed_success_message">Bağlantılar kaldırıldı</string>
+    <!--Alert warning shown to the user when attempting to remove sharing from 1 or more folders-->
+    <string name="stop_sharing_dialog_title">Bu klasörü paylaşmayı durdurmak istiyor musunuz?</string>
+    <!--Alert warning shown to the user when attempting to remove sharing from multiple folders-->
+    <string name="stop_sharing_dialog_title_plurals">Bu klasörleri paylaşmayı durdurmak istiyor musunuz?</string>
+    <!-- Title of the dialog to choose permissions when sharing. -->
+    <string name="share_folder_dialog_choose_permission_title">İzni seçin</string>
+    <!-- Refers to access rights for a file folder. -->
+    <string name="share_folder_dialog_full_access_radio_option">Tam erişim</string>
+    <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
+    <string name="share_folder_dialog_read_only_radio_option">Salt okunur</string>
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
+    <string name="share_folder_dialog_read_write_radio_option">Okuma ve yazma</string>
+    <!-- Text shown in the app bar when nodes are being selected in selection mode -->
+    <string name="app_bar_selection_mode_description">Seçiliyor</string>
+    <!-- success message when moving a node -->
+    <string name="node_moved_success_message">Öğe taşındı</string>
+    <!-- success message when a node was restore from Rubbish bin to a location -->
+    <string name="node_restored_from_rubbish_bin_to_location">%s geri yüklendi</string>
+    <!-- error message when a node failed to be restored from Rubbish bin -->
+    <string name="node_restore_error_message">Bir hata oluştu. Öğe geri yüklenemedi.</string>
+    <!-- Snackbar message to show when successfully left shared folder(s) along with one or more failures -->
+    <plurals name="leave_shared_folder_partial_success_snackbar_message">
+        <item quantity="one">%1$d adet paylaşılan klasörden çıkıldı, ancak bir veya daha fazla klasörden çıkılamadı</item>
+        <item quantity="other">%1$d adet paylaşılan klasörden çıkıldı, ancak bir veya daha fazla klasörden çıkılamadı</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
+    <plurals name="node_restored_from_rubbish_bin_success_message">
+        <item quantity="one">%d öğe geri yüklendi</item>
+        <item quantity="other">%d öğe geri yüklendi</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
+    <plurals name="node_restored_from_rubbish_bin_error_message">
+        <item quantity="one">%d öğe geri yüklenemedi</item>
+        <item quantity="other">%d öğe geri yüklenemedi</item>
+    </plurals>
 </resources>

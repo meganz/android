@@ -325,7 +325,7 @@
     <!-- Rewind duration available in the free plan -->
     <string name="account_cancel_account_screen_plan_rewind_free">最多30天（僅能檢視）</string>
     <!-- Rewind duration available in the current plan. %1s represents the number of days. -->
-    <string name="account_cancel_account_screen_plan_rewind_current">長達%1s天</string>
+    <string name="account_cancel_account_screen_plan_rewind_current">最多%1s天</string>
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
@@ -1457,7 +1457,7 @@
         <item quantity="other"></item>
     </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="context_share_correctly_removed">Access removed</string>
+    <string name="context_share_correctly_removed">已移除存取權限</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">是</string>
     <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1505,7 +1505,7 @@
     <!-- dialog option continue in alert dialog -->
     <string name="button_continue">繼續</string>
     <!--Dialog title when the user selected is not on the contact list when sharing a node -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Can’t verify contact</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">無法驗證聯絡人</string>
     <!--Dialog description when the user selected is not on the contact list when sharing a node -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">您無法驗證%s，因為他們不在您的聯絡人列表中。請先等待他們接受您的邀請。</string>
     <!-- Answer for confirmation dialog. -->
@@ -1583,7 +1583,7 @@
     <!-- category in sort by action to sort by node label name -->
     <string name="action_sort_by_label">標籤</string>
     <!-- category in sort by action to sort by favorite -->
-    <string name="action_sort_by_favorite">收藏</string>
+    <string name="action_sort_by_favorite">我的最愛</string>
     <!-- category in sort by action to sort by link creation date -->
     <string name="action_sort_by_link">連結</string>
     <!-- Header of action to sort nodes -->
@@ -1597,5 +1597,55 @@
     <!-- Snackbar message when retry success on failed transfers tab, plural form. -->
     <string name="transfers_retry_feedback_snackbar_message_plural">正在重試傳輸，請查看進行中的傳輸分頁瞭解進度</string>
     <!--Default file name for scanned documents. Placeholder value is for the current date and time values eg:   Scanned_2025091120323.  -->
-    <string name="document_scanning_default_file_name">Scanned_%1$s</string>
+    <string name="document_scanning_default_file_name">掃描_%1$s</string>
+    <!-- Benefit: Rewind up to specified days of deleted data -->
+    <string name="pro_plan_benefit_rewind_days">最多可回溯%1$d天內刪除的資料</string>
+    <!-- Error message when removing 1 or more public links from nodes. -->
+    <string name="public_link_node_removal_error_message">連結移除失敗，請稍後重試</string>
+    <!-- Warning that appears prior to remove links of files-->
+    <string name="remove_links_warning_message">移除連結意味著其內容將不再公開</string>
+    <!-- Success message after removing a share of a folder. a contact has no access to the folder now -->
+    <string name="stop_sharing_folder_success_message">已停止資料夾共享</string>
+    <!-- Positive button text for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="stop_sharing_dialog_positive_button_text">停止共享</string>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <string name="leave_shared_folder_failed_message">無法離開一個或多個共享資料夾</string>
+    <!-- Confirmation message before leaving incoming shared folders -->
+    <string name="leave_shared_folder_confirmation_message">離開共享資料夾意味著您無法再看到它</string>
+    <!-- Message when a single public link is removed successfully. -->
+    <string name="link_removed_success_message">連結已移除</string>
+    <!-- Message when a single public link is removed successfully. -->
+    <string name="links_removed_success_message">已移除連結</string>
+    <!--Alert warning shown to the user when attempting to remove sharing from 1 or more folders-->
+    <string name="stop_sharing_dialog_title">停止共享此資料夾嗎？</string>
+    <!--Alert warning shown to the user when attempting to remove sharing from multiple folders-->
+    <string name="stop_sharing_dialog_title_plurals">停止共享這些資料夾嗎？</string>
+    <!-- Title of the dialog to choose permissions when sharing. -->
+    <string name="share_folder_dialog_choose_permission_title">選擇權限</string>
+    <!-- Refers to access rights for a file folder. -->
+    <string name="share_folder_dialog_full_access_radio_option">完全存取</string>
+    <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
+    <string name="share_folder_dialog_read_only_radio_option">僅能閱讀</string>
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
+    <string name="share_folder_dialog_read_write_radio_option">讀取與編輯</string>
+    <!-- Text shown in the app bar when nodes are being selected in selection mode -->
+    <string name="app_bar_selection_mode_description">選擇</string>
+    <!-- success message when moving a node -->
+    <string name="node_moved_success_message">已移動項目</string>
+    <!-- success message when a node was restore from Rubbish bin to a location -->
+    <string name="node_restored_from_rubbish_bin_to_location">恢復至%s</string>
+    <!-- error message when a node failed to be restored from Rubbish bin -->
+    <string name="node_restore_error_message">發生錯誤。項目無法還原。</string>
+    <!-- Snackbar message to show when successfully left shared folder(s) along with one or more failures -->
+    <plurals name="leave_shared_folder_partial_success_snackbar_message">
+        <item quantity="other">已離開%1$d個共享資料夾，但無法離開一個或多個資料夾</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
+    <plurals name="node_restored_from_rubbish_bin_success_message">
+        <item quantity="other">已恢復%d個項目</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
+    <plurals name="node_restored_from_rubbish_bin_error_message">
+        <item quantity="other">未恢復%d個項目</item>
+    </plurals>
 </resources>

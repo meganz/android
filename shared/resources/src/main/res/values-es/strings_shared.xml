@@ -1087,7 +1087,7 @@
     <!-- Possible state of a transfer. When the transfer was cancelled -->
     <string name="transfers_section_cancelled">Cancelada</string>
     <!-- Title of the tab section for active transfers -->
-    <string name="transfers_section_tab_title_active_transfers">Activa</string>
+    <string name="transfers_section_tab_title_active_transfers">Activas</string>
     <!-- Title of the tab section for failed transfers -->
     <string name="transfers_section_tab_title_failed_transfers">Fallidas</string>
     <!--Text for showing the empty state when there are no transfers. The [A][/A] format marks are to put the text in a different color and style.-->
@@ -1413,7 +1413,7 @@
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_last_modified_file_explanation">El archivo actualizado más recientemente reemplazará al anterior en ambas ubicaciones</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict</string>
+    <string name="sync_stalled_issue_general_explanation">Esta acción se aplicará para resolver el conflicto</string>
     <!-- Dialog choose option -->
     <string name="general_dialog_choose_button">Seleccionar</string>
     <!-- Text label of Apply to all -->
@@ -1463,17 +1463,18 @@
     <!--Sign Up page text field input last name error message when character limit exceeded-->
     <string name="sign_up_last_name_text_field_char_limit_exceed_error">Los apellidos no pueden superar los 40 caracteres</string>
     <!-- Error message when IP has already sent an issue report and needs to wait -->
-    <string name="report_issue_too_many_times_error">You’ve already sent an issue report within the last 10 minutes. Please wait before trying again, or contact %1$s for assistance.</string>
+    <string name="report_issue_too_many_times_error">Ya has enviado un reporte de problemas en los últimos 10 minutos. Espera antes de volver a intentarlo o contacta %1$s para obtener ayuda.</string>
     <!-- The snackbar message for informing the user about the invitation is trying to sent, is already in the received contact requests because the user already invited them. -->
-    <string name="contacts_invite_already_received">This user has already sent you an invitation</string>
+    <string name="contacts_invite_already_received">Ese usuario ya te ha enviado una invitación</string>
     <!-- The snackbar message for informing the user about the invitations is trying to sent, are already in the received contact requests because the users already invited them. -->
-    <string name="contacts_invites_already_received">All the people you invited have already sent you an invitation</string>
+    <string name="contacts_invites_already_received">Todas las personas a las que has invitado ya te han enviado una invitación</string>
     <!-- The snackbar message for informing the user about the invitations are correctly sent. -->
-    <string name="contacts_invites_sent">Invitation sent. They’ll appear in Contacts once accepted.</string>
+    <string name="contacts_invites_sent">Invitación enviada. Aparecerá en Contactos una vez que se acepte.</string>
     <!-- The snackbar message for informing the user about some invitations correctly sent, but not others because they are already in the received contact requests because the users already invited them. -->
     <plurals name="contacts_invites_sent_but_others_already_received">
-        <item quantity="one">%1$d user invited, but one or more users have already invited you</item>
-        <item quantity="other">%1$d users invited, but one or more users have already invited you</item>
+        <item quantity="one">%1$d usuario invitado, pero uno o más usuarios ya te han invitado</item>
+        <item quantity="many">%1$d DE usuarios invitados, pero uno o más usuarios ya te han invitado</item>
+        <item quantity="other">%1$d usuarios invitados, pero uno o más usuarios ya te han invitado</item>
     </plurals>
     <!--  Error shown when the user tries to resend the sign up link multiple times at once. -->
     <string name="resend_signup_link_error">Correo electrónico ya enviado. Espera unos minutos antes de volver a intentarlo.</string>
@@ -1500,7 +1501,7 @@
         <item quantity="other"></item>
     </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="context_share_correctly_removed">Access removed</string>
+    <string name="context_share_correctly_removed">Acceso revocado</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Sí</string>
     <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1513,8 +1514,9 @@
     </plurals>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
-        <item quantity="one">This folder is shared with %1$d contact. Stop sharing?</item>
-        <item quantity="other">This folder is shared with %1$d contacts. Stop sharing?</item>
+        <item quantity="one">Esta carpeta se ha compartido con %1$d contacto. ¿Dejar de compartir?</item>
+        <item quantity="many">Esta carpeta se ha compartido con %1$d de contactos. ¿Dejar de compartir?</item>
+        <item quantity="other">Esta carpeta se ha compartido con %1$d contactos. ¿Dejar de compartir?</item>
     </plurals>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
     <plurals name="alert_remove_several_shares">
@@ -1523,37 +1525,37 @@
         <item quantity="other"></item>
     </plurals>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
-    <string name="figures_storage_referrals_achievements_text">%1$s extra storage for each invitation, valid for %2$d days</string>
+    <string name="figures_storage_referrals_achievements_text">%1$s de almacenamiento adicional por cada invitación, válido durante %2$d días</string>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with permanent valid duration -->
-    <string name="figures_storage_referrals_achievements_text_permanent">%1$s extra storage for each invitation, valid permanently</string>
+    <string name="figures_storage_referrals_achievements_text_permanent">%1$s de almacenamiento adicional para cada invitación, válido de forma permanente</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement with dynamic valid duration -->
-    <string name="figures_storage_achievements_text">%1$s extra storage, valid for %2$d days</string>
+    <string name="figures_storage_achievements_text">%1$s de almacenamiento adicional, válido durante %2$d días</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement with permanent valid duration -->
-    <string name="figures_storage_achievements_text_permanent">%1$s extra storage, valid permanently</string>
+    <string name="figures_storage_achievements_text_permanent">%1$s de almacenamiento adicional, válido de forma permanente</string>
     <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with dynamic valid duration -->
-    <string name="figures_storage_achievements_awarded_text">%1$s storage bonus applied, valid for %2$d days</string>
+    <string name="figures_storage_achievements_awarded_text">Bono de %1$s de almacenamiento aplicado, válido durante %2$d días</string>
     <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with permanent valid duration -->
-    <string name="figures_storage_achievements_awarded_text_permanent">%1$s storage bonus applied, valid permanently</string>
+    <string name="figures_storage_achievements_awarded_text_permanent">Bono de %1$s de almacenamiento aplicado, válido de forma permanente</string>
     <!-- info paragraph about the achievement install megasync with dynamic valid duration -->
-    <string name="paragraph_info_achievement_install_desktop_dynamic_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid for %2$s days. The desktop app is available for Windows, macOS and Linux.</string>
+    <string name="paragraph_info_achievement_install_desktop_dynamic_duration">Instala la aplicación de escritorio de MEGA y obtén %1$s de espacio de almacenamiento adicional gratuito, válido durante %2$s días. La aplicación de escritorio está disponible para Windows, macOS y Linux.</string>
     <!-- info paragraph about the achievement install megasync with permanent valid duration -->
-    <string name="paragraph_info_achievement_install_desktop_permanent_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid permanently. The desktop app is available for Windows, macOS and Linux.</string>
+    <string name="paragraph_info_achievement_install_desktop_permanent_duration">Instala la aplicación de escritorio de MEGA y obtén %1$s de espacio de almacenamiento adicional gratuito, válido de forma permanente. La aplicación de escritorio está disponible para Windows, macOS y Linux.</string>
     <!-- info paragraph about the achievement install mobile app with dynamic valid duration -->
-    <string name="paragraph_info_achievement_install_mobile_app_dynamic_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid for %2$s days. The mobile apps are available for iOS and Android.</string>
+    <string name="paragraph_info_achievement_install_mobile_app_dynamic_duration">Instala una de las aplicaciones móviles de MEGA y obtén %1$s de espacio de almacenamiento adicional gratuito, válido durante %2$s días. La aplicación móvil está disponible para iOS y Android.</string>
     <!-- info paragraph about the achievement install mobile app with permanent valid duration -->
-    <string name="paragraph_info_achievement_install_mobile_app_permanent_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid permanently. The mobile apps are available for iOS and Android.</string>
+    <string name="paragraph_info_achievement_install_mobile_app_permanent_duration">Instala la aplicación móvil de MEGA y obtén %1$s de espacio de almacenamiento adicional gratuito, válido de forma permanente. La aplicación móvil está disponible para iOS y Android.</string>
     <!-- Share multi backup folders, show below warning message -->
-    <string name="backup_multi_share_permission_text">These are backup folders and can only be shared as read-only</string>
+    <string name="backup_multi_share_permission_text">Las carpetas de backup solo pueden ser compartidas como de solo lectura</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_share_permission_text">This is a backup folder and can only be shared as read-only</string>
+    <string name="backup_share_permission_text">Esta es una carpeta de backup y solo se puede compartir como de solo lectura</string>
     <!-- Button to confirm the action of restarting one transfer-->
     <string name="button_permission_info">Entendido</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_share_permission_title">Backup folders are read-only</string>
+    <string name="backup_share_permission_title">Las carpetas de backup son de solo lectura</string>
     <!-- dialog option continue in alert dialog -->
     <string name="button_continue">Continuar</string>
     <!--Dialog title when the user selected is not on the contact list when sharing a node -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Can’t verify contact</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">No se puede verificar el contacto</string>
     <!--Dialog description when the user selected is not on the contact list when sharing a node -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">No se puede verificar %s porque no está en tu lista de contactos. Espera a que acepte tu invitación primero.</string>
     <!-- Answer for confirmation dialog. -->
@@ -1601,7 +1603,7 @@
     <!-- Text shown in the app bar when nodes are being selected in selection mode -->
     <string name="general_selecting">Selecting</string>
     <!-- Snackbar message when retry failed on failed transfers tab. -->
-    <string name="transfers_retry_failed_snackbar_message">Unable to restart transfers</string>
+    <string name="transfers_retry_failed_snackbar_message">No se pueden reiniciar las transferencias</string>
     <!-- Action for the Snackbar when retry failed on failed transfers tab. -->
     <string name="transfers_retry_failed_snackbar_action">Reintentar</string>
     <!-- Snackbar message when retry success on failed transfers tab. -->
@@ -1630,13 +1632,15 @@
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item restored but %d item wasn’t restored. Try again later.</item>
-        <item quantity="other">1 item restored but %d items weren’t restored. Try again later.</item>
+        <item quantity="one">Se ha restaurado 1 elemento pero %d elemento no se ha podido restaurar. Inténtalo más tarde.</item>
+        <item quantity="many">Se ha restaurado 1 elemento pero otros %d no se han podido restaurar. Inténtalo más tarde.</item>
+        <item quantity="other">Se ha restaurado 1 elemento pero otros %d no se han podido restaurar. Inténtalo más tarde.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
-        <item quantity="one">%d item restored but 1 item wasn’t restored. Try again later.</item>
-        <item quantity="other">%d items restored but 1 item wasn’t restored. Try again later.</item>
+        <item quantity="one">Se ha restaurado %d elemento pero 1 elemento no se ha podido restaurar. Inténtalo más tarde.</item>
+        <item quantity="many">Se han restaurado %d de elementos pero 1 elemento no se ha podido restaurar. Inténtalo más tarde.</item>
+        <item quantity="other">Se han restaurado %d elementos pero 1 elemento no se ha podido restaurar. Inténtalo más tarde.</item>
     </plurals>
     <!-- category in sort by action to sort by name -->
     <string name="action_sort_by_name">Nombre</string>
@@ -1649,7 +1653,7 @@
     <!-- category in sort by action to sort by node label name -->
     <string name="action_sort_by_label">Etiqueta</string>
     <!-- category in sort by action to sort by favorite -->
-    <string name="action_sort_by_favorite">Favorite</string>
+    <string name="action_sort_by_favorite">Favorito</string>
     <!-- category in sort by action to sort by link creation date -->
     <string name="action_sort_by_link">Enlace</string>
     <!-- Header of action to sort nodes -->
@@ -1659,9 +1663,64 @@
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <string name="general_links_copied_clipboard">Enlaces copiados al portapapeles</string>
     <!-- Snackbar message when retry success on failed transfers tab, singular form. -->
-    <string name="transfers_retry_feedback_snackbar_message_singular">Retrying transfer, see the Active tab for progress</string>
+    <string name="transfers_retry_feedback_snackbar_message_singular">Reintentando transferencia, consulta la pestaña Activas para ver el progreso</string>
     <!-- Snackbar message when retry success on failed transfers tab, plural form. -->
-    <string name="transfers_retry_feedback_snackbar_message_plural">Retrying transfers, see the Active tab for progress</string>
+    <string name="transfers_retry_feedback_snackbar_message_plural">Reintentando transferencias, consulta la pestaña Activas para ver el progreso</string>
     <!--Default file name for scanned documents. Placeholder value is for the current date and time values eg:   Scanned_2025091120323.  -->
-    <string name="document_scanning_default_file_name">Scanned_%1$s</string>
+    <string name="document_scanning_default_file_name">Escaneado_%1$s</string>
+    <!-- Benefit: Rewind up to specified days of deleted data -->
+    <string name="pro_plan_benefit_rewind_days">Rewind up to %1$d days of deleted data</string>
+    <!-- Error message when removing 1 or more public links from nodes. -->
+    <string name="public_link_node_removal_error_message">Link removal failed, try again later</string>
+    <!-- Warning that appears prior to remove links of files-->
+    <string name="remove_links_warning_message">Removing a link means its contents won’t be publicly accessible anymore</string>
+    <!-- Success message after removing a share of a folder. a contact has no access to the folder now -->
+    <string name="stop_sharing_folder_success_message">Folder sharing stopped</string>
+    <!-- Positive button text for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="stop_sharing_dialog_positive_button_text">Dejar de compartir</string>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <string name="leave_shared_folder_failed_message">Couldn’t leave one or more shared folders</string>
+    <!-- Confirmation message before leaving incoming shared folders -->
+    <string name="leave_shared_folder_confirmation_message">Leaving a shared folder means you won’t be able to see it again</string>
+    <!-- Message when a single public link is removed successfully. -->
+    <string name="link_removed_success_message">Enlace eliminado</string>
+    <!-- Message when a single public link is removed successfully. -->
+    <string name="links_removed_success_message">Enlaces eliminados</string>
+    <!--Alert warning shown to the user when attempting to remove sharing from 1 or more folders-->
+    <string name="stop_sharing_dialog_title">Stop sharing this folder?</string>
+    <!--Alert warning shown to the user when attempting to remove sharing from multiple folders-->
+    <string name="stop_sharing_dialog_title_plurals">Stop sharing these folders?</string>
+    <!-- Title of the dialog to choose permissions when sharing. -->
+    <string name="share_folder_dialog_choose_permission_title">Choose permissions</string>
+    <!-- Refers to access rights for a file folder. -->
+    <string name="share_folder_dialog_full_access_radio_option">Acceso completo</string>
+    <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
+    <string name="share_folder_dialog_read_only_radio_option">Solo lectura</string>
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
+    <string name="share_folder_dialog_read_write_radio_option">Lectura y escritura</string>
+    <!-- Text shown in the app bar when nodes are being selected in selection mode -->
+    <string name="app_bar_selection_mode_description">Selecting</string>
+    <!-- success message when moving a node -->
+    <string name="node_moved_success_message">Elemento movido</string>
+    <!-- success message when a node was restore from Rubbish bin to a location -->
+    <string name="node_restored_from_rubbish_bin_to_location">Restaurado a %s</string>
+    <!-- error message when a node failed to be restored from Rubbish bin -->
+    <string name="node_restore_error_message">Se ha producido un error. El elemento no se ha podido restaurar.</string>
+    <!-- Snackbar message to show when successfully left shared folder(s) along with one or more failures -->
+    <plurals name="leave_shared_folder_partial_success_snackbar_message">
+        <item quantity="one">Left %1$d shared folder, but couldn’t leave one or more folders</item>
+        <item quantity="other">Left %1$d shared folders, but couldn’t leave one or more folders</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
+    <plurals name="node_restored_from_rubbish_bin_success_message">
+        <item quantity="one">Se ha restaurado %d elemento</item>
+        <item quantity="many">Se han restaurado %d de elementos</item>
+        <item quantity="other">Se han restaurado %d elementos</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
+    <plurals name="node_restored_from_rubbish_bin_error_message">
+        <item quantity="one">No se ha podido restaurar %d elemento</item>
+        <item quantity="many">No se han podido restaurar %d de elementos</item>
+        <item quantity="other">No se han podido restaurar %d elementos</item>
+    </plurals>
 </resources>

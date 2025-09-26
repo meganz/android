@@ -1035,8 +1035,6 @@
     <string name="transfer_completing">완료중</string>
     <!-- Possible state of a transfer. When the transfer is retrying -->
     <string name="transfer_retrying">재시도중</string>
-    <!-- Possible state of a transfer. When the transfer was cancelled -->
-    <string name="transfer_cancelled">취소됨</string>
     <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
     <string name="upload_service_notification">파일 업로드 중: %2$d 중 %1$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->

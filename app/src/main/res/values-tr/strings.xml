@@ -153,9 +153,9 @@
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Onay bağlantınız artık geçerli değil. Hesabınız zaten etkinleştirilmiş veya kaydınızı iptal etmiş olabilirsiniz.</string>
     <!-- First Name of the user -->
-    <string name="first_name_text">Ad</string>
+    <string name="first_name_text">İsim</string>
     <!-- Last name of the user -->
-    <string name="lastname_text">Soyad</string>
+    <string name="lastname_text">Soy isim</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">[B]Şifremi kaybedersem verilerimi de kaybedebileceğimi[/B] anlıyorum. [A]MEGA’nın uçtan uca şifrelemesi[/A] hakkında daha fazlasını öğrenin.</string>
     <!-- warning dialog -->
@@ -163,9 +163,9 @@
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">Şifrenizi kaybetme riskini anladığınızı kabul etmelisiniz</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
-    <string name="error_enter_username">Adınızı girin</string>
+    <string name="error_enter_username">İsminizi girin</string>
     <!-- Warning dialog -->
-    <string name="error_enter_userlastname">Soyadınızı girin</string>
+    <string name="error_enter_userlastname">Soy isminizi girin</string>
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Şifreler eşleşmiyor</string>
     <!-- when creating the account -->
@@ -1053,8 +1053,6 @@
     <string name="transfer_completing">Tamamlanıyor</string>
     <!-- Possible state of a transfer. When the transfer is retrying -->
     <string name="transfer_retrying">Tekrar deneniyor</string>
-    <!-- Possible state of a transfer. When the transfer was cancelled -->
-    <string name="transfer_cancelled">İptal edildi</string>
     <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
     <string name="upload_service_notification">%2$d dosyadan %1$d tanesi yükleniyor</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
@@ -1166,9 +1164,9 @@
     <!-- Message when an error ocurred when deleting an user avatar -->
     <string name="error_deleting_user_avatar">Profil fotoğrafı silinirken bir hata oluştu</string>
     <!-- Message when an error ocurred when changing an user attribute -->
-    <string name="error_changing_user_attributes">Ad değiştirilirken bir hata oluştu</string>
+    <string name="error_changing_user_attributes">İsim değiştirilirken bir hata oluştu</string>
     <!-- Message when an user attribute has been changed successfully -->
-    <string name="success_changing_user_attributes">Adınız güncellendi</string>
+    <string name="success_changing_user_attributes">İsminiz güncellendi</string>
     <!-- Message show when a participant has been successfully invited to a group chat -->
     <string name="add_participant_success">Katılımcı eklendi</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
@@ -2387,15 +2385,15 @@
     <!-- Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description -->
     <string name="locked_accounts_text_2">Şifreniz sızdırıldı ve artık MEGA hesabınız dahil ancak bunlarla sınırlı olmamak üzere hesaplarınıza giriş yapmak için kötü niyetli kişiler tarafından kullanılıyor.</string>
     <!-- Button to add a nickname for a user -->
-    <string name="add_nickname">Takma ad ayarla</string>
+    <string name="add_nickname">Takma isim ayarla</string>
     <!-- Button to update a nickname for a user -->
-    <string name="edit_nickname">Takma adı düzenle</string>
+    <string name="edit_nickname">Takma ismi düzenle</string>
     <!-- Label showing that a nickname has been added -->
-    <string name="snackbar_nickname_added">Takma ad eklendi</string>
+    <string name="snackbar_nickname_added">Takma isim eklendi</string>
     <!-- Label showing that a nickname has been added -->
-    <string name="snackbar_nickname_removed">Takma ad kaldırıldı</string>
+    <string name="snackbar_nickname_removed">Takma isim kaldırıldı</string>
     <!-- title of a dialog to edit or remove the nickname -->
-    <string name="nickname_title">Takma ad</string>
+    <string name="nickname_title">Takma isim</string>
     <!-- Text related to verified phone number. Used as title or cell description. -->
     <string name="phonenumber_title">Telefon numarası</string>
     <!-- Text shown in a call when it is trying to reconnect after lose the internet connection -->
@@ -2807,7 +2805,7 @@
     <!-- Text of the option Backup Recovery Key in My account section -->
     <string name="backup_recovery_key_subtitle">Şifrenizi hatırlıyor musunuz?\nMEGA, unutmanız durumunda şifrenizi sıfırlayamaz.</string>
     <!-- Action to change name -->
-    <string name="change_name_action">Adı değiştir</string>
+    <string name="change_name_action">İsmi değiştir</string>
     <!-- Action to add photo -->
     <string name="add_photo_action">Profil fotoğrafını değiştir</string>
     <!-- Action to add phone number -->

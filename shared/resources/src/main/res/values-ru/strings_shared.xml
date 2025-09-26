@@ -1523,7 +1523,7 @@
         <item quantity="other"></item>
     </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="context_share_correctly_removed">Access removed</string>
+    <string name="context_share_correctly_removed">Доступ закрыт</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Да</string>
     <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1580,7 +1580,7 @@
     <!-- dialog option continue in alert dialog -->
     <string name="button_continue">Продолжить</string>
     <!--Dialog title when the user selected is not on the contact list when sharing a node -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Can’t verify contact</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Не удаётся подтвердить контакт</string>
     <!--Dialog description when the user selected is not on the contact list when sharing a node -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">Вы не можете подтвердить %s, так как его нет в вашем списке контактов. Подождите, пока он сначала примет приглашение.</string>
     <!-- Answer for confirmation dialog. -->
@@ -1688,7 +1688,7 @@
     <!-- category in sort by action to sort by node label name -->
     <string name="action_sort_by_label">Метка</string>
     <!-- category in sort by action to sort by favorite -->
-    <string name="action_sort_by_favorite">Избранное</string>
+    <string name="action_sort_by_favorite">Добавить в избранное</string>
     <!-- category in sort by action to sort by link creation date -->
     <string name="action_sort_by_link">Ссылка</string>
     <!-- Header of action to sort nodes -->
@@ -1702,5 +1702,64 @@
     <!-- Snackbar message when retry success on failed transfers tab, plural form. -->
     <string name="transfers_retry_feedback_snackbar_message_plural">Повтор передач — статус на вкладке «Активные»</string>
     <!--Default file name for scanned documents. Placeholder value is for the current date and time values eg:   Scanned_2025091120323.  -->
-    <string name="document_scanning_default_file_name">Scanned_%1$s</string>
+    <string name="document_scanning_default_file_name">Скан_%1$s</string>
+    <!-- Benefit: Rewind up to specified days of deleted data -->
+    <string name="pro_plan_benefit_rewind_days">Перемотка удалённых данных до %1$d дней назад</string>
+    <!-- Error message when removing 1 or more public links from nodes. -->
+    <string name="public_link_node_removal_error_message">Не удалось удалить ссылку. Попробуйте позже.</string>
+    <!-- Warning that appears prior to remove links of files-->
+    <string name="remove_links_warning_message">Если удалить ссылку, её содержимое больше не будет общедоступно</string>
+    <!-- Success message after removing a share of a folder. a contact has no access to the folder now -->
+    <string name="stop_sharing_folder_success_message">Доступ к папке закрыт</string>
+    <!-- Positive button text for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="stop_sharing_dialog_positive_button_text">Прекратить демонстрацию</string>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <string name="leave_shared_folder_failed_message">Не удалось выйти из одной или нескольких общих папок</string>
+    <!-- Confirmation message before leaving incoming shared folders -->
+    <string name="leave_shared_folder_confirmation_message">Если вы покинете общую папку, вы больше не сможете её увидеть</string>
+    <!-- Message when a single public link is removed successfully. -->
+    <string name="link_removed_success_message">Ссылка удалена</string>
+    <!-- Message when a single public link is removed successfully. -->
+    <string name="links_removed_success_message">Ссылки удалены</string>
+    <!--Alert warning shown to the user when attempting to remove sharing from 1 or more folders-->
+    <string name="stop_sharing_dialog_title">Закрыть доступ к папке?</string>
+    <!--Alert warning shown to the user when attempting to remove sharing from multiple folders-->
+    <string name="stop_sharing_dialog_title_plurals">Закрыть доступ к папкам?</string>
+    <!-- Title of the dialog to choose permissions when sharing. -->
+    <string name="share_folder_dialog_choose_permission_title">Выберите разрешения</string>
+    <!-- Refers to access rights for a file folder. -->
+    <string name="share_folder_dialog_full_access_radio_option">Полный доступ</string>
+    <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
+    <string name="share_folder_dialog_read_only_radio_option">Только чтение</string>
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
+    <string name="share_folder_dialog_read_write_radio_option">Чтение и запись</string>
+    <!-- Text shown in the app bar when nodes are being selected in selection mode -->
+    <string name="app_bar_selection_mode_description">Выбор</string>
+    <!-- success message when moving a node -->
+    <string name="node_moved_success_message">Элемент перемещён</string>
+    <!-- success message when a node was restore from Rubbish bin to a location -->
+    <string name="node_restored_from_rubbish_bin_to_location">Восстановлено в %s</string>
+    <!-- error message when a node failed to be restored from Rubbish bin -->
+    <string name="node_restore_error_message">Произошла ошибка. Элемент не восстановлен.</string>
+    <!-- Snackbar message to show when successfully left shared folder(s) along with one or more failures -->
+    <plurals name="leave_shared_folder_partial_success_snackbar_message">
+        <item quantity="one">Покинута %1$d общая папка, но из одной или нескольких выйти не удалось</item>
+        <item quantity="few">Покинуты %1$d общие папки, но из одной или нескольких выйти не удалось</item>
+        <item quantity="many">Покинуто %1$d общих папок, но из одной или нескольких выйти не удалось</item>
+        <item quantity="other">Покинуто %1$d общей папки, но из одной или нескольких выйти не удалось</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
+    <plurals name="node_restored_from_rubbish_bin_success_message">
+        <item quantity="one">%d элемент восстановлен</item>
+        <item quantity="few">%d элемента восстановлено</item>
+        <item quantity="many">%d элементов восстановлено</item>
+        <item quantity="other">%d элемента восстановлено</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
+    <plurals name="node_restored_from_rubbish_bin_error_message">
+        <item quantity="one">%d элемент не был удалён</item>
+        <item quantity="few">%d элемента не было удалено</item>
+        <item quantity="many">%d элементов не было удалено</item>
+        <item quantity="other">%d элемента не было удалено</item>
+    </plurals>
 </resources>

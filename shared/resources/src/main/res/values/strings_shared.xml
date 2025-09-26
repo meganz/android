@@ -1618,7 +1618,7 @@
     <!-- category in sort by action to sort by node label name -->
     <string name="action_sort_by_label">Label</string>
     <!-- category in sort by action to sort by favorite -->
-    <string name="action_sort_by_favorite">Favorite</string>
+    <string name="action_sort_by_favorite">Favourite</string>
     <!-- category in sort by action to sort by link creation date -->
     <string name="action_sort_by_link">Link</string>
     <!-- Header of action to sort nodes -->
@@ -1674,7 +1674,7 @@
     <!-- Snackbar message to show when successfully left shared folder(s) along with one or more failures -->
     <plurals name="leave_shared_folder_partial_success_snackbar_message">
         <item quantity="one">Left %1$d shared folder, but couldn’t leave one or more folders</item>
-        <item quantity="other">Left %1$d shared folders, but couldn’t leave one or more folders,///.≥ x  fcda v</item>
+        <item quantity="other">Left %1$d shared folders, but couldn’t leave one or more folders</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="node_restored_from_rubbish_bin_success_message">
