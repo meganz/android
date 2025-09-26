@@ -125,7 +125,7 @@
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">Neu bei MEGA?</string>
     <!-- button that allows the user to create an account -->
-    <string name="create_account">MEGA-Account erstellen</string>
+    <string name="create_account">Registrieren</string>
     <!-- when the user tries to log in MEGA without typing the email -->
     <string name="error_enter_email">Ihre E-Mail-Adresse</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
@@ -1053,8 +1053,6 @@
     <string name="transfer_completing">Beendet</string>
     <!-- Possible state of a transfer. When the transfer is retrying -->
     <string name="transfer_retrying">Wiederholung</string>
-    <!-- Possible state of a transfer. When the transfer was cancelled -->
-    <string name="transfer_cancelled">Storniert</string>
     <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
     <string name="upload_service_notification">Dateiupload: %1$d von %2$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->

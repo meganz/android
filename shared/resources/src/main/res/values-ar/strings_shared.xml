@@ -1567,7 +1567,7 @@
         <item quantity="other"></item>
     </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="context_share_correctly_removed">Access removed</string>
+    <string name="context_share_correctly_removed">تمت إزالة إذن الوصول</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">نعم</string>
     <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1630,7 +1630,7 @@
     <!-- dialog option continue in alert dialog -->
     <string name="button_continue">استمرار</string>
     <!--Dialog title when the user selected is not on the contact list when sharing a node -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Can’t verify contact</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">لا يمكن التحقق من جهة الاتصال</string>
     <!--Dialog description when the user selected is not on the contact list when sharing a node -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">لا يمكنك التحقق من %s لأنه ليس في قائمة جهات الاتصال الخاصة بك. انتظر حتى يقبل دعوتك أولاً.</string>
     <!-- Answer for confirmation dialog. -->
@@ -1768,9 +1768,74 @@
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <string name="general_links_copied_clipboard">تم نسخ الرابط الى الحافظة</string>
     <!-- Snackbar message when retry success on failed transfers tab, singular form. -->
-    <string name="transfers_retry_feedback_snackbar_message_singular">Retrying transfer, see the Active tab for progress</string>
+    <string name="transfers_retry_feedback_snackbar_message_singular">عند إعادة محاولة التراسل، راجع صفحة النشاط للتقدم</string>
     <!-- Snackbar message when retry success on failed transfers tab, plural form. -->
-    <string name="transfers_retry_feedback_snackbar_message_plural">Retrying transfers, see the Active tab for progress</string>
+    <string name="transfers_retry_feedback_snackbar_message_plural">عند إعادة محاولة التراسلات، راجع صفحة النشاط للتقدم</string>
     <!--Default file name for scanned documents. Placeholder value is for the current date and time values eg:   Scanned_2025091120323.  -->
-    <string name="document_scanning_default_file_name">Scanned_%1$s</string>
+    <string name="document_scanning_default_file_name">تم المسح الضوئي_%1$s</string>
+    <!-- Benefit: Rewind up to specified days of deleted data -->
+    <string name="pro_plan_benefit_rewind_days">الترجيع إلى ما يصل إلى %1$d أيام للبيانات المحذوفة</string>
+    <!-- Error message when removing 1 or more public links from nodes. -->
+    <string name="public_link_node_removal_error_message">فشلت إزالة الرابط، حاول مرة أخرى لاحقًا</string>
+    <!-- Warning that appears prior to remove links of files-->
+    <string name="remove_links_warning_message">إزالة رابط يعني أن محتوياته لن تكون متاحة للجمهور بعد الآن</string>
+    <!-- Success message after removing a share of a folder. a contact has no access to the folder now -->
+    <string name="stop_sharing_folder_success_message">تم إيقاف مشاركة المجلد</string>
+    <!-- Positive button text for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="stop_sharing_dialog_positive_button_text">أوقف المشاركة</string>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <string name="leave_shared_folder_failed_message">تعذّر مغادرة مجلد واحد أو أكثر من المجلدات المشاركة</string>
+    <!-- Confirmation message before leaving incoming shared folders -->
+    <string name="leave_shared_folder_confirmation_message">ترك مجلد مشارك يعني أنك لن تتمكن من رؤيته مرة أخرى</string>
+    <!-- Message when a single public link is removed successfully. -->
+    <string name="link_removed_success_message">‏الرابط محذوف</string>
+    <!-- Message when a single public link is removed successfully. -->
+    <string name="links_removed_success_message">تم حذف الروابط</string>
+    <!--Alert warning shown to the user when attempting to remove sharing from 1 or more folders-->
+    <string name="stop_sharing_dialog_title">هل تريد إيقاف مشاركة هذا المجلد؟</string>
+    <!--Alert warning shown to the user when attempting to remove sharing from multiple folders-->
+    <string name="stop_sharing_dialog_title_plurals">هل تريد إيقاف مشاركة هذه المجلدات؟</string>
+    <!-- Title of the dialog to choose permissions when sharing. -->
+    <string name="share_folder_dialog_choose_permission_title">اختر الأذونات</string>
+    <!-- Refers to access rights for a file folder. -->
+    <string name="share_folder_dialog_full_access_radio_option">وصول كامل</string>
+    <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
+    <string name="share_folder_dialog_read_only_radio_option">للقراءة فقط</string>
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
+    <string name="share_folder_dialog_read_write_radio_option">قراءة وكتابة</string>
+    <!-- Text shown in the app bar when nodes are being selected in selection mode -->
+    <string name="app_bar_selection_mode_description">الاختيار</string>
+    <!-- success message when moving a node -->
+    <string name="node_moved_success_message">تم نقل العنصر</string>
+    <!-- success message when a node was restore from Rubbish bin to a location -->
+    <string name="node_restored_from_rubbish_bin_to_location">تم الاسترجاع الى %s</string>
+    <!-- error message when a node failed to be restored from Rubbish bin -->
+    <string name="node_restore_error_message">حدث خطأ. لم تتم استعادة العنصر.</string>
+    <!-- Snackbar message to show when successfully left shared folder(s) along with one or more failures -->
+    <plurals name="leave_shared_folder_partial_success_snackbar_message">
+        <item quantity="zero">غادرت %1$d مجلد مشارك ولكن لم تتمكن من مغادرة مجلد واحد أو أكثر</item>
+        <item quantity="one">غادرت %1$d مجلد مشارك ولكن لم تتمكن من مغادرة مجلد واحد أو أكثر</item>
+        <item quantity="two">غادرت %1$d مجلدان مشاركان ولكن لم تتمكن من مغادرة مجلد واحد أو أكثر</item>
+        <item quantity="few">غادرت %1$d مجلدات مشاركة ولكن لم تتمكن من مغادرة مجلد واحد أو أكثر</item>
+        <item quantity="many">غادرت %1$d مجلد مشارك ولكن لم تتمكن من مغادرة مجلد واحد أو أكثر</item>
+        <item quantity="other">غادرت %1$d مجلد مشارك ولكن لم تتمكن من مغادرة مجلد واحد أو أكثر</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
+    <plurals name="node_restored_from_rubbish_bin_success_message">
+        <item quantity="zero">تمت استعادة %d عنصر</item>
+        <item quantity="one">تمت استعادة %d عنصر</item>
+        <item quantity="two">تمت استعادة %d عنصرين</item>
+        <item quantity="few">تمت استعادة %d عناصر</item>
+        <item quantity="many">تمت استعادة %d عنصراً</item>
+        <item quantity="other">تمت استعادة %d عنصر</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
+    <plurals name="node_restored_from_rubbish_bin_error_message">
+        <item quantity="zero">لم تتم استعادة %d عنصر</item>
+        <item quantity="one">لم تتم استعادة %d عنصر</item>
+        <item quantity="two">لم تتم استعادة %d عنصرين</item>
+        <item quantity="few">لم تتم استعادة %d عناصر</item>
+        <item quantity="many">لم تتم استعادة %d عنصراً</item>
+        <item quantity="other">لم تتم استعادة %d عنصر</item>
+    </plurals>
 </resources>

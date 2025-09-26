@@ -1557,7 +1557,8 @@
     <string name="transfers_retry_failed_snackbar_action">재시도</string>
     <!-- Snackbar message when retry success on failed transfers tab. -->
     <plurals name="transfers_retry_feedback_snackbar_message">
-        <item quantity="other"></item>
+        <item quantity="one">Retrying transfer, see the Active tab for progress</item>
+        <item quantity="other">Retrying transfers, see the Active tab for progress</item>
     </plurals>
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">%s(으)로 되돌렸음</string>
@@ -1607,4 +1608,54 @@
     <string name="transfers_retry_feedback_snackbar_message_plural">전송을 다시 시도하고 있습니다, 진행 상태는 활성 탭을 보세요</string>
     <!--Default file name for scanned documents. Placeholder value is for the current date and time values eg:   Scanned_2025091120323.  -->
     <string name="document_scanning_default_file_name">스캔함_%1$s</string>
+    <!-- Benefit: Rewind up to specified days of deleted data -->
+    <string name="pro_plan_benefit_rewind_days">최대 %1$d일의 삭제된 데이터 되감기</string>
+    <!-- Error message when removing 1 or more public links from nodes. -->
+    <string name="public_link_node_removal_error_message">링크 제거를 실패하였습니다, 나중에 다시 시도하세요.</string>
+    <!-- Warning that appears prior to remove links of files-->
+    <string name="remove_links_warning_message">링크를 삭제하는 것은 콘텐츠가 공개적으로 접근할 수 없다는 것을 의미합니다</string>
+    <!-- Success message after removing a share of a folder. a contact has no access to the folder now -->
+    <string name="stop_sharing_folder_success_message">폴더 공유 멈춤</string>
+    <!-- Positive button text for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="stop_sharing_dialog_positive_button_text">공유 중단</string>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <string name="leave_shared_folder_failed_message">하나 이상의 공유된 폴더에서 나갈 수 없었습니다</string>
+    <!-- Confirmation message before leaving incoming shared folders -->
+    <string name="leave_shared_folder_confirmation_message">공유된 폴더에서 나간다는 것은 이것을 다시 볼 수 없다는 것을 의미합니다</string>
+    <!-- Message when a single public link is removed successfully. -->
+    <string name="link_removed_success_message">링크 삭제됨</string>
+    <!-- Message when a single public link is removed successfully. -->
+    <string name="links_removed_success_message">링크 삭제됨</string>
+    <!--Alert warning shown to the user when attempting to remove sharing from 1 or more folders-->
+    <string name="stop_sharing_dialog_title">이 폴더의 공유를 멈출까요?</string>
+    <!--Alert warning shown to the user when attempting to remove sharing from multiple folders-->
+    <string name="stop_sharing_dialog_title_plurals">이 폴더들의 공유를 멈출까요?</string>
+    <!-- Title of the dialog to choose permissions when sharing. -->
+    <string name="share_folder_dialog_choose_permission_title">권한 선택</string>
+    <!-- Refers to access rights for a file folder. -->
+    <string name="share_folder_dialog_full_access_radio_option">전체 접근</string>
+    <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
+    <string name="share_folder_dialog_read_only_radio_option">읽기 전용</string>
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
+    <string name="share_folder_dialog_read_write_radio_option">읽기와 쓰기</string>
+    <!-- Text shown in the app bar when nodes are being selected in selection mode -->
+    <string name="app_bar_selection_mode_description">선택 중</string>
+    <!-- success message when moving a node -->
+    <string name="node_moved_success_message">항목 이동됨</string>
+    <!-- success message when a node was restore from Rubbish bin to a location -->
+    <string name="node_restored_from_rubbish_bin_to_location">%s(으)로 되돌렸음</string>
+    <!-- error message when a node failed to be restored from Rubbish bin -->
+    <string name="node_restore_error_message">오류가 발생하였습니다. 항목이 복원되지 않았습니다.</string>
+    <!-- Snackbar message to show when successfully left shared folder(s) along with one or more failures -->
+    <plurals name="leave_shared_folder_partial_success_snackbar_message">
+        <item quantity="other">%1$d개의 공유된 폴더에서 나갔지만, 하나 이상의 폴더에서 나갈 수 없었습니다</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
+    <plurals name="node_restored_from_rubbish_bin_success_message">
+        <item quantity="other">항목 %d개가 복원되었습니다</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
+    <plurals name="node_restored_from_rubbish_bin_error_message">
+        <item quantity="other">항목 %d개가 복원되지 않았습니다</item>
+    </plurals>
 </resources>

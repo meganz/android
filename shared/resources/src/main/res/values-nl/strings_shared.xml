@@ -1530,7 +1530,7 @@
     <!-- dialog option continue in alert dialog -->
     <string name="button_continue">Doorgaan</string>
     <!--Dialog title when the user selected is not on the contact list when sharing a node -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Can’t verify contact</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Kan het contact niet verifiëren</string>
     <!--Dialog description when the user selected is not on the contact list when sharing a node -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">U kunt %s niet verifiëren omdat ze niet in u contactenlijst staan. Wacht tot ze eerst uw uitnodiging accepteren.</string>
     <!-- Answer for confirmation dialog. -->
@@ -1633,4 +1633,57 @@
     <string name="transfers_retry_feedback_snackbar_message_plural">Overdrachten opnieuw proberen, zie het tabblad Actief voor de voortgang</string>
     <!--Default file name for scanned documents. Placeholder value is for the current date and time values eg:   Scanned_2025091120323.  -->
     <string name="document_scanning_default_file_name">Gescand_%1$s</string>
+    <!-- Benefit: Rewind up to specified days of deleted data -->
+    <string name="pro_plan_benefit_rewind_days">Terugspoelen tot %1$d dagen aan verwijderde gegevens</string>
+    <!-- Error message when removing 1 or more public links from nodes. -->
+    <string name="public_link_node_removal_error_message">Het verwijderen van de link is mislukt, later opnieuw proberen</string>
+    <!-- Warning that appears prior to remove links of files-->
+    <string name="remove_links_warning_message">Als u een link verwijdert, is de inhoud ervan niet meer openbaar toegankelijk</string>
+    <!-- Success message after removing a share of a folder. a contact has no access to the folder now -->
+    <string name="stop_sharing_folder_success_message">Het delen van mappen is gestopt</string>
+    <!-- Positive button text for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="stop_sharing_dialog_positive_button_text">Delen stoppen</string>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <string name="leave_shared_folder_failed_message">Kon een of meer gedeelde mappen niet verlaten</string>
+    <!-- Confirmation message before leaving incoming shared folders -->
+    <string name="leave_shared_folder_confirmation_message">Als u een gedeelde map verlaat, kunt u deze niet meer zien</string>
+    <!-- Message when a single public link is removed successfully. -->
+    <string name="link_removed_success_message">Link verwijderd</string>
+    <!-- Message when a single public link is removed successfully. -->
+    <string name="links_removed_success_message">Links verwijderd</string>
+    <!--Alert warning shown to the user when attempting to remove sharing from 1 or more folders-->
+    <string name="stop_sharing_dialog_title">Stopt u met het delen van deze map?</string>
+    <!--Alert warning shown to the user when attempting to remove sharing from multiple folders-->
+    <string name="stop_sharing_dialog_title_plurals">Stopt u met het delen van deze mappen?</string>
+    <!-- Title of the dialog to choose permissions when sharing. -->
+    <string name="share_folder_dialog_choose_permission_title">Kies machtigingen</string>
+    <!-- Refers to access rights for a file folder. -->
+    <string name="share_folder_dialog_full_access_radio_option">Volledige toegang</string>
+    <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
+    <string name="share_folder_dialog_read_only_radio_option">Alleen-lezen</string>
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
+    <string name="share_folder_dialog_read_write_radio_option">Lezen en Schrijven</string>
+    <!-- Text shown in the app bar when nodes are being selected in selection mode -->
+    <string name="app_bar_selection_mode_description">Selecteren</string>
+    <!-- success message when moving a node -->
+    <string name="node_moved_success_message">Item verplaatst</string>
+    <!-- success message when a node was restore from Rubbish bin to a location -->
+    <string name="node_restored_from_rubbish_bin_to_location">Hersteld naar %s</string>
+    <!-- error message when a node failed to be restored from Rubbish bin -->
+    <string name="node_restore_error_message">Er is een fout opgetreden. Item niet hersteld.</string>
+    <!-- Snackbar message to show when successfully left shared folder(s) along with one or more failures -->
+    <plurals name="leave_shared_folder_partial_success_snackbar_message">
+        <item quantity="one">Links %1$d gedeelde map, maar kon een of meer mappen niet verlaten</item>
+        <item quantity="other">Links %1$d gedeelde mappen, maar kon een of meer mappen niet verlaten</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
+    <plurals name="node_restored_from_rubbish_bin_success_message">
+        <item quantity="one">%d item hersteld</item>
+        <item quantity="other">%d items hersteld</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
+    <plurals name="node_restored_from_rubbish_bin_error_message">
+        <item quantity="one">%d item was niet hersteld</item>
+        <item quantity="other">%d items waren niet hersteld</item>
+    </plurals>
 </resources>

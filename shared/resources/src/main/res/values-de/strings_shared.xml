@@ -1001,7 +1001,7 @@
     <!-- USP Carousel page 4 description-->
     <string name="carousel_page_description_slide_4">Chatten Sie mit Freunden und Familienmitgliedern, tauschen Sie Fotos oder vertrauliche Informationen aus, führen Sie Videogespräche und planen Sie Meetings. Sicherheit und Datenschutz garantiert.</string>
     <!-- Create account label-->
-    <string name="general_label_create_account">MEGA-Account erstellen</string>
+    <string name="general_label_create_account">Registrieren</string>
     <!-- The new feature hidden nodes feature -->
     <string name="hidden_nodes_new_feature">Neue Funktion: Verborgene Dateien und Ordner</string>
     <!-- Hidden nodes: hide files and folders feature -->
@@ -1479,7 +1479,7 @@
         <item quantity="other"></item>
     </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="context_share_correctly_removed">Access removed</string>
+    <string name="context_share_correctly_removed">Zugriff entfernt</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Ja</string>
     <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1530,7 +1530,7 @@
     <!-- dialog option continue in alert dialog -->
     <string name="button_continue">Fortfahren</string>
     <!--Dialog title when the user selected is not on the contact list when sharing a node -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Can’t verify contact</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Kontakt kann nicht verifiziert werden</string>
     <!--Dialog description when the user selected is not on the contact list when sharing a node -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">Sie können %s nicht verifizieren, da diese Person nicht in Ihrer Kontaktliste steht. Warten Sie, bis Ihre Einladung angenommen wird.</string>
     <!-- Answer for confirmation dialog. -->
@@ -1618,7 +1618,7 @@
     <!-- category in sort by action to sort by node label name -->
     <string name="action_sort_by_label">Markierung</string>
     <!-- category in sort by action to sort by favorite -->
-    <string name="action_sort_by_favorite">Favorit</string>
+    <string name="action_sort_by_favorite">Lesezeichen hinzufügen</string>
     <!-- category in sort by action to sort by link creation date -->
     <string name="action_sort_by_link">Link</string>
     <!-- Header of action to sort nodes -->
@@ -1628,9 +1628,62 @@
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <string name="general_links_copied_clipboard">Links in Zwischenablage kopiert</string>
     <!-- Snackbar message when retry success on failed transfers tab, singular form. -->
-    <string name="transfers_retry_feedback_snackbar_message_singular">Retrying transfer, see the Active tab for progress</string>
+    <string name="transfers_retry_feedback_snackbar_message_singular">Der Transfer wird erneut versucht, den Fortschritt können Sie auf dem Reiter „Aktiv“ verfolgen</string>
     <!-- Snackbar message when retry success on failed transfers tab, plural form. -->
-    <string name="transfers_retry_feedback_snackbar_message_plural">Retrying transfers, see the Active tab for progress</string>
+    <string name="transfers_retry_feedback_snackbar_message_plural">Die Transfers werden erneut versucht, den Fortschritt können Sie auf dem Reiter „Aktiv“ verfolgen</string>
     <!--Default file name for scanned documents. Placeholder value is for the current date and time values eg:   Scanned_2025091120323.  -->
-    <string name="document_scanning_default_file_name">Scanned_%1$s</string>
+    <string name="document_scanning_default_file_name">Gescannt_%1$s</string>
+    <!-- Benefit: Rewind up to specified days of deleted data -->
+    <string name="pro_plan_benefit_rewind_days">Rewind zur Wiederherstellung gelöschter Daten bis zu %1$d Tage lang</string>
+    <!-- Error message when removing 1 or more public links from nodes. -->
+    <string name="public_link_node_removal_error_message">Der Link konnte nicht entfernt werden, bitte später erneut versuchen</string>
+    <!-- Warning that appears prior to remove links of files-->
+    <string name="remove_links_warning_message">Wenn Sie einen Link entfernen, wird dessen Inhalt nicht mehr öffentlich zugänglich sein</string>
+    <!-- Success message after removing a share of a folder. a contact has no access to the folder now -->
+    <string name="stop_sharing_folder_success_message">Ordnerfreigabe beendet</string>
+    <!-- Positive button text for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="stop_sharing_dialog_positive_button_text">Freigabe beenden</string>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <string name="leave_shared_folder_failed_message">Ein oder mehrere freigegebene Ordner konnten nicht verlassen werden</string>
+    <!-- Confirmation message before leaving incoming shared folders -->
+    <string name="leave_shared_folder_confirmation_message">Wenn Sie einen freigegebenen Ordner verlassen, können Sie ihn nicht mehr sehen</string>
+    <!-- Message when a single public link is removed successfully. -->
+    <string name="link_removed_success_message">Der Link wurde gelöscht</string>
+    <!-- Message when a single public link is removed successfully. -->
+    <string name="links_removed_success_message">Links wurden entfernt</string>
+    <!--Alert warning shown to the user when attempting to remove sharing from 1 or more folders-->
+    <string name="stop_sharing_dialog_title">Freigabe dieses Ordners beenden?</string>
+    <!--Alert warning shown to the user when attempting to remove sharing from multiple folders-->
+    <string name="stop_sharing_dialog_title_plurals">Freigabe dieser Ordner beenden?</string>
+    <!-- Title of the dialog to choose permissions when sharing. -->
+    <string name="share_folder_dialog_choose_permission_title">Berechtigungen auswählen</string>
+    <!-- Refers to access rights for a file folder. -->
+    <string name="share_folder_dialog_full_access_radio_option">Vollzugriff</string>
+    <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
+    <string name="share_folder_dialog_read_only_radio_option">Schreibgeschützt</string>
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
+    <string name="share_folder_dialog_read_write_radio_option">Lese- und Schreibzugriff</string>
+    <!-- Text shown in the app bar when nodes are being selected in selection mode -->
+    <string name="app_bar_selection_mode_description">Auswählen</string>
+    <!-- success message when moving a node -->
+    <string name="node_moved_success_message">Element verschoben</string>
+    <!-- success message when a node was restore from Rubbish bin to a location -->
+    <string name="node_restored_from_rubbish_bin_to_location">Wiederherstellung nach %s erfolgreich</string>
+    <!-- error message when a node failed to be restored from Rubbish bin -->
+    <string name="node_restore_error_message">Ein Fehler ist aufgetreten. Das Element wurde nicht wiederhergestellt.</string>
+    <!-- Snackbar message to show when successfully left shared folder(s) along with one or more failures -->
+    <plurals name="leave_shared_folder_partial_success_snackbar_message">
+        <item quantity="one">%1$d freigegebener Ordner wurde verlassen, ein oder mehrere Ordner konnten jedoch nicht verlassen werden</item>
+        <item quantity="other">%1$d freigegebene Ordner wurden verlassen, ein oder mehrere Ordner konnten jedoch nicht verlassen werden</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
+    <plurals name="node_restored_from_rubbish_bin_success_message">
+        <item quantity="one">%d Element wiederhergestellt</item>
+        <item quantity="other">%d Elemente wiederhergestellt</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
+    <plurals name="node_restored_from_rubbish_bin_error_message">
+        <item quantity="one">%d Element konnte nicht wiederhergestellt werden</item>
+        <item quantity="other">%d Elemente konnten nicht wiederhergestellt werden</item>
+    </plurals>
 </resources>

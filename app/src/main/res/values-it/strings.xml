@@ -665,7 +665,7 @@
     <!-- Subtitle of the screen to backup the master key -->
     <string name="backup_subtitle">La tua password sblocca la tua Chiave di recupero</string>
     <!-- First paragraph of the screen to backup the master key -->
-    <string name="backup_first_paragraph">I tuoi dati sono leggibili solo tramite una catena di operazioni di decriptazione che inizia con la tua chiave master di criptazione, che archiviamo in modo criptato assieme alla tua password. Questo significa che se perdi la tua password, la tua chiave master non può essere decriptata, e non potrai più decriptare i tuoi dati.</string>
+    <string name="backup_first_paragraph">I tuoi dati sono leggibili solo tramite una catena di operazioni di decriptazione che inizia con la tua chiave master di criptazione, che archiviamo in modo criptato assieme alla tua password. Questo significa che se perdi la tua password, la tua chiave di recupero non può essere decriptata, e non potrai più decriptare i tuoi dati.</string>
     <!-- Summary of the preference Recovery key on Settings section -->
     <string name="backup_second_paragraph">Esportare la Chiave di recupero e tenerla in un posto sicuro ti permette di reimpostare la password senza perdite di dati.</string>
     <!-- Third paragraph of the screen to backup the master key -->
@@ -1071,8 +1071,6 @@
     <string name="transfer_completing">Completando</string>
     <!-- Possible state of a transfer. When the transfer is retrying -->
     <string name="transfer_retrying">Ritentando</string>
-    <!-- Possible state of a transfer. When the transfer was cancelled -->
-    <string name="transfer_cancelled">Annullato</string>
     <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
     <string name="upload_service_notification">Caricamento di %1$d su %2$d file</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
@@ -2747,7 +2745,7 @@
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">I cambiamenti delle impostazioni dei cookie sono stati salvati</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_accept">Accetta Cookie</string>
+    <string name="preference_cookies_accept">Accetta i cookie</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_essential_title">Cookie essenziali</string>
     <!-- Preference screen item summary -->
@@ -2755,7 +2753,7 @@
     <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">Cookie di performance e statistiche</string>
     <!-- Preference screen item summary -->
-    <string name="preference_cookies_performance_summary">Aiutaci a capire come utilizzi i nostri servizi e forniscici dati che possiamo utilizzare per fare miglioramenti. Non accettare questi Cookie significa che avremo meno dati disponibili per fare dei miglioramenti grafici.</string>
+    <string name="preference_cookies_performance_summary">Aiutaci a capire come utilizzi i nostri servizi e forniscici dati che possiamo utilizzare per fare miglioramenti. Non accettare questi cookie significa che avremo meno dati disponibili per fare dei miglioramenti grafici.</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">Sempre attivi</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->

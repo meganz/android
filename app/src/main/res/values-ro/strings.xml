@@ -1071,8 +1071,6 @@
     <string name="transfer_completing">Se finalizează</string>
     <!-- Possible state of a transfer. When the transfer is retrying -->
     <string name="transfer_retrying">Se reîncearcă</string>
-    <!-- Possible state of a transfer. When the transfer was cancelled -->
-    <string name="transfer_cancelled">Anulat</string>
     <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
     <string name="upload_service_notification">Se încarcă fișiere: %1$d din %2$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
@@ -1663,7 +1661,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">Activați previzualizările linkurilor trimise</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Generează previzualizări pentru anumite link-uri pe care le trimiteți în chat, atunci când sunt disponibile. Rețineți că preluarea acestor previzualizări nu este protejată de criptarea tip zero cunoștințe.</string>
+    <string name="text_enable_rich_links">Generează previzualizări pentru anumite link-uri pe care le trimiteți în chat, atunci când sunt disponibile. Rețineți că preluarea acestor previzualizări nu este protejată de criptare cu cunoștință zero.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Vă rugăm să introduceți o parolă mai puternică</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -1741,7 +1739,7 @@
     <!-- Label Play Store -->
     <string name="play_store_label">Google Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
-    <string name="text_2fa_help">Ai nevoie de o aplicație de autentificare pentru a activa A2F pe MEGA. Poți descărca și instala aplicația Google Authenticator, Duo Mobile, Authy sau Microsoft Authenticator pentru telefon sau tabletă.</string>
+    <string name="text_2fa_help">Ai nevoie de o aplicație de autentificare pentru a activa 2FA pe MEGA. Poți descărca și instala aplicația Google Authenticator, Duo Mobile, Authy sau Microsoft Authenticator pentru telefon sau tabletă.</string>
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">Deschide</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
@@ -2691,7 +2689,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">Utilizatorii MEGA Pro au acces exclusiv la funcții suplimentare de siguranță pentru linkuri, făcând contul și mai securizat.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Sistemul nostru de criptare tip zero cunoștințe necesită o cheie unică generată automat pentru acest fișier sau folder. În mod implicit, este creat un link cu această cheie, însă poți exporta cheia de decriptare separat pentru un strat de securitate suplimentar.</string>
+    <string name="decryption_key_explanation">Sistemul nostru de criptare cu cunoștință zero necesită o cheie unică generată automat pentru acest fișier sau folder. În mod implicit, este creat un link cu această cheie, însă poți exporta cheia de decriptare separat pentru un strat de securitate suplimentar.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Resetați parola</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -4707,7 +4705,7 @@
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Întâlnirea a fost actualizată</string>
     <!-- Header content about secure sharing in approve credentials screen-->
-    <string name="contact_approve_credentials_secure_share_description">Vă protejăm datele cu criptare tip zero, astfel încât toate informațiile pe care le stocați, partajați și primiți pe MEGA să fie sigure. Pentru a asigura un plus de securitate, vă rugăm să confirmați contactele cu care partajați informații sau de la care primiți date.</string>
+    <string name="contact_approve_credentials_secure_share_description">Vă protejăm datele cu criptare cu cunoștință zero, astfel încât toate informațiile pe care le stocați, partajați și primiți pe MEGA să fie sigure. Pentru a asigura un plus de securitate, vă rugăm să confirmați contactele cu care partajați informații sau de la care primiți date.</string>
     <!-- Message of contact verification in approve credentials screen -->
     <string name="contact_approve_credentials_contact_verify_description">Pentru a vă confirma contactul, asigurați-vă că acreditările pe care le vedeți mai sus corespund cu acreditările contului lor. Le puteți cere să vă împărtășească acreditările.</string>
     <!-- Toolbar title text in approve credentials screen -->
@@ -4847,7 +4845,7 @@
     <!-- Button title on Storage/Transfer usage screen related to My account screen. When user taps on button he will be redirected to Upgrade account screen. -->
     <string name="account_my_account_usage_get_more_storage_button">Obțineți mai mult spațiu de stocare</string>
     <!-- General message about MEGA in the first message header when there are no message in the chat screen -->
-    <string name="chat_chatroom_first_message_header_mega_info_text">MEGA vă protejează comunicațiile cu sistemul nostru de criptare tip zero cunoștințe, oferind asigurări esențiale de siguranță:</string>
+    <string name="chat_chatroom_first_message_header_mega_info_text">MEGA vă protejează comunicațiile cu sistemul nostru de criptare cu cunoștință zero, oferind asigurări esențiale de siguranță:</string>
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_authenticity_info_text">Sistemul se asigură că datele primite sunt într-adevăr de la expeditorul specificat, iar conținutul său nu a fost manipulat în timpul tranzitului.</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->

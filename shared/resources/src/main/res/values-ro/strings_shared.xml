@@ -481,7 +481,7 @@
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">Păstrați conversațiile private</string>
     <!--Subtitle text from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_subtitle">Toate mesajele, chat-urile de grup și apelurile dvs. sunt protejate de criptarea tip zero cunoștințe. [A]Aflați mai multe[/A]</string>
+    <string name="chat_recent_list_empty_subtitle">Toate mesajele, chat-urile de grup și apelurile dvs. sunt protejate de criptare cu cunoștință zero. [A]Aflați mai multe[/A]</string>
     <!-- Label of the action button of inviting a friend from contact screen -->
     <string name="chat_recent_invite_friend">Invitați un prieten</string>
     <!-- Title Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
@@ -547,7 +547,7 @@
     <!--Title text to start a meeting from Meeting screen empty view-->
     <string name="meeting_recent_list_empty_title">Protejați-vă apelurile</string>
     <!--Subtitle text from Meeting screen empty view-->
-    <string name="meeting_recent_list_empty_subtitle">Întâlnirile, apelurile de familie și conversațiile private sunt protejate de criptarea tip zero cunoștințe. [A]Aflați mai multe[/A]</string>
+    <string name="meeting_recent_list_empty_subtitle">Întâlnirile, apelurile de familie și conversațiile private sunt protejate de criptare cu cunoștință zero. [A]Aflați mai multe[/A]</string>
     <!--Warning message to inform the user the minimum number of characters to enter into the edit text field for the survey-->
     <string name="account_cancel_subscription_survey_minimum_character_limit">Mesajul trebuie să conțină cel puțin 10 caractere</string>
     <!--Warning message to inform the user that the edit text field for the survey is empty and needs to be filled with details-->
@@ -921,7 +921,7 @@
     <!-- Text for the "Don’t cancel" button in the cancel registration dialog -->
     <string name="email_confirmation_dialog_cancel_registration_dismiss_button">Nu o anula</string>
     <!-- First message header paragraph in note to self chat -->
-    <string name="chat_note_to_self_chat_first_message_header_paragraph">Un spațiu privat pentru imagini, informații importante sau idei mari. Întotdeauna sincronizat și protejat cu criptarea tip zero cunoștințe.</string>
+    <string name="chat_note_to_self_chat_first_message_header_paragraph">Un spațiu privat pentru imagini, informații importante sau idei mari. Întotdeauna sincronizat și protejat cu criptare cu cunoștință zero.</string>
     <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
     <string name="general_sync_notification_low_battery_title">Sincronizarea întreruptă din cauza bateriei descărcate</string>
     <!-- Text of the notification displayed when Syncs are paused due to low battery conditions -->
@@ -1003,7 +1003,7 @@
     <!-- USP Carousel page 1 title-->
     <string name="carousel_page_title_slide_1">Tu deții cheile</string>
     <!-- USP Carousel page 1 description-->
-    <string name="carousel_page_description_slide_1">Controlată de utilizator, criptarea tip zero cunoștințe înseamnă că nimeni nu vă poate vedea datele decât dacă doriți - nici măcar noi!</string>
+    <string name="carousel_page_description_slide_1">Controlată de utilizator, criptare cu cunoștință zero înseamnă că nimeni nu vă poate vedea datele decât dacă doriți - nici măcar noi!</string>
     <!-- USP Carousel page 2 title-->
     <string name="carousel_page_title_slide_2">Păstrați fiecare moment în siguranță</string>
     <!-- USP Carousel page 2 description-->
@@ -1501,7 +1501,7 @@
         <item quantity="other"></item>
     </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="context_share_correctly_removed">Access removed</string>
+    <string name="context_share_correctly_removed">Accesul a fost eliminat</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Da</string>
     <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1555,7 +1555,7 @@
     <!-- dialog option continue in alert dialog -->
     <string name="button_continue">Continuați</string>
     <!--Dialog title when the user selected is not on the contact list when sharing a node -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Can’t verify contact</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Nu se pot confirma contactul</string>
     <!--Dialog description when the user selected is not on the contact list when sharing a node -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">Nu poți confirma pe %s deoarece nu se află în lista de contacte. Așteaptă ca această persoană să îți accepte mai întâi invitația.</string>
     <!-- Answer for confirmation dialog. -->
@@ -1632,13 +1632,15 @@
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item restored but %d item wasn’t restored. Try again later.</item>
-        <item quantity="other">1 item restored but %d items weren’t restored. Try again later.</item>
+        <item quantity="one">1 element restaurat, dar %d elementul nu a fost restaurat. Încercați din nou mai târziu.</item>
+        <item quantity="few">1 element restaurat, dar %d elementele nu au fost restaurate. Încercați din nou mai târziu.</item>
+        <item quantity="other">1 element restaurat, dar %d de elementele nu au fost restaurate. Încercați din nou mai târziu.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
-        <item quantity="one">%d item restored but 1 item wasn’t restored. Try again later.</item>
-        <item quantity="other">%d items restored but 1 item wasn’t restored. Try again later.</item>
+        <item quantity="one">%d element restaurat, dar 1 element nu a fost restaurat. Încercați din nou mai târziu.</item>
+        <item quantity="few">%d elemente restaurate, dar 1 element nu a fost restaurat. Încercați din nou mai târziu.</item>
+        <item quantity="other">%d de elemente restaurate, dar 1 element nu a fost restaurat. Încercați din nou mai târziu.</item>
     </plurals>
     <!-- category in sort by action to sort by name -->
     <string name="action_sort_by_name">Nume</string>
@@ -1651,7 +1653,7 @@
     <!-- category in sort by action to sort by node label name -->
     <string name="action_sort_by_label">Etichetă</string>
     <!-- category in sort by action to sort by favorite -->
-    <string name="action_sort_by_favorite">Favorite</string>
+    <string name="action_sort_by_favorite">Favorit</string>
     <!-- category in sort by action to sort by link creation date -->
     <string name="action_sort_by_link">Link</string>
     <!-- Header of action to sort nodes -->
@@ -1663,7 +1665,63 @@
     <!-- Snackbar message when retry success on failed transfers tab, singular form. -->
     <string name="transfers_retry_feedback_snackbar_message_singular">Se reîncearcă transferul, consultați fila Activ pentru progres</string>
     <!-- Snackbar message when retry success on failed transfers tab, plural form. -->
-    <string name="transfers_retry_feedback_snackbar_message_plural">Retrying transfers, see the Active tab for progress</string>
+    <string name="transfers_retry_feedback_snackbar_message_plural">Reîncercarea transferurilor, consultați fila Active pentru progres</string>
     <!--Default file name for scanned documents. Placeholder value is for the current date and time values eg:   Scanned_2025091120323.  -->
-    <string name="document_scanning_default_file_name">Scanned_%1$s</string>
+    <string name="document_scanning_default_file_name">Scanat_%1$s</string>
+    <!-- Benefit: Rewind up to specified days of deleted data -->
+    <string name="pro_plan_benefit_rewind_days">Derularea înapoi până la %1$d de zile de date șterse</string>
+    <!-- Error message when removing 1 or more public links from nodes. -->
+    <string name="public_link_node_removal_error_message">Eliminarea legăturii a eșuat, încercați din nou mai târziu</string>
+    <!-- Warning that appears prior to remove links of files-->
+    <string name="remove_links_warning_message">Eliminarea unui link înseamnă că conținutul său nu va mai fi accesibil publicului</string>
+    <!-- Success message after removing a share of a folder. a contact has no access to the folder now -->
+    <string name="stop_sharing_folder_success_message">Partajarea folderelor s-a oprit</string>
+    <!-- Positive button text for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="stop_sharing_dialog_positive_button_text">Opriți partajarea</string>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <string name="leave_shared_folder_failed_message">Nu putea lăsa unul sau mai multe foldere partajate</string>
+    <!-- Confirmation message before leaving incoming shared folders -->
+    <string name="leave_shared_folder_confirmation_message">Lăsând un folder partajat înseamnă că nu îl veți mai putea vedea</string>
+    <!-- Message when a single public link is removed successfully. -->
+    <string name="link_removed_success_message">Link eliminat</string>
+    <!-- Message when a single public link is removed successfully. -->
+    <string name="links_removed_success_message">Linkuri eliminate</string>
+    <!--Alert warning shown to the user when attempting to remove sharing from 1 or more folders-->
+    <string name="stop_sharing_dialog_title">Nu mai partajați acest folder?</string>
+    <!--Alert warning shown to the user when attempting to remove sharing from multiple folders-->
+    <string name="stop_sharing_dialog_title_plurals">Nu mai partajați aceste foldere?</string>
+    <!-- Title of the dialog to choose permissions when sharing. -->
+    <string name="share_folder_dialog_choose_permission_title">Alegeți permisiunile</string>
+    <!-- Refers to access rights for a file folder. -->
+    <string name="share_folder_dialog_full_access_radio_option">Acces complet</string>
+    <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
+    <string name="share_folder_dialog_read_only_radio_option">Numai citire</string>
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
+    <string name="share_folder_dialog_read_write_radio_option">Citire și scriere</string>
+    <!-- Text shown in the app bar when nodes are being selected in selection mode -->
+    <string name="app_bar_selection_mode_description">Selectarea</string>
+    <!-- success message when moving a node -->
+    <string name="node_moved_success_message">Elementul a fost mutat</string>
+    <!-- success message when a node was restore from Rubbish bin to a location -->
+    <string name="node_restored_from_rubbish_bin_to_location">Restaurat în %s</string>
+    <!-- error message when a node failed to be restored from Rubbish bin -->
+    <string name="node_restore_error_message">A apărut o eroare. Element nerestaurat.</string>
+    <!-- Snackbar message to show when successfully left shared folder(s) along with one or more failures -->
+    <plurals name="leave_shared_folder_partial_success_snackbar_message">
+        <item quantity="one">Stânga %1$d folderul partajat, dar nu a putut părăsi unul sau mai multe foldere</item>
+        <item quantity="few">Stânga %1$d foldere partajate, dar nu a putut părăsi unul sau mai multe foldere</item>
+        <item quantity="other">Stânga %1$d de foldere partajate, dar nu a putut părăsi unul sau mai multe foldere</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
+    <plurals name="node_restored_from_rubbish_bin_success_message">
+        <item quantity="one">%d element a fost restaurat</item>
+        <item quantity="few">%d elemente au fost restaurate</item>
+        <item quantity="other">%d de elemente au fost restaurate</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
+    <plurals name="node_restored_from_rubbish_bin_error_message">
+        <item quantity="one">%d element nu a fost restaurat</item>
+        <item quantity="few">%d elemente nu au fost restaurate</item>
+        <item quantity="other">%d de elemente nu au fost restaurate</item>
+    </plurals>
 </resources>
