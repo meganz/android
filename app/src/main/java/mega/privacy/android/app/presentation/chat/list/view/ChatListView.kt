@@ -165,6 +165,7 @@ private fun ListView(
     FastScrollLazyColumn(
         state = listState,
         totalItems = items.size,
+        contentPadding = PaddingValues(bottom = 86.dp),
         modifier = modifier
             .testTag("chat_room_list:list"),
     ) {
@@ -202,6 +203,7 @@ private fun ListView(
                     onItemSelected = onItemSelected,
                 )
             }
+            if (index == items.lastIndex) ChatDivider()
         }
     }
 
