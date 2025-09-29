@@ -357,9 +357,11 @@ internal fun VideoPlayerScreen(
                                 updateResizeMode(uiState.isFullscreen)
 
                                 autoHideJob?.cancel()
-                                isControllerViewVisible = true
-                                systemUiController.isSystemBarsVisible = true
-                                playerComposeView.showController()
+                                if (isControllerViewVisible) {
+                                    systemUiController.isSystemBarsVisible = true
+                                    playerComposeView.showController()
+                                }
+
                                 playerComposeView.controllerAutoShow = false
 
                                 autoHideJob = coroutineScope.launch {
