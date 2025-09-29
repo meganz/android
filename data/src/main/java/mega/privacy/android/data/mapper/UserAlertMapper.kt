@@ -35,12 +35,12 @@ import mega.privacy.android.domain.entity.UpdatedScheduledMeetingRulesAlert
 import mega.privacy.android.domain.entity.UpdatedScheduledMeetingTimezoneAlert
 import mega.privacy.android.domain.entity.UpdatedScheduledMeetingTitleAlert
 import mega.privacy.android.domain.entity.UserAlert
+import mega.privacy.android.domain.entity.UserAlertDestination
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.useralert.UserAlertChange
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUserAlert
-import timber.log.Timber
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -55,12 +55,18 @@ internal class UserAlertMapper @Inject constructor() {
         scheduledMeetingProvider: suspend (Long, Long) -> ChatScheduledMeeting?,
         scheduledMeetingOccurrProvider: suspend (Long) -> List<ChatScheduledMeetingOccurr>?,
         nodeProvider: suspend (Long) -> MegaNode?,
+        rootParentNodeProvider: suspend (Long) -> MegaNode?,
+        rubbishNodeProvider: suspend () -> MegaNode?,
+        rootNodeProvider: suspend () -> MegaNode?,
     ): UserAlert = toUserAlert(
         megaUserAlert,
         contactProvider,
         scheduledMeetingProvider,
         scheduledMeetingOccurrProvider,
         nodeProvider,
+        rootParentNodeProvider,
+        rubbishNodeProvider,
+        rootNodeProvider
     )
 }
 
@@ -77,6 +83,9 @@ internal suspend fun toUserAlert(
     scheduledMeetingProvider: suspend (Long, Long) -> ChatScheduledMeeting?,
     scheduledMeetingOccurrProvider: suspend (Long) -> List<ChatScheduledMeetingOccurr>?,
     nodeProvider: suspend (Long) -> MegaNode?,
+    rootParentNodeProvider: suspend (Long) -> MegaNode?,
+    rubbishNodeProvider: suspend () -> MegaNode?,
+    rootNodeProvider: suspend () -> MegaNode?,
 ): UserAlert {
     return when (megaUserAlert.type) {
         MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_REQUEST -> {
@@ -313,6 +322,13 @@ internal suspend fun toUserAlert(
                 rootNodeId = getRootNodeId(megaUserAlert, nodeProvider),
                 name = megaUserAlert.name,
                 path = megaUserAlert.path,
+                destination = getDestination(
+                    megaUserAlert,
+                    nodeProvider,
+                    rootParentNodeProvider,
+                    rubbishNodeProvider,
+                    rootNodeProvider
+                )
             )
         }
 
@@ -326,6 +342,13 @@ internal suspend fun toUserAlert(
                 rootNodeId = getRootNodeId(megaUserAlert, nodeProvider),
                 name = megaUserAlert.name,
                 path = megaUserAlert.path,
+                destination = getDestination(
+                    megaUserAlert,
+                    nodeProvider,
+                    rootParentNodeProvider,
+                    rubbishNodeProvider,
+                    rootNodeProvider
+                )
             )
         }
 
@@ -385,6 +408,31 @@ internal suspend fun toUserAlert(
         }
     }
 }
+
+private suspend fun getDestination(
+    megaUserAlert: MegaUserAlert,
+    nodeProvider: suspend (Long) -> MegaNode?,
+    rootParentNodeProvider: suspend (Long) -> MegaNode?,
+    rubbishNodeProvider: suspend () -> MegaNode?,
+    rootNodeProvider: suspend () -> MegaNode?,
+): UserAlertDestination? = getRootNodeId(megaUserAlert, nodeProvider)?.let {
+    rootParentNodeProvider(it)?.let { rootParent ->
+        val rootNode = rootNodeProvider()
+        val rubbishNode = rubbishNodeProvider()
+        when (rootParent.handle) {
+            rootNode?.handle -> {
+                UserAlertDestination.CloudDrive
+            }
+
+            rubbishNode?.handle -> {
+                UserAlertDestination.RubbishBin
+            }
+
+            else -> UserAlertDestination.IncomingShares
+        }
+    }
+}
+
 
 private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
     meeting: ChatScheduledMeeting?,

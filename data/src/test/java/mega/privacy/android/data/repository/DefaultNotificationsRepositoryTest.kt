@@ -22,6 +22,9 @@ import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.ContactAlert
 import mega.privacy.android.domain.entity.NodesCurrentEvent
+import mega.privacy.android.domain.entity.TakeDownAlert
+import mega.privacy.android.domain.entity.TakeDownReinstatedAlert
+import mega.privacy.android.domain.entity.UserAlertDestination
 import mega.privacy.android.domain.entity.notifications.PromoNotification
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
@@ -30,6 +33,7 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaEvent
 import nz.mega.sdk.MegaIntegerList
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNotification
 import nz.mega.sdk.MegaNotificationList
 import nz.mega.sdk.MegaPushNotificationSettings
@@ -722,6 +726,318 @@ class DefaultNotificationsRepositoryTest {
                 underTest.updatePushNotificationSettings()
                 verify(appEventGateway).broadcastPushNotificationSettings()
             }
+    }
+
+    @Test
+    fun `test that takedown alert destination is CloudDrive when root parent matches root node`() =
+        runTest {
+            val expectedNodeId = 2L
+            val rootNodeId = 1L
+            val rootNode = mock<MegaNode> { on { handle }.thenReturn(rootNodeId) }
+            val rootParentNode = mock<MegaNode> { on { handle }.thenReturn(rootNodeId) }
+            val rubbishNode = mock<MegaNode> { on { handle }.thenReturn(3L) }
+
+            val megaUserAlert = mock<MegaUserAlert> {
+                on { type }.thenReturn(MegaUserAlert.TYPE_TAKEDOWN)
+                on { id }.thenReturn(1L)
+                on { seen }.thenReturn(false)
+                on { userHandle }.thenReturn(2L)
+                on { getTimestamp(0L) }.thenReturn(3L)
+                on { isOwnChange }.thenReturn(false)
+                on { nodeHandle }.thenReturn(expectedNodeId)
+                on { email }.thenReturn("")
+                on { name }.thenReturn("testName")
+                on { path }.thenReturn("testPath")
+                on { heading }.thenReturn("testHeading")
+            }
+
+            val node = mock<MegaNode> {
+                on { handle }.thenReturn(expectedNodeId)
+                on { isFile }.thenReturn(true)
+                on { parentHandle }.thenReturn(rootNodeId)
+            }
+            val globalUpdate = GlobalUpdate.OnUserAlertsUpdate(arrayListOf(megaUserAlert))
+            whenever(megaApiGateway.globalUpdates).thenReturn(flowOf(globalUpdate))
+            whenever(megaApiGateway.getMegaNodeByHandle(expectedNodeId)).thenReturn(
+                node
+            )
+            whenever(megaApiGateway.getParentNode(any())).thenReturn(null)
+            whenever(megaApiGateway.getMegaNodeByHandle(rootNodeId)).thenReturn(rootParentNode)
+            whenever(megaApiGateway.getRubbishBinNode()).thenReturn(rubbishNode)
+            whenever(megaApiGateway.getRootNode()).thenReturn(rootNode)
+            whenever(megaApiGateway.getContact(any())).thenReturn(mock())
+
+            underTest.monitorUserAlerts().test {
+                val alert = awaitItem().first() as TakeDownAlert
+                assertThat(alert.destination).isEqualTo(UserAlertDestination.CloudDrive)
+                awaitComplete()
+            }
+        }
+
+    @Test
+    fun `test that takedown alert destination is RubbishBin when root parent matches rubbish node`() =
+        runTest {
+            val expectedNodeId = 2L
+            val rootNodeId = 1L
+            val rubbishNodeId = 3L
+            val rootNode = mock<MegaNode> { on { handle }.thenReturn(rootNodeId) }
+            val rootParentNode =
+                mock<MegaNode> { on { handle }.thenReturn(rubbishNodeId) }
+            val rubbishNode = mock<MegaNode> { on { handle }.thenReturn(rubbishNodeId) }
+
+            val megaUserAlert = mock<MegaUserAlert> {
+                on { type }.thenReturn(MegaUserAlert.TYPE_TAKEDOWN)
+                on { id }.thenReturn(1L)
+                on { seen }.thenReturn(false)
+                on { userHandle }.thenReturn(2L)
+                on { getTimestamp(0L) }.thenReturn(3L)
+                on { isOwnChange }.thenReturn(false)
+                on { nodeHandle }.thenReturn(expectedNodeId)
+                on { email }.thenReturn("")
+                on { name }.thenReturn("testName")
+                on { path }.thenReturn("testPath")
+                on { heading }.thenReturn("testHeading")
+            }
+
+            val node = mock<MegaNode> {
+                on { handle }.thenReturn(expectedNodeId)
+                on { isFile }.thenReturn(true)
+                on { parentHandle }.thenReturn(rootNodeId)
+            }
+            val globalUpdate = GlobalUpdate.OnUserAlertsUpdate(arrayListOf(megaUserAlert))
+            whenever(megaApiGateway.globalUpdates).thenReturn(flowOf(globalUpdate))
+            whenever(megaApiGateway.getMegaNodeByHandle(expectedNodeId)).thenReturn(
+                node
+            )
+            whenever(megaApiGateway.getParentNode(any())).thenReturn(null)
+            whenever(megaApiGateway.getMegaNodeByHandle(rootNodeId)).thenReturn(rootParentNode)
+            whenever(megaApiGateway.getRubbishBinNode()).thenReturn(rubbishNode)
+            whenever(megaApiGateway.getRootNode()).thenReturn(rootNode)
+            whenever(megaApiGateway.getContact(any())).thenReturn(mock())
+
+            underTest.monitorUserAlerts().test {
+                val alert = awaitItem().first() as TakeDownAlert
+                assertThat(alert.destination).isEqualTo(UserAlertDestination.RubbishBin)
+                awaitComplete()
+            }
+        }
+
+    @Test
+    fun `test that takedown alert destination is IncomingShares when root parent does not match root or rubbish node`() =
+        runTest {
+            val expectedNodeId = 2L
+            val rootNodeId = 1L
+            val rubbishNodeId = 3L
+            val otherNodeId = 4L
+            val rootNode = mock<MegaNode> { on { handle }.thenReturn(rootNodeId) }
+            val rootParentNode =
+                mock<MegaNode> { on { handle }.thenReturn(otherNodeId) }
+            val rubbishNode = mock<MegaNode> { on { handle }.thenReturn(rubbishNodeId) }
+
+            val megaUserAlert = mock<MegaUserAlert> {
+                on { type }.thenReturn(MegaUserAlert.TYPE_TAKEDOWN)
+                on { id }.thenReturn(1L)
+                on { seen }.thenReturn(false)
+                on { userHandle }.thenReturn(2L)
+                on { getTimestamp(0L) }.thenReturn(3L)
+                on { isOwnChange }.thenReturn(false)
+                on { nodeHandle }.thenReturn(expectedNodeId)
+                on { email }.thenReturn("")
+                on { name }.thenReturn("testName")
+                on { path }.thenReturn("testPath")
+                on { heading }.thenReturn("testHeading")
+            }
+
+            val node = mock<MegaNode> {
+                on { handle }.thenReturn(expectedNodeId)
+                on { isFile }.thenReturn(true)
+                on { parentHandle }.thenReturn(rootNodeId)
+            }
+            val globalUpdate = GlobalUpdate.OnUserAlertsUpdate(arrayListOf(megaUserAlert))
+            whenever(megaApiGateway.globalUpdates).thenReturn(flowOf(globalUpdate))
+            whenever(megaApiGateway.getMegaNodeByHandle(expectedNodeId)).thenReturn(
+                node
+            )
+            whenever(megaApiGateway.getParentNode(any())).thenReturn(null)
+            whenever(megaApiGateway.getMegaNodeByHandle(rootNodeId)).thenReturn(rootParentNode)
+            whenever(megaApiGateway.getRubbishBinNode()).thenReturn(rubbishNode)
+            whenever(megaApiGateway.getRootNode()).thenReturn(rootNode)
+            whenever(megaApiGateway.getContact(any())).thenReturn(mock())
+
+            underTest.monitorUserAlerts().test {
+                val alert = awaitItem().first() as TakeDownAlert
+                assertThat(alert.destination).isEqualTo(UserAlertDestination.IncomingShares)
+                awaitComplete()
+            }
+        }
+
+    @Test
+    fun `test that takedown reinstated alert destination is CloudDrive when root parent matches root node`() =
+        runTest {
+            val expectedNodeId = 2L
+            val rootNodeId = 1L
+            val rootNode = mock<MegaNode> { on { handle }.thenReturn(rootNodeId) }
+            val rootParentNode = mock<MegaNode> { on { handle }.thenReturn(rootNodeId) }
+            val rubbishNode = mock<MegaNode> { on { handle }.thenReturn(3L) }
+
+            val megaUserAlert = mock<MegaUserAlert> {
+                on { type }.thenReturn(MegaUserAlert.TYPE_TAKEDOWN_REINSTATED)
+                on { id }.thenReturn(1L)
+                on { seen }.thenReturn(false)
+                on { userHandle }.thenReturn(2L)
+                on { getTimestamp(0L) }.thenReturn(3L)
+                on { isOwnChange }.thenReturn(false)
+                on { nodeHandle }.thenReturn(expectedNodeId)
+                on { email }.thenReturn("")
+                on { name }.thenReturn("testName")
+                on { path }.thenReturn("testPath")
+                on { heading }.thenReturn("testHeading")
+            }
+
+            val node = mock<MegaNode> {
+                on { handle }.thenReturn(expectedNodeId)
+                on { isFile }.thenReturn(true)
+                on { parentHandle }.thenReturn(rootNodeId)
+            }
+            val globalUpdate = GlobalUpdate.OnUserAlertsUpdate(arrayListOf(megaUserAlert))
+            whenever(megaApiGateway.globalUpdates).thenReturn(flowOf(globalUpdate))
+            whenever(megaApiGateway.getMegaNodeByHandle(expectedNodeId)).thenReturn(
+                node
+            )
+            whenever(megaApiGateway.getParentNode(any())).thenReturn(null)
+            whenever(megaApiGateway.getMegaNodeByHandle(rootNodeId)).thenReturn(rootParentNode)
+            whenever(megaApiGateway.getRubbishBinNode()).thenReturn(rubbishNode)
+            whenever(megaApiGateway.getRootNode()).thenReturn(rootNode)
+            whenever(megaApiGateway.getContact(any())).thenReturn(mock())
+
+            underTest.monitorUserAlerts().test {
+                val alert = awaitItem().first() as TakeDownReinstatedAlert
+                assertThat(alert.destination).isEqualTo(UserAlertDestination.CloudDrive)
+                awaitComplete()
+            }
+        }
+
+    @Test
+    fun `test that takedown alert destination is null when root node id is null`() = runTest {
+        val invalidNodeId = -1L
+        val rootNode = mock<MegaNode> { on { handle }.thenReturn(1L) }
+        val rootParentNode = mock<MegaNode> { on { handle }.thenReturn(1L) }
+        val rubbishNode = mock<MegaNode> { on { handle }.thenReturn(3L) }
+
+        val megaUserAlert = mock<MegaUserAlert> {
+            on { type }.thenReturn(MegaUserAlert.TYPE_TAKEDOWN)
+            on { id }.thenReturn(1L)
+            on { seen }.thenReturn(false)
+            on { userHandle }.thenReturn(2L)
+            on { getTimestamp(0L) }.thenReturn(3L)
+            on { isOwnChange }.thenReturn(false)
+            on { nodeHandle }.thenReturn(invalidNodeId)
+            on { email }.thenReturn("")
+            on { name }.thenReturn("testName")
+            on { path }.thenReturn("testPath")
+            on { heading }.thenReturn("testHeading")
+        }
+
+        val globalUpdate = GlobalUpdate.OnUserAlertsUpdate(arrayListOf(megaUserAlert))
+        whenever(megaApiGateway.globalUpdates).thenReturn(flowOf(globalUpdate))
+        whenever(megaApiGateway.getMegaNodeByHandle(invalidNodeId)).thenReturn(null)
+        whenever(megaApiGateway.getRubbishBinNode()).thenReturn(rubbishNode)
+        whenever(megaApiGateway.getRootNode()).thenReturn(rootNode)
+        whenever(megaApiGateway.getContact(any())).thenReturn(mock())
+
+        underTest.monitorUserAlerts().test {
+            val alert = awaitItem().first() as TakeDownAlert
+            assertThat(alert.destination).isNull()
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test that takedown alert destination is null when root parent node is null`() = runTest {
+        val expectedNodeId = 2L
+        val rootNodeId = 1L
+        val rootNode = mock<MegaNode> { on { handle }.thenReturn(rootNodeId) }
+        val rubbishNode = mock<MegaNode> { on { handle }.thenReturn(3L) }
+
+        val megaUserAlert = mock<MegaUserAlert> {
+            on { type }.thenReturn(MegaUserAlert.TYPE_TAKEDOWN)
+            on { id }.thenReturn(1L)
+            on { seen }.thenReturn(false)
+            on { userHandle }.thenReturn(2L)
+            on { getTimestamp(0L) }.thenReturn(3L)
+            on { isOwnChange }.thenReturn(false)
+            on { nodeHandle }.thenReturn(expectedNodeId)
+            on { email }.thenReturn("")
+            on { name }.thenReturn("testName")
+            on { path }.thenReturn("testPath")
+            on { heading }.thenReturn("testHeading")
+        }
+
+        val node = mock<MegaNode> {
+            on { handle }.thenReturn(expectedNodeId)
+            on { isFile }.thenReturn(true)
+            on { parentHandle }.thenReturn(rootNodeId)
+        }
+        val globalUpdate = GlobalUpdate.OnUserAlertsUpdate(arrayListOf(megaUserAlert))
+        whenever(megaApiGateway.globalUpdates).thenReturn(flowOf(globalUpdate))
+        whenever(megaApiGateway.getMegaNodeByHandle(expectedNodeId)).thenReturn(
+            node
+        )
+        whenever(megaApiGateway.getParentNode(any())).thenReturn(null)
+        whenever(megaApiGateway.getMegaNodeByHandle(rootNodeId)).thenReturn(null)
+        whenever(megaApiGateway.getRubbishBinNode()).thenReturn(rubbishNode)
+        whenever(megaApiGateway.getRootNode()).thenReturn(rootNode)
+        whenever(megaApiGateway.getContact(any())).thenReturn(mock())
+
+        underTest.monitorUserAlerts().test {
+            val alert = awaitItem().first() as TakeDownAlert
+            assertThat(alert.destination).isNull()
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test that getUserAlerts returns alerts with destination`() = runTest {
+        val expectedNodeId = 2L
+        val rootNodeId = 1L
+        val rootNode = mock<MegaNode> { on { handle }.thenReturn(rootNodeId) }
+        val rootParentNode = mock<MegaNode> { on { handle }.thenReturn(rootNodeId) }
+        val rubbishNode = mock<MegaNode> { on { handle }.thenReturn(3L) }
+
+        val megaUserAlert = mock<MegaUserAlert> {
+            on { type }.thenReturn(MegaUserAlert.TYPE_TAKEDOWN)
+            on { id }.thenReturn(1L)
+            on { seen }.thenReturn(false)
+            on { userHandle }.thenReturn(2L)
+            on { getTimestamp(0L) }.thenReturn(3L)
+            on { isOwnChange }.thenReturn(false)
+            on { nodeHandle }.thenReturn(expectedNodeId)
+            on { email }.thenReturn("")
+            on { name }.thenReturn("testName")
+            on { path }.thenReturn("testPath")
+            on { heading }.thenReturn("testHeading")
+        }
+
+        val node = mock<MegaNode> {
+            on { handle }.thenReturn(expectedNodeId)
+            on { isFile }.thenReturn(true)
+            on { parentHandle }.thenReturn(rootNodeId)
+        }
+        whenever(megaApiGateway.getUserAlerts()).thenReturn(listOf(megaUserAlert))
+        whenever(megaApiGateway.getMegaNodeByHandle(expectedNodeId)).thenReturn(
+            node
+        )
+        whenever(megaApiGateway.getParentNode(any())).thenReturn(null)
+        whenever(megaApiGateway.getMegaNodeByHandle(rootNodeId)).thenReturn(rootParentNode)
+        whenever(megaApiGateway.getRubbishBinNode()).thenReturn(rubbishNode)
+        whenever(megaApiGateway.getRootNode()).thenReturn(rootNode)
+        whenever(megaApiGateway.getContact(any())).thenReturn(mock())
+
+        val result = underTest.getUserAlerts()
+
+        assertThat(result).hasSize(1)
+        val alert = result.first() as TakeDownAlert
+        assertThat(alert.destination).isEqualTo(UserAlertDestination.CloudDrive)
     }
 
 }

@@ -475,6 +475,7 @@ data class TakeDownAlert(
     val rootNodeId: Long?,
     val name: String?,
     val path: String?,
+    val destination: UserAlertDestination?,
 ) : UserAlert, CustomAlert {}
 
 /**
@@ -498,6 +499,7 @@ data class TakeDownReinstatedAlert(
     val rootNodeId: Long?,
     val name: String?,
     val path: String?,
+    val destination: UserAlertDestination?,
 ) : UserAlert, CustomAlert {}
 
 /**

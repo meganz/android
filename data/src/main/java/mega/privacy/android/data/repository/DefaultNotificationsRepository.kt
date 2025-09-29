@@ -35,6 +35,7 @@ import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeeting
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaPushNotificationSettings
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
@@ -75,11 +76,14 @@ internal class DefaultNotificationsRepository @Inject constructor(
             withContext(dispatcher) {
                 val userAlerts = newUserAlerts?.map { userAlert ->
                     userAlertsMapper(
-                        userAlert,
-                        ::provideContact,
-                        ::provideScheduledMeeting,
-                        ::provideSchedMeetingOccurrences,
-                        megaApiGateway::getMegaNodeByHandle
+                        megaUserAlert = userAlert,
+                        contactProvider = ::provideContact,
+                        scheduledMeetingProvider = ::provideScheduledMeeting,
+                        scheduledMeetingOccurrProvider = ::provideSchedMeetingOccurrences,
+                        nodeProvider = megaApiGateway::getMegaNodeByHandle,
+                        rootParentNodeProvider = ::provideRootParentNode,
+                        rubbishNodeProvider = megaApiGateway::getRubbishBinNode,
+                        rootNodeProvider = megaApiGateway::getRootNode
                     )
                 }
 
@@ -106,11 +110,14 @@ internal class DefaultNotificationsRepository @Inject constructor(
         withContext(dispatcher) {
             val userAlerts = megaApiGateway.getUserAlerts().map { userAlert ->
                 userAlertsMapper(
-                    userAlert,
-                    ::provideContact,
-                    ::provideScheduledMeeting,
-                    ::provideSchedMeetingOccurrences,
-                    megaApiGateway::getMegaNodeByHandle
+                    megaUserAlert = userAlert,
+                    contactProvider = ::provideContact,
+                    scheduledMeetingProvider = ::provideScheduledMeeting,
+                    scheduledMeetingOccurrProvider = ::provideSchedMeetingOccurrences,
+                    nodeProvider = megaApiGateway::getMegaNodeByHandle,
+                    rootParentNodeProvider = ::provideRootParentNode,
+                    rubbishNodeProvider = megaApiGateway::getRubbishBinNode,
+                    rootNodeProvider = megaApiGateway::getRootNode
                 )
             }
 
@@ -159,6 +166,17 @@ internal class DefaultNotificationsRepository @Inject constructor(
             hasPendingRequest = hasPendingRequest
         )
     }
+
+    private suspend fun provideRootParentNode(nodeHandle: Long): MegaNode? =
+        withContext(dispatcher) {
+            var currentRootParent = megaApiGateway.getMegaNodeByHandle(nodeHandle)
+            while (currentRootParent != null) {
+                megaApiGateway.getParentNode(currentRootParent)?.let {
+                    currentRootParent = it
+                } ?: break
+            }
+            currentRootParent
+        }
 
     private suspend fun provideScheduledMeeting(
         chatId: Long,
