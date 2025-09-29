@@ -96,14 +96,17 @@ class GetRecentActionsUseCase @Inject constructor(
                                 RecentActionsSharesType.INCOMING_SHARES
                             }
                         }
+                        val isNodeKeyDecrypted =
+                            bucket.nodes.firstOrNull()?.isNodeKeyDecrypted == true
                         val isNodeKeyVerified =
-                            bucket.nodes.firstOrNull()?.isNodeKeyDecrypted == true ||
+                            isNodeKeyDecrypted ||
                                     currentUserIsOwner ||
                                     mutex.withLock {
                                         verifiedCredentialsCache.getOrPut(bucket.userEmail) {
                                             areCredentialsVerified(bucket.userEmail)
                                         }
                                     }
+
                         RecentActionBucket(
                             timestamp = bucket.timestamp,
                             userEmail = bucket.userEmail,
@@ -116,6 +119,7 @@ class GetRecentActionsUseCase @Inject constructor(
                             parentFolderSharesType = sharesType,
                             currentUserIsOwner = currentUserIsOwner,
                             isKeyVerified = isNodeKeyVerified,
+                            isNodeKeyDecrypted = isNodeKeyDecrypted
                         )
                     }
                 }

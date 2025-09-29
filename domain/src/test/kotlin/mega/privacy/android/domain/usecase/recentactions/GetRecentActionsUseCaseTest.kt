@@ -468,4 +468,112 @@ class GetRecentActionsUseCaseTest {
 
             assertThat(result[0].parentFolderSharesType).isEqualTo(expected)
         }
+
+    @Test
+    fun `test that isNodeKeyDecrypted is set correctly when node key is decrypted`() = runTest {
+        val fileNode = mock<FileNode> {
+            on { id } doReturn NodeId(123L)
+            on { isNodeKeyDecrypted }.thenReturn(true)
+        }
+        val recentActionBucketUnTyped = RecentActionBucketUnTyped(
+            timestamp = 0L,
+            userEmail = "aaa@aaa.com",
+            parentNodeId = NodeId(321L),
+            isUpdate = false,
+            isMedia = false,
+            nodes = listOf(fileNode)
+        )
+        whenever(addNodeType(fileNode)).thenReturn(DefaultTypedFileNode(fileNode))
+        whenever(recentActionsRepository.getRecentActions(any())).thenReturn(
+            listOf(recentActionBucketUnTyped)
+        )
+
+        val result = underTest(false)
+
+        assertThat(result[0].isNodeKeyDecrypted).isTrue()
+    }
+
+    @Test
+    fun `test that isNodeKeyDecrypted is set correctly when node key is not decrypted`() = runTest {
+        val fileNode = mock<FileNode> {
+            on { id } doReturn NodeId(123L)
+            on { isNodeKeyDecrypted }.thenReturn(false)
+        }
+        val recentActionBucketUnTyped = RecentActionBucketUnTyped(
+            timestamp = 0L,
+            userEmail = "aaa@aaa.com",
+            parentNodeId = NodeId(321L),
+            isUpdate = false,
+            isMedia = false,
+            nodes = listOf(fileNode)
+        )
+        whenever(addNodeType(fileNode)).thenReturn(DefaultTypedFileNode(fileNode))
+        whenever(recentActionsRepository.getRecentActions(any())).thenReturn(
+            listOf(recentActionBucketUnTyped)
+        )
+
+        val result = underTest(false)
+
+        assertThat(result[0].isNodeKeyDecrypted).isFalse()
+    }
+
+    @Test
+    fun `test that isNodeKeyDecrypted is set correctly when multiple nodes have different decryption status`() =
+        runTest {
+            val fileNode1 = mock<FileNode> {
+                on { id } doReturn NodeId(123L)
+                on { isNodeKeyDecrypted }.thenReturn(true)
+            }
+            val fileNode2 = mock<FileNode> {
+                on { id } doReturn NodeId(124L)
+                on { isNodeKeyDecrypted }.thenReturn(false)
+            }
+            val recentActionBucketUnTyped = RecentActionBucketUnTyped(
+                timestamp = 0L,
+                userEmail = "aaa@aaa.com",
+                parentNodeId = NodeId(321L),
+                isUpdate = false,
+                isMedia = false,
+                nodes = listOf(fileNode1, fileNode2)
+            )
+            whenever(addNodeType(fileNode1)).thenReturn(DefaultTypedFileNode(fileNode1))
+            whenever(addNodeType(fileNode2)).thenReturn(DefaultTypedFileNode(fileNode2))
+            whenever(recentActionsRepository.getRecentActions(any())).thenReturn(
+                listOf(recentActionBucketUnTyped)
+            )
+
+            val result = underTest(false)
+
+            // Should be false because first node (which is checked) is decrypted, but we check firstOrNull
+            assertThat(result[0].isNodeKeyDecrypted).isTrue()
+        }
+
+    @Test
+    fun `test that isKeyVerified is calculated correctly based on isNodeKeyDecrypted and other factors`() =
+        runTest {
+            val fileNode = mock<FileNode> {
+                on { id } doReturn NodeId(123L)
+                on { isNodeKeyDecrypted }.thenReturn(false)
+            }
+            val recentActionBucketUnTyped = RecentActionBucketUnTyped(
+                timestamp = 0L,
+                userEmail = "bbb@bbb.com", // Different from current user
+                parentNodeId = NodeId(321L),
+                isUpdate = false,
+                isMedia = false,
+                nodes = listOf(fileNode)
+            )
+            whenever(addNodeType(fileNode)).thenReturn(DefaultTypedFileNode(fileNode))
+            whenever(getCurrentUserEmail(false)).thenReturn("aaa@aaa.com") // Different user
+            whenever(areCredentialsVerifiedUseCase("bbb@bbb.com")).thenReturn(true) // Credentials verified
+            whenever(recentActionsRepository.getRecentActions(any())).thenReturn(
+                listOf(recentActionBucketUnTyped)
+            )
+
+            val result = underTest(false)
+
+            // Should be true because credentials are verified, even though node key is not decrypted
+            assertThat(result[0].isKeyVerified).isTrue()
+            assertThat(result[0].isNodeKeyDecrypted).isFalse()
+        }
 }

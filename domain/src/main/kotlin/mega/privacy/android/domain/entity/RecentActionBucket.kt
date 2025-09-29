@@ -31,6 +31,7 @@ data class RecentActionBucket(
     val parentFolderSharesType: RecentActionsSharesType = RecentActionsSharesType.NONE,
     val currentUserIsOwner: Boolean = false,
     val isKeyVerified: Boolean = false,
+    val isNodeKeyDecrypted: Boolean = true
 ) {
     /**
      * Generated sample identifier: m_true-u_false-t_1713248239-ue_ht@mega.co.nz-pni_100124500130291
