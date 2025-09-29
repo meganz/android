@@ -584,7 +584,7 @@
     <!-- Warning Message indicating the user needs to upgrade to get more storage -->
     <string name="account_storage_over_quota_inline_warning_banner_message">Veri yüklemeye devam etmek için, daha fazla depolama alanı elde etmek üzere yükseltin.</string>
     <!-- Label for the upgrade action link -->
-    <string name="account_storage_over_quota_inline_error_banner_upgrade_link">Şimdi yükselt</string>
+    <string name="account_storage_over_quota_inline_error_banner_upgrade_link">Hemen yükselt</string>
     <!-- Hidden nodes sharing albums -->
     <string name="hidden_nodes_sharing_albums">Bu albümlerden birinde veya daha fazlasında gizli öğeler var. Albümleri paylaşmak, gizli öğelerin paylaştığınız kişiler tarafından görülebileceği anlamına gelir. Öğeler Bulut depolamanızda gizli kalmaya devam edecektir.</string>
     <!-- Backup title for toolbar when inside new backup screen -->
@@ -1113,7 +1113,7 @@
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">Önerilen</string>
     <!-- Text for the upgrade banner action -->
-    <string name="transfers_over_quota_banner_action_button">Şimdi yükselt</string>
+    <string name="transfers_over_quota_banner_action_button">Hemen yükselt</string>
     <!-- Section title for additional benefits of Pro plans -->
     <string name="pro_plan_additional_benefits_section_title">Pro planlarının ek avantajları</string>
     <!-- Benefit: Password-protected links -->
@@ -1122,8 +1122,6 @@
     <string name="pro_plan_benefit_links_with_expiry_dates">Son kullanma tarihli bağlantılar</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
     <string name="pro_plan_benefit_auto_sync_mobile">Mobil cihazınızdaki klasörleri otomatik olarak senkronize etme</string>
-    <!-- Benefit: Rewind up to 180 days of deleted data -->
-    <string name="pro_plan_benefit_rewind_180_days">Silinen verileri 180 güne kadar geri sarabilme</string>
     <!-- Benefit: Host calls and meetings with unlimited participants and no time restrictions -->
     <string name="pro_plan_benefit_host_calls_unlimited">Sınırsız katılımcıyla ve zaman kısıtlaması olmadan arama ve toplantı düzenleme</string>
     <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->

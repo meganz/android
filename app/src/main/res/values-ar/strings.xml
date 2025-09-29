@@ -296,15 +296,6 @@
     <string name="context_remove_link_menu">إزالة الرابط</string>
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">لن يكون هذا الرابط متاحاً كمشاركة عامة بعد الآن.</string>
-    <!-- Warning that appears prior to remove links of files. Plural. -->
-    <plurals name="remove_links_warning_text">
-        <item quantity="zero">لن يكون هذا الرابط متاحاً كمشاركة عامة بعد الآن.</item>
-        <item quantity="one">لن يكون هذا الرابط متاحاً كمشاركة عامة بعد الآن.</item>
-        <item quantity="two">لن تكون هذه الروابط متاحة كمشاركة عامة بعد الآن.</item>
-        <item quantity="few">لن تكون هذه الروابط متاحة كمشاركة عامة بعد الآن.</item>
-        <item quantity="many">لن تكون هذه الروابط متاحة كمشاركة عامة بعد الآن.</item>
-        <item quantity="other">لن تكون هذه الروابط متاحة كمشاركة عامة بعد الآن.</item>
-    </plurals>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_rename">إعادة التسمية</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -380,8 +371,6 @@
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">اختر مجلد الوجهة</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">تم نقل العنصر</string>
-    <!-- success message when moving a node -->
     <string name="context_correctly_moved_to_rubbish">تم نقل العنصر إلى سلة المحذوفات</string>
     <!-- error message -->
     <string name="context_no_moved">خطأ. لم يتم النقل</string>
@@ -419,8 +408,6 @@
     <string name="subscription_type_monthly">شهرياً</string>
     <!--  -->
     <string name="subscription_type_yearly">سنويًا</string>
-    <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="context_share_correctly_removed">تم حذف المشاركة بنجاح</string>
     <!-- Menu option to create a new folder in the file manager. -->
     <string name="menu_new_folder">مجلد جديد</string>
     <!-- Menu option to add a contact to your contact list. -->
@@ -775,15 +762,6 @@
     <string name="edit_link_option">إدارة الرابط</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
     <string name="old_password_provided_incorrect">كلمة المرور الحالية التى أدخلتها غير صحيحة.</string>
-    <!-- Confirmation before removing the outgoing shares of a folder -->
-    <plurals name="confirmation_remove_outgoing_shares">
-        <item quantity="zero">هذا المجلد مشارك من قبل %1$d جهة اتصال. هل تود إزالة كل المشاركات؟</item>
-        <item quantity="one">هذا المجلد مشارك من قبل %1$d جهات اتصال. هل تود إزالة المشاركة؟</item>
-        <item quantity="two">هذا المجلد مشارك من قبل %1$d جهتي اتصال. هل تود إزالة كل المشاركات؟</item>
-        <item quantity="few">هذا المجلد مشارك من قبل %1$d جهات اتصال. هل تود إزالة كل المشاركات؟</item>
-        <item quantity="many">هذا المجلد مشارك من قبل %1$d جهة اتصال. هل تود إزالة كل المشاركات؟</item>
-        <item quantity="other">هذا المجلد مشارك من قبل %1$d جهة اتصال. هل تود إزالة كل المشاركات؟</item>
-    </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">البريد الإلكتروني أو كلمة المرور غير صالحين. حاول مرة أخرى</string>
     <!-- Error message when trying to login and the account is suspended. -->
@@ -1230,15 +1208,6 @@
     <string name="copyright_alert_disagree_button">غير موافق</string>
     <!-- Hint how to cancel the download -->
     <string name="download_show_info">شاهد المعلومات</string>
-    <!-- Error message when removing public links of nodes. Plural. -->
-    <plurals name="context_link_removal_error">
-        <item quantity="zero">فشل إزالة الرابط، يرجى إعادة المحاولة لاحقاً.</item>
-        <item quantity="one">فشل إزالة الرابط، يرجى إعادة المحاولة لاحقاً.</item>
-        <item quantity="two">فشل في إزالة بعض الروابط. الرجاء معاودة المحاولة في وقت لاحق.</item>
-        <item quantity="few">فشل في إزالة بعض الروابط. الرجاء معاودة المحاولة في وقت لاحق.</item>
-        <item quantity="many">فشل في إزالة بعض الروابط. الرجاء معاودة المحاولة في وقت لاحق.</item>
-        <item quantity="other">فشل في إزالة بعض الروابط. الرجاء معاودة المحاولة في وقت لاحق.</item>
-    </plurals>
     <!-- Error message when creating public links of nodes. Plural. -->
     <plurals name="context_link_export_error">
         <item quantity="zero">فشل إنشاء الرابط. الرجاء المحاولة في وقت لاحق.</item>
@@ -1247,15 +1216,6 @@
         <item quantity="few">فشل إنشاء بعض الروابط. الرجاء المحاولة في وقت لاحق.</item>
         <item quantity="many">فشل إنشاء بعض الروابط. الرجاء المحاولة في وقت لاحق.</item>
         <item quantity="other">فشل إنشاء بعض الروابط. الرجاء المحاولة في وقت لاحق.</item>
-    </plurals>
-    <!-- Message when some public links were removed successfully. Plural. -->
-    <plurals name="context_link_removal_success">
-        <item quantity="zero">تمت إزالة الرابط</item>
-        <item quantity="one">تمت إزالة الرابط</item>
-        <item quantity="two">تمت إزالة الروابط</item>
-        <item quantity="few">تمت إزالة الروابط</item>
-        <item quantity="many">تمت إزالة الروابط</item>
-        <item quantity="other">تمت إزالة الروابط</item>
     </plurals>
     <!-- title of the screen to see the details of several contact attachments -->
     <string name="activity_title_contacts_attached">جهات اتصال مرفقة</string>
@@ -1397,15 +1357,6 @@
         <item quantity="few">مجلدات مشاركة</item>
         <item quantity="many">مجلد مشارك</item>
         <item quantity="other">مجلد مشارك</item>
-    </plurals>
-    <!-- confirmation message before leaving some incoming shared folders -->
-    <plurals name="confirmation_leave_share_folder">
-        <item quantity="zero">إذا غادرت هذا المجلد، فلن تتمكن من رؤيته مرة أخرى.</item>
-        <item quantity="one">إذا غادرت هذا المجلد، فلن تتمكن من رؤيته مرة أخرى.</item>
-        <item quantity="two">إذا غادرت هذين المجلدين، فلن تتمكن من رؤيتهما مرة أخرى.</item>
-        <item quantity="few">إذا غادرت هذه المجلدات، فلن تتمكن من رؤيتهم مرة أخرى.</item>
-        <item quantity="many">إذا غادرت هذه المجلدات، فلن تتمكن من رؤيتهم مرة أخرى.</item>
-        <item quantity="other">إذا غادرت هذه المجلدات، فلن تتمكن من رؤيتهم مرة أخرى.</item>
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">المساعدة</string>
@@ -1899,10 +1850,6 @@
     <string name="error_streaming">حدث خطأ اثناء عملية انشاء البث للمحتوى</string>
     <!-- Menu option to restore an item from the Rubbish bin -->
     <string name="context_restore">استرجاع</string>
-    <!-- success message when a node was restore from Rubbish bin -->
-    <string name="context_correctly_node_restored">تم الاسترجاع الى %s</string>
-    <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">حدث خطأ. لم تتم استعادة العنصر.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">أرسل رسالة</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -2648,15 +2595,6 @@
     <string name="version_as_new_file_created">تم إنشاء النسخة كملف جديد.</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">في %1$s</string>
-    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <plurals name="alert_remove_several_shares">
-        <item quantity="zero">هل تريد إلغاء مشاركة هذا الـ %1$d مجلد؟</item>
-        <item quantity="one">هل تريد إلغاء مشاركة هذا المجلد؟</item>
-        <item quantity="two">هل تريد إلغاء مشاركة هذان %1$d المجلدان؟</item>
-        <item quantity="few">هل تريد إلغاء مشاركة هذي الـ %1$d مجلدات؟</item>
-        <item quantity="many">هل تريد إلغاء مشاركة هؤلاء الـ %1$d مجلداً؟</item>
-        <item quantity="other">هل تريد إلغاء مشاركة هؤلاء الـ %1$d مجلد؟</item>
-    </plurals>
     <!-- Download location label -->
     <string name="download_location">موقع التنزيل</string>
     <!-- Action to show any file in its location -->
@@ -3050,24 +2988,6 @@
         <item quantity="many">تم نقل %d عنصراً إلى سلة المحذوفات ولكن لم يتم نقل 1 عنصر واحد. حاول مرة أخرى لاحقاً</item>
         <item quantity="other">تم نقل %d عنصر إلى سلة المحذوفات ولكن لم يتم نقل 1 عنصر واحد. حاول مرة أخرى لاحقاً.</item>
     </plurals>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
-    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
-        <item quantity="zero">تمت استعادة 1 عنصر واحد ولكن لم تتم استعادة %d عنصر. حاول مرة أخرى لاحقاً.</item>
-        <item quantity="one">تمت استعادة 1 عنصر واحد ولكن لم يتم استعادة العنصر الآخر. حاول مرة أخرى في وقت لاحق.</item>
-        <item quantity="two">تمت استعادة 1 عنصر واحد ولكن لم تتم استعادة %d عنصرين. حاول مرة أخرى لاحقاً.</item>
-        <item quantity="few">تمت استعادة 1 عنصر واحد ولكن لم تتم استعادة %d عناصر. حاول مرة أخرى لاحقاً.</item>
-        <item quantity="many">تمت استعادة 1 عنصر واحد ولكن لم تتم استعادة %d عنصراً. حاول مرة أخرى لاحقاً.</item>
-        <item quantity="other">تمت استعادة 1 عنصر واحد ولكن لم تتم استعادة %d عنصر. حاول مرة أخرى لاحقاً.</item>
-    </plurals>
-    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
-    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
-        <item quantity="zero">%d عنصر تمت استعادتهم ولكن لم تتم استعادة 1 عنصر واحد. حاول مرة لاحقاً.</item>
-        <item quantity="one">تمت استعادة %d عنصر واحد ولكن لم تتم استعادة العنصر الآخر. حاول مرة أخرى لاحقاً.</item>
-        <item quantity="two">%d عنصرين تمت استعادتهما ولكن لم تتم استعادة 1 عنصر واحد. حاول مرة لاحقاً.</item>
-        <item quantity="few">%d عناصر تمت استعادتهم ولكن لم تتم استعادة 1 عنصر واحد. حاول مرة لاحقاً.</item>
-        <item quantity="many">%d عنصراً تمت استعادتهم ولكن لم تتم استعادة 1 عنصر واحد. حاول مرة لاحقاً.</item>
-        <item quantity="other">%d عنصر تمت استعادتهم ولكن لم تتم استعادة 1 عنصر واحد. حاول مرة لاحقاً.</item>
-    </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
         <item quantity="zero">تم نقل %d عنصر إلى سلة المحذوفات</item>
@@ -3085,24 +3005,6 @@
         <item quantity="few">لم يتم نقل %d عناصر إلى سلة المحذوفات</item>
         <item quantity="many">لم يتم نقل %d عنصراً إلى سلة المحذوفات</item>
         <item quantity="other">لم يتم نقل %d عنصر إلى سلة المحذوفات</item>
-    </plurals>
-    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
-    <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="zero">تمت استعادة %d عنصر</item>
-        <item quantity="one">تمت استعادة %d عنصر</item>
-        <item quantity="two">تمت استعادة %d عنصرين</item>
-        <item quantity="few">تمت استعادة %d عناصر</item>
-        <item quantity="many">تمت استعادة %d عنصراً</item>
-        <item quantity="other">تمت استعادة %d عنصر</item>
-    </plurals>
-    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
-    <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="zero">لم تتم استعادة %d عنصر</item>
-        <item quantity="one">لم تتم استعادة %d عنصر</item>
-        <item quantity="two">لم تتم استعادة %d عنصرين</item>
-        <item quantity="few">لم تتم استعادة %d عناصر</item>
-        <item quantity="many">لم تتم استعادة %d عنصراً</item>
-        <item quantity="other">لم تتم استعادة %d عنصر</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">تغيير على أي حال</string>
@@ -3600,10 +3502,6 @@
     <string name="calls_call_screen_bottom_panel_leave_call_option">غادر</string>
     <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
     <string name="calls_call_screen_bottom_panel_end_call_for_all_option">إنهاء المكالمة للجميع</string>
-    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
-    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">نعم</string>
-    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
-    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">لا</string>
     <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos_2">
         <item quantity="zero">و %1$d مقطع فيديو</item>
@@ -4768,33 +4666,6 @@
         <item quantity="few">تمت مغادرة %1$d ملفات مشاركة</item>
         <item quantity="many">تمت مغادرة %1$d ملفاً مشاركاً</item>
         <item quantity="other">تمت مغادرة %1$d ملف مشارك</item>
-    </plurals>
-    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
-    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
-        <item quantity="zero">تعذرت مغادرة %1$d مجلد مشارك</item>
-        <item quantity="one">تعذرت مغادرة %1$d مجلد مشارك</item>
-        <item quantity="two">تعذرت مغادرة %1$d مجلدين مشاركين</item>
-        <item quantity="few">تعذرت مغادرة %1$d مجلدات مشاركة</item>
-        <item quantity="many">تعذرت مغادرة %1$d مجلد مشارك</item>
-        <item quantity="other">تعذرت مغادرة %1$d مجلد مشارك</item>
-    </plurals>
-    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
-    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
-        <item quantity="zero">تمت مغادرة %1$d ملف مشارك،&#160;</item>
-        <item quantity="one">تمت مغادرة %1$d ملف مشارك،&#160;</item>
-        <item quantity="two">تمت مغادرة %1$d ملفين مشاركين،&#160;</item>
-        <item quantity="few">تمت مغادرة %1$d ملفات مشاركة،&#160;</item>
-        <item quantity="many">تمت مغادرة %1$d ملفاً مشاركاً،&#160;</item>
-        <item quantity="other">تمت مغادرة %1$d ملف مشارك،&#160;</item>
-    </plurals>
-    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
-    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
-        <item quantity="zero">تعذرت مغادرة %1$d مجلد مشارك</item>
-        <item quantity="one">تعذرت مغادرة %1$d مجلد مشارك</item>
-        <item quantity="two">تعذرت مغادرة %1$d مجلدين مشاركين</item>
-        <item quantity="few">تعذرت مغادرة %1$d مجلدات مشاركة</item>
-        <item quantity="many">تعذرت مغادرة %1$d مجلد مشارك</item>
-        <item quantity="other">تعذرت مغادرة %1$d مجلد مشارك</item>
     </plurals>
     <!-- Text shown in the list of meetings when there is a call in progress -->
     <string name="meetings_list_ongoing_call_message">الاجتماع جارٍ الآن</string>

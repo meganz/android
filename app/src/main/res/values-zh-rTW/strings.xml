@@ -276,10 +276,6 @@
     <string name="context_remove_link_menu">移除連結</string>
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">此連結將不再是公開狀態。</string>
-    <!-- Warning that appears prior to remove links of files. Plural. -->
-    <plurals name="remove_links_warning_text">
-        <item quantity="other">這些連結將不再是公開狀態。</item>
-    </plurals>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_rename">重新命名</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -355,8 +351,6 @@
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">選擇目的地資料夾</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">已移動項目</string>
-    <!-- success message when moving a node -->
     <string name="context_correctly_moved_to_rubbish">項目已移到垃圾筒</string>
     <!-- error message -->
     <string name="context_no_moved">錯誤。未移動</string>
@@ -394,8 +388,6 @@
     <string name="subscription_type_monthly">每月</string>
     <!--  -->
     <string name="subscription_type_yearly">每年</string>
-    <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="context_share_correctly_removed">共享已移除</string>
     <!-- Menu option to create a new folder in the file manager. -->
     <string name="menu_new_folder">新資料夾</string>
     <!-- Menu option to add a contact to your contact list. -->
@@ -740,10 +732,6 @@
     <string name="edit_link_option">管理連結</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
     <string name="old_password_provided_incorrect">您提供的現有密碼不正確。</string>
-    <!-- Confirmation before removing the outgoing shares of a folder -->
-    <plurals name="confirmation_remove_outgoing_shares">
-        <item quantity="other">此資料夾正與%1$d個聯絡人共享中。請問要取消所有的共享嗎？</item>
-    </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">無效的電子郵件地址或密碼。請重試。</string>
     <!-- Error message when trying to login and the account is suspended. -->
@@ -1105,17 +1093,9 @@
     <string name="copyright_alert_disagree_button">不同意</string>
     <!-- Hint how to cancel the download -->
     <string name="download_show_info">相關資訊</string>
-    <!-- Error message when removing public links of nodes. Plural. -->
-    <plurals name="context_link_removal_error">
-        <item quantity="other">刪除某些連結失敗。請稍後再試。</item>
-    </plurals>
     <!-- Error message when creating public links of nodes. Plural. -->
     <plurals name="context_link_export_error">
         <item quantity="other">連結建立失敗。請稍後再試。</item>
-    </plurals>
-    <!-- Message when some public links were removed successfully. Plural. -->
-    <plurals name="context_link_removal_success">
-        <item quantity="other">連結已移除</item>
     </plurals>
     <!-- title of the screen to see the details of several contact attachments -->
     <string name="activity_title_contacts_attached">聯絡人已附加</string>
@@ -1252,10 +1232,6 @@
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="other">共享資料夾</item>
-    </plurals>
-    <!-- confirmation message before leaving some incoming shared folders -->
-    <plurals name="confirmation_leave_share_folder">
-        <item quantity="other">如果您離開這些資料夾，您將無法再看到它們。</item>
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">支援</string>
@@ -1694,10 +1670,6 @@
     <string name="error_streaming">嘗試建立串流時發生錯誤</string>
     <!-- Menu option to restore an item from the Rubbish bin -->
     <string name="context_restore">還原</string>
-    <!-- success message when a node was restore from Rubbish bin -->
-    <string name="context_correctly_node_restored">恢復至%s</string>
-    <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">發生錯誤。項目無法還原。</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">發送訊息</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -2348,10 +2320,6 @@
     <string name="version_as_new_file_created">該版本已以新檔案建立</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">於%1$s</string>
-    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <plurals name="alert_remove_several_shares">
-        <item quantity="other">是否取消共享這些%1$d資料夾？</item>
-    </plurals>
     <!-- Download location label -->
     <string name="download_location">下載位址</string>
     <!-- Action to show any file in its location -->
@@ -2690,14 +2658,6 @@
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
         <item quantity="other">%d個項目已移到垃圾筒，1個項目未移動。請稍後再試。</item>
     </plurals>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
-    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
-        <item quantity="other">1個項目已還原，%d個項目未還原。請稍後再試。</item>
-    </plurals>
-    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
-    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
-        <item quantity="other">%d個項目已還原，1個項目未還原。請稍後再試。</item>
-    </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
         <item quantity="other">%d個項目已移到垃圾筒</item>
@@ -2705,14 +2665,6 @@
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
         <item quantity="other">%d個項目未移到垃圾筒</item>
-    </plurals>
-    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
-    <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="other">已恢復%d個項目</item>
-    </plurals>
-    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
-    <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="other">未恢復%d個項目</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">仍要更改</string>
@@ -3190,10 +3142,6 @@
     <string name="calls_call_screen_bottom_panel_leave_call_option">離開</string>
     <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
     <string name="calls_call_screen_bottom_panel_end_call_for_all_option">結束所有人通話</string>
-    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
-    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">是</string>
-    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
-    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">否</string>
     <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos_2">
         <item quantity="other">和%1$d個影片</item>
@@ -3873,18 +3821,6 @@
     <!-- Success message when left shared folders -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
         <item quantity="other">已離開%1$d個共享資料夾</item>
-    </plurals>
-    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
-    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
-        <item quantity="other">無法離開%1$d個共享資料夾</item>
-    </plurals>
-    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
-    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
-        <item quantity="other">已離開%1$d個共享資料夾，&#160;</item>
-    </plurals>
-    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
-    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
-        <item quantity="other">無法離開%1$d個共享資料夾</item>
     </plurals>
     <!-- Text shown in the list of meetings when there is a call in progress -->
     <string name="meetings_list_ongoing_call_message">會議進行中</string>

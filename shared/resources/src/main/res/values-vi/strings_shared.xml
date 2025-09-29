@@ -1106,8 +1106,6 @@
     <string name="pro_plan_benefit_links_with_expiry_dates">Đặt thời&#160;hạn cho đường liên&#160;kết</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
     <string name="pro_plan_benefit_auto_sync_mobile">Tự động đồng&#160;bộ các thư&#160;mục trên thiết&#160;bị di&#160;động của bạn</string>
-    <!-- Benefit: Rewind up to 180 days of deleted data -->
-    <string name="pro_plan_benefit_rewind_180_days">Tua lại dữ&#160;liệu bị xóa lên đến 180 ngày</string>
     <!-- Benefit: Host calls and meetings with unlimited participants and no time restrictions -->
     <string name="pro_plan_benefit_host_calls_unlimited">Tổ&#160;chức các cuộc gọi và cuộc họp với thời&#160;gian và số lượng người tham&#160;gia không giới&#160;hạn</string>
     <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->

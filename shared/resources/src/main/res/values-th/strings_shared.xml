@@ -1106,8 +1106,6 @@
     <string name="pro_plan_benefit_links_with_expiry_dates">ตั้งค่าลิงก์ให้หมดอายุได้</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
     <string name="pro_plan_benefit_auto_sync_mobile">ซิงค์โฟลเดอร์ในอุปกรณ์มือถือของคุณโดยอัตโนมัติ</string>
-    <!-- Benefit: Rewind up to 180 days of deleted data -->
-    <string name="pro_plan_benefit_rewind_180_days">กู้คืนข้อมูลที่ถูกลบได้นานสูงสุด 180 วัน</string>
     <!-- Benefit: Host calls and meetings with unlimited participants and no time restrictions -->
     <string name="pro_plan_benefit_host_calls_unlimited">โทรและประชุมได้แบบไม่จำกัดจำนวนผู้เข้าร่วมและไม่มีข้อจำกัดด้านเวลา</string>
     <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->
@@ -1457,7 +1455,7 @@
         <item quantity="other"></item>
     </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="context_share_correctly_removed">Access removed</string>
+    <string name="context_share_correctly_removed">ยกเลิกการเข้าถึงแล้ว</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">ใช่</string>
     <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1468,45 +1466,44 @@
     </plurals>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
-        <item quantity="one">This folder is shared with %1$d contact. Stop sharing?</item>
-        <item quantity="other">This folder is shared with %1$d contacts. Stop sharing?</item>
+        <item quantity="other">โฟลเดอร์นี้ถูกแชร์กับผู้ติดต่อ %1$d ราย ต้องการหยุดการแชร์หรือไม่</item>
     </plurals>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
     <plurals name="alert_remove_several_shares">
         <item quantity="other"></item>
     </plurals>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
-    <string name="figures_storage_referrals_achievements_text">%1$s extra storage for each invitation, valid for %2$d days</string>
+    <string name="figures_storage_referrals_achievements_text">ได้พื้นที่เก็บข้อมูลเพิ่ม %1$s สำหรับการเชิญแต่ละครั้ง มีอายุ %2$d วัน</string>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with permanent valid duration -->
     <string name="figures_storage_referrals_achievements_text_permanent">รับพื้นที่เพิ่ม %1$s สำหรับทุกคำเชิญ ไม่มีวันหมดอายุ</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement with dynamic valid duration -->
-    <string name="figures_storage_achievements_text">%1$s extra storage, valid for %2$d days</string>
+    <string name="figures_storage_achievements_text">ได้พื้นที่เก็บข้อมูลเพิ่ม %1$s มีอายุการใช้งาน %2$d วัน</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement with permanent valid duration -->
     <string name="figures_storage_achievements_text_permanent">พื้นที่เพิ่ม %1$s ไม่มีวันหมดอายุ</string>
     <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with dynamic valid duration -->
-    <string name="figures_storage_achievements_awarded_text">%1$s storage bonus applied, valid for %2$d days</string>
+    <string name="figures_storage_achievements_awarded_text">โบนัสพื้นที่เก็บข้อมูล %1$s ถูกใช้แล้ว มีอายุ %2$d วัน</string>
     <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with permanent valid duration -->
     <string name="figures_storage_achievements_awarded_text_permanent">เพิ่มโบนัสพื้นที่เก็บข้อมูล %1$s ให้แล้ว ไม่มีวันหมดอายุ</string>
     <!-- info paragraph about the achievement install megasync with dynamic valid duration -->
-    <string name="paragraph_info_achievement_install_desktop_dynamic_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid for %2$s days. The desktop app is available for Windows, macOS and Linux.</string>
+    <string name="paragraph_info_achievement_install_desktop_dynamic_duration">ติดตั้งแอป MEGA สำหรับเดสก์ท็อป เพื่อรับพื้นที่เก็บข้อมูลฟรีเพิ่ม %1$s มีอายุการใช้งาน %2$s วัน ใช้ได้บน Windows macOS และ Linux</string>
     <!-- info paragraph about the achievement install megasync with permanent valid duration -->
     <string name="paragraph_info_achievement_install_desktop_permanent_duration">ติดตั้งแอป MEGA สำหรับเดสก์ท็อปเพื่อรับพื้นที่ฟรีเพิ่ม %1$s แบบไม่มีวันหมดอายุ แอปสำหรับเดสก์ท็อปพร้อมให้ใช้งานบน Windows, macOS และ Linux</string>
     <!-- info paragraph about the achievement install mobile app with dynamic valid duration -->
-    <string name="paragraph_info_achievement_install_mobile_app_dynamic_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid for %2$s days. The mobile apps are available for iOS and Android.</string>
+    <string name="paragraph_info_achievement_install_mobile_app_dynamic_duration">ติดตั้งแอป MEGA สำหรับมือถือ เพื่อรับพื้นที่เก็บข้อมูลฟรีเพิ่ม %1$s มีอายุการใช้งาน %2$s วัน ใช้ได้บน iOS และ Android</string>
     <!-- info paragraph about the achievement install mobile app with permanent valid duration -->
     <string name="paragraph_info_achievement_install_mobile_app_permanent_duration">ติดตั้งแอป MEGA บนมือถือเพื่อรับพื้นที่ฟรีเพิ่ม %1$s แบบไม่มีวันหมดอายุ แอปสำหรับมือถือพร้อมให้ใช้งานบน iOS และ Android</string>
     <!-- Share multi backup folders, show below warning message -->
-    <string name="backup_multi_share_permission_text">These are backup folders and can only be shared as read-only</string>
+    <string name="backup_multi_share_permission_text">โฟลเดอร์เหล่านี้คือโฟลเดอร์สำรองข้อมูล แชร์ได้เฉพาะสิทธิ์อ่านเท่านั้น</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_share_permission_text">This is a backup folder and can only be shared as read-only</string>
+    <string name="backup_share_permission_text">โฟลเดอร์นี้เป็นโฟลเดอร์สำรองข้อมูล แชร์ได้เฉพาะสิทธิ์อ่านเท่านั้น</string>
     <!-- Button to confirm the action of restarting one transfer-->
     <string name="button_permission_info">ปิด</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_share_permission_title">Backup folders are read-only</string>
+    <string name="backup_share_permission_title">โฟลเดอร์สำรองข้อมูลแชร์ได้เฉพาะสิทธิ์อ่าน</string>
     <!-- dialog option continue in alert dialog -->
     <string name="button_continue">ดำเนินการต่อ</string>
     <!--Dialog title when the user selected is not on the contact list when sharing a node -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Can’t verify contact</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">ยืนยันรายชื่อผู้ติดต่อไม่ได้</string>
     <!--Dialog description when the user selected is not on the contact list when sharing a node -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">คุณไม่สามารถตรวจสอบ %s ได้เนื่องจากไม่ได้อยู่ในรายชื่อผู้ติดต่อของคุณ รอให้พวกเขาตอบรับคำเชิญของคุณก่อน</string>
     <!-- Answer for confirmation dialog. -->
@@ -1534,7 +1531,7 @@
         <item quantity="other">หากคุณออกจากโฟลเดอร์เหล่านี้ คุณจะไม่สามารถมองเห็นได้อีก</item>
     </plurals>
     <!-- Title of the dialog to choose permissions when sharing. -->
-    <string name="dialog_select_permissions">Choose permissions</string>
+    <string name="dialog_select_permissions">เลือกสิทธิ์การเข้าถึง</string>
     <!-- Refers to access rights for a file folder. -->
     <string name="file_properties_shared_folder_full_access">เข้าถึงแบบเต็มที่</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
@@ -1542,9 +1539,9 @@
     <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="file_properties_shared_folder_read_write">อ่านและเขียน</string>
     <!-- Text shown in the app bar when nodes are being selected in selection mode -->
-    <string name="general_selecting">Selecting</string>
+    <string name="general_selecting">กำลังเลือก</string>
     <!-- Snackbar message when retry failed on failed transfers tab. -->
-    <string name="transfers_retry_failed_snackbar_message">Unable to restart transfers</string>
+    <string name="transfers_retry_failed_snackbar_message">เริ่มการถ่ายโอนใหม่ไม่สำเร็จ</string>
     <!-- Action for the Snackbar when retry failed on failed transfers tab. -->
     <string name="transfers_retry_failed_snackbar_action">ลองใหม่</string>
     <!-- Snackbar message when retry success on failed transfers tab. -->
@@ -1567,13 +1564,11 @@
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item restored but %d item wasn’t restored. Try again later.</item>
-        <item quantity="other">1 item restored but %d items weren’t restored. Try again later.</item>
+        <item quantity="other">กู้คืนแล้ว 1 รายการ แต่ไม่สำเร็จ %d รายการ กรุณาลองใหม่ภายหลัง</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
-        <item quantity="one">%d item restored but 1 item wasn’t restored. Try again later.</item>
-        <item quantity="other">%d items restored but 1 item wasn’t restored. Try again later.</item>
+        <item quantity="other">กู้คืนแล้ว %d%d รายการ แต่ไม่สำเร็จ 1 รายการ กรุณาลองใหม่ภายหลัง</item>
     </plurals>
     <!-- category in sort by action to sort by name -->
     <string name="action_sort_by_name">ชื่อ</string>
@@ -1596,35 +1591,35 @@
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <string name="general_links_copied_clipboard">คัดลอกลิงก์ไปไว้ที่คลิปบอร์ดแล้ว</string>
     <!-- Snackbar message when retry success on failed transfers tab, singular form. -->
-    <string name="transfers_retry_feedback_snackbar_message_singular">Retrying transfer, see the Active tab for progress</string>
+    <string name="transfers_retry_feedback_snackbar_message_singular">กำลังลองถ่ายโอนใหม่ ดูความคืบหน้าได้ที่แท็บใช้งานอยู่</string>
     <!-- Snackbar message when retry success on failed transfers tab, plural form. -->
-    <string name="transfers_retry_feedback_snackbar_message_plural">Retrying transfers, see the Active tab for progress</string>
+    <string name="transfers_retry_feedback_snackbar_message_plural">กำลังลองถ่ายโอนใหม่ ดูความคืบหน้าได้ที่แท็บใช้งานอยู่</string>
     <!--Default file name for scanned documents. Placeholder value is for the current date and time values eg:   Scanned_2025091120323.  -->
-    <string name="document_scanning_default_file_name">Scanned_%1$s</string>
+    <string name="document_scanning_default_file_name">สแกน_%1$s</string>
     <!-- Benefit: Rewind up to specified days of deleted data -->
-    <string name="pro_plan_benefit_rewind_days">Rewind up to %1$d days of deleted data</string>
+    <string name="pro_plan_benefit_rewind_days">ย้อนคืนข้อมูลที่ถูกลบได้ถึง %1$d วัน</string>
     <!-- Error message when removing 1 or more public links from nodes. -->
-    <string name="public_link_node_removal_error_message">Link removal failed, try again later</string>
+    <string name="public_link_node_removal_error_message">ลบลิงก์ไม่สำเร็จ กรุณาลองใหม่ภายหลัง</string>
     <!-- Warning that appears prior to remove links of files-->
-    <string name="remove_links_warning_message">Removing a link means its contents won’t be publicly accessible anymore</string>
+    <string name="remove_links_warning_message">เมื่อลบลิงก์แล้ว เนื้อหาภายในจะไม่เป็นสาธารณะอีกต่อไป</string>
     <!-- Success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="stop_sharing_folder_success_message">Folder sharing stopped</string>
+    <string name="stop_sharing_folder_success_message">หยุดแชร์โฟลเดอร์แล้ว</string>
     <!-- Positive button text for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="stop_sharing_dialog_positive_button_text">หยุดแชร์</string>
     <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
-    <string name="leave_shared_folder_failed_message">Couldn’t leave one or more shared folders</string>
+    <string name="leave_shared_folder_failed_message">ออกจากโฟลเดอร์ที่แชร์บางรายการไม่สำเร็จ</string>
     <!-- Confirmation message before leaving incoming shared folders -->
-    <string name="leave_shared_folder_confirmation_message">Leaving a shared folder means you won’t be able to see it again</string>
+    <string name="leave_shared_folder_confirmation_message">หากออกจากโฟลเดอร์ที่แชร์ คุณจะไม่เห็นโฟลเดอร์นั้นอีก</string>
     <!-- Message when a single public link is removed successfully. -->
     <string name="link_removed_success_message">ลิงก์ถูกลบแล้ว</string>
     <!-- Message when a single public link is removed successfully. -->
     <string name="links_removed_success_message">ลิงก์ถูกลบแล้ว</string>
     <!--Alert warning shown to the user when attempting to remove sharing from 1 or more folders-->
-    <string name="stop_sharing_dialog_title">Stop sharing this folder?</string>
+    <string name="stop_sharing_dialog_title">ต้องการหยุดแชร์โฟลเดอร์นี้หรือไม่</string>
     <!--Alert warning shown to the user when attempting to remove sharing from multiple folders-->
-    <string name="stop_sharing_dialog_title_plurals">Stop sharing these folders?</string>
+    <string name="stop_sharing_dialog_title_plurals">ต้องการหยุดแชร์โฟลเดอร์เหล่านี้หรือไม่</string>
     <!-- Title of the dialog to choose permissions when sharing. -->
-    <string name="share_folder_dialog_choose_permission_title">Choose permissions</string>
+    <string name="share_folder_dialog_choose_permission_title">เลือกสิทธิ์การเข้าถึง</string>
     <!-- Refers to access rights for a file folder. -->
     <string name="share_folder_dialog_full_access_radio_option">เข้าถึงแบบเต็มที่</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
@@ -1632,7 +1627,7 @@
     <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="share_folder_dialog_read_write_radio_option">อ่านและเขียน</string>
     <!-- Text shown in the app bar when nodes are being selected in selection mode -->
-    <string name="app_bar_selection_mode_description">Selecting</string>
+    <string name="app_bar_selection_mode_description">กำลังเลือก</string>
     <!-- success message when moving a node -->
     <string name="node_moved_success_message">ย้ายรายการแล้ว</string>
     <!-- success message when a node was restore from Rubbish bin to a location -->
@@ -1641,8 +1636,7 @@
     <string name="node_restore_error_message">พบข้อผิดพลาด ไม่สามารถกู้คืนได้</string>
     <!-- Snackbar message to show when successfully left shared folder(s) along with one or more failures -->
     <plurals name="leave_shared_folder_partial_success_snackbar_message">
-        <item quantity="one">Left %1$d shared folder, but couldn’t leave one or more folders</item>
-        <item quantity="other">Left %1$d shared folders, but couldn’t leave one or more folders</item>
+        <item quantity="other">ออกจากโฟลเดอร์ที่แชร์แล้ว %1$d รายการ แต่ไม่สำเร็จบางรายการ</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="node_restored_from_rubbish_bin_success_message">
