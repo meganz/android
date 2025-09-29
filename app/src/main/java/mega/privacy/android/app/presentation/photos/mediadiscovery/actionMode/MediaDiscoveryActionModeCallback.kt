@@ -165,6 +165,10 @@ class MediaDiscoveryActionModeCallback(
     }
 
     override fun onDestroyActionMode(mode: ActionMode?) {
+        if (!fragment.mediaDiscoveryViewModel.state.value.isClearSelectedPhotos) {
+            fragment.mediaDiscoveryViewModel.updateIsClearSelectedPhotos(true)
+            return
+        }
         fragment.destroyActionMode()
     }
 

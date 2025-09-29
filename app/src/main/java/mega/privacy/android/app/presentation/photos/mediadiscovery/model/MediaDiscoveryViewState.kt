@@ -83,4 +83,5 @@ data class MediaDiscoveryViewState(
     val storageCapacity: StorageOverQuotaCapacity = DEFAULT,
     val isBusinessAccountExpired: Boolean = false,
     val hiddenNodeEnabled: Boolean = false,
+    val isClearSelectedPhotos: Boolean = true,
 )

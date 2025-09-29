@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.photos.mediadiscovery
 
 import android.content.Intent
 import android.net.Uri
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,12 +24,8 @@ import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
-import mega.privacy.android.core.nodecomponents.components.banners.StorageCapacityMapper
-import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
-import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment.Companion.INTENT_KEY_CURRENT_FOLDER_ID
-import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment.Companion.PARAM_ERROR_MESSAGE
 import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
@@ -47,6 +42,8 @@ import mega.privacy.android.app.presentation.photos.util.groupPhotosByDay
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.nodecomponents.components.banners.StorageCapacityMapper
+import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
@@ -97,7 +94,6 @@ import javax.inject.Inject
 @HiltViewModel
 class MediaDiscoveryViewModel @Inject constructor(
     private val getNodeListByIds: GetNodeListByIds,
-    savedStateHandle: SavedStateHandle,
     private val getPhotosByFolderIdUseCase: GetPhotosByFolderIdUseCase,
     private val getCameraSortOrder: GetCameraSortOrder,
     private val setCameraSortOrder: SetCameraSortOrder,
@@ -134,21 +130,21 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(
-        MediaDiscoveryViewState(
-            currentFolderId = savedStateHandle.get<Long>(INTENT_KEY_CURRENT_FOLDER_ID),
-            errorMessage = savedStateHandle.get<Int>(PARAM_ERROR_MESSAGE)
-        )
-    )
+    private val _state = MutableStateFlow(MediaDiscoveryViewState())
     val state = _state.asStateFlow()
 
     private var fetchPhotosJob: Job? = null
     private var fromFolderLink: Boolean? = null
     internal var showHiddenItems: Boolean? = null
 
-    init {
-        fromFolderLink =
-            savedStateHandle.get<Boolean>(MediaDiscoveryActivity.INTENT_KEY_FROM_FOLDER_LINK)
+    internal fun initialize(folderId: Long?, errorMessage: Int?, fromFolderLink: Boolean?) {
+        _state.update {
+            it.copy(
+                currentFolderId = folderId,
+                errorMessage = errorMessage.takeIf { errorMessage -> errorMessage != 0 }
+            )
+        }
+        this.fromFolderLink = fromFolderLink
         checkConnectivity()
         checkMDSetting()
         loadSortRule()
@@ -453,6 +449,12 @@ class MediaDiscoveryViewModel @Inject constructor(
         }
         _state.update {
             it.copy(selectedPhotoIds = selectedPhotoIds)
+        }
+    }
+
+    internal fun updateSelectedPhotoIds(photoIds: Set<Long>) {
+        _state.update {
+            it.copy(selectedPhotoIds = photoIds)
         }
     }
 
@@ -809,6 +811,12 @@ class MediaDiscoveryViewModel @Inject constructor(
             runCatching {
                 setAlmostFullStorageBannerClosingTimestampUseCase()
             }.onFailure { Timber.e(it) }
+        }
+    }
+
+    internal fun updateIsClearSelectedPhotos(isClear: Boolean) {
+        _state.update {
+            it.copy(isClearSelectedPhotos = isClear)
         }
     }
 }

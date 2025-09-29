@@ -29,7 +29,6 @@ import androidx.core.os.bundleOf
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -41,6 +40,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.photos.albums.importlink.ImagePreviewProvider
+import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity.Companion.INTENT_KEY_FROM_FOLDER_LINK
 import mega.privacy.android.app.presentation.photos.mediadiscovery.actionMode.MediaDiscoveryActionModeCallback
 import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
 import mega.privacy.android.app.presentation.photos.mediadiscovery.view.MediaDiscoveryView
@@ -67,7 +67,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MediaDiscoveryFragment : Fragment() {
 
-    internal val mediaDiscoveryViewModel: MediaDiscoveryViewModel by viewModels()
+    internal val mediaDiscoveryViewModel: MediaDiscoveryViewModel by activityViewModels()
     private val mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel by activityViewModels()
 
     @Inject
@@ -112,8 +112,20 @@ class MediaDiscoveryFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         managerActivity = activity as? ManagerActivity
-        actionModeCallback =
-            MediaDiscoveryActionModeCallback(this)
+        actionModeCallback = MediaDiscoveryActionModeCallback(this)
+        val folderId = arguments?.getLong(INTENT_KEY_CURRENT_FOLDER_ID) ?: -1
+        val errorMessage = arguments?.getInt(PARAM_ERROR_MESSAGE) ?: 0
+        val fromFolderLink = arguments?.getBoolean(INTENT_KEY_FROM_FOLDER_LINK) ?: false
+
+        mediaDiscoveryViewModel.initialize(folderId, errorMessage, fromFolderLink)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putLongArray(
+            KEY_SELECTED_IDS,
+            mediaDiscoveryViewModel.state.value.selectedPhotoIds.toLongArray()
+        )
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -216,6 +228,16 @@ class MediaDiscoveryFragment : Fragment() {
         setupFlow()
         setupParentActivityUI()
         setupMenu()
+        savedInstanceState?.let {
+            val savedSet = it.getLongArray(KEY_SELECTED_IDS)?.toSet() ?: emptySet()
+            mediaDiscoveryViewModel.updateIsClearSelectedPhotos(savedSet.isEmpty())
+
+            // Prevent onDestroyActionMode from being invoked before updating isClearSelectedPhotos.
+            // Otherwise, the selected IDs may be cleared prematurely and then updated again.
+            if (mediaDiscoveryViewModel.state.value.selectedPhotoIds.isEmpty() && savedSet.isNotEmpty()) {
+                mediaDiscoveryViewModel.updateSelectedPhotoIds(savedSet)
+            }
+        }
     }
 
     /**
@@ -468,6 +490,7 @@ class MediaDiscoveryFragment : Fragment() {
         private const val INTENT_KEY_IS_ACCESSED_BY_ICON_CLICK = "IS_ACCESSED_BY_ICON_CLICK"
         const val IS_NEW_DESIGN = "IS_NEW_DESIGN"
         const val INTENT_KEY_CURRENT_FOLDER_NAME = "CURRENT_FOLDER_NAME"
+        const val KEY_SELECTED_IDS = "SELECTED_IDS"
 
         /**
          * The message to be displayed in the error banner

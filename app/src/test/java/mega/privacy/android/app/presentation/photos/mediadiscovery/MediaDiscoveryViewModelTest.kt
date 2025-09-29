@@ -2,7 +2,6 @@
 
 package mega.privacy.android.app.presentation.photos.mediadiscovery
 
-import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
@@ -19,10 +18,10 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.extensions.asHotFlow
-import mega.privacy.android.core.nodecomponents.components.banners.StorageCapacityMapper
-import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.nodecomponents.components.banners.StorageCapacityMapper
+import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
@@ -91,7 +90,6 @@ class MediaDiscoveryViewModelTest {
     private lateinit var underTest: MediaDiscoveryViewModel
 
     private val getNodeListByIds = mock<GetNodeListByIds>()
-    private val savedStateHandle = mock<SavedStateHandle>()
     private val getPhotosByFolderIdUseCase = mock<GetPhotosByFolderIdUseCase>()
     private val getCameraSortOrder = mock<GetCameraSortOrder>()
     private val setCameraSortOrder = mock<SetCameraSortOrder>()
@@ -148,7 +146,6 @@ class MediaDiscoveryViewModelTest {
     private fun initViewModel() {
         underTest = MediaDiscoveryViewModel(
             getNodeListByIds = getNodeListByIds,
-            savedStateHandle = savedStateHandle,
             getPhotosByFolderIdUseCase = getPhotosByFolderIdUseCase,
             getCameraSortOrder = getCameraSortOrder,
             setCameraSortOrder = setCameraSortOrder,
@@ -192,8 +189,6 @@ class MediaDiscoveryViewModelTest {
         whenever(monitorMediaDiscoveryView()).thenReturn(flow { awaitCancellation() })
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flow { awaitCancellation() })
         whenever(monitorAccountDetailUseCase()).thenReturn(flow { awaitCancellation() })
-        whenever(savedStateHandle.get<Long>(any())) doReturn (null)
-        whenever(savedStateHandle.get<Boolean>(any())) doReturn (null)
         getFeatureFlagValueUseCase.stub { onBlocking { invoke(any()) }.thenReturn(false) }
         whenever(monitorStorageStateUseCase()).thenReturn(
             StorageState.Green.asHotFlow()
@@ -218,7 +213,6 @@ class MediaDiscoveryViewModelTest {
     fun resetMocks() {
         reset(
             getNodeListByIds,
-            savedStateHandle,
             getPhotosByFolderIdUseCase,
             getCameraSortOrder,
             setCameraSortOrder,
@@ -310,8 +304,8 @@ class MediaDiscoveryViewModelTest {
         runTest {
             commonStub()
             whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) doReturn true
-            whenever(savedStateHandle.get<Boolean>(MediaDiscoveryActivity.INTENT_KEY_FROM_FOLDER_LINK)) doReturn false
             initViewModel()
+            underTest.initialize(null, null, false)
             verify(monitorShowHiddenItemsUseCase, times(1)).invoke()
             verify(monitorAccountDetailUseCase, times(1)).invoke()
         }
@@ -321,8 +315,8 @@ class MediaDiscoveryViewModelTest {
         runTest {
             commonStub()
             whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) doReturn false
-            whenever(savedStateHandle.get<Boolean>(MediaDiscoveryActivity.INTENT_KEY_FROM_FOLDER_LINK)) doReturn false
             initViewModel()
+            underTest.initialize(null, null, false)
             verifyNoInteractions(monitorShowHiddenItemsUseCase)
             verifyNoInteractions(monitorAccountDetailUseCase)
         }
@@ -332,8 +326,8 @@ class MediaDiscoveryViewModelTest {
         runTest {
             commonStub()
             whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) doReturn true
-            whenever(savedStateHandle.get<Boolean>(MediaDiscoveryActivity.INTENT_KEY_FROM_FOLDER_LINK)) doReturn true
             initViewModel()
+            underTest.initialize(null, null, true)
             verifyNoInteractions(monitorShowHiddenItemsUseCase)
             verifyNoInteractions(monitorAccountDetailUseCase)
         }
@@ -343,8 +337,8 @@ class MediaDiscoveryViewModelTest {
         runTest {
             commonStub()
             whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) doReturn false
-            whenever(savedStateHandle.get<Boolean>(MediaDiscoveryActivity.INTENT_KEY_FROM_FOLDER_LINK)) doReturn true
             initViewModel()
+            underTest.initialize(null, null, true)
             verifyNoInteractions(monitorShowHiddenItemsUseCase)
             verifyNoInteractions(monitorAccountDetailUseCase)
         }
@@ -416,6 +410,7 @@ class MediaDiscoveryViewModelTest {
             }
             whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
             initViewModel()
+            underTest.initialize(null, null, null)
             val nonSensitivePhoto = createNonSensitivePhoto()
             val photos = listOf(
                 nonSensitivePhoto,
@@ -469,9 +464,9 @@ class MediaDiscoveryViewModelTest {
         runTest {
             val photos = listOf<Photo.Image>()
             commonStub()
-            whenever(savedStateHandle.get<Long>(MediaDiscoveryFragment.INTENT_KEY_CURRENT_FOLDER_ID)) doReturn 1L
             whenever(isNodeInRubbishBinUseCase(NodeId(1L))) doReturn true
             initViewModel()
+            underTest.initialize(1L, null, null)
             underTest.handleFolderPhotosAndLogic(photos)
 
             underTest.state.test {
@@ -484,9 +479,9 @@ class MediaDiscoveryViewModelTest {
         runTest {
             val photos = listOf<Photo.Image>()
             commonStub()
-            whenever(savedStateHandle.get<Long>(MediaDiscoveryFragment.INTENT_KEY_CURRENT_FOLDER_ID)) doReturn 1L
             whenever(isNodeInRubbishBinUseCase(NodeId(1L))) doReturn false
             initViewModel()
+            underTest.initialize(1L, null, null)
             underTest.handleFolderPhotosAndLogic(photos)
 
             underTest.state.test {
@@ -499,9 +494,9 @@ class MediaDiscoveryViewModelTest {
         runTest {
             val photos = listOf(createNonSensitivePhoto())
             commonStub()
-            whenever(savedStateHandle.get<Long>(MediaDiscoveryFragment.INTENT_KEY_CURRENT_FOLDER_ID)) doReturn 1L
             whenever(isNodeInRubbishBinUseCase(NodeId(1L))) doReturn true
             initViewModel()
+            underTest.initialize(1L, null, null)
             underTest.handleFolderPhotosAndLogic(photos)
 
             underTest.state.test {
@@ -514,9 +509,9 @@ class MediaDiscoveryViewModelTest {
         runTest {
             val photos = listOf(createNonSensitivePhoto())
             commonStub()
-            whenever(savedStateHandle.get<Long>(MediaDiscoveryFragment.INTENT_KEY_CURRENT_FOLDER_ID)) doReturn 1L
             whenever(isNodeInRubbishBinUseCase(NodeId(1L))) doReturn false
             initViewModel()
+            underTest.initialize(1L, null, null)
             underTest.handleFolderPhotosAndLogic(photos)
 
             underTest.state.test {
@@ -617,8 +612,36 @@ class MediaDiscoveryViewModelTest {
             storageOverQuotaCapacity
         )
         initViewModel()
+        underTest.initialize(null, null, null)
         underTest.state.map { it.storageCapacity }.distinctUntilChanged().test {
             assertThat(awaitItem()).isEqualTo(storageOverQuotaCapacity)
+        }
+    }
+
+    @Test
+    fun `test that selectedPhotoIds is updated correctly`() = runTest {
+        val selectedIds = setOf(1L, 2L, 3L)
+        initViewModel()
+
+        underTest.state.map { it.selectedPhotoIds }.test {
+            assertThat(awaitItem()).isEmpty()
+            underTest.updateSelectedPhotoIds(selectedIds)
+            val ids = awaitItem()
+            assertThat(ids).isNotEmpty()
+            assertThat(ids.size).isEqualTo(3)
+            underTest.clearSelectedPhotos()
+            assertThat(awaitItem()).isEmpty()
+        }
+    }
+
+    @Test
+    fun `test that isClearSelectedPhotos is updated correctly`() = runTest {
+        initViewModel()
+
+        underTest.state.map { it.isClearSelectedPhotos }.test {
+            assertThat(awaitItem()).isTrue()
+            underTest.updateIsClearSelectedPhotos(false)
+            assertThat(awaitItem()).isFalse()
         }
     }
 }
