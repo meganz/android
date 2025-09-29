@@ -7,13 +7,13 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import mega.privacy.android.app.presentation.transfers.model.TransfersViewModel
 import mega.privacy.android.app.presentation.transfers.view.TransfersView
-import mega.privacy.android.navigation.destination.Transfers
+import mega.privacy.android.navigation.destination.TransfersNavKey
 
 internal fun NavGraphBuilder.transfersScreen(
     onBackPress: () -> Unit,
     onNavigateToUpgradeAccount: () -> Unit,
 ) {
-    composable<Transfers> {
+    composable<TransfersNavKey> {
         val viewModel = hiltViewModel<TransfersViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

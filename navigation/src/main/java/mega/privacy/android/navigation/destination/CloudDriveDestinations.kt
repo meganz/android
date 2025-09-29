@@ -14,7 +14,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
  * @property highlightedNodeNames the names of the nodes to highlight
  */
 @Serializable
-data class CloudDrive(
+data class CloudDriveNavKey(
     val nodeHandle: Long = -1L,
     val nodeName: String? = null,
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
@@ -27,4 +27,4 @@ data class CloudDrive(
  * Shares route args
  */
 @Serializable
-data object Shares : NavKey
+data object SharesNavKey : NavKey

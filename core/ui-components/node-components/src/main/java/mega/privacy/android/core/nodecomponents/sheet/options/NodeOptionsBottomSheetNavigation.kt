@@ -11,7 +11,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.bottomsheet.megaBottomSheet
 
 @Serializable
-data class NodeOptionsBottomSheet(
+data class NodeOptionsBottomSheetNavKey(
     val nodeHandle: Long = -1L,
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
 ) : NavKey
@@ -21,8 +21,8 @@ internal fun NavGraphBuilder.nodeOptionsBottomSheet(
     navigationHandler: NavigationHandler,
     onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
-    megaBottomSheet<NodeOptionsBottomSheet> {
-        val args = it.toRoute<NodeOptionsBottomSheet>()
+    megaBottomSheet<NodeOptionsBottomSheetNavKey> {
+        val args = it.toRoute<NodeOptionsBottomSheetNavKey>()
 
         if (args.nodeHandle == -1L) {
             navigationHandler.back()

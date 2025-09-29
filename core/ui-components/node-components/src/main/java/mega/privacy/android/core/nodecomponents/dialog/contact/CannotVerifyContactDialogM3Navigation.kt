@@ -7,13 +7,13 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CannotVerifyContactDialogArgs(val email: String) : NavKey
+data class CannotVerifyContactDialogNavKey(val email: String) : NavKey
 
 fun NavGraphBuilder.cannotVerifyContactDialogM3(
     onBack: () -> Unit,
 ) {
-    dialog<CannotVerifyContactDialogArgs> {
-        val args = it.toRoute<CannotVerifyContactDialogArgs>()
+    dialog<CannotVerifyContactDialogNavKey> {
+        val args = it.toRoute<CannotVerifyContactDialogNavKey>()
 
         CannotVerifyContactDialogM3(email = args.email, onDismiss = onBack)
     }

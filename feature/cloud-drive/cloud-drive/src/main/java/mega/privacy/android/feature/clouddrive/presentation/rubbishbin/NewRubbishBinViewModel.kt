@@ -46,7 +46,7 @@ import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.model.NewRubbishBinUiState
-import mega.privacy.android.navigation.destination.RubbishBin
+import mega.privacy.android.navigation.destination.RubbishBinNavKey
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject
@@ -85,7 +85,7 @@ class NewRubbishBinViewModel @Inject constructor(
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-    private val args = savedStateHandle.toRoute<RubbishBin>()
+    private val args = savedStateHandle.toRoute<RubbishBinNavKey>()
 
     /**
      * The RubbishBin UI State

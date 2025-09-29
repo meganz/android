@@ -2,7 +2,7 @@ package mega.privacy.android.core.nodecomponents.action.clickhandler
 
 import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.core.nodecomponents.action.SingleNodeActionProvider
-import mega.privacy.android.core.nodecomponents.dialog.leaveshare.LeaveShareDialogArgs
+import mega.privacy.android.core.nodecomponents.dialog.leaveshare.LeaveShareDialogNavKey
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.LeaveShareMenuAction
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -18,7 +18,7 @@ class LeaveShareActionClickHandler @Inject constructor(
             nodeHandlesToJsonMapper(listOf(node.id.longValue))
         }.onSuccess {
             provider.navigationHandler?.navigate(
-                LeaveShareDialogArgs(handles = it)
+                LeaveShareDialogNavKey(handles = it)
             )
         }
     }

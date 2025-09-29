@@ -6,10 +6,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity
-import mega.privacy.android.navigation.destination.CookieSettings
+import mega.privacy.android.navigation.destination.CookieSettingsNavKey
 
 fun NavGraphBuilder.cookieSettingsNavigationDestination(removeDestination: () -> Unit) {
-    composable<CookieSettings> {
+    composable<CookieSettingsNavKey> {
         val context = LocalContext.current
         LaunchedEffect(Unit) {
             val intent = Intent(context, CookiePreferencesActivity::class.java)

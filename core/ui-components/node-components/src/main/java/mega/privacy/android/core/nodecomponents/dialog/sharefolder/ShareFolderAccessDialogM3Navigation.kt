@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 
 @Serializable
-data class ShareFolderAccessDialogArgs(
+data class ShareFolderAccessDialogNavKey(
     val nodes: String,
     val contacts: String,
     val isFromBackups: Boolean
@@ -17,8 +17,8 @@ data class ShareFolderAccessDialogArgs(
 fun NavGraphBuilder.shareFolderAccessDialogM3(
     onDismiss: () -> Unit,
 ) {
-    dialog<ShareFolderAccessDialogArgs> {
-        val args = it.toRoute<ShareFolderAccessDialogArgs>()
+    dialog<ShareFolderAccessDialogNavKey> {
+        val args = it.toRoute<ShareFolderAccessDialogNavKey>()
         val mapper = NodeHandlesToJsonMapper()
         val handles = mapper(args.nodes)
         val contacts = args.contacts.split(",").filter { contact -> contact.isNotBlank() }

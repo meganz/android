@@ -55,7 +55,7 @@ import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
-import mega.privacy.android.navigation.destination.CloudDrive
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -153,7 +153,7 @@ class CloudDriveViewModelTest {
         monitorAlmostFullStorageBannerVisibilityUseCase = monitorAlmostFullStorageBannerVisibilityUseCase,
         setAlmostFullStorageBannerClosingTimestampUseCase = setAlmostFullStorageBannerClosingTimestampUseCase,
         savedStateHandle = SavedStateHandle.Companion.invoke(
-            route = CloudDrive(nodeHandle)
+            route = CloudDriveNavKey(nodeHandle)
         ),
     )
 

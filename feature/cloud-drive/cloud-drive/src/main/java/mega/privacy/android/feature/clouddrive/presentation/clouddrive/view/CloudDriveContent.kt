@@ -79,7 +79,7 @@ import mega.privacy.android.feature.clouddrive.presentation.upload.UploadingFile
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.camera.CameraArg
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.destination.MediaDiscovery
+import mega.privacy.android.navigation.destination.MediaDiscoveryNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedR
@@ -355,7 +355,7 @@ internal fun CloudDriveContent(
                 onEnterMediaDiscoveryClick = {
                     navigationHandler.back()
                     navigationHandler.navigate(
-                        MediaDiscovery(
+                        MediaDiscoveryNavKey(
                             nodeHandle = uiState.currentFolderId.longValue,
                             nodeName = uiState.title.get(context),
                         )

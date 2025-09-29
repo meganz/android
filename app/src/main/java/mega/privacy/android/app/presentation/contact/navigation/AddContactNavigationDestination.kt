@@ -5,17 +5,17 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import mega.privacy.android.navigation.destination.AddContactToShare
+import mega.privacy.android.navigation.destination.AddContactToShareNavKey
 
 fun NavGraphBuilder.addContactLegacyDestination(
     returnResult: (String, List<String>?) -> Unit,
 ) {
-    composable<AddContactToShare> {
-        val addContactToShare = it.toRoute<AddContactToShare>()
+    composable<AddContactToShareNavKey> {
+        val addContactToShare = it.toRoute<AddContactToShareNavKey>()
         val launcher = rememberLauncherForActivityResult(
             contract = AddContactsContract()
         ) { result ->
-            returnResult(AddContactToShare.KEY, result?.emails)
+            returnResult(AddContactToShareNavKey.KEY, result?.emails)
         }
 
         LaunchedEffect(Unit) {

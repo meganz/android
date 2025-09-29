@@ -11,14 +11,14 @@ import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountAc
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 
 @Serializable
-data class UpgradeAccount(
+data class UpgradeAccountNavKey(
     val source: UpgradeAccountSource = UpgradeAccountSource.UNKNOWN,
 ) : NavKey
 
 fun NavGraphBuilder.upgradeAccount(removeDestination: () -> Unit) {
-    composable<UpgradeAccount> {
+    composable<UpgradeAccountNavKey> {
         val context = LocalContext.current
-        val args = it.toRoute<UpgradeAccount>()
+        val args = it.toRoute<UpgradeAccountNavKey>()
         LaunchedEffect(Unit) {
             ChooseAccountActivity.navigateToUpgradeAccount(
                 context = context,

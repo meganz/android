@@ -52,8 +52,8 @@ import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.TOOLB
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.contract.NavDrawerItem
-import mega.privacy.android.navigation.destination.MyAccount
-import mega.privacy.android.navigation.destination.Notifications
+import mega.privacy.android.navigation.destination.MyAccountNavKey
+import mega.privacy.android.navigation.destination.NotificationsNavKey
 import timber.log.Timber
 
 @Composable
@@ -86,7 +86,7 @@ fun MenuHomeScreenUi(
                 trailingIcons = {
                     IconButton(
                         modifier = Modifier.testTag(NOTIFICATION_ICON),
-                        onClick = { navigateToFeature(Notifications) }
+                        onClick = { navigateToFeature(NotificationsNavKey) }
                     ) {
                         MegaIcon(
                             painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Bell),
@@ -130,7 +130,7 @@ fun MenuHomeScreenUi(
                         )
                     },
                     onClickListener = {
-                        navigateToFeature(MyAccount)
+                        navigateToFeature(MyAccountNavKey)
                     }
                 )
             }

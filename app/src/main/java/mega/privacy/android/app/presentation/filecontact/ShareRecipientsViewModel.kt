@@ -28,7 +28,7 @@ import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarning
 import mega.privacy.android.domain.usecase.foldernode.ShareFolderUseCase
 import mega.privacy.android.domain.usecase.shares.GetAllowedSharingPermissionsUseCase
 import mega.privacy.android.domain.usecase.shares.MonitorShareRecipientsUseCase
-import mega.privacy.android.navigation.destination.FileContactInfo
+import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -42,7 +42,7 @@ internal class ShareRecipientsViewModel @Inject constructor(
     private val getAllowedSharingPermissionsUseCase: GetAllowedSharingPermissionsUseCase,
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
 ) : ViewModel() {
-    private val folderInfo = savedStateHandle.toRoute<FileContactInfo>()
+    private val folderInfo = savedStateHandle.toRoute<FileContactInfoNavKey>()
 
     val state: StateFlow<FileContactListState>
         field: MutableStateFlow<FileContactListState> = MutableStateFlow(
@@ -208,7 +208,7 @@ internal class ShareRecipientsViewModel @Inject constructor(
 
 }
 
-internal val FileContactInfo.folderId: NodeId
+internal val FileContactInfoNavKey.folderId: NodeId
     get() = NodeId(folderHandle)
 
 private fun interface StateTransform {

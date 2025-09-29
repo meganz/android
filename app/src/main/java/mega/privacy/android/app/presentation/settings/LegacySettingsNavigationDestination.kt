@@ -8,15 +8,15 @@ import androidx.navigation.toRoute
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
-import mega.privacy.android.navigation.destination.LegacySettings
+import mega.privacy.android.navigation.destination.LegacySettingsNavKey
 import mega.privacy.android.navigation.extensions.typeMapOf
 import mega.privacy.android.navigation.settings.arguments.TargetPreference
 
 fun NavGraphBuilder.legacySettingsScreen(removeDestination: () -> Unit) {
-    composable<LegacySettings>(
+    composable<LegacySettingsNavKey>(
         typeMap = mapOf(typeMapOf<TargetPreference?>())
     ) {
-        val targetPreference = it.toRoute<LegacySettings>().targetPreference
+        val targetPreference = it.toRoute<LegacySettingsNavKey>().targetPreference
         val context = LocalContext.current
         LaunchedEffect(Unit) {
             val intent = SettingsActivity.getIntent(context, targetPreference)

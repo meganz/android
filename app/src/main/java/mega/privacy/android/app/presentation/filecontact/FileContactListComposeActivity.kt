@@ -23,7 +23,7 @@ import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectF
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.destination.FileContactInfo
+import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -115,7 +115,7 @@ internal class FileContactListComposeActivity : AppCompatActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = FileContactInfo(
+                    startDestination = FileContactInfoNavKey(
                         folderHandle = nodeHandle,
                         folderName = nodeName,
                     )

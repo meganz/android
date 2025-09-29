@@ -14,9 +14,9 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.filecontact.ShareRecipientsViewModel
 import mega.privacy.android.app.presentation.filecontact.view.FileContactHomeScreen
-import mega.privacy.android.navigation.destination.AddContactToShare
-import mega.privacy.android.navigation.destination.ContactInfo
-import mega.privacy.android.navigation.destination.FileContactInfo
+import mega.privacy.android.navigation.destination.AddContactToShareNavKey
+import mega.privacy.android.navigation.destination.ContactInfoNavKey
+import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import mega.privacy.mobile.analytics.event.FileContactListScreenViewEvent
 
 internal fun NavGraphBuilder.fileContacts(
@@ -24,11 +24,11 @@ internal fun NavGraphBuilder.fileContacts(
     onNavigate: (NavKey) -> Unit,
     resultFlow: (String) -> Flow<List<String>?>,
 ) {
-    composable<FileContactInfo> {
+    composable<FileContactInfoNavKey> {
         LaunchedEffect(Unit) {
             Analytics.tracker.trackEvent(FileContactListScreenViewEvent)
         }
-        val result by resultFlow(AddContactToShare.KEY).collectAsStateWithLifecycle(
+        val result by resultFlow(AddContactToShareNavKey.KEY).collectAsStateWithLifecycle(
             null
         )
 
@@ -40,8 +40,8 @@ internal fun NavGraphBuilder.fileContacts(
 
         val onShareFolder = { handle: Long ->
             onNavigate(
-                AddContactToShare(
-                    contactType = AddContactToShare.ContactType.All,
+                AddContactToShareNavKey(
+                    contactType = AddContactToShareNavKey.ContactType.All,
                     nodeHandle = listOf(handle),
                 )
             )
@@ -59,7 +59,7 @@ internal fun NavGraphBuilder.fileContacts(
             updatePermissions = viewModel::changePermissions,
             shareRemovedEventHandled = viewModel::onShareRemovedEventHandled,
             shareCompletedEventHandled = viewModel::onSharingCompletedEventHandled,
-            navigateToInfo = { onNavigate(ContactInfo(it.email)) },
+            navigateToInfo = { onNavigate(ContactInfoNavKey(it.email)) },
             addContact = onShareFolder,
         )
     }

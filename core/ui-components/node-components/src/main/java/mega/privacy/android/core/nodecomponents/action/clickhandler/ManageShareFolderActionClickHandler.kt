@@ -8,7 +8,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.navigation.destination.FileContactInfo
+import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import javax.inject.Inject
 
 class ManageShareFolderActionClickHandler @Inject constructor(
@@ -21,7 +21,7 @@ class ManageShareFolderActionClickHandler @Inject constructor(
         provider.coroutineScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
                 provider.navigationHandler?.navigate(
-                    FileContactInfo(
+                    FileContactInfoNavKey(
                         folderHandle = node.id.longValue, folderName = node.name
                     )
                 )

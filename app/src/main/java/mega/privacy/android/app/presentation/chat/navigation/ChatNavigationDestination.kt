@@ -5,14 +5,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import mega.privacy.android.navigation.destination.Chat
+import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 
 fun NavGraphBuilder.chatLegacyDestination(removeDestination: () -> Unit) {
-    composable<Chat> {
+    composable<ChatNavKey> {
         val context = LocalContext.current
         val megaNavigator = rememberMegaNavigator()
-        val chat = it.toRoute<Chat>()
+        val chat = it.toRoute<ChatNavKey>()
         LaunchedEffect(Unit) {
             megaNavigator.openChat(context, chat.chatId, chat.action)
             removeDestination()

@@ -14,8 +14,8 @@ import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.privacy.android.app.R
 import mega.privacy.android.app.consent.model.CookieConsentState
 import mega.privacy.android.app.consent.view.CookieConsentDialog
-import mega.privacy.android.navigation.destination.CookieSettings
-import mega.privacy.android.navigation.destination.WebSite
+import mega.privacy.android.navigation.destination.CookieSettingsNavKey
+import mega.privacy.android.navigation.destination.WebSiteNavKey
 
 @Serializable
 data object CookieDialog : NavKey
@@ -61,10 +61,10 @@ fun NavGraphBuilder.cookieDialogDestination(
                         }
                     },
                     onOpenCookieSettings = {
-                        navigate(CookieSettings)
+                        navigate(CookieSettingsNavKey)
                     },
                     onNavigateToCookiePolicy = {
-                        navigate(WebSite(state.cookiesUrl))
+                        navigate(WebSiteNavKey(state.cookiesUrl))
                     },
                 )
             }

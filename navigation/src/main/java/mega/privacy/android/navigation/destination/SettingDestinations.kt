@@ -5,9 +5,9 @@ import kotlinx.serialization.Serializable
 import mega.privacy.android.navigation.settings.arguments.TargetPreference
 
 @Serializable
-data class LegacySettings(
+data class LegacySettingsNavKey(
     val targetPreference: TargetPreference?,
 ) : NavKey
 
 @Serializable
-data object CookieSettings : NavKey
+data object CookieSettingsNavKey : NavKey

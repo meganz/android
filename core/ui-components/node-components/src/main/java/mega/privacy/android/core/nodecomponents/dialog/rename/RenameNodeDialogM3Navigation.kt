@@ -8,13 +8,13 @@ import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.node.NodeId
 
 @Serializable
-data class RenameNodeDialog(val nodeId: Long) : NavKey
+data class RenameNodeDialogNavKey(val nodeId: Long) : NavKey
 
 fun NavGraphBuilder.renameNodeDialogM3(
     onDismiss: () -> Unit,
 ) {
-    dialog<RenameNodeDialog> {
-        val args = it.toRoute<RenameNodeDialog>()
+    dialog<RenameNodeDialogNavKey> {
+        val args = it.toRoute<RenameNodeDialogNavKey>()
 
         RenameNodeDialogM3(
             nodeId = NodeId(args.nodeId),

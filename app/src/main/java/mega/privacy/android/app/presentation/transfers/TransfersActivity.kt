@@ -25,7 +25,7 @@ import mega.privacy.android.app.presentation.transfers.view.navigation.transfers
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.navigation.destination.Transfers
+import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
@@ -79,7 +79,7 @@ class TransfersActivity : AppCompatActivity() {
 
                                     NavHost(
                                         navController = rememberNavController(),
-                                        startDestination = Transfers(tabIndex = tabIndex),
+                                        startDestination = TransfersNavKey(tabIndex = tabIndex),
                                         modifier = Modifier.navigationBarsPadding()
                                     ) {
                                         transfersScreen(

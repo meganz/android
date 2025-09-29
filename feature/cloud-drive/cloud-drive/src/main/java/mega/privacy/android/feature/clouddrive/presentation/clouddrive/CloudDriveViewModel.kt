@@ -53,7 +53,7 @@ import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
-import mega.privacy.android.navigation.destination.CloudDrive
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -81,7 +81,7 @@ class CloudDriveViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val args = savedStateHandle.toRoute<CloudDrive>()
+    private val args = savedStateHandle.toRoute<CloudDriveNavKey>()
     private val highlightedNodeId = args.highlightedNodeHandle?.let { NodeId(it) }
     private val highlightedNodeNames = args.highlightedNodeNames
     internal val nodeSourceType = args.nodeSourceType

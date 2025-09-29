@@ -8,13 +8,13 @@ import kotlinx.serialization.Serializable
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 
 @Serializable
-data class RemoveNodeLinkDialogArgs(val nodes: String) : NavKey
+data class RemoveNodeLinkDialogNavKey(val nodes: String) : NavKey
 
 fun NavGraphBuilder.removeNodeLinkDialogM3(
     onDismiss: () -> Unit,
 ) {
-    dialog<RemoveNodeLinkDialogArgs> {
-        val args = it.toRoute<RemoveNodeLinkDialogArgs>()
+    dialog<RemoveNodeLinkDialogNavKey> {
+        val args = it.toRoute<RemoveNodeLinkDialogNavKey>()
         val mapper = NodeHandlesToJsonMapper()
 
         RemoveNodeLinkDialogM3(

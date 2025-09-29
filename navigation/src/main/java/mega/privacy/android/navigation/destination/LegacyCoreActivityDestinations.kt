@@ -6,25 +6,25 @@ import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.node.NodeSourceType
 
 @Serializable
-data object OverDiskQuotaPaywallWarning : NavKey
+data object OverDiskQuotaPaywallWarningNavKey : NavKey
 
 @Serializable
-data object MyAccount : NavKey
+data object MyAccountNavKey : NavKey
 
 @Serializable
-data object Achievement : NavKey
+data object AchievementNavKey : NavKey
 
 @Serializable
-data class WebSite(val url: String) : NavKey
+data class WebSiteNavKey(val url: String) : NavKey
 
 @Serializable
-data object Contacts : NavKey
+data object ContactsNavKey : NavKey
 
 @Serializable
-data class Chat(val chatId: Long, val action: String?) : NavKey
+data class ChatNavKey(val chatId: Long, val action: String?) : NavKey
 
 @Serializable
-data class AddContactToShare(
+data class AddContactToShareNavKey(
     val contactType: ContactType,
     val nodeHandle: List<Long>,
 ) : NavKey {
@@ -35,22 +35,22 @@ data class AddContactToShare(
         All,
     }
 
-    companion object {
+    companion object Companion {
         const val KEY = "extra_contacts"
     }
 }
 
 @Serializable
-data class ContactInfo(val email: String) : NavKey
+data class ContactInfoNavKey(val email: String) : NavKey
 
 @Serializable
-data class FileContactInfo(
+data class FileContactInfoNavKey(
     val folderHandle: Long,
     val folderName: String,
 ) : NavKey
 
 @Serializable
-data class SearchNode(
+data class SearchNodeNavKey(
     val isFirstNavigationLevel: Boolean,
     val nodeSourceType: NodeSourceType,
     val parentHandle: Long,

@@ -1,27 +1,27 @@
 package mega.privacy.android.app.menu.navigation
 
 import androidx.navigation3.runtime.NavKey
-import mega.privacy.android.feature.payment.UpgradeAccount
+import mega.privacy.android.feature.payment.UpgradeAccountNavKey
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavDrawerItem
-import mega.privacy.android.navigation.destination.Achievement
+import mega.privacy.android.navigation.destination.AchievementNavKey
 import mega.privacy.android.navigation.destination.ExampleLegacyScreen
-import mega.privacy.android.navigation.destination.LegacySettings
-import mega.privacy.android.navigation.destination.MyAccount
-import mega.privacy.android.navigation.destination.RubbishBin
-import mega.privacy.android.navigation.destination.Shares
-import mega.privacy.android.navigation.destination.Transfers
+import mega.privacy.android.navigation.destination.LegacySettingsNavKey
+import mega.privacy.android.navigation.destination.MyAccountNavKey
+import mega.privacy.android.navigation.destination.RubbishBinNavKey
+import mega.privacy.android.navigation.destination.SharesNavKey
+import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 
 object CurrentPlanItem : NavDrawerItem.Account(
-    destination = UpgradeAccount(),
+    destination = UpgradeAccountNavKey(),
     icon = IconPack.Medium.Thin.Outline.Shield,
     title = sharedR.string.account_upgrade_account_pro_plan_info_current_plan_label,
     actionLabel = sharedR.string.general_upgrade_button
 )
 
 object StorageItem : NavDrawerItem.Account(
-    destination = MyAccount,
+    destination = MyAccountNavKey,
     icon = IconPack.Medium.Thin.Outline.HardDrive,
     title = sharedR.string.account_cancel_account_screen_plan_storage
 )
@@ -33,13 +33,13 @@ object ContactsItem : NavDrawerItem.Account(
 )
 
 object AchievementsItem : NavDrawerItem.Account(
-    destination = Achievement,
+    destination = AchievementNavKey,
     icon = IconPack.Medium.Thin.Outline.Rocket,
     title = sharedR.string.general_section_achievements,
 )
 
 object SharedItemsItem : NavDrawerItem.Account(
-    destination = Shares,
+    destination = SharesNavKey,
     icon = IconPack.Medium.Thin.Outline.FolderUsers,
     title = sharedR.string.video_section_videos_location_option_shared_items
 )
@@ -51,7 +51,7 @@ object DeviceCentreItem : NavDrawerItem.Account(
 )
 
 object TransfersItem : NavDrawerItem.Account(
-    destination = Transfers(),
+    destination = TransfersNavKey(),
     icon = IconPack.Medium.Thin.Outline.ArrowsUpDownCircle,
     title = sharedR.string.general_section_transfers
 )
@@ -63,13 +63,13 @@ object OfflineFilesItem : NavDrawerItem.Account(
 )
 
 object RubbishBinItem : NavDrawerItem.Account(
-    destination = RubbishBin(),
+    destination = RubbishBinNavKey(),
     icon = IconPack.Medium.Thin.Outline.Trash,
     title = sharedR.string.general_section_rubbish_bin
 )
 
 object SettingsItem : NavDrawerItem.Account(
-    destination = LegacySettings(null),
+    destination = LegacySettingsNavKey(null),
     icon = IconPack.Medium.Thin.Outline.GearSix,
     title = sharedR.string.general_settings
 )

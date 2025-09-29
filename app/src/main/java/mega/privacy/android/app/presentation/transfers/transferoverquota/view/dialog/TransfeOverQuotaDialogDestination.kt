@@ -9,7 +9,7 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.login.LoginScreen
 import mega.privacy.android.app.presentation.transfers.transferoverquota.TransferOverQuotaViewModel
-import mega.privacy.android.feature.payment.UpgradeAccount
+import mega.privacy.android.feature.payment.UpgradeAccountNavKey
 import mega.privacy.android.navigation.contract.AppDialogDestinations
 import mega.privacy.android.navigation.contract.NavigationHandler
 
@@ -39,7 +39,7 @@ fun NavGraphBuilder.transferOverQuotaDialogDestination(
         TransferOverQuotaDialog(
             uiState = uiState,
             navigateToUpgradeAccount = {
-                navigate(UpgradeAccount())
+                navigate(UpgradeAccountNavKey())
             },
             navigateToLogin = {
                 navigate(LoginScreen)

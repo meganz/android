@@ -8,13 +8,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.navigation.destination.ContactInfo
+import mega.privacy.android.navigation.destination.ContactInfoNavKey
 
 fun NavGraphBuilder.contactInfoLegacyDestination(
     removeDestination: () -> Unit,
 ) {
-    composable<ContactInfo> {
-        val contactInfo = it.toRoute<ContactInfo>()
+    composable<ContactInfoNavKey> {
+        val contactInfo = it.toRoute<ContactInfoNavKey>()
 
         val context = LocalContext.current
         LaunchedEffect(Unit) {

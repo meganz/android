@@ -4,15 +4,15 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RubbishBin(
+data class RubbishBinNavKey(
     val handle: Long? = null,
 ) : NavKey
 
 @Serializable
-data object Notifications : NavKey
+data object NotificationsNavKey : NavKey
 
 @Serializable
-data class MediaDiscovery(
+data class MediaDiscoveryNavKey(
     val nodeHandle: Long,
     val nodeName: String? = null,
 ) : NavKey

@@ -9,4 +9,4 @@ import kotlinx.serialization.Serializable
  * @param tabIndex The index of the tab to open, if null it will be decided by view model logic
  */
 @Serializable
-class Transfers(val tabIndex: Int? = null) : NavKey
+class TransfersNavKey(val tabIndex: Int? = null) : NavKey

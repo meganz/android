@@ -6,10 +6,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
-import mega.privacy.android.navigation.destination.OverDiskQuotaPaywallWarning
+import mega.privacy.android.navigation.destination.OverDiskQuotaPaywallWarningNavKey
 
 fun NavGraphBuilder.overDiskQuotaPaywallWarning(removeDestination: () -> Unit) {
-    composable<OverDiskQuotaPaywallWarning> {
+    composable<OverDiskQuotaPaywallWarningNavKey> {
         val context = LocalContext.current
         LaunchedEffect(Unit) {
             val intent = Intent(

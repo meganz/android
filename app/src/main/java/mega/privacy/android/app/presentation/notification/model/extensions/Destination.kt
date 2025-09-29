@@ -18,10 +18,10 @@ import mega.privacy.android.domain.entity.UpdatedPendingContactIncomingDeniedAle
 import mega.privacy.android.domain.entity.UpdatedPendingContactIncomingIgnoredAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactOutgoingDeniedAlert
 import mega.privacy.android.domain.entity.UserAlert
-import mega.privacy.android.navigation.destination.Chat
-import mega.privacy.android.navigation.destination.ContactInfo
-import mega.privacy.android.navigation.destination.Contacts
-import mega.privacy.android.navigation.destination.MyAccount
+import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.destination.ContactInfoNavKey
+import mega.privacy.android.navigation.destination.ContactsNavKey
+import mega.privacy.android.navigation.destination.MyAccountNavKey
 
 /**
  * Notification Destination
@@ -29,9 +29,9 @@ import mega.privacy.android.navigation.destination.MyAccount
  */
 internal fun UserAlert.destination(): NavKey? {
     return when (this) {
-        is PaymentFailedAlert -> MyAccount
-        is PaymentReminderAlert -> MyAccount
-        is PaymentSucceededAlert -> MyAccount
+        is PaymentFailedAlert -> MyAccountNavKey
+        is PaymentReminderAlert -> MyAccountNavKey
+        is PaymentSucceededAlert -> MyAccountNavKey
         is TakeDownAlert -> null //TODO handle TakeDownAlert
 
         is TakeDownReinstatedAlert -> null //TODO handle TakeDownReinstatedAlert
@@ -47,12 +47,12 @@ internal fun UserAlert.destination(): NavKey? {
 
         is ContactAlert ->
             if (contact.isVisible) {
-                contact.email?.let { ContactInfo(it) }
+                contact.email?.let { ContactInfoNavKey(it) }
             } else if (contact.hasPendingRequest) {
-                Contacts
+                ContactsNavKey
             } else null
 
-        is ScheduledMeetingAlert -> Chat(chatId, Constants.ACTION_CHAT_SHOW_MESSAGES)
+        is ScheduledMeetingAlert -> ChatNavKey(chatId, Constants.ACTION_CHAT_SHOW_MESSAGES)
 
         else -> null
     }

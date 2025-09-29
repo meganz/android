@@ -11,7 +11,7 @@ import mega.privacy.android.app.sslverification.model.SSLDialogState
 import mega.privacy.android.app.sslverification.view.SSLErrorDialog
 import mega.privacy.android.navigation.contract.AppDialogDestinations
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.destination.WebSite
+import mega.privacy.android.navigation.destination.WebSiteNavKey
 
 @Serializable
 data object SSLErrorDialog : NavKey
@@ -47,7 +47,7 @@ fun NavGraphBuilder.sslDialogDestination(
                     onRetry = viewModel::onRetry,
                     onOpenBrowser = {
                         navigateAndClear(
-                            WebSite(state.webUrl),
+                            WebSiteNavKey(state.webUrl),
                             SSLErrorDialog,
                             true,
                         )

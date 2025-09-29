@@ -49,7 +49,7 @@ import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOv
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
-import mega.privacy.android.navigation.destination.Transfers
+import mega.privacy.android.navigation.destination.TransfersNavKey
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -86,7 +86,7 @@ class TransfersViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(TransfersUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val transfersInfo = savedStateHandle.toRoute<Transfers>()
+    private val transfersInfo = savedStateHandle.toRoute<TransfersNavKey>()
 
     init {
         val initialTabIndex = transfersInfo.tabIndex

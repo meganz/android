@@ -3,7 +3,7 @@ package mega.privacy.android.core.nodecomponents.action.clickhandler
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.core.nodecomponents.action.SingleNodeActionProvider
-import mega.privacy.android.core.nodecomponents.dialog.contact.CannotVerifyContactDialogArgs
+import mega.privacy.android.core.nodecomponents.dialog.contact.CannotVerifyContactDialogNavKey
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VerifyMenuAction
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.shares.GetNodeShareDataUseCase
@@ -21,7 +21,7 @@ class VerifyActionClickHandler @Inject constructor(
             getNodeShareDataUseCase(node)?.let { data ->
                 if (data.isVerified.not() && data.isPending) {
                     provider.navigationHandler?.navigate(
-                        CannotVerifyContactDialogArgs(data.user.orEmpty())
+                        CannotVerifyContactDialogNavKey(data.user.orEmpty())
                     )
                 } else {
                     megaNavigator.openAuthenticityCredentialsActivity(

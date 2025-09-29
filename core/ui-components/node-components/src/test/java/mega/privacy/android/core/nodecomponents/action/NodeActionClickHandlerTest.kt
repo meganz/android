@@ -90,7 +90,7 @@ import mega.privacy.android.domain.usecase.shares.GetNodeShareDataUseCase
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.destination.FileContactInfo
+import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -817,7 +817,7 @@ class NodeActionClickHandlerTest {
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockNavigationHandler).navigate(any<FileContactInfo>())
+        verify(mockNavigationHandler).navigate(any<FileContactInfoNavKey>())
     }
 
     // InfoAction Tests

@@ -10,7 +10,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import mega.privacy.android.feature.transfers.components.widget.TransfersToolbarWidgetViewAnimated
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.destination.Transfers
+import mega.privacy.android.navigation.destination.TransfersNavKey
 
 /**
  * Widget to show current transfers progress in the toolbar
@@ -34,7 +34,7 @@ fun TransfersToolbarWidget(
             modifier = modifier,
             onClick = {
                 if (state.isUserLoggedIn) {
-                    navigationHandler.navigate(Transfers())
+                    navigationHandler.navigate(TransfersNavKey())
                 }
             },
         )

@@ -2,7 +2,7 @@ package mega.privacy.android.core.nodecomponents.action.clickhandler
 
 import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.core.nodecomponents.action.SingleNodeActionProvider
-import mega.privacy.android.core.nodecomponents.dialog.removeshare.RemoveShareFolderDialogArgs
+import mega.privacy.android.core.nodecomponents.dialog.removeshare.RemoveShareFolderDialogNavKey
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveShareMenuAction
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -19,7 +19,7 @@ class RemoveShareActionClickHandler @Inject constructor(
         runCatching { nodeHandlesToJsonMapper(nodeList) }
             .onSuccess { handles ->
                 provider.navigationHandler?.navigate(
-                    RemoveShareFolderDialogArgs(nodes = handles)
+                    RemoveShareFolderDialogNavKey(nodes = handles)
                 )
             }.onFailure {
                 Timber.e(it)

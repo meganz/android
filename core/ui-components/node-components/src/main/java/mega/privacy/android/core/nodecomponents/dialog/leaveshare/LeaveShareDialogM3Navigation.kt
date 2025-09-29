@@ -8,13 +8,13 @@ import kotlinx.serialization.Serializable
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 
 @Serializable
-data class LeaveShareDialogArgs(val handles: String) : NavKey
+data class LeaveShareDialogNavKey(val handles: String) : NavKey
 
 fun NavGraphBuilder.leaveShareDialogM3(
     onBack: () -> Unit,
 ) {
-    dialog<LeaveShareDialogArgs> {
-        val args = it.toRoute<LeaveShareDialogArgs>()
+    dialog<LeaveShareDialogNavKey> {
+        val args = it.toRoute<LeaveShareDialogNavKey>()
         val mapper = NodeHandlesToJsonMapper()
         val handles = mapper(args.handles)
 

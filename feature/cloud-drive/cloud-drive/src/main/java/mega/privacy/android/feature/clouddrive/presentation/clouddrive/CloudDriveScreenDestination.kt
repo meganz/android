@@ -17,7 +17,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.destination.CloudDrive
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
 
 fun NavGraphBuilder.cloudDriveScreen(
     navigationHandler: NavigationHandler,
@@ -28,8 +28,8 @@ fun NavGraphBuilder.cloudDriveScreen(
     onRenameNode: (NodeId) -> Unit,
     openSearch: (Boolean, Long, NodeSourceType) -> Unit,
 ) {
-    composable<CloudDrive> { backStackEntry ->
-        val args = backStackEntry.toRoute<CloudDrive>()
+    composable<CloudDriveNavKey> { backStackEntry ->
+        val args = backStackEntry.toRoute<CloudDriveNavKey>()
         val viewModel = hiltViewModel<CloudDriveViewModel>(key = args.nodeHandle.toString())
         val snackbarHostState = LocalSnackBarHostState.current
         val context = LocalContext.current

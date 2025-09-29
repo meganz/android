@@ -9,13 +9,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.destination.MediaDiscovery
+import mega.privacy.android.navigation.destination.MediaDiscoveryNavKey
 
 fun NavGraphBuilder.legacyMediaDiscoveryScreen(
     navigationHandler: NavigationHandler,
 ) {
-    composable<MediaDiscovery> { backStackEntry ->
-        val args = backStackEntry.toRoute<MediaDiscovery>()
+    composable<MediaDiscoveryNavKey> { backStackEntry ->
+        val args = backStackEntry.toRoute<MediaDiscoveryNavKey>()
 
         AndroidFragment<MediaDiscoveryFragment>(
             arguments = bundleOf(

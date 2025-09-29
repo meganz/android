@@ -5,14 +5,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import mega.privacy.android.navigation.destination.SearchNode
+import mega.privacy.android.navigation.destination.SearchNodeNavKey
 import mega.privacy.android.navigation.megaNavigator
 
 fun NavGraphBuilder.searchLegacyDestination(
     removeDestination: () -> Unit,
 ) {
-    composable<SearchNode> {
-        val route = it.toRoute<SearchNode>()
+    composable<SearchNodeNavKey> {
+        val route = it.toRoute<SearchNodeNavKey>()
         val context = LocalContext.current
         LaunchedEffect(Unit) {
             context.megaNavigator.openSearchActivity(

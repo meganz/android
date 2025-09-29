@@ -26,7 +26,7 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
-import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderAccessDialogArgs
+import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderAccessDialogNavKey
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogM3
 import mega.privacy.android.core.nodecomponents.list.NodeListViewItem
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
@@ -107,7 +107,7 @@ fun NodeOptionsBottomSheetRoute(
         onConsumed = nodeOptionsActionViewModel::markShareFolderAccessDialogShown,
         action = { (contactData, isFromBackups, nodeHandles) ->
             navigationHandler.navigate(
-                ShareFolderAccessDialogArgs(
+                ShareFolderAccessDialogNavKey(
                     nodes = nodeHandles,
                     contacts = contactData.joinToString(separator = ","),
                     isFromBackups = isFromBackups

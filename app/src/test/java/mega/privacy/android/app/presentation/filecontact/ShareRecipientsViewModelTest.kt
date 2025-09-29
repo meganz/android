@@ -23,7 +23,7 @@ import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarning
 import mega.privacy.android.domain.usecase.foldernode.ShareFolderUseCase
 import mega.privacy.android.domain.usecase.shares.GetAllowedSharingPermissionsUseCase
 import mega.privacy.android.domain.usecase.shares.MonitorShareRecipientsUseCase
-import mega.privacy.android.navigation.destination.FileContactInfo
+import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -63,7 +63,7 @@ class ShareRecipientsViewModelTest {
     private fun initUnderTest() {
         underTest = ShareRecipientsViewModel(
             savedStateHandle = SavedStateHandle.Companion.invoke(
-                route = FileContactInfo(
+                route = FileContactInfoNavKey(
                     folderName = TestValues.FOLDER_NAME,
                     folderHandle = TestValues.NODE_HANDLE,
                 ),

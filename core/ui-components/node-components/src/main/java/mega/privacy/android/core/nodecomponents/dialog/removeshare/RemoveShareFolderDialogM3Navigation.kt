@@ -9,13 +9,13 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.domain.entity.node.NodeId
 
 @Serializable
-data class RemoveShareFolderDialogArgs(val nodes: String) : NavKey
+data class RemoveShareFolderDialogNavKey(val nodes: String) : NavKey
 
 fun NavGraphBuilder.removeShareFolderDialogM3(
     onDismiss: () -> Unit,
 ) {
-    dialog<RemoveShareFolderDialogArgs> {
-        val args = it.toRoute<RemoveShareFolderDialogArgs>()
+    dialog<RemoveShareFolderDialogNavKey> {
+        val args = it.toRoute<RemoveShareFolderDialogNavKey>()
         val mapper = NodeHandlesToJsonMapper()
         val nodes = mapper(args.nodes)
             .map { handle -> NodeId(handle) }

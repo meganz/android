@@ -6,17 +6,17 @@ import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.navigation.destination.AddContactToShare
+import mega.privacy.android.navigation.destination.AddContactToShareNavKey
 
 class AddContactsContract :
-    ActivityResultContract<AddContactToShare, AddContactsContract.Output?>() {
+    ActivityResultContract<AddContactToShareNavKey, AddContactsContract.Output?>() {
 
     data class Output(
         val emails: List<String>,
         val nodeHandle: Long,
     )
 
-    override fun createIntent(context: Context, input: AddContactToShare): Intent {
+    override fun createIntent(context: Context, input: AddContactToShareNavKey): Intent {
         return Intent(context, AddContactActivity::class.java).apply {
             putExtra("contactType", input.contactType.intValue)
             if (input.nodeHandle.size == 1) {
@@ -40,9 +40,9 @@ class AddContactsContract :
     }
 }
 
-internal val AddContactToShare.ContactType.intValue
+internal val AddContactToShareNavKey.ContactType.intValue
     get() = when (this) {
-        AddContactToShare.ContactType.Mega -> Constants.CONTACT_TYPE_MEGA
-        AddContactToShare.ContactType.Device -> Constants.CONTACT_TYPE_DEVICE
-        AddContactToShare.ContactType.All -> Constants.CONTACT_TYPE_BOTH
+        AddContactToShareNavKey.ContactType.Mega -> Constants.CONTACT_TYPE_MEGA
+        AddContactToShareNavKey.ContactType.Device -> Constants.CONTACT_TYPE_DEVICE
+        AddContactToShareNavKey.ContactType.All -> Constants.CONTACT_TYPE_BOTH
     }
