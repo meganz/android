@@ -1106,6 +1106,8 @@
     <string name="pro_plan_benefit_links_with_expiry_dates">Tautan dengan tanggal kedaluwarsa</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
     <string name="pro_plan_benefit_auto_sync_mobile">Sinkronkan folder di perangkat seluler anda secara otomatis</string>
+    <!-- Benefit: Rewind up to 180 days of deleted data -->
+    <string name="pro_plan_benefit_rewind_180_days">Putar ulang hingga 180 hari data yang dihapus</string>
     <!-- Benefit: Host calls and meetings with unlimited participants and no time restrictions -->
     <string name="pro_plan_benefit_host_calls_unlimited">Selenggarakan panggilan dan rapat dengan peserta tak terbatas dan tanpa batasan waktu</string>
     <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->

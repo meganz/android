@@ -1138,6 +1138,8 @@
     <string name="pro_plan_benefit_links_with_expiry_dates">Linkuri cu date de expirare</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
     <string name="pro_plan_benefit_auto_sync_mobile">Sincronizați automat folderele de pe dispozitivul mobil</string>
+    <!-- Benefit: Rewind up to 180 days of deleted data -->
+    <string name="pro_plan_benefit_rewind_180_days">Derularea înapoi până la 180 de zile de date șterse</string>
     <!-- Benefit: Host calls and meetings with unlimited participants and no time restrictions -->
     <string name="pro_plan_benefit_host_calls_unlimited">Găzduiește apeluri și întâlniri cu participanți nelimitați și fără restricții de timp</string>
     <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->

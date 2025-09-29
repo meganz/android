@@ -284,6 +284,12 @@
     <string name="context_remove_link_menu">Eliminați linkul</string>
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">Acest link nu va mai fi disponibil publicului.</string>
+    <!-- Warning that appears prior to remove links of files. Plural. -->
+    <plurals name="remove_links_warning_text">
+        <item quantity="one">Acest link nu va mai fi disponibil publicului.</item>
+        <item quantity="few">Aceste linkuri nu vor mai fi disponibile publicului.</item>
+        <item quantity="other">Aceste linkuri nu vor mai fi disponibile publicului.</item>
+    </plurals>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_rename">Redenumește</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -359,6 +365,8 @@
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Alegeți un folder de destinație</string>
     <!-- success message when moving a node -->
+    <string name="context_correctly_moved">Elementul a fost mutat</string>
+    <!-- success message when moving a node -->
     <string name="context_correctly_moved_to_rubbish">Elementul a fost mutat în Coșul de gunoi</string>
     <!-- error message -->
     <string name="context_no_moved">Eroare. Nu a fost mutat</string>
@@ -396,6 +404,8 @@
     <string name="subscription_type_monthly">Lunar</string>
     <!--  -->
     <string name="subscription_type_yearly">Anual</string>
+    <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
+    <string name="context_share_correctly_removed">Partajare eliminată</string>
     <!-- Menu option to create a new folder in the file manager. -->
     <string name="menu_new_folder">Folder nou</string>
     <!-- Menu option to add a contact to your contact list. -->
@@ -744,6 +754,12 @@
     <string name="edit_link_option">Gestionează linkul</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
     <string name="old_password_provided_incorrect">Parola actuală furnizată este incorectă.</string>
+    <!-- Confirmation before removing the outgoing shares of a folder -->
+    <plurals name="confirmation_remove_outgoing_shares">
+        <item quantity="one">Folderul este partajat cu %1$d contact. Elimini partajarea?</item>
+        <item quantity="few">Folderul este partajat cu %1$d contacte. Elimini toate partajările?</item>
+        <item quantity="other">Folderul este partajat cu %1$d de contacte. Elimini toate partajările?</item>
+    </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">Adresă de e-mail sau parolă nevalide. Vă rugăm să încercați din nou.</string>
     <!-- Error message when trying to login and the account is suspended. -->
@@ -1139,11 +1155,23 @@
     <string name="copyright_alert_disagree_button">Nu sunt de acord</string>
     <!-- Hint how to cancel the download -->
     <string name="download_show_info">Afișează informații</string>
+    <!-- Error message when removing public links of nodes. Plural. -->
+    <plurals name="context_link_removal_error">
+        <item quantity="one">Eliminarea legăturii a eșuat. Vă rugăm să încercați din nou mai târziu.</item>
+        <item quantity="few">Nu am reușit să eliminați unele linkuri. Vă rugăm să încercați din nou mai târziu.</item>
+        <item quantity="other">Nu am reușit să eliminați unele linkuri. Vă rugăm să încercați din nou mai târziu.</item>
+    </plurals>
     <!-- Error message when creating public links of nodes. Plural. -->
     <plurals name="context_link_export_error">
         <item quantity="one">Crearea legăturilor a eșuat. Vă rugăm să încercați din nou mai târziu.</item>
         <item quantity="few">Nu s-a reușit crearea unor legături. Vă rugăm să încercați din nou mai târziu.</item>
         <item quantity="other">Nu s-a reușit crearea unor legături. Vă rugăm să încercați din nou mai târziu.</item>
+    </plurals>
+    <!-- Message when some public links were removed successfully. Plural. -->
+    <plurals name="context_link_removal_success">
+        <item quantity="one">Link eliminat</item>
+        <item quantity="few">Linkuri eliminate</item>
+        <item quantity="other">Linkuri eliminate</item>
     </plurals>
     <!-- title of the screen to see the details of several contact attachments -->
     <string name="activity_title_contacts_attached">Contacte atașate</string>
@@ -1282,6 +1310,12 @@
         <item quantity="one">Partajează folderul</item>
         <item quantity="few">Partajează folderele</item>
         <item quantity="other">Partajează folderele</item>
+    </plurals>
+    <!-- confirmation message before leaving some incoming shared folders -->
+    <plurals name="confirmation_leave_share_folder">
+        <item quantity="one">Dacă părăsești folderul, nu vei putea să îl vezi din nou.</item>
+        <item quantity="few">Dacă părăsești aceste foldere, nu vei putea să le vezi din nou.</item>
+        <item quantity="other">Dacă părăsești aceste foldere, nu vei putea să le vezi din nou.</item>
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">Ajutor</string>
@@ -1742,6 +1776,10 @@
     <string name="error_streaming">A apărut o eroare la încercarea de a crea redarea în flux</string>
     <!-- Menu option to restore an item from the Rubbish bin -->
     <string name="context_restore">Restaurează</string>
+    <!-- success message when a node was restore from Rubbish bin -->
+    <string name="context_correctly_node_restored">Restaurat în %s</string>
+    <!-- error message when a node was restore from Rubbish bin -->
+    <string name="context_no_restored">A apărut o eroare. Element nerestaurat.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Trimite un mesaj</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -2430,6 +2468,12 @@
     <string name="version_as_new_file_created">Versiunea a fost creată ca un fișier nou.</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">în data de %1$s</string>
+    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
+    <plurals name="alert_remove_several_shares">
+        <item quantity="one">Oprești partajarea acestui folder?</item>
+        <item quantity="few">Oprești partajarea acestor %1$d foldere?</item>
+        <item quantity="other">Oprești partajarea acestor %1$d de foldere?</item>
+    </plurals>
     <!-- Download location label -->
     <string name="download_location">Locație de descărcare</string>
     <!-- Action to show any file in its location -->
@@ -2790,6 +2834,18 @@
         <item quantity="few">%d elemente au fost mutate în Coșul de gunoi, însă 1 element nu a fost mutat. Încearcă din nou mai târziu.</item>
         <item quantity="other">%d de elemente au fost mutate în Coșul de gunoi, însă 1 element nu a fost mutat. Încearcă din nou mai târziu.</item>
     </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 element a fost restaurat, însă celălalt nu a fost restaurat. Încearcă din nou mai târziu.</item>
+        <item quantity="few">1 element a fost restaurat, însă %d elemente nu au fost restaurate. Încearcă din nou mai târziu.</item>
+        <item quantity="other">1 element a fost restaurat, însă %d de elemente nu au fost restaurate. Încearcă din nou mai târziu.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
+        <item quantity="one">%d element a fost restaurat, însă celălalt nu a fost restaurat. Încearcă din nou mai târziu.</item>
+        <item quantity="few">%d elemente au fost restaurate, însă 1 element nu a fost restaurat. Încearcă din nou mai târziu.</item>
+        <item quantity="other">%d de elemente au fost restaurate, însă 1 element nu a fost restaurat. Încearcă din nou mai târziu.</item>
+    </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
         <item quantity="one">%d element mutat în Coșul de gunoi</item>
@@ -2801,6 +2857,18 @@
         <item quantity="one">%d element nu a fost mutat în Coșul de gunoi</item>
         <item quantity="few">%d elemente nu au fost mutate în Coșul de gunoi</item>
         <item quantity="other">%d de elemente nu au fost mutate în Coșul de gunoi</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_correctly_restored_from_rubbish">
+        <item quantity="one">%d element a fost restaurat</item>
+        <item quantity="few">%d elemente au fost restaurate</item>
+        <item quantity="other">%d de elemente au fost restaurate</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_incorrectly_restored_from_rubbish">
+        <item quantity="one">%d element nu a fost restaurat</item>
+        <item quantity="few">%d elemente nu au fost restaurate</item>
+        <item quantity="other">%d de elemente nu au fost restaurate</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Modifică oricum</string>
@@ -3286,6 +3354,10 @@
     <string name="calls_call_screen_bottom_panel_leave_call_option">Părăsește</string>
     <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
     <string name="calls_call_screen_bottom_panel_end_call_for_all_option">Încheie apelul pentru toți</string>
+    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Da</string>
+    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">Nu</string>
     <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos_2">
         <item quantity="one">și %1$d videoclip</item>
@@ -4159,6 +4231,24 @@
         <item quantity="one">Ați părăsit %1$d folder partajat</item>
         <item quantity="few">Ați părăsit %1$d foldere partajate</item>
         <item quantity="other">Ați părăsit %1$d de foldere partajate</item>
+    </plurals>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
+        <item quantity="one">Nu am putut să părăsești %1$d folder partajat</item>
+        <item quantity="few">Nu am putut părăsi %1$d foldere partajate</item>
+        <item quantity="other">Nu am putut părăsi %1$d de foldere partajate</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
+        <item quantity="one">Ați părăsit %1$d folder partajat,&#160;</item>
+        <item quantity="few">Ați părăsit %1$d foldere partajate,&#160;</item>
+        <item quantity="other">Ați părăsit %1$d de foldere partajate,&#160;</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
+        <item quantity="one">nu ai putut lăsa %1$d1 folder partajat</item>
+        <item quantity="few">nu ai putut părăsi %1$d foldere partajate</item>
+        <item quantity="other">nu ai putut părăsi %1$d de foldere partajate</item>
     </plurals>
     <!-- Text shown in the list of meetings when there is a call in progress -->
     <string name="meetings_list_ongoing_call_message">Întâlnire în desfășurare</string>

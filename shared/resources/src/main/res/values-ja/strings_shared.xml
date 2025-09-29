@@ -1106,6 +1106,8 @@
     <string name="pro_plan_benefit_links_with_expiry_dates">有効期限のあるリンク</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
     <string name="pro_plan_benefit_auto_sync_mobile">モバイルデバイス上のフォルダを自動的に同期</string>
+    <!-- Benefit: Rewind up to 180 days of deleted data -->
+    <string name="pro_plan_benefit_rewind_180_days">削除されたデータを最大180日分復元</string>
     <!-- Benefit: Host calls and meetings with unlimited participants and no time restrictions -->
     <string name="pro_plan_benefit_host_calls_unlimited">無制限の参加者と時間制限なしで、通話やミーティングを開催</string>
     <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->

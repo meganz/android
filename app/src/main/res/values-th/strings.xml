@@ -276,6 +276,10 @@
     <string name="context_remove_link_menu">เอาลิงก์ออก</string>
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">ลิงก์นี้จะไม่เปิดเผยต่อสาธารณะอีกต่อไป</string>
+    <!-- Warning that appears prior to remove links of files. Plural. -->
+    <plurals name="remove_links_warning_text">
+        <item quantity="other">ลิงก์เหล่านี้จะไม่มีการเผยแพร่แบบสาธารณะอีกต่อไป</item>
+    </plurals>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_rename">เปลี่ยนชื่อ</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -351,6 +355,8 @@
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">เลือกโฟลเดอร์ปลายทาง</string>
     <!-- success message when moving a node -->
+    <string name="context_correctly_moved">ย้ายรายการแล้ว</string>
+    <!-- success message when moving a node -->
     <string name="context_correctly_moved_to_rubbish">ย้ายรายการไปที่ถังขยะแล้ว</string>
     <!-- error message -->
     <string name="context_no_moved">ผิดพลาด ยังไม่ได้ย้าย</string>
@@ -388,6 +394,8 @@
     <string name="subscription_type_monthly">รายเดือน</string>
     <!--  -->
     <string name="subscription_type_yearly">รายปี</string>
+    <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
+    <string name="context_share_correctly_removed">แชร์ได้ถูกลบออกอย่างถูกต้องแล้ว</string>
     <!-- Menu option to create a new folder in the file manager. -->
     <string name="menu_new_folder">โฟลเดอร์ใหม่</string>
     <!-- Menu option to add a contact to your contact list. -->
@@ -732,6 +740,10 @@
     <string name="edit_link_option">จัดการลิงก์</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
     <string name="old_password_provided_incorrect">รหัสผ่านปัจจุบันที่คุณกรอกไม่ถูกต้อง</string>
+    <!-- Confirmation before removing the outgoing shares of a folder -->
+    <plurals name="confirmation_remove_outgoing_shares">
+        <item quantity="other">โฟลเดอร์ที่แชร์กับ %1$d ผู้ติดต่อ ต้องการเอาออกทั้งหมดหรือไม่</item>
+    </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">อีเมลหรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง</string>
     <!-- Error message when trying to login and the account is suspended. -->
@@ -1093,9 +1105,17 @@
     <string name="copyright_alert_disagree_button">ไม่เห็นด้วย</string>
     <!-- Hint how to cancel the download -->
     <string name="download_show_info">แสดงข้อมูล</string>
+    <!-- Error message when removing public links of nodes. Plural. -->
+    <plurals name="context_link_removal_error">
+        <item quantity="other">ไม่สามารถลบลิงก์บางรายการได้ กรุณาลองใหม่อีกครั้งในภายหลัง</item>
+    </plurals>
     <!-- Error message when creating public links of nodes. Plural. -->
     <plurals name="context_link_export_error">
         <item quantity="other">สร้างลิงก์ไม่สำเร็จ กรุณาลองอีกครั้งในภายหลัง</item>
+    </plurals>
+    <!-- Message when some public links were removed successfully. Plural. -->
+    <plurals name="context_link_removal_success">
+        <item quantity="other">เอาลิงก์ออกแล้ว</item>
     </plurals>
     <!-- title of the screen to see the details of several contact attachments -->
     <string name="activity_title_contacts_attached">รายชื่อติดต่อที่แนบมา</string>
@@ -1232,6 +1252,10 @@
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="other">แชร์โฟลเดอร์</item>
+    </plurals>
+    <!-- confirmation message before leaving some incoming shared folders -->
+    <plurals name="confirmation_leave_share_folder">
+        <item quantity="other">หากคุณออกจากโฟลเดอร์เหล่านี้ คุณจะไม่สามารถมองเห็นได้อีก</item>
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">ช่วยเหลือ</string>
@@ -1670,6 +1694,10 @@
     <string name="error_streaming">เกิดข้อผิดพลาดในการพยายามสร้างสตรีม</string>
     <!-- Menu option to restore an item from the Rubbish bin -->
     <string name="context_restore">กู้คืน</string>
+    <!-- success message when a node was restore from Rubbish bin -->
+    <string name="context_correctly_node_restored">คืนค่าไปที่ %s</string>
+    <!-- error message when a node was restore from Rubbish bin -->
+    <string name="context_no_restored">พบข้อผิดพลาด ไม่สามารถกู้คืนได้</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">ส่งข้อความ</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -2320,6 +2348,10 @@
     <string name="version_as_new_file_created">สร้างเวอร์ชันเป็นไฟล์ใหม่แล้ว</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">เมื่อ %1$s</string>
+    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
+    <plurals name="alert_remove_several_shares">
+        <item quantity="other">ยกเลิกแชร์โฟลเดอร์ %1$d นี้หรือไม่</item>
+    </plurals>
     <!-- Download location label -->
     <string name="download_location">ที่ตั้งดาวน์โหลด</string>
     <!-- Action to show any file in its location -->
@@ -2658,6 +2690,14 @@
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
         <item quantity="other">ย้าย %d รายการไปที่ถังขยะสำเร็จแต่อีก 1 รายการไม่สามารถย้ายได้ กรุณาลองอีกครั้งในภายหลัง</item>
     </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
+        <item quantity="other">กู้คืนสำเร็จ 1 รายการแต่อีก %d รายการไม่สามารถกู้คืนได้ กรุณาลองอีกครั้งในภายหลัง</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
+        <item quantity="other">กู้คืนสำเร็จ %d รายการแต่อีก 1 รายการไม่สามารถกู้คืนได้ กรุณาลองอีกครั้งในภายหลัง</item>
+    </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
         <item quantity="other">%d รายการถูกย้ายไปที่ถังขยะแล้ว</item>
@@ -2665,6 +2705,14 @@
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
         <item quantity="other">%d รายการไม่ได้ถูกย้ายไปที่ถังขยะ</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_correctly_restored_from_rubbish">
+        <item quantity="other">กู้คืน %d รายการแล้ว</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_incorrectly_restored_from_rubbish">
+        <item quantity="other">มี %d รายการที่ไม่ได้กู้คืน</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">ยืนยันการเปลี่ยน</string>
@@ -3142,6 +3190,10 @@
     <string name="calls_call_screen_bottom_panel_leave_call_option">ออก</string>
     <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
     <string name="calls_call_screen_bottom_panel_end_call_for_all_option">วางสายทั้งหมด</string>
+    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">ใช่</string>
+    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">ไม่ใช่</string>
     <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos_2">
         <item quantity="other">และ %1$d วิดีโอ</item>
@@ -3821,6 +3873,18 @@
     <!-- Success message when left shared folders -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
         <item quantity="other">ออกจากโฟลเดอร์ที่แชร์แล้ว %1$d โฟลเดอร์</item>
+    </plurals>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
+        <item quantity="other">มี %1$d โฟลเดอร์ที่ไม่สามารถออกจากโฟลเดอร์ที่แชร์ได้</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
+        <item quantity="other">ออกจากโฟลเดอร์ที่แชร์แล้ว %1$d โฟลเดอร์&#160;</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
+        <item quantity="other">และมีอีก %1$d โฟลเดอร์ที่ไม่สามารถออกจากโฟลเดอร์ที่แชร์ได้</item>
     </plurals>
     <!-- Text shown in the list of meetings when there is a call in progress -->
     <string name="meetings_list_ongoing_call_message">กำลังประชุมอยู่</string>

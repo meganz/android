@@ -1138,6 +1138,8 @@
     <string name="pro_plan_benefit_links_with_expiry_dates">Links com data de validade</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
     <string name="pro_plan_benefit_auto_sync_mobile">Sincronização automática das pastas no seu dispositivo móvel</string>
+    <!-- Benefit: Rewind up to 180 days of deleted data -->
+    <string name="pro_plan_benefit_rewind_180_days">Retroceder até 180 dias de dados deletados</string>
     <!-- Benefit: Host calls and meetings with unlimited participants and no time restrictions -->
     <string name="pro_plan_benefit_host_calls_unlimited">Organizar chamadas e reuniões com um número ilimitado de participantes e sem restrições de tempo</string>
     <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->
@@ -1665,7 +1667,7 @@
     <!-- Snackbar message when retry success on failed transfers tab, plural form. -->
     <string name="transfers_retry_feedback_snackbar_message_plural">Tentando fazer as transferências novamente. Consulte a aba Ativas para ver o progresso</string>
     <!--Default file name for scanned documents. Placeholder value is for the current date and time values eg:   Scanned_2025091120323.  -->
-    <string name="document_scanning_default_file_name">Digitalizado_%1$s</string>
+    <string name="document_scanning_default_file_name">Scanned_%1$s</string>
     <!-- Benefit: Rewind up to specified days of deleted data -->
     <string name="pro_plan_benefit_rewind_days">Retroceder até %1$d dias de dados deletados</string>
     <!-- Error message when removing 1 or more public links from nodes. -->

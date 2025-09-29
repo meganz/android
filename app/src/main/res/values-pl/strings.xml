@@ -288,6 +288,13 @@
     <string name="context_remove_link_menu">Usuń&#160;link</string>
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">Ten link nie będzie już&#160;dostępny publicznie.</string>
+    <!-- Warning that appears prior to remove links of files. Plural. -->
+    <plurals name="remove_links_warning_text">
+        <item quantity="one">Ten link nie będzie już dostępny publicznie.</item>
+        <item quantity="few">Te linki nie będą już publicznie dostępne.</item>
+        <item quantity="many">Te linki nie będą już publicznie dostępne.</item>
+        <item quantity="other">Te linki nie będą już publicznie dostępne.</item>
+    </plurals>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_rename">Zmień nazwę</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -363,6 +370,8 @@
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Wybierz katalog docelowy</string>
     <!-- success message when moving a node -->
+    <string name="context_correctly_moved">Element przeniesiony</string>
+    <!-- success message when moving a node -->
     <string name="context_correctly_moved_to_rubbish">Element przeniesiony do kosza na śmieci</string>
     <!-- error message -->
     <string name="context_no_moved">Błąd. Nie przeniesiono</string>
@@ -400,6 +409,8 @@
     <string name="subscription_type_monthly">Miesięcznie</string>
     <!--  -->
     <string name="subscription_type_yearly">Rocznie</string>
+    <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
+    <string name="context_share_correctly_removed">Udostępnienie zostało usunięte</string>
     <!-- Menu option to create a new folder in the file manager. -->
     <string name="menu_new_folder">Nowy katalog</string>
     <!-- Menu option to add a contact to your contact list. -->
@@ -750,6 +761,13 @@
     <string name="edit_link_option">Zarządzaj linkiem</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
     <string name="old_password_provided_incorrect">Wprowadzone hasło jest niepoprawne.</string>
+    <!-- Confirmation before removing the outgoing shares of a folder -->
+    <plurals name="confirmation_remove_outgoing_shares">
+        <item quantity="one">Katalog jest udostępniony z %1$d. Usunąć udostępnienie?</item>
+        <item quantity="few">Katalog jest udostępniony z %1$d. Usunąć wszystkie udostępnienia?</item>
+        <item quantity="many">Katalog jest udostępniony z %1$d. Usunąć wszystkie udostępnienia?</item>
+        <item quantity="other">Katalog jest udostępniony z %1$d. Usunąć wszystkie udostępnienia?</item>
+    </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">Nieprawidłowy e-mail lub hasło. Proszę spróbować ponownie.</string>
     <!-- Error message when trying to login and the account is suspended. -->
@@ -1162,12 +1180,26 @@
     <string name="copyright_alert_disagree_button">Niezgadzam się</string>
     <!-- Hint how to cancel the download -->
     <string name="download_show_info">Pokaż info</string>
+    <!-- Error message when removing public links of nodes. Plural. -->
+    <plurals name="context_link_removal_error">
+        <item quantity="one">Usunięcie linku nie powiodło się. Spróbuj ponownie później.</item>
+        <item quantity="few">Nie udało się usunąć niektórych linków. Spróbuj ponownie później.</item>
+        <item quantity="many">Nie udało się usunąć niektórych linków. Spróbuj ponownie później.</item>
+        <item quantity="other">Nie udało się usunąć niektórych linków. Spróbuj ponownie później.</item>
+    </plurals>
     <!-- Error message when creating public links of nodes. Plural. -->
     <plurals name="context_link_export_error">
         <item quantity="one">Utworzenie łącza nie powiodło się. Spróbuj ponownie później.</item>
         <item quantity="few">Nie udało się utworzyć niektórych linków. Spróbuj ponownie później.</item>
         <item quantity="many">Nie udało się utworzyć niektórych linków. Spróbuj ponownie później.</item>
         <item quantity="other">Nie udało się utworzyć niektórych linków. Spróbuj ponownie później.</item>
+    </plurals>
+    <!-- Message when some public links were removed successfully. Plural. -->
+    <plurals name="context_link_removal_success">
+        <item quantity="one">Link usunięty</item>
+        <item quantity="few">Linki usunięte</item>
+        <item quantity="many">Linki usunięte</item>
+        <item quantity="other">Linki usunięte</item>
     </plurals>
     <!-- title of the screen to see the details of several contact attachments -->
     <string name="activity_title_contacts_attached">Kontakty załączone</string>
@@ -1307,6 +1339,13 @@
         <item quantity="few">Udostępnione katalogi</item>
         <item quantity="many">Udostępnione katalogi</item>
         <item quantity="other">Udostępnione katalogi</item>
+    </plurals>
+    <!-- confirmation message before leaving some incoming shared folders -->
+    <plurals name="confirmation_leave_share_folder">
+        <item quantity="one">Jeśli opuścisz katalog, nie będziesz go więcej widzieć.</item>
+        <item quantity="few">Jeśli opuścisz te katalogi, nie będziesz mógł ich ponownie zobaczyć.</item>
+        <item quantity="many">Jeśli opuścisz te katalogi, nie będziesz mógł ich ponownie zobaczyć.</item>
+        <item quantity="other">Jeśli opuścisz te katalogi, nie będziesz mógł ich ponownie zobaczyć.</item>
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">Pomoc</string>
@@ -1778,6 +1817,10 @@
     <string name="error_streaming">Wystąpił błąd podczas próby utworzenia strumienia</string>
     <!-- Menu option to restore an item from the Rubbish bin -->
     <string name="context_restore">Odzyskaj</string>
+    <!-- success message when a node was restore from Rubbish bin -->
+    <string name="context_correctly_node_restored">Przywrócono do %s</string>
+    <!-- error message when a node was restore from Rubbish bin -->
+    <string name="context_no_restored">Wystąpił błąd. Element nie został przywrócony.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Wyślij wiadomość</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -2485,6 +2528,13 @@
     <string name="version_as_new_file_created">Wersja została utworzona jako nowy plik</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">w %1$s</string>
+    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
+    <plurals name="alert_remove_several_shares">
+        <item quantity="one">Usunąć udostępnienie z tego katalogu?</item>
+        <item quantity="few">Usunąć udostępnienie z tych %1$d katalogów?</item>
+        <item quantity="many">Usunąć udostępnienie z tych %1$d katalogów?</item>
+        <item quantity="other">Usunąć udostępnienie z tych %1$d katalogów?</item>
+    </plurals>
     <!-- Download location label -->
     <string name="download_location">Lokalizacja na pliki</string>
     <!-- Action to show any file in its location -->
@@ -2856,6 +2906,20 @@
         <item quantity="many">%d elementów zostało przeniesionych do Kosza na śmieci, ale 1 element nie został przeniesiony. Spróbuj ponownie później.</item>
         <item quantity="other">%d elementów zostało przeniesionych do Kosza na śmieci, ale 1 element nie został przeniesiony. Spróbuj ponownie później.</item>
     </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 element został przywrócony, ale drugi nie został przywrócony. Spróbuj ponownie później.</item>
+        <item quantity="few">Przywrócono 1 element, ale %d elementów nie zostało przywróconych. Spróbuj ponownie później.</item>
+        <item quantity="many">Przywrócono 1 element, ale %d elementów nie zostało przywróconych. Spróbuj ponownie później.</item>
+        <item quantity="other">Przywrócono 1 element, ale %d elementów nie zostało przywróconych. Spróbuj ponownie później.</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
+        <item quantity="one">%d element został przywrócony, ale drugi nie został przywrócony. Spróbuj ponownie później.</item>
+        <item quantity="few">%d elementów przywróconych, ale 1 element nie został przywrócony. Spróbuj ponownie później.</item>
+        <item quantity="many">%d elementów przywróconych, ale 1 element nie został przywrócony. Spróbuj ponownie później.</item>
+        <item quantity="other">%d elementów przywróconych, ale 1 element nie został przywrócony. Spróbuj ponownie później.</item>
+    </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
         <item quantity="one">%d element przeniesiony do kosza na śmieci</item>
@@ -2869,6 +2933,20 @@
         <item quantity="few">%d elementów nie zostało przeniesione do kosza na śmieci</item>
         <item quantity="many">%d elementów nie zostało przeniesione do kosza na śmieci</item>
         <item quantity="other">%d elementów nie zostało przeniesione do kosza na śmieci</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_correctly_restored_from_rubbish">
+        <item quantity="one">%d element odzyskany</item>
+        <item quantity="few">%d elementów odzyskanych</item>
+        <item quantity="many">%d elementów odzyskanych</item>
+        <item quantity="other">%d elementów odzyskanych</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_incorrectly_restored_from_rubbish">
+        <item quantity="one">%d element nie został odzyskany</item>
+        <item quantity="few">%d elementów nie zostało odzyskanych</item>
+        <item quantity="many">%d elementów nie zostało odzyskanych</item>
+        <item quantity="other">%d elementów nie zostało odzyskanych</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Dokonaj zmiany</string>
@@ -3358,6 +3436,10 @@
     <string name="calls_call_screen_bottom_panel_leave_call_option">Anuluj</string>
     <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
     <string name="calls_call_screen_bottom_panel_end_call_for_all_option">Zakończ dla wszytskich</string>
+    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Tak</string>
+    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">Nie</string>
     <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos_2">
         <item quantity="one">i %1$d film</item>
@@ -4328,6 +4410,27 @@
         <item quantity="few">Opuszczono %1$d udostępnione katalogi</item>
         <item quantity="many">Opuszczono %1$d udostępnione katalogi</item>
         <item quantity="other">Opuszczono %1$d udostępnione katalogi</item>
+    </plurals>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
+        <item quantity="one">Nie udało się opuścić %1$d udostępnionego katalogu</item>
+        <item quantity="few">Nie udało się opuścić %1$d udostępnionych katalogów</item>
+        <item quantity="many">Nie udało się opuścić %1$d udostępnionych katalogów</item>
+        <item quantity="other">Nie udało się opuścić %1$d udostępnionych katalogów</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
+        <item quantity="one">Opuszczono %1$d udostępniony katalog,&#160;</item>
+        <item quantity="few">Opuszczono %1$d udostępnione katalogi,&#160;</item>
+        <item quantity="many">Opuszczono %1$d udostępnione katalogi,&#160;</item>
+        <item quantity="other">Opuszczono %1$d udostępnione katalogi,&#160;</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
+        <item quantity="one">nie udało się&#160;opuścić %1$d udostępnionego katalogu</item>
+        <item quantity="few">nie udało się&#160;opuścić %1$d udostępnionych katalogów</item>
+        <item quantity="many">nie udało się&#160;opuścić %1$d udostępnionych katalogów</item>
+        <item quantity="other">nie udało się&#160;opuścić %1$d udostępnionych katalogów</item>
     </plurals>
     <!-- Text shown in the list of meetings when there is a call in progress -->
     <string name="meetings_list_ongoing_call_message">Spotkanie w toku</string>

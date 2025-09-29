@@ -276,6 +276,10 @@
     <string name="context_remove_link_menu">リンクを削除</string>
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">このリンクは公開されなくなりました。</string>
+    <!-- Warning that appears prior to remove links of files. Plural. -->
+    <plurals name="remove_links_warning_text">
+        <item quantity="other">これらリンクは公開されなくなりました。</item>
+    </plurals>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_rename">名前を変更</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -351,6 +355,8 @@
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">目的のフォルダを選択してください</string>
     <!-- success message when moving a node -->
+    <string name="context_correctly_moved">項目を移動しました</string>
+    <!-- success message when moving a node -->
     <string name="context_correctly_moved_to_rubbish">項目をごみ箱に移動しました</string>
     <!-- error message -->
     <string name="context_no_moved">エラー。移動されませんでした</string>
@@ -388,6 +394,8 @@
     <string name="subscription_type_monthly">月ごと</string>
     <!--  -->
     <string name="subscription_type_yearly">年間</string>
+    <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
+    <string name="context_share_correctly_removed">共有は削除されました</string>
     <!-- Menu option to create a new folder in the file manager. -->
     <string name="menu_new_folder">新規フォルダ</string>
     <!-- Menu option to add a contact to your contact list. -->
@@ -732,6 +740,10 @@
     <string name="edit_link_option">リンクを管理</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
     <string name="old_password_provided_incorrect">入力された現在のパスワードが正しくありません。</string>
+    <!-- Confirmation before removing the outgoing shares of a folder -->
+    <plurals name="confirmation_remove_outgoing_shares">
+        <item quantity="other">そのフォルダは%1$d件の連絡先と共有されています。共有をすべて削除しますか？</item>
+    </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">メールアドレスかパスワードが無効です。もう一度お試しください。</string>
     <!-- Error message when trying to login and the account is suspended. -->
@@ -1093,9 +1105,17 @@
     <string name="copyright_alert_disagree_button">同意しない</string>
     <!-- Hint how to cancel the download -->
     <string name="download_show_info">情報を表示</string>
+    <!-- Error message when removing public links of nodes. Plural. -->
+    <plurals name="context_link_removal_error">
+        <item quantity="other">一部のリンクを削除できませんでした。後でもう一度お試しください。</item>
+    </plurals>
     <!-- Error message when creating public links of nodes. Plural. -->
     <plurals name="context_link_export_error">
         <item quantity="other">一部のリンクの作成に失敗しました。後でもう一度お試しください。</item>
+    </plurals>
+    <!-- Message when some public links were removed successfully. Plural. -->
+    <plurals name="context_link_removal_success">
+        <item quantity="other">リンクが削除されました</item>
     </plurals>
     <!-- title of the screen to see the details of several contact attachments -->
     <string name="activity_title_contacts_attached">添付された連絡先</string>
@@ -1232,6 +1252,10 @@
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="other">フォルダを共有</item>
+    </plurals>
+    <!-- confirmation message before leaving some incoming shared folders -->
+    <plurals name="confirmation_leave_share_folder">
+        <item quantity="other">これらのフォルダから去ると、再度それを見ることはできません。</item>
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">ヘルプ</string>
@@ -1670,6 +1694,10 @@
     <string name="error_streaming">ストリームの作成時にエラーが発生しました</string>
     <!-- Menu option to restore an item from the Rubbish bin -->
     <string name="context_restore">修復する</string>
+    <!-- success message when a node was restore from Rubbish bin -->
+    <string name="context_correctly_node_restored">%sに復元されました</string>
+    <!-- error message when a node was restore from Rubbish bin -->
+    <string name="context_no_restored">エラーが発生しました。項目が復元できませんでした。</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">メッセージを送信</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -2320,6 +2348,10 @@
     <string name="version_as_new_file_created">バージョンは新しいファイルとして作成されました</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">%1$sに</string>
+    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
+    <plurals name="alert_remove_several_shares">
+        <item quantity="other">これら%1$d個のフォルダの共有を解除しますか？</item>
+    </plurals>
     <!-- Download location label -->
     <string name="download_location">ダウンロード場所</string>
     <!-- Action to show any file in its location -->
@@ -2658,6 +2690,14 @@
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
         <item quantity="other">%d個の項目がごみ箱に移動しましたが、1個の項目は移動しませんでした。後でもう一度試してください。</item>
     </plurals>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
+        <item quantity="other">1個の項目が復元されましたが、%d個の項目は復元されませんでした。後でもう一度試してください。</item>
+    </plurals>
+    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
+        <item quantity="other">%d個の項目が復元されましたが、1個の項目は復元されませんでした。後でもう一度試してください。</item>
+    </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
         <item quantity="other">%d個の項目をゴミ箱に移動しました</item>
@@ -2665,6 +2705,14 @@
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
         <item quantity="other">%d個の項目はごみ箱に移動されませんでした</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_correctly_restored_from_rubbish">
+        <item quantity="other">%d個の項目が復元されました</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_incorrectly_restored_from_rubbish">
+        <item quantity="other">%d個の項目は復元されませんでした</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">とにかく変更する</string>
@@ -3142,6 +3190,10 @@
     <string name="calls_call_screen_bottom_panel_leave_call_option">通話から離れる</string>
     <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
     <string name="calls_call_screen_bottom_panel_end_call_for_all_option">全員に対して終了</string>
+    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">はい</string>
+    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">いいえ</string>
     <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos_2">
         <item quantity="other">と%1$d個の動画</item>
@@ -3821,6 +3873,18 @@
     <!-- Success message when left shared folders -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
         <item quantity="other">%1$d個の共有フォルダから抜けました</item>
+    </plurals>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
+        <item quantity="other">%1$d個の共有フォルダから抜けることができませんでした</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
+        <item quantity="other">%1$d個の共有フォルダから抜けましたが、&#160;</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
+        <item quantity="other">%1$d個の共有フォルダから抜けることができませんでした</item>
     </plurals>
     <!-- Text shown in the list of meetings when there is a call in progress -->
     <string name="meetings_list_ongoing_call_message">ミーティング中</string>
