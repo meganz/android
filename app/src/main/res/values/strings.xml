@@ -280,11 +280,6 @@
     <string name="context_remove_link_menu">Remove link</string>
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">This link will not be publicly available anymore.</string>
-    <!-- Warning that appears prior to remove links of files. Plural. -->
-    <plurals name="remove_links_warning_text">
-        <item quantity="one">This link will not be publicly available anymore.</item>
-        <item quantity="other">These links will not be publicly available anymore.</item>
-    </plurals>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_rename">Rename</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -360,8 +355,6 @@
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Choose a destination folder</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Item moved</string>
-    <!-- success message when moving a node -->
     <string name="context_correctly_moved_to_rubbish">Item moved to Rubbish bin</string>
     <!-- error message -->
     <string name="context_no_moved">Error. Not moved</string>
@@ -399,8 +392,6 @@
     <string name="subscription_type_monthly">Monthly</string>
     <!--  -->
     <string name="subscription_type_yearly">Yearly</string>
-    <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="context_share_correctly_removed">Share removed</string>
     <!-- Menu option to create a new folder in the file manager. -->
     <string name="menu_new_folder">New folder</string>
     <!-- Menu option to add a contact to your contact list. -->
@@ -747,11 +738,6 @@
     <string name="edit_link_option">Manage link</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
     <string name="old_password_provided_incorrect">The current password you have provided is incorrect.</string>
-    <!-- Confirmation before removing the outgoing shares of a folder -->
-    <plurals name="confirmation_remove_outgoing_shares">
-        <item quantity="one">The folder is shared with %1$d contact. Remove share?</item>
-        <item quantity="other">The folder is shared with %1$d contacts. Remove all shares?</item>
-    </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">Invalid email address or password. Please try again.</string>
     <!-- Error message when trying to login and the account is suspended. -->
@@ -1130,20 +1116,10 @@
     <string name="copyright_alert_disagree_button">Disagree</string>
     <!-- Hint how to cancel the download -->
     <string name="download_show_info">Show info</string>
-    <!-- Error message when removing public links of nodes. Plural. -->
-    <plurals name="context_link_removal_error">
-        <item quantity="one">Link removal failed. Please try again later.</item>
-        <item quantity="other">Failed to remove some links. Please try again later.</item>
-    </plurals>
     <!-- Error message when creating public links of nodes. Plural. -->
     <plurals name="context_link_export_error">
         <item quantity="one">Link creation failed. Please try again later.</item>
         <item quantity="other">Failed to create some links. Please try again later.</item>
-    </plurals>
-    <!-- Message when some public links were removed successfully. Plural. -->
-    <plurals name="context_link_removal_success">
-        <item quantity="one">Link removed</item>
-        <item quantity="other">Links removed</item>
     </plurals>
     <!-- title of the screen to see the details of several contact attachments -->
     <string name="activity_title_contacts_attached">Contacts attached</string>
@@ -1281,11 +1257,6 @@
     <plurals name="context_share_folders">
         <item quantity="one">Share folder</item>
         <item quantity="other">Share folders</item>
-    </plurals>
-    <!-- confirmation message before leaving some incoming shared folders -->
-    <plurals name="confirmation_leave_share_folder">
-        <item quantity="one">If you leave the folder, you will not be able to see it again.</item>
-        <item quantity="other">If you leave these folders, you will not be able to see them again.</item>
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">Help</string>
@@ -1735,10 +1706,6 @@
     <string name="error_streaming">An error occurred trying to create the stream</string>
     <!-- Menu option to restore an item from the Rubbish bin -->
     <string name="context_restore">Restore</string>
-    <!-- success message when a node was restore from Rubbish bin -->
-    <string name="context_correctly_node_restored">Restored to %s</string>
-    <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">An error occurred. Item not restored.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Send message</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -2408,11 +2375,6 @@
     <string name="version_as_new_file_created">Version was created as a new file</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">on %1$s</string>
-    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <plurals name="alert_remove_several_shares">
-        <item quantity="one">Unshare this folder?</item>
-        <item quantity="other">Unshare these %1$d folders?</item>
-    </plurals>
     <!-- Download location label -->
     <string name="download_location">Download location</string>
     <!-- Action to show any file in its location -->
@@ -2762,16 +2724,6 @@
         <item quantity="one">%d item moved to the Rubbish bin, but the other one not moved. Try again later.</item>
         <item quantity="other">%d items moved to the Rubbish bin, but 1 item not moved. Try again later.</item>
     </plurals>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
-    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item restored but the other one not restored. Try again later.</item>
-        <item quantity="other">1 item restored but %d items not restored. Try again later.</item>
-    </plurals>
-    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
-    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
-        <item quantity="one">%d item restored but the other one not restored. Try again later.</item>
-        <item quantity="other">%d items restored but 1 item not restored. Try again later.</item>
-    </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
         <item quantity="one">%d item moved to Rubbish bin</item>
@@ -2781,16 +2733,6 @@
     <plurals name="number_incorrectly_moved_to_rubbish">
         <item quantity="one">%d item wasn’t moved to the Rubbish bin</item>
         <item quantity="other">%d items weren’t moved to Rubbish bin</item>
-    </plurals>
-    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
-    <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="one">%d item restored</item>
-        <item quantity="other">%d items restored</item>
-    </plurals>
-    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
-    <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="one">%d item wasn’t restored</item>
-        <item quantity="other">%d items weren’t restored</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Change anyway</string>
@@ -3272,10 +3214,6 @@
     <string name="calls_call_screen_bottom_panel_leave_call_option">Leave</string>
     <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
     <string name="calls_call_screen_bottom_panel_end_call_for_all_option">End for all</string>
-    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
-    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Yes</string>
-    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
-    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">No</string>
     <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos_2">
         <item quantity="one">and %1$d video</item>
@@ -4058,21 +3996,6 @@
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
         <item quantity="one">Left %1$d shared folder</item>
         <item quantity="other">Left %1$d shared folders</item>
-    </plurals>
-    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
-    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
-        <item quantity="one">Couldn’t leave %1$d shared folder</item>
-        <item quantity="other">Couldn’t leave %1$d shared folders</item>
-    </plurals>
-    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
-    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
-        <item quantity="one">Left %1$d shared folder,&#160;</item>
-        <item quantity="other">Left %1$d shared folders,&#160;</item>
-    </plurals>
-    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
-    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
-        <item quantity="one">couldn’t leave %1$d shared folder</item>
-        <item quantity="other">couldn’t leave %1$d shared folders</item>
     </plurals>
     <!-- Text shown in the list of meetings when there is a call in progress -->
     <string name="meetings_list_ongoing_call_message">Meeting in progress</string>

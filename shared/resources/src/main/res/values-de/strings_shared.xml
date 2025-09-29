@@ -1122,8 +1122,6 @@
     <string name="pro_plan_benefit_links_with_expiry_dates">Links mit Ablaufdatum</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
     <string name="pro_plan_benefit_auto_sync_mobile">Automatische Synchronisierung der Ordner auf Ihrem Mobilgerät</string>
-    <!-- Benefit: Rewind up to 180 days of deleted data -->
-    <string name="pro_plan_benefit_rewind_180_days">Rewind zur Wiederherstellung gelöschter Daten bis zu 180 Tage lang</string>
     <!-- Benefit: Host calls and meetings with unlimited participants and no time restrictions -->
     <string name="pro_plan_benefit_host_calls_unlimited">Anrufe und Meetings mit beliebig vielen Teilnehmern und ohne Zeitbeschränkung</string>
     <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->

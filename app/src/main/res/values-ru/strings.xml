@@ -288,13 +288,6 @@
     <string name="context_remove_link_menu">Удалить ссылку</string>
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">Эта ссылка больше не будет доступна публично.</string>
-    <!-- Warning that appears prior to remove links of files. Plural. -->
-    <plurals name="remove_links_warning_text">
-        <item quantity="one">Эта ссылка больше не будет доступна.</item>
-        <item quantity="few">Эти ссылки больше не будут доступны.</item>
-        <item quantity="many">Эти ссылки больше не будут доступны.</item>
-        <item quantity="other">Эти ссылки больше не будут доступны.</item>
-    </plurals>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_rename">Переименовать</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -370,8 +363,6 @@
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Выберите папку назначения</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Элемент перемещён</string>
-    <!-- success message when moving a node -->
     <string name="context_correctly_moved_to_rubbish">Элемент перемещён в Корзину</string>
     <!-- error message -->
     <string name="context_no_moved">Ошибка. Не перемещено</string>
@@ -409,8 +400,6 @@
     <string name="subscription_type_monthly">Ежемесячно</string>
     <!--  -->
     <string name="subscription_type_yearly">Ежегодно</string>
-    <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="context_share_correctly_removed">Общий доступ удалён</string>
     <!-- Menu option to create a new folder in the file manager. -->
     <string name="menu_new_folder">Новая папка</string>
     <!-- Menu option to add a contact to your contact list. -->
@@ -761,13 +750,6 @@
     <string name="edit_link_option">Управление ссылкой</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
     <string name="old_password_provided_incorrect">Текущий пароль, который вы ввели, неверный.</string>
-    <!-- Confirmation before removing the outgoing shares of a folder -->
-    <plurals name="confirmation_remove_outgoing_shares">
-        <item quantity="one">К папке открыт доступ %1$d контакту. Закрыть доступ?</item>
-        <item quantity="few">К папке открыт доступ %1$d контактам. Закрыть доступ всем?</item>
-        <item quantity="many">К папке открыт доступ %1$d контактам. Закрыть доступ всем?</item>
-        <item quantity="other">К папке открыт доступ %1$d контактам. Закрыть доступ всем?</item>
-    </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">Неверная почта или пароль. Пожалуйста, попробуйте ещё раз.</string>
     <!-- Error message when trying to login and the account is suspended. -->
@@ -1180,26 +1162,12 @@
     <string name="copyright_alert_disagree_button">Не согласен</string>
     <!-- Hint how to cancel the download -->
     <string name="download_show_info">Подробнее</string>
-    <!-- Error message when removing public links of nodes. Plural. -->
-    <plurals name="context_link_removal_error">
-        <item quantity="one">Не удалось удалить ссылку. Попробуйте позже.</item>
-        <item quantity="few">Не удалось удалить некоторые ссылки. Пожалуйста, попробуйте позже.</item>
-        <item quantity="many">Не удалось удалить некоторые ссылки. Пожалуйста, попробуйте позже.</item>
-        <item quantity="other">Не удалось удалить некоторые ссылки. Пожалуйста, попробуйте позже.</item>
-    </plurals>
     <!-- Error message when creating public links of nodes. Plural. -->
     <plurals name="context_link_export_error">
         <item quantity="one">Не удалось создать ссылку. Пожалуйста, попробуйте позже.</item>
         <item quantity="few">Не удалось создать несколько ссылок. Пожалуйста, попробуйте позже.</item>
         <item quantity="many">Не удалось создать несколько ссылок. Пожалуйста, попробуйте позже.</item>
         <item quantity="other">Не удалось создать несколько ссылок. Пожалуйста, попробуйте позже.</item>
-    </plurals>
-    <!-- Message when some public links were removed successfully. Plural. -->
-    <plurals name="context_link_removal_success">
-        <item quantity="one">Ссылка удалена</item>
-        <item quantity="few">Ссылки удалены</item>
-        <item quantity="many">Ссылки удалены</item>
-        <item quantity="other">Ссылки удалены</item>
     </plurals>
     <!-- title of the screen to see the details of several contact attachments -->
     <string name="activity_title_contacts_attached">Прикреплённые контакты</string>
@@ -1339,13 +1307,6 @@
         <item quantity="few">Поделиться папками</item>
         <item quantity="many">Поделиться папками</item>
         <item quantity="other">Поделиться папками</item>
-    </plurals>
-    <!-- confirmation message before leaving some incoming shared folders -->
-    <plurals name="confirmation_leave_share_folder">
-        <item quantity="one">Если вы покинете эту папку, вы не сможете зайти в неё снова.</item>
-        <item quantity="few">Если вы покинете эти папки, вы больше не сможете их увидеть.</item>
-        <item quantity="many">Если вы покинете эти папки, вы больше не сможете их увидеть.</item>
-        <item quantity="other">Если вы покинете эти папки, вы больше не сможете их увидеть.</item>
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">Помощь</string>
@@ -1817,10 +1778,6 @@
     <string name="error_streaming">Произошла ошибка при создании трансляции</string>
     <!-- Menu option to restore an item from the Rubbish bin -->
     <string name="context_restore">Восстановить</string>
-    <!-- success message when a node was restore from Rubbish bin -->
-    <string name="context_correctly_node_restored">Восстановлено в %s</string>
-    <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">Произошла ошибка. Элемент не восстановлен.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Отправить cообщение</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -2528,13 +2485,6 @@
     <string name="version_as_new_file_created">Версия была создана как новый файл</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">%1$s</string>
-    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <plurals name="alert_remove_several_shares">
-        <item quantity="one">Закрыть доступ к этой папке?</item>
-        <item quantity="few">Закрыть доступ к этим %1$d папкам?</item>
-        <item quantity="many">Закрыть доступ к этим %1$d папкам?</item>
-        <item quantity="other">Закрыть доступ к этим %1$d папкам?</item>
-    </plurals>
     <!-- Download location label -->
     <string name="download_location">Папка скачивания</string>
     <!-- Action to show any file in its location -->
@@ -2906,20 +2856,6 @@
         <item quantity="many">%d элементов перемещено в Корзину, но 1 элемент не перемещён. Попробуйте ещё раз позже.</item>
         <item quantity="other">%d элемента перемещено в Корзину, но 1 элемент не перемещён. Попробуйте ещё раз позже.</item>
     </plurals>
-    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
-    <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 элемент восстановлен, но другой не восстановлен. Попробуйте ещё раз позже.</item>
-        <item quantity="few">1 элемент восстановлен, но ещё %d элемента не восстановлено. Попробуйте ещё раз позже.</item>
-        <item quantity="many">1 элемент восстановлен, но ещё %d элементов не восстановлено. Попробуйте ещё раз позже.</item>
-        <item quantity="other">1 элемент восстановлен, но ещё %d элемента не восстановлено. Попробуйте ещё раз позже.</item>
-    </plurals>
-    <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
-    <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
-        <item quantity="one">%d элемент восстановлен, но другой не восстановлен. Попробуйте ещё раз позже.</item>
-        <item quantity="few">%d элемента восстановлено, но ещё 1 элемент не восстановлен. Попробуйте ещё раз позже.</item>
-        <item quantity="many">%d элементов восстановлено, но ещё 1 элемент не восстановлен. Попробуйте ещё раз позже.</item>
-        <item quantity="other">%d элемента восстановлено, но ещё 1 элемент не восстановлен. Попробуйте ещё раз позже.</item>
-    </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
         <item quantity="one">%d элемент перемещён в Корзину</item>
@@ -2933,20 +2869,6 @@
         <item quantity="few">%d элемента не перемещены в Корзину</item>
         <item quantity="many">%d элементов не перемещено в Корзину</item>
         <item quantity="other">%d элемента не перемещено в Корзину</item>
-    </plurals>
-    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
-    <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="one">%d элемент восстановлен</item>
-        <item quantity="few">%d элемента восстановлено</item>
-        <item quantity="many">%d элементов восстановлено</item>
-        <item quantity="other">%d элемента восстановлено</item>
-    </plurals>
-    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
-    <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="one">%d элемент не был удалён</item>
-        <item quantity="few">%d элемента не было удалено</item>
-        <item quantity="many">%d элементов не было удалено</item>
-        <item quantity="other">%d элемента не было удалено</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Всё равно изменить</string>
@@ -3436,10 +3358,6 @@
     <string name="calls_call_screen_bottom_panel_leave_call_option">Выйти</string>
     <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
     <string name="calls_call_screen_bottom_panel_end_call_for_all_option">Завершить для всех</string>
-    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
-    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Да</string>
-    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
-    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">Нет</string>
     <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos_2">
         <item quantity="one">и %1$d видео</item>
@@ -4410,27 +4328,6 @@
         <item quantity="few">Покинуты %1$d общие папки</item>
         <item quantity="many">Покинуто %1$d общих папок</item>
         <item quantity="other">Покинуто %1$d общей папки</item>
-    </plurals>
-    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
-    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
-        <item quantity="one">Не удалось покинуть %1$d общую папку</item>
-        <item quantity="few">Не удалось покинуть %1$d общие папки</item>
-        <item quantity="many">Не удалось покинуть %1$d общих папок</item>
-        <item quantity="other">Не удалось покинуть %1$d общей папки</item>
-    </plurals>
-    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
-    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
-        <item quantity="one">Покинута %1$d общая папка,&#160;</item>
-        <item quantity="few">Покинуты %1$d общие папки,&#160;</item>
-        <item quantity="many">Покинуто %1$d общих папок,&#160;</item>
-        <item quantity="other">Покинуто %1$d общей папки,&#160;</item>
-    </plurals>
-    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
-    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
-        <item quantity="one">не удалось покинуть %1$d общую папку</item>
-        <item quantity="few">не удалось покинуть %1$d общие папки</item>
-        <item quantity="many">не удалось покинуть %1$d общих папок</item>
-        <item quantity="other">не удалось покинуть %1$d общей папки</item>
     </plurals>
     <!-- Text shown in the list of meetings when there is a call in progress -->
     <string name="meetings_list_ongoing_call_message">Идёт встреча</string>
