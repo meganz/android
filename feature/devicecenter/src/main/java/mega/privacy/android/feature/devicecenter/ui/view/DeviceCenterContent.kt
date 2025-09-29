@@ -3,6 +3,7 @@ package mega.privacy.android.feature.devicecenter.ui.view
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -47,7 +48,7 @@ internal fun DeviceCenterContent(
 
         LazyColumn(
             modifier = modifier,
-            state = LazyListState(),
+            state = rememberLazyListState(),
         ) {
             // The User's Device Folders are shown
             if (deviceFolders.isNotEmpty()) {
