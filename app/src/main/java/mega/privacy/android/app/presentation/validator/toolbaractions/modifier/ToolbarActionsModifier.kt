@@ -38,4 +38,6 @@ sealed interface ToolbarActionsModifierItem {
     data class OutgoingShares(
         val item: OutgoingSharesToolbarActionsModifierItem,
     ) : ToolbarActionsModifierItem
+
+    data object Links : ToolbarActionsModifierItem
 }

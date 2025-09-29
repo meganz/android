@@ -24,17 +24,24 @@ import mega.privacy.android.app.presentation.clouddrive.OptionItems
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.shares.links.model.LinksUiState
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.SelectedNode
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.SelectedNodeType
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorFolderNodeDeleteUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MonitorPublicLinksUseCase
+import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -51,6 +58,9 @@ class LinksViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val handleOptionClickMapper: HandleOptionClickMapper,
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
+    private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode,
+    private val getRubbishBinFolderUseCase: GetRubbishBinFolderUseCase,
+    private val getNodeAccessUseCase: GetNodeAccessUseCase,
 ) : ViewModel() {
 
     private val currentFlow = Channel<Flow<LinksUiState>>()
@@ -195,11 +205,6 @@ class LinksViewModel @Inject constructor(
     }
 
     /**
-     * Returns the count of nodes in the current folder
-     */
-    fun getNodeCount() = _state.value.nodesList.size
-
-    /**
      * This will reset the stack and will fetch the root links nodes
      */
     fun resetToRoot() {
@@ -217,12 +222,23 @@ class LinksViewModel @Inject constructor(
     /**
      * This will map list of [PublicLinkNode] to [NodeUIItem]
      */
-    private fun getNodeUiItems(nodeList: List<PublicLinkNode>): List<NodeUIItem<PublicLinkNode>> {
+    private suspend fun getNodeUiItems(nodeList: List<PublicLinkNode>): List<NodeUIItem<PublicLinkNode>> {
+        val rubbishBinNode = getRubbishBinFolderUseCase()
         return nodeList.mapIndexed { _, node ->
-            val isSelected = state.value.selectedNodeHandles.contains(node.id.longValue)
+            val accessPermission =
+                getNodeAccessUseCase(nodeId = node.id) ?: AccessPermission.UNKNOWN
+            val canBeMovedToRubbishBin =
+                rubbishBinNode != null && checkNodeCanBeMovedToTargetNode(
+                    nodeId = NodeId(longValue = node.id.longValue),
+                    targetNodeId = NodeId(longValue = rubbishBinNode.id.longValue)
+                )
+            val isSelected =
+                state.value.selectedNodes.firstOrNull { it.id == node.id.longValue } != null
             NodeUIItem(
                 node = node,
                 isSelected = isSelected,
+                accessPermission = accessPermission,
+                canBeMovedToRubbishBin = canBeMovedToRubbishBin
             )
         }
     }
@@ -331,7 +347,7 @@ class LinksViewModel @Inject constructor(
         viewModelScope.launch {
             val optionsItemInfo = handleOptionClickMapper(
                 item = item,
-                selectedNodeHandle = state.value.selectedNodeHandles
+                selectedNodeHandle = state.value.selectedNodes.map { it.id }
             )
             if (optionsItemInfo.optionClickedType == OptionItems.DOWNLOAD_CLICKED) {
                 _state.update {
@@ -361,11 +377,21 @@ class LinksViewModel @Inject constructor(
         val selectedNodeList = selectAllNodesUiList()
         var totalFolderNode = 0
         var totalFileNode = 0
-        val selectedNodeHandles = mutableListOf<Long>()
+        val selectedNodes = mutableListOf<SelectedNode>()
         selectedNodeList.forEach {
             if (it.node is FileNode) totalFolderNode++
             if (it.node is FolderNode) totalFileNode++
-            selectedNodeHandles.add(it.node.id.longValue)
+            selectedNodes.add(
+                SelectedNode(
+                    id = it.node.id.longValue,
+                    type = SelectedNodeType.toSelectedNodeType(it.node),
+                    isTakenDown = it.node.isTakenDown,
+                    isExported = it.node.exportedData != null,
+                    isIncomingShare = it.node.isIncomingShare,
+                    accessPermission = it.accessPermission,
+                    canBeMovedToRubbishBin = it.canBeMovedToRubbishBin
+                )
+            )
         }
         _state.update {
             it.copy(
@@ -373,7 +399,7 @@ class LinksViewModel @Inject constructor(
                 isInSelection = true,
                 selectedFolderNodes = totalFolderNode,
                 selectedFileNodes = totalFileNode,
-                selectedNodeHandles = selectedNodeHandles
+                selectedNodes = selectedNodes
             )
         }
     }
@@ -398,7 +424,7 @@ class LinksViewModel @Inject constructor(
                     selectedFileNodes = 0,
                     selectedFolderNodes = 0,
                     isInSelection = false,
-                    selectedNodeHandles = emptyList(),
+                    selectedNodes = emptyList(),
                     optionsItemInfo = null
                 )
             }
@@ -426,12 +452,22 @@ class LinksViewModel @Inject constructor(
      */
     private fun updateNodeInSelectionState(nodeUIItem: NodeUIItem<PublicLinkNode>, index: Int) {
         nodeUIItem.isSelected = !nodeUIItem.isSelected
-        val selectedNodeHandles = state.value.selectedNodeHandles.toMutableList()
+        val selectedNodes = state.value.selectedNodes.toMutableList()
         val pair = if (nodeUIItem.isSelected) {
-            selectedNodeHandles.add(nodeUIItem.node.id.longValue)
+            selectedNodes.add(
+                SelectedNode(
+                    id = nodeUIItem.node.id.longValue,
+                    type = SelectedNodeType.toSelectedNodeType(from = nodeUIItem.node),
+                    isTakenDown = nodeUIItem.node.isTakenDown,
+                    isExported = nodeUIItem.node.exportedData != null,
+                    isIncomingShare = nodeUIItem.node.isIncomingShare,
+                    accessPermission = nodeUIItem.accessPermission,
+                    canBeMovedToRubbishBin = nodeUIItem.canBeMovedToRubbishBin
+                )
+            )
             selectNode(nodeUIItem)
         } else {
-            selectedNodeHandles.remove(nodeUIItem.node.id.longValue)
+            selectedNodes.removeAll { it.id == nodeUIItem.node.id.longValue }
             unSelectNode(nodeUIItem)
         }
         val newNodesList = _state.value.nodesList.updateItemAt(index = index, item = nodeUIItem)
@@ -441,7 +477,7 @@ class LinksViewModel @Inject constructor(
                 selectedFolderNodes = pair.second,
                 nodesList = newNodesList,
                 isInSelection = pair.first > 0 || pair.second > 0,
-                selectedNodeHandles = selectedNodeHandles,
+                selectedNodes = selectedNodes,
                 optionsItemInfo = null
             )
         }

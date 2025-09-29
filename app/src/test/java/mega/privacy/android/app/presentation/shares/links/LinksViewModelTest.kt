@@ -19,24 +19,33 @@ import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.shares.links.model.LinksUiState
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorFolderNodeDeleteUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MonitorPublicLinksUseCase
+import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -62,6 +71,9 @@ internal class LinksViewModelTest {
     private val monitorFolderNodeDeleteUpdatesUseCase: MonitorFolderNodeDeleteUpdatesUseCase =
         mock()
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase = mock()
+    private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode = mock()
+    private val getRubbishBinFolderUseCase: GetRubbishBinFolderUseCase = mock()
+    private val getNodeAccessUseCase: GetNodeAccessUseCase = mock()
 
     @BeforeAll
     internal fun initialise() {
@@ -80,6 +92,9 @@ internal class LinksViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             handleOptionClickMapper = handleOptionClickMapper,
             isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
+            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
+            getRubbishBinFolderUseCase = getRubbishBinFolderUseCase,
+            getNodeAccessUseCase = getNodeAccessUseCase
         )
     }
 
@@ -101,6 +116,9 @@ internal class LinksViewModelTest {
             monitorConnectivityUseCase,
             handleOptionClickMapper,
             isNodeInRubbishBinUseCase,
+            checkNodeCanBeMovedToTargetNode,
+            getRubbishBinFolderUseCase,
+            getNodeAccessUseCase
         )
     }
 
@@ -247,7 +265,7 @@ internal class LinksViewModelTest {
                 val state = awaitItem()
                 assertThat(state.selectedFolderNodes).isEqualTo(0)
                 assertThat(state.selectedFileNodes).isEqualTo(0)
-                assertThat(state.selectedNodeHandles.size).isEqualTo(0)
+                assertThat(state.selectedNodes.size).isEqualTo(0)
             }
         }
 
@@ -273,7 +291,7 @@ internal class LinksViewModelTest {
                 val state = awaitItem()
                 assertThat(state.selectedFolderNodes).isEqualTo(1)
                 assertThat(state.selectedFileNodes).isEqualTo(0)
-                assertThat(state.selectedNodeHandles.size).isEqualTo(1)
+                assertThat(state.selectedNodes.size).isEqualTo(1)
             }
         }
 
@@ -307,7 +325,7 @@ internal class LinksViewModelTest {
                 val state = awaitItem()
                 assertThat(state.selectedFolderNodes).isEqualTo(1)
                 assertThat(state.selectedFileNodes).isEqualTo(1)
-                assertThat(state.selectedNodeHandles.size).isEqualTo(2)
+                assertThat(state.selectedNodes.size).isEqualTo(2)
             }
         }
 
@@ -319,7 +337,7 @@ internal class LinksViewModelTest {
             underTest.refreshLinkNodes()
             underTest.selectAllNodes()
             assertThat(underTest.state.value.nodesList.size)
-                .isEqualTo(underTest.state.value.selectedNodeHandles.size)
+                .isEqualTo(underTest.state.value.selectedNodes.size)
         }
 
     @Test
@@ -327,7 +345,7 @@ internal class LinksViewModelTest {
         underTest.clearAllNodesSelection()
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.selectedNodeHandles).isEmpty()
+            assertThat(state.selectedNodes).isEmpty()
         }
     }
 
@@ -428,4 +446,55 @@ internal class LinksViewModelTest {
                     .isInstanceOf(TransferTriggerEvent.StartDownloadForPreview::class.java)
             }
         }
+
+    @ParameterizedTest
+    @EnumSource(AccessPermission::class)
+    fun `test that the correct access permission for an account is set`(accessPermission: AccessPermission) =
+        runTest {
+            val node = mock<PublicLinkFolder> { on { id } doReturn NodeId(1L) }
+            whenever(
+                getNodeAccessUseCase(nodeId = node.id)
+            ) doReturn accessPermission
+
+            val publicLinkNodes = listOf<PublicLinkNode>(node)
+            monitorLinksChannel.send(publicLinkNodes)
+            underTest.refreshLinkNodes()
+
+            underTest.state.test {
+                assertThat(
+                    expectMostRecentItem().nodesList.first().accessPermission
+                ).isEqualTo(accessPermission)
+            }
+        }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that the correct value is set indicating whether the node can be moved to the rubbish bin`(
+        canBeMovedToRubbishBin: Boolean,
+    ) = runTest {
+        val node = mock<PublicLinkFolder> { on { id } doReturn NodeId(1L) }
+        val rubbishBinNode = if (canBeMovedToRubbishBin) {
+            mock<FileNode>()
+        } else null
+        whenever(getRubbishBinFolderUseCase()) doReturn rubbishBinNode
+        whenever(
+            checkNodeCanBeMovedToTargetNode(
+                nodeId = any(),
+                targetNodeId = any()
+            )
+        ) doReturn canBeMovedToRubbishBin
+        whenever(
+            getNodeAccessUseCase(nodeId = any())
+        ) doReturn AccessPermission.UNKNOWN
+
+        val publicLinkNodes = listOf<PublicLinkNode>(node)
+        monitorLinksChannel.send(publicLinkNodes)
+        underTest.refreshLinkNodes()
+
+        underTest.state.test {
+            assertThat(
+                expectMostRecentItem().nodesList.first().canBeMovedToRubbishBin
+            ).isEqualTo(canBeMovedToRubbishBin)
+        }
+    }
 }

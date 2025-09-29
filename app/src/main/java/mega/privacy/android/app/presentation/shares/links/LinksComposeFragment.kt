@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,7 +22,6 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEvent
@@ -42,15 +42,15 @@ import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetD
 import mega.privacy.android.app.presentation.clouddrive.OptionItems
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.manager.model.SharesTab
-import mega.privacy.android.app.presentation.manager.model.Tab
-import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.shares.SharesActionListener
 import mega.privacy.android.app.presentation.shares.links.view.LinksView
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
+import mega.privacy.android.app.presentation.validator.toolbaractions.ToolbarActionsValidator
+import mega.privacy.android.app.presentation.validator.toolbaractions.model.ToolbarActionsRequest
+import mega.privacy.android.app.presentation.validator.toolbaractions.modifier.ToolbarActionsModifierItem
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.Constants
@@ -84,10 +84,10 @@ class LinksComposeFragment : Fragment() {
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
 
     /**
-     * Mapper to get options for Action Bar
+     * Toolbar actions validator
      */
     @Inject
-    lateinit var getOptionsForToolbarMapper: GetOptionsForToolbarMapper
+    lateinit var toolbarActionsValidator: ToolbarActionsValidator
 
     /**
      * Mapper to get current theme mode
@@ -142,7 +142,7 @@ class LinksComposeFragment : Fragment() {
                         uiState = uiState,
                         emptyState = getEmptyFolderDrawable(uiState.isLinksEmpty),
                         onItemClick = {
-                            if (uiState.selectedNodeHandles.isEmpty()) {
+                            if (uiState.selectedNodes.isEmpty()) {
                                 when (val item = it.node) {
                                     is PublicLinkFile -> {
                                         currentFileNode = item.node
@@ -168,7 +168,7 @@ class LinksComposeFragment : Fragment() {
                             if (actionMode == null) {
                                 actionMode =
                                     (activity as? AppCompatActivity)?.startSupportActionMode(
-                                        ActionBarCallBack(SharesTab.LINKS_TAB)
+                                        ActionBarCallBack()
                                     )
                             }
                         },
@@ -203,11 +203,15 @@ class LinksComposeFragment : Fragment() {
                     )
                 }
 
-                performItemOptionsClick(uiState.optionsItemInfo)
-                updateActionModeTitle(
-                    fileCount = uiState.selectedFileNodes,
-                    folderCount = uiState.selectedFolderNodes
-                )
+                LaunchedEffect(uiState.optionsItemInfo) {
+                    performItemOptionsClick(uiState.optionsItemInfo)
+                }
+                LaunchedEffect(uiState.selectedFileNodes, uiState.selectedFolderNodes) {
+                    updateActionModeTitle(
+                        fileCount = uiState.selectedFileNodes,
+                        folderCount = uiState.selectedFolderNodes
+                    )
+                }
                 currentFileNode?.let {
                     HandleNodeAction(
                         typedFileNode = it,
@@ -433,7 +437,8 @@ class LinksComposeFragment : Fragment() {
                 }
 
                 OptionItems.MOVE_TO_RUBBISH_CLICKED -> {
-                    viewModel.state.value.selectedNodeHandles.takeIf { handles -> handles.isNotEmpty() }
+                    viewModel.state.value.selectedNodes.takeIf { nodes -> nodes.isNotEmpty() }
+                        ?.map { nodes -> nodes.id }
                         ?.let { handles ->
                             ConfirmMoveToRubbishBinDialogFragment.newInstance(handles)
                                 .show(
@@ -468,13 +473,19 @@ class LinksComposeFragment : Fragment() {
 
                 OptionItems.COPY_CLICKED -> {
                     val nC = NodeController(requireActivity())
-                    nC.chooseLocationToCopyNodes(viewModel.state.value.selectedNodeHandles)
+                    val selectedHandles = viewModel.state.value.selectedNodes.map { nodes ->
+                        nodes.id
+                    }
+                    nC.chooseLocationToCopyNodes(selectedHandles)
                     disableSelectMode()
                 }
 
                 OptionItems.MOVE_CLICKED -> {
                     val nC = NodeController(requireActivity())
-                    nC.chooseLocationToMoveNodes(viewModel.state.value.selectedNodeHandles)
+                    val selectedHandles = viewModel.state.value.selectedNodes.map { nodes ->
+                        nodes.id
+                    }
+                    nC.chooseLocationToMoveNodes(selectedHandles)
                     disableSelectMode()
                 }
 
@@ -502,7 +513,7 @@ class LinksComposeFragment : Fragment() {
     }
 
 
-    private inner class ActionBarCallBack(val currentTab: Tab) : ActionMode.Callback {
+    private inner class ActionBarCallBack : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
             val inflater = mode.menuInflater
             inflater.inflate(R.menu.cloud_storage_action, menu)
@@ -515,35 +526,40 @@ class LinksComposeFragment : Fragment() {
 
         override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
             val selected =
-                viewModel.state.value.selectedNodeHandles.takeUnless { it.isEmpty() }
+                viewModel.state.value.selectedNodes.takeUnless { it.isEmpty() }
                     ?: return false
             menu.findItem(R.id.cab_menu_share_link).title =
                 resources.getQuantityString(sharedR.plurals.label_share_links, selected.size)
-            lifecycleScope.launch {
-                val control = getOptionsForToolbarMapper(
-                    selectedNodeHandleList = viewModel.state.value.selectedNodeHandles,
+            val control = toolbarActionsValidator(
+                request = ToolbarActionsRequest(
+                    modifierItem = ToolbarActionsModifierItem.Links,
+                    selectedNodes = viewModel.state.value.selectedNodes.toList(),
                     totalNodes = viewModel.state.value.nodesList.size
                 )
+            )
 
-                // Slight customization for links page
-                control.hide().isVisible = false
-                control.unhide().isVisible = false
-                control.move().isVisible = false
-                control.removeShare().isVisible = false
-                control.shareFolder().isVisible = false
-                if (selected.size > 1) {
-                    control.removeLink().setVisible(true).showAsAction =
-                        MenuItem.SHOW_AS_ACTION_ALWAYS
-                    control.link.apply {
-                        isVisible = false
-                        showAsAction = MenuItem.SHOW_AS_ACTION_NEVER
-                    }
+            // Slight customization for links page
+            control.hide().isVisible = false
+            control.unhide().isVisible = false
+            control.move().isVisible = false
+            control.removeShare().isVisible = false
+            control.shareFolder().isVisible = false
+            if (selected.size > 1) {
+                control.removeLink().setVisible(true).showAsAction =
+                    MenuItem.SHOW_AS_ACTION_ALWAYS
+                control.link.apply {
+                    isVisible = false
+                    showAsAction = MenuItem.SHOW_AS_ACTION_NEVER
                 }
-                if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
-                    control.copy().showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
-                }
-                CloudStorageOptionControlUtil.applyControl(menu, control)
             }
+            if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+                control.copy().showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
+            }
+
+            CloudStorageOptionControlUtil.applyControl(
+                menu,
+                control
+            )
             return true
         }
 
