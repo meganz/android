@@ -231,9 +231,12 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                 viewModel.getUiState(),
                 Lifecycle.State.STARTED,
                 uiState -> {
+                    if (context instanceof FileExplorerActivity) {
+                        ((FileExplorerActivity) context).showOrHideSearchMenu(!viewModel.isListEmpty());
+                    }
                     if (this.uiState != null && this.uiState.getItems() != uiState.getItems() && !uiState.isItemUpdated()) {
                         List<ChatExplorerListItem> itemsList = uiState.getItems();
-                        if(itemsList != null) {
+                        if (itemsList != null) {
                             ArrayList<ChatExplorerListItem> items = new ArrayList<>(itemsList);
                             if (adapterList == null) {
                                 Timber.w("AdapterList is NULL");

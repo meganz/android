@@ -1200,6 +1200,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         createFolderMenuItem?.isVisible = intent.action != ACTION_MULTISELECT_FILE
     }
 
+    fun showOrHideSearchMenu(show: Boolean) {
+        Timber.d("Showing or hiding search menu $show")
+        searchMenuItem?.isVisible = show
+    }
+
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         Timber.d("onPrepareOptionsMenu")
 

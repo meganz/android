@@ -769,6 +769,11 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             adapter.setNodes(it)
             nodes.addAll(it)
             updateView()
+            if (context is FileExplorerActivity) {
+                if (isMultiselect()) {
+                    (context as FileExplorerActivity).showOrHideSearchMenu(isFolderEmpty().not())
+                }
+            }
         }
     }
 
