@@ -80,6 +80,7 @@ class RecentActionBucketUiEntityMapperTest {
             on { parentFolderName }.thenReturn("testFolder")
             on { currentUserIsOwner }.thenReturn(true)
             on { isKeyVerified }.thenReturn(true)
+            on { isNodeKeyDecrypted }.thenReturn(true)
             on { parentFolderSharesType }.thenReturn(RecentActionsSharesType.NONE)
         }
 
@@ -146,6 +147,7 @@ class RecentActionBucketUiEntityMapperTest {
             on { parentFolderName }.thenReturn("testFolder")
             on { currentUserIsOwner }.thenReturn(true)
             on { isKeyVerified }.thenReturn(true)
+            on { isNodeKeyDecrypted }.thenReturn(true)
             on { parentFolderSharesType }.thenReturn(RecentActionsSharesType.NONE)
         }
 
@@ -175,6 +177,7 @@ class RecentActionBucketUiEntityMapperTest {
             on { parentFolderName }.thenReturn("testFolder")
             on { currentUserIsOwner }.thenReturn(true)
             on { isKeyVerified }.thenReturn(true)
+            on { isNodeKeyDecrypted }.thenReturn(true)
             on { parentFolderSharesType }.thenReturn(RecentActionsSharesType.NONE)
         }
 
@@ -229,6 +232,7 @@ class RecentActionBucketUiEntityMapperTest {
                 on { parentFolderName }.thenReturn("testFolder")
                 on { currentUserIsOwner }.thenReturn(false)
                 on { isKeyVerified }.thenReturn(true)
+                on { isNodeKeyDecrypted }.thenReturn(true)
                 on { parentFolderSharesType }.thenReturn(RecentActionsSharesType.NONE)
             }
 
@@ -277,6 +281,7 @@ class RecentActionBucketUiEntityMapperTest {
             on { parentFolderName }.thenReturn("testFolder")
             on { currentUserIsOwner }.thenReturn(false)
             on { isKeyVerified }.thenReturn(true)
+            on { isNodeKeyDecrypted }.thenReturn(true)
             on { parentFolderSharesType }.thenReturn(RecentActionsSharesType.INCOMING_SHARES)
         }
 
@@ -307,6 +312,102 @@ class RecentActionBucketUiEntityMapperTest {
 
             assertThat(recentActionBucketUiEntity.isFavourite).isFalse()
             assertThat(recentActionBucketUiEntity.showMenuButton).isFalse()
+        }
+
+    @Test
+    fun `test that decrypted content is shown when isNodeKeyDecrypted is true`() =
+        runTest {
+            val recentActionBucket = mock<RecentActionBucket> {
+                on { timestamp }.thenReturn(100L)
+                on { userEmail }.thenReturn("test@example.com")
+                on { parentNodeId }.thenReturn(NodeId(123456L))
+                on { isUpdate }.thenReturn(true)
+                on { isMedia }.thenReturn(true)
+                on { nodes }.thenReturn(listOf(imageNode1))
+                on { userName }.thenReturn("testUser")
+                on { parentFolderName }.thenReturn("testFolder")
+                on { currentUserIsOwner }.thenReturn(true)
+                on { isKeyVerified }.thenReturn(true)
+                on { isNodeKeyDecrypted }.thenReturn(true)
+                on { parentFolderSharesType }.thenReturn(RecentActionsSharesType.NONE)
+            }
+
+            val recentActionBucketUiEntity = underTest(recentActionBucket)
+
+            assertThat(recentActionBucketUiEntity.firstLineText).isEqualTo("testFile.jpeg")
+            assertThat(recentActionBucketUiEntity.parentFolderName).isEqualTo("testFolder")
+        }
+
+    @Test
+    fun `test that undecrypted content is shown when isNodeKeyDecrypted is false but isKeyVerified is true`() =
+        runTest {
+            val recentActionBucket = mock<RecentActionBucket> {
+                on { timestamp }.thenReturn(100L)
+                on { userEmail }.thenReturn("test@example.com")
+                on { parentNodeId }.thenReturn(NodeId(123456L))
+                on { isUpdate }.thenReturn(true)
+                on { isMedia }.thenReturn(true)
+                on { nodes }.thenReturn(listOf(imageNode1))
+                on { userName }.thenReturn("testUser")
+                on { parentFolderName }.thenReturn("testFolder")
+                on { currentUserIsOwner }.thenReturn(true)
+                on { isKeyVerified }.thenReturn(true)
+                on { isNodeKeyDecrypted }.thenReturn(false)
+                on { parentFolderSharesType }.thenReturn(RecentActionsSharesType.NONE)
+            }
+
+            val expectedFirstLine = "[Undecrypted file]"
+            val expectedParentFolder = "[Undecrypted folder]"
+            whenever(
+                context.resources.getQuantityString(
+                    R.plurals.cloud_drive_undecrypted_file,
+                    1
+                )
+            ).thenReturn(expectedFirstLine)
+            whenever(context.getString(R.string.shared_items_verify_credentials_undecrypted_folder)).thenReturn(
+                expectedParentFolder
+            )
+
+            val recentActionBucketUiEntity = underTest(recentActionBucket)
+
+            assertThat(recentActionBucketUiEntity.firstLineText).isEqualTo(expectedFirstLine)
+            assertThat(recentActionBucketUiEntity.parentFolderName).isEqualTo(expectedParentFolder)
+        }
+
+    @Test
+    fun `test that multi-file bucket shows undecrypted label when isNodeKeyDecrypted is false`() =
+        runTest {
+            val recentActionBucket = mock<RecentActionBucket> {
+                on { timestamp }.thenReturn(100L)
+                on { userEmail }.thenReturn("test@example.com")
+                on { parentNodeId }.thenReturn(NodeId(123456L))
+                on { isUpdate }.thenReturn(true)
+                on { isMedia }.thenReturn(false)
+                on { nodes }.thenReturn(listOf(imageNode1, imageNode2))
+                on { userName }.thenReturn("testUser")
+                on { parentFolderName }.thenReturn("testFolder")
+                on { currentUserIsOwner }.thenReturn(true)
+                on { isKeyVerified }.thenReturn(true)
+                on { isNodeKeyDecrypted }.thenReturn(false)
+                on { parentFolderSharesType }.thenReturn(RecentActionsSharesType.NONE)
+            }
+
+            val expectedFirstLine = "[Undecrypted files]"
+            val expectedParentFolder = "[Undecrypted folder]"
+            whenever(
+                context.resources.getQuantityString(
+                    R.plurals.cloud_drive_undecrypted_file,
+                    2
+                )
+            ).thenReturn(expectedFirstLine)
+            whenever(context.getString(R.string.shared_items_verify_credentials_undecrypted_folder)).thenReturn(
+                expectedParentFolder
+            )
+
+            val recentActionBucketUiEntity = underTest(recentActionBucket)
+
+            assertThat(recentActionBucketUiEntity.firstLineText).isEqualTo(expectedFirstLine)
+            assertThat(recentActionBucketUiEntity.parentFolderName).isEqualTo(expectedParentFolder)
         }
 
     @AfterEach

@@ -1,16 +1,16 @@
 package mega.privacy.android.app.presentation.recentactions.mapper
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionBucketUiEntity
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.icon.pack.R as IconPackR
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -32,7 +32,7 @@ class RecentActionBucketUiEntityMapper @Inject constructor(
         val isSingleNode = item.nodes.size == 1
 
         return RecentActionBucketUiEntity(
-            firstLineText = if (item.isKeyVerified) {
+            firstLineText = if (item.isNodeKeyDecrypted) {
                 if (isSingleNode) node.name else {
                     if (item.isMedia)
                         getMediaTitle(context, item.nodes)
@@ -53,7 +53,7 @@ class RecentActionBucketUiEntityMapper @Inject constructor(
                 if (item.isUpdate) R.string.update_action_bucket else R.string.create_action_bucket,
                 item.userName
             ) else null,
-            parentFolderName = if (item.isKeyVerified) {
+            parentFolderName = if (item.isNodeKeyDecrypted) {
                 when (item.parentFolderName) {
                     CLOUD_DRIVE_FOLDER_NAME -> context.getString(R.string.section_cloud_drive)
                     else -> item.parentFolderName
