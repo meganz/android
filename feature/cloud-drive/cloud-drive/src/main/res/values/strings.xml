@@ -37,5 +37,7 @@
     <string name="tab_outgoing_shares">Outgoing</string>
     <!-- Capital letters. Files with link. The title of a tab -->
     <string name="tab_links_shares">Links</string>
+    <!-- Text of the empty screen when there are not elements in Incoming -->
+    <string name="context_empty_incoming">[B]No [/B][A]incoming shared folders[/A]</string>
     <!-- End of shares screen strings -->
 </resources>

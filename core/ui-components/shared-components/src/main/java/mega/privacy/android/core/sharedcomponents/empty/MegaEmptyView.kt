@@ -3,8 +3,11 @@ package mega.privacy.android.core.sharedcomponents.empty
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -13,6 +16,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.SpannedText
 import mega.android.core.ui.model.MegaSpanStyle
 import mega.android.core.ui.model.SpanIndicator
@@ -35,6 +39,7 @@ fun MegaEmptyView(
         Image(
             imageVector = imageVector,
             contentDescription = "Empty Icon",
+            modifier = Modifier.width(120.dp)
         )
     }
 }
@@ -56,6 +61,7 @@ fun MegaEmptyView(
         Image(
             bitmap = imageBitmap,
             contentDescription = "Empty Icon",
+            modifier = Modifier.width(120.dp)
         )
     }
 }
@@ -76,7 +82,8 @@ fun MegaEmptyViewWithImage(
     MegaEmptyView(modifier, text) {
         Image(
             painter = imagePainter,
-            contentDescription = "Empty Image"
+            contentDescription = "Empty Image",
+            modifier = Modifier.width(120.dp)
         )
     }
 }
@@ -98,6 +105,7 @@ fun MegaEmptyView(
         Image(
             painter = imagePainter,
             contentDescription = "Empty Icon",
+            modifier = Modifier.width(120.dp)
         )
     }
 }
@@ -112,15 +120,17 @@ private fun MegaEmptyView(modifier: Modifier, text: String, icon: @Composable ()
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         icon()
+        Spacer(modifier = Modifier.height(6.dp))
         val emptySpanStyle = MegaSpanStyle.DefaultColorStyle(SpanStyle())
         SpannedText(
             value = text,
-            baseTextColor = TextColor.Primary,
-            baseStyle = MaterialTheme.typography.bodyMedium,
+            baseTextColor = TextColor.Secondary,
+            baseStyle = MaterialTheme.typography.bodyLarge,
             spanStyles = mapOf(
                 SpanIndicator('A') to emptySpanStyle,
                 SpanIndicator('B') to emptySpanStyle
             ),
         )
+        Spacer(modifier = Modifier.height(56.dp))
     }
 }

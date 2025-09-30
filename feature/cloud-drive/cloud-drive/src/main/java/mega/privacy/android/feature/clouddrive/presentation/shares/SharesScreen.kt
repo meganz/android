@@ -18,6 +18,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.tabs.MegaScrollableTabRow
@@ -27,9 +28,14 @@ import mega.android.core.ui.model.TabItems
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
+import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesContent
+import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesViewModel
+import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.model.IncomingSharesAction
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 
 /**
@@ -40,7 +46,8 @@ import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 internal fun SharesScreen(
     navigationHandler: NavigationHandler,
     onTransfer: (TransferTriggerEvent) -> Unit,
-    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel()
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
+    incomingSharesViewModel: IncomingSharesViewModel = hiltViewModel(),
 ) {
     val megaNavigator = rememberMegaNavigator()
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
@@ -50,6 +57,8 @@ internal fun SharesScreen(
         viewModel = nodeOptionsActionViewModel,
         megaNavigator = megaNavigator
     )
+    val incomingSharesUiState by incomingSharesViewModel.uiState.collectAsStateWithLifecycle()
+
     // TODO handle back press in selection mode
 
     MegaScaffoldWithTopAppBarScrollBehavior(
@@ -87,15 +96,11 @@ internal fun SharesScreen(
                 addTextTabWithScrollableContent(
                     tabItem = TabItems(stringResource(R.string.tab_incoming_shares)),
                 ) { _, modifier ->
-                    // TODO
-                    Box(
-                        modifier = modifier
-                            .fillMaxSize()
-                            .align(Alignment.Center)
-                            .padding(paddingValues)
-                    ) {
-                        MegaText("Incoming Shares Screen")
-                    }
+                    IncomingSharesContent(
+                        modifier = modifier,
+                        uiState = incomingSharesUiState,
+                        onAction = incomingSharesViewModel::processAction,
+                    )
                 }
                 addTextTabWithScrollableContent(
                     tabItem = TabItems(stringResource(R.string.tab_outgoing_shares)),
@@ -129,6 +134,19 @@ internal fun SharesScreen(
                 selectedTabIndex = it
                 true
             }
+        )
+    }
+
+    EventEffect(
+        event = incomingSharesUiState.navigateToFolderEvent,
+        onConsumed = { incomingSharesViewModel.processAction(IncomingSharesAction.NavigateToFolderEventConsumed) }
+    ) { node ->
+        navigationHandler.navigate(
+            CloudDriveNavKey(
+                nodeHandle = node.id.longValue,
+                nodeName = node.name,
+                nodeSourceType = NodeSourceType.INCOMING_SHARES
+            )
         )
     }
 }

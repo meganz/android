@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -347,13 +348,18 @@ fun NodeListViewItem(
                 )
             }
             if (isInSelectionMode) {
-                Checkbox(
-                    checked = isSelected,
-                    onCheckStateChanged = { },
-                    tapTargetArea = false,
-                    clickable = false,
-                    modifier = Modifier.testTag(CHECKBOX_TAG),
-                )
+                Box(
+                    modifier = Modifier.size(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Checkbox(
+                        checked = isSelected,
+                        onCheckStateChanged = { },
+                        tapTargetArea = false,
+                        clickable = false,
+                        modifier = Modifier.testTag(CHECKBOX_TAG),
+                    )
+                }
             } else {
                 if (onMoreClicked != null) {
                     MegaIcon(
