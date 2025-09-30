@@ -42,4 +42,29 @@
     <!-- Text of the empty screen when there are not elements in Outgoing -->
     <string name="context_empty_outgoing">[B]No [/B][A]outgoing shared folders[/A]</string>
     <!-- End of shares screen strings -->
+
+    <!-- Text that indicates that a folder is currently empty -->
+    <string name="file_browser_empty_folder">Empty Folder</string>
+    <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
+    <plurals name="num_files_with_parameter">
+        <item quantity="one">%d file</item>
+        <item quantity="other">%d files</item>
+    </plurals>
+    <!-- on the section notifications indicates the number of folder added to a shared folder, Plural of folder/directory. 2 folders -->
+    <plurals name="num_folders_with_parameter">
+        <item quantity="one">%d folder</item>
+        <item quantity="other">%d folders</item>
+    </plurals>
+    <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
+    <plurals name="num_folders_num_files">
+        <item quantity="one">%1$d folder&#160;·&#160;</item>
+        <item quantity="other">%1$d folders&#160;·&#160;</item>
+    </plurals>
+    <!-- Second part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. -->
+    <plurals name="num_folders_num_files_2">
+        <item quantity="one">%1$d file</item>
+        <item quantity="other">%1$d files</item>
+    </plurals>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">Logging out deletes your offline content.</string>
 </resources>
