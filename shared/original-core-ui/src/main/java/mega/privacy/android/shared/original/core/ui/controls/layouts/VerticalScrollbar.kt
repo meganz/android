@@ -169,7 +169,7 @@ private fun VerticalScrollbar(
                     scrollableHeight = scrollableHeightPixels.toDp()
                 }
             }
-            .pointerInput(Unit) {
+            .pointerInput(itemCount, state) {
                 detectVerticalDragGestures(
                     onDragEnd = {
                         thumbPressed = false
