@@ -434,6 +434,32 @@ internal class FileFacadeTest {
         }
 
     @Test
+    fun `test that getDocumentEntities returns the mapped entities from a list of MIUI gallery raw uris`() =
+        runTest {
+            val contentUri =
+                "content://com.miui.gallery.open/raw/%2Fstorage%2Femulated%2F0%2Fscreen-recording-1738156692736.mp4"
+            val uri = mock<Uri> {
+                on { this.scheme } doReturn "content"
+                on { toString() } doReturn contentUri
+            }
+            val doc = mock<DocumentFile>()
+            val uriPath = UriPath("/raw/storage/emulated/0/screen-recording-1738156692736.mp4")
+            val contentUriPath = UriPath(contentUri)
+            val expected = mock<DocumentEntity>()
+            val document = mock<DocumentEntity> {
+                on { this.uri } doReturn uriPath
+                on { copy(uri = contentUriPath) } doReturn expected
+            }
+
+            whenever(documentFileWrapper.fromUri(uri)) doReturn doc
+            whenever(documentFileMapper(doc, 0, 0)) doReturn document
+            whenever(documentFileWrapper.isMIUIGalleryRawUri(uri)) doReturn true
+
+            assertThat(underTest.getDocumentEntities(listOf(uri)))
+                .containsExactly(expected)
+        }
+
+    @Test
     fun `test that getDocumentMetadata returns the mapped entity from a content uri file`() =
         runTest {
             val uri = mock<Uri> {
@@ -1071,7 +1097,6 @@ internal class FileFacadeTest {
     fun `test that getLastModifiedTime returns null for uri`() =
         runTest {
             mockStatic(Uri::class.java).use { _ ->
-                val expectedTime = 123456789L
                 val documentFile = mock<DocumentFile> {
                     on { this.exists() } doReturn true
                     on { lastModified() } doReturn 0
@@ -1125,7 +1150,12 @@ internal class FileFacadeTest {
                 whenever(Uri.fromFile(any())) doReturn parentUriMock
                 whenever(documentFileWrapper.fromUri(parentUriMock)) doReturn parentDoc
 
-                val result = underTest.createChildrenFilesSync(parentUri, children, true, false)
+                val result = underTest.createChildrenFilesSync(
+                    parentUri = parentUri,
+                    children = children,
+                    createIfMissing = true,
+                    lastAsFolder = false
+                )
 
                 assertThat(result).isEqualTo(expectedUri)
             }
@@ -1170,7 +1200,12 @@ internal class FileFacadeTest {
                 whenever(Uri.fromFile(any())) doReturn parentUriMock
                 whenever(documentFileWrapper.fromUri(parentUriMock)) doReturn parentDoc
 
-                val result = underTest.createChildrenFilesSync(parentUri, children, true, false)
+                val result = underTest.createChildrenFilesSync(
+                    parentUri = parentUri,
+                    children = children,
+                    createIfMissing = true,
+                    lastAsFolder = false
+                )
 
                 assertThat(result).isEqualTo(expectedUri)
             }
@@ -1192,7 +1227,12 @@ internal class FileFacadeTest {
             whenever(Uri.fromFile(any())) doReturn parentUriMock
             whenever(documentFileWrapper.fromUri(parentUriMock)) doReturn parentDoc
 
-            val result = underTest.createChildrenFilesSync(parentUri, children, true, false)
+            val result = underTest.createChildrenFilesSync(
+                parentUri = parentUri,
+                children = children,
+                createIfMissing = true,
+                lastAsFolder = false
+            )
 
             assertThat(result).isNull()
         }
@@ -1213,7 +1253,12 @@ internal class FileFacadeTest {
             whenever(Uri.fromFile(any())) doReturn parentUriMock
             whenever(documentFileWrapper.fromUri(parentUriMock)) doReturn parentDoc
 
-            val result = underTest.createChildrenFilesSync(parentUri, children, true, false)
+            val result = underTest.createChildrenFilesSync(
+                parentUri = parentUri,
+                children = children,
+                createIfMissing = true,
+                lastAsFolder = false
+            )
 
             assertThat(result).isNull()
         }
@@ -1234,7 +1279,12 @@ internal class FileFacadeTest {
             whenever(Uri.fromFile(any())) doReturn parentUriMock
             whenever(documentFileWrapper.fromUri(parentUriMock)) doReturn parentDoc
 
-            val result = underTest.createChildrenFilesSync(parentUri, children, true, false)
+            val result = underTest.createChildrenFilesSync(
+                parentUri = parentUri,
+                children = children,
+                createIfMissing = true,
+                lastAsFolder = false
+            )
 
             assertThat(result).isNull()
         }
@@ -1251,7 +1301,12 @@ internal class FileFacadeTest {
             whenever(Uri.fromFile(any())) doReturn parentUriMock
             whenever(documentFileWrapper.fromUri(parentUriMock)) doReturn null
 
-            val result = underTest.createChildrenFilesSync(parentUri, children, true, false)
+            val result = underTest.createChildrenFilesSync(
+                parentUri = parentUri,
+                children = children,
+                createIfMissing = true,
+                lastAsFolder = false
+            )
 
             assertThat(result).isNull()
         }

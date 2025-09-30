@@ -70,7 +70,11 @@ class DocumentFileFacade @Inject constructor(
         DocumentsContract.getDocumentId(documentFile.uri)
 
     override fun fromUri(uri: Uri): DocumentFile? {
-        val file = uri.takeIf { (uri.scheme == "file") }?.path?.let { File(it) }
+        val isMIUIRawUri = isMIUIGalleryRawUri(uri)
+        val file = uri.takeIf { (uri.scheme == "file") || isMIUIRawUri }?.path?.let { path ->
+            File(if (isMIUIRawUri) path.removePrefix(MIUI_RAW_PREFIX_PATH) else path)
+        }
+
         return when {
             file?.exists() == true -> DocumentFile.fromFile(file)
             DocumentsContract.isTreeUri(uri) -> fromTreeUri(uri).takeIf { it?.exists() == true }
@@ -398,11 +402,9 @@ class DocumentFileFacade @Inject constructor(
         }
     }
 
-    /**
-     * @see getAbsolutePath
-     */
-    private fun DocumentFile.getSimplePath(context: Context) =
-        "${storageId}:${getBasePath(context)}".removePrefix(":")
+    override fun isMIUIGalleryRawUri(uri: Uri) =
+        uri.authority == MIUI_GALLERY_AUTHORITY
+                && uri.path?.startsWith(MIUI_RAW_PREFIX_PATH) == true
 
     companion object {
         /**
@@ -438,5 +440,15 @@ class DocumentFileFacade @Inject constructor(
          * It is not really a storage ID, and can't be used in file tree URI.
          */
         const val DATA = "data"
+
+        /**
+         * MIUI’s Gallery app authority.
+         */
+        const val MIUI_GALLERY_AUTHORITY = "com.miui.gallery.open"
+
+        /**
+         * MIUI’s raw file path prefix in Uris.
+         */
+        const val MIUI_RAW_PREFIX_PATH = "/raw/"
     }
 }

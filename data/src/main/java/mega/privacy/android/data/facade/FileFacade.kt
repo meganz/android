@@ -803,7 +803,13 @@ internal class FileFacade @Inject constructor(
                     file = doc,
                     numFiles = childFiles.count { it.isFile },
                     numFolders = childFiles.count { it.isDirectory },
-                )
+                ).let {
+                    if (documentFileWrapper.isMIUIGalleryRawUri(uri)) {
+                        it.copy(uri = UriPath(uri.toString()))
+                    } else {
+                        it
+                    }
+                }
             }
         }
     }

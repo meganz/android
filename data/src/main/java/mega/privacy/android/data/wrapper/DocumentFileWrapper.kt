@@ -138,4 +138,13 @@ interface DocumentFileWrapper {
      * e.g  "content://com.android.externalstorage.documents/tree/primary:Recordings/document/primary:Recordings/A/B/c.txt"
      */
     suspend fun getDocumentFileForSyncContentUri(uriString: String): DocumentFile?
+
+    /**
+     * MIUI’s Uris are not standard content Uris. MIUI’s Gallery app exposes a “raw” file URI for files stored on device storage.
+     * MIUI’s “raw” URI doesn’t actually point to a document SAF can handle, it’s more like a “shortcut” to a file path,
+     * that is why we need to handle them separately.
+     * E.g.: content://com.miui.gallery.open/raw/%2Fstorage%2Femulated%2F0%2Fscreen-recording-1738156692736.mp4
+     *  and its path /raw/storage/emulated/0/screen-recording-1738156692736.mp4
+     */
+    fun isMIUIGalleryRawUri(uri: Uri): Boolean
 }
