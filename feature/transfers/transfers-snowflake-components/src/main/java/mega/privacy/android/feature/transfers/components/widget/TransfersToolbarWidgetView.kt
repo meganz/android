@@ -12,6 +12,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -108,6 +109,7 @@ internal fun TransfersToolbarWidgetView(
 ) {
     Box(
         modifier = modifier
+            .padding(PADDING.dp)
             .size(SIZE.dp)
             .clickable(
                 onClick = onClick,
@@ -237,16 +239,47 @@ private fun TransfersToolbarWidgetInAppBarPreview(
                     100L
                 )
             },
-            actions = listOf(object : MenuActionWithIcon {
-                override val testTag = "test"
+        )
+    }
+}
 
-                @Composable
-                override fun getDescription() = "test"
+@CombinedThemePreviews
+@Composable
+private fun TransfersToolbarWidgetInAppBarWithActionsPreview(
+    @PreviewParameter(TransfersWidgetStatusPreviewProvider::class) status: TransfersToolbarWidgetStatus,
+) {
+    AndroidThemeForPreviews {
+        MegaTopAppBar(
+            title = status.name,
+            navigationType = AppBarNavigationType.None,
+            trailingIcons = {
+                TransfersToolbarWidgetView(
+                    status,
+                    30L,
+                    100L
+                )
+            },
+            actions = listOf(
+                object : MenuActionWithIcon {
+                    override val testTag = "test"
 
-                @Composable
-                override fun getIconPainter() =
-                    rememberVectorPainter(IconPack.Medium.Thin.Outline.Bell)
-            }),
+                    @Composable
+                    override fun getDescription() = "test"
+
+                    @Composable
+                    override fun getIconPainter() =
+                        rememberVectorPainter(IconPack.Medium.Thin.Outline.Bell)
+                },
+                object : MenuActionWithIcon {
+                    override val testTag = "test"
+
+                    @Composable
+                    override fun getDescription() = "test"
+
+                    @Composable
+                    override fun getIconPainter() =
+                        rememberVectorPainter(IconPack.Medium.Thin.Outline.AlertTriangle)
+                }),
             onActionPressed = {}
         )
     }
@@ -272,6 +305,8 @@ internal const val TAG_STATUS_ICON = "transfers_toolbar_widget_view:button:statu
 internal const val TAG_TRANSFERS_WIDGET = "transfers_widget_view:button:floating_button"
 
 private const val SIZE = 24f
+private const val BOX_SIZE = 48f
+private const val PADDING = (BOX_SIZE - SIZE) / 2
 private const val PROGRESS_THICKNESS = 2f
 private const val IDLE_THICKNESS = 1.5f
 private const val RADIUS = (SIZE - PROGRESS_THICKNESS) / 2f
