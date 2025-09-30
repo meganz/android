@@ -35,4 +35,9 @@ class PhotoHomeWidgetProvider @Inject constructor(
                     getPhotosByIdsUseCase = getPhotosByIdsUseCase
                 )
             }?.toSet() ?: emptySet()
+
+    override suspend fun deleteWidget(identifier: String): Boolean {
+        // In a real provider we would check and delete the widget here and return true if found and deleted successfully
+        return identifier.toLongOrNull() != null
+    }
 }

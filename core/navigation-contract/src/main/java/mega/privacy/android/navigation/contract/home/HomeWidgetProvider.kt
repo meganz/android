@@ -6,6 +6,7 @@ package mega.privacy.android.navigation.contract.home
  * of this interface and inject it into a set. Otherwise you can just provide an implementation of [HomeWidget] (Also injected into a set)
  *
  */
-fun interface HomeWidgetProvider {
+interface HomeWidgetProvider {
     suspend fun getWidgets(): Set<HomeWidget>
+    suspend fun deleteWidget(identifier: String): Boolean
 }

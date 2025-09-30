@@ -1,6 +1,7 @@
 package mega.privacy.android.navigation.contract.home
 
 import kotlinx.coroutines.flow.Flow
+import mega.android.core.ui.model.LocalizedText
 
 /**
  * Home widget
@@ -12,5 +13,7 @@ import kotlinx.coroutines.flow.Flow
 interface HomeWidget {
     val identifier: String
     val defaultOrder: Int
+    val canDelete: Boolean
+    suspend fun getWidgetName(): LocalizedText
     fun getWidget(): Flow<HomeWidgetViewHolder>
 }

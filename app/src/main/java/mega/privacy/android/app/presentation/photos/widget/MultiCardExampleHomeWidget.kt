@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.timeout
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetPhotosByIdsUseCase
 import mega.privacy.android.navigation.contract.home.HomeWidget
@@ -19,6 +20,14 @@ class MultiCardExampleHomeWidget(
     val getPhotosByIdsUseCase: GetPhotosByIdsUseCase,
 ) : HomeWidget {
     override val defaultOrder: Int = 50
+    override val canDelete: Boolean = true
+
+    override suspend fun getWidgetName(): LocalizedText {
+        val nodeId = identifier.toLongOrNull()?.let { NodeId(it) }
+        val photo = nodeId?.let { getPhotosByIdsUseCase(listOf(nodeId)).firstOrNull() }
+        return LocalizedText.Literal("Photo: ${photo?.name ?: "Unknown"}")
+    }
+
     override fun getWidget() = flow {
         val nodeId = identifier.toLongOrNull()?.let { NodeId(it) }
         val photo = nodeId?.let { getPhotosByIdsUseCase(listOf(nodeId)).firstOrNull() }
@@ -28,7 +37,7 @@ class MultiCardExampleHomeWidget(
         .catch { Timber.e("Failed to get photo for home widget: ${it.message}") }
         .map { photo ->
             HomeWidgetViewHolder(
-                widgetFunction = { modifier ->
+                widgetFunction = { modifier, _ ->
                     PhotoHomeWidgetCard(photo = photo, modifier = modifier)
                 },
             )

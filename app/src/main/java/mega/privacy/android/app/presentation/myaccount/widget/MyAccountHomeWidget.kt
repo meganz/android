@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.myaccount.widget
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -18,8 +19,15 @@ import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountStorageDetail
 
 @Composable
-internal fun MyAccountHomeWidget(state: MyAccountHomeUIState, modifier: Modifier = Modifier) {
-    CardSurface(surfaceColor = SurfaceColor.Surface1) {
+internal fun MyAccountHomeWidget(
+    state: MyAccountHomeUIState,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    CardSurface(
+        modifier = Modifier.clickable { onClick() },
+        surfaceColor = SurfaceColor.Surface1
+    ) {
         Column(modifier = modifier.padding(8.dp)) {
             MegaText(text = state.name ?: "")
             MegaText(stringResource(state.accountTypeNameResource))
@@ -52,6 +60,6 @@ private fun PreviewMyAccountHomeWidget() {
                 ),
                 accountTypeNameResource = R.string.pro2_account,
             ),
-        )
+        ) { }
     }
 }

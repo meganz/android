@@ -15,7 +15,9 @@ class HomeModule {
     @Provides
     @IntoSet
     fun provideInjectedWidgetProvider(widgets: Set<@JvmSuppressWildcards HomeWidget>): HomeWidgetProvider =
-        HomeWidgetProvider {
-            widgets
+        object : HomeWidgetProvider {
+            override suspend fun getWidgets() = widgets
+
+            override suspend fun deleteWidget(identifier: String) = false
         }
 }
