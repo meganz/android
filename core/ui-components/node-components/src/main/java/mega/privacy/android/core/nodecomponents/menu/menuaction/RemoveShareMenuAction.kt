@@ -11,9 +11,7 @@ import javax.inject.Inject
 /**
  * Remove share menu action
  */
-class RemoveShareMenuAction @Inject constructor(
-    override val orderInCategory: Int,
-) : MenuActionWithIcon {
+class RemoveShareMenuAction @Inject constructor() : MenuActionWithIcon {
 
     @Composable
     override fun getIconPainter() =
@@ -24,4 +22,6 @@ class RemoveShareMenuAction @Inject constructor(
 
 
     override val testTag: String = "menu_action:remove_share"
+
+    override val orderInCategory: Int = 210
 }

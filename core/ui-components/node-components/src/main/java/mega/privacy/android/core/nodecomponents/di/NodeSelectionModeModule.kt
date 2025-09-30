@@ -14,6 +14,15 @@ import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.Move
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.DeletePermanentlySelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RestoreSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RubbishBinSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.UnhideSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RenameSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.GetLinkSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RemoveLinkSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.SendToChatSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.ShareFolderSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RemoveShareSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.DisputeTakeDownSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.ShareSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.domain.qualifier.features.CloudDrive
 import mega.privacy.android.domain.qualifier.features.RubbishBin
@@ -35,13 +44,31 @@ abstract class NodeSelectionModeModule {
             rubbishBinSelectionMenuAction: RubbishBinSelectionMenuItem,
             manageLinkSelectionMenuAction: ManageLinkSelectionMenuItem,
             downloadSelectionMenuItem: DownloadSelectionMenuItem,
+            unhideSelectionMenuItem: UnhideSelectionMenuItem,
+            renameSelectionMenuItem: RenameSelectionMenuItem,
+            getLinkSelectionMenuItem: GetLinkSelectionMenuItem,
+            removeLinkSelectionMenuItem: RemoveLinkSelectionMenuItem,
+            sendToChatSelectionMenuItem: SendToChatSelectionMenuItem,
+            shareFolderSelectionMenuItem: ShareFolderSelectionMenuItem,
+            removeShareSelectionMenuItem: RemoveShareSelectionMenuItem,
+            disputeTakeDownSelectionMenuItem: DisputeTakeDownSelectionMenuItem,
+            shareSelectionMenuItem: ShareSelectionMenuItem,
         ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
             copySelectionModeMenuAction,
             hideSelectionModeMenuAction,
             moveSelectionModeMenuAction,
             rubbishBinSelectionMenuAction,
             manageLinkSelectionMenuAction,
-            downloadSelectionMenuItem
+            downloadSelectionMenuItem,
+            unhideSelectionMenuItem,
+            renameSelectionMenuItem,
+            getLinkSelectionMenuItem,
+            removeLinkSelectionMenuItem,
+            sendToChatSelectionMenuItem,
+            shareFolderSelectionMenuItem,
+            removeShareSelectionMenuItem,
+            disputeTakeDownSelectionMenuItem,
+            shareSelectionMenuItem
         )
 
         @Provides

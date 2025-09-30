@@ -10,7 +10,9 @@ import javax.inject.Inject
 /**
  * Remove link bottom sheet menu item
  */
-class RemoveLinkBottomSheetMenuItem @Inject constructor() :
+class RemoveLinkBottomSheetMenuItem @Inject constructor(
+    override val menuAction: RemoveLinkMenuAction,
+) :
     NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
@@ -23,6 +25,5 @@ class RemoveLinkBottomSheetMenuItem @Inject constructor() :
             && isNodeInRubbish.not()
             && accessPermission == AccessPermission.OWNER
 
-    override val menuAction = RemoveLinkMenuAction(170)
     override val groupId = 7
 }

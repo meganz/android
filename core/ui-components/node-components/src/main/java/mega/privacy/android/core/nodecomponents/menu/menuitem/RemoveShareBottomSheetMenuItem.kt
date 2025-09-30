@@ -12,6 +12,7 @@ import javax.inject.Inject
  * Remove share bottom sheet menu item
  */
 class RemoveShareBottomSheetMenuItem @Inject constructor(
+    override val menuAction: RemoveShareMenuAction,
     private val isOutShareUseCase: IsOutShareUseCase
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(
@@ -23,8 +24,6 @@ class RemoveShareBottomSheetMenuItem @Inject constructor(
     ) = node.isTakenDown.not()
             && isOutShareUseCase(node)
             && isNodeInRubbish.not()
-
-    override val menuAction = RemoveShareMenuAction(210)
 
     override val groupId = 7
 }

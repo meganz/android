@@ -135,6 +135,13 @@ object NodeActionHandlerModule {
         moveToRubbishBinAction: MoveToRubbishBinActionClickHandler,
         manageLinkAction: ManageLinkActionClickHandler,
         deletePermanentAction: DeletePermanentActionClickHandler,
+        disputeTakeDownAction: DisputeTakeDownActionClickHandler,
+        getLinkAction: GetLinkActionClickHandler,
+        removeLinkAction: RemoveLinkActionClickHandler,
+        removeShareAction: RemoveShareActionClickHandler,
+        renameNodeAction: RenameNodeActionClickHandler,
+        shareAction: ShareActionClickHandler,
+        unhideAction: UnhideActionClickHandler
     ): Set<MultiNodeAction> {
         return setOf(
             openWithAction,
@@ -148,7 +155,14 @@ object NodeActionHandlerModule {
             hideAction,
             moveToRubbishBinAction,
             manageLinkAction,
-            deletePermanentAction
+            deletePermanentAction,
+            disputeTakeDownAction,
+            getLinkAction,
+            removeLinkAction,
+            removeShareAction,
+            renameNodeAction,
+            shareAction,
+            unhideAction
         )
     }
 }

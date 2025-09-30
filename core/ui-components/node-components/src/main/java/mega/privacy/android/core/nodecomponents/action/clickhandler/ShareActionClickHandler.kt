@@ -8,6 +8,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.menu.MenuAction
+import mega.privacy.android.core.nodecomponents.action.MultipleNodesActionProvider
 import mega.privacy.android.core.nodecomponents.action.SingleNodeActionProvider
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -18,13 +19,14 @@ import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import java.io.File
+import java.util.UUID
 import javax.inject.Inject
 
 class ShareActionClickHandler @Inject constructor(
     private val getLocalFilePathUseCase: GetLocalFilePathUseCase,
     private val exportNodesUseCase: ExportNodeUseCase,
     private val getFileUriUseCase: GetFileUriUseCase,
-) : SingleNodeAction {
+) : SingleNodeAction, MultiNodeAction {
     override fun canHandle(action: MenuAction): Boolean = action is ShareMenuAction
 
     override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
@@ -77,6 +79,91 @@ class ShareActionClickHandler @Inject constructor(
         }
     }
 
+    override fun handle(
+        action: MenuAction,
+        nodes: List<TypedNode>,
+        provider: MultipleNodesActionProvider,
+    ) {
+        val context = provider.context
+        provider.coroutineScope.launch {
+            withContext(NonCancellable) {
+                val fileNodeList = nodes.filterIsInstance<TypedFileNode>()
+                val localFiles = fileNodeList.mapNotNull {
+                    runCatching {
+                        getLocalFilePathUseCase(it)
+                    }.getOrElse {
+                        Timber.e(it)
+                        null
+                    }
+                }
+                if (localFiles.size == nodes.size) {
+                    val filesUri = localFiles.mapNotNull {
+                        runCatching {
+                            getLocalFileUri(context, it)?.let { filePath ->
+                                Uri.parse(filePath)
+                            }
+                        }.getOrElse {
+                            Timber.e(it)
+                            null
+                        }
+                    }
+                    val similarTypes = fileNodeList.groupBy {
+                        it.type.mimeType
+                    }
+                    val intentType = if (similarTypes.size == 1) {
+                        "${similarTypes.keys}"
+                    } else {
+                        "*/*"
+                    }
+                    val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+                        type = intentType
+                        putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(filesUri))
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                    }
+                    context.startActivity(
+                        Intent.createChooser(
+                            shareIntent,
+                            context.getString(sharedResR.string.general_share)
+                        )
+                    )
+                } else {
+                    val allExportedNodes = nodes.all { it.exportedData != null }
+                    if (allExportedNodes) {
+                        val uris = nodes.mapNotNull {
+                            it.exportedData?.publicLink
+                        }
+                        shareLinks(
+                            context = context,
+                            links = uris,
+                            selectedNodes = nodes
+                        )
+                    } else {
+                        val uris = nodes.mapNotNull {
+                            runCatching { exportNodesUseCase(nodeToExport = it.id) }
+                                .getOrElse {
+                                    Timber.e(it)
+                                    null
+                                }
+                        }
+                        shareLinks(
+                            context = context,
+                            links = uris,
+                            selectedNodes = nodes
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun shareLinks(context: Context, links: List<String>, selectedNodes: List<TypedNode>) {
+        if (links.isNotEmpty()) {
+            val combinedLinks = links.joinToString(separator = "\n\n")
+            val title = getTitle(selectedNodes)
+            startShareIntent(context, combinedLinks, title)
+        }
+    }
+
     private fun startShareIntent(context: Context, path: String, name: String) {
         val intent = Intent(Intent.ACTION_SEND).apply {
             putExtra(Intent.EXTRA_SUBJECT, name)
@@ -89,6 +176,14 @@ class ShareActionClickHandler @Inject constructor(
                 context.getString(sharedResR.string.general_share)
             )
         )
+    }
+
+    private fun getTitle(selectedNodes: List<TypedNode>): String {
+        return if (selectedNodes.size == 1) {
+            selectedNodes.first().name
+        } else {
+            "${UUID.randomUUID()}"
+        }
     }
 
     private suspend fun getLocalFileUri(context: Context, filePath: String) = runCatching {
