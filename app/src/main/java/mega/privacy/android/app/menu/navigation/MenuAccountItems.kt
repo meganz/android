@@ -5,7 +5,7 @@ import mega.privacy.android.feature.payment.UpgradeAccountNavKey
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import mega.privacy.android.navigation.destination.AchievementNavKey
-import mega.privacy.android.navigation.destination.ExampleLegacyScreen
+import mega.privacy.android.navigation.destination.ContactsNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.RubbishBinNavKey
@@ -27,7 +27,7 @@ object StorageItem : NavDrawerItem.Account(
 )
 
 object ContactsItem : NavDrawerItem.Account(
-    destination = ExampleLegacyScreen("From Contacts menu item"),
+    destination = ContactsNavKey(ContactsNavKey.NavType.List),
     icon = IconPack.Medium.Thin.Outline.UserSquare,
     title = sharedR.string.general_section_contacts,
 )

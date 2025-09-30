@@ -18,7 +18,14 @@ data object AchievementNavKey : NavKey
 data class WebSiteNavKey(val url: String) : NavKey
 
 @Serializable
-data object ContactsNavKey : NavKey
+data class ContactsNavKey(val navType: NavType = NavType.List) : NavKey {
+    @Keep
+    enum class NavType {
+        List,
+        SentRequests,
+        ReceivedRequests,
+    }
+}
 
 @Serializable
 data class ChatNavKey(val chatId: Long, val action: String?) : NavKey

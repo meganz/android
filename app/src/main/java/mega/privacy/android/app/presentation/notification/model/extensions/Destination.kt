@@ -62,7 +62,7 @@ internal fun UserAlert.destination(): NavKey? {
             if (contact.isVisible) {
                 contact.email?.let { ContactInfoNavKey(it) }
             } else if (contact.hasPendingRequest) {
-                ContactsNavKey
+                ContactsNavKey(ContactsNavKey.NavType.ReceivedRequests)
             } else null
 
         is ScheduledMeetingAlert -> ChatNavKey(chatId, Constants.ACTION_CHAT_SHOW_MESSAGES)
