@@ -7,7 +7,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import javax.inject.Inject
 
 class RestoreSelectionMenuItem @Inject constructor(
-    override val menuAction: RestoreMenuAction
+    override val menuAction: RestoreMenuAction,
 ) : NodeSelectionMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
@@ -15,5 +15,6 @@ class RestoreSelectionMenuItem @Inject constructor(
         canBeMovedToTarget: Boolean,
         noNodeInBackups: Boolean,
         noNodeTakenDown: Boolean,
-    ): Boolean = selectedNodes.isNotEmpty() && noNodeTakenDown
+    ): Boolean =
+        selectedNodes.isNotEmpty() && noNodeTakenDown && selectedNodes.all { it.restoreId != null }
 }

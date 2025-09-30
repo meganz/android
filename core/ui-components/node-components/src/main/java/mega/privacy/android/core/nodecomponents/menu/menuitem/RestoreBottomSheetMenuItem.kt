@@ -21,7 +21,7 @@ class RestoreBottomSheetMenuItem @Inject constructor(
         isInBackups: Boolean,
         node: TypedNode,
         isConnected: Boolean,
-    ) = isNodeInRubbish
+    ) = isNodeInRubbish && node.restoreId != null
 
     override val groupId = 8
 }
