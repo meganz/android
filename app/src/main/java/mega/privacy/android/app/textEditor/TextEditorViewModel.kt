@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
+import mega.privacy.android.app.features.CloudDriveFeature
 import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.utils.AlertsAndWarnings.showConfirmRemoveLinkDialog
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -87,6 +88,7 @@ import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
@@ -157,6 +159,7 @@ class TextEditorViewModel @Inject constructor(
     private val crashReporter: CrashReporter,
     // Use existing use case for smart filename generation
     private val getNodeNameCollisionRenameNameUseCase: GetNodeNameCollisionRenameNameUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     companion object {
@@ -637,18 +640,11 @@ class TextEditorViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Starts the save file content action by creating a temp file, setting the new or modified text,
-     * and then uploading it to the Cloud.
-     *
-     * @param fromHome True if is creating file from Home page, false otherwise.
-     */
-    fun saveFile(fromHome: Boolean) {
+    private fun saveFileFix(fromHome: Boolean) {
         if (!isFileEdited() && !isCreateMode()) {
             setViewMode()
             return
         }
-
         viewModelScope.launch {
             try {
                 // Generate unique filename using existing collision handling
@@ -693,6 +689,84 @@ class TextEditorViewModel @Inject constructor(
             } catch (e: Exception) {
                 Timber.e(e, "Error in saveFile")
                 throwable.value = e
+            }
+        }
+    }
+
+    private fun saveFileLegacy(fromHome: Boolean) {
+        if (!isFileEdited() && !isCreateMode()) {
+            setViewMode()
+            return
+        }
+        val tempFile = CacheFolderManager.buildTempFile(fileName.value)
+        if (tempFile == null) {
+            Timber.e("Cannot get temporal file.")
+            return
+        }
+
+        val fileWriter = FileWriter(tempFile.absolutePath)
+        val out = BufferedWriter(fileWriter)
+        out.write(pagination.value?.getEditedText() ?: "")
+        out.close()
+
+        if (!isFileAvailable(tempFile)) {
+            Timber.e("Cannot manage temporal file.")
+            return
+        }
+
+        val parentHandle = if (mode.value == TextEditorMode.Create.value && getNode() == null) {
+            megaApi.rootNode?.handle
+        } else if (mode.value == TextEditorMode.Create.value) {
+            getNode()?.handle
+        } else {
+            getNode()?.parentHandle
+        }
+
+        if (parentHandle == null) {
+            Timber.e("Parent handle not valid.")
+            return
+        }
+
+        if (mode.value == TextEditorMode.Edit.value) {
+            uploadFile(fromHome, tempFile, parentHandle)
+            return
+        }
+
+        viewModelScope.launch {
+            runCatching {
+                checkFileNameCollisionsUseCase(
+                    files = listOf(tempFile.let {
+                        DocumentEntity(
+                            name = it.name,
+                            size = it.length(),
+                            lastModified = it.lastModified(),
+                            uri = UriPath(it.toUri().toString()),
+                        )
+                    }),
+                    parentNodeId = NodeId(parentHandle)
+                )
+            }.onSuccess { fileCollisions ->
+                fileCollisions.firstOrNull()?.let {
+                    collision.value = it
+                } ?: uploadFile(fromHome, tempFile, parentHandle)
+            }.onFailure {
+                Timber.e(it, "Cannot check name collisions")
+            }
+        }
+    }
+
+    /**
+     * Starts the save file content action by creating a temp file, setting the new or modified text,
+     * and then uploading it to the Cloud.
+     *
+     * @param fromHome True if is creating file from Home page, false otherwise.
+     */
+    fun saveFile(fromHome: Boolean) {
+        viewModelScope.launch {
+            if (getFeatureFlagValueUseCase(CloudDriveFeature.INCOMING_SHARE_NAME_DUPLICATION_FIX)) {
+                saveFileFix(fromHome = fromHome)
+            } else {
+                saveFileLegacy(fromHome = fromHome)
             }
         }
     }

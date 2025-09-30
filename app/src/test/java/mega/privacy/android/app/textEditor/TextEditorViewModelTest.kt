@@ -11,11 +11,13 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.observeOnce
+import mega.privacy.android.app.features.CloudDriveFeature
 import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
@@ -41,6 +43,7 @@ import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
@@ -112,6 +115,12 @@ internal class TextEditorViewModelTest {
     private val getNodeNameCollisionRenameNameUseCase =
         mock<GetNodeNameCollisionRenameNameUseCase>()
 
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
+        runBlocking {
+            on(it.invoke(feature = CloudDriveFeature.INCOMING_SHARE_NAME_DUPLICATION_FIX)) doReturn false
+        }
+    }
+
     @BeforeEach
     fun setUp() {
         underTest = TextEditorViewModel(
@@ -137,7 +146,8 @@ internal class TextEditorViewModelTest {
             savedStateHandle = savedStateHandle,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             crashReporter = mock(),
-            getNodeNameCollisionRenameNameUseCase = getNodeNameCollisionRenameNameUseCase
+            getNodeNameCollisionRenameNameUseCase = getNodeNameCollisionRenameNameUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
         )
     }
 
@@ -510,6 +520,9 @@ internal class TextEditorViewModelTest {
     @Test
     fun `test that getNode returns correct node for Edit mode`() = runTest {
         // Given
+        whenever(getFeatureFlagValueUseCase.invoke(feature = CloudDriveFeature.INCOMING_SHARE_NAME_DUPLICATION_FIX)).thenReturn(
+            true
+        )
         val testIntent = createTestIntent(handle = 456L)
         underTest.setInitialValues(testIntent, mock())
 
@@ -533,6 +546,9 @@ internal class TextEditorViewModelTest {
     @Test
     fun `test that getNodeAccess returns correct access level`() = runTest {
         // Given
+        whenever(getFeatureFlagValueUseCase.invoke(feature = CloudDriveFeature.INCOMING_SHARE_NAME_DUPLICATION_FIX)).thenReturn(
+            true
+        )
         val testIntent = createTestIntent(handle = 456L)
         underTest.setInitialValues(testIntent, mock())
 
@@ -555,6 +571,9 @@ internal class TextEditorViewModelTest {
     fun `test that getNodeAccess returns correct access level for different permissions`() =
         runTest {
             // Given
+            whenever(getFeatureFlagValueUseCase.invoke(feature = CloudDriveFeature.INCOMING_SHARE_NAME_DUPLICATION_FIX)).thenReturn(
+                true
+            )
             val testIntent = createTestIntent(handle = 789L)
             underTest.setInitialValues(testIntent, mock())
 
@@ -576,6 +595,9 @@ internal class TextEditorViewModelTest {
     @Test
     fun `test that isFileEdited returns true when text has been modified`() = runTest {
         // Given
+        whenever(getFeatureFlagValueUseCase.invoke(feature = CloudDriveFeature.INCOMING_SHARE_NAME_DUPLICATION_FIX)).thenReturn(
+            true
+        )
         val testIntent = createTestIntent()
         underTest.setInitialValues(testIntent, mock())
         setupPagination("Original content")
@@ -590,6 +612,9 @@ internal class TextEditorViewModelTest {
     @Test
     fun `test that isFileEdited returns false when text has not been modified`() = runTest {
         // Given
+        whenever(getFeatureFlagValueUseCase.invoke(feature = CloudDriveFeature.INCOMING_SHARE_NAME_DUPLICATION_FIX)).thenReturn(
+            true
+        )
         val testIntent = createTestIntent()
         underTest.setInitialValues(testIntent, mock())
         setupPagination("Original content")
@@ -603,6 +628,9 @@ internal class TextEditorViewModelTest {
     @Test
     fun `test that isFileEdited returns false when pagination is null`() = runTest {
         // Given
+        whenever(getFeatureFlagValueUseCase.invoke(feature = CloudDriveFeature.INCOMING_SHARE_NAME_DUPLICATION_FIX)).thenReturn(
+            true
+        )
         val testIntent = createTestIntent()
         underTest.setInitialValues(testIntent, mock())
         // Don't set up pagination - leave it null
@@ -614,6 +642,9 @@ internal class TextEditorViewModelTest {
     @Test
     fun `test that saveFile handles errors gracefully`() = runTest {
         // Given
+        whenever(getFeatureFlagValueUseCase.invoke(feature = CloudDriveFeature.INCOMING_SHARE_NAME_DUPLICATION_FIX)).thenReturn(
+            true
+        )
         val testIntent = createTestIntent()
         underTest.setInitialValues(testIntent, mock())
 
@@ -634,6 +665,9 @@ internal class TextEditorViewModelTest {
     @Test
     fun `test that setEditMode correctly sets Edit mode`() = runTest {
         // Given
+        whenever(getFeatureFlagValueUseCase.invoke(feature = CloudDriveFeature.INCOMING_SHARE_NAME_DUPLICATION_FIX)).thenReturn(
+            true
+        )
         val testIntent = createTestIntent()
         underTest.setInitialValues(testIntent, mock())
 
@@ -649,6 +683,9 @@ internal class TextEditorViewModelTest {
     @Test
     fun `test that setEditedText updates pagination correctly`() = runTest {
         // Given
+        whenever(getFeatureFlagValueUseCase.invoke(feature = CloudDriveFeature.INCOMING_SHARE_NAME_DUPLICATION_FIX)).thenReturn(
+            true
+        )
         val testIntent = createTestIntent()
         underTest.setInitialValues(testIntent, mock())
         setupPagination("Original content")
