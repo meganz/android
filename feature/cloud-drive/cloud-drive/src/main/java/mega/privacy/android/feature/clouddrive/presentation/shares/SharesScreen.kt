@@ -34,6 +34,9 @@ import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesContent
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesViewModel
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.model.IncomingSharesAction
+import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.OutgoingSharesContent
+import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.OutgoingSharesViewModel
+import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.model.OutgoingSharesAction
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
@@ -48,6 +51,7 @@ internal fun SharesScreen(
     onTransfer: (TransferTriggerEvent) -> Unit,
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
     incomingSharesViewModel: IncomingSharesViewModel = hiltViewModel(),
+    outgoingSharesViewModel: OutgoingSharesViewModel = hiltViewModel(),
 ) {
     val megaNavigator = rememberMegaNavigator()
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
@@ -58,6 +62,7 @@ internal fun SharesScreen(
         megaNavigator = megaNavigator
     )
     val incomingSharesUiState by incomingSharesViewModel.uiState.collectAsStateWithLifecycle()
+    val outgoingSharesUiState by outgoingSharesViewModel.uiState.collectAsStateWithLifecycle()
 
     // TODO handle back press in selection mode
 
@@ -105,15 +110,11 @@ internal fun SharesScreen(
                 addTextTabWithScrollableContent(
                     tabItem = TabItems(stringResource(R.string.tab_outgoing_shares)),
                 ) { _, modifier ->
-                    // TODO
-                    Box(
-                        modifier = modifier
-                            .fillMaxSize()
-                            .align(Alignment.Center)
-                            .padding(paddingValues)
-                    ) {
-                        MegaText("Outgoing Shares Screen")
-                    }
+                    OutgoingSharesContent(
+                        modifier = modifier,
+                        uiState = outgoingSharesUiState,
+                        onAction = outgoingSharesViewModel::processAction,
+                    )
                 }
                 addTextTabWithScrollableContent(
                     tabItem = TabItems(stringResource(R.string.tab_links_shares)),
@@ -146,6 +147,19 @@ internal fun SharesScreen(
                 nodeHandle = node.id.longValue,
                 nodeName = node.name,
                 nodeSourceType = NodeSourceType.INCOMING_SHARES
+            )
+        )
+    }
+
+    EventEffect(
+        event = outgoingSharesUiState.navigateToFolderEvent,
+        onConsumed = { outgoingSharesViewModel.processAction(OutgoingSharesAction.NavigateToFolderEventConsumed) }
+    ) { node ->
+        navigationHandler.navigate(
+            CloudDriveNavKey(
+                nodeHandle = node.id.longValue,
+                nodeName = node.name,
+                nodeSourceType = NodeSourceType.OUTGOING_SHARES
             )
         )
     }

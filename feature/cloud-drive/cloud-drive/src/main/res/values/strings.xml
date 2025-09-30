@@ -39,5 +39,7 @@
     <string name="tab_links_shares">Links</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
     <string name="context_empty_incoming">[B]No [/B][A]incoming shared folders[/A]</string>
+    <!-- Text of the empty screen when there are not elements in Outgoing -->
+    <string name="context_empty_outgoing">[B]No [/B][A]outgoing shared folders[/A]</string>
     <!-- End of shares screen strings -->
 </resources>
