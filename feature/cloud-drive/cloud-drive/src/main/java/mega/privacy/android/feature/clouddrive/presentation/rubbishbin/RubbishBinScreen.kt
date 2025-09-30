@@ -57,6 +57,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.HandleNodeOptionEvent
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.view.ClearRubbishBinDialog
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.view.RubbishBinAppBarAction
@@ -181,7 +182,7 @@ internal fun RubbishBinScreen(
             if (uiState.isInSelectionMode) {
                 NodeSelectionModeAppBar(
                     count = uiState.selectedNodes.size,
-                    isSelecting = false,
+                    isSelecting = uiState.isSelecting,
                     onSelectAllClicked = { viewModel.selectAllNodes() },
                     onCancelSelectionClicked = { viewModel.clearAllSelectedNodes() }
                 )
@@ -228,7 +229,7 @@ internal fun RubbishBinScreen(
                 visibleActions = nodeActionState.visibleActions,
                 visible = nodeActionState.visibleActions.isNotEmpty() && uiState.isInSelectionMode,
                 nodeActionHandler = actionHandler,
-                isSelecting = false,
+                isSelecting = uiState.isSelecting,
                 selectedNodes = uiState.selectedNodes,
             )
         },
@@ -244,7 +245,7 @@ internal fun RubbishBinScreen(
                 }
             }
 
-            uiState.items.isEmpty() -> {
+            uiState.items.isEmpty() && uiState.nodesLoadingState == NodesLoadingState.FullyLoaded -> {
                 MegaEmptyView(
                     modifier = Modifier
                         .testTag(NODES_EMPTY_VIEW_VISIBLE),

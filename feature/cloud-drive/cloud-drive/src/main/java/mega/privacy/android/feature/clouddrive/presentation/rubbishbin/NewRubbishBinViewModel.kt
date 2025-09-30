@@ -7,12 +7,15 @@ import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
@@ -38,6 +41,7 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CleanRubbishBinUseCase
+import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
@@ -45,6 +49,7 @@ import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinNodeChildrenU
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.R
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.model.NewRubbishBinUiState
 import mega.privacy.android.navigation.destination.RubbishBinNavKey
 import nz.mega.sdk.MegaApiJava
@@ -56,7 +61,7 @@ import javax.inject.Inject
  *
  * @param monitorNodeUpdatesUseCase Monitor node updates
  * @param getParentNodeUseCase [mega.privacy.android.domain.usecase.GetParentNodeUseCase] Fetch parent node
- * @param getRubbishBinNodeChildrenUseCase [mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinNodeChildrenUseCase] Fetch list of Rubbish Bin [mega.privacy.android.domain.entity.node.Node]
+ * @param getNodesByIdInChunkUseCase [mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase] Fetch list of nodes in chunks for progressive loading
  * @param isNodeDeletedFromBackupsUseCase Checks whether the deleted Node came from Backups or not
  * @param setViewType [mega.privacy.android.domain.usecase.viewtype.SetViewType] to set view type
  * @param monitorViewType [mega.privacy.android.domain.usecase.viewtype.MonitorViewType] check view type
@@ -69,6 +74,7 @@ class NewRubbishBinViewModel @Inject constructor(
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val getParentNodeUseCase: GetParentNodeUseCase,
     private val getRubbishBinNodeChildrenUseCase: GetRubbishBinNodeChildrenUseCase,
+    private val getNodesByIdInChunkUseCase: GetNodesByIdInChunkUseCase,
     private val isNodeDeletedFromBackupsUseCase: IsNodeDeletedFromBackupsUseCase,
     private val setViewType: SetViewType,
     private val monitorViewType: MonitorViewType,
@@ -100,8 +106,12 @@ class NewRubbishBinViewModel @Inject constructor(
     val isConnected: Boolean
         get() = isConnectedToInternetUseCase()
 
+    private var nodeMultiSelectionJob: Job? = null
+    private var loadNodeChunksJob: Job? = null
+
     init {
         setRubbishBinFolderHandle()
+        setupNodesLoading()
         nodeUpdates()
         monitorViewTypeChanges()
         getCloudSortOrderAndRefresh()
@@ -119,10 +129,47 @@ class NewRubbishBinViewModel @Inject constructor(
                 ?: MegaApiJava.INVALID_HANDLE
             }.onSuccess { handle ->
                 _uiState.update { it.copy(currentFolderId = NodeId(handle)) }
-                refreshNodes()
             }.onFailure {
                 Timber.e(it)
             }
+        }
+    }
+
+    private fun setupNodesLoading() {
+        loadNodeChunksJob = viewModelScope.launch {
+            val folderId = uiState.value.currentFolderId
+            val folderOrRootNodeId = if (folderId.longValue == -1L) {
+                getRubbishBinFolderUseCase()?.let { NodeId(it.id.longValue) } ?: folderId
+            } else {
+                folderId
+            }
+            getNodesByIdInChunkUseCase(folderOrRootNodeId)
+                .catch {
+                    Timber.e(it)
+                    _uiState.update {
+                        it.copy(
+                            nodesLoadingState = NodesLoadingState.Failed
+                        )
+                    }
+                }
+                .collect { (nodes, hasMore) ->
+                    val nodeUiItems = nodeUiItemMapper(
+                        nodeList = nodes,
+                        nodeSourceType = NodeSourceType.RUBBISH_BIN,
+                        existingItems = uiState.value.items,
+                    )
+                    _uiState.update { state ->
+                        state.copy(
+                            items = nodeUiItems,
+                            nodesLoadingState = if (hasMore) {
+                                NodesLoadingState.PartiallyLoaded
+                            } else {
+                                NodesLoadingState.FullyLoaded
+                            },
+                            currentFolderId = folderOrRootNodeId,
+                        )
+                    }
+                }
         }
     }
 
@@ -207,7 +254,6 @@ class NewRubbishBinViewModel @Inject constructor(
                         isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
                     )
                 }
-                refreshNodes()
             }.catch { Timber.e(it) }
             .launchIn(viewModelScope)
     }
@@ -221,17 +267,18 @@ class NewRubbishBinViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 currentFolderId = NodeId(nodeHandle),
-                isLoading = true,
                 items = emptyList(),
+                nodesLoadingState = NodesLoadingState.Loading,
             )
         }
-        refreshNodes()
+        setupNodesLoading()
     }
 
     /**
      * Retrieves the list of Nodes and converts them to NodeUiItems
      */
     fun refreshNodes() {
+        loadNodeChunksJob?.cancel()
         viewModelScope.launch {
             runCatching {
                 val currentNode = getNodeByIdUseCase(_uiState.value.currentFolderId)
@@ -255,12 +302,11 @@ class NewRubbishBinViewModel @Inject constructor(
                         parentFolderId = parentNode?.id,
                         title = title,
                         items = nodeUiItems,
-                        isLoading = false,
+                        nodesLoadingState = NodesLoadingState.FullyLoaded,
                     )
                 }
             }.onFailure {
                 Timber.e(it)
-                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
@@ -313,20 +359,6 @@ class NewRubbishBinViewModel @Inject constructor(
     }
 
     /**
-     * Handles back click of rubbishBinFragment
-     */
-    fun onBackPressed() {
-        val parentFolderId = _uiState.value.parentFolderId ?: return
-        _uiState.update {
-            it.copy(
-                isLoading = true,
-                currentFolderId = parentFolderId,
-            )
-        }
-        refreshNodes()
-    }
-
-    /**
      * Performs action when folder is clicked from adapter
      */
     fun onFolderItemClicked(id: NodeId) {
@@ -359,8 +391,38 @@ class NewRubbishBinViewModel @Inject constructor(
      * Select all NodeUiItems
      */
     fun selectAllNodes() {
-        val updatedItems = _uiState.value.items.map { it.copy(isSelected = true) }
-        _uiState.update { it.copy(items = updatedItems) }
+        nodeMultiSelectionJob?.cancel()
+        nodeMultiSelectionJob = viewModelScope.launch {
+            runCatching {
+                // Select all items that are already loaded
+                performAllItemSelection()
+                // If nodes are still loading, wait until fully loaded then select all
+                if (uiState.value.nodesLoadingState.isInProgress) {
+                    _uiState.update { state ->
+                        state.copy(isSelecting = true)
+                    }
+                    uiState.first { it.nodesLoadingState.isComplete }
+                    if (isActive) {
+                        performAllItemSelection()
+                    }
+                }
+            }.onFailure {
+                _uiState.update { state ->
+                    state.copy(isSelecting = false)
+                }
+                Timber.e(it, "Failed to select all nodes")
+            }
+        }
+    }
+
+    private fun performAllItemSelection() {
+        val updatedItems = uiState.value.items.map { it.copy(isSelected = true) }
+        _uiState.update { state ->
+            state.copy(
+                items = updatedItems,
+                isSelecting = false
+            )
+        }
     }
 
     /**
@@ -379,8 +441,14 @@ class NewRubbishBinViewModel @Inject constructor(
      * Clear the selections of items from NodeUiItems and reset selection state
      */
     fun clearAllSelectedNodes() {
+        nodeMultiSelectionJob?.cancel()
         val updatedItems = _uiState.value.items.map { it.copy(isSelected = false) }
-        _uiState.update { it.copy(items = updatedItems) }
+        _uiState.update { state ->
+            state.copy(
+                items = updatedItems,
+                isSelecting = false
+            )
+        }
     }
 
     /**

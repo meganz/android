@@ -4,8 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
-import de.palm.composestateevents.consumed
-import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -43,6 +41,7 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CleanRubbishBinUseCase
+import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
@@ -89,6 +88,7 @@ class NewRubbishBinViewModelTest {
     private val nodeSortConfigurationUiMapper = mock<NodeSortConfigurationUiMapper>()
     private val cleanRubbishBinUseCase = mock<CleanRubbishBinUseCase>()
     private val savedStateHandle = mock<SavedStateHandle>()
+    private val getNodesByIdInChunkUseCase = mock<GetNodesByIdInChunkUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -137,6 +137,7 @@ class NewRubbishBinViewModelTest {
             nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
             cleanRubbishBinUseCase = cleanRubbishBinUseCase,
             savedStateHandle = savedStateHandle,
+            getNodesByIdInChunkUseCase = getNodesByIdInChunkUseCase
         )
     }
 
@@ -189,58 +190,6 @@ class NewRubbishBinViewModelTest {
             monitorNodeUpdatesFakeFlow.emit(NodeUpdate(emptyMap()))
             underTest.setRubbishBinHandle(newValue)
             assertThat(underTest.uiState.value.items.size).isEqualTo(0)
-        }
-
-    @Test
-    fun `test that on setting rubbish bin handle rubbish bin node returns null`() = runTest {
-        val newValue = 123456789L
-        whenever(getRubbishBinNodeChildrenUseCase(newValue)).thenReturn(emptyList())
-        whenever(
-            nodeUiItemMapper(
-                nodeList = any(),
-                existingItems = any(),
-                nodeSourceType = eq(NodeSourceType.RUBBISH_BIN),
-                isPublicNodes = eq(false),
-                showPublicLinkCreationTime = eq(false),
-                highlightedNodeId = eq(null),
-                highlightedNames = eq(null),
-                isContactVerificationOn = eq(false),
-            )
-        ).thenReturn(emptyList())
-        underTest.setRubbishBinHandle(newValue)
-        assertThat(underTest.uiState.value.items.size).isEqualTo(0)
-        verify(getRubbishBinNodeChildrenUseCase, times(1)).invoke(newValue)
-    }
-
-    @Test
-    fun `test that when handle on back pressed and parent handle is null, then getRubbishBinChildrenNode is not invoked`() =
-        runTest {
-            val newValue = 123456789L
-            underTest.onBackPressed()
-            verify(getRubbishBinNodeChildrenUseCase, times(0)).invoke(newValue)
-        }
-
-    @Test
-    fun `test that when handle on back pressed and parent handle is not null, then getRubbishBinChildrenNode is invoked once`() =
-        runTest {
-            val newValue = 123456789L
-            // to update handles rubbishBinHandle
-            whenever(getRubbishBinNodeChildrenUseCase(newValue)).thenReturn(emptyList())
-            whenever(
-                nodeUiItemMapper(
-                    nodeList = any(),
-                    existingItems = any(),
-                    nodeSourceType = eq(NodeSourceType.RUBBISH_BIN),
-                    isPublicNodes = eq(false),
-                    showPublicLinkCreationTime = eq(false),
-                    highlightedNodeId = eq(null),
-                    highlightedNames = eq(null),
-                    isContactVerificationOn = eq(false),
-                )
-            ).thenReturn(emptyList())
-            underTest.setRubbishBinHandle(newValue)
-            underTest.onBackPressed()
-            verify(getRubbishBinNodeChildrenUseCase, times(1)).invoke(newValue)
         }
 
     @Test

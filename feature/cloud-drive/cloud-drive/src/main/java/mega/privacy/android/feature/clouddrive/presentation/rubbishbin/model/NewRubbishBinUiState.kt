@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 
 /**
  * M3 UI State for RubbishBin using new NodeUiItem model
@@ -24,6 +25,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property currentViewType ViewType The current ViewType used by the UI
  * @property sortConfiguration [mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration] of current list
  * @property isLoading Whether the screen is loading
+ * @property nodesLoadingState Current state of node loading
  * @property accountType Current account type
  * @property isBusinessAccountExpired Whether business account is expired
  * @property isHiddenNodesEnabled Whether hidden nodes feature is enabled
@@ -39,14 +41,17 @@ data class NewRubbishBinUiState(
     val currentViewType: ViewType = ViewType.LIST,
     val sortConfiguration: NodeSortConfiguration = NodeSortConfiguration.Companion.default,
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
-    val isLoading: Boolean = true,
+    val nodesLoadingState: NodesLoadingState = NodesLoadingState.Loading,
     val accountType: AccountType? = null,
     val isBusinessAccountExpired: Boolean = false,
     val isHiddenNodesEnabled: Boolean = false,
+    val isSelecting: Boolean = false,
     val messageEvent: StateEventWithContent<LocalizedText> = consumed(),
     val openedFileNode: TypedFileNode? = null,
     val openFolderEvent: StateEventWithContent<NodeId> = consumed(),
 ) {
+    val isLoading = nodesLoadingState == NodesLoadingState.Loading
+
     /**
      * Whether current folder is root rubbish bin directory
      */
