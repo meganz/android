@@ -948,8 +948,7 @@ class ManagerViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 checkNodesNameCollisionUseCase(
-                    nodes = nodes.associate { it.id.longValue to (it.restoreId?.longValue ?: -1) }
-                        .filter { it.value != -1L },
+                    nodes = nodes.associate { it.id.longValue to (it.restoreId?.longValue ?: -1) },
                     type = NodeNameCollisionType.RESTORE
                 )
             }.onSuccess { result ->
