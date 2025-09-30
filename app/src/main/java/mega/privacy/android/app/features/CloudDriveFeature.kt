@@ -22,7 +22,16 @@ internal enum class CloudDriveFeature(
     LABEL_MULTIPLE_SELECTION(
         "Allow multiple selection for labeling in Cloud Drive (SAO-3057)",
         true
-    );
+    ),
+
+    /**
+     * Toggle for enabling the name duplication fix in incoming share folder
+     */
+    INCOMING_SHARE_NAME_DUPLICATION_FIX(
+        "The fix of the incoming share text file name duplication (SAO-2025)",
+        defaultValue = false
+    )
+    ;
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =
