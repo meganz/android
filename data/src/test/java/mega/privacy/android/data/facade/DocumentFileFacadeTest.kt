@@ -6,6 +6,9 @@ import android.provider.DocumentsContract
 import androidx.documentfile.provider.DocumentFile
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.facade.DocumentFileFacade.Companion.EXTERNAL_STORAGE_AUTHORITY
+import mega.privacy.android.data.facade.DocumentFileFacade.Companion.MIUI_GALLERY_AUTHORITY
+import mega.privacy.android.data.facade.DocumentFileFacade.Companion.MIUI_RAW_PREFIX_PATH
 import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -39,6 +42,36 @@ class DocumentFileFacadeTest {
     fun cleanUp() {
         reset(context)
     }
+
+    @Test
+    fun `test that get from uri with a MIUI gallery raw uri returns the correct document`() =
+        runTest {
+            mockStatic(Uri::class.java).use {
+                mockStatic(DocumentFile::class.java).use {
+                    val testUri =
+                        "content://com.miui.gallery.open/raw/%2Fstorage%2Femulated%2F0%2Fscreen-recording-1738156692736.mp4"
+                    val uri = mock<Uri> {
+                        on { authority } doReturn MIUI_GALLERY_AUTHORITY
+                        on { path } doReturn "/raw/storage/emulated/0/screen-recording-1738156692736.mp4"
+                    }
+                    val expected = mock<DocumentFile>()
+
+                    // Recreate the exact File path that DocumentFileFacade will build:
+                    // It removes the prefix "/raw/" resulting in a RELATIVE path: "storage/emulated/0/..."
+                    val relativePath = uri.path?.removePrefix(MIUI_RAW_PREFIX_PATH)
+                    val file = File(relativePath ?: "")
+                    file.parentFile?.mkdirs()
+                    if (!file.exists()) file.createNewFile()
+
+                    whenever(Uri.parse(testUri)).thenReturn(uri)
+                    whenever(DocumentFile.fromFile(file)) doReturn expected
+
+                    val actual = underTest.fromUri(uri)
+
+                    assertThat(actual).isEqualTo(expected)
+                }
+            }
+        }
 
     @Test
     fun `test that get from uri with a file uri returns the correct document`() = runTest {
@@ -353,6 +386,32 @@ class DocumentFileFacadeTest {
                     assertThat(underTest.getDocumentFile(stringUri, fileName)).isEqualTo(expected)
                 }
             }
+        }
+    }
+
+    @Test
+    fun `test that isMIUIGalleryRawUri returns true for MIUI gallery raw uri`() {
+        mockStatic(Uri::class.java).use {
+            val uri = mock<Uri> {
+                on { authority } doReturn MIUI_GALLERY_AUTHORITY
+                on { path } doReturn "/raw/storage/emulated/0/screen-recording-1738156692736.mp4"
+            }
+
+            assertThat(underTest.isMIUIGalleryRawUri(uri)).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that isMIUIGalleryRawUri returns true for non MIUI gallery raw uri`() {
+        mockStatic(Uri::class.java).use {
+            val uriPath =
+                "content://$EXTERNAL_STORAGE_AUTHORITY$MIUI_RAW_PREFIX_PATH%2Fstorage%2Femulated%2F0%2Fscreen-recording-1738156692736.mp4"
+            val uri = mock<Uri> {
+                on { this.authority } doReturn EXTERNAL_STORAGE_AUTHORITY
+                on { path } doReturn uriPath
+            }
+
+            assertThat(underTest.isMIUIGalleryRawUri(uri)).isFalse()
         }
     }
 }
