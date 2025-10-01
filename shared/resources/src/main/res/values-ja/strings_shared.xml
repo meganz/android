@@ -1196,8 +1196,6 @@
     <string name="transfers_all_transfers_paused_warning">すべての転送が一時停止されました</string>
     <!-- Button for resuming the transfers queue -->
     <string name="transfers_resume_all_button">すべて再開</string>
-    <!-- Sync over quota warning title -->
-    <string name="sync_storage_over_quota_warning_title">同期が一時停止されました。MEGAプランのストレージが不足しています</string>
     <!-- Label for contacts -->
     <string name="general_section_contacts">連絡先</string>
     <!-- Label for achievements -->

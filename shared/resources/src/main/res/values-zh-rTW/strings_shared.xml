@@ -1196,8 +1196,6 @@
     <string name="transfers_all_transfers_paused_warning">所有傳輸已暫停</string>
     <!-- Button for resuming the transfers queue -->
     <string name="transfers_resume_all_button">全部恢復</string>
-    <!-- Sync over quota warning title -->
-    <string name="sync_storage_over_quota_warning_title">同步已暫停，您的MEGA方案的儲存空間已用完</string>
     <!-- Label for contacts -->
     <string name="general_section_contacts">聯絡人</string>
     <!-- Label for achievements -->

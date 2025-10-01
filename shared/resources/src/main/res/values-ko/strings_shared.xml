@@ -1196,8 +1196,6 @@
     <string name="transfers_all_transfers_paused_warning">모든 동기화 일시정지됨</string>
     <!-- Button for resuming the transfers queue -->
     <string name="transfers_resume_all_button">모두 재개</string>
-    <!-- Sync over quota warning title -->
-    <string name="sync_storage_over_quota_warning_title">당신의 MEGA 요금제의 저장소를 다 써서, 동기화가 일시정지 되었습니다</string>
     <!-- Label for contacts -->
     <string name="general_section_contacts">연락처</string>
     <!-- Label for achievements -->

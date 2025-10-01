@@ -1230,8 +1230,6 @@
     <string name="transfers_all_transfers_paused_warning">Toate transferurile au fost întrerupte</string>
     <!-- Button for resuming the transfers queue -->
     <string name="transfers_resume_all_button">Reluați toate</string>
-    <!-- Sync over quota warning title -->
-    <string name="sync_storage_over_quota_warning_title">Sincronizarea a fost întreruptă. Planul dvs. MEGA a rămas fără spațiu de stocare.</string>
     <!-- Label for contacts -->
     <string name="general_section_contacts">Contacte</string>
     <!-- Label for achievements -->

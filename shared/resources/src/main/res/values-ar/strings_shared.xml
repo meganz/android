@@ -1281,8 +1281,6 @@
     <string name="transfers_all_transfers_paused_warning">تم إيقاف عمليات التراسل مؤقتاً</string>
     <!-- Button for resuming the transfers queue -->
     <string name="transfers_resume_all_button">استئناف للكل</string>
-    <!-- Sync over quota warning title -->
-    <string name="sync_storage_over_quota_warning_title">تم إيقاف المزامنة مؤقتًا ونفدت مساحة التخزين في باقة ميغا MEGA الخاصة بك</string>
     <!-- Label for contacts -->
     <string name="general_section_contacts">جهات الاتصال</string>
     <!-- Label for achievements -->

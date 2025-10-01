@@ -1196,8 +1196,6 @@
     <string name="transfers_all_transfers_paused_warning">หยุดการโอนข้อมูลทั้งหมดชั่วคราวแล้ว</string>
     <!-- Button for resuming the transfers queue -->
     <string name="transfers_resume_all_button">ดำเนินการต่อทั้งหมด</string>
-    <!-- Sync over quota warning title -->
-    <string name="sync_storage_over_quota_warning_title">การซิงค์ถูกหยุดไว้ชั่วคราว เนื่องจากพื้นที่เก็บข้อมูลใน MEGA ของคุณเต็มแล้ว</string>
     <!-- Label for contacts -->
     <string name="general_section_contacts">รายชื่อผู้ติดต่อ</string>
     <!-- Label for achievements -->

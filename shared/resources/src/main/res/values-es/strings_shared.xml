@@ -1230,8 +1230,6 @@
     <string name="transfers_all_transfers_paused_warning">Todas las transferencias se han pausado</string>
     <!-- Button for resuming the transfers queue -->
     <string name="transfers_resume_all_button">Reanudar todo</string>
-    <!-- Sync over quota warning title -->
-    <string name="sync_storage_over_quota_warning_title">Sincronización pausada, tu plan de MEGA se ha quedado sin almacenamiento disponible</string>
     <!-- Label for contacts -->
     <string name="general_section_contacts">Contactos</string>
     <!-- Label for achievements -->

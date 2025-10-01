@@ -1247,8 +1247,6 @@
     <string name="transfers_all_transfers_paused_warning">Wszystkie transfery wstrzymane</string>
     <!-- Button for resuming the transfers queue -->
     <string name="transfers_resume_all_button">Wznów wszystko</string>
-    <!-- Sync over quota warning title -->
-    <string name="sync_storage_over_quota_warning_title">Synchronizacja wstrzymana, Twój plan MEGA wyczerpał pojemność</string>
     <!-- Label for contacts -->
     <string name="general_section_contacts">Kontakty</string>
     <!-- Label for achievements -->

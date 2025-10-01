@@ -1247,8 +1247,6 @@
     <string name="transfers_all_transfers_paused_warning">Все передачи приостановлены</string>
     <!-- Button for resuming the transfers queue -->
     <string name="transfers_resume_all_button">Возобновить все</string>
-    <!-- Sync over quota warning title -->
-    <string name="sync_storage_over_quota_warning_title">Синхронизация приостановлена, в вашем плане MEGA закончилось место</string>
     <!-- Label for contacts -->
     <string name="general_section_contacts">Контакты</string>
     <!-- Label for achievements -->

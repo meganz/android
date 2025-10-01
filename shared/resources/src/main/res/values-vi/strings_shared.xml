@@ -1196,8 +1196,6 @@
     <string name="transfers_all_transfers_paused_warning">Các phiên truyền&#160;tải hiện tạm dừng</string>
     <!-- Button for resuming the transfers queue -->
     <string name="transfers_resume_all_button">Tiếp tục tất cả</string>
-    <!-- Sync over quota warning title -->
-    <string name="sync_storage_over_quota_warning_title">Đồng&#160;bộ hóa tạm dừng, gói MEGA của bạn đã hết dung&#160;lượng lưu&#160;trữ</string>
     <!-- Label for contacts -->
     <string name="general_section_contacts">Sổ liên lạc</string>
     <!-- Label for achievements -->

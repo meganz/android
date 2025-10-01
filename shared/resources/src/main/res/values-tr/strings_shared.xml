@@ -1213,8 +1213,6 @@
     <string name="transfers_all_transfers_paused_warning">Tüm transferler duraklatıldı</string>
     <!-- Button for resuming the transfers queue -->
     <string name="transfers_resume_all_button">Tümünü devam ettir</string>
-    <!-- Sync over quota warning title -->
-    <string name="sync_storage_over_quota_warning_title">Senkronizasyon duraklatıldı, MEGA planınızın depolama alanı doldu</string>
     <!-- Label for contacts -->
     <string name="general_section_contacts">Kişiler</string>
     <!-- Label for achievements -->
