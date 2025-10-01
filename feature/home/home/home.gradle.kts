@@ -27,4 +27,10 @@ dependencies {
     implementation(lib.kotlin.serialisation)
     implementation(lib.mega.analytics)
     implementation(lib.mega.core.ui)
+    implementation(lib.logging.timber)
+
+    testImplementation(platform(testlib.junit5.bom))
+    testImplementation(testlib.bundles.unit.test)
+    testImplementation(testlib.bundles.junit5.api)
+    testRuntimeOnly(testlib.junit.jupiter.engine)
 }

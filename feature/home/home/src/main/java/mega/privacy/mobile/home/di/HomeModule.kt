@@ -6,8 +6,10 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
+import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.qualifier.DefaultStartScreen
+import mega.privacy.mobile.home.navigation.HomeFeatureGraph
 import mega.privacy.mobile.home.navigation.HomeNavItem
 
 
@@ -22,4 +24,8 @@ class HomeModule {
     @Provides
     @DefaultStartScreen
     fun provideDefaultStartScreen(): NavKey = HomeNavItem().destination
+
+    @Provides
+    @IntoSet
+    fun provideHomeFeatureDestination(): FeatureDestination = HomeFeatureGraph()
 }
