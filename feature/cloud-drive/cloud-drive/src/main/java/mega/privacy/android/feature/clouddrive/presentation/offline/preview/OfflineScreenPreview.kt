@@ -26,9 +26,8 @@ private fun PreviewOfflineScreenList() {
                     getNodeUiItem(5)
                 ),
                 selectedNodeHandles = listOf(),
-                parentId = -1,
+                nodeId = -1,
                 title = "Offline",
-                defaultTitle = "Offline",
                 currentViewType = ViewType.LIST,
                 isOnline = true,
                 searchQuery = null,
@@ -37,8 +36,9 @@ private fun PreviewOfflineScreenList() {
             onItemClicked = {},
             onItemLongClicked = {},
             onBack = {},
-            onNavigateToFolder = {},
+            onNavigateToFolder = { _, _ -> },
             onOpenFile = {},
+            onDismissOfflineWarning = {}
         )
     }
 }
@@ -59,9 +59,8 @@ private fun PreviewOfflineScreenGrid() {
                     getNodeUiItem(5)
                 ),
                 selectedNodeHandles = listOf(),
-                parentId = -1,
+                nodeId = -1,
                 title = "Offline",
-                defaultTitle = "Offline",
                 currentViewType = ViewType.GRID,
                 isOnline = true,
                 searchQuery = null,
@@ -70,8 +69,9 @@ private fun PreviewOfflineScreenGrid() {
             onItemClicked = {},
             onItemLongClicked = {},
             onBack = {},
-            onNavigateToFolder = {},
+            onNavigateToFolder = { _, _ -> },
             onOpenFile = {},
+            onDismissOfflineWarning = {}
         )
     }
 }
@@ -86,9 +86,8 @@ private fun PreviewEmptyOfflineScreen() {
                 isLoadingChildFolders = false,
                 offlineNodes = listOf(),
                 selectedNodeHandles = listOf(),
-                parentId = -1,
+                nodeId = -1,
                 title = "Offline",
-                defaultTitle = "Offline",
                 currentViewType = ViewType.LIST,
                 isOnline = true,
                 searchQuery = null,
@@ -97,8 +96,9 @@ private fun PreviewEmptyOfflineScreen() {
             onItemClicked = {},
             onItemLongClicked = {},
             onBack = {},
-            onNavigateToFolder = {},
+            onNavigateToFolder = { _, _ -> },
             onOpenFile = {},
+            onDismissOfflineWarning = {}
         )
     }
 }
@@ -113,9 +113,8 @@ private fun PreviewLoadingOfflineScreen() {
                 isLoadingChildFolders = false,
                 offlineNodes = listOf(),
                 selectedNodeHandles = listOf(),
-                parentId = -1,
+                nodeId = -1,
                 title = "Offline",
-                defaultTitle = "Offline",
                 currentViewType = ViewType.LIST,
                 isOnline = true,
                 searchQuery = null,
@@ -124,8 +123,9 @@ private fun PreviewLoadingOfflineScreen() {
             onItemClicked = {},
             onItemLongClicked = {},
             onBack = {},
-            onNavigateToFolder = {},
+            onNavigateToFolder = { _, _ -> },
             onOpenFile = {},
+            onDismissOfflineWarning = {}
         )
     }
 }

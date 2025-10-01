@@ -3,12 +3,14 @@ package mega.privacy.android.feature.clouddrive.navigation
 import androidx.navigation.NavGraphBuilder
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.cloudDriveScreen
+import mega.privacy.android.feature.clouddrive.presentation.offline.offlineScreen
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.rubbishBin
 import mega.privacy.android.feature.clouddrive.presentation.shares.shares
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.OfflineNavKey
 import mega.privacy.android.navigation.destination.SearchNodeNavKey
 
 class CloudDriveFeatureDestination : FeatureDestination {
@@ -53,5 +55,17 @@ class CloudDriveFeatureDestination : FeatureDestination {
             rubbishBin(navigationHandler, transferHandler)
 
             shares(navigationHandler, transferHandler)
+
+            offlineScreen(
+                onBack = navigationHandler::back,
+                onNavigateToFolder = { parentId, name ->
+                    navigationHandler.navigate(
+                        OfflineNavKey(
+                            nodeId = parentId,
+                            title = name,
+                        )
+                    )
+                }
+            )
         }
 }

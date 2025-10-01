@@ -40,10 +40,10 @@ import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.feature.clouddrive.R
 
 /**
  * OfflineScreen - A purely composable screen for displaying offline files
@@ -56,6 +56,7 @@ import mega.privacy.android.feature.clouddrive.R
 @Composable
 fun OfflineScreen(
     onBack: () -> Unit,
+    onNavigateToFolder: (nodeId: Int, name: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: OfflineViewModel = hiltViewModel(),
 ) {
@@ -64,18 +65,15 @@ fun OfflineScreen(
     OfflineScreen(
         uiState = uiState,
         onBack = onBack,
-        onItemClicked = { node ->
-            viewModel.onItemClicked(node, rootFolderOnly = false)
-        },
-        onItemLongClicked = { node ->
-            viewModel.onLongItemClicked(node)
-        },
+        onItemClicked = viewModel::onItemClicked,
+        onItemLongClicked = viewModel::onLongItemClicked,
         onOpenFile = { node ->
             // Todo implement OfflineNodeActionsViewModel to handle open file action
         },
-        onNavigateToFolder = { node ->
-            // Todo implement navigation to folder
-        },
+        onDismissOfflineWarning = viewModel::dismissOfflineWarning,
+        onNavigateToFolder = onNavigateToFolder,
+        consumeOpenFolderEvent = viewModel::onOpenFolderInPageEventConsumed,
+        consumeOpenFileEvent = viewModel::onOpenOfflineNodeEventConsumed,
         modifier = modifier
     )
 }
@@ -86,8 +84,9 @@ internal fun OfflineScreen(
     onBack: () -> Unit,
     onItemClicked: (OfflineNodeUiItem) -> Unit,
     onItemLongClicked: (OfflineNodeUiItem) -> Unit,
-    onNavigateToFolder: (String) -> Unit,
+    onNavigateToFolder: (nodeId: Int, name: String) -> Unit,
     onOpenFile: (String) -> Unit,
+    onDismissOfflineWarning: () -> Unit,
     modifier: Modifier = Modifier,
     consumeOpenFolderEvent: () -> Unit = {},
     consumeOpenFileEvent: () -> Unit = {},
@@ -95,22 +94,25 @@ internal fun OfflineScreen(
     EventEffect(
         event = uiState.openFolderInPageEvent,
         onConsumed = consumeOpenFolderEvent
-    ) { offlineFileInformation ->
-        onNavigateToFolder(offlineFileInformation.name)
+    ) { folderNode ->
+        onNavigateToFolder(folderNode.id, folderNode.name)
     }
 
     EventEffect(
         event = uiState.openOfflineNodeEvent,
         onConsumed = consumeOpenFileEvent
-    ) { offlineFileInformation ->
-        onOpenFile(offlineFileInformation.name)
+    ) { file ->
+        onOpenFile(file.name)
     }
 
     MegaScaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
             MegaTopAppBar(
-                title = uiState.actualTitle,
+                title = uiState
+                    .title
+                    .takeIf { uiState.nodeId != -1 }
+                    ?: stringResource(R.string.offline_screen_title),
                 navigationType = AppBarNavigationType.Back(onBack)
             )
         }
@@ -125,9 +127,7 @@ internal fun OfflineScreen(
                     modifier = Modifier.fillMaxWidth(),
                     body = stringResource(R.string.offline_warning),
                     showCancelButton = true,
-                    onCancelButtonClick = {
-                        // Todo implement hide offline warning permanently
-                    },
+                    onCancelButtonClick = onDismissOfflineWarning
                 )
             }
 

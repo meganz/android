@@ -3,6 +3,7 @@ package mega.privacy.android.feature.clouddrive.presentation.offline
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -21,6 +22,7 @@ import mega.privacy.android.domain.usecase.offline.SetOfflineWarningMessageVisib
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
+import mega.privacy.android.navigation.destination.OfflineNavKey
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -38,14 +40,19 @@ class OfflineViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorViewType: MonitorViewType,
 ) : ViewModel() {
-
+    private val args = savedStateHandle.toRoute<OfflineNavKey>()
     private val _uiState = MutableStateFlow(
         OfflineUiState(
-            parentId = savedStateHandle["parentId"] ?: -1,
-            title = savedStateHandle["title"] ?: ""
+            nodeId = args.nodeId,
+            title = args.title,
+            path = args.path,
+            highlightedFiles = args
+                .highlightedFiles
+                ?.split(",")
+                ?.toSet()
+                ?: emptySet()
         )
     )
-    private val parentStack = ArrayDeque<Pair<Int, String?>>()
 
     /**
      * Flow of [OfflineUiState] UI State
@@ -57,23 +64,31 @@ class OfflineViewModel @Inject constructor(
         monitorOfflineWarningMessage()
         monitorOfflineNodeUpdates()
         monitorViewTypeUpdate()
+        // Navigate to path if specified
+        navigateToPath()
     }
 
     /**
      * Navigates to the specified path, if exists
      */
-    fun navigateToPath(path: String, rootFolderOnly: Boolean, fileNames: Array<String>? = null) {
-        if (path.isBlank() || path == File.separator) return
+    fun navigateToPath() {
+        val path = args.path
+        if (path.isNullOrBlank() || path == File.separator) return
         isLoadingChildFolders(true)
         viewModelScope.launch {
-            path.split(File.separator).filterNot { it.isBlank() }.forEach { child ->
-                loadOfflineNodes()
-                uiState.value.offlineNodes.find { it.offlineFileInformation.name == child }?.let {
-                    openFolder(it, rootFolderOnly, false)
-                } ?: return@forEach
-            }
+            path
+                .split(File.separator)
+                .filterNot { it.isBlank() }
+                .forEach { child ->
+                    loadOfflineNodes()
+                    uiState.value
+                        .offlineNodes
+                        .find { it.offlineFileInformation.name == child }
+                        ?.let { openFolder(it, false) }
+                        ?: return@forEach
+                }
             loadOfflineNodes()
-            highlightFiles(fileNames)
+            highlightFiles()
             isLoadingChildFolders(false)
         }
     }
@@ -123,7 +138,7 @@ class OfflineViewModel @Inject constructor(
 
     private suspend fun loadOfflineNodes() {
         runCatching {
-            getOfflineNodesByParentIdUseCase(uiState.value.parentId, uiState.value.searchQuery)
+            getOfflineNodesByParentIdUseCase(uiState.value.nodeId, uiState.value.searchQuery)
         }.onSuccess { offlineNodeList ->
             _uiState.update {
                 it.copy(
@@ -154,12 +169,14 @@ class OfflineViewModel @Inject constructor(
         it.copy(isLoadingChildFolders = isLoadingChildFolders)
     }
 
-    private fun highlightFiles(fileNamesToHighlight: Array<String>?) {
+    private fun highlightFiles() {
+        val fileNamesToHighlight = uiState.value.highlightedFiles
         _uiState.update {
             it.copy(
                 offlineNodes = it.offlineNodes.map { item ->
                     item.copy(
-                        isHighlighted = fileNamesToHighlight?.contains(item.offlineFileInformation.name) == true
+                        isHighlighted = fileNamesToHighlight
+                            .contains(item.offlineFileInformation.name)
                     )
                 }
             )
@@ -186,10 +203,10 @@ class OfflineViewModel @Inject constructor(
     /**
      * Handle on clicked of item
      */
-    fun onItemClicked(offlineNodeUIItem: OfflineNodeUiItem, rootFolderOnly: Boolean) {
+    fun onItemClicked(offlineNodeUIItem: OfflineNodeUiItem) {
         if (uiState.value.selectedNodeHandles.isEmpty()) {
             if (offlineNodeUIItem.offlineFileInformation.isFolder) {
-                openFolder(offlineNodeUIItem, rootFolderOnly, true)
+                openFolder(offlineNodeUIItem, true)
             } else {
                 _uiState.update {
                     it.copy(openOfflineNodeEvent = triggered(offlineNodeUIItem.offlineFileInformation))
@@ -202,31 +219,13 @@ class OfflineViewModel @Inject constructor(
 
     private fun openFolder(
         offlineNodeUIItem: OfflineNodeUiItem,
-        rootFolderOnly: Boolean,
         refreshNodesAsync: Boolean,
     ) {
-        if (rootFolderOnly) {
-            _uiState.update {
-                it.copy(openFolderInPageEvent = triggered(offlineNodeUIItem.offlineFileInformation))
-            }
-        } else {
-            Pair(
-                offlineNodeUIItem.offlineFileInformation.parentId,
-                uiState.value.title
-            ).also {
-                parentStack.remove(it)
-                parentStack.add(it)
-            }
-
-            _uiState.update {
-                it.copy(
-                    title = offlineNodeUIItem.offlineFileInformation.name,
-                    parentId = offlineNodeUIItem.offlineFileInformation.id,
-                    closeSearchViewEvent = triggered
-                )
-            }
-            if (refreshNodesAsync) refreshOfflineNodes()
+        _uiState.update {
+            it.copy(openFolderInPageEvent = triggered(offlineNodeUIItem.offlineFileInformation))
         }
+
+        if (refreshNodesAsync) refreshOfflineNodes()
     }
 
     /**
@@ -241,25 +240,6 @@ class OfflineViewModel @Inject constructor(
      */
     fun onOpenOfflineNodeEventConsumed() {
         _uiState.update { it.copy(openOfflineNodeEvent = consumed()) }
-    }
-
-    /**
-     * OnBackClicked
-     * @return [Int] 0 if no node was opened, and offline page should be exited
-     */
-    fun onBackClicked(): Int? {
-        parentStack.removeLastOrNull()?.let { (parentId, parentTitle) ->
-            _uiState.update {
-                it.copy(
-                    parentId = parentId,
-                    title = parentTitle
-                )
-            }
-            refreshOfflineNodes()
-            return null
-        } ?: run {
-            return 0
-        }
     }
 
     /**
@@ -336,10 +316,4 @@ class OfflineViewModel @Inject constructor(
         _uiState.update { it.copy(title = title) }
     }
 
-    /**
-     * Update default title
-     */
-    fun updateDefaultTitle(defaultTitle: String) {
-        _uiState.update { it.copy(defaultTitle = defaultTitle) }
-    }
 }

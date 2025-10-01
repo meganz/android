@@ -67,4 +67,6 @@
     </plurals>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">Logging out deletes your offline content.</string>
+
+    <string name="offline_screen_title">Offline</string>
 </resources>

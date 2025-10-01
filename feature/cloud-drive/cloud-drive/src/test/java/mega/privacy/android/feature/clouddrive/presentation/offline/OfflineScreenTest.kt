@@ -118,11 +118,12 @@ class OfflineScreenTest {
     }
 
     @Test
-    fun `test that OfflineScreen displays correct title`() {
+    fun `test that OfflineScreen displays correct title when parent is not root`() {
         val uiState = OfflineUiState(
             isLoadingCurrentFolder = false,
             offlineNodes = emptyList(),
-            title = "Test Offline Title"
+            title = "Test Offline Title",
+            nodeId = 1
         )
         setupComposeContent(uiState)
 
@@ -130,16 +131,17 @@ class OfflineScreenTest {
     }
 
     @Test
-    fun `test that OfflineScreen displays default title when title is null`() {
+    fun `test that OfflineScreen displays correct title when parent is root`() {
         val uiState = OfflineUiState(
             isLoadingCurrentFolder = false,
             offlineNodes = emptyList(),
-            title = null,
-            defaultTitle = "Default Offline"
+            nodeId = -1
         )
         setupComposeContent(uiState)
 
-        composeRule.onNodeWithText("Default Offline").assertIsDisplayed()
+        composeRule.onNodeWithText(
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.offline_screen_title)
+        ).assertIsDisplayed()
     }
 
     @Test
@@ -281,9 +283,10 @@ class OfflineScreenTest {
         uiState: OfflineUiState,
         onItemClicked: (OfflineNodeUiItem) -> Unit = {},
         onItemLongClicked: (OfflineNodeUiItem) -> Unit = {},
-        onNavigateToFolder: (String) -> Unit = {},
+        onNavigateToFolder: (Int, String) -> Unit = { _, _ -> },
         onOpenFile: (String) -> Unit = {},
         onBack: () -> Unit = {},
+        onDismissOfflineWarning: () -> Unit = {},
     ) {
         composeRule.setContent {
             CompositionLocalProvider(LocalContext provides composeRule.activity) {
@@ -294,7 +297,8 @@ class OfflineScreenTest {
                         onItemClicked = onItemClicked,
                         onItemLongClicked = onItemLongClicked,
                         onNavigateToFolder = onNavigateToFolder,
-                        onOpenFile = onOpenFile
+                        onOpenFile = onOpenFile,
+                        onDismissOfflineWarning = onDismissOfflineWarning
                     )
                 }
             }

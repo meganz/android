@@ -28,3 +28,14 @@ data class CloudDriveNavKey(
  */
 @Serializable
 data object SharesNavKey : NavKey
+
+/**
+ * Offline route args
+ */
+@Serializable
+data class OfflineNavKey(
+    val title: String? = null,
+    val nodeId: Int = -1,
+    val path: String? = null,
+    val highlightedFiles: String? = null,
+) : NavKey

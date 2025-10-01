@@ -8,6 +8,7 @@ import mega.privacy.android.navigation.destination.AchievementNavKey
 import mega.privacy.android.navigation.destination.ContactsNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
+import mega.privacy.android.navigation.destination.OfflineNavKey
 import mega.privacy.android.navigation.destination.RubbishBinNavKey
 import mega.privacy.android.navigation.destination.SharesNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
@@ -57,7 +58,7 @@ object TransfersItem : NavDrawerItem.Account(
 )
 
 object OfflineFilesItem : NavDrawerItem.Account(
-    destination = object : NavKey {},
+    destination = OfflineNavKey(),
     icon = IconPack.Medium.Thin.Outline.CloudOff,
     title = sharedR.string.general_section_offline_files
 )

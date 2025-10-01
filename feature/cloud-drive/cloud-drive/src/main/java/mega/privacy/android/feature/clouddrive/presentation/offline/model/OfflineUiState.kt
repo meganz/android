@@ -13,9 +13,8 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @param showOfflineWarning UI state to show the offline warning
  * @param offlineNodes The offline nodes fetched from the database
  * @param selectedNodeHandles The selected nodes when the view is in the selecting mode
- * @param parentId Parent id of Node
+ * @param nodeId Parent id of Node
  * @param title Title of screen
- * @param defaultTitle default title
  * @param currentViewType ViewType [ViewType]
  * @param isOnline true if connected to network
  * @param searchQuery Search query
@@ -29,9 +28,10 @@ data class OfflineUiState(
     val showOfflineWarning: Boolean = false,
     val offlineNodes: List<OfflineNodeUiItem> = emptyList(),
     val selectedNodeHandles: List<Long> = emptyList(),
-    val parentId: Int = -1,
+    val nodeId: Int = -1,
     val title: String? = null,
-    val defaultTitle: String = "",
+    val path: String? = null,
+    val highlightedFiles: Set<String> = emptySet(),
     val currentViewType: ViewType = ViewType.LIST,
     val isOnline: Boolean = false,
     val searchQuery: String? = null,
@@ -45,16 +45,6 @@ data class OfflineUiState(
      */
     val isLoading: Boolean
         get() = isLoadingCurrentFolder || isLoadingChildFolders
-
-    /**
-     * Actual title to show, it's [title] if it's not null or blank, [defaultTitle] otherwise
-     */
-    val actualTitle = title?.takeIf { it.isNotBlank() } ?: defaultTitle
-
-    /**
-     * Actual subtitle to show, it's default title if [actualTitle] is not null, null otherwise
-     */
-    val actualSubtitle = if (title.isNullOrEmpty()) null else defaultTitle
 
     /**
      * Get the selected offline nodes
