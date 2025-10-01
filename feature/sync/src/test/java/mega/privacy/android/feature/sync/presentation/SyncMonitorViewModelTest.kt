@@ -3,17 +3,11 @@ package mega.privacy.android.feature.sync.presentation
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.transfer.Transfer
-import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
-import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.feature.sync.domain.entity.NotificationDetails
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType
@@ -31,7 +25,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -42,8 +35,6 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class SyncMonitorViewModelTest {
 
-    private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase = mock()
-    private val handleTransferEventUseCase: HandleTransferEventUseCase = mock()
     private val monitorShouldSyncUseCase: MonitorShouldSyncUseCase = mock()
     private val monitorSyncNotificationsUseCase: MonitorSyncNotificationsUseCase = mock()
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase = mock()
@@ -59,7 +50,6 @@ internal class SyncMonitorViewModelTest {
 
     @BeforeEach
     fun setup() {
-        whenever(monitorTransferEventsUseCase()).thenReturn(emptyFlow())
         whenever(monitorShouldSyncUseCase()).thenReturn(emptyFlow())
         whenever(monitorSyncNotificationsUseCase()).thenReturn(emptyFlow())
         whenever(monitorBatteryInfoUseCase()).thenReturn(emptyFlow())
@@ -70,8 +60,6 @@ internal class SyncMonitorViewModelTest {
     @AfterEach
     fun resetAndTearDown() {
         reset(
-            monitorTransferEventsUseCase,
-            handleTransferEventUseCase,
             monitorBatteryInfoUseCase,
             pauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
             monitorSyncStalledIssuesUseCase,
@@ -79,27 +67,6 @@ internal class SyncMonitorViewModelTest {
             setSyncNotificationShownUseCase,
             getSyncNotificationUseCase,
             isOnWifiNetworkUseCase,
-        )
-    }
-
-    @Test
-    fun `test that monitorTransferEventsUseCase calls handleTransferEventUseCase`() = runTest {
-        val transfer: Transfer = mock {
-            on { isSyncTransfer } doReturn true
-        }
-        val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
-        whenever(monitorTransferEventsUseCase()).thenReturn(
-            flow {
-                emit(transferEvent)
-            }
-        )
-
-        initViewModel()
-        underTest.startMonitoring()
-        advanceUntilIdle()
-
-        verify(handleTransferEventUseCase).invoke(
-            *arrayOf(transferEvent)
         )
     }
 
@@ -146,8 +113,6 @@ internal class SyncMonitorViewModelTest {
 
     private fun initViewModel() {
         underTest = SyncMonitorViewModel(
-            monitorTransferEventsUseCase = monitorTransferEventsUseCase,
-            handleTransferEventUseCase = handleTransferEventUseCase,
             monitorShouldSyncUseCase = monitorShouldSyncUseCase,
             monitorSyncNotificationsUseCase = monitorSyncNotificationsUseCase,
             pauseResumeSyncsBasedOnBatteryAndWiFiUseCase = pauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
