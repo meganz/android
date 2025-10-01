@@ -8,6 +8,7 @@ import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 
 /**
  * View States for the Timeline View
@@ -62,6 +63,7 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property hiddenNodeEnabled                          True if the Hidden Nodes feature is enabled
  * @property isCameraUploadsBannerImprovementEnabled    True if the Camera Uploads Banner Improvement feature is enabled
  * @property isCameraUploadsTransferScreenEnabled       True if the Camera Uploads Transfer Screen feature is enabled
+ * @property cameraUploadsTransfers                       List of in progress Camera Uploads transfers
  */
 data class TimelineViewState(
     val photos: List<Photo> = emptyList(),
@@ -113,5 +115,6 @@ data class TimelineViewState(
     val isBusinessAccountExpired: Boolean = false,
     val hiddenNodeEnabled: Boolean = false,
     val isCameraUploadsBannerImprovementEnabled: Boolean = false,
-    val isCameraUploadsTransferScreenEnabled: Boolean = false
+    val isCameraUploadsTransferScreenEnabled: Boolean = false,
+    val cameraUploadsTransfers: List<InProgressTransfer> = emptyList(),
 )
