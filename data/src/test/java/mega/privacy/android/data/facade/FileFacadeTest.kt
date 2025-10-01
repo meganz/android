@@ -1313,6 +1313,38 @@ internal class FileFacadeTest {
     }
 
     @Test
+    fun `test createChildrenFilesSync returns uri when case-insensitive name conflict exists`() {
+        mockStatic(Uri::class.java).use {
+            val parentUri = UriPath("content://parent")
+            val children = listOf("Test.txt")  // Different case from existing file
+
+            val existingFileUri = mock<Uri>()
+            val existingFile = mock<DocumentFile> {
+                on { name } doReturn "test.txt"  // Existing file with different case
+                on { uri } doReturn existingFileUri
+                on { isDirectory } doReturn false
+            }
+
+            val parentDoc = mock<DocumentFile> {
+                on { isDirectory } doReturn true
+                on { listFiles() } doReturn arrayOf(existingFile)
+            }
+
+            val uri = stubGetDocumentFileFromUri(parentDoc)
+            whenever(Uri.parse(parentUri.value)) doReturn uri
+
+            val result = underTest.createChildrenFilesSync(
+                parentUri = parentUri,
+                children = children,
+                createIfMissing = true,
+                lastAsFolder = false
+            )
+
+            assertThat(result).isNotNull()
+        }
+    }
+
+    @Test
     fun `test that getTotalSizeRecursive returns correct total size excluding tmp folders`() =
         runTest {
             val rootPath =

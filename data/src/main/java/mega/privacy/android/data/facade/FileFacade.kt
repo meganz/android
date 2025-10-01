@@ -1237,7 +1237,7 @@ internal class FileFacade @Inject constructor(
                 }
 
                 // If the name does not match, delete and fall back to listFiles
-                if (nextDocument != null && nextDocument.name != name) {
+                if (nextDocument != null && !nextDocument.name.equals(name, ignoreCase = true)) {
                     Timber.w("Created file '${nextDocument.name}' does not match expected name '$name'. Deleting it.")
                     try {
                         nextDocument.delete()
@@ -1252,7 +1252,8 @@ internal class FileFacade @Inject constructor(
 
                 // Find at listFiles
                 if (nextDocument == null) {
-                    nextDocument = currentDocument.listFiles().firstOrNull { it.name == name }
+                    nextDocument = currentDocument.listFiles()
+                        .firstOrNull { it.name.equals(name, ignoreCase = true) }
                     if (nextDocument == null) {
                         return failure(Exception("Failed to create or locate '$name'"))
                     }
@@ -1267,7 +1268,8 @@ internal class FileFacade @Inject constructor(
                 }
 
             } else {
-                nextDocument = currentDocument.listFiles().firstOrNull { it.name == name }
+                nextDocument = currentDocument.listFiles()
+                    .firstOrNull { it.name.equals(name, ignoreCase = true) }
                     ?: return failure(Exception("Path component '$name' does not exist"))
 
                 if (shouldBeDirectory && !nextDocument.isDirectory) {
