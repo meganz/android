@@ -30,6 +30,7 @@ import mega.privacy.android.app.presentation.transfers.view.sheet.CompletedTrans
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.feature.transfers.components.CompletedTransferItem
+import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyColumn
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CompletedTransfersItemTapAndHoldSelectedEvent
 import kotlin.time.Duration.Companion.milliseconds
@@ -52,8 +53,9 @@ internal fun CompletedTransfersView(
             modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFERS_EMPTY_VIEW)
         )
     } else {
-        LazyColumn(
+        FastScrollLazyColumn(
             state = lazyListState,
+            totalItems = completedTransfers.size,
             modifier = modifier
                 .fillMaxSize()
                 .testTag(TEST_TAG_COMPLETED_TRANSFERS_VIEW)

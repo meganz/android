@@ -28,6 +28,7 @@ import mega.privacy.android.app.presentation.transfers.view.TEST_TAG_ACTIVE_TAB
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.feature.transfers.components.ActiveTransferItem
 import mega.privacy.android.feature.transfers.components.OverQuotaBanner
+import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollForLazyColumn
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ActiveTransfersIndividualPauseButtonButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ActiveTransfersIndividualPlayButtonButtonPressedEvent
@@ -68,36 +69,42 @@ internal fun ActiveTransfersView(
                     onCancelButtonClick = onConsumeQuotaWarning,
                 )
             }
-            MegaReorderableLazyColumn(
-                lazyListState = lazyListState,
-                items = activeTransfers,
-                key = { it.tag },
-                modifier = modifier
-                    .fillMaxSize()
-                    .testTag(TEST_TAG_ACTIVE_TRANSFERS_VIEW),
-                onMove = { from, to -> onReorderPreview(from.index, to.index) },
-                onDragStarted = { dragged, _ ->
-                    draggedTransfer = dragged
-                },
-                onDragStopped = {
-                    draggedTransfer = null
-                    onReorderConfirmed(it)
-                },
-                dragEnabled = { !selectMode }
-            ) { item ->
-                ActiveTransferItem(
-                    activeTransfer = item,
-                    isTransferOverQuota = isTransferOverQuota,
-                    isStorageOverQuota = isStorageOverQuota,
-                    areTransfersPaused = areTransfersPaused,
-                    onPlayPauseClicked = onPlayPauseClicked,
-                    isSelected = selectedActiveTransfersIds?.contains(item.uniqueId),
-                    isDraggable = selectedActiveTransfersIds == null,
-                    isBeingDragged = item == draggedTransfer,
-                    modifier = Modifier.clickable(enabled = selectMode) {
-                        onActiveTransferSelected(item)
-                    }
-                )
+            FastScrollForLazyColumn(
+                totalItems = activeTransfers.size,
+                modifier = modifier.fillMaxSize(),
+                state = lazyListState,
+            ) { state ->
+                MegaReorderableLazyColumn(
+                    lazyListState = state,
+                    items = activeTransfers,
+                    key = { it.tag },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .testTag(TEST_TAG_ACTIVE_TRANSFERS_VIEW),
+                    onMove = { from, to -> onReorderPreview(from.index, to.index) },
+                    onDragStarted = { dragged, _ ->
+                        draggedTransfer = dragged
+                    },
+                    onDragStopped = {
+                        draggedTransfer = null
+                        onReorderConfirmed(it)
+                    },
+                    dragEnabled = { !selectMode }
+                ) { item ->
+                    ActiveTransferItem(
+                        activeTransfer = item,
+                        isTransferOverQuota = isTransferOverQuota,
+                        isStorageOverQuota = isStorageOverQuota,
+                        areTransfersPaused = areTransfersPaused,
+                        onPlayPauseClicked = onPlayPauseClicked,
+                        isSelected = selectedActiveTransfersIds?.contains(item.uniqueId),
+                        isDraggable = selectedActiveTransfersIds == null,
+                        isBeingDragged = item == draggedTransfer,
+                        modifier = Modifier.clickable(enabled = selectMode) {
+                            onActiveTransferSelected(item)
+                        }
+                    )
+                }
             }
         }
     }

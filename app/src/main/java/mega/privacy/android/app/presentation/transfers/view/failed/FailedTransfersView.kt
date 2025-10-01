@@ -32,6 +32,7 @@ import mega.privacy.android.app.presentation.transfers.view.sheet.FailedTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.feature.transfers.components.FailedTransferItem
+import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyColumn
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.FailedTransfersItemMoreOptionsMenuItemEvent
 import mega.privacy.mobile.analytics.event.FailedTransfersItemTapAndHoldSelectedEvent
@@ -55,8 +56,9 @@ internal fun FailedTransfersView(
             modifier = Modifier.testTag(TEST_TAG_FAILED_TRANSFERS_EMPTY_VIEW)
         )
     } else {
-        LazyColumn(
+        FastScrollLazyColumn(
             state = lazyListState,
+            totalItems = failedTransfers.size,
             modifier = modifier
                 .fillMaxSize()
                 .testTag(TEST_TAG_FAILED_TRANSFERS_VIEW)

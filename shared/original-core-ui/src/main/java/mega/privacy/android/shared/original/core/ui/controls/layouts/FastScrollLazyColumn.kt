@@ -7,11 +7,13 @@ import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -63,19 +65,51 @@ fun FastScrollLazyColumn(
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     userScrollEnabled: Boolean = true,
     content: LazyListScope.() -> Unit,
+) = FastScrollForLazyColumn(
+    totalItems = totalItems,
+    modifier = modifier,
+    tooltipText = tooltipText,
+    state = state,
+    reverseLayout = reverseLayout,
 ) {
-    Box {
-        LazyColumn(
-            modifier = modifier.testTag(LAZY_COLUMN_TAG),
-            state = state,
-            contentPadding = contentPadding,
-            reverseLayout = reverseLayout,
-            verticalArrangement = verticalArrangement,
-            horizontalAlignment = horizontalAlignment,
-            flingBehavior = flingBehavior,
-            userScrollEnabled = userScrollEnabled,
-            content = content
-        )
+    LazyColumn(
+        modifier = Modifier.wrapContentSize().testTag(LAZY_COLUMN_TAG),
+        state = state,
+        contentPadding = contentPadding,
+        reverseLayout = reverseLayout,
+        verticalArrangement = verticalArrangement,
+        horizontalAlignment = horizontalAlignment,
+        flingBehavior = flingBehavior,
+        userScrollEnabled = userScrollEnabled,
+        content = content
+    )
+}
+
+/**
+ * A LazyColumn that shows a vertical scrollbar with a thumb that
+ * allows fast scrolling of the list when it has more than 50 items.
+ * This function allows for injecting a custom LazyColumn implementation.
+ *
+ * @param totalItems The total number of items in the list.
+ * @param modifier The modifier to be applied to the layout.
+ * @param tooltipText A function that returns the text to be displayed in the tooltip
+ *                    when the user interacts with the scrollbar. It takes the current index as input.
+ * @param state The state object to be used to control and observe the list's scroll position.
+ * @param reverseLayout `true` if the items should be laid out in reverse order, `false` otherwise.
+ * @param lazyColumn A composable lambda that takes a `LazyListState` and renders the LazyColumn.
+ *                   This allows for customization of the LazyColumn's behavior and appearance.
+ */
+@Composable
+fun FastScrollForLazyColumn(
+    totalItems: Int,
+    modifier: Modifier = Modifier,
+    tooltipText: ((currentIndex: Int) -> String)? = null,
+    state: LazyListState = rememberLazyListState(),
+    reverseLayout: Boolean = false,
+    lazyColumn: @Composable BoxScope.(LazyListState) -> Unit,
+) {
+    Box(modifier) {
+        lazyColumn(state)
         if (totalItems > MinimumItemThreshold.SINGLE_COLUMN) {
             VerticalScrollbar(
                 tooltipText = tooltipText,
