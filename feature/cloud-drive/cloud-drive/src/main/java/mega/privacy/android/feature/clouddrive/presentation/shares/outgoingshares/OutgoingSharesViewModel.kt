@@ -17,6 +17,7 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -83,6 +84,7 @@ class OutgoingSharesViewModel @Inject constructor(
             val nodeUiItems = nodeUiItemMapper(
                 nodeList = nodes,
                 existingItems = uiState.value.items,
+                nodeSourceType = NodeSourceType.OUTGOING_SHARES
             )
             _uiState.update { state ->
                 state.copy(

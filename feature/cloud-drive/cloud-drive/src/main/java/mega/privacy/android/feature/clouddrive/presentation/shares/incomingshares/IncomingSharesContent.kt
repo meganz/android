@@ -18,22 +18,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.model.IncomingSharesAction
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.model.IncomingSharesUiState
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
 
 @Composable
 fun IncomingSharesContent(
     uiState: IncomingSharesUiState,
     onAction: (IncomingSharesAction) -> Unit,
+    navigationHandler: NavigationHandler,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     listState: LazyListState = rememberLazyListState(),
@@ -102,5 +107,18 @@ fun IncomingSharesContent(
                 inSelectionMode = uiState.isInSelectionMode,
             )
         }
+    }
+
+    EventEffect(
+        event = uiState.navigateToFolderEvent,
+        onConsumed = { onAction(IncomingSharesAction.NavigateToFolderEventConsumed) }
+    ) { node ->
+        navigationHandler.navigate(
+            CloudDriveNavKey(
+                nodeHandle = node.id.longValue,
+                nodeName = node.name,
+                nodeSourceType = NodeSourceType.INCOMING_SHARES
+            )
+        )
     }
 }
