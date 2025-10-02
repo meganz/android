@@ -200,6 +200,9 @@ class MediaDiscoveryFragment : Fragment() {
     }
 
     private fun onModalSheetVisibilityChange(isVisible: Boolean) {
+        // When action mode is on, do not show the bottom nav.
+        if (!isVisible && actionMode != null) return
+
         managerActivity?.showHideBottomNavigationView(hide = isVisible)
         if (isVisible) {
             managerActivity?.hideAdsView()
