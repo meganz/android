@@ -1,7 +1,6 @@
-package mega.privacy.android.app.presentation.login.confirmemail
+package mega.privacy.android.app.presentation.login.confirmemail.changeemail
 
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -10,41 +9,34 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
-import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.login.LoginGraph
 import mega.privacy.android.app.presentation.login.LoginGraphContent
 import mega.privacy.android.app.presentation.login.LoginScreen
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.StartRoute
-import mega.privacy.android.app.presentation.login.confirmemail.changeemail.ChangeEmailAddressViewModel
-import mega.privacy.android.app.presentation.login.confirmemail.changeemail.navigateToChangeEmailAddress
-import mega.privacy.android.app.presentation.login.confirmemail.view.NewConfirmEmailRoute
+import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailScreen
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountRoute
 import mega.privacy.android.app.presentation.login.onboarding.TourScreen
-import mega.privacy.android.app.utils.Constants.HELP_CENTRE_HOME_URL
 
-@Serializable
-data object ConfirmationEmailScreen : NavKey
-
-internal fun NavGraphBuilder.confirmationEmailScreen(
+/**
+ * function to build the ChangeEmailAddress screen.
+ */
+fun NavGraphBuilder.changeEmailAddress(
     navController: NavController,
+    activityViewModel: LoginViewModel?,
     chatRequestHandler: MegaChatRequestHandler,
     onFinish: () -> Unit,
     stopShowingSplashScreen: () -> Unit,
-    activityViewModel: LoginViewModel? = null,
+    onChangeEmailSuccess: (String) -> Unit,
 ) {
-    composable<ConfirmationEmailScreen> { backStackEntry ->
-        val newEmail =
-            backStackEntry.savedStateHandle.get<String>(ChangeEmailAddressViewModel.EMAIL)
-        val context = LocalContext.current
+    composable<ChangeEmailAddressScreen> { backStackEntry ->
         val sharedViewModel = activityViewModel ?: run {
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry<LoginGraph>()
             }
             hiltViewModel<LoginViewModel>(parentEntry)
         }
-
         LoginGraphContent(
             navigateToLoginScreen = { navController.navigate(LoginScreen) },
             navigateToCreateAccountScreen = { navController.navigate(CreateAccountRoute) },
@@ -61,27 +53,33 @@ internal fun NavGraphBuilder.confirmationEmailScreen(
             onFinish = onFinish,
             stopShowingSplashScreen = stopShowingSplashScreen,
         ) {
-            NewConfirmEmailRoute(
-                newEmail = newEmail,
-                onShowPendingFragment = sharedViewModel::setPendingFragmentToShow,
-                onNavigateToChangeEmailAddress = { email, fullName ->
-                    navController.navigateToChangeEmailAddress(
-                        email = email,
-                        fullName = fullName,
-                    )
-                },
-                onNavigateToHelpCentre = {
-                    context.launchUrl(HELP_CENTRE_HOME_URL)
-                },
-                onBackPressed = onFinish,
-                checkTemporalCredentials = sharedViewModel::checkTemporalCredentials,
-                cancelCreateAccount = sharedViewModel::cancelCreateAccount,
-                onSetTemporalEmail = sharedViewModel::setTemporalEmail
+            ChangeEmailAddressRoute(
+                onChangeEmailSuccess = onChangeEmailSuccess
             )
         }
     }
 }
 
-internal fun NavController.openConfirmationEmailScreen(navOptions: NavOptions? = null) {
-    navigate(ConfirmationEmailScreen, navOptions)
+@Serializable
+data class ChangeEmailAddressScreen(
+    val email: String?,
+    val fullName: String?,
+) : NavKey
+
+
+/**
+ * Navigation for [ChangeEmailAddressRoute]
+ */
+fun NavController.navigateToChangeEmailAddress(
+    email: String?,
+    fullName: String?,
+    navOptions: NavOptions? = null,
+) {
+    this.navigate(
+        ChangeEmailAddressScreen(
+            email = email,
+            fullName = fullName,
+        ),
+        navOptions = navOptions
+    )
 }

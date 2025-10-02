@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.login.confirmemail.view
 
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -37,8 +38,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.LinkSpannedText
 import mega.android.core.ui.components.MegaScaffold
@@ -75,41 +74,16 @@ import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ChangeEmailAddressButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ResendEmailConfirmationButtonPressedEvent
 
-/**
- * Route for the Confirm Email composable.
- */
-const val confirmEmailRoute = "confirmEmailRoute"
-
-/**
- * Add the Confirm Email composable to the navigation graph.
- */
-fun NavGraphBuilder.confirmEmail(
-    fullName: String?,
-    onShowPendingFragment: (loginFragmentType: LoginFragmentType) -> Unit,
-    onSetTemporalEmail: (email: String) -> Unit,
-    onNavigateToChangeEmailAddress: () -> Unit,
-    onNavigateToHelpCentre: () -> Unit,
-    viewModel: ConfirmEmailViewModel,
-) {
-    composable(confirmEmailRoute) {
-        NewConfirmEmailRoute(
-            fullName = fullName,
-            onShowPendingFragment = onShowPendingFragment,
-            onSetTemporalEmail = onSetTemporalEmail,
-            onNavigateToChangeEmailAddress = onNavigateToChangeEmailAddress,
-            onNavigateToHelpCentre = onNavigateToHelpCentre,
-            viewModel = viewModel
-        )
-    }
-}
-
 @Composable
-private fun NewConfirmEmailRoute(
-    fullName: String?,
+fun NewConfirmEmailRoute(
+    newEmail: String?,
     onShowPendingFragment: (loginFragmentType: LoginFragmentType) -> Unit,
-    onSetTemporalEmail: (email: String) -> Unit,
-    onNavigateToChangeEmailAddress: () -> Unit,
+    onNavigateToChangeEmailAddress: (String, String) -> Unit,
     onNavigateToHelpCentre: () -> Unit,
+    onBackPressed: () -> Unit,
+    checkTemporalCredentials: () -> Unit,
+    onSetTemporalEmail: (String) -> Unit,
+    cancelCreateAccount: () -> Unit,
     viewModel: ConfirmEmailViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -117,16 +91,34 @@ private fun NewConfirmEmailRoute(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    BackHandler(onBack = onBackPressed)
+
+    LaunchedEffect(uiState.isCreatingAccountCancelled) {
+        if (uiState.isCreatingAccountCancelled) {
+            cancelCreateAccount()
+            viewModel.onHandleCancelCreateAccount()
+        }
+    }
+
+    LaunchedEffect(uiState.isAccountConfirmed) {
+        if (uiState.isAccountConfirmed) {
+            onShowPendingFragment(LoginFragmentType.Login)
+            checkTemporalCredentials()
+        }
+    }
+
+    LaunchedEffect(newEmail) {
+        if (!newEmail.isNullOrEmpty()) {
+            onSetTemporalEmail(newEmail)
+            viewModel.updateRegisteredEmail(newEmail)
+            snackBarHostState.showSnackbar(context.getString(sharedR.string.email_confirmation_email_address_update_message))
+        }
+    }
+
     LaunchedEffect(uiState.isPendingToShowFragment) {
         uiState.isPendingToShowFragment?.let {
             onShowPendingFragment(it)
             viewModel.isPendingToShowFragmentConsumed()
-        }
-    }
-
-    LaunchedEffect(uiState.registeredEmail) {
-        uiState.registeredEmail?.let {
-            onSetTemporalEmail(it)
         }
     }
 
@@ -168,9 +160,14 @@ private fun NewConfirmEmailRoute(
             viewModel.cancelCreateAccount()
         },
         onResendSignUpLink = {
-            viewModel.resendSignUpLink(email = it, fullName = fullName)
+            viewModel.resendSignUpLink(email = it, fullName = uiState.firstName.orEmpty())
         },
-        onNavigateToChangeEmailAddress = onNavigateToChangeEmailAddress,
+        onNavigateToChangeEmailAddress = {
+            onNavigateToChangeEmailAddress(
+                uiState.registeredEmail.orEmpty(),
+                uiState.firstName.orEmpty()
+            )
+        },
         snackBarHostState = snackBarHostState,
         onNavigateToHelpCentre = onNavigateToHelpCentre
     )

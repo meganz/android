@@ -146,9 +146,7 @@ class MegaActivity : AppCompatActivity() {
                     loginNavigationGraph(
                         navController = navController,
                         chatRequestHandler = chatRequestHandler,
-                        onFinish = {
-                            navController.popBackStack(LoginGraph, inclusive = true)
-                        },
+                        onFinish = ::finish,
                         stopShowingSplashScreen = {
                             keepSplashScreen = false
                         },

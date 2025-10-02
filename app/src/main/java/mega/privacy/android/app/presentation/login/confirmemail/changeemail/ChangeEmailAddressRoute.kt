@@ -33,12 +33,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
-import androidx.navigation.NavType
-import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaSnackbar
@@ -61,44 +55,8 @@ import mega.privacy.android.app.presentation.login.confirmemail.model.ResendSign
 import mega.privacy.android.app.presentation.login.view.tabletScreenWidth
 import mega.privacy.android.shared.resources.R as sharedR
 
-internal const val changeEmailAddressRoute = "changeEmailAddress"
-internal const val EMAIL = "email"
-internal const val FULL_NAME = "full_name"
-
-/**
- * function to build the ChangeEmailAddress screen.
- */
-fun NavGraphBuilder.changeEmailAddress(
-    onChangeEmailSuccess: (String) -> Unit,
-) {
-    composable(
-        route = "$changeEmailAddressRoute?$EMAIL={$EMAIL}&$FULL_NAME={$FULL_NAME}",
-        arguments = listOf(
-            navArgument(EMAIL) { type = NavType.StringType },
-            navArgument(FULL_NAME) { type = NavType.StringType }),
-    ) {
-        ChangeEmailAddressRoute(
-            onChangeEmailSuccess = onChangeEmailSuccess
-        )
-    }
-}
-
-/**
- * Navigation for [ChangeEmailAddressRoute]
- */
-fun NavController.navigateToChangeEmailAddress(
-    email: String?,
-    fullName: String?,
-    navOptions: NavOptions? = null,
-) {
-    this.navigate(
-        route = "$changeEmailAddressRoute?$EMAIL=$email&$FULL_NAME=$fullName",
-        navOptions = navOptions
-    )
-}
-
 @Composable
-private fun ChangeEmailAddressRoute(
+internal fun ChangeEmailAddressRoute(
     onChangeEmailSuccess: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ChangeEmailAddressViewModel = hiltViewModel(),

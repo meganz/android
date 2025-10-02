@@ -4,6 +4,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -23,7 +24,7 @@ internal class ChangeEmailAddressViewModel @Inject constructor(
     private val resendSignUpLinkUseCase: ResendSignUpLinkUseCase,
     private val resendSignUpLinkErrorMapper: ResendSignUpLinkErrorMapper,
 ) : ViewModel() {
-
+    private val route = savedStateHandle.toRoute<ChangeEmailAddressScreen>()
     private val _uiState = MutableStateFlow(ChangeEmailAddressUIState())
 
     /**
@@ -33,6 +34,7 @@ internal class ChangeEmailAddressViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
+        savedStateHandle[EMAIL] = route.email
         _uiState.update {
             it.copy(email = savedStateHandle[EMAIL] ?: "")
         }
@@ -62,7 +64,7 @@ internal class ChangeEmailAddressViewModel @Inject constructor(
     fun changeEmailAddress() {
         viewModelScope.launch {
             val email = savedStateHandle[EMAIL] ?: ""
-            val fullName = savedStateHandle[FULL_NAME] ?: ""
+            val fullName = route.fullName
             if (validateEmail(email).not()) {
                 return@launch
             }
@@ -92,5 +94,9 @@ internal class ChangeEmailAddressViewModel @Inject constructor(
      */
     internal fun onResendSignUpLinkErrorConsumed() {
         _uiState.update { it.copy(resendSignUpLinkError = consumed()) }
+    }
+
+    companion object {
+        const val EMAIL = "new_email"
     }
 }

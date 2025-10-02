@@ -14,6 +14,8 @@ import androidx.navigation.navigation
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
+import mega.privacy.android.app.presentation.login.confirmemail.changeemail.ChangeEmailAddressViewModel
+import mega.privacy.android.app.presentation.login.confirmemail.changeemail.changeEmailAddress
 import mega.privacy.android.app.presentation.login.confirmemail.confirmationEmailScreen
 import mega.privacy.android.app.presentation.login.confirmemail.openConfirmationEmailScreen
 import mega.privacy.android.app.presentation.login.createaccount.createAccountScreen
@@ -109,8 +111,20 @@ fun NavGraphBuilder.loginNavigationGraph(
             chatRequestHandler = chatRequestHandler,
             onFinish = onFinish,
             stopShowingSplashScreen = stopShowingSplashScreen,
-            onBackPressed = onFinish,
             activityViewModel = activityViewModel,
+        )
+        changeEmailAddress(
+            navController = navController,
+            chatRequestHandler = chatRequestHandler,
+            onFinish = onFinish,
+            stopShowingSplashScreen = stopShowingSplashScreen,
+            onChangeEmailSuccess = { newEmail ->
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.set(ChangeEmailAddressViewModel.EMAIL, newEmail)
+                navController.popBackStack()
+            },
+            activityViewModel = activityViewModel
         )
     }
 } 

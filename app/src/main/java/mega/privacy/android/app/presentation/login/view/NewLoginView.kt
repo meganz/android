@@ -211,7 +211,7 @@ fun NewLoginView(
             onConsumed = onSnackbarMessageConsumed
         ) {
             snackbarHostState.showSnackbar(
-                message = context.resources.getString(it),
+                message = context.getString(it),
                 duration = SnackbarDuration.Short
             )
         }
