@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.offline.action.model
+package mega.privacy.android.core.nodecomponents.components.offline
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed

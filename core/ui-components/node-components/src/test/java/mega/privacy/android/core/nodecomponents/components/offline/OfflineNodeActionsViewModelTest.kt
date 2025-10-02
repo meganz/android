@@ -1,17 +1,14 @@
-package mega.privacy.android.app.presentation.offline.action
-
+package mega.privacy.android.core.nodecomponents.components.offline
 
 import android.content.Intent
 import app.cash.turbine.test
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.offline.action.model.OfflineNodeActionUiEntity
-import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
+import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -47,6 +44,7 @@ import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
 import java.util.stream.Stream
+import mega.privacy.android.core.nodecomponents.R
 import kotlin.time.Duration
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -112,9 +110,9 @@ class OfflineNodeActionsViewModelTest {
 
             underTest.uiState.test {
                 val res = awaitItem()
-                assertThat(res.shareFilesEvent)
+                Truth.assertThat(res.shareFilesEvent)
                     .isInstanceOf(StateEventWithContentTriggered::class.java)
-                assertThat((res.shareFilesEvent as StateEventWithContentTriggered).content)
+                Truth.assertThat((res.shareFilesEvent as StateEventWithContentTriggered).content)
                     .containsExactly(file)
             }
         }
@@ -157,9 +155,9 @@ class OfflineNodeActionsViewModelTest {
 
             underTest.uiState.test {
                 val res = awaitItem()
-                assertThat(res.sharesNodeLinksEvent)
+                Truth.assertThat(res.sharesNodeLinksEvent)
                     .isInstanceOf(StateEventWithContentTriggered::class.java)
-                assertThat((res.sharesNodeLinksEvent as StateEventWithContentTriggered).content)
+                Truth.assertThat((res.sharesNodeLinksEvent as StateEventWithContentTriggered).content)
                     .isEqualTo("name1" to "link1\n\nlink2")
             }
         }
@@ -207,9 +205,9 @@ class OfflineNodeActionsViewModelTest {
 
         underTest.uiState.test {
             val res = awaitItem()
-            assertThat(res.openFileEvent)
+            Truth.assertThat(res.openFileEvent)
                 .isInstanceOf(StateEventWithContentTriggered::class.java)
-            assertThat((res.openFileEvent as StateEventWithContentTriggered).content)
+            Truth.assertThat((res.openFileEvent as StateEventWithContentTriggered).content)
                 .isInstanceOf(expected::class.java)
         }
     }
@@ -231,7 +229,7 @@ class OfflineNodeActionsViewModelTest {
             }
 
             val file = mock<File> {
-                on { length() } doReturn TextFileTypeInfo.MAX_SIZE_OPENABLE_TEXT_FILE + 100L
+                on { length() } doReturn TextFileTypeInfo.Companion.MAX_SIZE_OPENABLE_TEXT_FILE + 100L
             }
             whenever(getOfflineFileUseCase(nodeInfo)).thenReturn(file)
 
@@ -239,9 +237,9 @@ class OfflineNodeActionsViewModelTest {
 
             underTest.uiState.test {
                 val res = awaitItem()
-                assertThat(res.openFileEvent)
+                Truth.assertThat(res.openFileEvent)
                     .isInstanceOf(StateEventWithContentTriggered::class.java)
-                assertThat((res.openFileEvent as StateEventWithContentTriggered).content)
+                Truth.assertThat((res.openFileEvent as StateEventWithContentTriggered).content)
                     .isInstanceOf(OfflineNodeActionUiEntity.Other::class.java)
             }
         }
@@ -268,9 +266,9 @@ class OfflineNodeActionsViewModelTest {
             verify(getPathFromNodeContentUseCase).invoke(NodeContentUri.LocalContentUri(file))
             underTest.uiState.test {
                 val res = awaitItem()
-                assertThat(res.openFileEvent)
+                Truth.assertThat(res.openFileEvent)
                     .isInstanceOf(StateEventWithContentTriggered::class.java)
-                assertThat((res.openFileEvent as StateEventWithContentTriggered).content)
+                Truth.assertThat((res.openFileEvent as StateEventWithContentTriggered).content)
                     .isInstanceOf(OfflineNodeActionUiEntity.Uri::class.java)
             }
         }

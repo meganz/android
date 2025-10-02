@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.offline
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,6 +35,8 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
+import mega.privacy.android.core.nodecomponents.components.offline.HandleOfflineNodeAction3
+import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeActionsViewModel
 import mega.privacy.android.core.nodecomponents.list.NodeGridViewItem
 import mega.privacy.android.core.nodecomponents.list.NodeListViewItem
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
@@ -59,17 +62,26 @@ fun OfflineScreen(
     onNavigateToFolder: (nodeId: Int, name: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: OfflineViewModel = hiltViewModel(),
+    actionViewModel: OfflineNodeActionsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val actionUiState by actionViewModel.uiState.collectAsStateWithLifecycle()
+
+    HandleOfflineNodeAction3(
+        uiState = actionUiState,
+        consumeShareFilesEvent = actionViewModel::onShareFilesEventConsumed,
+        consumeShareNodeLinksEvent = actionViewModel::onShareNodeLinksEventConsumed,
+        consumeOpenFileEvent = actionViewModel::onOpenFileEventConsumed
+    )
 
     OfflineScreen(
         uiState = uiState,
         onBack = onBack,
+        selectAll = viewModel::selectAll,
+        deselectAll = viewModel::clearSelection,
         onItemClicked = viewModel::onItemClicked,
         onItemLongClicked = viewModel::onLongItemClicked,
-        onOpenFile = { node ->
-            // Todo implement OfflineNodeActionsViewModel to handle open file action
-        },
+        onOpenFile = actionViewModel::handleOpenOfflineFile,
         onDismissOfflineWarning = viewModel::dismissOfflineWarning,
         onNavigateToFolder = onNavigateToFolder,
         consumeOpenFolderEvent = viewModel::onOpenFolderInPageEventConsumed,
@@ -82,10 +94,12 @@ fun OfflineScreen(
 internal fun OfflineScreen(
     uiState: OfflineUiState,
     onBack: () -> Unit,
+    selectAll: () -> Unit,
+    deselectAll: () -> Unit,
     onItemClicked: (OfflineNodeUiItem) -> Unit,
     onItemLongClicked: (OfflineNodeUiItem) -> Unit,
     onNavigateToFolder: (nodeId: Int, name: String) -> Unit,
-    onOpenFile: (String) -> Unit,
+    onOpenFile: (OfflineFileInformation) -> Unit,
     onDismissOfflineWarning: () -> Unit,
     modifier: Modifier = Modifier,
     consumeOpenFolderEvent: () -> Unit = {},
@@ -102,7 +116,11 @@ internal fun OfflineScreen(
         event = uiState.openOfflineNodeEvent,
         onConsumed = consumeOpenFileEvent
     ) { file ->
-        onOpenFile(file.name)
+        onOpenFile(file)
+    }
+
+    BackHandler(uiState.selectedNodeHandles.isNotEmpty()) {
+        deselectAll()
     }
 
     MegaScaffold(

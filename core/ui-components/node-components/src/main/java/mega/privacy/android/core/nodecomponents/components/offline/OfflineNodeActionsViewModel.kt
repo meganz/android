@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.offline.action
+package mega.privacy.android.core.nodecomponents.components.offline
 
 import android.content.Intent
 import androidx.lifecycle.ViewModel
@@ -10,11 +10,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.offline.action.model.OfflineNodeActionUiEntity
-import mega.privacy.android.app.presentation.offline.action.model.OfflineNodeActionsUiState
-import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
+import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
+import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
@@ -67,7 +65,9 @@ class OfflineNodeActionsViewModel @Inject constructor(
                 if (isOnline) {
                     shareNodes(nodes)
                 } else {
-                    snackBarHandler.postSnackbarMessage(R.string.error_server_connection_problem)
+                    snackBarHandler.postSnackbarMessage(
+                        R.string.error_server_connection_problem
+                    )
                 }
             }
         }
@@ -160,6 +160,7 @@ class OfflineNodeActionsViewModel @Inject constructor(
                     )
 
                     fileType is TextFileTypeInfo && localFile.length() <= TextFileTypeInfo.MAX_SIZE_OPENABLE_TEXT_FILE -> OfflineNodeActionUiEntity.Text(
+                        nodeId = nodeId,
                         file = localFile
                     )
 
@@ -274,4 +275,3 @@ class OfflineNodeActionsViewModel @Inject constructor(
         nodeContentUriIntentMapper(intent, contentUri, mimeType, isSupported)
     }
 }
-

@@ -336,6 +336,21 @@ interface AppNavigator {
     )
 
     /**
+     * Open PDF viewer activity
+     *
+     * @param context Context
+     * @param content NodeContentUri
+     * @param type the adapter type of the view
+     * @param nodeId NodeId
+     */
+    suspend fun openPdfActivity(
+        context: Context,
+        content: NodeContentUri.LocalContentUri,
+        type: Int?,
+        nodeId: NodeId,
+    )
+
+    /**
      * Open image viewer activity
      *
      * @param context Context
@@ -346,6 +361,19 @@ interface AppNavigator {
         context: Context,
         currentFileNode: TypedFileNode,
         nodeSourceType: Int?,
+    )
+
+    /**
+     * Open image viewer activity for offline files
+     *
+     * @param context Context
+     * @param node the NodeId of the current node
+     * @param path the local path of the current node
+     */
+    fun openImageViewerForOfflineNode(
+        context: Context,
+        node: NodeId,
+        path: String
     )
 
     /**

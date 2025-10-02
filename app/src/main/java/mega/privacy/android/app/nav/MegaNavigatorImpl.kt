@@ -25,6 +25,7 @@ import mega.privacy.android.app.presentation.filecontact.FileContactListComposeA
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -555,6 +556,30 @@ internal class MegaNavigatorImpl @Inject constructor(
         context.startActivity(pdfIntent)
     }
 
+    override suspend fun openPdfActivity(
+        context: Context,
+        content: NodeContentUri.LocalContentUri,
+        type: Int?,
+        nodeId: NodeId,
+    ) {
+        val pdfIntent = Intent(context, PdfViewerActivity::class.java)
+        val mimeType = getFileTypeInfoUseCase(content.file).mimeType
+        pdfIntent.apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, nodeId.longValue)
+            putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
+            putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, type)
+            putExtra(Constants.INTENT_EXTRA_KEY_APP, true)
+        }
+        nodeContentUriIntentMapper(
+            intent = pdfIntent,
+            content = content,
+            mimeType = mimeType,
+        )
+        context.startActivity(pdfIntent)
+    }
+
     override fun openImageViewerActivity(
         context: Context,
         currentFileNode: TypedFileNode,
@@ -611,6 +636,22 @@ internal class MegaNavigatorImpl @Inject constructor(
                 NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
                 NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER,
             )
+        )
+
+        context.startActivity(intent)
+    }
+
+    override fun openImageViewerForOfflineNode(
+        context: Context,
+        node: NodeId,
+        path: String
+    ) {
+        val intent = ImagePreviewActivity.createIntent(
+            context = context,
+            imageSource = ImagePreviewFetcherSource.OFFLINE,
+            menuOptionsSource = ImagePreviewMenuSource.OFFLINE,
+            anchorImageNodeId = node,
+            params = mapOf(OfflineImageNodeFetcher.PATH to path),
         )
 
         context.startActivity(intent)

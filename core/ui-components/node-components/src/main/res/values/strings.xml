@@ -246,4 +246,10 @@
     <string name="context_clear_rubbish">Empty Rubbish bin</string>
     <!-- More button in contact info page -->
     <string name="label_more">More</string>
+
+    <!--Offline feature-->
+    <!-- to share a file using Facebook, Whatsapp, etc -->
+    <string name="context_share">Share using</string>
+    <!-- when the user tries to log in to MEGA without a network connection -->
+    <string name="error_server_connection_problem">No network connection</string>
 </resources>

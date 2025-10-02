@@ -63,7 +63,7 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewStat
 import mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowActivity
 import mega.privacy.android.app.presentation.imagepreview.view.ImagePreviewScreen
 import mega.privacy.android.app.presentation.offline.action.HandleOfflineNodeActions
-import mega.privacy.android.app.presentation.offline.action.OfflineNodeActionsViewModel
+import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeActionsViewModel
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.psa.PsaContainer

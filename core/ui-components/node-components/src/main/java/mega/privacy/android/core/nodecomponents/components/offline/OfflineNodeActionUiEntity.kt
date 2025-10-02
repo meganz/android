@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.offline.action.model
+package mega.privacy.android.core.nodecomponents.components.offline
 
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
@@ -38,6 +38,7 @@ sealed interface OfflineNodeActionUiEntity {
      * @property file [File]
      */
     data class Text(
+        val nodeId: NodeId,
         val file: File,
     ) : OfflineNodeActionUiEntity
 

@@ -15,7 +15,6 @@ import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.clouddrive.R
-import mega.privacy.android.feature.clouddrive.presentation.offline.OfflineScreen
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
 import org.junit.Rule
@@ -284,9 +283,11 @@ class OfflineScreenTest {
         onItemClicked: (OfflineNodeUiItem) -> Unit = {},
         onItemLongClicked: (OfflineNodeUiItem) -> Unit = {},
         onNavigateToFolder: (Int, String) -> Unit = { _, _ -> },
-        onOpenFile: (String) -> Unit = {},
+        onOpenFile: (OfflineFileInformation) -> Unit = {},
         onBack: () -> Unit = {},
         onDismissOfflineWarning: () -> Unit = {},
+        selectAll: () -> Unit = {},
+        deselectAll: () -> Unit = {},
     ) {
         composeRule.setContent {
             CompositionLocalProvider(LocalContext provides composeRule.activity) {
@@ -298,7 +299,9 @@ class OfflineScreenTest {
                         onItemLongClicked = onItemLongClicked,
                         onNavigateToFolder = onNavigateToFolder,
                         onOpenFile = onOpenFile,
-                        onDismissOfflineWarning = onDismissOfflineWarning
+                        onDismissOfflineWarning = onDismissOfflineWarning,
+                        selectAll = selectAll,
+                        deselectAll = deselectAll,
                     )
                 }
             }
