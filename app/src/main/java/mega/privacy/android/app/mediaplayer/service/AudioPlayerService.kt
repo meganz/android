@@ -140,8 +140,10 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
     // We need keep it as Runnable here, because we need remove it from handler later,
     // using lambda doesn't work when remove it from handler.
     private val resumePlayRunnable = Runnable {
-        if (needPlayWhenReceiveResumeCommand || !mediaPlayerGateway.getPlayWhenReady()) {
-            setPlayWhenReady(true)
+        if (needPlayWhenReceiveResumeCommand) {
+            if (!mediaPlayerGateway.getPlayWhenReady()) {
+                setPlayWhenReady(true)
+            }
             needPlayWhenReceiveResumeCommand = false
         }
         audioClosable = true
@@ -166,7 +168,10 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                 }
 
                 AudioManager.AUDIOFOCUS_GAIN -> {
-                    if (!mediaPlayerGateway.getPlayWhenReady() && isForeground) {
+                    if (!mediaPlayerGateway.getPlayWhenReady()
+                        && isForeground
+                        && needPlayWhenReceiveResumeCommand
+                    ) {
                         setPlayWhenReady(true)
                     }
                 }
