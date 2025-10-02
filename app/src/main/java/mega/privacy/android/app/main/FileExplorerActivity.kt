@@ -2222,23 +2222,22 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         Timber.d("onNodesUpdate")
         cDriveExplorer?.let { cDriveExplorer ->
             if (cloudExplorerFragment != null) {
-                if (megaApi.getNodeByHandle(cDriveExplorer.parentHandle) != null) {
-                    nodes =
-                        megaApi.getChildren(megaApi.getNodeByHandle(parentHandle))
+                cDriveExplorer.lifecycleScope.launch {
+                    nodes = withContext(ioDispatcher) {
+                        if (megaApi.getNodeByHandle(cDriveExplorer.parentHandle) != null) {
+                            megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.parentHandle))
+                        } else {
+                            megaApi.rootNode?.let { rootNode ->
+                                parentHandle = rootNode.handle ?: INVALID_HANDLE
+                                megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.parentHandle))
+                            }
+                        }
+                    }
+
                     nodes?.let {
                         cDriveExplorer.updateNodesByAdapter(it)
                     }
                     cDriveExplorer.recyclerView.invalidate()
-                } else {
-                    if (megaApi.rootNode != null) {
-                        parentHandle = megaApi.rootNode?.handle ?: INVALID_HANDLE
-                        nodes =
-                            megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.parentHandle))
-                        nodes?.let {
-                            cDriveExplorer.updateNodesByAdapter(it)
-                        }
-                        cDriveExplorer.recyclerView.invalidate()
-                    }
                 }
             }
         }

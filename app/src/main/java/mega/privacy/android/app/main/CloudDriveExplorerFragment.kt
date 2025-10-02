@@ -575,8 +575,10 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
 
         setParentHandle(handle)
         originalData.clear()
-        updateNodesByAdapter(originalData)
-        recyclerView.scrollToPosition(0)
+        lifecycleScope.launch {
+            updateNodesByAdapter(originalData)
+            recyclerView.scrollToPosition(0)
+        }
 
         if (modeCloud == FileExplorerActivity.MOVE || modeCloud == FileExplorerActivity.COPY || modeCloud == FileExplorerActivity.SELECT)
             activateButton(true)
@@ -629,8 +631,11 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
                         activateButton(!selectFile)
 
                     setParentHandle(node.handle)
-                    updateNodesByAdapter(megaApi.getChildren(node, order))
-                    recyclerView.scrollToPosition(0)
+                    lifecycleScope.launch {
+                        val childNodes = withContext(ioDispatcher) { megaApi.getChildren(node, order) }
+                        updateNodesByAdapter(childNodes)
+                        recyclerView.scrollToPosition(0)
+                    }
 
                     if (modeCloud == FileExplorerActivity.MOVE || modeCloud == FileExplorerActivity.COPY) {
                         if (adapter.itemCount == 0) {
@@ -722,20 +727,23 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             binding.fileListEmptyImage.isVisible = false
             binding.fileListEmptyText.isVisible = false
 
-            updateNodesByAdapter(megaApi.getChildren(parentNode, order))
-            var lastVisiblePosition = 0
-            if (lastPositionStack.isNotEmpty()) {
-                lastVisiblePosition = lastPositionStack.pop()
-                Timber.d("Pop of the stack $lastVisiblePosition position")
-            }
-            Timber.d("Scroll to $lastVisiblePosition position")
+            lifecycleScope.launch {
+                val childNodes = withContext(ioDispatcher) { megaApi.getChildren(parentNode, order) }
+                updateNodesByAdapter(childNodes)
+                var lastVisiblePosition = 0
+                if (lastPositionStack.isNotEmpty()) {
+                    lastVisiblePosition = lastPositionStack.pop()
+                    Timber.d("Pop of the stack $lastVisiblePosition position")
+                }
+                Timber.d("Scroll to $lastVisiblePosition position")
 
-            if (lastVisiblePosition >= 0) {
-                if (sortByHeaderViewModel.isListView()) {
-                    listLayoutManager
-                } else {
-                    gridLayoutManager
-                }?.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                if (lastVisiblePosition >= 0) {
+                    if (sortByHeaderViewModel.isListView()) {
+                        listLayoutManager
+                    } else {
+                        gridLayoutManager
+                    }?.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                }
             }
             2
         }
@@ -755,12 +763,14 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
      *
      * @param sourceData original nodes
      */
-    fun updateNodesByAdapter(sourceData: List<MegaNode?>) {
+    suspend fun updateNodesByAdapter(sourceData: List<MegaNode?>) {
         val data = if (fileExplorerViewModel.showHiddenItems) {
             sourceData
         } else {
-            sourceData.filter {
-                it != null && !it.isMarkedSensitive && !megaApi.isSensitiveInherited(it)
+            withContext(ioDispatcher) {
+                sourceData.filter {
+                    it != null && !it.isMarkedSensitive && !megaApi.isSensitiveInherited(it)
+                }
             }
         }
         data.toList().let {
