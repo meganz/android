@@ -31,7 +31,6 @@ import mega.privacy.android.data.database.entity.LastPageViewedInPdfEntity
 import mega.privacy.android.data.database.entity.MediaPlaybackInfoEntity
 import mega.privacy.android.data.database.entity.PendingTransferEntity
 import mega.privacy.android.data.database.entity.VideoRecentlyWatchedEntity
-import mega.privacy.android.data.facade.MegaLocalRoomFacade.Companion.MAX_COMPLETED_TRANSFER_ROWS
 import mega.privacy.android.data.facade.MegaLocalRoomFacade.Companion.MAX_INSERT_LIST_SIZE
 import mega.privacy.android.data.mapper.MediaPlaybackInfoEntityMapper
 import mega.privacy.android.data.mapper.MediaPlaybackInfoMapper
@@ -81,6 +80,7 @@ import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.entity.transfer.pending.UpdateAlreadyTransferredFilesCount
 import mega.privacy.android.domain.entity.transfer.pending.UpdatePendingTransferState
+import mega.privacy.android.domain.repository.TransferRepository.Companion.MAX_COMPLETED_TRANSFERS
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -461,7 +461,7 @@ internal class MegaLocalRoomFacadeTest {
             ).forEach {
                 whenever(transferStateIntMapper(it)) doReturn it.ordinal
             }
-            whenever(completedTransferDao.getCompletedTransfersCount()) doReturn MAX_COMPLETED_TRANSFER_ROWS + 10
+            whenever(completedTransferDao.getCompletedTransfersCount()) doReturn MAX_COMPLETED_TRANSFERS + 10
 
             underTest.deleteOldestCompletedTransfers()
             listOf(
@@ -471,7 +471,7 @@ internal class MegaLocalRoomFacadeTest {
             ).forEach {
                 verify(completedTransferDao).deleteOldCompletedTransfersByState(
                     it.ordinal,
-                    MAX_COMPLETED_TRANSFER_ROWS
+                    MAX_COMPLETED_TRANSFERS
                 )
             }
         }

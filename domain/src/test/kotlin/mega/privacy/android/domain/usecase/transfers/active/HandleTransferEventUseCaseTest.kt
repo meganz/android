@@ -11,6 +11,7 @@ import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.repository.TransferRepository
+import mega.privacy.android.domain.repository.TransferRepository.Companion.MAX_COMPLETED_TRANSFERS
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -207,12 +208,41 @@ class HandleTransferEventUseCaseTest {
 
     @ParameterizedTest
     @MethodSource("provideFinishEvents")
+    fun `test that invoke call removeInProgressTransfers when the event is a finish event`(
+        transferEvent: TransferEvent.TransferFinishEvent,
+    ) = runTest {
+        underTest.invoke(transferEvent)
+        verify(transferRepository).removeInProgressTransfers(setOf(transferEvent.transfer.uniqueId))
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideFinishEvents")
     fun `test that invoke call addCompletedTransfers when the event is a finish event`(
         transferEvent: TransferEvent.TransferFinishEvent,
     ) = runTest {
         underTest.invoke(transferEvent)
         verify(transferRepository).addCompletedTransfers(eq(listOf(transferEvent)))
     }
+
+    @Test
+    fun `test that invoke call addCompletedTransfers with correct value when more than 100 events`() =
+        runTest {
+            val events = buildList {
+                for (i in 1..105) {
+                    add(
+                        mockTransferEvent<TransferEvent.TransferFinishEvent>(
+                            TransferType.DOWNLOAD,
+                            i.toLong()
+                        )
+                    )
+                }
+            }
+            val expected = events.takeLast(MAX_COMPLETED_TRANSFERS)
+
+            underTest.invoke(events = events.toTypedArray())
+
+            verify(transferRepository).addCompletedTransfers(eq(expected))
+        }
 
     @Test
     fun `test that invoke call addCompletedTransfers with all events when multiple events are send`() =

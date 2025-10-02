@@ -29,6 +29,10 @@ import kotlin.time.Instant
  */
 interface TransferRepository {
 
+    companion object {
+        const val MAX_COMPLETED_TRANSFERS = 100
+    }
+
     /**
      * Timestamp of the last transfer over quota event warned
      */

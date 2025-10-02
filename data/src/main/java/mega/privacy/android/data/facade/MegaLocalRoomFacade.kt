@@ -74,6 +74,7 @@ import mega.privacy.android.domain.entity.transfer.pending.UpdateAlreadyTransfer
 import mega.privacy.android.domain.entity.transfer.pending.UpdatePendingTransferRequest
 import mega.privacy.android.domain.entity.transfer.pending.UpdatePendingTransferState
 import mega.privacy.android.domain.entity.transfer.pending.UpdateScanningFoldersData
+import mega.privacy.android.domain.repository.TransferRepository.Companion.MAX_COMPLETED_TRANSFERS
 import javax.inject.Inject
 
 internal class MegaLocalRoomFacade @Inject constructor(
@@ -258,7 +259,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun deleteOldestCompletedTransfers() {
         val count = completedTransferDao.get().getCompletedTransfersCount()
-        if (count > MAX_COMPLETED_TRANSFER_ROWS) {
+        if (count > MAX_COMPLETED_TRANSFERS) {
             listOf(
                 TransferState.STATE_COMPLETED,
                 TransferState.STATE_CANCELLED,
@@ -267,7 +268,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
                 completedTransferDao.get()
                     .deleteOldCompletedTransfersByState(
                         transferStateIntMapper(it),
-                        MAX_COMPLETED_TRANSFER_ROWS
+                        MAX_COMPLETED_TRANSFERS
                     )
             }
         }
@@ -692,7 +693,6 @@ internal class MegaLocalRoomFacade @Inject constructor(
     }
 
     companion object {
-        internal const val MAX_COMPLETED_TRANSFER_ROWS = 100
         internal const val MAX_INSERT_LIST_SIZE = 200
     }
 }

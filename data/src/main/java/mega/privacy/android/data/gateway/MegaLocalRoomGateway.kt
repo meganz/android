@@ -1,7 +1,6 @@
 package mega.privacy.android.data.gateway
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.data.facade.MegaLocalRoomFacade.Companion.MAX_COMPLETED_TRANSFER_ROWS
 import mega.privacy.android.data.model.VideoRecentlyWatchedItem
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.Contact
@@ -23,6 +22,7 @@ import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.entity.transfer.pending.UpdatePendingTransferRequest
+import mega.privacy.android.domain.repository.TransferRepository.Companion.MAX_COMPLETED_TRANSFERS
 
 /**
  * Mega local room gateway
@@ -148,7 +148,7 @@ interface MegaLocalRoomGateway {
      * @param transferStates the transfer states to filter the completed transfers
      */
     fun getCompletedTransfersByStateWithLimit(
-        limit: Int = MAX_COMPLETED_TRANSFER_ROWS,
+        limit: Int = MAX_COMPLETED_TRANSFERS,
         vararg transferStates: TransferState,
     ): Flow<List<CompletedTransfer>>
 
