@@ -251,8 +251,10 @@ private fun MegaNavigationSuiteScaffoldLayout(
                     // Place content above the navigation component.
                     contentPlaceable.placeRelative(0, 0)
                     // Place the navigation component at the bottom of the screen with animated position.
-                    val navigationY = layoutHeight - animatedNavigationHeight
-                    navigationPlaceable.placeRelative(0, navigationY)
+                    if (animatedNavigationHeight > 0) {
+                        val navigationY = layoutHeight - animatedNavigationHeight
+                        navigationPlaceable.placeRelative(0, navigationY)
+                    }
                 } else {
                     // Place the navigation component at the start of the screen with animated position.
                     val navigationX = -navigationPlaceable.width + animatedNavigationWidth
