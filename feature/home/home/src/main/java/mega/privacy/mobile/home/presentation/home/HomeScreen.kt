@@ -43,7 +43,7 @@ internal fun HomeScreen(
                         .padding(paddingValues),
                     contentPadding = PaddingValues(bottom = 50.dp),
                 ) {
-                    items(state.widgets) {
+                    items(state.widgets, key = { it.identifier }) { it ->
                         it.content(Modifier, onNavigate)
                         Spacer(modifier = Modifier.height(8.dp))
                     }
