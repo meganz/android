@@ -31,6 +31,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.NavKey
+import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.button.PrimaryFilledButton
 import mega.android.core.ui.components.button.SecondaryFilledButton
@@ -54,7 +55,7 @@ import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.NotificationsNavKey
-import timber.log.Timber
+import mega.privacy.android.navigation.destination.TestPasswordNavKey
 
 @Composable
 fun MenuHomeScreen(
@@ -62,16 +63,30 @@ fun MenuHomeScreen(
     viewModel: MenuViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    MenuHomeScreenUi(uiState, navigateToFeature)
+    MenuHomeScreenUi(
+        uiState = uiState,
+        navigateToFeature = navigateToFeature,
+        onLogoutClicked = viewModel::logout,
+        onResetTestPasswordScreenEvent = viewModel::resetTestPasswordScreenEvent
+    )
 }
 
 @Composable
 fun MenuHomeScreenUi(
     uiState: MenuUiState,
     navigateToFeature: (NavKey) -> Unit,
+    onLogoutClicked: () -> Unit,
+    onResetTestPasswordScreenEvent: () -> Unit,
 ) {
     var isPrivacySuiteExpanded by rememberSaveable { mutableStateOf(true) }
     val context = LocalContext.current
+
+    EventEffect(
+        event = uiState.showTestPasswordScreenEvent,
+        onConsumed = onResetTestPasswordScreenEvent
+    ) {
+        navigateToFeature(TestPasswordNavKey(isLogoutMode = true))
+    }
 
     MegaScaffold(
         modifier = Modifier
@@ -177,8 +192,8 @@ fun MenuHomeScreenUi(
             }
 
             item {
-                LogoutButton {
-                    Timber.d("Logout button clicked")
+                LogoutButton(uiState.isLoggingOut) {
+                    onLogoutClicked()
                 }
             }
         }
@@ -267,7 +282,8 @@ private fun PrivacySuiteItem(
 
 @Composable
 private fun LogoutButton(
-    onLogout: () -> Unit,
+    isLoggingOut: Boolean,
+    onLogoutClicked: () -> Unit,
 ) {
     SecondaryFilledButton(
         modifier = Modifier
@@ -275,7 +291,8 @@ private fun LogoutButton(
             .padding(vertical = 16.dp)
             .testTag(LOGOUT_BUTTON),
         text = "Log out",
-        onClick = onLogout
+        onClick = onLogoutClicked,
+        isLoading = isLoggingOut
     )
 }
 

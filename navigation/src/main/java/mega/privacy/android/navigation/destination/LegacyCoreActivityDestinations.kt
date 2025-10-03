@@ -62,3 +62,10 @@ data class SearchNodeNavKey(
     val nodeSourceType: NodeSourceType,
     val parentHandle: Long,
 ) : NavKey
+
+@Serializable
+data class TestPasswordNavKey(
+    val wrongPasswordCounter: Int = 0,
+    val isTestPasswordMode: Boolean = false,
+    val isLogoutMode: Boolean = false,
+) : NavKey

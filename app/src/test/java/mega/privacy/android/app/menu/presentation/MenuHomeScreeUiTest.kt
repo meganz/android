@@ -11,9 +11,12 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.navigation3.runtime.NavKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.parcelize.Parcelize
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.ACCOUNT_ITEM
@@ -27,6 +30,10 @@ import mega.privacy.android.navigation.contract.NavDrawerItem
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 class MenuHomeScreeUiTest {
@@ -67,12 +74,16 @@ class MenuHomeScreeUiTest {
 
     private fun setupRule(
         uiState: MenuUiState = createDefaultMenuUiState(),
-        navigateToFeature: (Any) -> Unit = {},
+        navigateToFeature: (NavKey) -> Unit = {},
+        onLogoutClicked: () -> Unit = {},
+        onResetTestPasswordScreenEvent: () -> Unit = {},
     ) {
         composeRule.setContent {
             MenuHomeScreenUi(
                 uiState = uiState,
-                navigateToFeature = navigateToFeature
+                navigateToFeature = navigateToFeature,
+                onLogoutClicked = onLogoutClicked,
+                onResetTestPasswordScreenEvent = onResetTestPasswordScreenEvent
             )
         }
     }
@@ -84,7 +95,9 @@ class MenuHomeScreeUiTest {
         name = "Test User",
         avatar = null,
         avatarColor = Color.Blue,
-        isConnectedToNetwork = true
+        isConnectedToNetwork = true,
+        showTestPasswordScreenEvent = consumed,
+        showLogoutConfirmationEvent = consumed
     )
 
     @Test
@@ -159,5 +172,57 @@ class MenuHomeScreeUiTest {
         composeRule.onNodeWithTag(MY_ACCOUNT_ITEM).assertIsDisplayed()
         composeRule.onNodeWithTag(PRIVACY_SUITE_HEADER).performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag(LOGOUT_BUTTON).performScrollTo().assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that logout button click triggers logout callback`() {
+        val onLogoutClicked = mock<() -> Unit>()
+        setupRule(
+            uiState = createDefaultMenuUiState().copy(
+                privacySuiteItems = emptyMap()
+            ), onLogoutClicked = onLogoutClicked
+
+        )
+        composeRule.onNodeWithTag(LOGOUT_BUTTON).performScrollTo().performClick()
+        verify(onLogoutClicked).invoke()
+    }
+
+    @Test
+    fun `test that test password screen event triggers navigation and reset callback`() {
+        val navigateToFeature = mock<(NavKey) -> Unit>()
+        val onResetTestPasswordScreenEvent = mock<() -> Unit>()
+
+        setupRule(
+            uiState = createDefaultMenuUiState().copy(
+                showTestPasswordScreenEvent = triggered
+            ),
+            navigateToFeature = navigateToFeature,
+            onResetTestPasswordScreenEvent = onResetTestPasswordScreenEvent
+        )
+
+        // Wait for the event to be processed
+        composeRule.waitForIdle()
+
+        verify(navigateToFeature).invoke(any())
+        verify(onResetTestPasswordScreenEvent).invoke()
+    }
+
+    @Test
+    fun `test that consumed test password screen event does not trigger navigation or reset callback`() {
+        val navigateToFeature = mock<(NavKey) -> Unit>()
+        val onResetTestPasswordScreenEvent = mock<() -> Unit>()
+
+        setupRule(
+            uiState = createDefaultMenuUiState().copy(
+                showTestPasswordScreenEvent = consumed
+            ),
+            navigateToFeature = navigateToFeature,
+            onResetTestPasswordScreenEvent = onResetTestPasswordScreenEvent
+        )
+
+        composeRule.waitForIdle()
+
+        verify(navigateToFeature, never()).invoke(any())
+        verify(onResetTestPasswordScreenEvent, never()).invoke()
     }
 } 

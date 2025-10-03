@@ -7,6 +7,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation3.runtime.NavKey
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
@@ -37,6 +39,7 @@ import mega.privacy.android.domain.usecase.account.IsAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import org.junit.jupiter.api.AfterAll
@@ -72,6 +75,7 @@ class MenuViewModelTest {
     private val getCurrentUserEmail = mock<GetCurrentUserEmail>()
     private val monitorUserUpdates = mock<MonitorUserUpdates>()
     private val isAchievementsEnabledUseCase = mock<IsAchievementsEnabledUseCase>()
+    private val checkPasswordReminderUseCase = mock<CheckPasswordReminderUseCase>()
     private val ioDispatcher = UnconfinedTestDispatcher()
 
     private object TestDestination : NavKey
@@ -100,7 +104,8 @@ class MenuViewModelTest {
             getUserFullNameUseCase,
             getCurrentUserEmail,
             monitorUserUpdates,
-            isAchievementsEnabledUseCase
+            isAchievementsEnabledUseCase,
+            checkPasswordReminderUseCase
         )
     }
 
@@ -533,6 +538,7 @@ class MenuViewModelTest {
             getCurrentUserEmail = getCurrentUserEmail,
             monitorUserUpdates = monitorUserUpdates,
             isAchievementsEnabledUseCase = isAchievementsEnabledUseCase,
+            checkPasswordReminderUseCase = checkPasswordReminderUseCase,
             ioDispatcher = ioDispatcher,
         )
     }
@@ -844,4 +850,109 @@ class MenuViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that logout triggers test password screen event when password reminder is required`() = runTest {
+        stubDefaultDependencies()
+        whenever(checkPasswordReminderUseCase(true)).thenReturn(true)
+        initUnderTest()
+
+        underTest.logout()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.showTestPasswordScreenEvent).isEqualTo(triggered)
+            assertThat(state.showLogoutConfirmationEvent).isEqualTo(consumed)
+            verify(checkPasswordReminderUseCase).invoke(true)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that logout triggers logout confirmation event when password reminder is not required`() = runTest {
+        stubDefaultDependencies()
+        whenever(checkPasswordReminderUseCase(true)).thenReturn(false)
+        initUnderTest()
+
+        underTest.logout()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.showTestPasswordScreenEvent).isEqualTo(consumed)
+            assertThat(state.showLogoutConfirmationEvent).isEqualTo(triggered)
+            verify(checkPasswordReminderUseCase).invoke(true)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that logout handles password reminder check failure gracefully`() = runTest {
+        stubDefaultDependencies()
+        whenever(checkPasswordReminderUseCase(true)).thenThrow(RuntimeException("Password check failed"))
+        initUnderTest()
+
+        underTest.logout()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            // Should not trigger any events on failure
+            assertThat(state.showTestPasswordScreenEvent).isEqualTo(consumed)
+            assertThat(state.showLogoutConfirmationEvent).isEqualTo(consumed)
+            verify(checkPasswordReminderUseCase).invoke(true)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that resetTestPasswordScreenEvent updates state correctly`() = runTest {
+        stubDefaultDependencies()
+        initUnderTest()
+
+        // First, trigger the test password screen event
+        whenever(checkPasswordReminderUseCase(true)).thenReturn(true)
+        underTest.logout()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.showTestPasswordScreenEvent).isEqualTo(triggered)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // Now reset the event
+        underTest.resetTestPasswordScreenEvent()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.showTestPasswordScreenEvent).isEqualTo(consumed)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that resetTestPasswordScreenEvent works when event is already consumed`() = runTest {
+        stubDefaultDependencies()
+        initUnderTest()
+
+        // Reset the event when it's already consumed
+        underTest.resetTestPasswordScreenEvent()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.showTestPasswordScreenEvent).isEqualTo(consumed)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that initial state has correct default event values`() = runTest {
+        stubDefaultDependencies()
+        initUnderTest()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.showTestPasswordScreenEvent).isEqualTo(consumed)
+            assertThat(state.showLogoutConfirmationEvent).isEqualTo(consumed)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 } 

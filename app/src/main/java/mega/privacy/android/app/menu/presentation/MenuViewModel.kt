@@ -4,6 +4,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,6 +35,7 @@ import mega.privacy.android.domain.usecase.account.IsAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import timber.log.Timber
@@ -53,6 +56,7 @@ class MenuViewModel @Inject constructor(
     private val getCurrentUserEmail: GetCurrentUserEmail,
     private val monitorUserUpdates: MonitorUserUpdates,
     private val isAchievementsEnabledUseCase: IsAchievementsEnabledUseCase,
+    private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     // Flows for items that need dynamic subtitles
@@ -240,6 +244,33 @@ class MenuViewModel @Inject constructor(
             _uiState.update {
                 it.copy(email = runCatching { getCurrentUserEmail() }.getOrNull())
             }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoggingOut = true) }
+            runCatching { checkPasswordReminderUseCase(true) }
+                .onSuccess { show ->
+                    if (show) {
+                        _uiState.update {
+                            it.copy(showTestPasswordScreenEvent = triggered, isLoggingOut = false)
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(showLogoutConfirmationEvent = triggered, isLoggingOut = false)
+                        }
+                    }
+                }.onFailure { error ->
+                    Timber.e(error, "Error checking password reminder requirement")
+                    _uiState.update { it.copy(isLoggingOut = false) }
+                }
+        }
+    }
+
+    fun resetTestPasswordScreenEvent() {
+        _uiState.update {
+            it.copy(showTestPasswordScreenEvent = consumed)
         }
     }
 }
