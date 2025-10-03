@@ -25,6 +25,7 @@ import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.clouddrive.R
@@ -37,8 +38,9 @@ import mega.privacy.android.navigation.destination.CloudDriveNavKey
 @Composable
 fun IncomingSharesContent(
     uiState: IncomingSharesUiState,
-    onAction: (IncomingSharesAction) -> Unit,
     navigationHandler: NavigationHandler,
+    onAction: (IncomingSharesAction) -> Unit,
+    onShowNodeOptions: (NodeId) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     listState: LazyListState = rememberLazyListState(),
@@ -95,15 +97,13 @@ fun IncomingSharesContent(
                 isNextPageLoading = false,
                 isHiddenNodesEnabled = false,
                 showHiddenNodes = true,
-                onMenuClicked = { }, // TODO
-                onItemClicked = { onAction(IncomingSharesAction.ItemClicked(it)) }, // TODO
-                onLongClicked = { onAction(IncomingSharesAction.ItemLongClicked(it)) }, // TODO
+                onMenuClicked = { onShowNodeOptions(it.id) },
+                onItemClicked = { onAction(IncomingSharesAction.ItemClicked(it)) },
+                onLongClicked = { onAction(IncomingSharesAction.ItemLongClicked(it)) },
                 sortConfiguration = uiState.selectedSortConfiguration,
                 isListView = isListView,
                 onSortOrderClick = { }, // TODO
                 onChangeViewTypeClicked = { onAction(IncomingSharesAction.ChangeViewTypeClicked) },
-                showMediaDiscoveryButton = false,
-                onEnterMediaDiscoveryClick = { }, // TODO
                 inSelectionMode = uiState.isInSelectionMode,
             )
         }

@@ -50,6 +50,7 @@ import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaBannerM3
 import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
 import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.NewFolderNodeDialog
+import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
 import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
 import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
@@ -79,6 +80,7 @@ import mega.privacy.android.feature.clouddrive.presentation.upload.UploadingFile
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.camera.CameraArg
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.MediaDiscoveryNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
@@ -94,11 +96,8 @@ internal fun CloudDriveContent(
     showUploadOptionsBottomSheet: Boolean,
     onDismissUploadOptionsBottomSheet: () -> Unit,
     onAction: (CloudDriveAction) -> Unit,
-    onNavigateToFolder: (NodeId, String?) -> Unit,
     onNavigateBack: () -> Unit,
-    onCreatedNewFolder: (NodeId) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
-    onRenameNode: (NodeId) -> Unit,
     onSortNodes: (NodeSortConfiguration) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp, 0.dp),
@@ -122,7 +121,6 @@ internal fun CloudDriveContent(
     var uploadUris by rememberSaveable { mutableStateOf(emptyList<Uri>()) }
     var isUploadFolder by rememberSaveable { mutableStateOf(false) }
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
-    val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val internalFolderPickerLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             val intent = it.data
@@ -250,7 +248,7 @@ internal fun CloudDriveContent(
     }
 
     EventEffect(
-        event = nodeOptionsActionUiState.downloadEvent,
+        event = nodeActionState.downloadEvent,
         onConsumed = nodeOptionsActionViewModel::markDownloadEventConsumed,
         action = onTransfer
     )
@@ -280,7 +278,7 @@ internal fun CloudDriveContent(
         event = nodeActionState.renameNodeRequestEvent,
         onConsumed = nodeOptionsActionViewModel::resetRenameNodeRequest,
         action = { nodeId ->
-            onRenameNode(nodeId)
+            navigationHandler.navigate(RenameNodeDialogNavKey(nodeId = nodeId.longValue))
         }
     )
 
@@ -369,7 +367,12 @@ internal fun CloudDriveContent(
             event = uiState.navigateToFolderEvent,
             onConsumed = { onAction(NavigateToFolderEventConsumed) }
         ) { node ->
-            onNavigateToFolder(node.id, node.name)
+            navigationHandler.navigate(
+                CloudDriveNavKey(
+                    nodeHandle = node.id.longValue,
+                    nodeName = node.name
+                )
+            )
         }
 
         EventEffect(
@@ -457,7 +460,12 @@ internal fun CloudDriveContent(
                     showNewFolderDialog = false
                     coroutineScope.launch {
                         if (folderId != null) {
-                            onCreatedNewFolder(folderId)
+                            navigationHandler.navigate(
+                                CloudDriveNavKey(
+                                    nodeHandle = folderId.longValue,
+                                    isNewFolder = true
+                                )
+                            )
                         } else {
                             snackbarHostState?.showAutoDurationSnackbar(context.getString(R.string.context_folder_no_created))
                         }

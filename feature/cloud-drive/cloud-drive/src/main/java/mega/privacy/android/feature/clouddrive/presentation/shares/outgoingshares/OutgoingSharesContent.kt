@@ -25,6 +25,7 @@ import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.clouddrive.R
@@ -37,8 +38,9 @@ import mega.privacy.android.navigation.destination.CloudDriveNavKey
 @Composable
 fun OutgoingSharesContent(
     uiState: OutgoingSharesUiState,
-    onAction: (OutgoingSharesAction) -> Unit,
     navigationHandler: NavigationHandler,
+    onAction: (OutgoingSharesAction) -> Unit,
+    onShowNodeOptions: (NodeId) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     listState: LazyListState = rememberLazyListState(),
@@ -57,7 +59,6 @@ fun OutgoingSharesContent(
     }
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
-
     Column(
         modifier = modifier
             .padding(top = contentPadding.calculateTopPadding()),
@@ -95,15 +96,13 @@ fun OutgoingSharesContent(
                 isNextPageLoading = false,
                 isHiddenNodesEnabled = false,
                 showHiddenNodes = true,
-                onMenuClicked = { }, // TODO
-                onItemClicked = { onAction(OutgoingSharesAction.ItemClicked(it)) }, // TODO
-                onLongClicked = { onAction(OutgoingSharesAction.ItemLongClicked(it)) }, // TODO
+                onMenuClicked = { onShowNodeOptions(it.id) },
+                onItemClicked = { onAction(OutgoingSharesAction.ItemClicked(it)) },
+                onLongClicked = { onAction(OutgoingSharesAction.ItemLongClicked(it)) },
                 sortConfiguration = uiState.selectedSortConfiguration,
                 isListView = isListView,
                 onSortOrderClick = { }, // TODO
                 onChangeViewTypeClicked = { onAction(OutgoingSharesAction.ChangeViewTypeClicked) },
-                showMediaDiscoveryButton = false,
-                onEnterMediaDiscoveryClick = { }, // TODO
                 inSelectionMode = uiState.isInSelectionMode,
             )
         }

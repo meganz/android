@@ -5,7 +5,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveViewModel
@@ -16,11 +15,8 @@ data object DriveSync : NavKey
 
 fun NavGraphBuilder.driveSyncScreen(
     navigationHandler: NavigationHandler,
-    onNavigateToFolder: (NodeId, String?) -> Unit,
-    onCreatedNewFolder: (NodeId) -> Unit,
     setNavigationVisibility: (Boolean) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
-    onRenameNode: (NodeId) -> Unit,
     openSearch: (Boolean, Long, NodeSourceType) -> Unit,
 ) {
     composable<DriveSync> {
@@ -30,11 +26,8 @@ fun NavGraphBuilder.driveSyncScreen(
             navigationHandler = navigationHandler,
             viewModel = viewModel,
             cloudDriveViewModel = cloudDriveViewModel,
-            onNavigateToFolder = onNavigateToFolder,
-            onCreatedNewFolder = onCreatedNewFolder,
             setNavigationItemVisibility = setNavigationVisibility,
             onTransfer = onTransfer,
-            onRenameNode = onRenameNode,
             openSearch = openSearch
         )
     }

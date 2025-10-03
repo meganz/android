@@ -5,7 +5,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
 import mega.privacy.android.feature.clouddrive.presentation.drivesync.DriveSync
 import mega.privacy.android.feature.clouddrive.presentation.drivesync.driveSyncScreen
 import mega.privacy.android.icon.pack.IconPack
@@ -14,7 +13,6 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.android.navigation.contract.TransferHandler
-import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.SearchNodeNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
@@ -26,29 +24,8 @@ class DriveSyncNavItem : MainNavItem {
         { navigationHandler, navigationController, transferHandler ->
             driveSyncScreen(
                 navigationHandler = navigationHandler,
-                onNavigateToFolder = { nodeId, name ->
-                    navigationHandler.navigate(
-                        CloudDriveNavKey(
-                            nodeHandle = nodeId.longValue,
-                            nodeName = name
-                        )
-                    )
-                },
-                onCreatedNewFolder = { nodeId ->
-                    navigationHandler.navigate(
-                        CloudDriveNavKey(
-                            nodeHandle = nodeId.longValue,
-                            isNewFolder = true
-                        )
-                    )
-                },
                 setNavigationVisibility = navigationController::showNavigation,
                 onTransfer = transferHandler::setTransferEvent,
-                onRenameNode = { nodeId ->
-                    navigationHandler.navigate(
-                        RenameNodeDialogNavKey(nodeId = nodeId.longValue)
-                    )
-                },
                 openSearch = { isFirstNavigationLevel, parentHandle, nodeSourceType ->
                     navigationHandler.navigate(
                         SearchNodeNavKey(

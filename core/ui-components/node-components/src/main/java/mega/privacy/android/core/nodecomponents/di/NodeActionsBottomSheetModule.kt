@@ -6,7 +6,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.AvailableOfflineBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.CopyBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.DeletePermanentlyBottomSheetMenuItem
@@ -38,6 +37,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuitem.UnhideBottomSheetM
 import mega.privacy.android.core.nodecomponents.menu.menuitem.VerifyBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.VersionsBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.ViewInFolderBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.qualifier.features.Backups
 import mega.privacy.android.domain.qualifier.features.CloudDrive
 import mega.privacy.android.domain.qualifier.features.IncomingShares
@@ -155,7 +155,6 @@ abstract class NodeActionsBottomSheetModule {
             leaveShareMenuAction: LeaveShareBottomSheetMenuItem,
             manageLinkMenuAction: ManageLinkBottomSheetMenuItem,
             manageShareFolderBottomSheetMenuItem: ManageShareFolderBottomSheetMenuItem,
-            moveMenuAction: MoveBottomSheetMenuItem,
             openLocationMenuAction: OpenLocationBottomSheetMenuItem,
             openWithMenuAction: OpenWithBottomSheetMenuItem,
             removeLinkMenuAction: RemoveLinkBottomSheetMenuItem,
@@ -186,7 +185,6 @@ abstract class NodeActionsBottomSheetModule {
                 leaveShareMenuAction,
                 manageLinkMenuAction,
                 manageShareFolderBottomSheetMenuItem,
-                moveMenuAction,
                 openLocationMenuAction,
                 openWithMenuAction,
                 removeLinkMenuAction,

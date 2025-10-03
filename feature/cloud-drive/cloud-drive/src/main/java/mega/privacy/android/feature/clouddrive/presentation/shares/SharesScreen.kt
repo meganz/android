@@ -1,16 +1,22 @@
 package mega.privacy.android.feature.clouddrive.presentation.shares
 
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -21,20 +27,31 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.StateEventWithContentTriggered
+import kotlinx.coroutines.launch
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.sheets.MegaModalBottomSheet
+import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.components.tabs.MegaScrollableTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.model.TabItems
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
+import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetRoute
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.HandleNodeOptionEvent
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesContent
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesViewModel
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.model.IncomingSharesAction
@@ -43,6 +60,7 @@ import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshare
 import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.model.OutgoingSharesAction
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
+import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 
 /**
  * Shares screen containing incoming shares, outgoing shares and links tabs
@@ -57,8 +75,10 @@ internal fun SharesScreen(
     outgoingSharesViewModel: OutgoingSharesViewModel = hiltViewModel(),
 ) {
     val megaNavigator = rememberMegaNavigator()
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = LocalSnackBarHostState.current
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
-    val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
+    val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val nodeActionHandler = rememberNodeActionHandler(
         navigationHandler = navigationHandler,
         viewModel = nodeOptionsActionViewModel,
@@ -66,6 +86,10 @@ internal fun SharesScreen(
     )
     val incomingSharesUiState by incomingSharesViewModel.uiState.collectAsStateWithLifecycle()
     val outgoingSharesUiState by outgoingSharesViewModel.uiState.collectAsStateWithLifecycle()
+
+    // Node options modal state
+    var visibleNodeOptionId by remember { mutableStateOf<NodeId?>(null) }
+    val nodeOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 
     val (isInSelectionMode, selectedItemsCount) = when (selectedTabIndex) {
         0 -> incomingSharesUiState.isInSelectionMode to incomingSharesUiState.selectedItemsCount
@@ -97,6 +121,12 @@ internal fun SharesScreen(
         }
     } else {
         emptyList()
+    }
+
+    fun getNodeSourceType() = when (selectedTabIndex) {
+        0 -> NodeSourceType.INCOMING_SHARES
+        1 -> NodeSourceType.OUTGOING_SHARES
+        else -> NodeSourceType.LINKS
     }
 
     BackHandler(enabled = isInSelectionMode) {
@@ -134,9 +164,9 @@ internal fun SharesScreen(
         },
         bottomBar = {
             NodeSelectionModeBottomBar(
-                availableActions = nodeOptionsActionUiState.availableActions,
-                visibleActions = nodeOptionsActionUiState.visibleActions,
-                visible = nodeOptionsActionUiState.visibleActions.isNotEmpty() && isInSelectionMode,
+                availableActions = nodeActionState.availableActions,
+                visibleActions = nodeActionState.visibleActions,
+                visible = nodeActionState.visibleActions.isNotEmpty() && isInSelectionMode,
                 nodeActionHandler = nodeActionHandler,
                 selectedNodes = getSelectedNodes(),
                 isSelecting = false
@@ -157,8 +187,9 @@ internal fun SharesScreen(
                     IncomingSharesContent(
                         modifier = modifier,
                         uiState = incomingSharesUiState,
-                        onAction = incomingSharesViewModel::processAction,
                         navigationHandler = navigationHandler,
+                        onAction = incomingSharesViewModel::processAction,
+                        onShowNodeOptions = { visibleNodeOptionId = it }
                     )
                 }
                 addTextTabWithScrollableContent(
@@ -167,8 +198,9 @@ internal fun SharesScreen(
                     OutgoingSharesContent(
                         modifier = modifier,
                         uiState = outgoingSharesUiState,
+                        navigationHandler = navigationHandler,
                         onAction = outgoingSharesViewModel::processAction,
-                        navigationHandler = navigationHandler
+                        onShowNodeOptions = { visibleNodeOptionId = it }
                     )
                 }
                 addTextTabWithScrollableContent(
@@ -193,16 +225,98 @@ internal fun SharesScreen(
         )
     }
 
-    EventEffect(
-        event = nodeOptionsActionUiState.downloadEvent,
-        onConsumed = nodeOptionsActionViewModel::markDownloadEventConsumed,
-        action = onTransfer
+    val megaResultContract = rememberMegaResultContract()
+    val nameCollisionLauncher = rememberLauncherForActivityResult(
+        contract = megaResultContract.nameCollisionActivityContract
+    ) { message ->
+        if (!message.isNullOrEmpty()) {
+            coroutineScope.launch {
+                snackbarHostState?.showAutoDurationSnackbar(message)
+            }
+        }
+    }
+    HandleNodeOptionEvent(
+        megaNavigator = megaNavigator,
+        nodeActionState = nodeActionState,
+        nameCollisionLauncher = nameCollisionLauncher,
+        snackbarHostState = snackbarHostState,
+        onNodeNameCollisionResultHandled = nodeOptionsActionViewModel::markHandleNodeNameCollisionResult,
+        onInfoToShowEventConsumed = nodeOptionsActionViewModel::onInfoToShowEventConsumed,
+        onForeignNodeDialogShown = nodeOptionsActionViewModel::markForeignNodeDialogShown,
+        onQuotaDialogShown = nodeOptionsActionViewModel::markQuotaDialogShown,
+        onHandleNodesWithoutConflict = { collisionType, nodes ->
+            when (collisionType) {
+                NodeNameCollisionType.MOVE -> nodeOptionsActionViewModel.moveNodes(nodes)
+                NodeNameCollisionType.COPY -> nodeOptionsActionViewModel.copyNodes(nodes)
+                else -> { /* No-op for other types */ }
+            }
+        },
     )
 
     LaunchedEffect(selectedItemsCount) {
         nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
-            getSelectedNodes().toSet(),
-            NodeSourceType.CLOUD_DRIVE
+            selectedNodes = getSelectedNodes().toSet(),
+            nodeSourceType = getNodeSourceType()
         )
+    }
+
+    EventEffect(
+        event = nodeActionState.downloadEvent,
+        onConsumed = nodeOptionsActionViewModel::markDownloadEventConsumed,
+        action = onTransfer
+    )
+
+    // Reset selection mode after handling move, copy, delete action
+    LaunchedEffect(nodeActionState.infoToShowEvent) {
+        if (nodeActionState.infoToShowEvent is StateEventWithContentTriggered) {
+            deselectAllItems()
+        }
+    }
+
+    // Reset selection mode after handling name collision
+    LaunchedEffect(nodeActionState.nodeNameCollisionsResult) {
+        if (nodeActionState.nodeNameCollisionsResult is StateEventWithContentTriggered) {
+            deselectAllItems()
+        }
+    }
+
+    EventEffect(
+        event = nodeActionState.renameNodeRequestEvent,
+        onConsumed = nodeOptionsActionViewModel::resetRenameNodeRequest,
+        action = { nodeId ->
+            navigationHandler.navigate(RenameNodeDialogNavKey(nodeId = nodeId.longValue))
+        }
+    )
+
+    // Node options modal
+    LaunchedEffect(visibleNodeOptionId) {
+        if (visibleNodeOptionId != null) {
+            nodeOptionSheetState.show()
+        } else {
+            nodeOptionSheetState.hide()
+        }
+    }
+    // Todo: We will remove this, and replace it with NavigationHandler
+    visibleNodeOptionId?.let { nodeId ->
+        MegaModalBottomSheet(
+            modifier = Modifier.statusBarsPadding(),
+            sheetState = nodeOptionSheetState,
+            onDismissRequest = {
+                visibleNodeOptionId = null
+            },
+            bottomSheetBackground = MegaModalBottomSheetBackground.Surface1
+        ) {
+            NodeOptionsBottomSheetRoute(
+                navigationHandler = navigationHandler,
+                onDismiss = {
+                    visibleNodeOptionId = null
+                },
+                nodeId = nodeId.longValue,
+                nodeSourceType = getNodeSourceType(),
+                onTransfer = onTransfer,
+                actionHandler = nodeActionHandler,
+                nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            )
+        }
     }
 }

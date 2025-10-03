@@ -34,7 +34,6 @@ import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -48,13 +47,12 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.Clou
 import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetViewM3
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Drive Sync Screen, shown in the Drive bottom navigation tab
  *
- * @param onNavigateToFolder Callback to navigate to a specific folder, accepts NodeId and an optional name for folder title
- * @param onCreatedNewFolder Callback to be invoked when a new folder is created, accepts NodeId of the new folder
  * @param setNavigationItemVisibility Callback to set the visibility of the navigation item
  * @param viewModel ViewModel for managing the state of the Drive Sync screen
  */
@@ -62,11 +60,8 @@ import mega.privacy.android.shared.resources.R as sharedR
 @Composable
 internal fun DriveSyncScreen(
     navigationHandler: NavigationHandler,
-    onNavigateToFolder: (NodeId, String?) -> Unit,
-    onCreatedNewFolder: (NodeId) -> Unit,
     setNavigationItemVisibility: (Boolean) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
-    onRenameNode: (NodeId) -> Unit,
     openSearch: (Boolean, Long, NodeSourceType) -> Unit,
     viewModel: DriveSyncViewModel = hiltViewModel(),
     cloudDriveViewModel: CloudDriveViewModel = hiltViewModel(),
@@ -169,15 +164,12 @@ internal fun DriveSyncScreen(
                         ),
                         uiState = cloudDriveUiState,
                         onAction = cloudDriveViewModel::processAction,
-                        onNavigateToFolder = onNavigateToFolder,
                         onNavigateBack = { }, // Ignore back navigation in this tab
                         onTransfer = onTransfer,
-                        onCreatedNewFolder = onCreatedNewFolder,
                         showUploadOptionsBottomSheet = showUploadOptionsBottomSheet,
                         onDismissUploadOptionsBottomSheet = {
                             showUploadOptionsBottomSheet = false
                         },
-                        onRenameNode = onRenameNode,
                         onSortNodes = cloudDriveViewModel::setCloudSortOrder,
                         nodeOptionsActionViewModel = nodeOptionsActionViewModel,
                         nodeActionHandler = nodeActionHandler,
@@ -212,7 +204,7 @@ internal fun DriveSyncScreen(
                             megaNavigator.openUpgradeAccount(context)
                         },
                         onOpenMegaFolderClicked = { handle ->
-                            onNavigateToFolder(NodeId(handle), null)
+                            navigationHandler.navigate(CloudDriveNavKey(nodeHandle = handle))
                         },
                         onCameraUploadsSettingsClicked = {
                             megaNavigator.openSettingsCameraUploads(context)
