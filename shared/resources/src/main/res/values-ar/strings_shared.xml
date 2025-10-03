@@ -1250,9 +1250,9 @@
     <!-- text of how it works for mega pass free trial in achivements section -->
     <string name="text_how_it_works_mega_pass_free_trial">قم بتثبيت تطبيق ميغا باس MEGA&#160;Pass، قم بتسجيل الدخول باستخدام حساب ميغا MEGA الخاص بك وابدأ الفترة التجريبية المجانية. تتم إضافة مساحة تخزين المكافأة تلقائيًا بعد بدء الفترة التجريبية المجانية.</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">لقد استلمت %1$s من مساحة التخزين لبدء تشغيل الفترة التجريبية المجانية من ميغا في بي إن MEGA&#160;VPN</string>
+    <string name="text_received_mega_vpn_free_trial">You’ve received %1$s extra storage space for starting a MEGA&#160;VPN free trial</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">لقد استلمت %1$s من مساحة التخزين لبدء تشغيل الفترة التجريبية المجانية من ميغا باس MEGA&#160;Pass</string>
+    <string name="text_received_mega_pass_free_trial">You’ve received %1$s extra storage space for starting a MEGA&#160;Pass free trial</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">بعض المجلدات غير قادرة على المزامنة أو النسخ الاحتياطي لأن تطبيق ميغا MEGA فقد الأذونات للوصول إلى المجلدات المحلية. انقر فوق استئناف لإعادة إضافة الأذونات لكل مجلد متأثر.</string>
     <!-- Title for the free plan card when the user is an existing account -->
@@ -1834,4 +1834,12 @@
         <item quantity="many">لم تتم استعادة %d عنصراً</item>
         <item quantity="other">لم تتم استعادة %d عنصر</item>
     </plurals>
+    <!--header for the Camera Uploads transfer in progress items -->
+    <string name="camera_uploads_tranfer_header_in_progress">قيد الإنجاز</string>
+    <!--header for the Camera Uploads transfer in queue items -->
+    <string name="camera_uploads_tranfer_header_in_queue">Queueing</string>
+    <!--Title for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_title">All caught up</string>
+    <!--description for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_description">New photos and videos will appear here after you take them</string>
 </resources>

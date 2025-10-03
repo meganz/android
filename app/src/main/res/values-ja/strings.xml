@@ -1198,7 +1198,7 @@
     <!-- title of the section for unlocked storage quota -->
     <string name="unlocked_storage_title">ストレージ容量</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_referral_bonuses">招待ボーナス</string>
+    <string name="title_referral_bonuses">友人や知り合いをMEGAに招待</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">当社のモバイルアプリをインストール</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
@@ -1224,9 +1224,9 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">メールアドレスの形式が間違っています</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">あなたは当社のMEGAデスクトップアプリのインストールに対して、%1$sのストレージスペースを受け取りました。</string>
+    <string name="result_paragraph_info_achievement_install_desktop">当社のデスクトップ アプリをインストールすると、%1$sの追加ストレージ容量が付与されます</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">あなたはMEGAモバイルアプリのインストールに対して、%1$sのストレージスペースを受け取りました。</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">当社のモバイルアプリをインストールすると、%1$sの追加ストレージ容量が付与されます</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">無料サインアップボーナスとして%1$sのストレージスペースを受け取りました。</string>
     <!-- menu items -->

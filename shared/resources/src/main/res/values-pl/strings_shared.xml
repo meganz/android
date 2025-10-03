@@ -1216,9 +1216,9 @@
     <!-- text of how it works for mega pass free trial in achivements section -->
     <string name="text_how_it_works_mega_pass_free_trial">Zainstaluj aplikację MEGA&#160;Pass, zaloguj się na swoje konto MEGA i rozpocznij darmowy okres próbny. Dodatkowa pojemność zostanie automatycznie dodana po rozpoczęciu darmowego okresu próbnego.</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">Otrzymałeś %1$s pojemności za rozpoczęcie darmowego okresu próbnego MEGA&#160;VPN</string>
+    <string name="text_received_mega_vpn_free_trial">Otrzymałeś %1$s dodatkowej pojemności za rozpoczęcie darmowego okresu próbnego MEGA&#160;VPN</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">Otrzymałeś %1$s pojemności za rozpoczęcie darmowego okresu próbnego MEGA&#160;Pass</string>
+    <string name="text_received_mega_pass_free_trial">You’ve received %1$s extra storage space for starting a MEGA&#160;Pass free trial</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">Niektóre katalogi nie mogą być synchronizowane ani tworzone kopie zapasowe, ponieważ aplikacja MEGA utraciła uprawnienia do dostępu do lokalnych katalogów. Kliknij Wznów, aby ponownie dodać uprawnienia dla każdego dotkniętego katalogu.</string>
     <!-- Title for the free plan card when the user is an existing account -->
@@ -1758,4 +1758,12 @@
         <item quantity="many">%d elementów nie zostało odzyskanych</item>
         <item quantity="other">%d elementów nie zostało odzyskanych</item>
     </plurals>
+    <!--header for the Camera Uploads transfer in progress items -->
+    <string name="camera_uploads_tranfer_header_in_progress">W trakcie</string>
+    <!--header for the Camera Uploads transfer in queue items -->
+    <string name="camera_uploads_tranfer_header_in_queue">Kolejkowanie</string>
+    <!--Title for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_title">Wszystko nadrobione</string>
+    <!--description for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_description">Nowe zdjęcia i filmy pojawią się tutaj po ich zrobieniu</string>
 </resources>

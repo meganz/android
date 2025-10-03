@@ -1318,15 +1318,15 @@
     <!-- title of the section for unlocked storage quota -->
     <string name="unlocked_storage_title">مساحة التخزين المتاحة</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_referral_bonuses">مكافآت الدعوة</string>
+    <string name="title_referral_bonuses">Invite people to MEGA</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
-    <string name="title_install_app">تثبيت تطبيق ميغا MEGA mobile</string>
+    <string name="title_install_app">حمل تطبيقاتنا للجوال</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">مكافأة الاشتراك</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">قم بتثبيت تطبيق ميغا للحاسوب المكتبي MEGA Desktop</string>
+    <string name="title_install_desktop">Install our desktop app</string>
     <!-- indicates the number of days left related to a achievement -->
-    <string name="general_num_days_left">%1$d يوم متبقي</string>
+    <string name="general_num_days_left">%1$d days left</string>
     <!-- State to indicate an achievement has expired -->
     <string name="expired_label">منتهي الصلاحية</string>
     <!-- title of the advanced setting to choose the use of https -->
@@ -1344,9 +1344,9 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">عنوان البريد الإلكتروني غير صحيح</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">لقد تلقيت %1$s مساحة تخزين لتثبيت تطبيق ميغا MEGA للحاسب المكتبي.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">You’ve received %1$s extra storage space for installing our desktop app</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">لقد تلقيت %1$s من مساحة تخزين لتثبيتك تطبيق ميغا للهاتف المحمول MEGA mobile.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">You’ve received %1$s extra storage space for installing our mobile app</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">لقد استلمت %1$s من مساحة تخزين كمكافأة تسجيل مجانية.</string>
     <!-- menu items -->

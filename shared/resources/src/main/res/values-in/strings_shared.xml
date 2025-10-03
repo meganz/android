@@ -1165,9 +1165,9 @@
     <!-- text of how it works for mega pass free trial in achivements section -->
     <string name="text_how_it_works_mega_pass_free_trial">Instal aplikasi MEGA&#160;Pass, masuk dengan akun MEGA anda, dan mulai uji coba gratis anda. Penyimpanan bonus anda ditambahkan secara otomatis setelah memulai uji coba gratis anda.</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">Anda telah menerima %1$s ruang penyimpanan untuk memulai MEGA&#160;Uji coba gratis VPN</string>
+    <string name="text_received_mega_vpn_free_trial">You’ve received %1$s extra storage space for starting a MEGA&#160;VPN free trial</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">Anda telah menerima %1$s ruang penyimpanan untuk memulai MEGA&#160;Lulus uji coba gratis</string>
+    <string name="text_received_mega_pass_free_trial">You’ve received %1$s extra storage space for starting a MEGA&#160;Pass free trial</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">Beberapa folder tidak dapat disinkronkan atau dicadangkan karena aplikasi MEGA telah kehilangan izin untuk mengakses folder lokal. Ketuk Lanjutkan untuk menambahkan kembali izin untuk setiap folder yang terpengaruh.</string>
     <!-- Title for the free plan card when the user is an existing account -->
@@ -1649,4 +1649,12 @@
     <plurals name="node_restored_from_rubbish_bin_error_message">
         <item quantity="other">%d item tidak dipulihkan</item>
     </plurals>
+    <!--header for the Camera Uploads transfer in progress items -->
+    <string name="camera_uploads_tranfer_header_in_progress">Sedang berjalan</string>
+    <!--header for the Camera Uploads transfer in queue items -->
+    <string name="camera_uploads_tranfer_header_in_queue">Queueing</string>
+    <!--Title for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_title">All caught up</string>
+    <!--description for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_description">New photos and videos will appear here after you take them</string>
 </resources>

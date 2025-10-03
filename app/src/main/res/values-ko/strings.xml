@@ -1198,13 +1198,13 @@
     <!-- title of the section for unlocked storage quota -->
     <string name="unlocked_storage_title">저장소 할당량</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_referral_bonuses">초대 보너스</string>
+    <string name="title_referral_bonuses">MEGA에 사람들 초대</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
-    <string name="title_install_app">MEGA 모바일 앱 설치</string>
+    <string name="title_install_app">모바일 앱 설치</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">가입 보너스</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">MEGA 데스크톱 앱 설치</string>
+    <string name="title_install_desktop">데스크톱 앱 설치</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d일 남음</string>
     <!-- State to indicate an achievement has expired -->
@@ -1224,9 +1224,9 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">이메일 주소 형식이 이상합니다</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">MEGA 데스크톱 앱을 설치하여 %1$s의 저장 공간을 받았습니다.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">데스크톱 앱을 설치하여 %1$s의 추가 저장 공간을 받았습니다</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">MEGA 모바일 앱을 설치하여 저장소 공간 %1$s를 받았습니다.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">모바일 앱을 설치하여 %1$s의 추가 저장 공간을 받았습니다</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">당신은 무료 가입 보너스로 저장 공간 %1$s를 받았습니다.</string>
     <!-- menu items -->

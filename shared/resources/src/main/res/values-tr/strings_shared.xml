@@ -79,7 +79,7 @@
     <!-- Search drop down chips filter type file type videos -->
     <string name="search_dropdown_chip_filter_type_file_type_video">Videolar</string>
     <!-- Search drop down chips filter type file type audio -->
-    <string name="search_dropdown_chip_filter_type_file_type_audio">Sesler</string>
+    <string name="search_dropdown_chip_filter_type_file_type_audio">Ses</string>
     <!-- Search drop down chips filter type file type documents -->
     <string name="search_dropdown_chip_filter_type_file_type_documents">Belgeler</string>
     <!-- Search drop down chips filter type file type pdf -->
@@ -373,7 +373,7 @@
     <!-- Step 1: instruction step no.1 to Open the settings App to cancel the subscription from iOS device-->
     <string name="account_cancellation_instructions_open_settings">1. [A]Ayarlar[/A] uygulamasını açın.</string>
     <!-- Step 2: instruction step no.2 to Tap on the name in the iOS device-->
-    <string name="account_cancellation_instructions_tap_on_name">2. İsminize dokunun.</string>
+    <string name="account_cancellation_instructions_tap_on_name">2. Adınıza dokunun.</string>
     <!-- Step 3: instruction step no.3 to Select subscriptions section in the iOS device-->
     <string name="account_cancellation_instructions_select_subscriptions">3. [A]Abonelikler[/A]’e dokunun.</string>
     <!-- Step 4: instruction step no.4 to Select MEGA subscription in the iOS device -->
@@ -429,7 +429,7 @@
     <!-- Error message when the user writes a character not allowed for naming a file or folder -->
     <string name="general_invalid_characters_defined">Şu karakterlere izin verilmez: %1$s</string>
     <!-- Sync settings section title-->
-    <string name="settings_section_sync">Senkronize et</string>
+    <string name="settings_section_sync">Senkronize etme</string>
     <!-- Transfers scanning folders dialog title when the app is creating the needed folders -->
     <string name="transfers_scanning_folders_dialog_creating_folders_title">Klasörler oluşturuluyor&#8230;</string>
     <!-- Transfers scanning folders dialog title when the app is starting transfers but some files still needs to be added to the queue  -->
@@ -865,7 +865,7 @@
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
     <string name="device_center_list_view_item_status_uploading_with_progress">%%%1$d yükleniyor&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is inactive -->
-    <string name="device_center_list_view_item_status_inactive">Etkin Değil</string>
+    <string name="device_center_list_view_item_status_inactive">Etkin değil</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
     <string name="device_center_list_view_item_status_attention_needed">İlgi gerekli</string>
     <!--General Unable to log in-->
@@ -939,9 +939,9 @@
     <!-- Snackbar text to inform the user that download started -->
     <string name="transfers_download_started_snackbar">İndirme başladı. Ayrıntılar için bildirime bakın.</string>
     <!--Sign Up page text field input first name error message when empty-->
-    <string name="sign_up_first_name_text_field_error_message">Bir isim girin</string>
+    <string name="sign_up_first_name_text_field_error_message">Bir ad girin</string>
     <!--Sign Up page text field input last name error message when empty-->
-    <string name="sign_up_last_name_text_field_error_message">Bir soy ismi girin</string>
+    <string name="sign_up_last_name_text_field_error_message">Bir soyadı girin</string>
     <!--Sign Up page text field input email error message when more than 190 characters-->
     <string name="sign_up_email_text_field_char_limit_exceed_error">190 karakter veya daha az olmalıdır</string>
     <!--Sign Up page message to be shown when password is less than 8 characters-->
@@ -1009,9 +1009,9 @@
     <!-- Hidden nodes description: hide files and folders feature -->
     <string name="hidden_nodes_description_hide_files_folders_feature">Gizlilik için hassas dosyaları ve klasörleri gizleyebilirsiniz. Bunları yalnızca siz, tek tek veya menüden gizli öğeleri geçici olarak görüntüleyerek ortaya çıkarabilirsiniz.</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">Zaman Akışından hariç tut</string>
+    <string name="hidden_nodes_title_control_visibility">Zaman akışından hariç tut</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Gizli öğelere yalnızca Bulut depolama üzerinden erişilebilir ve Fotoğraflarınızda, Albümlerinizde veya Son etkinliklerinizde görünmez.</string>
+    <string name="hidden_nodes_description_control_visibility">Gizli öğelere yalnızca bulut depolama üzerinden erişilebilir ve Fotoğraflarınızda, Albümlerinizde veya Son etkinliklerinizde görünmez.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">Gözden uzak</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
@@ -1071,7 +1071,7 @@
     <!-- Possible state of a transfer. When the transfer was cancelled -->
     <string name="transfers_section_cancelled">İptal edildi</string>
     <!-- Title of the tab section for active transfers -->
-    <string name="transfers_section_tab_title_active_transfers">Aktif</string>
+    <string name="transfers_section_tab_title_active_transfers">Etkin</string>
     <!-- Title of the tab section for failed transfers -->
     <string name="transfers_section_tab_title_failed_transfers">Başarısız</string>
     <!--Text for showing the empty state when there are no transfers. The [A][/A] format marks are to put the text in a different color and style.-->
@@ -1182,9 +1182,9 @@
     <!-- text of how it works for mega pass free trial in achivements section -->
     <string name="text_how_it_works_mega_pass_free_trial">MEGA&#160;Pass uygulamasını yükleyin, MEGA hesabınızla giriş yapın ve ücretsiz denemenizi başlatın. Ücretsiz denemenize başladıktan sonra bonus depolama alanınız otomatik olarak eklenir.</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">MEGA&#160;VPN ücretsiz denemesini başlattığınız için %1$s depolama alanı aldınız</string>
+    <string name="text_received_mega_vpn_free_trial">MEGA&#160;VPN ücretsiz denemesini başlattığınız için %1$s ek depolama alanı kazandınız</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">MEGA&#160;Pass ücretsiz denemesini başlattığınız için %1$s depolama alanı aldınız</string>
+    <string name="text_received_mega_pass_free_trial">MEGA&#160;Pass ücretsiz denemesini başlattığınız için %1$s ek depolama alanı kazandınız</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">Bazı klasörler senkronize edilemez veya yedeklenemez çünkü MEGA uygulaması, yerel klasörlere erişim izinlerini kaybetti. Her etkilenen klasör için izinleri yeniden eklemek üzere Devam ettir’e dokunun.</string>
     <!-- Title for the free plan card when the user is an existing account -->
@@ -1458,7 +1458,7 @@
     <!-- success message when renaming a node -->
     <string name="context_correctly_renamed">Öğe yeniden adlandırıldı</string>
     <!-- Homepage section. -->
-    <string name="general_section_home">Ana Sayfa</string>
+    <string name="general_section_home">Ana sayfa</string>
     <!-- Error message when removing public links of nodes. Plural. -->
     <plurals name="context_link_removal_error">
         <item quantity="one">Bağlantı kaldırma başarısız oldu. Lütfen daha sonra tekrar deneyin.</item>
@@ -1682,4 +1682,12 @@
         <item quantity="one">%d öğe geri yüklenemedi</item>
         <item quantity="other">%d öğe geri yüklenemedi</item>
     </plurals>
+    <!--header for the Camera Uploads transfer in progress items -->
+    <string name="camera_uploads_tranfer_header_in_progress">Devam ediyor</string>
+    <!--header for the Camera Uploads transfer in queue items -->
+    <string name="camera_uploads_tranfer_header_in_queue">Kuyruğa alınıyor</string>
+    <!--Title for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_title">Tümü tamamlandı</string>
+    <!--description for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_description">Yeni fotoğraf ve videolar, çekildikten sonra burada görünecektir</string>
 </resources>

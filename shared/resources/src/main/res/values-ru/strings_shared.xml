@@ -1216,9 +1216,9 @@
     <!-- text of how it works for mega pass free trial in achivements section -->
     <string name="text_how_it_works_mega_pass_free_trial">Установите приложение MEGA&#160;Pass, войдите в свой аккаунт MEGA и активируйте бесплатную пробную версию. Бонусное хранилище будет добавлено автоматически после активации бесплатной пробной версии.</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">Вы получили %1$s на диске за то, что активировали бесплатную пробную версию MEGA&#160;VPN</string>
+    <string name="text_received_mega_vpn_free_trial">Вы получили дополнительно %1$s на диске за активацию бесплатной пробной версии MEGA&#160;VPN</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">Вы получили %1$s на диске за то, что активировали бесплатную пробную версию MEGA&#160;Pass</string>
+    <string name="text_received_mega_pass_free_trial">Вы получили дополнительно %1$s на диске за активацию бесплатной пробной версии MEGA&#160;Pass</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">Для некоторых папок невозможно выполнить синхронизацию или резервное копирование, так как приложение MEGA потеряло разрешения на доступ к локальным папкам. Нажмите «Возобновить», чтобы повторно добавить разрешения для каждой затронутой папки.</string>
     <!-- Title for the free plan card when the user is an existing account -->
@@ -1758,4 +1758,12 @@
         <item quantity="many">%d элементов не было удалено</item>
         <item quantity="other">%d элемента не было удалено</item>
     </plurals>
+    <!--header for the Camera Uploads transfer in progress items -->
+    <string name="camera_uploads_tranfer_header_in_progress">Выполняется</string>
+    <!--header for the Camera Uploads transfer in queue items -->
+    <string name="camera_uploads_tranfer_header_in_queue">В очереди</string>
+    <!--Title for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_title">Всё синхронизировано</string>
+    <!--description for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_description">Новые фото и видео будут появляться здесь после съёмки</string>
 </resources>

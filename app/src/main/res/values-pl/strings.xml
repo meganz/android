@@ -1270,15 +1270,15 @@
     <!-- title of the section for unlocked storage quota -->
     <string name="unlocked_storage_title">Limit pamięci</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_referral_bonuses">Premie za zaproszenia</string>
+    <string name="title_referral_bonuses">Zaproś ludzi do MEGA</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
-    <string name="title_install_app">Zainstaluj aplikację mobilną</string>
+    <string name="title_install_app">Zainstaluj naszą aplikację mobilną</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Bonus za rejestrację</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Zainstaluj aplikację MEGA Desktop</string>
+    <string name="title_install_desktop">Zainstaluj naszą aplikację na komputer</string>
     <!-- indicates the number of days left related to a achievement -->
-    <string name="general_num_days_left">%1$d d pozostało</string>
+    <string name="general_num_days_left">Pozostało %1$d dni</string>
     <!-- State to indicate an achievement has expired -->
     <string name="expired_label">Wygasło</string>
     <!-- title of the advanced setting to choose the use of https -->
@@ -1296,9 +1296,9 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Adres e-mail jest nieprawidłowo sformatowany</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">Otrzymałeś %1$s przestrzeni dyskowej za instalację naszej aplikacji desktopowej MEGA.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Otrzymałeś %1$s dodatkowej pojemności za zainstalowanie naszej aplikacji desktopowej.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">Otrzymałeś %1$s przestrzeni dyskowej za instalację MEGA Mobile App.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Otrzymałeś %1$s dodatkowej pojemności za zainstalowanie naszej aplikacji mobilnej.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Otrzymałeś %1$s miejsce do przechowywania jako darmowy bonus rejestracyjny.</string>
     <!-- menu items -->

@@ -1246,15 +1246,15 @@
     <!-- title of the section for unlocked storage quota -->
     <string name="unlocked_storage_title">Spazio di archiviazione utilizzato</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_referral_bonuses">Bonus di invito</string>
+    <string name="title_referral_bonuses">Invite people to MEGA</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">Installa la nostra app</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Bonus di registrazione</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Installa un’app per desktop di MEGA</string>
+    <string name="title_install_desktop">Install our desktop app</string>
     <!-- indicates the number of days left related to a achievement -->
-    <string name="general_num_days_left">%1$d gg rimanenti</string>
+    <string name="general_num_days_left">%1$d days left</string>
     <!-- State to indicate an achievement has expired -->
     <string name="expired_label">Scaduto</string>
     <!-- title of the advanced setting to choose the use of https -->
@@ -1272,9 +1272,9 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Indirizzo email scritto erroneamente</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">Hai ricevuto %1$s di spazio di archiviazione per aver installato la nostra app per desktop.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">You’ve received %1$s extra storage space for installing our desktop app</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">Hai ricevuto %1$s di spazio di archiviazione per aver installato l\’app per mobile di MEGA.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">You’ve received %1$s extra storage space for installing our mobile app</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Hai ricevuto %1$s di spazio di archiviazione gratuito come bonus per la tua registrazione.</string>
     <!-- menu items -->
