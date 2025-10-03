@@ -9,7 +9,6 @@ import mega.privacy.android.domain.entity.RawFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.ImageNode
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.repository.PhotosRepository
 import javax.inject.Inject
@@ -34,15 +33,7 @@ class MonitorFavouriteAlbumNodesUseCase @Inject constructor(
         }
     }
 
-    private suspend fun isVideoFileType(imageNode: ImageNode): Boolean {
-        return imageNode.type is VideoFileTypeInfo && inSyncFolder(imageNode.parentId)
-    }
-
-    private suspend fun inSyncFolder(parentId: NodeId): Boolean {
-        val id = parentId.longValue
-
-        return photosRepository.run {
-            id == getCameraUploadFolderId() || id == getMediaUploadFolderId()
-        }
+    private fun isVideoFileType(imageNode: ImageNode): Boolean {
+        return imageNode.type is VideoFileTypeInfo
     }
 }

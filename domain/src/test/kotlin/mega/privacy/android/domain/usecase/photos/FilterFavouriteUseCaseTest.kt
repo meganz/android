@@ -5,10 +5,8 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.domain.repository.PhotosRepository
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.mock
 import java.time.LocalDateTime
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -20,47 +18,11 @@ class FilterFavouriteUseCaseTest {
 
     lateinit var underTest: FilterFavouriteUseCase
 
-    private val cameraUploadFolderId = 10L
-    private val mediaUploadFolderId = 20L
-
-    private val photosRepository = mock<PhotosRepository>() {
-        onBlocking { getCameraUploadFolderId() }.thenReturn(cameraUploadFolderId)
-        onBlocking { getMediaUploadFolderId() }.thenReturn(mediaUploadFolderId)
-    }
-
 
     @Before
     fun setUp() {
-        underTest = FilterFavouriteUseCase(photosRepository)
+        underTest = FilterFavouriteUseCase()
     }
-
-    @Test
-    fun `test that a favourite video is in sync folder then return true`() =
-        runTest {
-            val video1 = createVideo(
-                isFavourite = true,
-                parentId = cameraUploadFolderId
-            )
-
-            val video2 = createVideo(
-                isFavourite = true,
-                parentId = mediaUploadFolderId
-            )
-
-            assertTrue { underTest().invoke(video1) }
-            assertTrue { underTest().invoke(video2) }
-        }
-
-    @Test
-    fun `test that a favourite video is not in sync folder then return false`() =
-        runTest {
-
-            val video = createVideo(
-                isFavourite = true
-            )
-
-            assertFalse { underTest().invoke(video) }
-        }
 
     @Test
     fun `test that a non-favourite video then return false`() =
