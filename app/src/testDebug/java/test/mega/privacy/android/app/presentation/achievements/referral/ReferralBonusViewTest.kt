@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.achievements.referral
 
+import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assert
@@ -10,6 +11,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import coil.annotation.ExperimentalCoilApi
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
@@ -26,6 +28,7 @@ import mega.privacy.android.domain.entity.user.UserVisibility
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 import kotlin.random.Random
 
 @OptIn(ExperimentalCoilApi::class)
@@ -34,6 +37,8 @@ import kotlin.random.Random
 class ReferralBonusViewTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     private val oneHundredMbInBytes = 104857600L
     private val name = "Qwerty Uiop"
@@ -79,8 +84,9 @@ class ReferralBonusViewTest {
                         ApplicationProvider.getApplicationContext()
                     )
                 )
+            val expectedText = context.getString(R.string.general_num_days_left, expirationInDays)
             composeTestRule.onNodeWithTag(TestTags.DAYS_LEFT + index)
-                .assertWithText("$expirationInDays d left")
+                .assertWithText(expectedText)
         }
     }
 
