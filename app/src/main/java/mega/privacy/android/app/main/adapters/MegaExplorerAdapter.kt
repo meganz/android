@@ -634,6 +634,8 @@ class MegaExplorerAdapter(
                                 fileExplorerViewModel.getFolderType(node.handle) is FolderType.Sync
                             itemView.alpha = if (isSync) 0.5f else 1f
                             itemView.isEnabled = !isSync
+                            binding.fileExplorerFilename.isEnabled = !isSync
+                            binding.fileExplorerFilesize.isEnabled = !isSync
                         }
                     }
                     // Save job
