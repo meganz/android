@@ -56,6 +56,7 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_ADD_TO_ALBUM
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_IS_FOREIGN
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_MENU_OPTIONS
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_SORT
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
@@ -63,9 +64,9 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewStat
 import mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowActivity
 import mega.privacy.android.app.presentation.imagepreview.view.ImagePreviewScreen
 import mega.privacy.android.app.presentation.offline.action.HandleOfflineNodeActions
-import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeActionsViewModel
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
+import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
@@ -77,6 +78,7 @@ import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
+import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeActionsViewModel
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
@@ -584,6 +586,7 @@ class ImagePreviewActivity : BaseActivity() {
             params: Map<String, Any> = mapOf(),
             isForeign: Boolean = false,
             enableAddToAlbum: Boolean = false,
+            sort: Sort = Sort.DEFAULT,
         ): Intent {
             return Intent(context, ImagePreviewActivity::class.java).apply {
                 putExtra(IMAGE_NODE_FETCHER_SOURCE, imageSource)
@@ -592,6 +595,7 @@ class ImagePreviewActivity : BaseActivity() {
                 putExtra(FETCHER_PARAMS, bundleOf(*params.toList().toTypedArray()))
                 putExtra(IMAGE_PREVIEW_IS_FOREIGN, isForeign)
                 putExtra(IMAGE_PREVIEW_ADD_TO_ALBUM, enableAddToAlbum)
+                putExtra(IMAGE_PREVIEW_SORT, sort)
             }
         }
 

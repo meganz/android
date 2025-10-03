@@ -11,6 +11,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,13 +26,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
-import mega.privacy.android.core.nodecomponents.mapper.RemovePublicLinkResultMapper
 import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumContentImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewState
+import mega.privacy.android.app.presentation.photos.model.Sort
+import mega.privacy.android.core.nodecomponents.mapper.RemovePublicLinkResultMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -188,7 +190,7 @@ class ImagePreviewViewModel @Inject constructor(
             val isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
 
             val filteredImageNodes = filterNonSensitiveNodes(
-                imageNodes = imageNodes,
+                imageNodes = imageNodes.sort(),
                 showHiddenItems = showHiddenItems,
                 isPaid = accountType?.isPaid,
                 isBusinessAccountExpired = isBusinessAccountExpired,
@@ -215,6 +217,7 @@ class ImagePreviewViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun monitorOfflineNodeUpdates() {
         monitorOfflineNodeUpdatesUseCase()
             .catch { Timber.e(it) }
@@ -236,13 +239,15 @@ class ImagePreviewViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun monitorImageNodes() {
         val imageFetcher = imageNodeFetchers[imagePreviewFetcherSource] ?: return
         imageFetcher.monitorImageNodes(params)
             .catch { Timber.e(it) }
             .mapLatest { imageNodes ->
+                val sortedImageNodes = imageNodes.sort()
                 val (currentImageNodeIndex, currentImageNode) = findCurrentImageNode(
-                    imageNodes
+                    sortedImageNodes
                 )
                 val isCurrentImageNodeAvailableOffline =
                     currentImageNode?.isAvailableOffline ?: false
@@ -252,7 +257,7 @@ class ImagePreviewViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         isInitialized = true,
-                        imageNodes = imageNodes,
+                        imageNodes = sortedImageNodes,
                         currentImageNodeIndex = currentImageNodeIndex,
                         currentImageNode = currentImageNode,
                         isCurrentImageNodeAvailableOffline = isCurrentImageNodeAvailableOffline
@@ -304,6 +309,14 @@ class ImagePreviewViewModel @Inject constructor(
             imageNodes
         } else {
             imageNodes.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }
+        }
+    }
+
+    private fun List<ImageNode>.sort(): List<ImageNode> {
+        return when (getSort()) {
+            Sort.NEWEST -> sortedWith(compareByDescending<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
+            Sort.OLDEST -> sortedWith(compareBy<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
+            else -> this
         }
     }
 
@@ -405,7 +418,7 @@ class ImagePreviewViewModel @Inject constructor(
         return menu?.isMoveToRubbishBinMenuVisible(imageNode) ?: false
     }
 
-    suspend fun isAddToAlbumMenuVisible(imageNode: ImageNode): Boolean {
+    fun isAddToAlbumMenuVisible(imageNode: ImageNode): Boolean {
         return (savedStateHandle[IMAGE_PREVIEW_ADD_TO_ALBUM] ?: false) &&
                 (imageNode.type is ImageFileTypeInfo || imageNode.type is VideoFileTypeInfo)
     }
@@ -640,7 +653,7 @@ class ImagePreviewViewModel @Inject constructor(
                     )
                 }
             }.onFailure {
-                Timber.d("Move node failure", it)
+                Timber.d("Move node failure: $it")
                 setCopyMoveException(it)
             }
         }
@@ -678,7 +691,7 @@ class ImagePreviewViewModel @Inject constructor(
                     )
                 }
             }.onFailure {
-                Timber.e("Error not copied", it)
+                Timber.e("Error not copied $it")
                 setCopyMoveException(it)
             }
         }
@@ -749,7 +762,7 @@ class ImagePreviewViewModel @Inject constructor(
                     )
                 }
             }.onFailure {
-                Timber.e("Error not copied", it)
+                Timber.e("Error not copied $it")
                 setCopyMoveException(it)
             }
         }
@@ -967,6 +980,10 @@ class ImagePreviewViewModel @Inject constructor(
         }
     }
 
+    private fun getSort(): Sort {
+        return savedStateHandle[IMAGE_PREVIEW_SORT] ?: Sort.DEFAULT
+    }
+
     companion object {
         const val IMAGE_NODE_FETCHER_SOURCE = "image_node_fetcher_source"
         const val IMAGE_PREVIEW_MENU_OPTIONS = "image_preview_menu_options"
@@ -974,5 +991,6 @@ class ImagePreviewViewModel @Inject constructor(
         const val PARAMS_CURRENT_IMAGE_NODE_ID_VALUE = "currentImageNodeIdValue"
         const val IMAGE_PREVIEW_IS_FOREIGN = "image_preview_is_foreign"
         const val IMAGE_PREVIEW_ADD_TO_ALBUM = "image_preview_add_to_album"
+        const val IMAGE_PREVIEW_SORT = "image_preview_sort"
     }
 }

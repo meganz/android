@@ -90,6 +90,7 @@ class ImagePreviewProvider @Inject constructor(
                 activity = activity,
                 photo = photo,
                 folderNodeId = folderNodeId,
+                currentSort = currentSort,
             )
         }
     }
@@ -98,6 +99,7 @@ class ImagePreviewProvider @Inject constructor(
         activity: Activity,
         photo: Photo,
         folderNodeId: Long?,
+        currentSort: Sort,
     ) {
         (activity as LifecycleOwner).lifecycleScope.launch {
             folderNodeId?.let { parentID ->
@@ -110,6 +112,7 @@ class ImagePreviewProvider @Inject constructor(
                     anchorImageNodeId = NodeId(photo.id),
                     params = mapOf(PARENT_ID to parentID, IS_RECURSIVE to recursive),
                     enableAddToAlbum = true,
+                    sort = currentSort
                 ).run {
                     activity.startActivity(this)
                 }
