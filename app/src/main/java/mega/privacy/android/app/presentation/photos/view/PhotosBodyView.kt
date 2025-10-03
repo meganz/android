@@ -199,6 +199,6 @@ fun LazyGridState.isScrolledToEnd() = remember(this) {
 @Composable
 fun LazyGridState.isScrolledToTop() = remember(this) {
     derivedStateOf {
-        firstVisibleItemIndex == 0 && firstVisibleItemScrollOffset == 0
+        firstVisibleItemIndex <= 1 && firstVisibleItemScrollOffset == 0
     }
 }
