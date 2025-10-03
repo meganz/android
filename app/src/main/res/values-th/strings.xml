@@ -1198,15 +1198,15 @@
     <!-- title of the section for unlocked storage quota -->
     <string name="unlocked_storage_title">โควต้าพื้นที่เก็บข้อมูล</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_referral_bonuses">โบนัสคำเชิญ</string>
+    <string name="title_referral_bonuses">Invite people to MEGA</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
-    <string name="title_install_app">ติดตั้งแอป MEGA บนมือถือ</string>
+    <string name="title_install_app">ติดตั้งแอปของเราบนมือถือ</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">โบนัสการลงทะเบียน</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">ติดตั้งแอปเดสก์ท็อป MEGA</string>
+    <string name="title_install_desktop">Install our desktop app</string>
     <!-- indicates the number of days left related to a achievement -->
-    <string name="general_num_days_left">เหลืออีก %1$d วัน</string>
+    <string name="general_num_days_left">%1$d days left</string>
     <!-- State to indicate an achievement has expired -->
     <string name="expired_label">หมดอายุแล้ว</string>
     <!-- title of the advanced setting to choose the use of https -->
@@ -1224,9 +1224,9 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">ที่อยู่อีเมลมีรูปแบบไม่ถูกต้อง</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">คุณได้รับพื้นที่เก็บข้อมูล %1$s จากการติดตั้งแอป MEGA ของเราบนเดสก์ท็อป</string>
+    <string name="result_paragraph_info_achievement_install_desktop">You’ve received %1$s extra storage space for installing our desktop app</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">คุณได้รับพื้นที่จัดเก็บ %1$s จากการติดตั้งแอป MEGA บนมือถือ</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">You’ve received %1$s extra storage space for installing our mobile app</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">คุณได้รับพื้นที่เก็บข้อมูล %1$s เป็นโบนัสการลงทะเบียนฟรี</string>
     <!-- menu items -->

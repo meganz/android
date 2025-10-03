@@ -1165,9 +1165,9 @@
     <!-- text of how it works for mega pass free trial in achivements section -->
     <string name="text_how_it_works_mega_pass_free_trial">安裝MEGA&#160;Pass應用程式，使用您的MEGA帳戶登入，然後開始免費試用。開始免費試用後，您將獲得儲存空間自動增加的獎勵。</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">您已經開始免費試用MEGA&#160;VPN而獲得%1$s儲存空間</string>
+    <string name="text_received_mega_vpn_free_trial">您已經開始免費試用MEGA&#160;VPN而獲得%1$s額外儲存空間</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">您已經開始免費試用MEGA&#160;Pass而獲得%1$s儲存空間</string>
+    <string name="text_received_mega_pass_free_trial">您已經開始免費試用MEGA&#160;Pass而獲得%1$s額外儲存空間</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">由於MEGA應用程式遺失了本地資料夾的存取權限，部分資料夾無法同步或備份。點選恢復即可為每個受到影響的資料夾重新加入權限。</string>
     <!-- Title for the free plan card when the user is an existing account -->
@@ -1644,4 +1644,12 @@
     <plurals name="node_restored_from_rubbish_bin_error_message">
         <item quantity="other">未恢復%d個項目</item>
     </plurals>
+    <!--header for the Camera Uploads transfer in progress items -->
+    <string name="camera_uploads_tranfer_header_in_progress">進行中</string>
+    <!--header for the Camera Uploads transfer in queue items -->
+    <string name="camera_uploads_tranfer_header_in_queue">佇列中</string>
+    <!--Title for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_title">上傳完畢</string>
+    <!--description for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_description">您拍攝的新照片和影片將顯示在此</string>
 </resources>

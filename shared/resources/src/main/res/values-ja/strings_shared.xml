@@ -1165,9 +1165,9 @@
     <!-- text of how it works for mega pass free trial in achivements section -->
     <string name="text_how_it_works_mega_pass_free_trial">MEGA&#160;Passアプリをインストールし、MEGAアカウントでログインして無料トライアルを開始してください。無料トライアル開始後、ボーナスストレージが自動的に追加されます。</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">%1$sGBのストレージスペースを受け取りました。これでMEGA&#160;VPNの無料トライアルを開始できます。</string>
+    <string name="text_received_mega_vpn_free_trial">%1$sの追加ストレージスペースを受け取りました。これでMEGA&#160;VPNの無料トライアルを開始できます。</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">%1$sGBのストレージスペースを受け取りました。これでMEGA&#160;Passの無料トライアルを開始できます。</string>
+    <string name="text_received_mega_pass_free_trial">%1$sの追加ストレージスペースを受け取りました。これでMEGA&#160;Passの無料トライアルを開始できます。</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">MEGAアプリがローカルフォルダへのアクセス許可を失ったため、一部のフォルダが同期またはバックアップできません。「再開（Resume）」をタップすると、影響を受けた各フォルダのアクセス許可を再度追加できます。</string>
     <!-- Title for the free plan card when the user is an existing account -->
@@ -1644,4 +1644,12 @@
     <plurals name="node_restored_from_rubbish_bin_error_message">
         <item quantity="other">%d個の項目は復元されませんでした</item>
     </plurals>
+    <!--header for the Camera Uploads transfer in progress items -->
+    <string name="camera_uploads_tranfer_header_in_progress">進行中</string>
+    <!--header for the Camera Uploads transfer in queue items -->
+    <string name="camera_uploads_tranfer_header_in_queue">アップロード待機中</string>
+    <!--Title for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_title">すべてアップロード完了</string>
+    <!--description for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_description">新しい写真や動画を撮影するとここに表示されます</string>
 </resources>

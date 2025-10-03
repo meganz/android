@@ -153,9 +153,9 @@
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Onay bağlantınız artık geçerli değil. Hesabınız zaten etkinleştirilmiş veya kaydınızı iptal etmiş olabilirsiniz.</string>
     <!-- First Name of the user -->
-    <string name="first_name_text">İsim</string>
+    <string name="first_name_text">Adı</string>
     <!-- Last name of the user -->
-    <string name="lastname_text">Soy isim</string>
+    <string name="lastname_text">Soyadı</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">[B]Şifremi kaybedersem verilerimi de kaybedebileceğimi[/B] anlıyorum. [A]MEGA’nın uçtan uca şifrelemesi[/A] hakkında daha fazlasını öğrenin.</string>
     <!-- warning dialog -->
@@ -163,9 +163,9 @@
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">Şifrenizi kaybetme riskini anladığınızı kabul etmelisiniz</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
-    <string name="error_enter_username">İsminizi girin</string>
+    <string name="error_enter_username">Adınızı girin</string>
     <!-- Warning dialog -->
-    <string name="error_enter_userlastname">Soy isminizi girin</string>
+    <string name="error_enter_userlastname">Soyadınızı girin</string>
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Şifreler eşleşmiyor</string>
     <!-- when creating the account -->
@@ -403,9 +403,9 @@
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
     <string name="invalid_decryption_key">Geçersiz şifre çözme anahtarı</string>
     <!-- upload to. Then choose an Audio file -->
-    <string name="upload_to_audio">Sesler</string>
+    <string name="upload_to_audio">Ses</string>
     <!-- Title of the button in the contact info screen to start a video call -->
-    <string name="upload_to_video">Video</string>
+    <string name="upload_to_video">Görüntülü</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="one">Dosya hazırlanıyor</item>
@@ -1140,9 +1140,9 @@
     <!-- Message when an error ocurred when deleting an user avatar -->
     <string name="error_deleting_user_avatar">Profil fotoğrafı silinirken bir hata oluştu</string>
     <!-- Message when an error ocurred when changing an user attribute -->
-    <string name="error_changing_user_attributes">İsim değiştirilirken bir hata oluştu</string>
+    <string name="error_changing_user_attributes">Ad değiştirilirken bir hata oluştu</string>
     <!-- Message when an user attribute has been changed successfully -->
-    <string name="success_changing_user_attributes">İsminiz güncellendi</string>
+    <string name="success_changing_user_attributes">Adınız güncellendi</string>
     <!-- Message show when a participant has been successfully invited to a group chat -->
     <string name="add_participant_success">Katılımcı eklendi</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
@@ -1222,13 +1222,13 @@
     <!-- title of the section for unlocked storage quota -->
     <string name="unlocked_storage_title">Depolama kotası</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_referral_bonuses">Referans bonusları</string>
+    <string name="title_referral_bonuses">MEGA’ya davet et</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
-    <string name="title_install_app">MEGA Mobil Uygulamasını yükleyin</string>
+    <string name="title_install_app">Mobil uygulamamızı yükleyin</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Kayıt bonusu</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">MEGA Masaüstü Uygulamasını yükleyin</string>
+    <string name="title_install_desktop">Masaüstü uygulamamızı yükleyin</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d gün kaldı</string>
     <!-- State to indicate an achievement has expired -->
@@ -1248,9 +1248,9 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">E-posta adresi hatalı biçimlendirilmiş</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">MEGA Masaüstü Uygulamamızı yüklediğiniz için %1$s depolama alanı aldınız.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Masaüstü uygulamamızı yüklediğiniz için %1$s ek depolama alanı kazandınız</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">MEGA Mobil Uygulamasını yüklediğiniz için %1$s depolama alanı aldınız.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Mobil uygulamamızı yüklediğiniz için %1$s ek depolama alanı kazandınız</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Ücretsiz kayıt bonusunuz olarak %1$s depolama alanı aldınız.</string>
     <!-- menu items -->
@@ -2352,15 +2352,15 @@
     <!-- Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description -->
     <string name="locked_accounts_text_2">Şifreniz sızdırıldı ve artık MEGA hesabınız dahil ancak bunlarla sınırlı olmamak üzere hesaplarınıza giriş yapmak için kötü niyetli kişiler tarafından kullanılıyor.</string>
     <!-- Button to add a nickname for a user -->
-    <string name="add_nickname">Takma isim ayarla</string>
+    <string name="add_nickname">Takma adı ayarla</string>
     <!-- Button to update a nickname for a user -->
-    <string name="edit_nickname">Takma ismi düzenle</string>
+    <string name="edit_nickname">Takma adı düzenle</string>
     <!-- Label showing that a nickname has been added -->
-    <string name="snackbar_nickname_added">Takma isim eklendi</string>
+    <string name="snackbar_nickname_added">Takma adı eklendi</string>
     <!-- Label showing that a nickname has been added -->
-    <string name="snackbar_nickname_removed">Takma isim kaldırıldı</string>
+    <string name="snackbar_nickname_removed">Takma adı kaldırıldı</string>
     <!-- title of a dialog to edit or remove the nickname -->
-    <string name="nickname_title">Takma isim</string>
+    <string name="nickname_title">Takma adı</string>
     <!-- Text related to verified phone number. Used as title or cell description. -->
     <string name="phonenumber_title">Telefon numarası</string>
     <!-- Text shown in a call when it is trying to reconnect after lose the internet connection -->
@@ -2747,7 +2747,7 @@
     <!-- Text of the option Backup Recovery Key in My account section -->
     <string name="backup_recovery_key_subtitle">Şifrenizi hatırlıyor musunuz?\nMEGA, unutmanız durumunda şifrenizi sıfırlayamaz.</string>
     <!-- Action to change name -->
-    <string name="change_name_action">İsmi değiştir</string>
+    <string name="change_name_action">Adınızı değiştirin</string>
     <!-- Action to add photo -->
     <string name="add_photo_action">Profil fotoğrafını değiştir</string>
     <!-- Action to add phone number -->
@@ -4740,7 +4740,7 @@
     <!-- Search drop down chips filter type file type videos -->
     <string name="search_dropdown_chip_filter_type_file_type_video">Videolar</string>
     <!-- Search drop down chips filter type file type audio -->
-    <string name="search_dropdown_chip_filter_type_file_type_audio">Sesler</string>
+    <string name="search_dropdown_chip_filter_type_file_type_audio">Ses</string>
     <!-- Search drop down chips filter type file type documents -->
     <string name="search_dropdown_chip_filter_type_file_type_documents">Belgeler</string>
     <!-- Search drop down chips filter type date added -->

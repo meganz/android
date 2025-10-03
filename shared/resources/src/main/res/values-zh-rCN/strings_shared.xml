@@ -1165,9 +1165,9 @@
     <!-- text of how it works for mega pass free trial in achivements section -->
     <string name="text_how_it_works_mega_pass_free_trial">安装MEGA&#160;Pass应用程序，使用您的MEGA帐户登录，然后开始免费试用。开启免费试用后，您的奖励存储空间将自动添加。</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">您已开始MEGA&#160;VPN的免费试用，因此您获得了%1$s的存储空间。</string>
+    <string name="text_received_mega_vpn_free_trial">您已开始MEGA&#160;VPN的免费试用，因此您获得了%1$s的额外存储空间。</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">您已开始MEGA&#160;Pass的免费试用，因此您获得了%1$s的存储空间。</string>
+    <string name="text_received_mega_pass_free_trial">您已开始MEGA&#160;Pass的免费试用，因此您获得了%1$s的额外存储空间。</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">由于MEGA应用程序已失去访问本地文件夹的权限，某些文件夹无法同步或备份。点击“恢复”为每个受影响的文件夹重新添加权限。</string>
     <!-- Title for the free plan card when the user is an existing account -->
@@ -1375,7 +1375,7 @@
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_last_modified_file_explanation">最近更新的文件将替换两个位置中的旧文件</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict</string>
+    <string name="sync_stalled_issue_general_explanation">此操作将应用于解决冲突</string>
     <!-- Dialog choose option -->
     <string name="general_dialog_choose_button">选择</string>
     <!-- Text label of Apply to all -->
@@ -1423,17 +1423,16 @@
     <!--Sign Up page text field input last name error message when character limit exceeded-->
     <string name="sign_up_last_name_text_field_char_limit_exceed_error">姓氏不能超过40个字符</string>
     <!-- Error message when IP has already sent an issue report and needs to wait -->
-    <string name="report_issue_too_many_times_error">You’ve already sent an issue report within the last 10 minutes. Please wait before trying again, or contact %1$s for assistance.</string>
+    <string name="report_issue_too_many_times_error">您在过去10分钟内已经发送了一份问题报告。请稍候再试，或联系%1$s寻求帮助。</string>
     <!-- The snackbar message for informing the user about the invitation is trying to sent, is already in the received contact requests because the user already invited them. -->
-    <string name="contacts_invite_already_received">This user has already sent you an invitation</string>
+    <string name="contacts_invite_already_received">此用户已经向您发送了邀请</string>
     <!-- The snackbar message for informing the user about the invitations is trying to sent, are already in the received contact requests because the users already invited them. -->
-    <string name="contacts_invites_already_received">All the people you invited have already sent you an invitation</string>
+    <string name="contacts_invites_already_received">您邀请的所有人都已经向您发送了邀请</string>
     <!-- The snackbar message for informing the user about the invitations are correctly sent. -->
-    <string name="contacts_invites_sent">Invitation sent. They’ll appear in Contacts once accepted.</string>
+    <string name="contacts_invites_sent">邀请已发送。对方一旦接受，将会显示在您的联系人列表中。</string>
     <!-- The snackbar message for informing the user about some invitations correctly sent, but not others because they are already in the received contact requests because the users already invited them. -->
     <plurals name="contacts_invites_sent_but_others_already_received">
-        <item quantity="one">%1$d user invited, but one or more users have already invited you</item>
-        <item quantity="other">%1$d users invited, but one or more users have already invited you</item>
+        <item quantity="other">%1$d个用户已被邀请，但其中已有一个或多个用户邀请了您</item>
     </plurals>
     <!--  Error shown when the user tries to resend the sign up link multiple times at once. -->
     <string name="resend_signup_link_error">邮件已发送。请等待几分钟后再试。</string>
@@ -1454,7 +1453,7 @@
         <item quantity="other"></item>
     </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="context_share_correctly_removed">Access removed</string>
+    <string name="context_share_correctly_removed">访问权限已移除</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">是</string>
     <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1465,45 +1464,44 @@
     </plurals>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
-        <item quantity="one">This folder is shared with %1$d contact. Stop sharing?</item>
-        <item quantity="other">This folder is shared with %1$d contacts. Stop sharing?</item>
+        <item quantity="other">此文件夹已共享给%1$d个联系人。要停止共享吗？</item>
     </plurals>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
     <plurals name="alert_remove_several_shares">
         <item quantity="other"></item>
     </plurals>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
-    <string name="figures_storage_referrals_achievements_text">%1$s extra storage for each invitation, valid for %2$d days</string>
+    <string name="figures_storage_referrals_achievements_text">每份邀请都有额外的%1$s存储空间，有效期为%2$d天</string>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with permanent valid duration -->
-    <string name="figures_storage_referrals_achievements_text_permanent">%1$s extra storage for each invitation, valid permanently</string>
+    <string name="figures_storage_referrals_achievements_text_permanent">每份邀请都有额外的%1$s存储空间，永久有效</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement with dynamic valid duration -->
-    <string name="figures_storage_achievements_text">%1$s extra storage, valid for %2$d days</string>
+    <string name="figures_storage_achievements_text">%1$s额外存储空间，有效期为%2$d天</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement with permanent valid duration -->
-    <string name="figures_storage_achievements_text_permanent">%1$s extra storage, valid permanently</string>
+    <string name="figures_storage_achievements_text_permanent">%1$s额外存储空间。永久有效。</string>
     <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with dynamic valid duration -->
-    <string name="figures_storage_achievements_awarded_text">%1$s storage bonus applied, valid for %2$d days</string>
+    <string name="figures_storage_achievements_awarded_text">%1$s存储奖励已生效，有效期为%2$d天</string>
     <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with permanent valid duration -->
-    <string name="figures_storage_achievements_awarded_text_permanent">%1$s storage bonus applied, valid permanently</string>
+    <string name="figures_storage_achievements_awarded_text_permanent">%1$s存储奖励已生效，永久有效</string>
     <!-- info paragraph about the achievement install megasync with dynamic valid duration -->
-    <string name="paragraph_info_achievement_install_desktop_dynamic_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid for %2$s days. The desktop app is available for Windows, macOS and Linux.</string>
+    <string name="paragraph_info_achievement_install_desktop_dynamic_duration">安装MEGA桌面应用程序并获取%1$s额外的免费存储空间，有效期为%2$s天。桌面应用程序支持Windows、macOS和Linux。</string>
     <!-- info paragraph about the achievement install megasync with permanent valid duration -->
-    <string name="paragraph_info_achievement_install_desktop_permanent_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid permanently. The desktop app is available for Windows, macOS and Linux.</string>
+    <string name="paragraph_info_achievement_install_desktop_permanent_duration">安装MEGA桌面应用程序并获取%1$s额外的免费存储空间，永久有效。桌面应用程序支持Windows、macOS和Linux。</string>
     <!-- info paragraph about the achievement install mobile app with dynamic valid duration -->
-    <string name="paragraph_info_achievement_install_mobile_app_dynamic_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid for %2$s days. The mobile apps are available for iOS and Android.</string>
+    <string name="paragraph_info_achievement_install_mobile_app_dynamic_duration">安装一个MEGA移动应用程序即可获得%1$s额外的免费存储空间，有效期为%2$s天。移动应用程序支持iOS和安卓系统。</string>
     <!-- info paragraph about the achievement install mobile app with permanent valid duration -->
-    <string name="paragraph_info_achievement_install_mobile_app_permanent_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid permanently. The mobile apps are available for iOS and Android.</string>
+    <string name="paragraph_info_achievement_install_mobile_app_permanent_duration">安装一个MEGA移动应用程序即可获得%1$s额外的免费存储空间，永久有效。移动应用程序支持iOS和安卓系统。</string>
     <!-- Share multi backup folders, show below warning message -->
-    <string name="backup_multi_share_permission_text">These are backup folders and can only be shared as read-only</string>
+    <string name="backup_multi_share_permission_text">这些是备份文件夹，只能以只读方式共享</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_share_permission_text">This is a backup folder and can only be shared as read-only</string>
+    <string name="backup_share_permission_text">这是一个备份文件夹，只能以只读方式共享</string>
     <!-- Button to confirm the action of restarting one transfer-->
     <string name="button_permission_info">好的，明白了</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_share_permission_title">Backup folders are read-only</string>
+    <string name="backup_share_permission_title">备份文件夹是只读文件夹</string>
     <!-- dialog option continue in alert dialog -->
     <string name="button_continue">继续</string>
     <!--Dialog title when the user selected is not on the contact list when sharing a node -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Can’t verify contact</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">无法验证联系人</string>
     <!--Dialog description when the user selected is not on the contact list when sharing a node -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">您无法验证%s，因为他们不在您的联系人列表中。请先等待他们接受您的邀请。</string>
     <!-- Answer for confirmation dialog. -->
@@ -1531,7 +1529,7 @@
         <item quantity="other">离开这些共享文件夹后，您将无法再次查看。</item>
     </plurals>
     <!-- Title of the dialog to choose permissions when sharing. -->
-    <string name="dialog_select_permissions">Choose permissions</string>
+    <string name="dialog_select_permissions">选择权限</string>
     <!-- Refers to access rights for a file folder. -->
     <string name="file_properties_shared_folder_full_access">完全访问</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
@@ -1539,9 +1537,9 @@
     <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="file_properties_shared_folder_read_write">仅读写</string>
     <!-- Text shown in the app bar when nodes are being selected in selection mode -->
-    <string name="general_selecting">Selecting</string>
+    <string name="general_selecting">选择中</string>
     <!-- Snackbar message when retry failed on failed transfers tab. -->
-    <string name="transfers_retry_failed_snackbar_message">Unable to restart transfers</string>
+    <string name="transfers_retry_failed_snackbar_message">无法重启传输</string>
     <!-- Action for the Snackbar when retry failed on failed transfers tab. -->
     <string name="transfers_retry_failed_snackbar_action">重试</string>
     <!-- Snackbar message when retry success on failed transfers tab. -->
@@ -1564,13 +1562,11 @@
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item restored but %d item wasn’t restored. Try again later.</item>
-        <item quantity="other">1 item restored but %d items weren’t restored. Try again later.</item>
+        <item quantity="other">已恢复1个项目但是%d个项目未恢复。请稍后再试。</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
-        <item quantity="one">%d item restored but 1 item wasn’t restored. Try again later.</item>
-        <item quantity="other">%d items restored but 1 item wasn’t restored. Try again later.</item>
+        <item quantity="other">%d个项目已恢复，但有1个项目未恢复。请稍后再试。</item>
     </plurals>
     <!-- category in sort by action to sort by name -->
     <string name="action_sort_by_name">名称</string>
@@ -1593,35 +1589,35 @@
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <string name="general_links_copied_clipboard">已复制链接到剪贴板</string>
     <!-- Snackbar message when retry success on failed transfers tab, singular form. -->
-    <string name="transfers_retry_feedback_snackbar_message_singular">Retrying transfer, see the Active tab for progress</string>
+    <string name="transfers_retry_feedback_snackbar_message_singular">重试传输，参见“活动”选项卡了解进度</string>
     <!-- Snackbar message when retry success on failed transfers tab, plural form. -->
-    <string name="transfers_retry_feedback_snackbar_message_plural">Retrying transfers, see the Active tab for progress</string>
+    <string name="transfers_retry_feedback_snackbar_message_plural">重试传输，参见“活动”选项卡了解进度</string>
     <!--Default file name for scanned documents. Placeholder value is for the current date and time values eg:   Scanned_2025091120323.  -->
-    <string name="document_scanning_default_file_name">Scanned_%1$s</string>
+    <string name="document_scanning_default_file_name">已扫描_%1$s</string>
     <!-- Benefit: Rewind up to specified days of deleted data -->
-    <string name="pro_plan_benefit_rewind_days">Rewind up to %1$d days of deleted data</string>
+    <string name="pro_plan_benefit_rewind_days">还原最多%1$d天的已删除数据</string>
     <!-- Error message when removing 1 or more public links from nodes. -->
-    <string name="public_link_node_removal_error_message">Link removal failed, try again later</string>
+    <string name="public_link_node_removal_error_message">删除链接失败，请稍后重试</string>
     <!-- Warning that appears prior to remove links of files-->
-    <string name="remove_links_warning_message">Removing a link means its contents won’t be publicly accessible anymore</string>
+    <string name="remove_links_warning_message">删除链接意味着其内容将无法再被公开访问</string>
     <!-- Success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="stop_sharing_folder_success_message">Folder sharing stopped</string>
+    <string name="stop_sharing_folder_success_message">文件夹共享已停止</string>
     <!-- Positive button text for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="stop_sharing_dialog_positive_button_text">停止共享</string>
     <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
-    <string name="leave_shared_folder_failed_message">Couldn’t leave one or more shared folders</string>
+    <string name="leave_shared_folder_failed_message">无法退出一个或多个共享文件夹</string>
     <!-- Confirmation message before leaving incoming shared folders -->
-    <string name="leave_shared_folder_confirmation_message">Leaving a shared folder means you won’t be able to see it again</string>
+    <string name="leave_shared_folder_confirmation_message">退出共享的文件夹意味着您将无法再次看到它</string>
     <!-- Message when a single public link is removed successfully. -->
     <string name="link_removed_success_message">链接已移除</string>
     <!-- Message when a single public link is removed successfully. -->
     <string name="links_removed_success_message">链接已移除</string>
     <!--Alert warning shown to the user when attempting to remove sharing from 1 or more folders-->
-    <string name="stop_sharing_dialog_title">Stop sharing this folder?</string>
+    <string name="stop_sharing_dialog_title">停止共享此文件夹？</string>
     <!--Alert warning shown to the user when attempting to remove sharing from multiple folders-->
-    <string name="stop_sharing_dialog_title_plurals">Stop sharing these folders?</string>
+    <string name="stop_sharing_dialog_title_plurals">停止共享这些文件夹？</string>
     <!-- Title of the dialog to choose permissions when sharing. -->
-    <string name="share_folder_dialog_choose_permission_title">Choose permissions</string>
+    <string name="share_folder_dialog_choose_permission_title">选择权限</string>
     <!-- Refers to access rights for a file folder. -->
     <string name="share_folder_dialog_full_access_radio_option">完全访问</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
@@ -1629,7 +1625,7 @@
     <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="share_folder_dialog_read_write_radio_option">仅读写</string>
     <!-- Text shown in the app bar when nodes are being selected in selection mode -->
-    <string name="app_bar_selection_mode_description">Selecting</string>
+    <string name="app_bar_selection_mode_description">选择中</string>
     <!-- success message when moving a node -->
     <string name="node_moved_success_message">已移动项目</string>
     <!-- success message when a node was restore from Rubbish bin to a location -->
@@ -1638,8 +1634,7 @@
     <string name="node_restore_error_message">发生错误。项目未还原。</string>
     <!-- Snackbar message to show when successfully left shared folder(s) along with one or more failures -->
     <plurals name="leave_shared_folder_partial_success_snackbar_message">
-        <item quantity="one">Left %1$d shared folder, but couldn’t leave one or more folders</item>
-        <item quantity="other">Left %1$d shared folders, but couldn’t leave one or more folders</item>
+        <item quantity="other">已退出%1$d个共享文件夹，但无法退出某一个或多个文件夹</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="node_restored_from_rubbish_bin_success_message">
@@ -1649,4 +1644,12 @@
     <plurals name="node_restored_from_rubbish_bin_error_message">
         <item quantity="other">%d个项目恢复失败</item>
     </plurals>
+    <!--header for the Camera Uploads transfer in progress items -->
+    <string name="camera_uploads_tranfer_header_in_progress">进行中的传输</string>
+    <!--header for the Camera Uploads transfer in queue items -->
+    <string name="camera_uploads_tranfer_header_in_queue">排队中</string>
+    <!--Title for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_title">全部已获取</string>
+    <!--description for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_description">拍摄了新的照片和视频后将出现在这里</string>
 </resources>

@@ -1165,9 +1165,9 @@
     <!-- text of how it works for mega pass free trial in achivements section -->
     <string name="text_how_it_works_mega_pass_free_trial">ติดตั้งแอป MEGA&#160;Pass เข้าสู่ระบบด้วยบัญชี MEGA ของคุณ แล้วเริ่มทดลองใช้ฟรี พื้นที่เก็บข้อมูลโบนัสของคุณจะถูกเพิ่มให้โดยอัตโนมัติหลังจากที่คุณเริ่มทดลองใช้ฟรี</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">คุณได้รับพื้นที่เก็บข้อมูล %1$s จากการเริ่มทดลองใช้ MEGA&#160;VPN ฟรี</string>
+    <string name="text_received_mega_vpn_free_trial">You’ve received %1$s extra storage space for starting a MEGA&#160;VPN free trial</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">คุณได้รับพื้นที่เก็บข้อมูล %1$s จากการเริ่มทดลองใช้ MEGA&#160;Pass ฟรี</string>
+    <string name="text_received_mega_pass_free_trial">You’ve received %1$s extra storage space for starting a MEGA&#160;Pass free trial</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">โฟลเดอร์บางรายการไม่สามารถซิงค์หรือสำรองข้อมูลได้ เนื่องจากแอป MEGA สูญเสียสิทธิ์ในการเข้าถึงโฟลเดอร์ในเครื่อง แตะ ดำเนินการต่อ เพื่อเพิ่มสิทธิ์สำหรับแต่ละโฟลเดอร์ที่ได้รับผลกระทบอีกครั้ง</string>
     <!-- Title for the free plan card when the user is an existing account -->
@@ -1644,4 +1644,12 @@
     <plurals name="node_restored_from_rubbish_bin_error_message">
         <item quantity="other">มี %d รายการที่ไม่ได้กู้คืน</item>
     </plurals>
+    <!--header for the Camera Uploads transfer in progress items -->
+    <string name="camera_uploads_tranfer_header_in_progress">กำลังดำเนินการ</string>
+    <!--header for the Camera Uploads transfer in queue items -->
+    <string name="camera_uploads_tranfer_header_in_queue">กำลังรอคิว</string>
+    <!--Title for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_title">ทุกอย่างเป็นปัจจุบันแล้ว</string>
+    <!--description for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_description">เมื่อคุณถ่ายรูปและวิดีโอ รายการใหม่ ๆ จะปรากฏในส่วนนี้</string>
 </resources>

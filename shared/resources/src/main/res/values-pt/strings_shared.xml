@@ -1720,4 +1720,12 @@
         <item quantity="many">%d de itens não foram restaurados</item>
         <item quantity="other">%d itens não foram restaurados</item>
     </plurals>
+    <!--header for the Camera Uploads transfer in progress items -->
+    <string name="camera_uploads_tranfer_header_in_progress">Em andamento</string>
+    <!--header for the Camera Uploads transfer in queue items -->
+    <string name="camera_uploads_tranfer_header_in_queue">Na fila</string>
+    <!--Title for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_title">Tudo atualizado</string>
+    <!--description for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_description">As novas fotos que você tirar e os vídeos que você gravar vão aparecer aqui</string>
 </resources>

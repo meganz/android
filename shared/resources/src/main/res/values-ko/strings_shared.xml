@@ -1165,9 +1165,9 @@
     <!-- text of how it works for mega pass free trial in achivements section -->
     <string name="text_how_it_works_mega_pass_free_trial">MEGA&#160;Pass 앱을 설치하고, MEGA 계정으로 로그인한 다음, 무료 체험을 시작하세요. 보너스 저장소는 무료 체험을 시작한 이후 자동으로 추가됩니다.</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">MEGA&#160;VPN 무료 체험을 시작하여 %1$s 저장 공간을 받았습니다</string>
+    <string name="text_received_mega_vpn_free_trial">MEGA&#160;VPN 무료 체험을 시작하여 %1$s의 추가 저장 공간을 받았습니다</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">MEGA&#160;Pass 무료 체험을 시작하여 %1$s 저장 공간을 받았습니다</string>
+    <string name="text_received_mega_pass_free_trial">MEGA&#160;Pass 무료 체험을 시작하여 %1$s의 추가 저장 공간을 받았습니다</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">일부 폴더는 MEGA 앱이 로컬 폴더에 대한 접근 권한을 상실하여 동기화하거나 백업할 수 없습니다. 재개를 탭하여 영향 받은 각 폴더의 권한을 다시 추가하세요.</string>
     <!-- Title for the free plan card when the user is an existing account -->
@@ -1654,4 +1654,12 @@
     <plurals name="node_restored_from_rubbish_bin_error_message">
         <item quantity="other">항목 %d개가 복원되지 않았습니다</item>
     </plurals>
+    <!--header for the Camera Uploads transfer in progress items -->
+    <string name="camera_uploads_tranfer_header_in_progress">진행 중</string>
+    <!--header for the Camera Uploads transfer in queue items -->
+    <string name="camera_uploads_tranfer_header_in_queue">대기 중</string>
+    <!--Title for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_title">모두 완료</string>
+    <!--description for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_description">새 사진과 동영상이 촬영되면 여기에 나타납니다</string>
 </resources>

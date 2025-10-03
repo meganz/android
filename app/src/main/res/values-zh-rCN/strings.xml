@@ -1198,13 +1198,13 @@
     <!-- title of the section for unlocked storage quota -->
     <string name="unlocked_storage_title">存储空间</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_referral_bonuses">邀请奖励</string>
+    <string name="title_referral_bonuses">邀请他人加入MEGA</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
-    <string name="title_install_app">安装MEGA手机应用程序</string>
+    <string name="title_install_app">安装手机App</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">注册奖励</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">安装MEGA桌面应用程序</string>
+    <string name="title_install_desktop">安装我们的桌面应用程序</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">剩余%1$d天</string>
     <!-- State to indicate an achievement has expired -->
@@ -1224,9 +1224,9 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">电子邮件地址格式错误</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">您已通过安装MEGA桌面应用程序获得了%1$s存储空间。</string>
+    <string name="result_paragraph_info_achievement_install_desktop">您已通过安装MEGA桌面应用程序获得了%1$s额外存储空间。</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">您已通过安装MEGA手机应用程序获得了%1$s的存储空间。</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">您已通过安装MEGA手机应用程序获得了%1$s额外存储空间。</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">您已收到%1$s存储空间作为您的免费注册奖励。</string>
     <!-- menu items -->

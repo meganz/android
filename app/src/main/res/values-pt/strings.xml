@@ -1246,15 +1246,15 @@
     <!-- title of the section for unlocked storage quota -->
     <string name="unlocked_storage_title">Espaço de armazenamento</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_referral_bonuses">Bônus de indicação</string>
+    <string name="title_referral_bonuses">Convidar amigos ao MEGA</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
-    <string name="title_install_app">Instalar o aplicativo móvel</string>
+    <string name="title_install_app">Instalar o app móvel</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Bônus de cadastro</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Instalar o app para desktop</string>
     <!-- indicates the number of days left related to a achievement -->
-    <string name="general_num_days_left">Vence em %1$d d</string>
+    <string name="general_num_days_left">%1$d dias restantes</string>
     <!-- State to indicate an achievement has expired -->
     <string name="expired_label">Expirado</string>
     <!-- title of the advanced setting to choose the use of https -->
@@ -1272,9 +1272,9 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Formato de email incorreto</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">Você recebeu %1$s de espaço de armazenamento por instalar o aplicativo do MEGA para desktop.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Você recebeu %1$s de espaço de armazenamento adicional por instalar o nosso aplicativo para desktop</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">Você recebeu %1$s de espaço de armazenamento por instalar o aplicativo do MEGA para dispositivos móveis.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Você recebeu %1$s de espaço de armazenamento adicional por instalar o nosso aplicativo para dispositivos móveis</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Você recebeu %1$s de espaço de armazenamento como bônus por cadastrar uma conta.</string>
     <!-- menu items -->
@@ -2641,7 +2641,7 @@
     <!-- Message displayed to inform that a link and its password have been sent separately to a chat -->
     <string name="link_and_password_sent">O link e a senha foram enviados</string>
     <!-- Title of a warning recommending upgrade to Pro -->
-    <string name="upgrade_pro">Fazer o upgrade a Pro</string>
+    <string name="upgrade_pro">Fazer upgrade a Pro</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">Os usuários Pro do MEGA têm acesso exclusivo a recursos adicionais para a proteção dos links, tornando sua conta ainda mais segura.</string>
     <!-- Meaning of links decryption key -->

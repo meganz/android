@@ -1222,15 +1222,15 @@
     <!-- title of the section for unlocked storage quota -->
     <string name="unlocked_storage_title">Opslag tegoed</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_referral_bonuses">Uitnodigingsbonussen</string>
+    <string name="title_referral_bonuses">Uitnodigen bij MEGA</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
-    <string name="title_install_app">Installeer een mobiele app</string>
+    <string name="title_install_app">Installeer onze mobiele app</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Inschrijfbonus</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Installeer een MEGA Desktop Applicatie</string>
+    <string name="title_install_desktop">Installeer onze desktop applicatie</string>
     <!-- indicates the number of days left related to a achievement -->
-    <string name="general_num_days_left">%1$d d over</string>
+    <string name="general_num_days_left">%1$d resterende dagen</string>
     <!-- State to indicate an achievement has expired -->
     <string name="expired_label">Verlopen</string>
     <!-- title of the advanced setting to choose the use of https -->
@@ -1248,9 +1248,9 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Email address is malformed</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">U heeft %1$s opslagruimte ontvangen voor het installeren van onze MEGA Desktop Applicatie.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">U heeft %1$s extra opslagruimte voor het installeren van onze desktop applicatie ontvangen</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">U heeft %1$s opslagruimte gekregen voor het installeren van de MEGA Mobile Applicatie.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">U heeft %1$s extra opslagruimte voor het installeren van onze mobiele applicatie ontvangen</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">U heeft %1$s opslagruimte als gratis aanmeldingsbonus ontvangen.</string>
     <!-- menu items -->

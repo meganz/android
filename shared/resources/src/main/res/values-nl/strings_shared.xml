@@ -1182,9 +1182,9 @@
     <!-- text of how it works for mega pass free trial in achivements section -->
     <string name="text_how_it_works_mega_pass_free_trial">Installeer de MEGA&#160;Pass-applicatie, log in met uw MEGA-account en uw gratis proefperiode starten. Uw bonusopslag wordt automatisch toegevoegd na het starten van uw gratis proefperiode.</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">U heeft %1$saan opslagruimte voor het starten van een MEGA&#160;VPN gratis proefversie ontvangen</string>
+    <string name="text_received_mega_vpn_free_trial">U heeft %1$s extra opslagruimte ontvangen voor het starten van een MEGA&#160; VPN  gratis proefversie</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">U heeft %1$saan opslagruimte voor het starten van een MEGA&#160;Pass gratis proefversie ontvangen</string>
+    <string name="text_received_mega_pass_free_trial">U heeft %1$s extra opslagruimte ontvangen voor het starten van een MEGA&#160;Pass gratis proefversie</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">Sommige mappen kunnen niet worden gesynchroniseerd of er kan geen back-up van worden gemaakt omdat de MEGA-applicatie geen rechten meer heeft om toegang te krijgen tot de lokale mappen. Tik op Hervatten om machtigingen opnieuw toe te voegen voor elke betreffende map.</string>
     <!-- Title for the free plan card when the user is an existing account -->
@@ -1682,4 +1682,12 @@
         <item quantity="one">%d item was niet hersteld</item>
         <item quantity="other">%d items waren niet hersteld</item>
     </plurals>
+    <!--header for the Camera Uploads transfer in progress items -->
+    <string name="camera_uploads_tranfer_header_in_progress">In behandeling</string>
+    <!--header for the Camera Uploads transfer in queue items -->
+    <string name="camera_uploads_tranfer_header_in_queue">In de wachtrij staan</string>
+    <!--Title for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_title">Allemaal bijgewerkt</string>
+    <!--description for the Camera Uploads transfer empty view -->
+    <string name="camera_uploads_tranfer_empty_view_description">Nieuwe foto\’s en video\’s verschijnen hier nadat u ze heeft gemaakt</string>
 </resources>
