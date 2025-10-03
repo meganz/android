@@ -208,15 +208,6 @@ class HandleTransferEventUseCaseTest {
 
     @ParameterizedTest
     @MethodSource("provideFinishEvents")
-    fun `test that invoke call removeInProgressTransfers when the event is a finish event`(
-        transferEvent: TransferEvent.TransferFinishEvent,
-    ) = runTest {
-        underTest.invoke(transferEvent)
-        verify(transferRepository).removeInProgressTransfers(setOf(transferEvent.transfer.uniqueId))
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideFinishEvents")
     fun `test that invoke call addCompletedTransfers when the event is a finish event`(
         transferEvent: TransferEvent.TransferFinishEvent,
     ) = runTest {
@@ -235,9 +226,22 @@ class HandleTransferEventUseCaseTest {
                             i.toLong()
                         )
                     )
+                    if (i % 2 == 0) {
+                        add(
+                            mockTransferEvent<TransferEvent.TransferFinishEvent>(
+                                TransferType.DOWNLOAD,
+                                -i.toLong()
+                            ) {
+                                on { this.error }.thenReturn(BusinessAccountExpiredMegaException(1))
+                            }
+                        )
+                    }
                 }
             }
-            val expected = events.takeLast(MAX_COMPLETED_TRANSFERS)
+            val (failed, completed) = events.partition { it.error != null }
+            val recentFailed = failed.takeLast(MAX_COMPLETED_TRANSFERS)
+            val recentCompleted = completed.takeLast(MAX_COMPLETED_TRANSFERS)
+            val expected = recentFailed + recentCompleted
 
             underTest.invoke(events = events.toTypedArray())
 
@@ -305,7 +309,18 @@ class HandleTransferEventUseCaseTest {
         transferEvent: TransferEvent,
     ) = runTest {
         underTest(transferEvent)
-        verify(transferRepository).updateInProgressTransfers(eq(listOf(transferEvent.transfer)))
+        verify(transferRepository)
+            .updateInProgressTransfers(eq(listOf(transferEvent.transfer)), eq(emptyList()))
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideFinishEvents")
+    fun `test that updateInProgressTransfers in repository is invoked when finish event is received`(
+        transferEvent: TransferEvent,
+    ) = runTest {
+        underTest(transferEvent)
+        verify(transferRepository)
+            .updateInProgressTransfers(emptyList(), listOf(transferEvent.transfer.uniqueId))
     }
 
     @ParameterizedTest
@@ -351,7 +366,8 @@ class HandleTransferEventUseCaseTest {
                         events2.last().transfer,
                         events3.last().transfer,
                     )
-                )
+                ),
+                eq(emptyList())
             )
         }
 
@@ -448,10 +464,10 @@ class HandleTransferEventUseCaseTest {
 
     private fun provideFinishEvents(): List<TransferEvent.TransferFinishEvent> =
         provideFinishEventsWithError() +
-                provideTransferEvents()
+                provideTransferEvents(isFinished = true)
 
     private fun provideFinishEventsWithError() =
-        provideTransferEvents<TransferEvent.TransferFinishEvent> {
+        provideTransferEvents<TransferEvent.TransferFinishEvent>(isFinished = true) {
             on { this.error }.thenReturn(BusinessAccountExpiredMegaException(1))
         }
 
@@ -472,15 +488,21 @@ class HandleTransferEventUseCaseTest {
 
     private inline fun <reified T : TransferEvent> provideTransferEvents(
         transferUniqueId: Long = 0,
+        isFinished: Boolean = false,
         stubbing: KStubbing<T>.(T) -> Unit = {},
-    ) =
-        TransferType.entries.map { transferType ->
-            mockTransferEvent(transferType, transferUniqueId, stubbing = stubbing)
-        }
+    ) = TransferType.entries.map { transferType ->
+        mockTransferEvent(
+            transferType = transferType,
+            transferUniqueId = transferUniqueId,
+            isFinished = isFinished,
+            stubbing = stubbing
+        )
+    }
 
     private inline fun <reified T : TransferEvent> mockTransferEvent(
         transferType: TransferType,
         transferUniqueId: Long = 0,
+        isFinished: Boolean = false,
         folderTransferTag: Int? = null,
         isFolderTransfer: Boolean = false,
         stubbing: KStubbing<T>.(T) -> Unit = {},
@@ -488,6 +510,7 @@ class HandleTransferEventUseCaseTest {
         val transfer = mock<Transfer> {
             on { this.transferType }.thenReturn(transferType)
             on { this.uniqueId }.thenReturn(transferUniqueId)
+            on { this.isFinished }.thenReturn(isFinished)
             on { this.folderTransferTag }.thenReturn(folderTransferTag)
             on { this.isFolderTransfer }.thenReturn(isFolderTransfer)
             on { this.appData }.thenReturn(emptyList())

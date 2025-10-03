@@ -8,6 +8,8 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
+import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -226,6 +228,106 @@ internal class CorrectActiveTransfersUseCaseTest {
             verify(transferRepository).updateInProgressTransfers(
                 argThat { this.map { it.tag } == notInDataBase.map { it.tag } }
             )
+        }
+
+    @Test
+    fun `test that in progress streaming transfers not in active transfers are not updated in in progress transfers`() =
+        runTest {
+            stubActiveTransfers(false)
+            val mockedTransfers = buildList {
+                for (i in 0..10) {
+                    add(mock<Transfer> {
+                        on { it.uniqueId } doReturn i.toLong()
+                        if (i % 2 == 0) {
+                            on { it.isStreamingTransfer } doReturn true
+                        }
+                    })
+                }
+            }
+            val notInDataBase = mockedTransfers.filterNot { it.isStreamingTransfer }
+
+            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+                .thenReturn(emptyList())
+            whenever(getInProgressTransfersUseCase()).thenReturn(mockedTransfers)
+
+            underTest(TransferType.GENERAL_UPLOAD)
+
+            verify(transferRepository).updateInProgressTransfers(notInDataBase)
+        }
+
+    @Test
+    fun `test that in progress folder transfers not in active transfers are not updated in in progress transfers`() =
+        runTest {
+            stubActiveTransfers(false)
+            val mockedTransfers = buildList {
+                for (i in 0..10) {
+                    add(mock<Transfer> {
+                        on { it.uniqueId } doReturn i.toLong()
+                        if (i % 2 == 0) {
+                            on { it.isFolderTransfer } doReturn true
+                        }
+                    })
+                }
+            }
+            val notInDataBase = mockedTransfers.filterNot { it.isFolderTransfer }
+
+            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+                .thenReturn(emptyList())
+            whenever(getInProgressTransfersUseCase()).thenReturn(mockedTransfers)
+
+            underTest(TransferType.GENERAL_UPLOAD)
+
+            verify(transferRepository).updateInProgressTransfers(notInDataBase)
+        }
+
+    @Test
+    fun `test that in progress background transfers not in active transfers are not updated in in progress transfers`() =
+        runTest {
+            stubActiveTransfers(false)
+            val mockedTransfers = buildList {
+                for (i in 0..10) {
+                    add(mock<Transfer> {
+                        on { it.uniqueId } doReturn i.toLong()
+                        if (i % 2 == 0) {
+                            on { it.appData } doReturn listOf(TransferAppData.BackgroundTransfer)
+                        }
+                    })
+                }
+            }
+            val notInDataBase = mockedTransfers.filterNot { it.isBackgroundTransfer() }
+
+            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+                .thenReturn(emptyList())
+            whenever(getInProgressTransfersUseCase()).thenReturn(mockedTransfers)
+
+            underTest(TransferType.GENERAL_UPLOAD)
+
+            verify(transferRepository).updateInProgressTransfers(notInDataBase)
+        }
+
+    @Test
+    fun `test that in progress preview transfers not in active transfers are not updated in in progress transfers`() =
+        runTest {
+            stubActiveTransfers(false)
+            val mockedTransfers = buildList {
+                for (i in 0..10) {
+                    add(mock<Transfer> {
+                        on { it.uniqueId } doReturn i.toLong()
+                        if (i % 2 == 0) {
+                            on { it.appData } doReturn listOf(TransferAppData.PreviewDownload)
+                        }
+                    })
+                }
+            }
+            val notInDataBase = mockedTransfers.filterNot { it.isPreviewDownload() }
+
+            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+                .thenReturn(emptyList())
+            whenever(getInProgressTransfersUseCase()).thenReturn(mockedTransfers)
+
+            underTest(TransferType.GENERAL_UPLOAD)
+
+            verify(transferRepository).updateInProgressTransfers(notInDataBase)
         }
 
     @ParameterizedTest

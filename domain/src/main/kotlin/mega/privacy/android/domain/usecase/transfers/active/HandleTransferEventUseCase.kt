@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
 import mega.privacy.android.domain.monitoring.CrashReporter
@@ -58,10 +59,22 @@ class HandleTransferEventUseCase @Inject internal constructor(
         events.filterByType(
             start = true,
             update = true,
+            finish = true,
             pause = true,
-        )?.map { it.transfer }?.let {
-            transferRepository.updateInProgressTransfers(it)
-            updateCameraUploadsInProgressTransfers(it)
+        )?.map { it.transfer }?.let { transfers ->
+            val (transfersToRemove, transfersToUpdate) = transfers.filterNot {
+                it.isStreamingTransfer
+                        || it.isBackgroundTransfer()
+                        || it.isFolderTransfer
+                        || it.isPreviewDownload()
+            }.partition { it.isFinished }
+
+            if (transfersToUpdate.isEmpty() && transfersToRemove.isEmpty()) return
+
+            val finishedUniqueIds = transfersToRemove.map { it.uniqueId }
+
+            transferRepository.updateInProgressTransfers(transfersToUpdate, finishedUniqueIds)
+            updateCameraUploadsInProgressTransfers(transfers)
         }
     }
 
@@ -174,11 +187,11 @@ class HandleTransferEventUseCase @Inject internal constructor(
             .filterIsInstance<TransferEvent.TransferFinishEvent>()
             .let { completedEvents ->
                 if (completedEvents.isNotEmpty()) {
-                    val finishedTransferIds = completedEvents.map { it.transfer.uniqueId }.toSet()
-                    val completedEventsToAdd = completedEvents.takeLast(MAX_COMPLETED_TRANSFERS)
+                    val (failed, completed) = completedEvents.partition { it.error != null }
+                    val recentFailed = failed.takeLast(MAX_COMPLETED_TRANSFERS)
+                    val recentCompleted = completed.takeLast(MAX_COMPLETED_TRANSFERS)
 
-                    transferRepository.removeInProgressTransfers(finishedTransferIds)
-                    transferRepository.addCompletedTransfers(completedEventsToAdd)
+                    transferRepository.addCompletedTransfers(recentFailed + recentCompleted)
                     removeCameraUploadsInProgressTransfers(completedEvents)
                 }
             }

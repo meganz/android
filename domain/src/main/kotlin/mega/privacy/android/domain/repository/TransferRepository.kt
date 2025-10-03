@@ -500,6 +500,14 @@ interface TransferRepository {
     suspend fun updateInProgressTransfers(transfers: List<Transfer>)
 
     /**
+     * Updates, removes or adds a list of transfers to the in progress transfers list.
+     */
+    suspend fun updateInProgressTransfers(
+        transfersToUpdate: List<Transfer>,
+        finishedUniqueIds: List<Long>,
+    )
+
+    /**
      * Monitor in progress transfers flow.
      */
     fun monitorInProgressTransfers(): Flow<Map<Long, InProgressTransfer>>

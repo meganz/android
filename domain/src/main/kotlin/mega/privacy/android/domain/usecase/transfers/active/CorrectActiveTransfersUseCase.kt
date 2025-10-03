@@ -52,16 +52,16 @@ class CorrectActiveTransfersUseCase @Inject constructor(
         transferRepository.updateTransferredBytes(inProgressTransfers)
 
         //set not-in-progress active transfers as finished, this can happen if we missed a finish event from SDK
-        val notInProgressNoSDCardActiveTransfersUniqueIds = activeTransfers
+        val notInProgressActiveTransfersUniqueIds = activeTransfers
             .filter { activeTransfer ->
                 !activeTransfer.isFinished
                         && activeTransfer.uniqueId !in inProgressTransfers.map { it.uniqueId }
             }
 
-        if (notInProgressNoSDCardActiveTransfersUniqueIds.isNotEmpty()) {
+        if (notInProgressActiveTransfersUniqueIds.isNotEmpty()) {
             //Set not in progress as finished. We are not sure if they have been cancelled or failed, we check the existence of the file to set it as cancelled as best effort approach
             transferRepository.apply {
-                val (fileExists, fileNotExists) = notInProgressNoSDCardActiveTransfersUniqueIds.partition {
+                val (fileExists, fileNotExists) = notInProgressActiveTransfersUniqueIds.partition {
                     fileSystemRepository.doesUriPathExist(UriPath(it.localPath))
                 }
                 fileExists.map { it.uniqueId }.takeIf { it.isNotEmpty() }?.let {
@@ -71,7 +71,7 @@ class CorrectActiveTransfersUseCase @Inject constructor(
                     setActiveTransfersAsFinishedByUniqueId(it, cancelled = true)
                 }
                 removeInProgressTransfers(
-                    notInProgressNoSDCardActiveTransfersUniqueIds.map { it.uniqueId }.toSet()
+                    notInProgressActiveTransfersUniqueIds.map { it.uniqueId }.toSet()
                 )
             }
         }
@@ -81,7 +81,14 @@ class CorrectActiveTransfersUseCase @Inject constructor(
             activeTransfers.map { it.uniqueId }.contains(transfer.uniqueId)
         }
         if (inProgressNotInActiveTransfers.isNotEmpty()) {
-            transferRepository.updateInProgressTransfers(inProgressNotInActiveTransfers)
+            inProgressNotInActiveTransfers.filterNot {
+                it.isStreamingTransfer
+                        || it.isBackgroundTransfer()
+                        || it.isFolderTransfer
+                        || it.isPreviewDownload()
+            }.takeUnless { it.isEmpty() }?.let { transfers ->
+                transferRepository.updateInProgressTransfers(transfers)
+            }
             transferRepository.insertOrUpdateActiveTransfers(inProgressNotInActiveTransfers)
         }
 

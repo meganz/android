@@ -1431,102 +1431,37 @@ class DefaultTransfersRepositoryTest {
         }
 
     @Test
-    fun `test that in progress transfers flow is not updated with folder transfers`() =
+    fun `test that in progress transfers flow is updated correctly when updateInProgressTransfers is called with updated and finished transfers`() =
         runTest {
-            val uniqueId = 5L
-            val folderTransfer = mock<Transfer> {
-                on { it.uniqueId } doReturn uniqueId
-                on { it.isFolderTransfer } doReturn true
+            val uniqueId1 = 5L
+            val uniqueId2 = 6L
+            val transfer1 = mock<Transfer> {
+                on { it.uniqueId } doReturn uniqueId1
             }
-            val transfer = mock<Transfer> {
-                on { it.uniqueId } doReturn uniqueId
-                on { it.isFolderTransfer } doReturn false
+            val inProgressTransfer1 = mock<InProgressTransfer.Download> {
+                on { it.uniqueId } doReturn uniqueId1
             }
-            val inProgressTransfer = mock<InProgressTransfer.Download> {
-                on { it.uniqueId } doReturn uniqueId
+            val transfer2 = mock<Transfer> {
+                on { it.uniqueId } doReturn uniqueId2
             }
-            whenever(inProgressTransferMapper(transfer)).thenReturn(inProgressTransfer)
+            val inProgressTransfer2 = mock<InProgressTransfer.Download> {
+                on { it.uniqueId } doReturn uniqueId2
+            }
+
+            whenever(inProgressTransferMapper(transfer1)).thenReturn(inProgressTransfer1)
+            whenever(inProgressTransferMapper(transfer2)).thenReturn(inProgressTransfer2)
+
             setUp()
             underTest.monitorInProgressTransfers().test {
                 assertThat(awaitItem()).isEmpty()
-                underTest.updateInProgressTransfers(listOf(transfer, folderTransfer))
 
-                assertThat(awaitItem()).containsExactly(uniqueId, inProgressTransfer)
-            }
-        }
+                underTest.updateInProgressTransfers(listOf(transfer1))
 
-    @Test
-    fun `test that in progress transfers flow is not updated with streaming transfers`() =
-        runTest {
-            val uniqueId = 5L
-            val folderTransfer = mock<Transfer> {
-                on { it.uniqueId } doReturn uniqueId
-                on { it.isStreamingTransfer } doReturn true
-            }
-            val transfer = mock<Transfer> {
-                on { it.uniqueId } doReturn uniqueId
-                on { it.isFolderTransfer } doReturn false
-            }
-            val inProgressTransfer = mock<InProgressTransfer.Download> {
-                on { it.uniqueId } doReturn uniqueId
-            }
-            whenever(inProgressTransferMapper(transfer)).thenReturn(inProgressTransfer)
-            setUp()
-            underTest.monitorInProgressTransfers().test {
-                assertThat(awaitItem()).isEmpty()
-                underTest.updateInProgressTransfers(listOf(transfer, folderTransfer))
+                assertThat(awaitItem()).containsExactly(uniqueId1, inProgressTransfer1)
 
-                assertThat(awaitItem()).containsExactly(uniqueId, inProgressTransfer)
-            }
-        }
+                underTest.updateInProgressTransfers(listOf(transfer2), listOf(uniqueId1))
 
-    @Test
-    fun `test that in progress transfers flow is not updated with preview transfers`() =
-        runTest {
-            val uniqueId = 5L
-            val folderTransfer = mock<Transfer> {
-                on { it.uniqueId } doReturn uniqueId
-                on { it.appData } doReturn listOf(TransferAppData.PreviewDownload)
-            }
-            val transfer = mock<Transfer> {
-                on { it.uniqueId } doReturn uniqueId
-                on { it.isFolderTransfer } doReturn false
-            }
-            val inProgressTransfer = mock<InProgressTransfer.Download> {
-                on { it.uniqueId } doReturn uniqueId
-            }
-            whenever(inProgressTransferMapper(transfer)).thenReturn(inProgressTransfer)
-            setUp()
-            underTest.monitorInProgressTransfers().test {
-                assertThat(awaitItem()).isEmpty()
-                underTest.updateInProgressTransfers(listOf(transfer, folderTransfer))
-
-                assertThat(awaitItem()).containsExactly(uniqueId, inProgressTransfer)
-            }
-        }
-
-    @Test
-    fun `test that in progress transfers flow is not updated with background transfers`() =
-        runTest {
-            val uniqueId = 5L
-            val folderTransfer = mock<Transfer> {
-                on { it.uniqueId } doReturn uniqueId
-                on { it.appData } doReturn listOf(TransferAppData.BackgroundTransfer)
-            }
-            val transfer = mock<Transfer> {
-                on { it.uniqueId } doReturn uniqueId
-                on { it.isFolderTransfer } doReturn false
-            }
-            val inProgressTransfer = mock<InProgressTransfer.Download> {
-                on { it.uniqueId } doReturn uniqueId
-            }
-            whenever(inProgressTransferMapper(transfer)).thenReturn(inProgressTransfer)
-            setUp()
-            underTest.monitorInProgressTransfers().test {
-                assertThat(awaitItem()).isEmpty()
-                underTest.updateInProgressTransfers(listOf(transfer, folderTransfer))
-
-                assertThat(awaitItem()).containsExactly(uniqueId, inProgressTransfer)
+                assertThat(awaitItem()).containsExactly(uniqueId2, inProgressTransfer2)
             }
         }
 

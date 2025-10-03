@@ -61,8 +61,6 @@ import mega.privacy.android.domain.entity.transfer.TransferAppData.RecursiveTran
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
-import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
@@ -700,12 +698,6 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override suspend fun updateInProgressTransfers(transfers: List<Transfer>) {
         transfers
-            .filterNot {
-                it.isStreamingTransfer
-                        || it.isBackgroundTransfer()
-                        || it.isFolderTransfer
-                        || it.isPreviewDownload()
-            }
             .map { inProgressTransferMapper(it) }
             .associateBy { it.uniqueId }
             .takeIf { it.isNotEmpty() }?.let { newInProgressTransfers ->
@@ -715,6 +707,23 @@ internal class DefaultTransfersRepository @Inject constructor(
                     }
                 }
             }
+    }
+
+    override suspend fun updateInProgressTransfers(
+        transfersToUpdate: List<Transfer>,
+        finishedUniqueIds: List<Long>
+    ) {
+        val newInProgressMapped = transfersToUpdate
+            .map { inProgressTransferMapper(it) }
+            .associateBy { it.uniqueId }
+
+        inProgressTransfersFlow.update { current ->
+            current.toMutableMap().let { updated ->
+                finishedUniqueIds.forEach { updated.remove(it) }
+                updated.putAll(newInProgressMapped)
+                updated
+            }
+        }
     }
 
     override fun monitorInProgressTransfers() = inProgressTransfersFlow
@@ -857,4 +866,3 @@ internal class DefaultTransfersRepository @Inject constructor(
     private fun MegaTransfer.isCUUpload() =
         appData?.contains(AppDataTypeConstants.CameraUpload.sdkTypeValue) == true
 }
-
