@@ -52,6 +52,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPrevie
  * @param content The content of the list.
  */
 @Composable
+@Deprecated("please use the FastScrollLazyColumn in core-ui library")
 fun FastScrollLazyColumn(
     totalItems: Int,
     modifier: Modifier = Modifier,
@@ -100,6 +101,7 @@ fun FastScrollLazyColumn(
  *                   This allows for customization of the LazyColumn's behavior and appearance.
  */
 @Composable
+@Deprecated("please use the FastScrollForLazyColumn in core-ui library")
 fun FastScrollForLazyColumn(
     totalItems: Int,
     modifier: Modifier = Modifier,

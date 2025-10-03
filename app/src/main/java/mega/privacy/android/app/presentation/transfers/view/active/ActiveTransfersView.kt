@@ -17,6 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.ImmutableList
 import mega.android.core.ui.components.list.MegaReorderableLazyColumn
+import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollForLazyColumn
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.extensions.transfers.getProgressPercentString
 import mega.privacy.android.app.presentation.extensions.transfers.getProgressSizeString
@@ -28,7 +29,6 @@ import mega.privacy.android.app.presentation.transfers.view.TEST_TAG_ACTIVE_TAB
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.feature.transfers.components.ActiveTransferItem
 import mega.privacy.android.feature.transfers.components.OverQuotaBanner
-import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollForLazyColumn
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ActiveTransfersIndividualPauseButtonButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ActiveTransfersIndividualPlayButtonButtonPressedEvent
