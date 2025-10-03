@@ -104,9 +104,6 @@ fun TimelineView(
     loadPhotos: () -> Unit = {},
 ) {
     val context = LocalContext.current
-    val isBarVisible by remember {
-        derivedStateOf { lazyGridState.firstVisibleItemIndex == 0 }
-    }
     val isScrollingDown by lazyGridState.isScrollingDown()
     val isScrolledToEnd by lazyGridState.isScrolledToEnd()
     val isScrolledToTop by lazyGridState.isScrolledToTop()
@@ -266,7 +263,6 @@ fun TimelineView(
                         HandlePhotosGridView(
                             timelineViewState = timelineViewState,
                             lazyGridState = lazyGridState,
-                            isBarVisible = isBarVisible,
                             isScrollingDown = isScrollingDown,
                             isScrolledToEnd = isScrolledToEnd,
                             isScrolledToTop = isScrolledToTop,
@@ -293,7 +289,6 @@ fun TimelineView(
 private fun HandlePhotosGridView(
     timelineViewState: TimelineViewState,
     lazyGridState: LazyGridState,
-    isBarVisible: Boolean,
     isScrollingDown: Boolean,
     isScrolledToEnd: Boolean,
     isScrolledToTop: Boolean,
@@ -429,7 +424,7 @@ private fun HandlePhotosGridView(
                         onTimeBarTabSelected = onTimeBarTabSelected,
                         selectedTimeBarTab = timelineViewState.selectedTimeBarTab,
                     ) {
-                        isBarVisible || (!isScrollingDown && !isScrolledToEnd)
+                        (!isScrollingDown && !isScrolledToEnd) || isScrolledToTop
                     }
                 }
             }
