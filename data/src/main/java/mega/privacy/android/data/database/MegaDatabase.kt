@@ -157,7 +157,9 @@ internal abstract class MegaDatabase : RoomDatabase() {
             context,
             MegaDatabase::class.java, MegaDatabaseConstant.DATABASE_NAME
         ).fallbackToDestructiveMigrationFrom(
-            *(1..66).toList().toIntArray() // allow destructive migration for version 1 to 66
+            dropAllTables = true,
+            startVersions = (1..66).toList()
+                .toIntArray() // allow destructive migration for version 1 to 66
         ).addMigrations(*MIGRATIONS)
             .openHelperFactory(
                 MegaOpenHelperFactor(
@@ -165,6 +167,7 @@ internal abstract class MegaDatabase : RoomDatabase() {
                     legacyDatabaseMigration
                 )
             )
+            .fallbackToDestructiveMigrationOnDowngrade(true)
             .build()
 
         private val MIGRATION_67_68 = object : Migration(67, 68) {

@@ -5,7 +5,7 @@ plugins {
     alias(convention.plugins.mega.android.room)
     alias(convention.plugins.mega.android.hilt)
     id("kotlin-android")
-    kotlin("plugin.serialization") version "1.9.21"
+    alias(plugin.plugins.kotlin.serialisation)
 }
 
 android {
