@@ -111,7 +111,7 @@ fun FileBrowserComposeView(
                         onDisputeTakeDownClicked = onDisputeTakeDownClicked,
                         showMediaDiscoveryButton = uiState.showMediaDiscoveryIcon,
                         onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
-                        listContentPadding = PaddingValues(top = 18.dp, bottom = 86.dp),
+                        listContentPadding = PaddingValues(top = 18.dp, bottom = 150.dp),
                         fileTypeIconMapper = fileTypeIconMapper,
                         inSelectionMode = uiState.isInSelection,
                         shouldApplySensitiveMode = uiState.hiddenNodeEnabled
