@@ -443,7 +443,8 @@ internal class FileFacadeTest {
                 on { toString() } doReturn contentUri
             }
             val doc = mock<DocumentFile>()
-            val uriPath = UriPath("/raw/storage/emulated/0/screen-recording-1738156692736.mp4")
+            val uriPath =
+                UriPath("file:///raw/storage/emulated/0/screen-recording-1738156692736.mp4")
             val contentUriPath = UriPath(contentUri)
             val expected = mock<DocumentEntity>()
             val document = mock<DocumentEntity> {
@@ -453,6 +454,32 @@ internal class FileFacadeTest {
 
             whenever(documentFileWrapper.fromUri(uri)) doReturn doc
             whenever(documentFileMapper(doc, 0, 0)) doReturn document
+            whenever(documentFileWrapper.isMIUIGalleryRawUri(uri)) doReturn true
+
+            assertThat(underTest.getDocumentEntities(listOf(uri)))
+                .containsExactly(expected)
+        }
+
+    @Test
+    fun `test that getDocumentEntities returns the mapped entities from a list of Samsung with Android less than 10 gallery uris`() =
+        runTest {
+            val contentUri = "content://media/external/images/media/5701"
+            val uri = mock<Uri> {
+                on { this.scheme } doReturn "content"
+                on { toString() } doReturn contentUri
+            }
+            val doc = mock<DocumentFile>()
+            val uriPath =
+                UriPath("file:///storage/2386-15F8/Test%20Downloads/picture20231109_162622_.jpg")
+            val contentUriPath = UriPath(contentUri)
+            val expected = mock<DocumentEntity>()
+            val document = mock<DocumentEntity> {
+                on { this.uri } doReturn uriPath
+                on { copy(uri = contentUriPath) } doReturn expected
+            }
+
+            whenever(documentFileWrapper.fromUri(uri)) doReturn doc
+            whenever(documentFileMapper(file = doc, numFiles = 0, numFolders = 0)) doReturn document
             whenever(documentFileWrapper.isMIUIGalleryRawUri(uri)) doReturn true
 
             assertThat(underTest.getDocumentEntities(listOf(uri)))

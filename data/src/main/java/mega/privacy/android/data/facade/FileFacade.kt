@@ -804,7 +804,9 @@ internal class FileFacade @Inject constructor(
                     numFiles = childFiles.count { it.isFile },
                     numFolders = childFiles.count { it.isDirectory },
                 ).let {
-                    if (documentFileWrapper.isMIUIGalleryRawUri(uri)) {
+                    if (documentFileWrapper.isMIUIGalleryRawUri(uri)
+                        || documentFileWrapper.isSamsungDeviceWithAndroidLessThanQ()
+                    ) {
                         it.copy(uri = UriPath(uri.toString()))
                     } else {
                         it

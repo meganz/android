@@ -147,4 +147,11 @@ interface DocumentFileWrapper {
      *  and its path /raw/storage/emulated/0/screen-recording-1738156692736.mp4
      */
     fun isMIUIGalleryRawUri(uri: Uri): Boolean
+
+    /**
+     * Check if the device is a Samsung device with Android version less than Q.
+     * Samsung devices with Android version less than Q have an issue that causes
+     * DocumentFile to not work properly. It is required to use File API instead.
+     */
+    fun isSamsungDeviceWithAndroidLessThanQ(): Boolean
 }

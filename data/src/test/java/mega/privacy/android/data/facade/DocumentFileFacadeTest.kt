@@ -1,14 +1,19 @@
 package mega.privacy.android.data.facade
 
+import android.content.ContentResolver
 import android.content.Context
+import android.database.Cursor
 import android.net.Uri
+import android.os.Build
 import android.provider.DocumentsContract
+import android.provider.MediaStore
 import androidx.documentfile.provider.DocumentFile
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.facade.DocumentFileFacade.Companion.EXTERNAL_STORAGE_AUTHORITY
 import mega.privacy.android.data.facade.DocumentFileFacade.Companion.MIUI_GALLERY_AUTHORITY
 import mega.privacy.android.data.facade.DocumentFileFacade.Companion.MIUI_RAW_PREFIX_PATH
+import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -29,18 +34,19 @@ class DocumentFileFacadeTest {
     private lateinit var underTest: DocumentFileWrapper
 
     private val context = mock<Context>()
+    private val deviceGateway = mock<DeviceGateway>()
 
     @TempDir
     lateinit var temporaryFolder: File
 
     @BeforeAll
     fun setup() {
-        underTest = DocumentFileFacade(context)
+        underTest = DocumentFileFacade(context = context, deviceGateway = deviceGateway)
     }
 
     @BeforeEach
     fun cleanUp() {
-        reset(context)
+        reset(context, deviceGateway)
     }
 
     @Test
@@ -65,6 +71,50 @@ class DocumentFileFacadeTest {
 
                     whenever(Uri.parse(testUri)).thenReturn(uri)
                     whenever(DocumentFile.fromFile(file)) doReturn expected
+
+                    val actual = underTest.fromUri(uri)
+
+                    assertThat(actual).isEqualTo(expected)
+                }
+            }
+        }
+
+    @Test
+    fun `test that get from uri with a Samsung with Android less than 10 gallery uri returns the correct document`() =
+        runTest {
+            mockStatic(Uri::class.java).use {
+                mockStatic(DocumentFile::class.java).use {
+                    val testUri = "content://media/external/images/media/5701"
+                    val uri = mock<Uri> {
+                        on { path } doReturn testUri
+                        on { scheme } doReturn "content"
+                    }
+                    val file = File(temporaryFolder, "picture20231109_162622_.jpg")
+                    file.createNewFile()
+                    val expected = mock<DocumentFile>()
+                    val contentResolver = mock<ContentResolver>()
+                    val cursor = mock<Cursor>()
+                    val projection = arrayOf(MediaStore.MediaColumns.DATA)
+                    val columnIndex = 0
+
+                    whenever(Uri.parse(testUri)).thenReturn(uri)
+                    whenever(context.contentResolver) doReturn contentResolver
+                    whenever(
+                        contentResolver.query(
+                            uri,
+                            projection,
+                            null,
+                            null,
+                            null
+                        )
+                    ) doReturn cursor
+                    whenever(cursor.moveToFirst()) doReturn true
+                    whenever(cursor.getColumnIndex(MediaStore.MediaColumns.DATA)) doReturn columnIndex
+                    whenever(cursor.getString(columnIndex)) doReturn file.absolutePath
+                    whenever(deviceGateway.getSdkVersionInt()) doReturn Build.VERSION_CODES.P
+                    whenever(deviceGateway.getManufacturerName()) doReturn "Samsung"
+                    whenever(DocumentFile.fromFile(file)) doReturn expected
+                    whenever(Uri.parse(testUri)).thenReturn(uri)
 
                     val actual = underTest.fromUri(uri)
 
