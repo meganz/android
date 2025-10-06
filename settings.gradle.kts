@@ -70,7 +70,8 @@ include(":shared:original-core-ui")
 include(":shared:resources")
 include(":shared:sync")
 include(":third-party-lib:pdfiumAndroid")
-
+include(":feature:photos:photos")
+include(":feature:photos:photos-snowflake-components")
 
 include(":core:ui-components:shared-components")
 // Configure modules to use their own name as the build file name
@@ -111,3 +112,4 @@ fun shouldUsePrebuiltSdk(): Boolean =
     System.getenv("USE_PREBUILT_SDK")?.let { it != "false" } ?: true
 
 fun isServerBuild(): Boolean = System.getenv("BUILD_NUMBER") != null
+
