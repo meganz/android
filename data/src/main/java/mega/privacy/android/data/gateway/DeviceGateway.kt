@@ -29,7 +29,7 @@ interface DeviceGateway {
      * Get sdk version int
      *
      */
-    suspend fun getSdkVersionInt(): Int
+    fun getSdkVersionInt(): Int
 
     /**
      * Get sdk version name

@@ -15,6 +15,7 @@ import kotlinx.coroutines.ensureActive
 import mega.privacy.android.data.facade.DocumentFileFacade.Companion.DOWNLOADS_FOLDER_AUTHORITY
 import mega.privacy.android.data.facade.DocumentFileFacade.Companion.EXTERNAL_STORAGE_AUTHORITY
 import mega.privacy.android.data.facade.DocumentFileFacade.Companion.PRIMARY
+import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import java.io.File
 import javax.inject.Inject
@@ -26,6 +27,7 @@ import javax.inject.Inject
  */
 class DocumentFileFacade @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val deviceGateway: DeviceGateway,
 ) : DocumentFileWrapper {
 
     override val DocumentFile.isTreeDocumentFile: Boolean
@@ -70,10 +72,7 @@ class DocumentFileFacade @Inject constructor(
         DocumentsContract.getDocumentId(documentFile.uri)
 
     override fun fromUri(uri: Uri): DocumentFile? {
-        val isMIUIRawUri = isMIUIGalleryRawUri(uri)
-        val file = uri.takeIf { (uri.scheme == "file") || isMIUIRawUri }?.path?.let { path ->
-            File(if (isMIUIRawUri) path.removePrefix(MIUI_RAW_PREFIX_PATH) else path)
-        }
+        val file = getFile(uri)
 
         return when {
             file?.exists() == true -> DocumentFile.fromFile(file)
@@ -82,8 +81,25 @@ class DocumentFileFacade @Inject constructor(
         }
     }
 
+    /**
+     * Get the [File] from the given [Uri].
+     * Takes into account different Operating Systems and Manufacturers.
+     */
+    private fun getFile(uri: Uri) = when {
+        isMIUIGalleryRawUri(uri) -> uri.path?.removePrefix(MIUI_RAW_PREFIX_PATH)
+            ?.let { path -> File(path) }
+
+        isSamsungDeviceWithAndroidLessThanQ() -> uri.getColumnInfoString(MediaStore.MediaColumns.DATA)
+            ?.let { path -> File(path) }
+
+        uri.scheme == "file" -> uri.path
+            ?.let { path -> File(path) }
+
+        else -> null
+    }
+
     override fun getAbsolutePathFromContentUri(uri: Uri): String? =
-        fromUri(uri)?.getAbsolutePath(context)
+        fromUri(uri)?.getAbsolutePath()
 
     override fun fromFile(file: File): DocumentFile =
         DocumentFile.fromFile(file)
@@ -277,7 +293,7 @@ class DocumentFileFacade @Inject constructor(
                 when {
                     // API 26 - 27 => content://com.android.providers.downloads.documents/document/22
                     Build.VERSION.SDK_INT < Build.VERSION_CODES.P && path.matches(Regex("/document/\\d+")) -> {
-                        val fileName = uri.getNameFromDownloadsDocument(context) ?: return ""
+                        val fileName = uri.getNameFromDownloadsDocument() ?: return ""
                         "${Environment.DIRECTORY_DOWNLOADS}/$fileName"
                     }
 
@@ -304,13 +320,13 @@ class DocumentFileFacade @Inject constructor(
         }
     }
 
-    private fun Uri.getNameFromDownloadsDocument(context: Context) =
-        toRawFile()?.name ?: getColumnInfoString(context, MediaStore.MediaColumns.DISPLAY_NAME)
+    private fun Uri.getNameFromDownloadsDocument() =
+        toRawFile()?.name ?: getColumnInfoString(MediaStore.MediaColumns.DISPLAY_NAME)
 
     private fun Uri.toRawFile() =
         if (scheme == ContentResolver.SCHEME_FILE) path?.let { File(it) } else null
 
-    private fun Uri.getColumnInfoString(context: Context, column: String): String? {
+    private fun Uri.getColumnInfoString(column: String): String? {
         context.contentResolver.query(this, arrayOf(column), null, null, null)?.use { cursor ->
             if (cursor.moveToFirst()) {
                 val columnIndex = cursor.getColumnIndex(column)
@@ -336,7 +352,7 @@ class DocumentFileFacade @Inject constructor(
      * @see File.getAbsolutePath
      * @see getSimplePath
      */
-    private fun DocumentFile.getAbsolutePath(context: Context): String {
+    private fun DocumentFile.getAbsolutePath(): String {
         val path = uri.path.orEmpty()
 
         return when {
@@ -361,7 +377,7 @@ class DocumentFileFacade @Inject constructor(
                 when {
                     // API 26 - 27 => content://com.android.providers.downloads.documents/document/22
                     Build.VERSION.SDK_INT < Build.VERSION_CODES.P && path.matches(Regex("/document/\\d+")) -> {
-                        val fileName = uri.getNameFromDownloadsDocument(context) ?: return ""
+                        val fileName = uri.getNameFromDownloadsDocument() ?: return ""
                         File(
                             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
                             fileName
@@ -405,6 +421,10 @@ class DocumentFileFacade @Inject constructor(
     override fun isMIUIGalleryRawUri(uri: Uri) =
         uri.authority == MIUI_GALLERY_AUTHORITY
                 && uri.path?.startsWith(MIUI_RAW_PREFIX_PATH) == true
+
+    override fun isSamsungDeviceWithAndroidLessThanQ() =
+        deviceGateway.getSdkVersionInt() < Build.VERSION_CODES.Q
+                && deviceGateway.getManufacturerName().equals("Samsung", true)
 
     companion object {
         /**
