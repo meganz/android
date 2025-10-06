@@ -29,7 +29,7 @@ class GetDiskSpaceBytesUseCase @Inject constructor(
                     ?: getExternalPathByUri(uriPath.value) // try to build the path from external content:// uri
             }
         }?.let { path ->
-            getDiskSpaceBytes(path)
+            runCatching { getDiskSpaceBytes(path) }.getOrNull()
         }
     }
 }
