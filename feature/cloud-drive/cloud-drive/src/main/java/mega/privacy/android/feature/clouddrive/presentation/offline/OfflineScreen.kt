@@ -135,24 +135,38 @@ internal fun OfflineScreen(
     MegaScaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            MegaSearchTopAppBar(
-                navigationType = AppBarNavigationType.Back(onBack),
-                title = uiState
-                    .title
-                    .takeIf { uiState.nodeId != -1 }
-                    ?: stringResource(R.string.offline_screen_title),
-                query = uiState.searchQuery,
-                onQueryChanged = onSearch,
-                isSearchingMode = isSearchMode,
-                onSearchingModeChanged = {
-                    isSearchMode = it
-                    if (!it) {
-                        // Clear search query when exiting search mode and
-                        // reset to the original search result
-                        onSearch("")
+            if (uiState.selectedNodeHandles.isEmpty()) {
+                MegaSearchTopAppBar(
+                    navigationType = AppBarNavigationType.Back(onBack),
+                    title = uiState
+                        .title
+                        .takeIf { uiState.nodeId != -1 }
+                        ?: stringResource(R.string.offline_screen_title),
+                    query = uiState.searchQuery,
+                    onQueryChanged = onSearch,
+                    isSearchingMode = isSearchMode,
+                    onSearchingModeChanged = {
+                        isSearchMode = it
+                        if (!it) {
+                            // Clear search query when exiting search mode and
+                            // reset to the original search result
+                            onSearch("")
+                        }
+                    },
+                )
+            } else {
+                MegaTopAppBar(
+                    title = uiState.selectedNodeHandles.size.toString(),
+                    navigationType = AppBarNavigationType.Close(deselectAll),
+                    actions = listOf(NodeSelectionAction.SelectAll),
+                    onActionPressed = { action ->
+                        when (action) {
+                            is NodeSelectionAction.SelectAll -> selectAll()
+                            else -> Unit
+                        }
                     }
-                },
-            )
+                )
+            }
         }
     ) { paddingValues ->
         Column(
