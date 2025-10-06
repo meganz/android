@@ -427,6 +427,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }.getOrNull()
         }
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+        megaApi.addGlobalListener(this)
 
         createChatLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
