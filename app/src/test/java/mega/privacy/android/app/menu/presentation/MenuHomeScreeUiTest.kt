@@ -77,13 +77,15 @@ class MenuHomeScreeUiTest {
         navigateToFeature: (NavKey) -> Unit = {},
         onLogoutClicked: () -> Unit = {},
         onResetTestPasswordScreenEvent: () -> Unit = {},
+        onResetLogoutConfirmationEvent: () -> Unit = {},
     ) {
         composeRule.setContent {
             MenuHomeScreenUi(
                 uiState = uiState,
                 navigateToFeature = navigateToFeature,
                 onLogoutClicked = onLogoutClicked,
-                onResetTestPasswordScreenEvent = onResetTestPasswordScreenEvent
+                onResetTestPasswordScreenEvent = onResetTestPasswordScreenEvent,
+                onResetLogoutConfirmationEvent = onResetLogoutConfirmationEvent
             )
         }
     }
@@ -224,5 +226,44 @@ class MenuHomeScreeUiTest {
 
         verify(navigateToFeature, never()).invoke(any())
         verify(onResetTestPasswordScreenEvent, never()).invoke()
+    }
+
+    @Test
+    fun `test that logout confirmation event triggers navigation and reset callback`() {
+        val navigateToFeature = mock<(NavKey) -> Unit>()
+        val onResetLogoutConfirmationEvent = mock<() -> Unit>()
+
+        setupRule(
+            uiState = createDefaultMenuUiState().copy(
+                showLogoutConfirmationEvent = triggered
+            ),
+            navigateToFeature = navigateToFeature,
+            onResetLogoutConfirmationEvent = onResetLogoutConfirmationEvent
+        )
+
+        // Wait for the event to be processed
+        composeRule.waitForIdle()
+
+        verify(navigateToFeature).invoke(any())
+        verify(onResetLogoutConfirmationEvent).invoke()
+    }
+
+    @Test
+    fun `test that consumed logout confirmation event does not trigger navigation or reset callback`() {
+        val navigateToFeature = mock<(NavKey) -> Unit>()
+        val onResetLogoutConfirmationEvent = mock<() -> Unit>()
+
+        setupRule(
+            uiState = createDefaultMenuUiState().copy(
+                showLogoutConfirmationEvent = consumed
+            ),
+            navigateToFeature = navigateToFeature,
+            onResetLogoutConfirmationEvent = onResetLogoutConfirmationEvent
+        )
+
+        composeRule.waitForIdle()
+
+        verify(navigateToFeature, never()).invoke(any())
+        verify(onResetLogoutConfirmationEvent, never()).invoke()
     }
 } 

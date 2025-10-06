@@ -50,6 +50,7 @@ import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.NOTIF
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.PRIVACY_SUITE_HEADER
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.PRIVACY_SUITE_ITEM
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.TOOLBAR
+import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialogM3NavKey
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.contract.NavDrawerItem
@@ -67,7 +68,8 @@ fun MenuHomeScreen(
         uiState = uiState,
         navigateToFeature = navigateToFeature,
         onLogoutClicked = viewModel::logout,
-        onResetTestPasswordScreenEvent = viewModel::resetTestPasswordScreenEvent
+        onResetTestPasswordScreenEvent = viewModel::resetTestPasswordScreenEvent,
+        onResetLogoutConfirmationEvent = viewModel::resetLogoutConfirmationEvent
     )
 }
 
@@ -77,6 +79,7 @@ fun MenuHomeScreenUi(
     navigateToFeature: (NavKey) -> Unit,
     onLogoutClicked: () -> Unit,
     onResetTestPasswordScreenEvent: () -> Unit,
+    onResetLogoutConfirmationEvent: () -> Unit,
 ) {
     var isPrivacySuiteExpanded by rememberSaveable { mutableStateOf(true) }
     val context = LocalContext.current
@@ -86,6 +89,13 @@ fun MenuHomeScreenUi(
         onConsumed = onResetTestPasswordScreenEvent
     ) {
         navigateToFeature(TestPasswordNavKey(isLogoutMode = true))
+    }
+
+    EventEffect(
+        event = uiState.showLogoutConfirmationEvent,
+        onConsumed = onResetLogoutConfirmationEvent
+    ) {
+        navigateToFeature(LogoutConfirmationDialogM3NavKey)
     }
 
     MegaScaffold(

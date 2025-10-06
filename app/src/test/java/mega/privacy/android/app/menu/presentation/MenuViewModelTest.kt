@@ -955,4 +955,44 @@ class MenuViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that resetLogoutConfirmationEvent updates state correctly`() = runTest {
+        stubDefaultDependencies()
+        initUnderTest()
+
+        // First, trigger the logout confirmation event
+        whenever(checkPasswordReminderUseCase(true)).thenReturn(false)
+        underTest.logout()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.showLogoutConfirmationEvent).isEqualTo(triggered)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // Now reset the event
+        underTest.resetLogoutConfirmationEvent()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.showLogoutConfirmationEvent).isEqualTo(consumed)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that resetLogoutConfirmationEvent works when event is already consumed`() = runTest {
+        stubDefaultDependencies()
+        initUnderTest()
+
+        // Reset the event when it's already consumed
+        underTest.resetLogoutConfirmationEvent()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.showLogoutConfirmationEvent).isEqualTo(consumed)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 } 

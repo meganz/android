@@ -273,4 +273,10 @@ class MenuViewModel @Inject constructor(
             it.copy(showTestPasswordScreenEvent = consumed)
         }
     }
+
+    fun resetLogoutConfirmationEvent() {
+        _uiState.update {
+            it.copy(showLogoutConfirmationEvent = consumed)
+        }
+    }
 }
