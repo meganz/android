@@ -9,7 +9,7 @@ package mega.privacy.android.app.namecollision.data
  * @property shouldFinish   True if should finish the activity because there are no more collisions, false otherwise.
  */
 data class NameCollisionActionResult(
-    val message: String,
+    val message: String? = null,
     val isForeignNode: Boolean = false,
     val shouldFinish: Boolean
 )

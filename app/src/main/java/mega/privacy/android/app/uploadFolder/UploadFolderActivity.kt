@@ -304,15 +304,13 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
                     if (event is StartTransferEvent.FinishUploadProcessing) {
                         val total = ((event.triggerEvent as? TransferTriggerEvent.StartUpload.Files)
                             ?.pathsAndNames?.size ?: 0)
-                        if (total > 0) {
-                            resources.getQuantityString(
-                                R.plurals.upload_began,
-                                total,
-                                total,
-                            )
-                        } else {
-                            getString(R.string.no_uploads_empty_folder)
-                        }.let { onActivityResult(it) }
+                        onActivityResult(
+                            if (total <= 0) {
+                                getString(R.string.no_uploads_empty_folder)
+                            } else {
+                                null
+                            }
+                        )
                     }
                 },
                 onCancelNotEnoughSpaceForUploadDialog = { finish() }

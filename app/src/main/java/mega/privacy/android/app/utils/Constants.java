@@ -400,8 +400,6 @@ public class Constants {
     public static final int INVALID_CALL_STATUS = -1;
     public static final int INVALID_CALL = -1;
 
-    public static final String SHOW_MESSAGE_UPLOAD_STARTED = "SHOW_MESSAGE_UPLOAD_STARTED";
-    public static final String NUMBER_UPLOADS = "NUMBER_UPLOADS";
     public static final String EXTRA_MESSAGE = "EXTRA_MESSAGE";
 
     public static final int MAX_WIDTH_CONTACT_NAME_LAND = 450;

@@ -1528,23 +1528,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         )
                         val highlightedNames =
                             intent.getStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES)
-                        if (intent.getBooleanExtra(
-                                Constants.SHOW_MESSAGE_UPLOAD_STARTED,
-                                false
-                            )
-                        ) {
-                            val numberUploads: Int =
-                                intent.getIntExtra(Constants.NUMBER_UPLOADS, 1)
-                            showSnackbar(
-                                SNACKBAR_TYPE,
-                                resources.getQuantityString(
-                                    R.plurals.upload_began,
-                                    numberUploads,
-                                    numberUploads
-                                ),
-                                -1
-                            )
-                        }
+
                         intent.getStringExtra(Constants.EXTRA_MESSAGE)?.let {
                             showSnackbar(
                                 SNACKBAR_TYPE,
@@ -2812,19 +2796,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         intent.getLongExtra(Constants.INTENT_EXTRA_KEY_PARENT_HANDLE, -1)
                     val highlightedNames =
                         intent.getStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES)
-                    if (intent.getBooleanExtra(Constants.SHOW_MESSAGE_UPLOAD_STARTED, false)) {
-                        val numberUploads: Int =
-                            intent.getIntExtra(Constants.NUMBER_UPLOADS, 1)
-                        showSnackbar(
-                            SNACKBAR_TYPE,
-                            resources.getQuantityString(
-                                R.plurals.upload_began,
-                                numberUploads,
-                                numberUploads
-                            ),
-                            -1
-                        )
-                    }
+
                     intent.getStringExtra(Constants.EXTRA_MESSAGE)?.let {
                         showSnackbar(
                             SNACKBAR_TYPE,

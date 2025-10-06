@@ -158,16 +158,7 @@ class NameCollisionActivity : PasscodeActivity() {
                 onConsumeEvent = { },
             ) { transferEvent ->
                 ((transferEvent as StartTransferEvent.FinishUploadProcessing).triggerEvent as TransferTriggerEvent.StartUpload.CollidedFiles).let {
-                    setResult(
-                        NameCollisionActionResult(
-                            message = resources.getQuantityString(
-                                R.plurals.upload_began,
-                                it.pathsAndNames.size,
-                                it.pathsAndNames.size,
-                            ),
-                            shouldFinish = viewModel.shouldFinish()
-                        )
-                    )
+                    setResult(NameCollisionActionResult(shouldFinish = viewModel.shouldFinish()))
                     viewModel.consumeUploadEvent()
                 }
             }

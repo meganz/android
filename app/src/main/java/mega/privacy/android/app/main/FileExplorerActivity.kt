@@ -264,7 +264,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         viewModel.setIsAskingForCollisionsResolution(isAskingForCollisionsResolution = false)
         backToCloud(
             if (result != null) parentHandle else INVALID_HANDLE,
-            0,
             result
         )
     }
@@ -1937,14 +1936,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * Goes back to Cloud.
      *
      * @param handle        Parent handle of the folder to open.
-     * @param numberUploads Number of uploads.
      * @param message       Message to show.
      */
-    private fun backToCloud(
-        handle: Long,
-        numberUploads: Int,
-        message: String?,
-    ) = lifecycleScope.launch {
+    private fun backToCloud(handle: Long, message: String?) = lifecycleScope.launch {
         Timber.d("handle: %s", handle)
         val isSingleActivity = getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
         if (isSingleActivity) {
@@ -1966,14 +1960,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             startIntent.putExtra(Constants.INTENT_EXTRA_KEY_PARENT_HANDLE, handle)
         }
 
-        if (numberUploads > 0) {
-            startIntent.putExtra(Constants.SHOW_MESSAGE_UPLOAD_STARTED, true)
-                .putExtra(Constants.NUMBER_UPLOADS, numberUploads)
-        }
-
-        if (message != null) {
-            startIntent.putExtra(Constants.EXTRA_MESSAGE, message)
-        }
+        startIntent.putExtra(Constants.EXTRA_MESSAGE, message)
 
         startActivity(startIntent)
         finish()
@@ -2724,11 +2711,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }
 
                 ((startTransferEvent as StartTransferEvent.FinishUploadProcessing).triggerEvent as TransferTriggerEvent.StartUpload.Files).let {
-                    backToCloud(
-                        it.destinationId.longValue,
-                        it.pathsAndNames.size,
-                        null
-                    )
+                    backToCloud(it.destinationId.longValue, null)
                 }
             }
         )

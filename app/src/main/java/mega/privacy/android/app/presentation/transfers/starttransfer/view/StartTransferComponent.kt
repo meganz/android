@@ -72,7 +72,6 @@ import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.StartUpload
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.StartUpload.Files
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.navigation.megaNavigator
@@ -327,13 +326,6 @@ private fun StartTransferComponent(
                 }
 
                 is StartTransferEvent.FinishUploadProcessing -> {
-                    val message = (event.triggerEvent as? Files)?.specificStartMessage
-                        ?: context.resources.getQuantityString(
-                            R.plurals.upload_began,
-                            event.totalFiles,
-                            event.totalFiles,
-                        )
-                    snackBarHostState.showAutoDurationSnackbar(message)
                     onScanningFinished(event)
                 }
 
