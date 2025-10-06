@@ -1222,15 +1222,15 @@
     <!-- title of the section for unlocked storage quota -->
     <string name="unlocked_storage_title">Speicherplatz</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_referral_bonuses">Invite people to MEGA</string>
+    <string name="title_referral_bonuses">Einladungen zu MEGA</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">Mobil-App installieren</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Registrierungsbonus</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Install our desktop app</string>
+    <string name="title_install_desktop">Desktop-App installieren</string>
     <!-- indicates the number of days left related to a achievement -->
-    <string name="general_num_days_left">%1$d days left</string>
+    <string name="general_num_days_left">Noch %1$d Tage</string>
     <!-- State to indicate an achievement has expired -->
     <string name="expired_label">Abgelaufen</string>
     <!-- title of the advanced setting to choose the use of https -->
@@ -1248,9 +1248,9 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Die E-Mail-Adresse hat ein falsches Format</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">You’ve received %1$s extra storage space for installing our desktop app</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Sie haben %1$s Extraspeicherplatz für die Installation unserer Desktop-App erhalten</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">You’ve received %1$s extra storage space for installing our mobile app</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Sie haben %1$s Extraspeicherplatz für die Installation unserer Mobil-App erhalten</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Sie haben %1$s Speicherplatz als kostenlosen Registrierungsbonus erhalten.</string>
     <!-- menu items -->
