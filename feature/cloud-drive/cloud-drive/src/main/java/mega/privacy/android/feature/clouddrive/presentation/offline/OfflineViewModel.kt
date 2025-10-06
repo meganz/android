@@ -143,13 +143,13 @@ class OfflineViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     isLoadingCurrentFolder = false,
-                    offlineNodes = offlineNodeList.map { offlineFileInformation ->
+                    offlineNodes = offlineNodeList.map { file ->
                         OfflineNodeUiItem(
-                            offlineFileInformation = offlineFileInformation,
+                            offlineFileInformation = file,
                             isSelected = uiState.value.selectedNodeHandles.contains(
-                                offlineFileInformation.handle.toLongOrNull()
+                                file.handle.toLongOrNull()
                             ),
-                            isHighlighted = false // TODO: Implement highlighting logic
+                            isHighlighted = file.name in uiState.value.highlightedFiles
                         )
                     }
                 )
@@ -226,13 +226,6 @@ class OfflineViewModel @Inject constructor(
         }
 
         if (refreshNodesAsync) refreshOfflineNodes()
-    }
-
-    /**
-     * On Close Search View Event Consumed
-     */
-    fun onCloseSearchViewEventConsumed() {
-        _uiState.update { it.copy(closeSearchViewEvent = consumed) }
     }
 
     /**

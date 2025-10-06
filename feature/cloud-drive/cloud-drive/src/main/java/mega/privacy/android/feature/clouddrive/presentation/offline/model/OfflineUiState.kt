@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.clouddrive.presentation.offline.model
 
-import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
@@ -35,7 +34,6 @@ data class OfflineUiState(
     val currentViewType: ViewType = ViewType.LIST,
     val isOnline: Boolean = false,
     val searchQuery: String? = null,
-    val closeSearchViewEvent: StateEvent = consumed,
     val openFolderInPageEvent: StateEventWithContent<OfflineFileInformation> = consumed(),
     val openOfflineNodeEvent: StateEventWithContent<OfflineFileInformation> = consumed(),
 ) {

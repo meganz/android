@@ -288,6 +288,7 @@ class OfflineScreenTest {
         onDismissOfflineWarning: () -> Unit = {},
         selectAll: () -> Unit = {},
         deselectAll: () -> Unit = {},
+        onSearch: (String) -> Unit = {},
     ) {
         composeRule.setContent {
             CompositionLocalProvider(LocalContext provides composeRule.activity) {
@@ -302,6 +303,7 @@ class OfflineScreenTest {
                         onDismissOfflineWarning = onDismissOfflineWarning,
                         selectAll = selectAll,
                         deselectAll = deselectAll,
+                        onSearch = onSearch,
                     )
                 }
             }

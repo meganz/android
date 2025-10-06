@@ -16,7 +16,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -32,6 +35,7 @@ import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.banner.TopWarningBanner
 import mega.android.core.ui.components.indicators.LargeHUD
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
+import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
@@ -40,6 +44,7 @@ import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeAc
 import mega.privacy.android.core.nodecomponents.list.NodeGridViewItem
 import mega.privacy.android.core.nodecomponents.list.NodeListViewItem
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -84,6 +89,7 @@ fun OfflineScreen(
         onOpenFile = actionViewModel::handleOpenOfflineFile,
         onDismissOfflineWarning = viewModel::dismissOfflineWarning,
         onNavigateToFolder = onNavigateToFolder,
+        onSearch = viewModel::setSearchQuery,
         consumeOpenFolderEvent = viewModel::onOpenFolderInPageEventConsumed,
         consumeOpenFileEvent = viewModel::onOpenOfflineNodeEventConsumed,
         modifier = modifier
@@ -101,10 +107,13 @@ internal fun OfflineScreen(
     onNavigateToFolder: (nodeId: Int, name: String) -> Unit,
     onOpenFile: (OfflineFileInformation) -> Unit,
     onDismissOfflineWarning: () -> Unit,
+    onSearch: (String) -> Unit,
     modifier: Modifier = Modifier,
     consumeOpenFolderEvent: () -> Unit = {},
     consumeOpenFileEvent: () -> Unit = {},
 ) {
+    var isSearchMode by rememberSaveable { mutableStateOf(false) }
+
     EventEffect(
         event = uiState.openFolderInPageEvent,
         onConsumed = consumeOpenFolderEvent
@@ -126,12 +135,23 @@ internal fun OfflineScreen(
     MegaScaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            MegaTopAppBar(
+            MegaSearchTopAppBar(
+                navigationType = AppBarNavigationType.Back(onBack),
                 title = uiState
                     .title
                     .takeIf { uiState.nodeId != -1 }
                     ?: stringResource(R.string.offline_screen_title),
-                navigationType = AppBarNavigationType.Back(onBack)
+                query = uiState.searchQuery,
+                onQueryChanged = onSearch,
+                isSearchingMode = isSearchMode,
+                onSearchingModeChanged = {
+                    isSearchMode = it
+                    if (!it) {
+                        // Clear search query when exiting search mode and
+                        // reset to the original search result
+                        onSearch("")
+                    }
+                },
             )
         }
     ) { paddingValues ->

@@ -39,6 +39,7 @@ private fun PreviewOfflineScreenList() {
             onItemLongClicked = {},
             onBack = {},
             onNavigateToFolder = { _, _ -> },
+            onSearch = {},
             onOpenFile = {},
             onDismissOfflineWarning = {}
         )
@@ -75,7 +76,8 @@ private fun PreviewOfflineScreenGrid() {
             onBack = {},
             onNavigateToFolder = { _, _ -> },
             onOpenFile = {},
-            onDismissOfflineWarning = {}
+            onDismissOfflineWarning = {},
+            onSearch = {},
         )
     }
 }
@@ -104,7 +106,8 @@ private fun PreviewEmptyOfflineScreen() {
             onBack = {},
             onNavigateToFolder = { _, _ -> },
             onOpenFile = {},
-            onDismissOfflineWarning = {}
+            onDismissOfflineWarning = {},
+            onSearch = {},
         )
     }
 }
@@ -133,7 +136,8 @@ private fun PreviewLoadingOfflineScreen() {
             onBack = {},
             onNavigateToFolder = { _, _ -> },
             onOpenFile = {},
-            onDismissOfflineWarning = {}
+            onDismissOfflineWarning = {},
+            onSearch = {},
         )
     }
 }
