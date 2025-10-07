@@ -36,6 +36,7 @@ import mega.privacy.android.app.presentation.login.view.MEGA_LOGO_TEST_TAG
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.mobile.navigation.snowflake.IndicatorDot
 import mega.privacy.mobile.navigation.snowflake.MainNavigationScaffold
 import kotlin.reflect.KClass
 
@@ -99,6 +100,7 @@ fun NavGraphBuilder.mainNavigationScaffold(
                         isSelected = { destination ->
                             currentDestination?.isTopLevelDestinationInHierarchy(destination::class) == true
                         },
+                        mainNavItemBadge = { IndicatorDot() },
                         navContent = { navigationUiController ->
                             PsaContainer {
                                 NavHost(
