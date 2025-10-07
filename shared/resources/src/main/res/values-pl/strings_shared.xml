@@ -1218,7 +1218,7 @@
     <!-- text of received for mega vpn free trial in achivements section -->
     <string name="text_received_mega_vpn_free_trial">Otrzymałeś %1$s dodatkowej pojemności za rozpoczęcie darmowego okresu próbnego MEGA&#160;VPN</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">You’ve received %1$s extra storage space for starting a MEGA&#160;Pass free trial</string>
+    <string name="text_received_mega_pass_free_trial">Otrzymałeś %1$s dodatkowej pojemności za rozpoczęcie darmowego okresu próbnego MEGA&#160;Pass</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">Niektóre katalogi nie mogą być synchronizowane ani tworzone kopie zapasowe, ponieważ aplikacja MEGA utraciła uprawnienia do dostępu do lokalnych katalogów. Kliknij Wznów, aby ponownie dodać uprawnienia dla każdego dotkniętego katalogu.</string>
     <!-- Title for the free plan card when the user is an existing account -->
