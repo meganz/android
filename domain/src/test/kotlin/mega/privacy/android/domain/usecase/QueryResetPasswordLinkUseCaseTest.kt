@@ -7,6 +7,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.domain.entity.RegexPatternType
+import mega.privacy.android.domain.entity.resetpassword.ResetPasswordLinkInfo
 import mega.privacy.android.domain.exception.ResetPasswordLinkException
 import mega.privacy.android.domain.repository.AccountRepository
 import org.junit.jupiter.api.BeforeAll
@@ -41,16 +42,18 @@ class QueryResetPasswordLinkUseCaseTest {
     }
 
     @Test
-    internal fun `test that use case should return correct url value when invoked and url type is RESET_PASSWORD_LINK`() =
+    internal fun `test that use case should return correct ResetPasswordLinkInfo when invoked and url type is RESET_PASSWORD_LINK`() =
         runTest {
             val link = "qhwuehqwuhajsdhsjakdhasjhd"
             val email = "lh@mega.co.nz"
+            val flag = true
+            val resetPasswordLinkInfo = ResetPasswordLinkInfo(email = email, isRequiredRecoveryKey = flag)
             whenever(getUrlRegexPatternTypeUseCase(link)).thenReturn(RegexPatternType.RESET_PASSWORD_LINK)
-            whenever(accountRepository.queryResetPasswordLink(link)).thenReturn(email)
+            whenever(accountRepository.queryResetPasswordLink(link)).thenReturn(resetPasswordLinkInfo)
 
             initTestClass()
 
-            assertThat(underTest(link)).isEqualTo(email)
+            assertThat(underTest(link)).isEqualTo(resetPasswordLinkInfo)
             verify(accountRepository).queryResetPasswordLink(link)
         }
 

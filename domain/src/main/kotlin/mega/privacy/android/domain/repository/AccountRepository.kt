@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SubscriptionOption
+import mega.privacy.android.domain.entity.resetpassword.ResetPasswordLinkInfo
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountSession
@@ -265,7 +266,7 @@ interface AccountRepository {
      * @param link Reset password link
      * @return Email associated with the link
      */
-    suspend fun queryResetPasswordLink(link: String): String
+    suspend fun queryResetPasswordLink(link: String): ResetPasswordLinkInfo
 
     /**
      * Stops using the current authentication token, it's needed to explicitly call

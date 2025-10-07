@@ -180,12 +180,15 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
 
                 if (resetPasswordLinkResult != null) {
                     if (resetPasswordLinkResult.isSuccess) {
-                        val emailForLink = resetPasswordLinkResult.getOrThrow()
+                        val linkInfo = resetPasswordLinkResult.getOrThrow()
+                        val emailForLink = linkInfo.email
                         if (emailForLink != userEmail && isLoggedIn == true) {
                             setError(getString(R.string.error_not_logged_with_correct_account))
-                        } else {
+                        } else if (linkInfo.isRequiredRecoveryKey) {
                             navigateToResetPassword(isLoggedIn == true, needsRefreshSession)
                             finish()
+                        } else {
+                            openWebLink(url)
                         }
                     } else {
                         val errorMessage = when (resetPasswordLinkResult.exceptionOrNull()) {

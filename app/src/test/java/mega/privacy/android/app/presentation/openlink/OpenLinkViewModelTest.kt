@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.resetpassword.ResetPasswordLinkInfo
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.QueryResetPasswordLinkUseCase
@@ -254,9 +255,10 @@ class OpenLinkViewModelTest {
     fun `test that reset password link result is updated when successfully querying reset password link`() =
         runTest {
             val link = randomLink()
-            val result = Result.success("lh@mega.co.nz")
+            val resetPasswordLinkInfo = ResetPasswordLinkInfo(email = "lh@mega.co.nz", isRequiredRecoveryKey = true)
+            val result = Result.success(resetPasswordLinkInfo)
 
-            whenever(queryResetPasswordLinkUseCase(link)).thenReturn("lh@mega.co.nz")
+            whenever(queryResetPasswordLinkUseCase(link)).thenReturn(resetPasswordLinkInfo)
             underTest.queryResetPasswordLink(link)
             underTest.uiState.test {
                 assertThat(expectMostRecentItem().resetPasswordLinkResult).isEqualTo(result)
@@ -274,7 +276,7 @@ class OpenLinkViewModelTest {
             underTest.queryResetPasswordLink(link)
             underTest.uiState.test {
                 assertThat(expectMostRecentItem().resetPasswordLinkResult)
-                    .isEqualTo(Result.failure<Unit>(exception))
+                    .isEqualTo(Result.failure<ResetPasswordLinkInfo>(exception))
             }
         }
 

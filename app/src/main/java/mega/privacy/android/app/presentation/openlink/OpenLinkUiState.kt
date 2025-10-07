@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.openlink
 
+import mega.privacy.android.domain.entity.resetpassword.ResetPasswordLinkInfo
+
 /**
  * Open link state
  *
@@ -20,5 +22,5 @@ data class OpenLinkUiState(
     val decodedUrl: String? = null,
     val logoutCompletedEvent: Boolean = false,
     val urlRedirectionEvent: Boolean = false,
-    val resetPasswordLinkResult: Result<String>? = null,
+    val resetPasswordLinkResult: Result<ResetPasswordLinkInfo>? = null,
 )

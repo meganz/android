@@ -2262,7 +2262,11 @@ class DefaultAccountRepositoryTest {
     fun `test that queryResetPasswordLink returns email when link is valid`() = runTest {
         val link = "validLink"
         val email = "test@example.com"
-        val request = mock<MegaRequest> { on { this.email }.thenReturn(email) }
+        val isRequiredRecoveryKey = false
+        val request = mock<MegaRequest> {
+            on { this.email }.thenReturn(email)
+            on { this.flag }.thenReturn(isRequiredRecoveryKey)
+        }
 
         whenever(megaApiGateway.queryResetPasswordLink(eq(link), any())).thenAnswer {
             (it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
@@ -2274,7 +2278,8 @@ class DefaultAccountRepositoryTest {
 
         val result = underTest.queryResetPasswordLink(link)
 
-        assertThat(result).isEqualTo(email)
+        assertThat(result.email).isEqualTo(email)
+        assertThat(result.isRequiredRecoveryKey).isEqualTo(isRequiredRecoveryKey)
     }
 
     @Test
