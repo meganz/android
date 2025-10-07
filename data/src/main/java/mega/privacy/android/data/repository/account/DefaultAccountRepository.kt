@@ -65,6 +65,7 @@ import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate.Action
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SubscriptionOption
+import mega.privacy.android.domain.entity.resetpassword.ResetPasswordLinkInfo
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.achievement.AchievementType
@@ -738,7 +739,7 @@ internal class DefaultAccountRepository @Inject constructor(
         passwordStrengthMapper(megaApiGateway.getPasswordStrength(password))
     }
 
-    override suspend fun queryResetPasswordLink(link: String): String =
+    override suspend fun queryResetPasswordLink(link: String): ResetPasswordLinkInfo =
         withContext(ioDispatcher) {
             suspendCancellableCoroutine { continuation ->
                 val listener = OptionalMegaRequestListenerInterface(
@@ -746,7 +747,14 @@ internal class DefaultAccountRepository @Inject constructor(
                         when (error.errorCode) {
                             MegaError.API_OK -> {
                                 Timber.d("MegaRequest.TYPE_QUERY_RECOVERY_LINK MegaError API_OK")
-                                continuation.resumeWith(Result.success(request.email.orEmpty()))
+                                continuation.resumeWith(
+                                    Result.success(
+                                        ResetPasswordLinkInfo(
+                                            email = request.email.orEmpty(),
+                                            isRequiredRecoveryKey = request.flag
+                                        )
+                                    )
+                                )
                             }
 
                             MegaError.API_EEXPIRED -> {

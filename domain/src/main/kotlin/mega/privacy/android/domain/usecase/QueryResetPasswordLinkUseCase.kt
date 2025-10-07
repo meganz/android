@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase
 
 import mega.privacy.android.domain.entity.RegexPatternType
+import mega.privacy.android.domain.entity.resetpassword.ResetPasswordLinkInfo
 import mega.privacy.android.domain.exception.ResetPasswordLinkException
 import mega.privacy.android.domain.repository.AccountRepository
 import javax.inject.Inject
@@ -16,9 +17,9 @@ class QueryResetPasswordLinkUseCase @Inject constructor(
      * Invoke
      * @param link as the reset password link
      *
-     * @return email associated with the reset password link
+     * @return ResetPasswordLinkInfo containing email and flag associated with the reset password link
      */
-    suspend operator fun invoke(link: String): String {
+    suspend operator fun invoke(link: String): ResetPasswordLinkInfo {
         return if (getUrlRegexPatternTypeUseCase(link) == RegexPatternType.RESET_PASSWORD_LINK) {
             accountRepository.queryResetPasswordLink(link)
         } else {
