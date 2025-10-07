@@ -27,19 +27,21 @@ import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.domain.usecase.FakeMonitorBackupFolder
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
-import mega.privacy.android.core.nodecomponents.mapper.RemovePublicLinkResultMapper
-import mega.privacy.android.core.nodecomponents.mapper.RemoveShareResultMapper
+import mega.privacy.android.app.fcm.FcmManager
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
-import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
-import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.psa.legacy.LegacyPsaGlobalState
-import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
-import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
+import mega.privacy.android.core.nodecomponents.mapper.RemovePublicLinkResultMapper
+import mega.privacy.android.core.nodecomponents.mapper.RemoveShareResultMapper
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
+import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
+import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
+import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountSubscriptionCycle
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.IncomingPendingContactRequestAlert
@@ -50,6 +52,8 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.UserAlert
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatCallTermCodeType
@@ -78,6 +82,7 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
@@ -288,6 +293,8 @@ class ManagerViewModelTest {
         onBlocking { invoke() }.thenReturn(emptyFlow())
     }
     private var monitorMyAccountUpdateFakeFlow = MutableSharedFlow<MyAccountUpdate>()
+    private var monitorAccountDetailFakeFlow = MutableSharedFlow<AccountDetail>()
+    private val fcmManager = mock<FcmManager>()
     private val establishCameraUploadsSyncHandlesUseCase =
         mock<EstablishCameraUploadsSyncHandlesUseCase>()
     private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
@@ -357,7 +364,8 @@ class ManagerViewModelTest {
     private val monitorChatListItemUpdates = MutableSharedFlow<ChatListItem>()
 
     private val deleteNodeVersionsUseCase: DeleteNodeVersionsUseCase = mock()
-    private val nodeVersionHistoryRemoveMessageMapper: NodeVersionHistoryRemoveMessageMapper = mock()
+    private val nodeVersionHistoryRemoveMessageMapper: NodeVersionHistoryRemoveMessageMapper =
+        mock()
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase = mock()
     private val legacyState = mock<LegacyPsaGlobalState>()
     private val appScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
@@ -454,6 +462,10 @@ class ManagerViewModelTest {
             getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
             legacyState = legacyState,
             appScope = appScope,
+            monitorAccountDetailUseCase = mock {
+                on { invoke() }.thenReturn(monitorAccountDetailFakeFlow)
+            },
+            fcmManager = fcmManager
         )
     }
 
@@ -527,6 +539,7 @@ class ManagerViewModelTest {
         monitorNodeUpdatesFakeFlow = MutableSharedFlow()
         monitorSyncsUseCaseFakeFlow = MutableSharedFlow()
         monitorMyAccountUpdateFakeFlow = MutableSharedFlow()
+        monitorAccountDetailFakeFlow = MutableSharedFlow()
         monitorDevicePowerConnectionFakeFlow = MutableSharedFlow()
         initViewModel()
     }
@@ -1682,6 +1695,85 @@ class ManagerViewModelTest {
             whenever(backgroundFastLoginUseCase.invoke()).thenReturn(sessionId)
             val result = underTest.performFastLoginInBackground()
             assertThat(result).isEqualTo(true)
+        }
+
+    @Test
+    fun `test that fcmManager subscribes to account type topic when account detail is emitted`() =
+        runTest {
+            val accountType = AccountType.PRO_I
+            monitorAccountDetailFakeFlow.emit(
+                AccountDetail(
+                    levelDetail = AccountLevelDetail(
+                        accountType = accountType,
+                        subscriptionStatus = null,
+                        subscriptionRenewTime = 0L,
+                        accountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
+                        proExpirationTime = 0L,
+                        accountPlanDetail = null,
+                        accountSubscriptionDetailList = emptyList()
+                    )
+                )
+            )
+            advanceUntilIdle()
+
+            verify(fcmManager).subscribeToAccountTypeTopic(accountType)
+            verify(fcmManager).setAccountTypeUserProperty(accountType)
+        }
+
+    @Test
+    fun `test that fcmManager does not subscribe when account detail has null levelDetail`() =
+        runTest {
+            monitorAccountDetailFakeFlow.emit(AccountDetail(levelDetail = null))
+            advanceUntilIdle()
+
+            verifyNoInteractions(fcmManager)
+        }
+
+    @Test
+    fun `test that fcmManager does not subscribe when account detail has null accountType`() =
+        runTest {
+            monitorAccountDetailFakeFlow.emit(
+                AccountDetail(
+                    levelDetail = AccountLevelDetail(
+                        accountType = null,
+                        subscriptionStatus = null,
+                        subscriptionRenewTime = 0L,
+                        accountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
+                        proExpirationTime = 0L,
+                        accountPlanDetail = null,
+                        accountSubscriptionDetailList = emptyList()
+                    )
+                )
+            )
+            advanceUntilIdle()
+
+            verifyNoInteractions(fcmManager)
+        }
+
+    @Test
+    fun `test that fcmManager subscribes only once when same account type is emitted multiple times`() =
+        runTest {
+            val accountType = AccountType.FREE
+            val accountDetail = AccountDetail(
+                levelDetail = AccountLevelDetail(
+                    accountType = accountType,
+                    subscriptionStatus = null,
+                    subscriptionRenewTime = 0L,
+                    accountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
+                    proExpirationTime = 0L,
+                    accountPlanDetail = null,
+                    accountSubscriptionDetailList = emptyList()
+                )
+            )
+            // Emit the same account detail three times
+            monitorAccountDetailFakeFlow.emit(accountDetail)
+            monitorAccountDetailFakeFlow.emit(accountDetail)
+            monitorAccountDetailFakeFlow.emit(accountDetail)
+            advanceUntilIdle()
+
+            // Should only be called once due to distinctUntilChanged()
+            verify(fcmManager).subscribeToAccountTypeTopic(accountType)
+            verify(fcmManager).setAccountTypeUserProperty(accountType)
         }
 
     companion object {
