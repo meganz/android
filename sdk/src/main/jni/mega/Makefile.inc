@@ -254,7 +254,8 @@ HEADERS += \
     sdk/include/mega/common/upload_callbacks.h \
     sdk/include/mega/common/upload_forward.h \
     sdk/include/mega/common/utility.h \
-    sdk/src/common/platform/posix/mega/common/platform/date_time.h
+    sdk/src/common/platform/posix/mega/common/platform/date_time.h \
+    sdk/src/common/platform/posix/mega/common/platform/folder_locker.h
 
 CPPFLAGS += -I sdk/src/common/platform/posix
 
