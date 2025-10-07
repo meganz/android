@@ -1,6 +1,8 @@
 package mega.privacy.mobile.home.presentation.configuration
 
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation3.runtime.NavKey
@@ -15,7 +17,13 @@ fun NavGraphBuilder.homeConfigurationScreen(
 ) {
     composable<HomeConfiguration> {
         val viewmodel = hiltViewModel<HomeConfigurationViewModel>()
+        val state by viewmodel.state.collectAsStateWithLifecycle()
 
-        HomeConfigurationScreen()
+        HomeConfigurationScreen(
+            state = state,
+            onWidgetEnabledChange = viewmodel::updateEnabledState,
+            onWidgetOrderChange = viewmodel::updateWidgetOrder,
+            onDeleteWidget = viewmodel::deleteWidget,
+        )
     }
 }
