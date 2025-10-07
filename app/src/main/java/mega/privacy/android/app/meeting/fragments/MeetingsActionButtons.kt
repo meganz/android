@@ -1,18 +1,15 @@
 package mega.privacy.android.app.meeting.fragments
 
-import mega.privacy.android.icon.pack.R as IconR
-import mega.privacy.android.shared.resources.R as SharedR
 import android.content.Context
 import android.util.AttributeSet
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,7 +31,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.fragments.MeetingActionButtonsTestTags.CAMERA_BUTTON
 import mega.privacy.android.app.meeting.fragments.MeetingActionButtonsTestTags.END_CALL_BUTTON
@@ -44,12 +40,14 @@ import mega.privacy.android.app.meeting.fragments.MeetingActionButtonsTestTags.S
 import mega.privacy.android.app.meeting.fragments.MeetingActionButtonsTestTags.TOOLTIP
 import mega.privacy.android.app.meeting.fragments.fab.OnOffFab
 import mega.privacy.android.domain.entity.call.AudioDevice
+import mega.privacy.android.icon.pack.R as IconR
 import mega.privacy.android.legacy.core.ui.controls.tooltips.LegacyMegaTooltip
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.CellButton
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.CellButtonType
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as SharedR
 import kotlin.random.Random
 
 
@@ -167,191 +165,148 @@ fun MeetingsActionButtons(
         mutableStateOf(buttonsEnabled)
     }
 
-    Box(
+    Row(
         modifier = modifier
             .semantics { testTagsAsResourceId = true }
             .padding(horizontal = 24.dp)
             .padding(top = 8.dp)
-            .fillMaxWidth()
-            .wrapContentHeight()
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Column(
+        // Microphone button
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
+                .weight(1F)
+                .wrapContentSize(),
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+            OnOffFab(
+                itemName = stringResource(id = R.string.general_mic),
+                modifier = Modifier.testTag(MIC_BUTTON),
+                isOn = micEnabled,
+                enabled = isEnabled,
+                onIcon = IconR.drawable.ic_mic,
+                offIcon = IconR.drawable.ic_mic_stop,
+                disableIcon = IconR.drawable.ic_mic_stop,
+                onOff = onMicClicked,
+            )
 
-                // Microphone button
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    ConstraintLayout {
-                        val (fab, warning) = createRefs()
-                        OnOffFab(
-                            itemName = stringResource(id = R.string.general_mic),
-                            modifier = Modifier
-                                .constrainAs(fab) {
-                                    top.linkTo(parent.top)
-                                    start.linkTo(parent.start)
-                                }
-                                .testTag(MIC_BUTTON),
-                            isOn = micEnabled,
-                            enabled = isEnabled,
-                            onIcon = IconR.drawable.ic_mic,
-                            offIcon = IconR.drawable.ic_mic_stop,
-                            disableIcon = IconR.drawable.ic_mic_stop,
-                            onOff = onMicClicked,
-                        )
-                        val showWarning by rememberSaveable(showMicWarning) {
-                            mutableStateOf(
-                                showMicWarning
-                            )
-                        }
-                        if (showWarning) {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_permission_warning),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .constrainAs(warning) {
-                                        top.linkTo(parent.top)
-                                        end.linkTo(parent.end)
-                                    }
-                                    .clip(CircleShape)
-                                    .shadow(3.dp)
-                            )
-                        }
-                    }
-                }
-
-                // Camera button
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    ConstraintLayout {
-                        val (fab, warning) = createRefs()
-                        OnOffFab(
-                            itemName = stringResource(id = R.string.general_camera),
-                            modifier = Modifier
-                                .constrainAs(fab) {
-                                    top.linkTo(parent.top)
-                                    start.linkTo(parent.start)
-                                }
-                                .testTag(CAMERA_BUTTON),
-                            isOn = cameraEnabled,
-                            enabled = isEnabled,
-                            onIcon = IconR.drawable.ic_video_on,
-                            offIcon = IconR.drawable.ic_video_off,
-                            disableIcon = IconR.drawable.ic_video_off,
-                            onOff = onCamClicked
-                        )
-                        val showWarning by rememberSaveable(showCameraWarning) {
-                            mutableStateOf(
-                                showCameraWarning
-                            )
-                        }
-                        if (showWarning) {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_permission_warning),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .constrainAs(warning) {
-                                        top.linkTo(parent.top)
-                                        end.linkTo(parent.end)
-                                    }
-                                    .clip(CircleShape)
-                                    .shadow(3.dp)
-                            )
-                        }
-                    }
-                }
-
-                // Speaker button
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    val (onIcon, stringId) =
-                        if (currentAudioDevice == AudioDevice.WiredHeadset ||
-                            currentAudioDevice == AudioDevice.Bluetooth
-                        ) Pair(
-                            R.drawable.ic_headphone,
-                            R.string.general_headphone
-                        ) else Pair(IconR.drawable.ic_volume_max, R.string.general_speaker)
-                    OnOffFab(
-                        itemName = stringResource(id = stringId),
-                        modifier = Modifier.testTag(SPEAKER_BUTTON),
-                        isOn = currentAudioDevice != AudioDevice.Earpiece,
-                        enabled = if (currentAudioDevice == AudioDevice.None) false else isEnabled,
-                        onIcon = onIcon,
-                        offIcon = IconR.drawable.ic_volume_off,
-                        disableIcon = IconR.drawable.ic_volume_off,
-                        onOff = onSpeakerClicked
-                    )
-                }
-
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    if (isRaiseHandToolTipShown || backgroundTintAlpha == 1.0F) {
-                        CellButton(
-                            itemName = stringResource(id = R.string.meetings_more_call_option_button),
-                            modifier = Modifier.testTag(MORE_BUTTON),
-                            iconId = R.drawable.more_call_options_icon,
-                            onItemClick = { onMoreClicked?.invoke() },
-                            enabled = true,
-                        )
-                    } else {
-                        LegacyMegaTooltip(
-                            key = tooltipKey,
-                            modifier = Modifier.testTag(TOOLTIP),
-                            descriptionText = stringResource(id = SharedR.string.meetings_raised_hand_tooltip_title),
-                            actionText = stringResource(R.string.button_permission_info),
-                            showOnTop = true,
-                            setDismissWhenTouchOutside = true,
-                            content = {
-                                CellButton(
-                                    itemName = stringResource(id = R.string.meetings_more_call_option_button),
-                                    modifier = Modifier.testTag(MORE_BUTTON),
-                                    iconId = R.drawable.more_call_options_icon,
-                                    onItemClick = {
-                                        onMoreClicked?.invoke()
-                                        onRaiseToRandTooltipDismissed?.invoke()
-                                    },
-                                    enabled = moreEnabled,
-                                )
-                            },
-                            onDismissed = {
-                                onRaiseToRandTooltipDismissed?.invoke()
-                            }
-                        )
-                    }
-                }
-
-                // End Call button
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    CellButton(
-                        itemName = stringResource(id = R.string.meeting_end),
-                        modifier = Modifier.testTag(END_CALL_BUTTON),
-                        type = CellButtonType.Interactive,
-                        enabled = true,
-                        iconId = IconR.drawable.hang_call_icon,
-                        onItemClick = { onEndClicked?.invoke() }
-                    )
-                }
+            val showWarning by rememberSaveable(showMicWarning) {
+                mutableStateOf(showMicWarning)
+            }
+            if (showWarning) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_permission_warning),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .shadow(3.dp)
+                        .align(Alignment.TopEnd)
+                )
             }
         }
+
+        // Camera button
+        Box(
+            modifier = Modifier
+                .weight(1F)
+                .wrapContentSize(),
+        ) {
+            OnOffFab(
+                itemName = stringResource(id = R.string.general_camera),
+                modifier = Modifier.testTag(CAMERA_BUTTON),
+                isOn = cameraEnabled,
+                enabled = isEnabled,
+                onIcon = IconR.drawable.ic_video_on,
+                offIcon = IconR.drawable.ic_video_off,
+                disableIcon = IconR.drawable.ic_video_off,
+                onOff = onCamClicked
+            )
+
+            val showWarning by rememberSaveable(showCameraWarning) {
+                mutableStateOf(showCameraWarning)
+            }
+            if (showWarning) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_permission_warning),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .shadow(3.dp)
+                        .align(Alignment.TopEnd)
+                )
+            }
+        }
+
+        // Speaker button
+        val (onIcon, stringId) =
+            if (currentAudioDevice == AudioDevice.WiredHeadset ||
+                currentAudioDevice == AudioDevice.Bluetooth
+            ) Pair(
+                R.drawable.ic_headphone,
+                R.string.general_headphone
+            ) else Pair(IconR.drawable.ic_volume_max, R.string.general_speaker)
+        OnOffFab(
+            itemName = stringResource(id = stringId),
+            modifier = Modifier
+                .weight(1F)
+                .testTag(SPEAKER_BUTTON),
+            isOn = currentAudioDevice != AudioDevice.Earpiece,
+            enabled = if (currentAudioDevice == AudioDevice.None) false else isEnabled,
+            onIcon = onIcon,
+            offIcon = IconR.drawable.ic_volume_off,
+            disableIcon = IconR.drawable.ic_volume_off,
+            onOff = onSpeakerClicked
+        )
+
+        if (isRaiseHandToolTipShown || backgroundTintAlpha == 1.0F) {
+            CellButton(
+                itemName = stringResource(id = R.string.meetings_more_call_option_button),
+                modifier = Modifier
+                    .weight(1F)
+                    .testTag(MORE_BUTTON),
+                iconId = R.drawable.more_call_options_icon,
+                onItemClick = { onMoreClicked?.invoke() },
+                enabled = true,
+            )
+        } else {
+            LegacyMegaTooltip(
+                key = tooltipKey,
+                modifier = Modifier.testTag(TOOLTIP),
+                descriptionText = stringResource(id = SharedR.string.meetings_raised_hand_tooltip_title),
+                actionText = stringResource(R.string.button_permission_info),
+                showOnTop = true,
+                setDismissWhenTouchOutside = true,
+                content = {
+                    CellButton(
+                        itemName = stringResource(id = R.string.meetings_more_call_option_button),
+                        modifier = Modifier.testTag(MORE_BUTTON),
+                        iconId = R.drawable.more_call_options_icon,
+                        onItemClick = {
+                            onMoreClicked?.invoke()
+                            onRaiseToRandTooltipDismissed?.invoke()
+                        },
+                        enabled = moreEnabled,
+                    )
+                },
+                onDismissed = {
+                    onRaiseToRandTooltipDismissed?.invoke()
+                }
+            )
+        }
+
+        // End Call button
+        CellButton(
+            itemName = stringResource(id = R.string.meeting_end),
+            modifier = Modifier
+                .weight(1F)
+                .testTag(END_CALL_BUTTON),
+            type = CellButtonType.Interactive,
+            enabled = true,
+            iconId = IconR.drawable.hang_call_icon,
+            onItemClick = { onEndClicked?.invoke() }
+        )
     }
 }
-
 
 @CombinedThemePreviews
 @Composable
