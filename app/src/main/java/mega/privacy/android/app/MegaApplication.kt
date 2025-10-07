@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
+import mega.privacy.android.app.fcm.FcmManager
 import mega.privacy.android.app.fetcher.MegaAvatarFetcher
 import mega.privacy.android.app.fetcher.MegaAvatarKeyer
 import mega.privacy.android.app.fetcher.MegaThumbnailFetcher
@@ -221,6 +222,8 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     @Inject
     lateinit var domainLogger: Logger
 
+    @Inject
+    lateinit var fcmManager: FcmManager
 
     var localIpAddress: String? = ""
 
@@ -273,6 +276,9 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         ContextUtils.initialize(applicationContext)
 
         if (BuildConfig.ACTIVATE_GREETER) greeter.get().initialize()
+
+        // Subscribe to all users FCM topic
+        fcmManager.subscribeToAllUsersTopic()
     }
 
     // Image loader for coil3
