@@ -235,14 +235,14 @@ internal suspend fun toUserAlert(
                     contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
                 )
             } else {
-                val validNodeId = megaUserAlert.nodeHandle.takeIf { it.isValid() }
+                val node = getNode(megaUserAlert, nodeProvider)
                 DeletedShareAlert(
                     id = megaUserAlert.id,
                     seen = megaUserAlert.seen,
                     createdTime = megaUserAlert.getTimestamp(CREATED_TIME_INDEX),
                     isOwnChange = megaUserAlert.isOwnChange,
-                    nodeId = validNodeId,
-                    nodeName = validNodeId?.let { nodeProvider(it) }?.name,
+                    nodeId = node?.handle,
+                    nodeName = node?.name,
                     contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
                 )
             }

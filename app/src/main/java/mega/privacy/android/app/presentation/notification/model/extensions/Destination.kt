@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.UpdatedPendingContactIncomingIgnoredAl
 import mega.privacy.android.domain.entity.UpdatedPendingContactOutgoingDeniedAlert
 import mega.privacy.android.domain.entity.UserAlert
 import mega.privacy.android.domain.entity.UserAlertDestination
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
@@ -38,14 +39,26 @@ internal fun UserAlert.destination(): NavKey? {
         is TakeDownAlert -> when (destination) {
             UserAlertDestination.CloudDrive -> rootNodeId?.let { CloudDriveNavKey(it) }
             UserAlertDestination.RubbishBin -> rootNodeId?.let { RubbishBinNavKey(it) }
-            UserAlertDestination.IncomingShares -> null //TODO handle IncomingShares JIRA AND-21337
+            UserAlertDestination.IncomingShares -> rootNodeId?.let {
+                CloudDriveNavKey(
+                    nodeHandle = it,
+                    nodeSourceType = NodeSourceType.INCOMING_SHARES
+                )
+            }
+
             else -> null
         }
 
         is TakeDownReinstatedAlert -> when (destination) {
             UserAlertDestination.CloudDrive -> rootNodeId?.let { CloudDriveNavKey(it) }
             UserAlertDestination.RubbishBin -> rootNodeId?.let { RubbishBinNavKey(it) }
-            UserAlertDestination.IncomingShares -> null // TODO handle IncomingShares AND-21337
+            UserAlertDestination.IncomingShares -> rootNodeId?.let {
+                CloudDriveNavKey(
+                    nodeHandle = it,
+                    nodeSourceType = NodeSourceType.INCOMING_SHARES
+                )
+            }
+
             else -> null
         }
 
@@ -56,7 +69,12 @@ internal fun UserAlert.destination(): NavKey? {
         is UpdatedPendingContactIncomingDeniedAlert -> null
         is UpdatedPendingContactIncomingIgnoredAlert -> null
         is UpdatedPendingContactOutgoingDeniedAlert -> null
-        is IncomingShareAlert -> null //TODO handle IncomingShareAlert AND-21337
+        is IncomingShareAlert -> nodeId?.let {
+            CloudDriveNavKey(
+                nodeHandle = it,
+                nodeSourceType = NodeSourceType.INCOMING_SHARES
+            )
+        }
 
         is ContactAlert ->
             if (contact.isVisible) {
