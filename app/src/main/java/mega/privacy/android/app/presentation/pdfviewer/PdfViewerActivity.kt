@@ -38,9 +38,11 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.shockwave.pdfium.PdfDocument.Bookmark
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.StateEventWithContentTriggered
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
@@ -89,6 +91,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.DocumentPreviewHideNodeMenuItemEvent
@@ -140,6 +143,10 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     @ApplicationScope
     @Inject
     lateinit var applicationScope: CoroutineScope
+
+    @Inject
+    @IoDispatcher
+    lateinit var ioDispatcher: CoroutineDispatcher
 
     private lateinit var binding: ActivityPdfviewerBinding
 
@@ -666,10 +673,15 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
 
     override fun onNodesUpdate(api: MegaApiJava, nodeList: ArrayList<MegaNode>?) {
         Timber.d("onNodesUpdate")
-        if (megaApi.getNodeByHandle(handle) == null) {
-            return
+        lifecycleScope.launch {
+            val node = withContext(ioDispatcher) {
+                megaApi.getNodeByHandle(handle)
+            }
+            if (node == null) {
+                return@launch
+            }
+            invalidateOptionsMenu()
         }
-        invalidateOptionsMenu()
     }
 
     override fun onAccountUpdate(api: MegaApiJava) {}
