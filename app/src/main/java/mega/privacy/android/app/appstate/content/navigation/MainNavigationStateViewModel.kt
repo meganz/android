@@ -100,6 +100,7 @@ class MainNavigationStateViewModel @Inject constructor(
     ): NavigationItem = NavigationItem(
         destination = mainNavItem.destination,
         icon = mainNavItem.icon,
+        selectedIcon = mainNavItem.selectedIcon,
         label = mainNavItem.label,
         preferredSlot = mainNavItem.preferredSlot,
         analyticsEventIdentifier = mainNavItem.analyticsEventIdentifier,

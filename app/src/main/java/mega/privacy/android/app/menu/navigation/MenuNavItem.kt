@@ -22,6 +22,7 @@ class MenuNavItem : MainNavItem {
     override val screen: NavGraphBuilder.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
         { navigationHandler, _, _ -> menuHomeScreen(navigationHandler::navigate) }
     override val icon: ImageVector = IconPack.Medium.Thin.Outline.Menu01
+    override val selectedIcon: ImageVector? = null
     override val badge: Flow<String?>? = null
     override val label: Int = sharedR.string.general_menu
     override val preferredSlot: PreferredSlot = PreferredSlot.Last

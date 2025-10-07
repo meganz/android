@@ -26,6 +26,7 @@ class HomeNavItem : MainNavItem {
             )
         }
     override val icon: ImageVector = IconPack.Medium.Thin.Outline.Mega
+    override val selectedIcon: ImageVector = IconPack.Medium.Thin.Solid.Eye
     override val badge: Flow<String?>? = null
     override val label: Int = sharedR.string.general_section_home
     override val preferredSlot: PreferredSlot = PreferredSlot.Ordered(0)

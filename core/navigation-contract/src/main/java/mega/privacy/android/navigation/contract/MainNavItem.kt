@@ -10,6 +10,7 @@ interface MainNavItem {
     val destination: NavKey
     val screen: NavGraphBuilder.(navigationHandler: NavigationHandler, navigationUiController: NavigationUiController, transferHandler: TransferHandler) -> Unit
     val icon: ImageVector
+    val selectedIcon: ImageVector?
     val badge: Flow<String?>?
     val label: Int
     val preferredSlot: PreferredSlot

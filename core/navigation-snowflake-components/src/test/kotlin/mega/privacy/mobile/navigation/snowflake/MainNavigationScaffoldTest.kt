@@ -407,6 +407,7 @@ class MainNavigationScaffoldTest {
         label: Int,
         icon: ImageVector,
         preferredSlot: PreferredSlot,
+        selectedIcon: ImageVector? = null,
         enabled: Boolean = true,
         badgeText: String? = null,
         navigationEventIdentifier: NavigationEventIdentifier = mock<NavigationEventIdentifier>(),
@@ -414,6 +415,7 @@ class MainNavigationScaffoldTest {
         return NavigationItem(
             destination = TestHomeScreen,
             icon = icon,
+            selectedIcon = selectedIcon,
             label = label,
             isEnabled = enabled,
             badgeText = badgeText,

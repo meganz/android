@@ -133,10 +133,11 @@ private fun MegaNavigationSuite(
             }
     ) {
         orderedItems.forEach { navItem ->
+            val selected = isSelected(navItem.destination)
             item(
                 icon = {
                     mainNavItemIcon(
-                        navItem.icon,
+                        navItem.getIcon(selected),
                         stringResource(navItem.label),
                         Modifier.testTag(navItem.testTag),
                     )
@@ -147,7 +148,7 @@ private fun MegaNavigationSuite(
                     }
                 },
                 label = { Text(text = stringResource(navItem.label)) },
-                selected = isSelected(navItem.destination),
+                selected = selected,
                 onClick = {
                     Analytics.tracker.trackEvent(navItem.analyticsEventIdentifier)
                     onDestinationClick(navItem.destination)

@@ -18,10 +18,13 @@ import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdenti
 data class NavigationItem(
     val destination: NavKey,
     val icon: ImageVector,
+    val selectedIcon: ImageVector?,
     @StringRes val label: Int,
     val isEnabled: Boolean,
     val badgeText: String?,
     val analyticsEventIdentifier: NavigationEventIdentifier,
     val preferredSlot: PreferredSlot,
     val testTag: String = "main_navigation:navigation_item_${destination::class.simpleName}"
-)
+){
+    fun getIcon(isSelected: Boolean) = selectedIcon?.takeIf { isSelected } ?: icon
+}

@@ -39,6 +39,7 @@ class DriveSyncNavItem : MainNavItem {
         }
 
     override val icon: ImageVector = IconPack.Medium.Thin.Outline.Folder
+    override val selectedIcon: ImageVector? = null
     override val badge: Flow<String?>? = null
 
     @StringRes
