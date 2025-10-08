@@ -284,6 +284,7 @@ internal fun SharesScreen(
         event = nodeActionState.renameNodeRequestEvent,
         onConsumed = nodeOptionsActionViewModel::resetRenameNodeRequest,
         action = { nodeId ->
+            deselectAllItems()
             navigationHandler.navigate(RenameNodeDialogNavKey(nodeId = nodeId.longValue))
         }
     )

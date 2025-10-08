@@ -278,6 +278,7 @@ internal fun CloudDriveContent(
         event = nodeActionState.renameNodeRequestEvent,
         onConsumed = nodeOptionsActionViewModel::resetRenameNodeRequest,
         action = { nodeId ->
+            onAction(CloudDriveAction.DeselectAllItems)
             navigationHandler.navigate(RenameNodeDialogNavKey(nodeId = nodeId.longValue))
         }
     )

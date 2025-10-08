@@ -19,6 +19,7 @@ import mega.privacy.android.core.nodecomponents.action.clickhandler.GetLinkActio
 import mega.privacy.android.core.nodecomponents.action.clickhandler.HideActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.InfoActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.LabelActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.LeaveShareActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.ManageLinkActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.ManageShareFolderActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.MoveActionClickHandler
@@ -36,6 +37,7 @@ import mega.privacy.android.core.nodecomponents.action.clickhandler.UnhideAction
 import mega.privacy.android.core.nodecomponents.action.clickhandler.VerifyActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.VersionsActionClickHandler
 import mega.privacy.android.core.nodecomponents.dialog.delete.MoveToRubbishOrDeleteDialogArgs
+import mega.privacy.android.core.nodecomponents.dialog.leaveshare.LeaveShareDialogNavKey
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.RestoreNodeResultMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AvailableOfflineMenuAction
@@ -49,6 +51,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.GetLinkMenuActio
 import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.InfoMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.LabelMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.LeaveShareMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ManageLinkMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ManageShareFolderMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
@@ -1112,7 +1115,80 @@ class NodeActionClickHandlerTest {
         verify(mockUpdateNodeFavoriteUseCase).invoke(any(), any())
     }
 
-    // Tests for the new selection menu items that were added
+    // LeaveShareAction Tests
+    @Test
+    fun `test LeaveShareAction canHandle returns true for LeaveShareMenuAction`() {
+        val action = LeaveShareActionClickHandler(mockNodeHandlesToJsonMapper)
+        val menuAction = mock<LeaveShareMenuAction>()
+
+        assertThat(action.canHandle(menuAction)).isTrue()
+    }
+
+    @Test
+    fun `test LeaveShareAction canHandle returns false for other actions`() {
+        val action = LeaveShareActionClickHandler(mockNodeHandlesToJsonMapper)
+        val otherAction = mock<CopyMenuAction>()
+
+        assertThat(action.canHandle(otherAction)).isFalse()
+    }
+
+    @Test
+    fun `test LeaveShareAction single node handle calls nodeHandlesToJsonMapper and navigate`() =
+        runTest {
+            val action = LeaveShareActionClickHandler(mockNodeHandlesToJsonMapper)
+            val menuAction = mock<LeaveShareMenuAction>()
+
+            action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+
+            verify(mockNodeHandlesToJsonMapper).invoke(listOf(123L))
+            verify(mockNavigationHandler).navigate(
+                LeaveShareDialogNavKey(handles = "test-json")
+            )
+        }
+
+    @Test
+    fun `test LeaveShareAction multiple nodes handle calls nodeHandlesToJsonMapper and navigate`() =
+        runTest {
+            val action = LeaveShareActionClickHandler(mockNodeHandlesToJsonMapper)
+            val menuAction = mock<LeaveShareMenuAction>()
+            val nodes = listOf(mockFileNode, mockFolderNode)
+
+            action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
+
+            verify(mockNodeHandlesToJsonMapper).invoke(listOf(123L, 456L))
+            verify(mockNavigationHandler).navigate(
+                LeaveShareDialogNavKey(handles = "test-json")
+            )
+        }
+
+    @Test
+    fun `test LeaveShareAction single node handle does not navigate when nodeHandlesToJsonMapper fails`() =
+        runTest {
+            val action = LeaveShareActionClickHandler(mockNodeHandlesToJsonMapper)
+            val menuAction = mock<LeaveShareMenuAction>()
+
+            whenever(mockNodeHandlesToJsonMapper(any<List<Long>>())).thenThrow(RuntimeException("Mapper failed"))
+
+            action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+
+            verify(mockNodeHandlesToJsonMapper).invoke(listOf(123L))
+            verify(mockNavigationHandler, never()).navigate(any<LeaveShareDialogNavKey>())
+        }
+
+    @Test
+    fun `test LeaveShareAction multiple nodes handle does not navigate when nodeHandlesToJsonMapper fails`() =
+        runTest {
+            val action = LeaveShareActionClickHandler(mockNodeHandlesToJsonMapper)
+            val menuAction = mock<LeaveShareMenuAction>()
+            val nodes = listOf(mockFileNode, mockFolderNode)
+
+            whenever(mockNodeHandlesToJsonMapper(any<List<Long>>())).thenThrow(RuntimeException("Mapper failed"))
+
+            action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
+
+            verify(mockNodeHandlesToJsonMapper).invoke(listOf(123L, 456L))
+            verify(mockNavigationHandler, never()).navigate(any<LeaveShareDialogNavKey>())
+        }
 
     // UnhideAction Tests (already exists, but adding for completeness)
     @Test
@@ -1308,5 +1384,6 @@ class NodeActionClickHandlerTest {
             )
         ).isFalse()
         assertThat(FavouriteActionClickHandler(mockUpdateNodeFavoriteUseCase).canHandle(wrongAction)).isFalse()
+        assertThat(LeaveShareActionClickHandler(mockNodeHandlesToJsonMapper).canHandle(wrongAction)).isFalse()
     }
 }

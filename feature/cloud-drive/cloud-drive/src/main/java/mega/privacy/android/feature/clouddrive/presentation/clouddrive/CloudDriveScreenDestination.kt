@@ -12,7 +12,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
@@ -23,9 +22,6 @@ fun NavGraphBuilder.cloudDriveScreen(
     navigationHandler: NavigationHandler,
     onBack: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
-    onNavigateToFolder: (NodeId, String?) -> Unit,
-    onCreatedNewFolder: (NodeId) -> Unit,
-    onRenameNode: (NodeId) -> Unit,
     openSearch: (Boolean, Long, NodeSourceType) -> Unit,
 ) {
     composable<CloudDriveNavKey> { backStackEntry ->
@@ -47,10 +43,7 @@ fun NavGraphBuilder.cloudDriveScreen(
             navigationHandler = navigationHandler,
             viewModel = viewModel,
             onBack = onBack,
-            onNavigateToFolder = onNavigateToFolder,
-            onCreatedNewFolder = onCreatedNewFolder,
             onTransfer = onTransfer,
-            onRenameNode = onRenameNode,
             openSearch = openSearch,
         )
     }

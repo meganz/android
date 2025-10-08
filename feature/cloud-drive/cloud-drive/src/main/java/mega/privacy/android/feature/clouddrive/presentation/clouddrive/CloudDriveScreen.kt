@@ -33,8 +33,6 @@ import mega.privacy.android.navigation.extensions.rememberMegaNavigator
  * Cloud Drive Screen, used to display contents of a folder
  *
  * @param onBack Callback to be invoked when the back button is pressed
- * @param onNavigateToFolder Callback to navigate to a specific folder, accepts NodeId and an name for folder title
- * @param onCreatedNewFolder Callback to be invoked when a new folder is created, accepts NodeId of the new folder
  * @param onTransfer Callback to handle transfer events
  * @param viewModel ViewModel for managing the state of the Cloud Drive screen
  */
@@ -43,10 +41,7 @@ import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 fun CloudDriveScreen(
     navigationHandler: NavigationHandler,
     onBack: () -> Unit,
-    onNavigateToFolder: (NodeId, String?) -> Unit,
-    onCreatedNewFolder: (NodeId) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
-    onRenameNode: (NodeId) -> Unit,
     openSearch: (Boolean, Long, NodeSourceType) -> Unit,
     viewModel: CloudDriveViewModel = hiltViewModel(),
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel()

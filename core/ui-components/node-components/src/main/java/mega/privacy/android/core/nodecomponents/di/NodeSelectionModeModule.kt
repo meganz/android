@@ -7,24 +7,26 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.CopySelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.DeletePermanentlySelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.DisputeTakeDownSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.DownloadSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.GetLinkSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.HideSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.LeaveShareSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.ManageLinkSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.MoveSelectionMenuItem
-import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.DeletePermanentlySelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RemoveLinkSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RemoveShareSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RenameSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RestoreSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RubbishBinSelectionMenuItem
-import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.UnhideSelectionMenuItem
-import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RenameSelectionMenuItem
-import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.GetLinkSelectionMenuItem
-import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RemoveLinkSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.SendToChatSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.ShareFolderSelectionMenuItem
-import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RemoveShareSelectionMenuItem
-import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.DisputeTakeDownSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.ShareSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.UnhideSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.domain.qualifier.features.CloudDrive
+import mega.privacy.android.domain.qualifier.features.IncomingShares
 import mega.privacy.android.domain.qualifier.features.RubbishBin
 import javax.inject.Singleton
 
@@ -81,6 +83,24 @@ abstract class NodeSelectionModeModule {
         ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
             deletePermanentlySelectionMenuItem,
             restoreSelectionMenuItem,
+        )
+
+        @Provides
+        @ElementsIntoSet
+        @IncomingShares
+        @Singleton
+        fun provideIncomingSharesToolbarItems(
+            copySelectionModeMenuItem: CopySelectionMenuItem,
+            moveSelectionModeMenuItem: MoveSelectionMenuItem,
+            downloadSelectionMenuItem: DownloadSelectionMenuItem,
+            renameSelectionMenuItem: RenameSelectionMenuItem,
+            leaveShareSelectionMenuItem: LeaveShareSelectionMenuItem,
+        ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
+            copySelectionModeMenuItem,
+            moveSelectionModeMenuItem,
+            downloadSelectionMenuItem,
+            renameSelectionMenuItem,
+            leaveShareSelectionMenuItem,
         )
     }
 }
