@@ -9,9 +9,8 @@ interface NotificationNavigationHandler {
      * Navigate to shared node
      *
      * @param nodeId
-     * @param childNodes
      */
-    fun navigateToSharedNode(nodeId: Long, childNodes: LongArray?)
+    fun navigateToSharedNode(nodeId: Long)
 
     /**
      * Navigate to my account

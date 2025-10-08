@@ -450,30 +450,6 @@ class UserAlertMapperTest {
     }
 
     @Test
-    fun `test that new shared nodes alert returns child nodes`() = runTest {
-        val childNodeList = (0L..5L)
-        val megaUserAlert =
-            createMegaUserAlert(
-                typeId = MegaUserAlert.TYPE_NEWSHAREDNODES,
-                handleResult = childNodeList.map { Pair(it, it) })
-
-        val actual =
-            toUserAlert(
-                megaUserAlert = megaUserAlert,
-                contactProvider = { _, _ -> testContact },
-                scheduledMeetingProvider = { _, _ -> testSchedMeeting },
-                scheduledMeetingOccurrProvider = { listOf(testSchedMeetingOccurr) },
-                nodeProvider = { null },
-                rootParentNodeProvider = { null },
-                rubbishNodeProvider = { null },
-                rootNodeProvider = { null }
-            ) as NewSharedNodesAlert
-
-        assertThat(actual.childNodes).containsExactlyElementsIn(childNodeList)
-
-    }
-
-    @Test
     fun `test that custom alerts has a header`() = runTest {
         val expectedHeading = "expectedHeading"
 

@@ -362,7 +362,6 @@ data class RemovedFromShareByOwnerAlert(
  * @property contact
  * @property folderCount
  * @property fileCount
- * @property childNodes
  */
 data class NewSharedNodesAlert(
     override val id: Long,
@@ -373,7 +372,6 @@ data class NewSharedNodesAlert(
     override val contact: Contact,
     val folderCount: Int,
     val fileCount: Int,
-    val childNodes: List<Long>,
 ) : UserAlert, IncomingShareAlert {}
 
 /**

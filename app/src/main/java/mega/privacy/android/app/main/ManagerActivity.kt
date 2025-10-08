@@ -578,7 +578,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     var comesFromNotificationHandle = Constants.INVALID_VALUE.toLong()
     var comesFromNotificationHandleSaved = Constants.INVALID_VALUE.toLong()
     private var comesFromNotificationDeepBrowserTreeIncoming = Constants.INVALID_VALUE
-    private var comesFromNotificationChildNodeHandleList: LongArray? = null
     private var comesFromNotificationSharedIndex: SharesTab = SharesTab.NONE
     private var bottomNavigationCurrentItem = -1
 
@@ -5818,8 +5817,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         showMyAccount()
     }
 
-    override fun navigateToSharedNode(nodeId: Long, childNodes: LongArray?) {
-        openLocation(nodeId, childNodes)
+    override fun navigateToSharedNode(nodeId: Long) {
+        openLocation(nodeId)
     }
 
     override fun navigateToContactInfo(email: String) {
@@ -6309,14 +6308,12 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      * Open location based on where parent node is located
      *
      * @param nodeHandle          parent node handle
-     * @param childNodeHandleList list of child nodes handles if comes from notification about new added nodes to shared folder
      */
-    private fun openLocation(nodeHandle: Long, childNodeHandleList: LongArray?) {
+    private fun openLocation(nodeHandle: Long) {
         Timber.d("Node handle: %s", nodeHandle)
         val node = megaApi.getNodeByHandle(nodeHandle) ?: return
         comesFromNotifications = true
         comesFromNotificationHandle = nodeHandle
-        comesFromNotificationChildNodeHandleList = childNodeHandleList
         val parent: MegaNode? = nodeController.getParent(node)
         when (parent?.handle) {
             megaApi.rootNode?.handle -> {

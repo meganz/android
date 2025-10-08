@@ -7,7 +7,6 @@ import mega.privacy.android.domain.entity.ContactChangeBlockedYouAlert
 import mega.privacy.android.domain.entity.ContactChangeDeletedYouAlert
 import mega.privacy.android.domain.entity.IncomingPendingContactCancelledAlert
 import mega.privacy.android.domain.entity.IncomingShareAlert
-import mega.privacy.android.domain.entity.NewSharedNodesAlert
 import mega.privacy.android.domain.entity.PaymentFailedAlert
 import mega.privacy.android.domain.entity.PaymentReminderAlert
 import mega.privacy.android.domain.entity.PaymentSucceededAlert
@@ -29,47 +28,59 @@ internal fun UserAlert.onClick(): (NotificationNavigationHandler) -> Unit {
         is PaymentFailedAlert -> { handler ->
             handler.navigateToMyAccount()
         }
+
         is PaymentReminderAlert -> { handler ->
             handler.navigateToMyAccount()
         }
+
         is PaymentSucceededAlert -> { handler ->
             handler.navigateToMyAccount()
         }
+
         is TakeDownAlert -> { handler ->
-            rootNodeId?.let { handler.navigateToSharedNode(it, null) }
+            rootNodeId?.let { handler.navigateToSharedNode(it) }
         }
+
         is TakeDownReinstatedAlert -> { handler ->
-            rootNodeId?.let { handler.navigateToSharedNode(it, null) }
+            rootNodeId?.let { handler.navigateToSharedNode(it) }
         }
+
         is ContactChangeAccountDeletedAlert -> { _ ->
             Timber.d("Do not navigate: ${this.javaClass.name}")
         }
+
         is ContactChangeBlockedYouAlert -> { _ ->
             Timber.d("Do not navigate: ${this.javaClass.name}")
         }
+
         is ContactChangeDeletedYouAlert -> { _ ->
             Timber.d("Do not navigate: ${this.javaClass.name}")
         }
+
         is IncomingPendingContactCancelledAlert -> { _ ->
             Timber.d("Do not navigate: ${this.javaClass.name}")
         }
+
         is UpdatedPendingContactIncomingDeniedAlert -> { _ ->
             Timber.d("Do not navigate: ${this.javaClass.name}")
         }
+
         is UpdatedPendingContactIncomingIgnoredAlert -> { _ ->
             Timber.d("Do not navigate: ${this.javaClass.name}")
         }
+
         is UpdatedPendingContactOutgoingDeniedAlert -> { _ ->
             Timber.d("Do not navigate: ${this.javaClass.name}")
         }
+
         is IncomingShareAlert -> { handler ->
             nodeId?.let {
                 handler.navigateToSharedNode(
-                    nodeId = it,
-                    childNodes = if (this is NewSharedNodesAlert) childNodes.toLongArray() else null
+                    nodeId = it
                 )
             }
         }
+
         is ContactAlert -> { handler ->
             if (contact.isVisible) {
                 contact.email?.let { handler.navigateToContactInfo(it) }
@@ -79,9 +90,11 @@ internal fun UserAlert.onClick(): (NotificationNavigationHandler) -> Unit {
                 Timber.d("Do not navigate: ${this.javaClass.name}")
             }
         }
+
         is ScheduledMeetingAlert -> { handler ->
             handler.moveToChatSection(chatId)
         }
+
         else -> { _ ->
             Timber.d("Do not navigate: ${this.javaClass.name}")
         }

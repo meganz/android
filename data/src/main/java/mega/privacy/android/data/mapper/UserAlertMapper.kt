@@ -261,7 +261,6 @@ internal suspend fun toUserAlert(
                 nodeId = getNode(megaUserAlert, nodeProvider)?.handle,
                 folderCount = megaUserAlert.getNumber(folderIndex).toInt(),
                 fileCount = megaUserAlert.getNumber(fileIndex).toInt(),
-                childNodes = getChildNodes(megaUserAlert),
                 contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
             )
         }
@@ -721,16 +720,6 @@ private suspend fun getRootNodeId(
 ) = getNode(megaUserAlert, nodeProvider)
     ?.let {
         if (it.isFile) it.parentHandle else it.handle
-    }
-
-private fun getChildNodes(megaUserAlert: MegaUserAlert) =
-    mutableListOf<Long>().apply {
-        var i = 0L
-        var nodeId = megaUserAlert.getHandle(i)
-        while (nodeId.isValid()) {
-            add(nodeId)
-            nodeId = megaUserAlert.getHandle(++i)
-        }
     }
 
 private fun MegaUserAlert.getScheduledMeetingChanges(): List<UserAlertChange> =
