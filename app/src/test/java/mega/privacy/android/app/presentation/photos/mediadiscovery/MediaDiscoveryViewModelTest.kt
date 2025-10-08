@@ -644,4 +644,61 @@ class MediaDiscoveryViewModelTest {
             assertThat(awaitItem()).isFalse()
         }
     }
+
+    @Test
+    fun `test that clearState resets all state properties to default values`() = runTest {
+        // Given: Initialize ViewModel with some state
+        initViewModel()
+        underTest.initialize(1L, 123, false)
+
+        // Set up some state values
+        underTest.togglePhotoSelection(1L)
+        underTest.togglePhotoSelection(2L)
+        underTest.updateSelectedPhotoIds(setOf(1L, 2L, 3L))
+        underTest.updateIsClearSelectedPhotos(false)
+        underTest.showSortByDialog(true)
+        underTest.showFilterDialog(true)
+        underTest.showSlidersPopup(true)
+        underTest.updateZoomLevel(mega.privacy.android.app.presentation.photos.model.ZoomLevel.Grid_1)
+        underTest.setCurrentSort(mega.privacy.android.app.presentation.photos.model.Sort.OLDEST)
+        underTest.setCurrentMediaType(mega.privacy.android.app.presentation.photos.model.FilterMediaType.IMAGES)
+
+        // When: clearState is called
+        underTest.clearState()
+
+        // Then: All state should be reset to default values
+        val currentState = underTest.state.value
+        assertThat(currentState.currentFolderId).isNull()
+        assertThat(currentState.sourcePhotos).isEmpty()
+        assertThat(currentState.mediaListItemList).isEmpty()
+        assertThat(currentState.currentZoomLevel).isEqualTo(mega.privacy.android.app.presentation.photos.model.ZoomLevel.Grid_3)
+        assertThat(currentState.selectedPhotoIds).isEmpty()
+        assertThat(currentState.currentSort).isEqualTo(mega.privacy.android.app.presentation.photos.model.Sort.NEWEST)
+        assertThat(currentState.currentMediaType).isEqualTo(mega.privacy.android.app.presentation.photos.model.FilterMediaType.ALL_MEDIA)
+        assertThat(currentState.selectedTimeBarTab).isEqualTo(mega.privacy.android.app.presentation.photos.model.TimeBarTab.All)
+        assertThat(currentState.yearsCardList).isEmpty()
+        assertThat(currentState.monthsCardList).isEmpty()
+        assertThat(currentState.daysCardList).isEmpty()
+        assertThat(currentState.scrollStartIndex).isEqualTo(0)
+        assertThat(currentState.scrollStartOffset).isEqualTo(0)
+        assertThat(currentState.mediaDiscoveryViewSettings).isNull()
+        assertThat(currentState.showSortByDialog).isFalse()
+        assertThat(currentState.showFilterDialog).isFalse()
+        assertThat(currentState.showSlidersPopup).isFalse()
+        assertThat(currentState.collisions).isEmpty()
+        assertThat(currentState.copyThrowable).isNull()
+        assertThat(currentState.copyResultText).isNull()
+        assertThat(currentState.isConnectedToNetwork).isTrue()
+        assertThat(currentState.hasDbCredentials).isTrue()
+        assertThat(currentState.loadPhotosDone).isFalse()
+        assertThat(currentState.shouldGoBack).isFalse()
+        assertThat(currentState.downloadEvent).isInstanceOf(StateEventWithContentConsumed::class.java)
+        assertThat(currentState.errorMessage).isNull()
+        assertThat(currentState.accountType).isNull()
+        assertThat(currentState.isHiddenNodesOnboarded).isFalse()
+        assertThat(currentState.storageCapacity).isEqualTo(StorageOverQuotaCapacity.DEFAULT)
+        assertThat(currentState.isBusinessAccountExpired).isFalse()
+        assertThat(currentState.hiddenNodeEnabled).isFalse()
+        assertThat(currentState.isClearSelectedPhotos).isTrue()
+    }
 }

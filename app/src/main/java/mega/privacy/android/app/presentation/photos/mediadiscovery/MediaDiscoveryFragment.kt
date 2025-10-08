@@ -488,6 +488,13 @@ class MediaDiscoveryFragment : Fragment() {
         Util.showSnackbar(requireActivity(), message)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        if (mediaDiscoveryViewModel.state.value.selectedPhotoIds.isEmpty()) {
+            mediaDiscoveryViewModel.clearState()
+        }
+    }
+
     companion object {
         internal const val INTENT_KEY_CURRENT_FOLDER_ID = "CURRENT_FOLDER_ID"
         private const val INTENT_KEY_IS_ACCESSED_BY_ICON_CLICK = "IS_ACCESSED_BY_ICON_CLICK"
