@@ -38,7 +38,9 @@ import kotlin.time.Duration.Companion.milliseconds
 internal fun CompletedTransfersView(
     completedTransfers: ImmutableList<CompletedTransfer>,
     selectedCompletedTransfersIds: ImmutableList<Int>?,
+    enableSwipeToDismiss: Boolean,
     onCompletedTransferSelected: (CompletedTransfer) -> Unit,
+    onClearCompletedTransfer: (Int) -> Unit,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
 ) {
@@ -63,22 +65,29 @@ internal fun CompletedTransfersView(
                 CompletedTransferItem(
                     completedTransfer = item,
                     isSelected = selectedCompletedTransfersIds?.contains(item.id),
-                    modifier = Modifier.then(
-                        if (selectMode) {
-                            Modifier.clickable { onCompletedTransferSelected(item) }
-                        } else {
-                            Modifier.combinedClickable(
-                                onClick = { },
-                                onLongClick = {
-                                    Analytics.tracker.trackEvent(
-                                        CompletedTransfersItemTapAndHoldSelectedEvent
-                                    )
-                                    onCompletedTransferSelected(item)
-                                },
-                            )
-                        }
-                    ),
-                    onMoreClicked = { completedItemSelected = it }
+                    enableSwipeToDismiss = enableSwipeToDismiss,
+                    onMoreClicked = { completedItemSelected = it },
+                    onClear = {
+                        // Analytics.tracker.trackEvent()
+                        onClearCompletedTransfer(item.id ?: 0)
+                    },
+                    modifier = Modifier
+                        .then(
+                            if (selectMode) {
+                                Modifier.clickable { onCompletedTransferSelected(item) }
+                            } else {
+                                Modifier.combinedClickable(
+                                    onClick = { },
+                                    onLongClick = {
+                                        Analytics.tracker.trackEvent(
+                                            CompletedTransfersItemTapAndHoldSelectedEvent
+                                        )
+                                        onCompletedTransferSelected(item)
+                                    },
+                                )
+                            }
+                        )
+                        .animateItem(),
                 )
             }
         }
@@ -103,9 +112,11 @@ internal fun CompletedTransfersView(
 internal fun CompletedTransferItem(
     completedTransfer: CompletedTransfer,
     isSelected: Boolean?,
+    enableSwipeToDismiss: Boolean,
+    onMoreClicked: (CompletedItemSelected) -> Unit,
+    onClear: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CompletedTransferImageViewModel = hiltViewModel(),
-    onMoreClicked: (CompletedItemSelected) -> Unit,
 ) = with(completedTransfer) {
     id?.let {
         val uiState by viewModel.getUiStateFlow(it).collectAsStateWithLifecycle()
@@ -123,7 +134,7 @@ internal fun CompletedTransferItem(
             sizeString = size,
             date = TimeUtils.formatLongDateTime(timestamp.milliseconds.inWholeSeconds),
             isSelected = isSelected,
-            modifier = modifier,
+            enableSwipeToDismiss = enableSwipeToDismiss,
             onMoreClicked = {
                 completedTransfer.id?.let { id ->
                     CompletedItemSelected(
@@ -133,6 +144,8 @@ internal fun CompletedTransferItem(
                     ).let { item -> onMoreClicked(item) }
                 }
             },
+            onClear = onClear,
+            modifier = modifier,
         )
     }
 }

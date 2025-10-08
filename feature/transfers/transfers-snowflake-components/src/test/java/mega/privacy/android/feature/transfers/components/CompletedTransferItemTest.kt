@@ -93,7 +93,9 @@ class CompletedTransferItemTest {
                     sizeString = sizeString,
                     date = date,
                     isSelected = isSelected,
+                    enableSwipeToDismiss = true,
                     onMoreClicked = mock(),
+                    onClear = mock(),
                 )
             }
         }

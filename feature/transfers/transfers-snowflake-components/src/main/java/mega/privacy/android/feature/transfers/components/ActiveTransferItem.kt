@@ -8,7 +8,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,7 +15,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,113 +62,153 @@ fun ActiveTransferItem(
     isPaused: Boolean,
     isOverQuota: Boolean,
     areTransfersPaused: Boolean,
+    enableSwipeToDismiss: Boolean,
     onPlayPauseClicked: () -> Unit,
+    onCancel: () -> Unit,
     modifier: Modifier = Modifier,
     isDraggable: Boolean = true,
     isSelected: Boolean? = null,
     isBeingDragged: Boolean = false,
-) = Box(
-    modifier = modifier
-        .height(68.dp)
-        .fillMaxWidth()
-        .background(if (isBeingDragged) DSTokens.colors.background.surface1 else DSTokens.colors.background.pageBackground)
-        .testTag(TEST_TAG_ACTIVE_TRANSFER_ITEM + "_$tag")
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(start = 12.dp, end = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        val subTitle = listOf(
-            progressPercentageString,
-            progressSizeString,
-            speed,
-        ).joinToString(" · ")
-        AnimatedVisibility(
-            isDraggable,
-            enter = fadeIn() + expandHorizontally(),
-            exit = fadeOut() + shrinkHorizontally(),
-        ) {
-            MegaIcon(
-                painter = rememberVectorPainter(IconPack.Small.Thin.Outline.QueueLine),
-                contentDescription = "Reorder icon",
-                tint = IconColor.Secondary,
-                modifier = Modifier
-                    .size(16.dp)
-                    .padding(end = 4.dp)
-                    .testTag(TEST_TAG_QUEUE_ICON)
-            )
-        }
-        TransferImage(
-            fileTypeResId = fileTypeResId,
-            previewUri = previewUri,
-            modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_IMAGE),
-        )
-        Column(
-            Modifier
-                .padding(start = 12.dp, end = 8.dp)
-                .weight(1f)
-        ) {
-            MegaText(
-                text = fileName,
-                maxLines = 1,
-                overflow = TextOverflow.MiddleEllipsis,
-                style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.W400),
-                textColor = TextColor.Primary,
-                modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_NAME),
-            )
-            Row(
-                modifier = Modifier.padding(top = 2.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                LeadingIndicator(
-                    modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_TYPE_ICON),
-                    isDownload = isDownload,
-                    isOverQuota = isOverQuota,
-                )
-                MegaText(
-                    text = subTitle,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    style = AppTheme.typography.bodySmall,
-                    textColor = TextColor.Secondary,
-                    modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_SUBTITLE),
-                )
+    val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
+        confirmValueChange = { swipeToDismissBoxValue ->
+            if (swipeToDismissBoxValue == SwipeToDismissBoxValue.EndToStart) {
+                onCancel()
             }
-        }
-        if (isSelected == null) {
-            IconButton(
-                onClick = onPlayPauseClicked,
-                modifier = Modifier
-                    .padding(start = 8.dp)
-                    .size(24.dp)
-                    .testTag(if (isPaused) TEST_TAG_PLAY_ICON else TEST_TAG_PAUSE_ICON)
-            ) {
 
-                MegaIcon(
-                    painter = rememberVectorPainter(if (isPaused) IconPack.Medium.Thin.Outline.Play else IconPack.Medium.Thin.Outline.Pause),
-                    contentDescription = if (isPaused) stringResource(id = sharedR.string.transfers_section_action_play)
-                    else stringResource(id = sharedR.string.transfers_section_action_pause),
-                    tint = if (areTransfersPaused) IconColor.Disabled else IconColor.Secondary,
-                )
+            swipeToDismissBoxValue != SwipeToDismissBoxValue.StartToEnd
+        }
+    )
+
+    SwipeToDismissBox(
+        state = swipeToDismissBoxState,
+        backgroundContent = {
+            when (swipeToDismissBoxState.dismissDirection) {
+                SwipeToDismissBoxValue.EndToStart -> if (enableSwipeToDismiss) {
+                    MegaIcon(
+                        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Trash),
+                        contentDescription = "Cancel icon",
+                        tint = IconColor.Inverse,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(DSTokens.colors.support.error)
+                            .wrapContentSize(Alignment.CenterEnd)
+                            .padding(12.dp)
+                            .testTag(TEST_TAG_CANCEL_ICON)
+                    )
+                }
+
+                else -> {}
             }
-        } else {
-            SelectedTransferIcon(
-                isSelected,
-                modifier = Modifier.padding(start = 8.dp),
+        },
+        modifier = modifier
+            .height(68.dp)
+            .fillMaxWidth()
+            .testTag(TEST_TAG_ACTIVE_TRANSFER_ITEM + "_$tag"),
+        enableDismissFromStartToEnd = false,
+        enableDismissFromEndToStart = enableSwipeToDismiss,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(if (isBeingDragged) DSTokens.colors.background.surface1 else DSTokens.colors.background.pageBackground)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(start = 12.dp, end = 16.dp)
+                    .weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val subTitle = listOf(
+                    progressPercentageString,
+                    progressSizeString,
+                    speed,
+                ).joinToString(" · ")
+                AnimatedVisibility(
+                    isDraggable,
+                    enter = fadeIn() + expandHorizontally(),
+                    exit = fadeOut() + shrinkHorizontally(),
+                ) {
+                    MegaIcon(
+                        painter = rememberVectorPainter(IconPack.Small.Thin.Outline.QueueLine),
+                        contentDescription = "Reorder icon",
+                        tint = IconColor.Secondary,
+                        modifier = Modifier
+                            .size(16.dp)
+                            .padding(end = 4.dp)
+                            .testTag(TEST_TAG_QUEUE_ICON)
+                    )
+                }
+                TransferImage(
+                    fileTypeResId = fileTypeResId,
+                    previewUri = previewUri,
+                    modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_IMAGE),
+                )
+                Column(
+                    Modifier
+                        .padding(start = 12.dp, end = 8.dp)
+                        .weight(1f)
+                ) {
+                    MegaText(
+                        text = fileName,
+                        maxLines = 1,
+                        overflow = TextOverflow.MiddleEllipsis,
+                        style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.W400),
+                        textColor = TextColor.Primary,
+                        modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_NAME),
+                    )
+                    Row(
+                        modifier = Modifier.padding(top = 2.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        LeadingIndicator(
+                            modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_TYPE_ICON),
+                            isDownload = isDownload,
+                            isOverQuota = isOverQuota,
+                        )
+                        MegaText(
+                            text = subTitle,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            style = AppTheme.typography.bodySmall,
+                            textColor = TextColor.Secondary,
+                            modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_SUBTITLE),
+                        )
+                    }
+                }
+                if (isSelected == null) {
+                    IconButton(
+                        onClick = onPlayPauseClicked,
+                        modifier = Modifier
+                            .padding(start = 8.dp)
+                            .size(24.dp)
+                            .testTag(if (isPaused) TEST_TAG_PLAY_ICON else TEST_TAG_PAUSE_ICON)
+                    ) {
+                        MegaIcon(
+                            painter = rememberVectorPainter(if (isPaused) IconPack.Medium.Thin.Outline.Play else IconPack.Medium.Thin.Outline.Pause),
+                            contentDescription = if (isPaused) stringResource(id = sharedR.string.transfers_section_action_play)
+                            else stringResource(id = sharedR.string.transfers_section_action_pause),
+                            tint = if (areTransfersPaused) IconColor.Disabled else IconColor.Secondary,
+                        )
+                    }
+                } else {
+                    SelectedTransferIcon(
+                        isSelected,
+                        modifier = Modifier.padding(start = 8.dp),
+                    )
+                }
+            }
+            ProgressBarIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(2.dp),
+                progressPercentage = progress * 100f,
+                supportColor = if (isOverQuota) SupportColor.Warning else SupportColor.Success
             )
         }
     }
-    ProgressBarIndicator(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(2.dp)
-            .align(Alignment.BottomCenter),
-        progressPercentage = progress * 100f,
-        supportColor = if (isOverQuota) SupportColor.Warning else SupportColor.Success
-    )
 }
 
 @CombinedThemePreviews
@@ -197,8 +240,10 @@ private fun Preview(activeTransferUI: ActiveTransferUI) {
                 isPaused = isPaused,
                 isOverQuota = isOverQuota,
                 areTransfersPaused = areTransfersPaused,
+                enableSwipeToDismiss = true,
                 isSelected = isSelected,
                 onPlayPauseClicked = {},
+                onCancel = {},
             )
         }
     }
@@ -307,14 +352,19 @@ const val TEST_TAG_ACTIVE_TRANSFER_TYPE_ICON = "$TEST_TAG_ACTIVE_TAB:transfer_ty
 /**
  * Tag for the active transfer queue icon.
  */
-const val TEST_TAG_QUEUE_ICON = "$TEST_TAG_ACTIVE_TAB:transfer_item:queue_icon"
+const val TEST_TAG_QUEUE_ICON = "$TEST_TAG_ACTIVE_TRANSFER_ITEM:queue_icon"
 
 /**
  * Tag for the active transfer pause icon.
  */
-const val TEST_TAG_PAUSE_ICON = "$TEST_TAG_ACTIVE_TAB:transfer_item:pause_icon"
+const val TEST_TAG_PAUSE_ICON = "$TEST_TAG_ACTIVE_TRANSFER_ITEM:pause_icon"
 
 /**
  * Tag for the active transfer play icon.
  */
-const val TEST_TAG_PLAY_ICON = "$TEST_TAG_ACTIVE_TAB:transfer_item:play_icon"
+const val TEST_TAG_PLAY_ICON = "$TEST_TAG_ACTIVE_TRANSFER_ITEM:play_icon"
+
+/**
+ * Tag for the active transfer cancel icon.
+ */
+const val TEST_TAG_CANCEL_ICON = "$TEST_TAG_ACTIVE_TRANSFER_ITEM:cancel_icon"

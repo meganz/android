@@ -48,6 +48,8 @@ internal fun NavGraphBuilder.transfersScreen(
             onSelectAllFailedTransfers = viewModel::selectAllFailedTransfers,
             onRetryTransfer = viewModel::retryFailedTransfer,
             onConsumeQuotaWarning = viewModel::onConsumeQuotaWarning,
+            onCancelActiveTransfer = viewModel::cancelActiveTransfer,
+            onClearCompletedTransfer = viewModel::clearCompletedTransfer,
         )
     }
 }

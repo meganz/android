@@ -41,12 +41,14 @@ internal fun ActiveTransfersView(
     isStorageOverQuota: Boolean,
     quotaWarning: QuotaWarning?,
     areTransfersPaused: Boolean,
+    enableSwipeToDismiss: Boolean,
     onPlayPauseClicked: (tag: Int) -> Unit,
     onReorderPreview: suspend (from: Int, to: Int) -> Unit,
     onReorderConfirmed: (InProgressTransfer) -> Unit,
     onActiveTransferSelected: (InProgressTransfer) -> Unit,
     onUpgradeClick: () -> Unit,
     onConsumeQuotaWarning: () -> Unit,
+    onCancelActiveTransfer: (InProgressTransfer) -> Unit,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
 ) {
@@ -96,13 +98,17 @@ internal fun ActiveTransfersView(
                         isTransferOverQuota = isTransferOverQuota,
                         isStorageOverQuota = isStorageOverQuota,
                         areTransfersPaused = areTransfersPaused,
-                        onPlayPauseClicked = onPlayPauseClicked,
+                        enableSwipeToDismiss = enableSwipeToDismiss,
                         isSelected = selectedActiveTransfersIds?.contains(item.uniqueId),
                         isDraggable = selectedActiveTransfersIds == null,
                         isBeingDragged = item == draggedTransfer,
-                        modifier = Modifier.clickable(enabled = selectMode) {
-                            onActiveTransferSelected(item)
-                        }
+                        onPlayPauseClicked = { onPlayPauseClicked(item.tag) },
+                        onCancel = { onCancelActiveTransfer(item) },
+                        modifier = Modifier
+                            .animateItem()
+                            .clickable(enabled = selectMode) {
+                                onActiveTransferSelected(item)
+                            }
                     )
                 }
             }
@@ -116,10 +122,12 @@ internal fun ActiveTransferItem(
     isTransferOverQuota: Boolean,
     isStorageOverQuota: Boolean,
     areTransfersPaused: Boolean,
-    onPlayPauseClicked: (tag: Int) -> Unit,
     isSelected: Boolean?,
     isDraggable: Boolean,
     isBeingDragged: Boolean,
+    enableSwipeToDismiss: Boolean,
+    onPlayPauseClicked: () -> Unit,
+    onCancel: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ActiveTransferImageViewModel = hiltViewModel(),
 ) = with(activeTransfer) {
@@ -147,12 +155,17 @@ internal fun ActiveTransferItem(
         isPaused = isPaused,
         isOverQuota = (isDownload && isTransferOverQuota) || (isDownload.not() && isStorageOverQuota),
         areTransfersPaused = areTransfersPaused,
+        enableSwipeToDismiss = enableSwipeToDismiss,
         onPlayPauseClicked = {
-            onPlayPauseClicked(tag)
+            onPlayPauseClicked()
             Analytics.tracker.trackEvent(
                 if (isPaused) ActiveTransfersIndividualPlayButtonButtonPressedEvent
                 else ActiveTransfersIndividualPauseButtonButtonPressedEvent
             )
+        },
+        onCancel = {
+            onCancel()
+//            Analytics.tracker.trackEvent()
         },
         modifier = modifier,
         isSelected = isSelected,

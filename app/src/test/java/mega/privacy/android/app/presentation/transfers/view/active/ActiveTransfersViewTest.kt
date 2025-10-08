@@ -6,10 +6,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
@@ -218,6 +216,7 @@ class ActiveTransfersViewTest {
                     isStorageOverQuota = isOverQuota,
                     quotaWarning = quotaWarning,
                     areTransfersPaused = areTransfersPaused,
+                    enableSwipeToDismiss = true,
                     onPlayPauseClicked = { },
                     onReorderPreview = onReorderPreview,
                     onReorderConfirmed = onReorderConfirmed,
@@ -226,6 +225,7 @@ class ActiveTransfersViewTest {
                     lazyListState = rememberLazyListState(),
                     onUpgradeClick = onUpgradeClick,
                     onConsumeQuotaWarning = onConsumeQuotaWarning,
+                    onCancelActiveTransfer = {},
                 )
             }
         }

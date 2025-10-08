@@ -39,10 +39,13 @@ class FailedTransfersViewTest {
     ) {
         composeTestRule.setContent {
             FailedTransfersView(
-                failedTransfers = failedTransfers, lazyListState = mock(),
+                failedTransfers = failedTransfers,
+                enableSwipeToDismiss = true,
                 selectedFailedTransfersIds = mock(),
                 onFailedTransferSelected = mock(),
                 onRetryTransfer = mock(),
+                onClearFailedTransfer = mock(),
+                lazyListState = mock(),
             )
         }
     }

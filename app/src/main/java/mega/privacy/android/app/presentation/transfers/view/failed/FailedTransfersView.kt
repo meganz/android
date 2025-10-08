@@ -40,8 +40,10 @@ import mega.privacy.mobile.analytics.event.FailedTransfersItemTapAndHoldSelected
 internal fun FailedTransfersView(
     failedTransfers: ImmutableList<CompletedTransfer>,
     selectedFailedTransfersIds: ImmutableList<Int>?,
+    enableSwipeToDismiss: Boolean,
     onFailedTransferSelected: (CompletedTransfer) -> Unit,
     onRetryTransfer: (CompletedTransfer) -> Unit,
+    onClearFailedTransfer: (Int) -> Unit,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
 ) {
@@ -66,25 +68,36 @@ internal fun FailedTransfersView(
                 FailedTransferItem(
                     failedTransfer = item,
                     isSelected = selectedFailedTransfersIds?.contains(item.id),
-                    modifier = Modifier.then(
-                        if (selectMode) {
-                            Modifier.clickable { onFailedTransferSelected(item) }
-                        } else {
-                            Modifier.combinedClickable(
-                                onClick = { },
-                                onLongClick = {
-                                    Analytics.tracker.trackEvent(
-                                        FailedTransfersItemTapAndHoldSelectedEvent
-                                    )
-                                    onFailedTransferSelected(item)
-                                },
-                            )
-                        }
-                    ),
+                    enableSwipeToDismiss = enableSwipeToDismiss,
                     onMoreClicked = {
                         Analytics.tracker.trackEvent(FailedTransfersItemMoreOptionsMenuItemEvent)
                         failedItemSelected = it
-                    }
+                    },
+                    onRetry = {
+                        // Analytics.tracker.trackEvent()
+                        onRetryTransfer(item)
+                    },
+                    onClear = {
+                        // Analytics.tracker.trackEvent()
+                        onClearFailedTransfer(item.id ?: 0)
+                    },
+                    modifier = Modifier
+                        .then(
+                            if (selectMode) {
+                                Modifier.clickable { onFailedTransferSelected(item) }
+                            } else {
+                                Modifier.combinedClickable(
+                                    onClick = { },
+                                    onLongClick = {
+                                        Analytics.tracker.trackEvent(
+                                            FailedTransfersItemTapAndHoldSelectedEvent
+                                        )
+                                        onFailedTransferSelected(item)
+                                    },
+                                )
+                            }
+                        )
+                        .animateItem(),
                 )
             }
         }
@@ -110,9 +123,12 @@ internal fun FailedTransfersView(
 internal fun FailedTransferItem(
     failedTransfer: CompletedTransfer,
     isSelected: Boolean?,
+    enableSwipeToDismiss: Boolean,
+    onMoreClicked: (FailedItemSelected) -> Unit,
+    onRetry: () -> Unit,
+    onClear: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CompletedTransferImageViewModel = hiltViewModel(),
-    onMoreClicked: (FailedItemSelected) -> Unit,
 ) = with(failedTransfer) {
     id?.let {
         val uiState by viewModel.getUiStateFlow(it).collectAsStateWithLifecycle()
@@ -127,9 +143,9 @@ internal fun FailedTransferItem(
             previewUri = uiState.previewUri,
             fileName = fileName,
             isSelected = isSelected,
+            enableSwipeToDismiss = enableSwipeToDismiss,
             error = String.format("%s: %s", stringResource(R.string.failed_label), error)
                 .takeIf { state != TransferState.STATE_CANCELLED },
-            modifier = modifier,
             onMoreClicked = {
                 failedTransfer.id?.let { id ->
                     FailedItemSelected(
@@ -138,7 +154,10 @@ internal fun FailedTransferItem(
                         previewUri = uiState.previewUri,
                     ).let { item -> onMoreClicked(item) }
                 }
-            }
+            },
+            onRetry = onRetry,
+            onClear = onClear,
+            modifier = modifier,
         )
     }
 }

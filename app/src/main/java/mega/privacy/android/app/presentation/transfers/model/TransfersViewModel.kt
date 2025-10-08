@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.RetryChatUploadUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.GetTransferByUniqueIdUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferBeforeByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToFirstByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToLastByTagUseCase
@@ -79,6 +80,7 @@ class TransfersViewModel @Inject constructor(
     private val deleteCompletedTransfersByIdUseCase: DeleteCompletedTransfersByIdUseCase,
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
     private val clearTransferErrorStatusUseCase: ClearTransferErrorStatusUseCase,
+    private val getTransferByUniqueIdUseCase: GetTransferByUniqueIdUseCase,
     isTransferInErrorStatusUseCase: IsTransferInErrorStatusUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -122,9 +124,10 @@ class TransfersViewModel @Inject constructor(
         _uiState.update { state ->
             state.copy(
                 activeTransfers = activeTransfers.toImmutableList(),
-                selectedActiveTransfersIds = state.selectedActiveTransfersIds?.filter { selectedId ->
-                    activeTransfers.any { it.uniqueId == selectedId }
-                }?.toImmutableList()
+                selectedActiveTransfersIds = state.selectedActiveTransfersIds
+                    ?.takeIf { activeTransfers.isNotEmpty() }
+                    ?.filter { id -> activeTransfers.any { it.uniqueId == id } }
+                    ?.toImmutableList()
             )
         }
     }
@@ -652,6 +655,31 @@ class TransfersViewModel @Inject constructor(
         _uiState.update {
             it.copy(selectedFailedTransfersIds = emptyList<Int>().toImmutableList())
         }
+    }
+
+    /**
+     * Cancel an active transfer
+     */
+    fun cancelActiveTransfer(inProgressTransfer: InProgressTransfer) = with(inProgressTransfer) {
+        viewModelScope.launch {
+            runCatching {
+                cancelTransferByTagUseCase(tag)
+            }.onFailure {
+                Timber.e(it, "Retrying cancel transfer")
+                // In case of resumed and not yet updated transfer, the tag could be changed.
+                getTransferByUniqueIdUseCase(uniqueId)?.let { transfer ->
+                    runCatching { cancelTransferByTagUseCase(transfer.tag) }
+                        .onFailure { Timber.e(it, "Retry cancel transfer failed") }
+                } ?: Timber.e("Transfer not found, probably already finished")
+            }
+        }
+    }
+
+    /**
+     * Clear a completed transfer
+     */
+    fun clearCompletedTransfer(completedTransferId: Int) {
+        deleteCompletedTransfersByIds(listOf(completedTransferId))
     }
 
     companion object {

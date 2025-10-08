@@ -25,6 +25,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
+import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -36,6 +37,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.RetryChatUploadUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.GetTransferByUniqueIdUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferBeforeByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToFirstByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToLastByTagUseCase
@@ -68,6 +70,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import java.math.BigInteger
@@ -98,6 +101,7 @@ class TransfersViewModelTest {
     private val deleteCompletedTransfersByIdUseCase = mock<DeleteCompletedTransfersByIdUseCase>()
     private val cancelTransferByTagUseCase = mock<CancelTransferByTagUseCase>()
     private val clearTransferErrorStatusUseCase = mock<ClearTransferErrorStatusUseCase>()
+    private val getTransferByUniqueIdUseCase = mock<GetTransferByUniqueIdUseCase>()
     private val isTransferInErrorStatusUseCase = mock<IsTransferInErrorStatusUseCase>()
 
     private val originalPath = "originalPath"
@@ -168,6 +172,7 @@ class TransfersViewModelTest {
             cancelTransfersUseCase,
             monitorCompletedTransfersByStateWithLimitUseCase,
             clearTransferErrorStatusUseCase,
+            getTransferByUniqueIdUseCase,
             isTransferInErrorStatusUseCase,
         )
         wheneverBlocking { monitorInProgressTransfersUseCase() }.thenReturn(emptyFlow())
@@ -207,8 +212,9 @@ class TransfersViewModelTest {
             deleteCompletedTransfersByIdUseCase = deleteCompletedTransfersByIdUseCase,
             cancelTransferByTagUseCase = cancelTransferByTagUseCase,
             clearTransferErrorStatusUseCase = clearTransferErrorStatusUseCase,
-            savedStateHandle = savedStateHandle,
+            getTransferByUniqueIdUseCase = getTransferByUniqueIdUseCase,
             isTransferInErrorStatusUseCase = isTransferInErrorStatusUseCase,
+            savedStateHandle = savedStateHandle,
         )
     }
 
@@ -1205,6 +1211,79 @@ class TransfersViewModelTest {
         }
     }
 
+    @Test
+    fun `test that cancelActiveTransfer invokes correctly`() = runTest {
+        val tag = 123
+        val inProgressTransfer = mock<InProgressTransfer.Upload> {
+            on { this.tag } doReturn tag
+        }
+
+        whenever(cancelTransferByTagUseCase(tag)) doReturn Unit
+
+        initTestClass()
+        underTest.cancelActiveTransfer(inProgressTransfer)
+
+        verify(cancelTransferByTagUseCase).invoke(tag)
+    }
+
+    @Test
+    fun `test that cancelActiveTransfer invokes correctly when first try fails and transfer is found`() =
+        runTest {
+            val tag = 123
+            val uniqueId = 321L
+            val inProgressTransfer = mock<InProgressTransfer.Upload> {
+                on { this.tag } doReturn tag
+                on { this.uniqueId } doReturn uniqueId
+            }
+            val updatedTag = 234
+            val transfer = mock<Transfer> {
+                on { this.tag } doReturn updatedTag
+            }
+
+            whenever(cancelTransferByTagUseCase(tag)) doThrow RuntimeException("something wrong")
+            whenever(getTransferByUniqueIdUseCase(uniqueId)) doReturn transfer
+            whenever(cancelTransferByTagUseCase(updatedTag)) doReturn Unit
+
+            initTestClass()
+            underTest.cancelActiveTransfer(inProgressTransfer)
+
+            verify(cancelTransferByTagUseCase).invoke(tag)
+            verify(getTransferByUniqueIdUseCase).invoke(uniqueId)
+            verify(cancelTransferByTagUseCase).invoke(updatedTag)
+        }
+
+    @Test
+    fun `test that cancelActiveTransfer invokes correctly when first try fails and transfer is not found`() =
+        runTest {
+            val tag = 123
+            val uniqueId = 321L
+            val inProgressTransfer = mock<InProgressTransfer.Upload> {
+                on { this.tag } doReturn tag
+                on { this.uniqueId } doReturn uniqueId
+            }
+
+            whenever(cancelTransferByTagUseCase(tag)) doThrow RuntimeException("something wrong")
+            whenever(getTransferByUniqueIdUseCase(uniqueId)) doReturn null
+
+            initTestClass()
+            underTest.cancelActiveTransfer(inProgressTransfer)
+
+            verify(cancelTransferByTagUseCase).invoke(tag)
+            verify(getTransferByUniqueIdUseCase).invoke(uniqueId)
+            verifyNoMoreInteractions(cancelTransferByTagUseCase)
+        }
+
+    @Test
+    fun `test that clearCompletedTransfer invokes correctly`() = runTest {
+        val id = 123
+
+        whenever(deleteCompletedTransfersByIdUseCase(listOf(id))) doReturn Unit
+
+        initTestClass()
+        underTest.clearCompletedTransfer(id)
+
+        verify(deleteCompletedTransfersByIdUseCase).invoke(listOf(id))
+    }
 
     private fun stubCompletedTransfers() = whenever(
         monitorCompletedTransfersByStateWithLimitUseCase(

@@ -40,9 +40,11 @@ class CompletedTransfersViewTest {
         composeTestRule.setContent {
             CompletedTransfersView(
                 completedTransfers = completedTransfers,
+                enableSwipeToDismiss = true,
                 lazyListState = mock(),
                 selectedCompletedTransfersIds = mock(),
                 onCompletedTransferSelected = mock(),
+                onClearCompletedTransfer = mock(),
                 modifier = mock(),
             )
         }

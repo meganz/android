@@ -107,6 +107,8 @@ internal fun TransfersView(
     onSelectAllFailedTransfers: () -> Unit,
     onRetryTransfer: (CompletedTransfer) -> Unit,
     onConsumeQuotaWarning: () -> Unit,
+    onCancelActiveTransfer: (InProgressTransfer) -> Unit,
+    onClearCompletedTransfer: (Int) -> Unit,
 ) = with(uiState) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -284,6 +286,7 @@ internal fun TransfersView(
                             isStorageOverQuota = isStorageOverQuota,
                             quotaWarning = quotaWarning,
                             areTransfersPaused = areTransfersPaused,
+                            enableSwipeToDismiss = !isInSelectTransfersMode,
                             onPlayPauseClicked = { tag ->
                                 onPlayPauseTransfer(tag)
                             },
@@ -296,6 +299,7 @@ internal fun TransfersView(
                             selectedActiveTransfersIds = selectedActiveTransfersIds,
                             onUpgradeClick = onNavigateToUpgradeAccount,
                             onConsumeQuotaWarning = onConsumeQuotaWarning,
+                            onCancelActiveTransfer = onCancelActiveTransfer,
                             modifier = modifier,
                         )
                     }
@@ -304,8 +308,10 @@ internal fun TransfersView(
                     ) { _, modifier ->
                         CompletedTransfersView(
                             completedTransfers = completedTransfers,
-                            onCompletedTransferSelected = onCompletedTransferSelected,
                             selectedCompletedTransfersIds = selectedCompletedTransfersIds,
+                            enableSwipeToDismiss = !isInSelectTransfersMode,
+                            onCompletedTransferSelected = onCompletedTransferSelected,
+                            onClearCompletedTransfer = onClearCompletedTransfer,
                             modifier = modifier,
                         )
                     }
@@ -316,9 +322,9 @@ internal fun TransfersView(
                             failedTransfers = failedTransfers,
                             onFailedTransferSelected = onFailedTransferSelected,
                             selectedFailedTransfersIds = selectedFailedTransfersIds,
-                            onRetryTransfer = {
-                                onRetryTransfer(it)
-                            },
+                            enableSwipeToDismiss = !isInSelectTransfersMode,
+                            onRetryTransfer = { onRetryTransfer(it) },
+                            onClearFailedTransfer = { onClearCompletedTransfer(it) },
                             modifier = modifier,
                         )
                     }
@@ -477,6 +483,8 @@ private fun TransfersViewPreview() {
             onSelectAllFailedTransfers = {},
             onRetryTransfer = {},
             onConsumeQuotaWarning = {},
+            onCancelActiveTransfer = {},
+            onClearCompletedTransfer = {},
         )
     }
 }

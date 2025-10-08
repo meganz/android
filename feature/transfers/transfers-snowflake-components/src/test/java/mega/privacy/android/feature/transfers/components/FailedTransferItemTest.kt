@@ -11,6 +11,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
 class FailedTransferItemTest {
@@ -148,6 +149,10 @@ class FailedTransferItemTest {
                     fileName = fileName,
                     error = error,
                     isSelected = isSelected,
+                    enableSwipeToDismiss = true,
+                    onMoreClicked = mock(),
+                    onRetry = mock(),
+                    onClear = mock(),
                 )
             }
         }

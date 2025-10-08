@@ -20,8 +20,11 @@ fun FailedTransferItem(
     fileName: String,
     error: String?,
     isSelected: Boolean?,
+    enableSwipeToDismiss: Boolean,
+    onMoreClicked: () -> Unit,
+    onRetry: () -> Unit,
+    onClear: () -> Unit,
     modifier: Modifier = Modifier,
-    onMoreClicked: () -> Unit = {},
 ) = CompletedTransferItem(
     isDownload = isDownload,
     fileTypeResId = fileTypeResId,
@@ -32,8 +35,12 @@ fun FailedTransferItem(
     date = null,
     error = error,
     isSelected = isSelected,
+    enableSwipeToDismiss = enableSwipeToDismiss,
+    enableDismissFromStartToEnd = true,
+    onMoreClicked = onMoreClicked,
+    onClear = onClear,
+    onRetry = onRetry,
     modifier = modifier,
-    onMoreClicked = onMoreClicked
 )
 
 @CombinedThemePreviews
@@ -50,6 +57,10 @@ private fun FailedTransferItemPreview(
                 fileName = fileName,
                 error = error,
                 isSelected = isSelected,
+                enableSwipeToDismiss = true,
+                onMoreClicked = {},
+                onRetry = {},
+                onClear = {},
             )
         }
     }

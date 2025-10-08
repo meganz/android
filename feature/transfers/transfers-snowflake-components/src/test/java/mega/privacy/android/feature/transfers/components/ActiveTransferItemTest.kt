@@ -128,9 +128,11 @@ class ActiveTransferItemTest {
                     speed = speed,
                     isPaused = isPaused,
                     isOverQuota = isOverQuota,
+                    isSelected = isSelected,
+                    enableSwipeToDismiss = true,
                     areTransfersPaused = areTransfersPaused,
                     onPlayPauseClicked = onPlayPauseClicked,
-                    isSelected = isSelected,
+                    onCancel = mock(),
                 )
             }
         }
