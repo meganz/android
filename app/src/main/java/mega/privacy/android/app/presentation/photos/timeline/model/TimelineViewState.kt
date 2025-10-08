@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.photos.timeline.model
 
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
@@ -63,7 +65,8 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
  * @property hiddenNodeEnabled                          True if the Hidden Nodes feature is enabled
  * @property isCameraUploadsBannerImprovementEnabled    True if the Camera Uploads Banner Improvement feature is enabled
  * @property isCameraUploadsTransferScreenEnabled       True if the Camera Uploads Transfer Screen feature is enabled
- * @property cameraUploadsTransfers                       List of in progress Camera Uploads transfers
+ * @property cameraUploadsTransfers                     List of in progress Camera Uploads transfers
+ * @property popBackFromCameraUploadsTransferScreenEvent An event to signal that we should pop back from the Camera Uploads Transfer Screen
  */
 data class TimelineViewState(
     val photos: List<Photo> = emptyList(),
@@ -117,4 +120,5 @@ data class TimelineViewState(
     val isCameraUploadsBannerImprovementEnabled: Boolean = false,
     val isCameraUploadsTransferScreenEnabled: Boolean = false,
     val cameraUploadsTransfers: List<InProgressTransfer> = emptyList(),
+    val popBackFromCameraUploadsTransferScreenEvent: StateEvent = consumed
 )

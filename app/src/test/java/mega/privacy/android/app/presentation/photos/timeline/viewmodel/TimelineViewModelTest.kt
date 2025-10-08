@@ -4,6 +4,8 @@ import app.cash.turbine.test
 import com.google.common.truth.Correspondence
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -1031,6 +1033,22 @@ internal class TimelineViewModelTest {
             val state = awaitItem()
             assertWithMessage("State should be accessible when feature flag returns null (defaults to enabled)")
                 .that(state).isNotNull()
+        }
+    }
+
+    @Test
+    fun `test that popBackFromCameraUploadsTransferScreenEvent is updated correctly`() = runTest {
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().popBackFromCameraUploadsTransferScreenEvent).isEqualTo(consumed)
+
+            underTest.updatePopBackFromCameraUploadsTransferScreenEvent(triggered)
+            assertThat(awaitItem().popBackFromCameraUploadsTransferScreenEvent).isEqualTo(triggered)
+
+            underTest.updatePopBackFromCameraUploadsTransferScreenEvent(consumed)
+            assertThat(awaitItem().popBackFromCameraUploadsTransferScreenEvent).isEqualTo(consumed)
         }
     }
 

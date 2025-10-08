@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.photos.timeline.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.StateEvent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -1086,6 +1087,10 @@ class TimelineViewModel @Inject constructor(
                 it.copy(isHiddenNodesOnboarded = isHiddenNodesOnboarded)
             }
         }
+    }
+
+    internal fun updatePopBackFromCameraUploadsTransferScreenEvent(value: StateEvent) {
+        _state.update { it.copy(popBackFromCameraUploadsTransferScreenEvent = value) }
     }
 
 

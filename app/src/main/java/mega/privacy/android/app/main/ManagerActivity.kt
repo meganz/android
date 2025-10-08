@@ -2462,9 +2462,12 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 handleShowingAds()
             } else {
                 hideAdsView()
-                showBNVImmediate()
-                showHideBottomNavigationView(hide = false)
-                updateHomepageFabPosition()
+                //When the Camera Uploads transfer screen is shown, the BNV should remain hidden
+                if (photosFragment?.isCameraUploadsTransferScreen() != true) {
+                    showBNVImmediate()
+                    showHideBottomNavigationView(hide = false)
+                    updateHomepageFabPosition()
+                }
             }
         }
         adsContainerView.setContent {
@@ -3812,7 +3815,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }
 
             DrawerItem.PHOTOS -> {
-                if (isInAlbumContent || isInFilterPage) {
+                if ((isInAlbumContent || isInFilterPage) && photosFragment?.isCameraUploadsTransferScreen() == true) {
                     showHideBottomNavigationView(true)
                 } else {
                     setAppBarVisibility(true)
@@ -4750,7 +4753,10 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         } else if (drawerItem == DrawerItem.CHAT) {
             performOnBack()
         } else if (drawerItem == DrawerItem.PHOTOS) {
-            if (isInAlbumContent) {
+            //When Camera Uploads transfer screen is shown, back press will trigger the event to hide the transfer screen
+            if (photosFragment?.isCameraUploadsTransferScreen() == true) {
+                photosFragment?.triggerPopBackFromCameraUploadsTransferScreenEvent()
+            } else if (isInAlbumContent) {
                 fromAlbumContent = true
                 isInAlbumContent = false
                 goBackToBottomNavigationItem(bottomNavigationCurrentItem)
@@ -5549,8 +5555,11 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     private fun cameraUploadsClicked() {
         Timber.d("cameraUploadsClicked")
         drawerItem = DrawerItem.PHOTOS
-        setBottomNavigationMenuItemChecked(PHOTOS_BNV)
-        selectDrawerItem(drawerItem)
+        //Only when camera uploads transfer screen is not shown, we need to set the photos BNV checked.
+        if (photosFragment?.isCameraUploadsTransferScreen() != true) {
+            setBottomNavigationMenuItemChecked(PHOTOS_BNV)
+            selectDrawerItem(drawerItem)
+        }
     }
 
     /**
@@ -7027,7 +7036,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      * @return True if the current screen is Photos, false otherwise.
      */
     val isInPhotosPage: Boolean
-        get() = drawerItem === DrawerItem.PHOTOS
+        get() = drawerItem === DrawerItem.PHOTOS && photosFragment?.isCameraUploadsTransferScreen() != true
 
     /**
      * Checks if the current screen is Media Discovery Fragment.

@@ -42,6 +42,9 @@ import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
@@ -218,6 +221,26 @@ class PhotosFragment : Fragment() {
                 OriginalTheme(isDark = mode.isDarkMode()) {
                     val bottomSheetNavigator = rememberBottomSheetNavigator()
                     val navHostController = rememberNavController(bottomSheetNavigator)
+                    val uiState by timelineViewModel.state.collectAsStateWithLifecycle()
+
+                    navHostController.addOnDestinationChangedListener { _, destination, _ ->
+                        isCameraUploadsTransferScreen =
+                            destination.route == CameraUploadsTransferScreen::class.qualifiedName
+                        updateActivityActionBarShown(isShowActivityActionBar = !isCameraUploadsTransferScreen)
+                    }
+
+                    EventEffect(
+                        event = uiState.popBackFromCameraUploadsTransferScreenEvent,
+                        onConsumed = {
+                            timelineViewModel.updatePopBackFromCameraUploadsTransferScreenEvent(
+                                consumed
+                            )
+                        }
+                    ) {
+                        if (isCameraUploadsTransferScreen) {
+                            navHostController.popBackStack()
+                        }
+                    }
 
                     navHostController.addOnDestinationChangedListener { _, destination, _ ->
                         isCameraUploadsTransferScreen =
@@ -1000,6 +1023,12 @@ class PhotosFragment : Fragment() {
         val message = result.data?.getStringExtra("message") ?: return
 
         Util.showSnackbar(requireActivity(), message)
+    }
+
+    internal fun isCameraUploadsTransferScreen() = isCameraUploadsTransferScreen
+
+    internal fun triggerPopBackFromCameraUploadsTransferScreenEvent() {
+        timelineViewModel.updatePopBackFromCameraUploadsTransferScreenEvent(triggered)
     }
 
     /**
