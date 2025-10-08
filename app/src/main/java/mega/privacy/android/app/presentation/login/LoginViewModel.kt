@@ -33,6 +33,7 @@ import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.app.presentation.extensions.newError
 import mega.privacy.android.app.presentation.login.LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
+import mega.privacy.android.app.presentation.login.model.AccountBlockedUiState
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.model.LoginIntentState
@@ -1193,7 +1194,16 @@ class LoginViewModel @Inject constructor(
     }
 
     fun triggerAccountBlockedEvent(accountBlockedEvent: AccountBlockedEvent) {
-        _state.update { it.copy(accountBlockedEvent = triggered(accountBlockedEvent)) }
+        _state.update {
+            it.copy(
+                accountBlockedEvent = triggered(
+                    AccountBlockedUiState(
+                        type = accountBlockedEvent.type,
+                        text = accountBlockedEvent.text
+                    )
+                )
+            )
+        }
     }
 
     fun resetAccountBlockedEvent() {

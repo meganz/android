@@ -32,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -76,8 +77,8 @@ import mega.android.core.ui.theme.values.LinkColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.extensions.login.newError
+import mega.privacy.android.app.presentation.login.model.AccountBlockedUiState
 import mega.privacy.android.app.presentation.login.model.LoginState
-import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
@@ -117,7 +118,7 @@ fun RequireLogin(
     val passwordRequester = remember { FocusRequester() }
     var wrongCredentials by remember { mutableStateOf(false) }
     var tooManyAttempts by remember { mutableStateOf(false) }
-    var accountBlockedEvent by remember { mutableStateOf<AccountBlockedEvent?>(null) }
+    var accountBlockedEvent by rememberSaveable { mutableStateOf<AccountBlockedUiState?>(null) }
     var titleOffset by remember { mutableIntStateOf(0) }
     var emailFieldOffset by remember { mutableIntStateOf(0) }
     var isEmailFieldFocused by remember { mutableStateOf(false) }

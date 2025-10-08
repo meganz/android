@@ -26,13 +26,16 @@ import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.R
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerDetails
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
+import mega.privacy.android.app.presentation.login.model.AccountBlockedUiState
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.model.RkLink
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.user.UserCredentials
@@ -784,6 +787,32 @@ internal class LoginViewModelTest {
                 assertThat(awaitItem().miscFlagLoaded).isTrue()
                 assertThat(awaitItem().openRecoveryUrlEvent).isInstanceOf(
                     StateEventWithContentTriggered::class.java
+                )
+            }
+        }
+
+    @Test
+    fun `test that the account blocked event model is successfully mapped to account blocker ui state`() =
+        runTest {
+            val handle = 123L
+            val type = AccountBlockedType.VERIFICATION_EMAIL
+            val text = "text"
+            val accountBlockedEvent = AccountBlockedEvent(
+                handle = handle,
+                type = type,
+                text = text
+            )
+
+            underTest.triggerAccountBlockedEvent(accountBlockedEvent = accountBlockedEvent)
+
+            underTest.state.test {
+                assertThat(expectMostRecentItem().accountBlockedEvent).isEqualTo(
+                    triggered(
+                        AccountBlockedUiState(
+                            type = type,
+                            text = text
+                        )
+                    )
                 )
             }
         }

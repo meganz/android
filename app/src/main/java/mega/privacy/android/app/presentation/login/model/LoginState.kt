@@ -1,14 +1,16 @@
 package mega.privacy.android.app.presentation.login.model
 
+import android.os.Parcelable
 import androidx.annotation.StringRes
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import kotlinx.parcelize.Parcelize
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.messageId
-import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.TemporaryWaitingError
@@ -100,7 +102,7 @@ data class LoginState(
     val requestStatusProgress: Progress? = null,
     val isFirstTimeLaunch: Boolean = false,
     val themeMode: ThemeMode = ThemeMode.System,
-    val accountBlockedEvent: StateEventWithContent<AccountBlockedEvent> = consumed(),
+    val accountBlockedEvent: StateEventWithContent<AccountBlockedUiState> = consumed(),
     val resendVerificationEmailEvent: StateEventWithContent<Boolean> = consumed(),
     val checkRecoveryKeyEvent: StateEventWithContent<Result<RkLink>> = consumed(),
     val openRecoveryUrlEvent: StateEventWithContent<String> = consumed(),
@@ -165,3 +167,9 @@ data class LoginState(
         }
     }
 }
+
+@Parcelize
+data class AccountBlockedUiState(
+    val type: AccountBlockedType,
+    val text: String,
+) : Parcelable
