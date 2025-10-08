@@ -69,4 +69,7 @@
     <string name="offline_warning">Logging out deletes your offline content.</string>
     <!-- Title of the Offline screen -->
     <string name="offline_screen_title">Offline</string>
+
+    <!-- Menu option to delete selected items of the offline state -->
+    <string name="offline_screen_selection_menu_remove_from_offline">Remove from Offline</string>
 </resources>

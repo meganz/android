@@ -39,6 +39,47 @@ fun NodeSelectionModeBottomBar(
 ) {
     var showMoreBottomSheet by rememberSaveable { mutableStateOf(false) }
 
+    SelectionModeBottomBar(
+        visible = visible,
+        actions = visibleActions,
+        modifier = modifier,
+        actionsEnabled = !isSelecting,
+        onActionPressed = { action ->
+            onActionPressed(action)
+
+            if (action is NodeSelectionAction.More) {
+                showMoreBottomSheet = true
+                return@SelectionModeBottomBar
+            }
+
+            nodeActionHandler(action, selectedNodes)
+        }
+    )
+
+    if (showMoreBottomSheet) {
+        NodeMoreOptionsBottomSheet(
+            actions = availableActions.filterNot { it is NodeSelectionAction.More },
+            sheetState = rememberModalBottomSheetState(),
+            onDismissRequest = {
+                showMoreBottomSheet = false
+            },
+            onActionPressed = { action ->
+                onActionPressed(action)
+                nodeActionHandler(action, selectedNodes)
+                showMoreBottomSheet = false
+            }
+        )
+    }
+}
+
+@Composable
+fun SelectionModeBottomBar(
+    visible: Boolean,
+    actions: List<MenuActionWithIcon>,
+    modifier: Modifier = Modifier,
+    actionsEnabled: Boolean = true,
+    onActionPressed: (MenuActionWithIcon) -> Unit = {},
+) {
     AnimatedVisibility(
         visible = visible,
         enter = slideInVertically(
@@ -55,34 +96,10 @@ fun NodeSelectionModeBottomBar(
         ) {
             MegaFloatingToolbar(
                 modifier = Modifier.align(Alignment.BottomCenter),
-                actions = visibleActions,
-                actionsEnabled = !isSelecting,
-                onActionPressed = { action ->
-                    onActionPressed(action)
-
-                    if (action is NodeSelectionAction.More) {
-                        showMoreBottomSheet = true
-                        return@MegaFloatingToolbar
-                    }
-
-                    nodeActionHandler(action, selectedNodes)
-                }
+                actions = actions,
+                actionsEnabled = actionsEnabled,
+                onActionPressed = onActionPressed
             )
         }
-    }
-
-    if (showMoreBottomSheet) {
-        NodeMoreOptionsBottomSheet(
-            actions = availableActions.filterNot { it is NodeSelectionAction.More },
-            sheetState = rememberModalBottomSheetState(),
-            onDismissRequest = {
-                showMoreBottomSheet = false
-            },
-            onActionPressed = { action ->
-                onActionPressed(action)
-                nodeActionHandler(action, selectedNodes)
-                showMoreBottomSheet = false
-            }
-        )
     }
 }

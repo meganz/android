@@ -31,25 +31,28 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
-import mega.android.core.ui.components.MegaScaffold
+import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.banner.TopWarningBanner
 import mega.android.core.ui.components.indicators.LargeHUD
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.model.menu.MenuActionIconWithClick
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.core.nodecomponents.components.offline.HandleOfflineNodeAction3
 import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeActionsViewModel
+import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.list.NodeGridViewItem
 import mega.privacy.android.core.nodecomponents.list.NodeListViewItem
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
-import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.clouddrive.R
+import mega.privacy.android.feature.clouddrive.model.CloudDriveAppBarAction
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
+import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineSelectionAction
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
 import mega.privacy.android.icon.pack.R as iconPackR
 
@@ -96,6 +99,7 @@ fun OfflineScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun OfflineScreen(
     uiState: OfflineUiState,
@@ -132,8 +136,32 @@ internal fun OfflineScreen(
         deselectAll()
     }
 
-    MegaScaffold(
+    MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier.fillMaxSize(),
+        bottomBar = {
+            SelectionModeBottomBar(
+                visible = uiState.selectedNodeHandles.isNotEmpty(),
+                actions = OfflineSelectionAction.bottomBarItems,
+                onActionPressed = {
+                    when (it) {
+                        is OfflineSelectionAction.Delete -> {
+                            // Todo implement delete action
+                            deselectAll()
+                        }
+
+                        is OfflineSelectionAction.Download -> {
+                            // Todo implement download action
+                            deselectAll()
+                        }
+
+                        is OfflineSelectionAction.Share -> {
+                            // Todo implement share action
+                            deselectAll()
+                        }
+                    }
+                }
+            )
+        },
         topBar = {
             if (uiState.selectedNodeHandles.isEmpty()) {
                 MegaSearchTopAppBar(
@@ -153,16 +181,25 @@ internal fun OfflineScreen(
                             onSearch("")
                         }
                     },
+                    actions = buildList {
+                        if (uiState.nodeId != -1) {
+                            add(
+                                MenuActionIconWithClick(CloudDriveAppBarAction.More) {
+                                    // Todo implement NodeOptionsBottomSheet
+                                }
+                            )
+                        }
+                    }
                 )
             } else {
                 MegaTopAppBar(
                     title = uiState.selectedNodeHandles.size.toString(),
                     navigationType = AppBarNavigationType.Close(deselectAll),
-                    actions = listOf(NodeSelectionAction.SelectAll),
+                    actions = OfflineSelectionAction.topBarItems,
                     onActionPressed = { action ->
                         when (action) {
-                            is NodeSelectionAction.SelectAll -> selectAll()
-                            else -> Unit
+                            is OfflineSelectionAction.SelectAll -> selectAll()
+                            else -> return@MegaTopAppBar
                         }
                     }
                 )
@@ -172,7 +209,7 @@ internal fun OfflineScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
+                .padding(top = paddingValues.calculateTopPadding()),
         ) {
             if (uiState.showOfflineWarning && !uiState.isLoading) {
                 TopWarningBanner(
@@ -209,6 +246,9 @@ internal fun OfflineScreen(
                             onMoreClicked = {
                                 // Todo implement NodeOptionsBottomSheet
                             },
+                            contentPadding = PaddingValues(
+                                bottom = paddingValues.calculateBottomPadding()
+                            )
                         )
                     }
                 }
@@ -224,6 +264,7 @@ private fun OfflineContent(
     onItemLongClicked: (OfflineNodeUiItem) -> Unit,
     onMoreClicked: (OfflineNodeUiItem) -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val fileTypeIconMapper = remember { FileTypeIconMapper() }
 
@@ -231,7 +272,7 @@ private fun OfflineContent(
         ViewType.LIST -> {
             LazyColumn(
                 modifier = modifier,
-                contentPadding = PaddingValues(vertical = 8.dp)
+                contentPadding = contentPadding
             ) {
                 items(
                     items = uiState.offlineNodes,
@@ -275,7 +316,7 @@ private fun OfflineContent(
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(120.dp),
                 modifier = modifier,
-                contentPadding = PaddingValues(8.dp),
+                contentPadding = contentPadding,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
