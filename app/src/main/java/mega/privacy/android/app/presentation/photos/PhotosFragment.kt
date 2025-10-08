@@ -59,6 +59,7 @@ import mega.privacy.android.app.presentation.photos.albums.albumcontent.AlbumCon
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
+import mega.privacy.android.app.presentation.photos.compose.navigation.CameraUploadsTransferScreen
 import mega.privacy.android.app.presentation.photos.compose.navigation.PhotosNavigationGraph
 import mega.privacy.android.app.presentation.photos.compose.navigation.photosNavigationGraph
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
@@ -122,6 +123,7 @@ class PhotosFragment : Fragment() {
 
     internal lateinit var managerActivity: ManagerActivity
     internal var menu: Menu? = null
+    private var isCameraUploadsTransferScreen = false
 
     // Action mode
     private var timelineActionMode: ActionMode? = null
@@ -217,6 +219,12 @@ class PhotosFragment : Fragment() {
                     val bottomSheetNavigator = rememberBottomSheetNavigator()
                     val navHostController = rememberNavController(bottomSheetNavigator)
 
+                    navHostController.addOnDestinationChangedListener { _, destination, _ ->
+                        isCameraUploadsTransferScreen =
+                            destination.route == CameraUploadsTransferScreen::class.qualifiedName
+                        updateActivityActionBarShown(isShowActivityActionBar = !isCameraUploadsTransferScreen)
+                    }
+
                     NavHost(
                         navController = navHostController,
                         startDestination = PhotosNavigationGraph
@@ -243,6 +251,18 @@ class PhotosFragment : Fragment() {
         }
     }
 
+    private fun updateActivityActionBarShown(isShowActivityActionBar: Boolean) {
+        if (isShowActivityActionBar) {
+            (activity as? AppCompatActivity)?.supportActionBar?.show()
+            managerActivity.handleShowingAds()
+        } else {
+            (activity as? AppCompatActivity)?.supportActionBar?.hide()
+            managerActivity.hideAdsView()
+        }
+        managerActivity.showHideBottomNavigationView(hide = !isShowActivityActionBar)
+        managerActivity.invalidateOptionsMenu()
+    }
+
     /**
      * onResume
      */
@@ -256,6 +276,9 @@ class PhotosFragment : Fragment() {
 
         // Start photo monitoring when UI is ready (UI-driven lifecycle)
         timelineViewModel.startPhotoMonitoring()
+        if (isCameraUploadsTransferScreen) {
+            updateActivityActionBarShown(isShowActivityActionBar = false)
+        }
     }
 
     private fun checkCameraUploadsPermissions(showAction: Boolean = false) {
@@ -389,6 +412,7 @@ class PhotosFragment : Fragment() {
         } else shouldShowRequestPermissionRationale(READ_EXTERNAL_STORAGE)
 
     private fun handleActionMode(state: TimelineViewState) {
+        if (isCameraUploadsTransferScreen) return
         if (state.selectedPhotoCount > 0) {
             if (timelineActionMode == null) {
                 enterActionMode()
@@ -423,6 +447,7 @@ class PhotosFragment : Fragment() {
     }
 
     private fun handleAlbumsActionMode(state: AlbumsViewState) {
+        if (isCameraUploadsTransferScreen) return
         if (state.selectedAlbumIds.isNotEmpty()) {
             if (albumsActionMode == null) {
                 enterAlbumsActionMode()
@@ -476,9 +501,8 @@ class PhotosFragment : Fragment() {
      * onCreateOptionsMenu
      */
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        if (!managerActivity.isInPhotosPage) {
-            return
-        }
+        if (!managerActivity.isInPhotosPage || isCameraUploadsTransferScreen) return
+
         inflater.inflate(R.menu.fragment_photos_toolbar, menu)
         super.onCreateOptionsMenu(menu, inflater)
         this.menu = menu

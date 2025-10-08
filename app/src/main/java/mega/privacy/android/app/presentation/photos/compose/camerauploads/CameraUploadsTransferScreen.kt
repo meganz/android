@@ -14,8 +14,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -26,12 +30,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.toolbar.AppBarNavigationType
+import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.presentation.extensions.transfers.getProgressPercentString
 import mega.privacy.android.app.presentation.extensions.transfers.getProgressSizeString
 import mega.privacy.android.app.presentation.extensions.transfers.getSpeedString
+import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowMenuAction
 import mega.privacy.android.app.presentation.photos.model.CameraUploadsTransferType
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.CameraUploadsTransferViewModel
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
@@ -53,15 +60,38 @@ fun CameraUploadsTransferScreen(
     onSettingOptionClick: () -> Unit,
     cameraUploadsTransferViewModel: CameraUploadsTransferViewModel = hiltViewModel(),
 ) {
+    val resources = LocalResources.current
+    val uiState by timelineViewModel.state.collectAsStateWithLifecycle()
+    val types by cameraUploadsTransferViewModel.cameraUploadsTransfers.collectAsStateWithLifecycle()
+    var subtitle by remember { mutableStateOf<String?>(null) }
+
     BackHandler {
         navHostController.popBackStack()
     }
 
-    val types by cameraUploadsTransferViewModel.cameraUploadsTransfers.collectAsStateWithLifecycle()
+    LaunchedEffect(uiState) {
+        subtitle = if (types.isNotEmpty() && uiState.pending > 0) {
+            resources.getQuantityString(
+                sharedR.plurals.camera_uploads_tranfer_top_bar_subtitle,
+                uiState.pending,
+                uiState.pending
+            )
+        } else {
+            null
+        }
+    }
 
     MegaScaffold(
         topBar = {
-            // Will implement in the ticket - AND-21340
+            MegaTopAppBar(
+                title = stringResource(sharedR.string.camera_uploads_tranfer_top_bar_title),
+                subtitle = subtitle,
+                navigationType = AppBarNavigationType.Back {
+                    navHostController.popBackStack()
+                },
+                actions = listOf(SlideshowMenuAction.SettingOptionsMenuAction),
+                onActionPressed = { onSettingOptionClick() }
+            )
         }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
@@ -91,7 +121,8 @@ internal fun CameraUploadsTranferView(types: List<CameraUploadsTransferType>) {
                     is CameraUploadsTransferType.InProgress -> {
                         item(key = "in progress header") {
                             MegaText(
-                                modifier = Modifier.padding(15.dp)
+                                modifier = Modifier
+                                    .padding(15.dp)
                                     .testTag(TEST_TAG_CAMERA_UPLOADS_TRANSFER_IN_PROGRESS_HEADER),
                                 text = stringResource(sharedR.string.camera_uploads_tranfer_header_in_progress),
                                 textColor = TextColor.Primary,
@@ -108,7 +139,8 @@ internal fun CameraUploadsTranferView(types: List<CameraUploadsTransferType>) {
                     is CameraUploadsTransferType.InQueue -> {
                         item(key = "in queue header") {
                             MegaText(
-                                modifier = Modifier.padding(15.dp)
+                                modifier = Modifier
+                                    .padding(15.dp)
                                     .testTag(TEST_TAG_CAMERA_UPLOADS_TRANSFER_IN_QUEUE_HEADER),
                                 text = stringResource(sharedR.string.camera_uploads_tranfer_header_in_queue),
                                 textColor = TextColor.Primary,
@@ -130,7 +162,9 @@ internal fun CameraUploadsTranferView(types: List<CameraUploadsTransferType>) {
 @Composable
 internal fun CameraUploadsTransferEmptyView(modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier.fillMaxSize().testTag(TEST_TAG_CAMERA_UPLOADS_TRANSFER_EMPTY_VIEW),
+        modifier = modifier
+            .fillMaxSize()
+            .testTag(TEST_TAG_CAMERA_UPLOADS_TRANSFER_EMPTY_VIEW),
         verticalArrangement = Arrangement.Center
     ) {
         Box(
@@ -174,7 +208,7 @@ internal fun CameraUploadsTransferEmptyView(modifier: Modifier = Modifier) {
 internal fun CameraUploadsTransferItem(
     item: InProgressTransfer,
     isInProgress: Boolean,
-    viewModel: ActiveTransferImageViewModel = hiltViewModel()
+    viewModel: ActiveTransferImageViewModel = hiltViewModel(),
 ) {
     val transferImageState by viewModel.getUiStateFlow(item.tag)
         .collectAsStateWithLifecycle()

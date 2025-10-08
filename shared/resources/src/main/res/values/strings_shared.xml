@@ -1690,4 +1690,11 @@
     <string name="camera_uploads_tranfer_empty_view_title">All caught up</string>
     <!--description for the Camera Uploads transfer empty view -->
     <string name="camera_uploads_tranfer_empty_view_description">New photos and videos will appear here after you take them</string>
+    <!--Title for the Camera Uploads transfer top bar -->
+    <string name="camera_uploads_tranfer_top_bar_title">Progress</string>
+    <!--Subtitle for the Camera Uploads transfer top bar -->
+    <plurals name="camera_uploads_tranfer_top_bar_subtitle">
+        <item quantity="one">Uploading: %1$d item left</item>
+        <item quantity="other">Uploading: %1$d items left</item>
+    </plurals>
 </resources>
