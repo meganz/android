@@ -819,4 +819,8 @@ class MediaDiscoveryViewModel @Inject constructor(
             it.copy(isClearSelectedPhotos = isClear)
         }
     }
+
+    internal fun clearState() {
+        _state.update { MediaDiscoveryViewState() }
+    }
 }
