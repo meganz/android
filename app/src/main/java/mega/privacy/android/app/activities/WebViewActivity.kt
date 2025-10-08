@@ -81,6 +81,17 @@ class WebViewActivity : BaseActivity() {
             pickedVideo = null
         }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        val url = intent.dataString
+        if (url != null && url.isURLSanitized()) {
+            binding.webView.loadUrl(url)
+        } else {
+            Timber.e("WebViewActivity::onNewIntent Vulnerable/Malicious Url detected: $url")
+            finish()
+        }
+    }
+
     /**
      * onCreate
      */
@@ -97,7 +108,7 @@ class WebViewActivity : BaseActivity() {
         val url = intent.dataString
 
         if (!url.isURLSanitized()) {
-            Timber.e("WebViewActivity::onCreate", "Vulnerable/Malicious Url detected: $url")
+            Timber.e("WebViewActivity::onCreate Vulnerable/Malicious Url detected: $url")
             finish()
         }
 
@@ -122,8 +133,7 @@ class WebViewActivity : BaseActivity() {
                 override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
                     if (!url.isURLSanitized()) {
                         Timber.e(
-                            "WebViewActivity::shouldOverrideUrlLoading",
-                            "Vulnerable/Malicious Url detected: $url"
+                            "WebViewActivity::shouldOverrideUrlLoading Vulnerable/Malicious Url detected: $url"
                         )
                         finish()
                         return false
