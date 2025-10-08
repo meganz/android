@@ -15,8 +15,7 @@ class IncomingSharesMenuOptionsProvider @Inject constructor(
     @IncomingShares private val bottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
     @IncomingShares private val selectionModeOptions: Lazy<Set<@JvmSuppressWildcards NodeSelectionMenuItem<MenuActionWithIcon>>>
 ) : NodeMenuOptionsProvider {
-    override val supportedSourceType: NodeSourceType = NodeSourceType.INCOMING_SHARES
+    override val supportedSourceType = NodeSourceType.INCOMING_SHARES
     override fun getBottomSheetOptions() = bottomSheetOptions.get()
-    override fun getSelectionModeOptions(): Set<@JvmSuppressWildcards NodeSelectionMenuItem<MenuActionWithIcon>> =
-        selectionModeOptions.get()
+    override fun getSelectionModeOptions() = selectionModeOptions.get()
 }

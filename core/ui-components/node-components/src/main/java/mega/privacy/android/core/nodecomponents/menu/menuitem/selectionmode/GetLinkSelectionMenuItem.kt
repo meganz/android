@@ -15,5 +15,6 @@ class GetLinkSelectionMenuItem @Inject constructor(
         canBeMovedToTarget: Boolean,
         noNodeInBackups: Boolean,
         noNodeTakenDown: Boolean,
-    ): Boolean = hasNodeAccessPermission && noNodeTakenDown && noNodeInBackups
+    ): Boolean =
+        hasNodeAccessPermission && noNodeTakenDown && noNodeInBackups && !selectedNodes.any { it.exportedData != null }
 }

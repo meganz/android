@@ -27,6 +27,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.Unhi
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.domain.qualifier.features.CloudDrive
 import mega.privacy.android.domain.qualifier.features.IncomingShares
+import mega.privacy.android.domain.qualifier.features.OutgoingShares
 import mega.privacy.android.domain.qualifier.features.RubbishBin
 import javax.inject.Singleton
 
@@ -101,6 +102,38 @@ abstract class NodeSelectionModeModule {
             downloadSelectionMenuItem,
             renameSelectionMenuItem,
             leaveShareSelectionMenuItem,
+        )
+
+        @Provides
+        @ElementsIntoSet
+        @OutgoingShares
+        @Singleton
+        fun provideOutgoingSharesToolbarItems(
+            copySelectionModeMenuAction: CopySelectionMenuItem,
+            rubbishBinSelectionMenuAction: RubbishBinSelectionMenuItem,
+            manageLinkSelectionMenuAction: ManageLinkSelectionMenuItem,
+            downloadSelectionMenuItem: DownloadSelectionMenuItem,
+            renameSelectionMenuItem: RenameSelectionMenuItem,
+            getLinkSelectionMenuItem: GetLinkSelectionMenuItem,
+            removeLinkSelectionMenuItem: RemoveLinkSelectionMenuItem,
+            sendToChatSelectionMenuItem: SendToChatSelectionMenuItem,
+            shareFolderSelectionMenuItem: ShareFolderSelectionMenuItem,
+            removeShareSelectionMenuItem: RemoveShareSelectionMenuItem,
+            disputeTakeDownSelectionMenuItem: DisputeTakeDownSelectionMenuItem,
+            shareSelectionMenuItem: ShareSelectionMenuItem,
+        ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
+            copySelectionModeMenuAction,
+            rubbishBinSelectionMenuAction,
+            manageLinkSelectionMenuAction,
+            downloadSelectionMenuItem,
+            renameSelectionMenuItem,
+            getLinkSelectionMenuItem,
+            removeLinkSelectionMenuItem,
+            sendToChatSelectionMenuItem,
+            shareFolderSelectionMenuItem,
+            removeShareSelectionMenuItem,
+            disputeTakeDownSelectionMenuItem,
+            shareSelectionMenuItem
         )
     }
 }

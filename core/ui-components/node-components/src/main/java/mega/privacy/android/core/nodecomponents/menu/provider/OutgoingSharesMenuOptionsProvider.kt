@@ -13,9 +13,9 @@ import javax.inject.Inject
  */
 class OutgoingSharesMenuOptionsProvider @Inject constructor(
     @OutgoingShares private val bottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
+    @OutgoingShares private val selectionModeOptions: Lazy<Set<@JvmSuppressWildcards NodeSelectionMenuItem<MenuActionWithIcon>>>,
 ) : NodeMenuOptionsProvider {
-    override val supportedSourceType: NodeSourceType = NodeSourceType.OUTGOING_SHARES
+    override val supportedSourceType = NodeSourceType.OUTGOING_SHARES
     override fun getBottomSheetOptions() = bottomSheetOptions.get()
-    override fun getSelectionModeOptions(): Set<@JvmSuppressWildcards NodeSelectionMenuItem<MenuActionWithIcon>> =
-        emptySet()
+    override fun getSelectionModeOptions() = selectionModeOptions.get()
 }

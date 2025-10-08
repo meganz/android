@@ -44,6 +44,8 @@ import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
+import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderAccessDialogNavKey
+import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogM3
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetRoute
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
@@ -90,6 +92,27 @@ internal fun SharesScreen(
     // Node options modal state
     var visibleNodeOptionId by remember { mutableStateOf<NodeId?>(null) }
     val nodeOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    var shareNodeHandles by remember { mutableStateOf<List<Long>>(emptyList()) }
+    val megaResultContract = rememberMegaResultContract()
+    val shareFolderLauncher = rememberLauncherForActivityResult(
+        contract = megaResultContract.shareFolderActivityResultContract
+    ) { result ->
+        result?.let { (contactIds, nodeHandles) ->
+            nodeOptionsActionViewModel.contactSelectedForShareFolder(
+                contactIds,
+                nodeHandles
+            )
+        }
+    }
+    val nameCollisionLauncher = rememberLauncherForActivityResult(
+        contract = megaResultContract.nameCollisionActivityContract
+    ) { message ->
+        if (!message.isNullOrEmpty()) {
+            coroutineScope.launch {
+                snackbarHostState?.showAutoDurationSnackbar(message)
+            }
+        }
+    }
 
     val (isInSelectionMode, selectedItemsCount) = when (selectedTabIndex) {
         0 -> incomingSharesUiState.isInSelectionMode to incomingSharesUiState.selectedItemsCount
@@ -225,16 +248,6 @@ internal fun SharesScreen(
         )
     }
 
-    val megaResultContract = rememberMegaResultContract()
-    val nameCollisionLauncher = rememberLauncherForActivityResult(
-        contract = megaResultContract.nameCollisionActivityContract
-    ) { message ->
-        if (!message.isNullOrEmpty()) {
-            coroutineScope.launch {
-                snackbarHostState?.showAutoDurationSnackbar(message)
-            }
-        }
-    }
     HandleNodeOptionEvent(
         megaNavigator = megaNavigator,
         nodeActionState = nodeActionState,
@@ -289,6 +302,22 @@ internal fun SharesScreen(
         }
     )
 
+    EventEffect(
+        event = nodeActionState.shareFolderDialogEvent,
+        onConsumed = nodeOptionsActionViewModel::resetShareFolderDialogEvent,
+        action = { handles ->
+            shareNodeHandles = handles
+        }
+    )
+
+    EventEffect(
+        event = nodeActionState.shareFolderEvent,
+        onConsumed = nodeOptionsActionViewModel::resetShareFolderEvent,
+        action = { handles ->
+            shareFolderLauncher.launch(handles.toLongArray())
+        }
+    )
+
     // Node options modal
     LaunchedEffect(visibleNodeOptionId) {
         if (visibleNodeOptionId != null) {
@@ -297,6 +326,7 @@ internal fun SharesScreen(
             nodeOptionSheetState.hide()
         }
     }
+
     // Todo: We will remove this, and replace it with NavigationHandler
     visibleNodeOptionId?.let { nodeId ->
         MegaModalBottomSheet(
@@ -320,4 +350,31 @@ internal fun SharesScreen(
             )
         }
     }
+
+    if (shareNodeHandles.isNotEmpty()) {
+        ShareFolderDialogM3(
+            nodeIds = shareNodeHandles.map { NodeId(it) },
+            onDismiss = {
+                shareNodeHandles = emptyList()
+            },
+            onConfirm = { nodes ->
+                val handles = nodes.map { it.id.longValue }.toLongArray()
+                shareFolderLauncher.launch(handles)
+            }
+        )
+    }
+
+    EventEffect(
+        event = nodeActionState.contactsData,
+        onConsumed = nodeOptionsActionViewModel::markShareFolderAccessDialogShown,
+        action = { (contactData, isFromBackups, nodeHandles) ->
+            navigationHandler.navigate(
+                ShareFolderAccessDialogNavKey(
+                    nodes = nodeHandles,
+                    contacts = contactData.joinToString(separator = ","),
+                    isFromBackups = isFromBackups
+                )
+            )
+        },
+    )
 }

@@ -17,5 +17,5 @@ class RemoveLinkSelectionMenuItem @Inject constructor(
         noNodeTakenDown: Boolean,
     ): Boolean = noNodeTakenDown
             && selectedNodes.size > 1
-            && selectedNodes.first().exportedData != null
+            && selectedNodes.all { it.exportedData != null }
 }
