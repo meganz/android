@@ -108,9 +108,13 @@ class InsertPendingDownloadsForNodesUseCaseTest {
     ) = runTest {
         val time = 349853489L
         val nodes = if (multipleNodes) (0..5).map { index ->
-            mock<DefaultTypedFileNode>()
+            mock<DefaultTypedFileNode> {
+                on { it.name } doReturn "fileName$index"
+            }
         } else {
-            listOf(mock<DefaultTypedFileNode>())
+            listOf(mock<DefaultTypedFileNode> {
+                on { it.name } doReturn "fileName"
+            })
         }
         val uriPath = UriPath(PATH_STRING)
         whenever(
@@ -127,7 +131,8 @@ class InsertPendingDownloadsForNodesUseCaseTest {
             ActiveTransferActionGroupImpl(
                 transferType = TransferType.DOWNLOAD,
                 destination = uriPath.value,
-                startTime = time
+                startTime = time,
+                selectedNames = nodes.map { it.name },
             )
         )
     }

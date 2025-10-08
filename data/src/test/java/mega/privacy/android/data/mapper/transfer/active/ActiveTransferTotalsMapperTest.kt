@@ -185,7 +185,7 @@ class ActiveTransferTotalsMapperTest {
                             completedFiles = 0,
                             alreadyTransferred = fileTransfers.count { it.isAlreadyTransferred },
                             destination = "destination$groupId",
-                            fileNames = fileTransfers.map { it.fileName },
+                            selectedNames = emptyList(),
                             singleTransferTag = fileTransfers.singleOrNull()?.tag,
                             startTime = groupId.toLong(),
                             pausedFiles = fileTransfers.count { it.isPaused },
@@ -236,7 +236,7 @@ class ActiveTransferTotalsMapperTest {
                             completedFiles = expectedCompleted,
                             alreadyTransferred = fileTransfers.count { it.isAlreadyTransferred },
                             destination = "destination$groupId",
-                            fileNames = fileTransfers.map { it.fileName },
+                            selectedNames = emptyList(),
                             singleTransferTag = fileTransfers.singleOrNull()?.tag,
                             startTime = groupId.toLong(),
                             pausedFiles = fileTransfers.count { it.isPaused },
@@ -285,7 +285,7 @@ class ActiveTransferTotalsMapperTest {
                             completedFiles = fileTransfers.count { it.isFinished && transferredBytes[it.uniqueId] == it.totalBytes },
                             alreadyTransferred = fileTransfers.count { it.isAlreadyTransferred },
                             destination = "destination$groupId",
-                            fileNames = fileTransfers.map { it.fileName },
+                            selectedNames = emptyList(),
                             singleTransferTag = fileTransfers.singleOrNull()?.tag,
                             startTime = groupId.toLong(),
                             pausedFiles = fileTransfers.count { it.isPaused },
@@ -332,7 +332,7 @@ class ActiveTransferTotalsMapperTest {
                     completedFiles = 0,
                     alreadyTransferred = 0,
                     destination = "",
-                    fileNames = entities.map { it.fileName },
+                    selectedNames = entities.map { it.fileName },
                     singleTransferTag = 0,
                     startTime = 0,
                     pausedFiles = 0,
@@ -360,7 +360,7 @@ class ActiveTransferTotalsMapperTest {
                         completedFiles = 0,
                         alreadyTransferred = 0,
                         destination = "destination$groupId",
-                        fileNames = listOf(entity.fileName),
+                        selectedNames = listOf(entity.fileName),
                         singleTransferTag = entity.tag,
                         startTime = groupId.toLong(),
                         pausedFiles = 0,
@@ -383,7 +383,7 @@ class ActiveTransferTotalsMapperTest {
                             completedFiles = 0,
                             alreadyTransferred = fileTransfers.count { it.isAlreadyTransferred },
                             destination = "destination$groupId",
-                            fileNames = fileTransfers.map { it.fileName },
+                            selectedNames = listOf(activeTransfers.first().fileName),
                             singleTransferTag = fileTransfers.singleOrNull()?.tag,
                             startTime = groupId.toLong(),
                             pausedFiles = fileTransfers.count { it.isPaused },
@@ -409,44 +409,50 @@ class ActiveTransferTotalsMapperTest {
 
     @ParameterizedTest(name = "Transfer Type {0}")
     @EnumSource(TransferType::class)
-    fun `test that mapper correctly maps single file name if group contains only one file`(
+    fun `test that mapper correctly maps selectedNames from previous group`(
         transferType: TransferType,
     ) = runTest {
-        val entities = createEntities(transferType).mapIndexed { index, entity ->
-            whenever(transferRepository.getActiveTransferGroupById(index)) doReturn ActiveTransferActionGroupImpl(
-                groupId = index,
-                transferType = transferType,
-                destination = "destination$index",
-                startTime = index.toLong(),
-            )
-            entity.copy(appData = listOf(TransferAppData.TransferGroup(index.toLong())))
+        val groupId = 2354
+        val entities = createEntities(transferType).map { entity ->
+            entity.copy(appData = listOf(TransferAppData.TransferGroup(groupId.toLong())))
         }.filterNot { it.isFolderTransfer }
         val transferredBytes = emptyMap<Long, Long>()
-        val expected = entities
-            .groupBy { it.getTransferGroup()?.groupId }
-            .mapNotNull { (key, activeTransfer) ->
-                key?.toInt()?.let { groupId ->
-                    ActiveTransferTotals.ActionGroup(
-                        groupId = groupId,
-                        totalFiles = activeTransfer.size,
-                        finishedFiles = activeTransfer.count { it.isFinished },
-                        completedFiles = 0,
-                        alreadyTransferred = activeTransfer.count { it.isAlreadyTransferred },
-                        destination = "destination$groupId",
-                        fileNames = listOfNotNull(activeTransfer.singleOrNull()?.fileName),
-                        singleTransferTag = activeTransfer.singleOrNull()?.tag,
-                        startTime = groupId.toLong(),
-                        pausedFiles = activeTransfer.count { it.isPaused },
-                        totalBytes = activeTransfer.sumOf { it.totalBytes },
-                        pendingTransferNodeId = null,
-                        transferredBytes = activeTransfer.sumOf {
-                            if (it.isFinished) it.totalBytes else 0L
-                        },
-                    )
-                }
+        val expectedNames = entities.map { it.fileName }
+        val previousGroup = listOf(
+            mock<ActiveTransferTotals.ActionGroup> {
+                on { this.groupId } doReturn groupId
+                on { this.selectedNames } doReturn expectedNames
+                on { this.destination } doReturn "destination"
             }
+        )
+
+        val actual = underTest(transferType, entities, transferredBytes, previousGroup).actionGroups
+
+        assertThat(actual.firstOrNull()?.selectedNames).containsExactlyElementsIn(expectedNames)
+    }
+
+    @ParameterizedTest(name = "Transfer Type {0}")
+    @EnumSource(TransferType::class)
+    fun `test that mapper correctly maps selectedNames from database`(
+        transferType: TransferType,
+    ) = runTest {
+        val groupId = 2354
+        val entities = createEntities(transferType).map { entity ->
+            entity.copy(appData = listOf(TransferAppData.TransferGroup(groupId.toLong())))
+        }.filterNot { it.isFolderTransfer }
+        val expectedNames = entities.map { it.fileName }
+        whenever(transferRepository.getActiveTransferGroupById(groupId)) doReturn ActiveTransferActionGroupImpl(
+            groupId = groupId,
+            transferType = transferType,
+            destination = "destination",
+            startTime = 2562,
+            selectedNames = expectedNames,
+        )
+        val transferredBytes = emptyMap<Long, Long>()
+
         val actual = underTest(transferType, entities, transferredBytes).actionGroups
-        assertThat(actual).containsExactlyElementsIn(expected)
+
+        assertThat(actual.firstOrNull()?.selectedNames).containsExactlyElementsIn(expectedNames)
     }
 
 

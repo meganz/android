@@ -13,6 +13,7 @@ internal class ActiveTransferGroupEntityMapper @Inject constructor() {
                 destination = destination,
                 startTime = startTime,
                 pendingTransferNodeId = pendingTransferNodeId,
+                selectedNames = selectedNames,
             )
         }
 }

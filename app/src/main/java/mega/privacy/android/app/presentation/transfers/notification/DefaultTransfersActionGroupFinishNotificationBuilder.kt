@@ -288,7 +288,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                 putExtra(FileStorageActivity.EXTRA_PATH, actionGroup.destination)
                 putStringArrayListExtra(
                     FileStorageActivity.EXTRA_FILE_NAMES,
-                    ArrayList(actionGroup.fileNames)
+                    ArrayList(actionGroup.selectedNames)
                 )
             }
         }
@@ -302,7 +302,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                 )
                 putStringArrayListExtra(
                     FileStorageActivity.EXTRA_FILE_NAMES,
-                    ArrayList(actionGroup.fileNames)
+                    ArrayList(actionGroup.selectedNames)
                 )
             }
         }

@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeId
  * @property destination The destination of the transfers in this group, UriPath value in case of downloads
  * @property startTime the local time in milliseconds when this action was started, it should be used for UX only as precision is not guaranteed7
  * @property pendingTransferNodeId the destination of this transfer in case of folder node destination, null otherwise
+ * @property selectedNames the names of the selected files for notification purposes
  */
 interface ActiveTransferActionGroup {
     val groupId: Int?
@@ -17,4 +18,5 @@ interface ActiveTransferActionGroup {
     val destination: String
     val startTime: Long?
     val pendingTransferNodeId: PendingTransferNodeIdentifier?
+    val selectedNames: List<String>?
 }

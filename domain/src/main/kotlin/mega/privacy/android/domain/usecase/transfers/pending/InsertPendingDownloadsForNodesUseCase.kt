@@ -45,6 +45,7 @@ class InsertPendingDownloadsForNodesUseCase @Inject constructor(
                 transferType = TransferType.DOWNLOAD,
                 destination = destination.value,
                 startTime = timeSystemRepository.getCurrentTimeInMillis(),
+                selectedNames = nodes.map { it.name }.take(MAX_NAMES_TO_SAVE)
             )
         )
         val appDataList = listOfNotNull(
@@ -75,4 +76,8 @@ class InsertPendingDownloadsForNodesUseCase @Inject constructor(
         } else {
             this.plus(File.separator)
         }
+
+    private companion object {
+        const val MAX_NAMES_TO_SAVE = 50
+    }
 }

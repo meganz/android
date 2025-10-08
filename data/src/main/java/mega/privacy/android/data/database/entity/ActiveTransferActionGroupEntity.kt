@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.data.database.converter.PendingTransferNodeIdentifierConverter
+import mega.privacy.android.data.database.converter.StringListConverter
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeIdentifier
@@ -16,7 +17,7 @@ import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeId
 @Entity(
     MegaDatabaseConstant.TABLE_ACTIVE_TRANSFER_ACTION_GROUPS,
 )
-@TypeConverters(PendingTransferNodeIdentifierConverter::class)
+@TypeConverters(PendingTransferNodeIdentifierConverter::class, StringListConverter::class)
 data class ActiveTransferActionGroupEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "group_id")
@@ -29,4 +30,6 @@ data class ActiveTransferActionGroupEntity(
     override val startTime: Long? = null,
     @ColumnInfo(name = "pending_transfer_node_id", defaultValue = "NULL")
     override val pendingTransferNodeId: PendingTransferNodeIdentifier? = null,
+    @ColumnInfo(name = "selected_names", defaultValue = "NULL")
+    override val selectedNames: List<String>? = null,
 ) : ActiveTransferActionGroup

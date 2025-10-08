@@ -42,7 +42,7 @@ data class ActiveTransferTotals(
      * @param completedFiles the amount of files completed (finished without errors)
      * @param alreadyTransferred the amount of files not transferred because already transferred
      * @param destination the destination of the transfer
-     * @param fileNames the names of the involved files
+     * @param selectedNames the names of the involved files
      * @param singleTransferTag in case of a single file transfer, its, null otherwise
      * @param startTime the local time in milliseconds when this action was started, it should be used for UX only as precision is not guaranteed
      * @param pausedFiles the amount of files that are paused
@@ -58,7 +58,7 @@ data class ActiveTransferTotals(
         val completedFiles: Int,
         val alreadyTransferred: Int,
         val destination: String,
-        val fileNames: List<String>,
+        val selectedNames: List<String>,
         val singleTransferTag: Int?,
         val startTime: Long,
         val pausedFiles: Int,
@@ -97,7 +97,7 @@ data class ActiveTransferTotals(
         /**
          * in case of a single file transfer, the name of the file, null otherwise
          */
-        val singleFileName = fileNames.singleOrNull()
+        val singleFileName = selectedNames.singleOrNull()
     }
 
     /**

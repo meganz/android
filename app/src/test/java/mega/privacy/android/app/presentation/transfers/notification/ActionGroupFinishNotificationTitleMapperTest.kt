@@ -156,7 +156,7 @@ class ActionGroupFinishNotificationTitleMapperTest {
         completedFiles = completedFiles,
         alreadyTransferred = 0,
         destination = "",
-        fileNames = fileNames,
+        selectedNames = fileNames,
         singleTransferTag = null,
         startTime = 0,
         pausedFiles = 0,

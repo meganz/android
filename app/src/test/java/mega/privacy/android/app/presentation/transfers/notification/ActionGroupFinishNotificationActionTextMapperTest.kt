@@ -4,13 +4,7 @@ import android.content.Context
 import android.content.res.Resources
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
-import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
-import mega.privacy.android.domain.usecase.file.IsContentUriUseCase
-import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -136,7 +130,7 @@ class ActionGroupFinishNotificationActionTextMapperTest {
         completedFiles = completedFiles,
         alreadyTransferred = 0,
         destination = "",
-        fileNames = fileNames,
+        selectedNames = fileNames,
         singleTransferTag = null,
         startTime = 0,
         pausedFiles = 0,

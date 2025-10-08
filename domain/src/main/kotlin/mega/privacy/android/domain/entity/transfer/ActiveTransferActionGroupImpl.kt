@@ -11,4 +11,5 @@ data class ActiveTransferActionGroupImpl(
     override val destination: String,
     override val startTime: Long,
     override val pendingTransferNodeId: PendingTransferNodeIdentifier? = null,
+    override val selectedNames: List<String>? = null,
 ) : ActiveTransferActionGroup

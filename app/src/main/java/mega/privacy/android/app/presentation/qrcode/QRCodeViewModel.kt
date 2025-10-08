@@ -445,7 +445,7 @@ class QRCodeViewModel @Inject constructor(
         completedFiles = 1,
         alreadyTransferred = 0,
         destination = destination,
-        fileNames = listOf(fileName),
+        selectedNames = listOf(fileName),
         singleTransferTag = null,
         startTime = 0,
         pausedFiles = 0,

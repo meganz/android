@@ -34,6 +34,7 @@ class ActiveTransferGroupEntityMapperTest {
                 destination = DESTINATION,
                 startTime = START_TIME,
                 pendingTransferNodeId = PendingTransferNodeIdentifier.CloudDriveNode(NodeId(NODE_ID)),
+                selectedNames = listOf(NAME_1, NAME_2),
             )
         val expected =
             ActiveTransferActionGroupEntity(
@@ -42,6 +43,7 @@ class ActiveTransferGroupEntityMapperTest {
                 destination = DESTINATION,
                 startTime = START_TIME,
                 pendingTransferNodeId = PendingTransferNodeIdentifier.CloudDriveNode(NodeId(NODE_ID)),
+                selectedNames = listOf(NAME_1, NAME_2),
             )
         val actual = underTest(activeTransferGroup)
         assertThat(expected).isEqualTo(actual)
@@ -52,5 +54,7 @@ class ActiveTransferGroupEntityMapperTest {
         const val DESTINATION = "destination"
         const val START_TIME = 94837594L
         const val NODE_ID = 4895L
+        const val NAME_1 = "name1.txt"
+        const val NAME_2 = "name2.jpg"
     }
 }
