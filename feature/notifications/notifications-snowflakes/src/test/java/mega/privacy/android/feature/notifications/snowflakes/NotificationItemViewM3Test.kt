@@ -30,7 +30,7 @@ class NotificationItemViewM3Test {
         description: String? = "Test description",
         subText: AnnotatedString? = null,
         date: String = "11 October 2022 6:46 pm",
-        isNew: Boolean = false,
+        isUnread: Boolean = false,
         onClick: () -> Unit = {},
     ) {
         composeRule.setContent {
@@ -41,7 +41,7 @@ class NotificationItemViewM3Test {
                 description = description,
                 subText = subText,
                 date = date,
-                isNew = isNew,
+                isUnread = isUnread,
                 onClick = onClick
             )
         }
@@ -86,18 +86,18 @@ class NotificationItemViewM3Test {
     }
 
     @Test
-    fun `test that NEW chip is displayed when isNew is true`() {
-        setupRule(isNew = true)
+    fun `test that Unread chip is displayed when isUnread is true`() {
+        setupRule(isUnread = true)
 
-        composeRule.onNodeWithTag(NOTIFICATION_ITEM_VIEW_NEW_M3_TEST_TAG, useUnmergedTree = true)
+        composeRule.onNodeWithTag(NOTIFICATION_ITEM_VIEW_UNREAD_M3_TEST_TAG, useUnmergedTree = true)
             .assertIsDisplayed()
     }
 
     @Test
-    fun `test that NEW chip is not displayed when isNew is false`() {
-        setupRule(isNew = false)
+    fun `test that Unread chip is not displayed when isUnread is false`() {
+        setupRule(isUnread = false)
 
-        composeRule.onNodeWithTag(NOTIFICATION_ITEM_VIEW_NEW_M3_TEST_TAG).assertDoesNotExist()
+        composeRule.onNodeWithTag(NOTIFICATION_ITEM_VIEW_UNREAD_M3_TEST_TAG).assertDoesNotExist()
     }
 
     @Test
@@ -239,8 +239,8 @@ class NotificationItemViewM3Test {
     }
 
     @Test
-    fun `test that background color changes based on isNew state`() {
-        setupRule(isNew = true)
+    fun `test that background color changes based on isUnread state`() {
+        setupRule(isUnread = true)
 
         composeRule.onNodeWithTag(NOTIFICATION_ITEM_VIEW_M3_TEST_TAG, useUnmergedTree = true)
             .assertIsDisplayed()
@@ -248,7 +248,7 @@ class NotificationItemViewM3Test {
 
     @Test
     fun `test that subtle divider is displayed when notification is new`() {
-        setupRule(isNew = true)
+        setupRule(isUnread = true)
 
         composeRule.onNodeWithTag(
             NOTIFICATION_ITEM_VIEW_SUBTLE_DIVIDER_M3_TEST_TAG,
@@ -264,7 +264,7 @@ class NotificationItemViewM3Test {
 
     @Test
     fun `test that strong divider is displayed when notification is not new`() {
-        setupRule(isNew = false)
+        setupRule(isUnread = false)
 
         composeRule.onNodeWithTag(
             NOTIFICATION_ITEM_VIEW_STRONG_DIVIDER_M3_TEST_TAG,
@@ -296,7 +296,7 @@ class NotificationItemViewM3Test {
             description = "Your meeting is scheduled for tomorrow",
             subText = subText,
             date = "12 October 2022 2:30 pm",
-            isNew = true
+            isUnread = true
         )
 
         composeRule.onNodeWithTag(NOTIFICATION_ITEM_VIEW_M3_TEST_TAG, useUnmergedTree = true)
@@ -326,7 +326,7 @@ class NotificationItemViewM3Test {
             useUnmergedTree = true
         )
             .assertIsDisplayed()
-        composeRule.onNodeWithTag(NOTIFICATION_ITEM_VIEW_NEW_M3_TEST_TAG, useUnmergedTree = true)
+        composeRule.onNodeWithTag(NOTIFICATION_ITEM_VIEW_UNREAD_M3_TEST_TAG, useUnmergedTree = true)
             .assertIsDisplayed()
     }
 
@@ -339,7 +339,7 @@ class NotificationItemViewM3Test {
             description = null,
             subText = null,
             date = "10 October 2022 1:00 pm",
-            isNew = false
+            isUnread = false
         )
 
         composeRule.onNodeWithTag(NOTIFICATION_ITEM_VIEW_M3_TEST_TAG, useUnmergedTree = true)
@@ -362,7 +362,7 @@ class NotificationItemViewM3Test {
         composeRule.onNodeWithTag(NOTIFICATION_ITEM_VIEW_DESCRIPTION_M3_TEST_TAG)
             .assertDoesNotExist()
         composeRule.onNodeWithTag(NOTIFICATION_ITEM_VIEW_SUB_TEXT_M3_TEST_TAG).assertDoesNotExist()
-        composeRule.onNodeWithTag(NOTIFICATION_ITEM_VIEW_NEW_M3_TEST_TAG).assertDoesNotExist()
+        composeRule.onNodeWithTag(NOTIFICATION_ITEM_VIEW_UNREAD_M3_TEST_TAG).assertDoesNotExist()
     }
 
     @Test

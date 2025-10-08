@@ -13,7 +13,7 @@ import mega.privacy.android.app.presentation.notification.model.NotificationStat
 import mega.privacy.android.app.presentation.notification.view.notificationviewtype.PROMO_NOTIFICATION_M3_TEST_TAG
 import mega.privacy.android.domain.entity.notifications.PromoNotification
 import mega.privacy.android.feature.notifications.snowflakes.NOTIFICATION_ITEM_VIEW_M3_TEST_TAG
-import mega.privacy.android.feature.notifications.snowflakes.NOTIFICATION_ITEM_VIEW_NEW_M3_TEST_TAG
+import mega.privacy.android.feature.notifications.snowflakes.NOTIFICATION_ITEM_VIEW_UNREAD_M3_TEST_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,7 +32,7 @@ class NotificationViewM3Test {
         description = { "xyz@gmail.com is now a contact" },
         schedMeetingNotification = null,
         dateText = { "11 October 2022 6:46 pm" },
-        isNew = true,
+        isUnread = true,
         onClick = {},
         destination = null
     )
@@ -95,26 +95,26 @@ class NotificationViewM3Test {
     }
 
     @Test
-    fun `test that New is displayed when isNew is true`() {
+    fun `test that Unread tag is displayed when isUnread is true`() {
         setupRule(
             NotificationState(
                 notifications = listOf(normalNotification),
                 promoNotifications = listOf(promoNotification)
             )
         )
-        composeRule.onNodeWithTag(NOTIFICATION_ITEM_VIEW_NEW_M3_TEST_TAG, useUnmergedTree = true)
+        composeRule.onNodeWithTag(NOTIFICATION_ITEM_VIEW_UNREAD_M3_TEST_TAG, useUnmergedTree = true)
             .assertIsDisplayed()
     }
 
     @Test
-    fun `test that New is not displayed when isNew is false`() {
+    fun `test that Unread tag is not displayed when isUnread is false`() {
         setupRule(
             NotificationState(
-                notifications = listOf(normalNotification.copy(isNew = false)),
+                notifications = listOf(normalNotification.copy(isUnread = false)),
                 promoNotifications = listOf(promoNotification)
             )
         )
-        composeRule.onNodeWithTag(NOTIFICATION_ITEM_VIEW_NEW_M3_TEST_TAG).assertDoesNotExist()
+        composeRule.onNodeWithTag(NOTIFICATION_ITEM_VIEW_UNREAD_M3_TEST_TAG).assertDoesNotExist()
     }
 
     @Test
@@ -159,7 +159,7 @@ class NotificationViewM3Test {
             sectionType = NotificationItemType.IncomingShares,
             title = { "File Shared" },
             description = { "A file has been shared with you" },
-            isNew = false
+            isUnread = false
         )
 
         setupRule(

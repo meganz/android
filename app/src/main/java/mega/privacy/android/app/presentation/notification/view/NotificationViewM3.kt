@@ -242,7 +242,7 @@ private fun NotificationListViewM3(
                             )
                         },
                     date = notification.dateText(context),
-                    isNew = notification.isNew,
+                    isUnread = notification.isUnread,
                     modifier = modifier,
                 ) {
                     onNotificationClick(notification)
@@ -342,7 +342,7 @@ private fun NotificationViewM3Preview() {
         description = { "xyz@gmail.com is now a contact" },
         schedMeetingNotification = null,
         dateText = { "11 October 2022 6:46 pm" },
-        isNew = true, onClick = {}, destination = null
+        isUnread = true, onClick = {}, destination = null
     )
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         NotificationViewM3(

@@ -14,7 +14,7 @@ import androidx.navigation3.runtime.NavKey
  * @property description
  * @property schedMeetingNotification
  * @property dateText
- * @property isNew
+ * @property isUnread
  * @property onClick
  * @constructor Create empty Notification
  */
@@ -26,7 +26,7 @@ data class Notification(
     val description: (Context) -> String?,
     val schedMeetingNotification: SchedMeetingNotification?,
     val dateText: (Context) -> String,
-    val isNew: Boolean,
+    val isUnread: Boolean,
     val onClick: (NotificationNavigationHandler) -> Unit,
     val destination: NavKey?,
 )

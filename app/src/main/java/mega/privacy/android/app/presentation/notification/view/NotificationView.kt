@@ -182,7 +182,7 @@ private fun NotificationListView(
                             )
                         },
                     date = notification.dateText(context),
-                    isNew = notification.isNew,
+                    isUnread = notification.isUnread,
                     modifier = modifier,
                 ) {
                     onNotificationClick(notification)
@@ -246,7 +246,7 @@ private fun NotificationViewPreview() {
         description = { "xyz@gmail.com is now a contact" },
         schedMeetingNotification = null,
         dateText = { "11 October 2022 6:46 pm" },
-        isNew = true, onClick = {}, destination = null
+        isUnread = true, onClick = {}, destination = null
     )
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         NotificationView(

@@ -104,7 +104,7 @@ class NotificationViewModelTest {
             description = { "" },
             schedMeetingNotification = null,
             dateText = { "" },
-            isNew = true,
+            isUnread = true,
             onClick = {},
             destination = null
         )
@@ -149,7 +149,7 @@ class NotificationViewModelTest {
             description = { "" },
             schedMeetingNotification = null,
             dateText = { "" },
-            isNew = true,
+            isUnread = true,
             onClick = {},
             destination = null
         )

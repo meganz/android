@@ -32,7 +32,7 @@ class NotificationMapper @Inject constructor() {
         description = alert.description(),
         schedMeetingNotification = alert.schedMeetingNotification(),
         dateText = alert.dateText(),
-        isNew = !alert.seen,
+        isUnread = !alert.seen,
         onClick = alert.onClick(),
         destination = alert.destination()
     )

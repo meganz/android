@@ -9,7 +9,7 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.controls.notifications.NOTIFICATION_DATE_TEST_TAG
 import mega.privacy.android.shared.original.core.ui.controls.notifications.NOTIFICATION_DESCRIPTION_TEST_TAG
 import mega.privacy.android.shared.original.core.ui.controls.notifications.NOTIFICATION_DIVIDER
-import mega.privacy.android.shared.original.core.ui.controls.notifications.NOTIFICATION_GREEN_ICON_TEST_TAG
+import mega.privacy.android.shared.original.core.ui.controls.notifications.NOTIFICATION_UNREAD_TEST_TAG
 import mega.privacy.android.shared.original.core.ui.controls.notifications.NOTIFICATION_SECTION_TITLE_TEST_TAG
 import mega.privacy.android.shared.original.core.ui.controls.notifications.NOTIFICATION_TITLE_ROW_TEST_TAG
 import mega.privacy.android.shared.original.core.ui.controls.notifications.NotificationItemView
@@ -42,7 +42,7 @@ class NotificationItemViewTest {
                 description = description,
                 subText = subText,
                 date = date,
-                isNew = isNew,
+                isUnread = isNew,
                 onClick = {}
             )
         }
@@ -54,7 +54,7 @@ class NotificationItemViewTest {
 
         composeRule.onNodeWithTag(NOTIFICATION_SECTION_TITLE_TEST_TAG, useUnmergedTree = true)
             .assertIsDisplayed()
-        composeRule.onNodeWithTag(NOTIFICATION_GREEN_ICON_TEST_TAG, useUnmergedTree = true)
+        composeRule.onNodeWithTag(NOTIFICATION_UNREAD_TEST_TAG, useUnmergedTree = true)
             .assertIsDisplayed()
         composeRule.onNodeWithTag(NOTIFICATION_TITLE_ROW_TEST_TAG, useUnmergedTree = true)
             .assertIsDisplayed()

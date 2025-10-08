@@ -21,7 +21,6 @@ import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.android.core.ui.theme.values.TextColor
@@ -48,7 +47,7 @@ fun NotificationItemView(
     description: String?,
     subText: AnnotatedString?,
     date: String,
-    isNew: Boolean,
+    isUnread: Boolean,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
@@ -56,7 +55,7 @@ fun NotificationItemView(
         modifier = modifier
             .clickable { onClick() }
             .background(
-                color = if (isNew) DSTokens.colors.background.pageBackground
+                color = if (isUnread) DSTokens.colors.background.pageBackground
                 else DSTokens.colors.background.surface1
             )
             .testTag(NOTIFICATION_TEST_TAG)
@@ -76,7 +75,7 @@ fun NotificationItemView(
 
         NotificationTitleRow(
             title = title,
-            showNewIcon = isNew,
+            showUnreadIcon = isUnread,
             isSingleLine = !description.isNullOrBlank()
         )
 
@@ -119,7 +118,7 @@ fun NotificationItemView(
         MegaDivider(
             modifier = Modifier.testTag(NOTIFICATION_DIVIDER),
             dividerType = DividerType.FullSize,
-            strong = !isNew,
+            strong = !isUnread,
         )
     }
 }
@@ -128,7 +127,7 @@ fun NotificationItemView(
 @Composable
 private fun NotificationTitleRow(
     title: String,
-    showNewIcon: Boolean,
+    showUnreadIcon: Boolean,
     isSingleLine: Boolean,
 ) {
     val titleMaxLines = if (isSingleLine) 1 else 3
@@ -155,12 +154,12 @@ private fun NotificationTitleRow(
                 .testTag(NOTIFICATION_TITLE_ROW_TITLE_TEST_TAG)
         )
 
-        if (showNewIcon) {
+        if (showUnreadIcon) {
             MegaChip(
                 selected = true,
                 text = stringResource(sharedR.string.notifications_notification_item_new_tag),
                 style = TagChipStyle,
-                modifier = Modifier.testTag(NOTIFICATION_GREEN_ICON_TEST_TAG)
+                modifier = Modifier.testTag(NOTIFICATION_UNREAD_TEST_TAG)
             )
         }
     }
@@ -174,7 +173,7 @@ private val spanStyles = mapOf(
 @CombinedTextAndThemePreviews
 @Composable
 private fun NotificationItemViewPreview(
-    @PreviewParameter(BooleanProvider::class) isNew: Boolean,
+    @PreviewParameter(BooleanProvider::class) isUnread: Boolean,
 ) {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         NotificationItemView(
@@ -193,7 +192,7 @@ private fun NotificationItemViewPreview(
                 }
             },
             date = "11 October 2022 6:46 pm",
-            isNew = isNew,
+            isUnread = isUnread,
         ) {}
     }
 }
@@ -207,5 +206,5 @@ internal const val NOTIFICATION_SECTION_TITLE_TEST_TAG =
 const val NOTIFICATION_TEST_TAG = "notification_item_view"
 internal const val NOTIFICATION_DATE_TEST_TAG =
     "notification_item_view:notification_date:date_text"
-const val NOTIFICATION_GREEN_ICON_TEST_TAG =
-    "notification_item_view:notification_title_row:new_text"
+const val NOTIFICATION_UNREAD_TEST_TAG =
+    "notification_item_view:notification_title_row:unread_text"

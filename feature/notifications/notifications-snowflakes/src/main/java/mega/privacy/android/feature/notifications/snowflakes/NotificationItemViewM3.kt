@@ -44,14 +44,14 @@ fun NotificationItemViewM3(
     description: String?,
     subText: AnnotatedString?,
     date: String,
-    isNew: Boolean,
+    isUnread: Boolean,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
     Column(
         modifier = modifier
             .background(
-                color = if (isNew) DSTokens.colors.background.pageBackground
+                color = if (isUnread) DSTokens.colors.background.pageBackground
                 else DSTokens.colors.background.surface1
             )
             .clickable(onClick = onClick)
@@ -72,7 +72,7 @@ fun NotificationItemViewM3(
 
         NotificationTitleRow(
             title = title,
-            showNewIcon = isNew,
+            showUnreadIcon = isUnread,
             isSingleLine = !description.isNullOrBlank()
         )
 
@@ -115,7 +115,7 @@ fun NotificationItemViewM3(
         val dividerModifier = modifier
             .fillMaxWidth()
 
-        if (isNew) SubtleDivider(
+        if (isUnread) SubtleDivider(
             dividerModifier.testTag(
                 NOTIFICATION_ITEM_VIEW_SUBTLE_DIVIDER_M3_TEST_TAG
             )
@@ -129,7 +129,7 @@ fun NotificationItemViewM3(
 @Composable
 private fun NotificationTitleRow(
     title: String,
-    showNewIcon: Boolean,
+    showUnreadIcon: Boolean,
     isSingleLine: Boolean,
 ) {
     val titleMaxLines = if (isSingleLine) 1 else 3
@@ -156,12 +156,12 @@ private fun NotificationTitleRow(
                 .testTag(NOTIFICATION_ITEM_VIEW_TITLE_ROW_TITLE_M3_TEST_TAG)
         )
 
-        if (showNewIcon) {
+        if (showUnreadIcon) {
             MegaChip(
                 selected = true,
                 text = stringResource(sharedR.string.notifications_notification_item_new_tag),
                 style = DefaultChipStyle,
-                modifier = Modifier.testTag(NOTIFICATION_ITEM_VIEW_NEW_M3_TEST_TAG)
+                modifier = Modifier.testTag(NOTIFICATION_ITEM_VIEW_UNREAD_M3_TEST_TAG)
             )
         }
     }
@@ -200,7 +200,7 @@ private fun NotificationItemViewM3Preview() {
             description = "John Doe wants to connect with you. [A]This is a longer description[/A] that might wrap to multiple lines. [B]This part should be styled[/B] differently.",
             subText = sampleSubText,
             date = "11 October 2022 6:46 pm",
-            isNew = true,
+            isUnread = true,
             onClick = {}
         )
     }
@@ -217,7 +217,7 @@ private fun NotificationItemViewM3WithoutDescriptionPreview() {
             description = null,
             subText = null,
             date = "10 October 2022 3:30 pm",
-            isNew = false,
+            isUnread = false,
             onClick = {}
         )
     }
@@ -237,6 +237,6 @@ internal const val NOTIFICATION_ITEM_VIEW_SECTION_TITLE_M3_TEST_TAG =
 const val NOTIFICATION_ITEM_VIEW_M3_TEST_TAG = "notification_item_view"
 internal const val NOTIFICATION_ITEM_VIEW_DATE_M3_TEST_TAG =
     "notification_item_view:date_text"
-const val NOTIFICATION_ITEM_VIEW_NEW_M3_TEST_TAG =
-    "notification_item_view:new_text"
+const val NOTIFICATION_ITEM_VIEW_UNREAD_M3_TEST_TAG =
+    "notification_item_view:unread_text"
 const val NOTIFICATION_ITEM_VIEW_SUB_TEXT_M3_TEST_TAG = "notification_item_view:sub_text"
