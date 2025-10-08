@@ -6,8 +6,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.shared.resources.R
 import org.junit.Rule
@@ -35,7 +33,7 @@ class FailedTransfersViewTest {
     }
 
     private fun initComposeTestRule(
-        failedTransfers: ImmutableList<CompletedTransfer> = emptyList<CompletedTransfer>().toImmutableList(),
+        failedTransfers: List<CompletedTransfer> = emptyList(),
     ) {
         composeTestRule.setContent {
             FailedTransfersView(

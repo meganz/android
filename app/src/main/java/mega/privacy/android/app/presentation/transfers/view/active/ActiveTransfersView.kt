@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.collections.immutable.ImmutableList
 import mega.android.core.ui.components.list.MegaReorderableLazyColumn
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollForLazyColumn
 import mega.privacy.android.analytics.Analytics
@@ -35,8 +34,8 @@ import mega.privacy.mobile.analytics.event.ActiveTransfersIndividualPlayButtonBu
 
 @Composable
 internal fun ActiveTransfersView(
-    activeTransfers: ImmutableList<InProgressTransfer>,
-    selectedActiveTransfersIds: ImmutableList<Long>?,
+    activeTransfers: List<InProgressTransfer>,
+    selectedActiveTransfersIds: List<Long>?,
     isTransferOverQuota: Boolean,
     isStorageOverQuota: Boolean,
     quotaWarning: QuotaWarning?,

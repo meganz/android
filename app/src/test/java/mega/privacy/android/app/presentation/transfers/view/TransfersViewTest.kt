@@ -13,7 +13,6 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.app.R
@@ -103,14 +102,14 @@ class TransfersViewTest {
     private val inProgressTransfers = listOf(
         getActiveTransfer(tag = tag1),
         getActiveTransfer(tag = tag2),
-    ).toImmutableList()
+    )
     private val completedTransfers = listOf(
         getCompletedTransfer(tag1, TransferState.STATE_COMPLETED),
-    ).toImmutableList()
+    )
     private val failedTransfers = listOf(
         getCompletedTransfer(tag2, TransferState.STATE_FAILED),
         getCompletedTransfer(tag3, TransferState.STATE_FAILED),
-    ).toImmutableList()
+    )
 
     @Test
     fun `test that view is displayed correctly if there are no transfers`() {
@@ -130,7 +129,7 @@ class TransfersViewTest {
         initComposeTestRule(
             uiState = TransfersUiState(
                 selectedTab = ACTIVE_TAB_INDEX,
-                activeTransfers = emptyList<InProgressTransfer>().toImmutableList(),
+                activeTransfers = emptyList(),
             )
         )
         with(composeTestRule) {
@@ -191,7 +190,7 @@ class TransfersViewTest {
         initComposeTestRule(
             uiState = TransfersUiState(
                 selectedTab = COMPLETED_TAB_INDEX,
-                completedTransfers = emptyList<CompletedTransfer>().toImmutableList(),
+                completedTransfers = emptyList(),
             )
         )
         with(composeTestRule) {
@@ -218,7 +217,7 @@ class TransfersViewTest {
         initComposeTestRule(
             uiState = TransfersUiState(
                 selectedTab = FAILED_TAB_INDEX,
-                failedTransfers = emptyList<CompletedTransfer>().toImmutableList(),
+                failedTransfers = emptyList(),
             )
         )
         with(composeTestRule) {
@@ -248,8 +247,7 @@ class TransfersViewTest {
                 activeTransfers = inProgressTransfers,
                 selectedActiveTransfersIds = inProgressTransfers
                     .take(1)
-                    .map { it.uniqueId }
-                    .toImmutableList(),
+                    .map { it.uniqueId },
             )
         )
 
@@ -264,8 +262,7 @@ class TransfersViewTest {
                 activeTransfers = inProgressTransfers,
                 selectedActiveTransfersIds = inProgressTransfers
                     .take(1)
-                    .map { it.uniqueId }
-                    .toImmutableList(),
+                    .map { it.uniqueId },
             )
         )
 
@@ -280,8 +277,7 @@ class TransfersViewTest {
                 failedTransfers = failedTransfers,
                 selectedFailedTransfersIds = failedTransfers
                     .take(1)
-                    .mapNotNull { it.id }
-                    .toImmutableList(),
+                    .mapNotNull { it.id },
             )
         )
 
@@ -296,8 +292,7 @@ class TransfersViewTest {
                 failedTransfers = failedTransfers,
                 selectedFailedTransfersIds = failedTransfers
                     .take(1)
-                    .mapNotNull { it.id }
-                    .toImmutableList(),
+                    .mapNotNull { it.id },
             )
         )
 
@@ -312,8 +307,7 @@ class TransfersViewTest {
                 failedTransfers = failedTransfers,
                 selectedFailedTransfersIds = failedTransfers
                     .take(1)
-                    .mapNotNull { it.id }
-                    .toImmutableList(),
+                    .mapNotNull { it.id },
             )
         )
 
@@ -406,8 +400,7 @@ class TransfersViewTest {
                 activeTransfers = inProgressTransfers,
                 selectedActiveTransfersIds = inProgressTransfers
                     .take(1)
-                    .map { it.uniqueId }
-                    .toImmutableList(),
+                    .map { it.uniqueId },
             ),
         )
 
@@ -424,8 +417,7 @@ class TransfersViewTest {
                 activeTransfers = inProgressTransfers,
                 selectedActiveTransfersIds = inProgressTransfers
                     .take(1)
-                    .map { it.uniqueId }
-                    .toImmutableList(),
+                    .map { it.uniqueId },
             ),
         )
 
@@ -442,8 +434,7 @@ class TransfersViewTest {
                 completedTransfers = completedTransfers,
                 selectedCompletedTransfersIds = completedTransfers
                     .take(1)
-                    .mapNotNull { it.id }
-                    .toImmutableList(),
+                    .mapNotNull { it.id },
             ),
         )
 
@@ -460,8 +451,7 @@ class TransfersViewTest {
                 failedTransfers = failedTransfers,
                 selectedFailedTransfersIds = failedTransfers
                     .take(1)
-                    .mapNotNull { it.id }
-                    .toImmutableList(),
+                    .mapNotNull { it.id },
             ),
             onSelectAllFailedTransfers = onSelectAllFailedTransfers
         )
@@ -481,8 +471,7 @@ class TransfersViewTest {
                 failedTransfers = failedTransfers,
                 selectedFailedTransfersIds = failedTransfers
                     .take(1)
-                    .mapNotNull { it.id }
-                    .toImmutableList(),
+                    .mapNotNull { it.id },
             ),
             onClearSelectedFailedTransfers = onClearSelectedFailedTransfers
         )
@@ -502,8 +491,7 @@ class TransfersViewTest {
                 failedTransfers = failedTransfers,
                 selectedFailedTransfersIds = failedTransfers
                     .take(1)
-                    .mapNotNull { it.id }
-                    .toImmutableList(),
+                    .mapNotNull { it.id },
             ),
             onRetrySelectedFailedTransfers = onRetrySelectedFailedTransfers
         )

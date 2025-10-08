@@ -20,7 +20,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.parcelize.Parcelize
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.privacy.android.analytics.Analytics
@@ -38,8 +37,8 @@ import mega.privacy.mobile.analytics.event.FailedTransfersItemTapAndHoldSelected
 
 @Composable
 internal fun FailedTransfersView(
-    failedTransfers: ImmutableList<CompletedTransfer>,
-    selectedFailedTransfersIds: ImmutableList<Int>?,
+    failedTransfers: List<CompletedTransfer>,
+    selectedFailedTransfersIds: List<Int>?,
     enableSwipeToDismiss: Boolean,
     onFailedTransferSelected: (CompletedTransfer) -> Unit,
     onRetryTransfer: (CompletedTransfer) -> Unit,

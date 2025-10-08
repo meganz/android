@@ -7,7 +7,6 @@ import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -120,14 +119,13 @@ class TransfersViewModel @Inject constructor(
         }
     }
 
-    private fun setTransfers(activeTransfers: Collection<InProgressTransfer>) {
+    private fun setTransfers(activeTransfers: List<InProgressTransfer>) {
         _uiState.update { state ->
             state.copy(
-                activeTransfers = activeTransfers.toImmutableList(),
+                activeTransfers = activeTransfers,
                 selectedActiveTransfersIds = state.selectedActiveTransfersIds
                     ?.takeIf { activeTransfers.isNotEmpty() }
                     ?.filter { id -> activeTransfers.any { it.uniqueId == id } }
-                    ?.toImmutableList()
             )
         }
     }
@@ -209,8 +207,7 @@ class TransfersViewModel @Inject constructor(
             ).conflate().collect { completed ->
                 _uiState.update { state ->
                     state.copy(
-                        completedTransfers = completed
-                            .sortedByDescending { it.timestamp }.toImmutableList(),
+                        completedTransfers = completed.sortedByDescending { it.timestamp },
                     )
                 }
             }
@@ -223,8 +220,7 @@ class TransfersViewModel @Inject constructor(
             ).conflate().collect { failedAndCancelled ->
                 _uiState.update { state ->
                     state.copy(
-                        failedTransfers = failedAndCancelled
-                            .sortedByDescending { it.timestamp }.toImmutableList(),
+                        failedTransfers = failedAndCancelled.sortedByDescending { it.timestamp },
                     )
                 }
             }
@@ -475,7 +471,7 @@ class TransfersViewModel @Inject constructor(
      */
     fun startActiveTransfersSelection() {
         _uiState.update {
-            it.copy(selectedActiveTransfersIds = emptyList<Long>().toImmutableList())
+            it.copy(selectedActiveTransfersIds = emptyList())
         }
     }
 
@@ -505,7 +501,7 @@ class TransfersViewModel @Inject constructor(
                 }
             }
         _uiState.update {
-            it.copy(selectedActiveTransfersIds = newSelection.toImmutableList())
+            it.copy(selectedActiveTransfersIds = newSelection)
         }
     }
 
@@ -514,8 +510,7 @@ class TransfersViewModel @Inject constructor(
      */
     fun selectAllActiveTransfers() {
         _uiState.update { uiState ->
-            uiState.copy(selectedActiveTransfersIds = uiState.activeTransfers.map { it.uniqueId }
-                .toImmutableList())
+            uiState.copy(selectedActiveTransfersIds = uiState.activeTransfers.map { it.uniqueId })
         }
     }
 
@@ -560,7 +555,7 @@ class TransfersViewModel @Inject constructor(
                 }
             }.filterNotNull()
         _uiState.update {
-            it.copy(selectedCompletedTransfersIds = newSelection.toImmutableList())
+            it.copy(selectedCompletedTransfersIds = newSelection)
         }
     }
 
@@ -577,7 +572,7 @@ class TransfersViewModel @Inject constructor(
                 }
             }.filterNotNull()
         _uiState.update {
-            it.copy(selectedFailedTransfersIds = newSelection.toImmutableList())
+            it.copy(selectedFailedTransfersIds = newSelection)
         }
     }
 
@@ -589,7 +584,6 @@ class TransfersViewModel @Inject constructor(
         _uiState.update { uiState ->
             uiState.copy(
                 selectedCompletedTransfersIds = uiState.completedTransfers.mapNotNull { it.id }
-                    .toImmutableList()
             )
         }
     }
@@ -599,8 +593,7 @@ class TransfersViewModel @Inject constructor(
      */
     fun selectAllFailedTransfers() {
         _uiState.update { uiState ->
-            uiState.copy(selectedFailedTransfersIds = uiState.failedTransfers.mapNotNull { it.id }
-                .toImmutableList())
+            uiState.copy(selectedFailedTransfersIds = uiState.failedTransfers.mapNotNull { it.id })
         }
     }
 
@@ -644,7 +637,7 @@ class TransfersViewModel @Inject constructor(
      */
     fun startCompletedTransfersSelection() {
         _uiState.update {
-            it.copy(selectedCompletedTransfersIds = emptyList<Int>().toImmutableList())
+            it.copy(selectedCompletedTransfersIds = emptyList())
         }
     }
 
@@ -653,7 +646,7 @@ class TransfersViewModel @Inject constructor(
      */
     fun startFailedTransfersSelection() {
         _uiState.update {
-            it.copy(selectedFailedTransfersIds = emptyList<Int>().toImmutableList())
+            it.copy(selectedFailedTransfersIds = emptyList())
         }
     }
 

@@ -52,7 +52,6 @@ import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOv
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
-import okhttp3.internal.immutableListOf
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -462,8 +461,8 @@ class TransfersViewModelTest {
             }
             val listCompleted = listOf(transfer1, transfer3)
             val listFailed = listOf(transfer2, transfer4)
-            val expectedCompleted = immutableListOf(transfer3, transfer1)
-            val expectedFailed = immutableListOf(transfer4, transfer2)
+            val expectedCompleted = listOf(transfer3, transfer1)
+            val expectedFailed = listOf(transfer4, transfer2)
 
             stubCompletedTransfers().thenReturn(flowCompleted)
             stubFailedTransfers().thenReturn(flowFailed)
@@ -497,7 +496,7 @@ class TransfersViewModelTest {
                 on { timestamp } doReturn 2L
             }
             val list = listOf(transfer1, transfer2)
-            val expectedCompleted = immutableListOf(transfer2, transfer1)
+            val expectedCompleted = listOf(transfer2, transfer1)
 
             stubCompletedTransfers().thenReturn(flow)
 
@@ -528,7 +527,7 @@ class TransfersViewModelTest {
                 on { timestamp } doReturn 2L
             }
             val list = listOf(transfer1, transfer2)
-            val expectedFailed = immutableListOf(transfer2, transfer1)
+            val expectedFailed = listOf(transfer2, transfer1)
 
             stubFailedTransfers() doReturn flow
 

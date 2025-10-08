@@ -13,7 +13,6 @@ import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.transfers.model.QuotaWarning
@@ -211,7 +210,7 @@ class ActiveTransfersViewTest {
         composeTestRule.setContent {
             CompositionLocalProvider(LocalViewModelStoreOwner provides viewModelStoreOwner) {
                 ActiveTransfersView(
-                    activeTransfers = inProgressTransfers.toImmutableList(),
+                    activeTransfers = inProgressTransfers,
                     isTransferOverQuota = isOverQuota,
                     isStorageOverQuota = isOverQuota,
                     quotaWarning = quotaWarning,

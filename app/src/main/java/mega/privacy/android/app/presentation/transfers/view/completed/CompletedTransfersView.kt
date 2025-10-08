@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.parcelize.Parcelize
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.privacy.android.analytics.Analytics
@@ -36,8 +35,8 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 internal fun CompletedTransfersView(
-    completedTransfers: ImmutableList<CompletedTransfer>,
-    selectedCompletedTransfersIds: ImmutableList<Int>?,
+    completedTransfers: List<CompletedTransfer>,
+    selectedCompletedTransfersIds: List<Int>?,
     enableSwipeToDismiss: Boolean,
     onCompletedTransferSelected: (CompletedTransfer) -> Unit,
     onClearCompletedTransfer: (Int) -> Unit,
