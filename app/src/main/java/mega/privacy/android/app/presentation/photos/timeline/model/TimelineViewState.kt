@@ -63,7 +63,6 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
  * @property isHiddenNodesOnboarded                     True if the Hidden Nodes have been onboarded
  * @property isBusinessAccountExpired                   True if the Business or Pro Flexi plan has expired
  * @property hiddenNodeEnabled                          True if the Hidden Nodes feature is enabled
- * @property isCameraUploadsBannerImprovementEnabled    True if the Camera Uploads Banner Improvement feature is enabled
  * @property isCameraUploadsTransferScreenEnabled       True if the Camera Uploads Transfer Screen feature is enabled
  * @property cameraUploadsTransfers                     List of in progress Camera Uploads transfers
  * @property popBackFromCameraUploadsTransferScreenEvent An event to signal that we should pop back from the Camera Uploads Transfer Screen
@@ -117,7 +116,6 @@ data class TimelineViewState(
     val isHiddenNodesOnboarded: Boolean = false,
     val isBusinessAccountExpired: Boolean = false,
     val hiddenNodeEnabled: Boolean = false,
-    val isCameraUploadsBannerImprovementEnabled: Boolean = false,
     val isCameraUploadsTransferScreenEnabled: Boolean = false,
     val cameraUploadsTransfers: List<InProgressTransfer> = emptyList(),
     val popBackFromCameraUploadsTransferScreenEvent: StateEvent = consumed

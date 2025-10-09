@@ -793,28 +793,6 @@ internal class TimelineViewModelTest {
         }
     }
 
-    @ParameterizedTest(name = "when CameraUploadsBannerImprovement is {0}")
-    @ValueSource(booleans = [true, false])
-    fun `test that isCameraUploadsBannerImprovementEnabled is updated as expected`(
-        isEnabled: Boolean,
-    ) = runTest {
-        // Set up default feature flags first
-        getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
-            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
-        }
-        whenever(getFeatureFlagValueUseCase(AppFeatures.CameraUploadsBannerImprovement))
-            .thenReturn(isEnabled)
-
-        initViewModel()
-        advanceUntilIdle()
-
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.isCameraUploadsBannerImprovementEnabled).isEqualTo(isEnabled)
-        }
-    }
-
     @ParameterizedTest(name = "when isCameraUploadsTransferScreenEnabled is {0}")
     @ValueSource(booleans = [true, false])
     fun `test that isCameraUploadsTransferScreenEnabled is updated as expected`(

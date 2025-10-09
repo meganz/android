@@ -9,27 +9,19 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarResult
-import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,12 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.DateCard
@@ -66,16 +53,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedRea
 import mega.privacy.android.shared.original.core.ui.theme.accent_050
 import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.black
-import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
-import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_038
-import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_087
 import mega.privacy.android.shared.original.core.ui.theme.white
-import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
-import mega.privacy.android.shared.original.core.ui.theme.white_alpha_038
-import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
-import mega.privacy.android.shared.original.core.ui.theme.yellow_100
-import mega.privacy.android.shared.original.core.ui.theme.yellow_700
-import mega.privacy.android.shared.original.core.ui.theme.yellow_700_alpha_015
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 
@@ -334,47 +312,38 @@ private fun HandlePhotosGridView(
                 || timelineViewState.isCameraUploadsLimitedAccess
     }
 
-    LaunchedEffect(timelineViewState.isCameraUploadsLimitedAccess) {
-        if (timelineViewState.isCameraUploadsLimitedAccess
-            && !timelineViewState.isCameraUploadsBannerImprovementEnabled
-        ) {
-            lazyGridState.scrollToItem(0)
-        }
-    }
     // Load Photos
     Column {
-        if (timelineViewState.isCameraUploadsBannerImprovementEnabled) {
-            val bannerType = getCameraUploadsBannerType(timelineViewState)
-            val pendingCount = timelineViewState.pending
+        val bannerType = getCameraUploadsBannerType(timelineViewState)
+        val pendingCount = timelineViewState.pending
 
-            when (bannerType) {
-                CameraUploadsBannerType.NoFullAccess -> {
-                    SlideBanner(visible = isWarningBannerShown) {
-                        CameraUploadsWarningBanner(
-                            bannerType = bannerType,
-                            onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
-                            onUpdateCameraUploadsLimitedAccessState = { isVisible ->
-                                isWarningBannerShown = isVisible
-                                onUpdateCameraUploadsLimitedAccessState(isVisible)
-                            }
-                        )
-                    }
+        when (bannerType) {
+            CameraUploadsBannerType.NoFullAccess -> {
+                SlideBanner(visible = isWarningBannerShown) {
+                    CameraUploadsWarningBanner(
+                        bannerType = bannerType,
+                        onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
+                        onUpdateCameraUploadsLimitedAccessState = { isVisible ->
+                            isWarningBannerShown = isVisible
+                            onUpdateCameraUploadsLimitedAccessState(isVisible)
+                        }
+                    )
                 }
+            }
 
-                else -> {
-                    SlideBanner(visible = isBannerShown) {
-                        CameraUploadsBanner(
-                            bannerType = bannerType,
-                            pendingCount = pendingCount,
-                            isTransferScreenAvailable = timelineViewState.isCameraUploadsTransferScreenEnabled,
-                            onEnableCameraUploads = onEnableCameraUploads,
-                            onNavigateToCameraUploadsTransferScreen = {
-                                if (timelineViewState.isCameraUploadsTransferScreenEnabled) {
-                                    onNavigateToCameraUploadsTransferScreen()
-                                }
-                            },
-                        )
-                    }
+            else -> {
+                SlideBanner(visible = isBannerShown) {
+                    CameraUploadsBanner(
+                        bannerType = bannerType,
+                        pendingCount = pendingCount,
+                        isTransferScreenAvailable = timelineViewState.isCameraUploadsTransferScreenEnabled,
+                        onEnableCameraUploads = onEnableCameraUploads,
+                        onNavigateToCameraUploadsTransferScreen = {
+                            if (timelineViewState.isCameraUploadsTransferScreenEnabled) {
+                                onNavigateToCameraUploadsTransferScreen()
+                            }
+                        },
+                    )
                 }
             }
         }
@@ -402,14 +371,6 @@ private fun HandlePhotosGridView(
                                 && !timelineViewState.isBusinessAccountExpired,
                         photoDownload = photoDownload,
                         onCardClick = onCardClick,
-                        cardListViewHeaderView = {
-                            if (timelineViewState.isCameraUploadsLimitedAccess) {
-                                CameraUploadsLimitedAccess(
-                                    onClick = onChangeCameraUploadsPermissions,
-                                    onClose = { onUpdateCameraUploadsLimitedAccessState(false) },
-                                )
-                            }
-                        }
                     )
                 }
             }
@@ -430,124 +391,6 @@ private fun HandlePhotosGridView(
             }
         }
     }
-}
-
-@Composable
-fun NewEnableCameraUploadsButton(onClick: () -> Unit) {
-    val isLight = MaterialTheme.colors.isLight
-
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        content = {
-            Row(
-                modifier = Modifier.padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                content = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_cu_status),
-                        contentDescription = null,
-                        tint = grey_alpha_038.takeIf { isLight } ?: white_alpha_038,
-                    )
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    Text(
-                        text = stringResource(id = R.string.enable_cu_subtitle),
-                        color = grey_alpha_087.takeIf { isLight } ?: white_alpha_087,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.W400,
-                        style = MaterialTheme.typography.body2,
-                    )
-                },
-            )
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                contentAlignment = Alignment.CenterEnd,
-                content = {
-                    Text(
-                        text = stringResource(id = R.string.settings_camera_upload_on),
-                        modifier = Modifier.clickable { onClick() },
-                        color = accent_900.takeIf { isLight } ?: accent_050,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.W500,
-                        textAlign = TextAlign.End,
-                        style = MaterialTheme.typography.button,
-                    )
-                },
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Divider(
-                color = grey_alpha_012.takeIf { isLight } ?: white_alpha_012,
-                thickness = 1.dp,
-            )
-        },
-    )
-}
-
-@Composable
-fun CameraUploadsLimitedAccess(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit = {},
-    onClose: () -> Unit = {},
-) {
-    val isLight = MaterialTheme.colors.isLight
-
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-            .background(yellow_100.takeIf { isLight } ?: yellow_700_alpha_015),
-        content = {
-            Row(
-                modifier = Modifier.padding(16.dp),
-                content = {
-                    Text(
-                        text = "${
-                            stringResource(
-                                id = R.string.camera_uploads_limited_access
-                            )
-                        } ${
-                            stringResource(
-                                id = R.string.camera_uploads_change_permissions
-                            )
-                        }",
-                        modifier = Modifier.weight(1f),
-                        color = black.takeIf { isLight } ?: yellow_700,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.W400,
-                        lineHeight = 18.sp,
-                    )
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    Column {
-                        Spacer(modifier = Modifier.height(4.dp))
-
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_close),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(12.dp)
-                                .clickable { onClose() },
-                            tint = grey_alpha_087.takeIf { isLight } ?: yellow_700,
-                        )
-                    }
-                },
-            )
-
-            if (isLight) {
-                Divider(
-                    color = grey_alpha_012,
-                    thickness = 1.dp,
-                )
-            }
-        },
-    )
 }
 
 private fun getCameraUploadsBannerType(

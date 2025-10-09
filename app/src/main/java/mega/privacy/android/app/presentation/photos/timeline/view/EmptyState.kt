@@ -38,10 +38,8 @@ import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewS
 fun EmptyState(
     timelineViewState: TimelineViewState = TimelineViewState(),
     setEnableCUPage: (Boolean) -> Unit = {},
-    onEnableCameraUploads: () -> Unit = {},
 ) {
     val enableCameraUploadButtonShowing = timelineViewState.enableCameraUploadButtonShowing
-            && !timelineViewState.isCameraUploadsBannerImprovementEnabled
     val currentMediaSource = timelineViewState.currentMediaSource
 
     if (enableCameraUploadButtonShowing && currentMediaSource != CLOUD_DRIVE) {
@@ -54,10 +52,6 @@ fun EmptyState(
         ) {
             EmptyStateContent(timelineViewState)
         }
-
-        if (enableCameraUploadButtonShowing) {
-            NewEnableCameraUploadsButton(onClick = onEnableCameraUploads)
-        }
     } else {
         Column(
             modifier = Modifier
@@ -65,10 +59,6 @@ fun EmptyState(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            if (enableCameraUploadButtonShowing) {
-                NewEnableCameraUploadsButton(onClick = onEnableCameraUploads)
-            }
-
             Spacer(modifier = Modifier.height(16.dp))
             EmptyStateContent(timelineViewState)
             Spacer(modifier = Modifier.height(16.dp))

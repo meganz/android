@@ -686,11 +686,7 @@ class PhotosFragment : Fragment() {
             }
 
             R.id.action_cu_status_warning -> {
-                if (timelineViewModel.state.value.isCameraUploadsBannerImprovementEnabled) {
-                    timelineViewModel.setCameraUploadsLimitedAccess(true)
-                } else {
-                    checkCameraUploadsPermissions(showAction = true)
-                }
+                timelineViewModel.setCameraUploadsLimitedAccess(true)
                 true
             }
 

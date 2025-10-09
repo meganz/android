@@ -151,9 +151,6 @@ fun PhotosScreen(
                         lazyGridState = timelineLazyGridState,
                         onClick = onPhotoClick,
                         onLongPress = timelineViewModel::onLongPress,
-                        onEnableCameraUploads = onNavigateCameraUploadsSettings,
-                        onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
-                        onUpdateCameraUploadsLimitedAccessState = timelineViewModel::setCameraUploadsLimitedAccess,
                         onZoomIn = onZoomIn,
                         onZoomOut = onZoomOut,
                         fileTypeIconMapper = fileTypeIconMapper
@@ -163,7 +160,6 @@ fun PhotosScreen(
                     EmptyState(
                         timelineViewState = timelineViewState,
                         setEnableCUPage = timelineViewModel::shouldEnableCUPage,
-                        onEnableCameraUploads = onNavigateCameraUploadsSettings,
                     )
                 },
                 onClickCameraUploadsSync = { /* TODO */ },

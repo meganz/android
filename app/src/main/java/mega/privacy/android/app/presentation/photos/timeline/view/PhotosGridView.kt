@@ -61,9 +61,6 @@ fun PhotosGridView(
     lazyGridState: LazyGridState = rememberLazyGridState(),
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
-    onEnableCameraUploads: () -> Unit = {},
-    onChangeCameraUploadsPermissions: () -> Unit = {},
-    onUpdateCameraUploadsLimitedAccessState: (Boolean) -> Unit = {},
     onZoomIn: () -> Unit = {},
     onZoomOut: () -> Unit = {},
 ) {
@@ -76,18 +73,9 @@ fun PhotosGridView(
         }
     }
 
-    val enableCameraUploadsBanner =
-        timelineViewState.enableCameraUploadButtonShowing
-                && !timelineViewState.showCameraUploadsWarning
-                && timelineViewState.selectedPhotoCount == 0
-                && !timelineViewState.isCameraUploadsBannerImprovementEnabled
-    val isCameraUploadsLimitedAccess = timelineViewState.isCameraUploadsLimitedAccess
-            && !timelineViewState.isCameraUploadsBannerImprovementEnabled
     val uiPhotoList = timelineViewState.photosListItems
     val currentZoomLevel = timelineViewState.currentZoomLevel
-    val potentialItems =
-        if (enableCameraUploadsBanner) 1 else 0 + if (isCameraUploadsLimitedAccess) 1 else 0
-    val totalItems = potentialItems + uiPhotoList.size + 1
+    val totalItems = uiPhotoList.size + 1
     var userScrollEnabled by remember { mutableStateOf(true) }
     val coroutineScope = rememberCoroutineScope()
     val onZoom = remember(coroutineScope) {
@@ -131,27 +119,6 @@ fun PhotosGridView(
         },
         userScrollEnabled = userScrollEnabled
     ) {
-        if (isCameraUploadsLimitedAccess) {
-            item(
-                key = "camera-uploads-limited-access-banner",
-                span = { GridItemSpan(maxLineSpan) },
-            ) {
-                CameraUploadsLimitedAccess(
-                    onClick = onChangeCameraUploadsPermissions,
-                    onClose = { onUpdateCameraUploadsLimitedAccessState(false) },
-                )
-            }
-        }
-
-        if (enableCameraUploadsBanner) {
-            item(
-                key = "enable-camera-uploads-banner",
-                span = { GridItemSpan(maxLineSpan) },
-            ) {
-                NewEnableCameraUploadsButton(onClick = onEnableCameraUploads)
-            }
-        }
-
         this.items(
             items = uiPhotoList,
             key = { it.key },
