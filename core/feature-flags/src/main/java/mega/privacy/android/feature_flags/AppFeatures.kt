@@ -48,14 +48,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Achievements Free Trial Reward
-     */
-    AchievementsFreeTrialReward(
-        "Enable achievements free trial reward",
-        true,
-    ),
-
-    /**
      * Contacts compose u i
      */
     ContactsComposeUI(

@@ -36,7 +36,6 @@ import mega.privacy.android.domain.entity.achievement.AchievementsOverview
  * @property megaVPNTrialStorage Storage by Mega VPN trial
  * @property megaPassTrialDurationInDays Duration in days for Mega Pass trial
  * @property megaVPNTrialDurationInDays Duration in days for Mega VPN trial
- * @property isFreeTrialAchievementsEnabled Is free trial achievements enabled
  *
  **/
 data class AchievementsUIState(
@@ -69,5 +68,4 @@ data class AchievementsUIState(
     val megaVPNTrialAwardDaysLeft: Long? = null,
     val megaVPNTrialAwardStorage: Long = 0,
     val megaVPNTrialDurationInDays: Int = 365,
-    val isFreeTrialAchievementsEnabled: Boolean = false,
 )

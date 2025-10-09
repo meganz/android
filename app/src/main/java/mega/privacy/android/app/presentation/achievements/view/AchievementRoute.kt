@@ -84,7 +84,6 @@ internal fun AchievementRoute(
         installDesktopAwardDaysLeft = uiState.installDesktopAwardDaysLeft,
         installDesktopAwardStorage = uiState.installDesktopAwardStorage,
         onInviteFriendsClicked = onNavigateToInviteFriends,
-        isAchievementEnabled = uiState.isFreeTrialAchievementsEnabled,
         onShowInfoAchievementsClicked = onNavigateToInfoAchievements,
         onReferBonusesClicked = onNavigateToReferralBonuses,
         onMegaVPNFreeTrialClicked = onNavigateToMegaVPNFreeTrial,
@@ -132,7 +131,6 @@ internal fun AchievementView(
     megaVPNTrialAwardStorage: Long,
     megaVPNTrialDurationInDays: Int,
     onInviteFriendsClicked: (Long) -> Unit = {},
-    isAchievementEnabled: Boolean = false,
     onShowInfoAchievementsClicked: (achievementType: AchievementType) -> Unit = {},
     onReferBonusesClicked: () -> Unit = {},
     onMegaVPNFreeTrialClicked: (Boolean, Long, Long, Int) -> Unit = { _, _, _, _ -> },
@@ -303,85 +301,83 @@ internal fun AchievementView(
                         )
                     }
 
-                    if (isAchievementEnabled) {
-                        if (hasMegaVPNTrial) {
-                            Divider(
-                                color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
-                                thickness = 1.dp
-                            )
+                    if (hasMegaVPNTrial) {
+                        Divider(
+                            color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
+                            thickness = 1.dp
+                        )
 
-                            Row(
-                                Modifier
-                                    .testTag(AchievementViewTestTags.START_MEGA_VPN_FREE_TRIAL_SECTION)
-                                    .clickable {
-                                        Analytics.tracker.trackEvent(StartMEGAVPNFreeTrialEvent)
-                                        onMegaVPNFreeTrialClicked(
-                                            megaVPNTrialAwardStorage > 0,
-                                            megaVPNTrialStorage ?: 0,
-                                            megaVPNTrialAwardStorage,
-                                            megaVPNTrialDurationInDays
+                        Row(
+                            Modifier
+                                .testTag(AchievementViewTestTags.START_MEGA_VPN_FREE_TRIAL_SECTION)
+                                .clickable {
+                                    Analytics.tracker.trackEvent(StartMEGAVPNFreeTrialEvent)
+                                    onMegaVPNFreeTrialClicked(
+                                        megaVPNTrialAwardStorage > 0,
+                                        megaVPNTrialStorage ?: 0,
+                                        megaVPNTrialAwardStorage,
+                                        megaVPNTrialDurationInDays
+                                    )
+                                }
+                        ) {
+                            AchievementListItem(
+                                iconId = iconPackR.drawable.ic_mega_vpn_free_trial,
+                                titleId = sharedR.string.title_start_mega_vpn_free_trial,
+                                zeroFiguresTitle = if (megaVPNTrialAwardStorage <= 0) {
+                                    megaVPNTrialStorage?.let {
+                                        megaVPNTrialDurationInDays.getTextByDurationInDays(
+                                            context = LocalContext.current,
+                                            daysStringId = sharedR.string.figures_storage_achievements_text,
+                                            permanentStringId = sharedR.string.figures_storage_achievements_text_permanent,
+                                            storage = it.toUnitString(LocalContext.current)
                                         )
                                     }
-                            ) {
-                                AchievementListItem(
-                                    iconId = iconPackR.drawable.ic_mega_vpn_free_trial,
-                                    titleId = sharedR.string.title_start_mega_vpn_free_trial,
-                                    zeroFiguresTitle = if (megaVPNTrialAwardStorage <= 0) {
-                                        megaVPNTrialStorage?.let {
-                                            megaVPNTrialDurationInDays.getTextByDurationInDays(
-                                                context = LocalContext.current,
-                                                daysStringId = sharedR.string.figures_storage_achievements_text,
-                                                permanentStringId = sharedR.string.figures_storage_achievements_text_permanent,
-                                                storage = it.toUnitString(LocalContext.current)
-                                            )
-                                        }
-                                    } else null,
-                                    hasFiguresTitle = if (megaVPNTrialAwardStorage > 0) {
-                                        megaVPNTrialAwardStorage.toUnitString(LocalContext.current)
-                                    } else null,
-                                    applied = megaVPNTrialAwardStorage > 0
-                                )
-                            }
+                                } else null,
+                                hasFiguresTitle = if (megaVPNTrialAwardStorage > 0) {
+                                    megaVPNTrialAwardStorage.toUnitString(LocalContext.current)
+                                } else null,
+                                applied = megaVPNTrialAwardStorage > 0
+                            )
                         }
+                    }
 
-                        if (hasMegaPassTrial) {
-                            Divider(
-                                color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
-                                thickness = 1.dp
-                            )
+                    if (hasMegaPassTrial) {
+                        Divider(
+                            color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
+                            thickness = 1.dp
+                        )
 
-                            Row(
-                                Modifier
-                                    .testTag(AchievementViewTestTags.START_MEGA_PASS_FREE_TRIAL_SECTION)
-                                    .clickable {
-                                        Analytics.tracker.trackEvent(StartMEGAPWMFreeTrialEvent)
-                                        onMegaPassFreeTrialClicked(
-                                            megaPassTrialAwardStorage > 0,
-                                            megaPassTrialStorage ?: 0,
-                                            megaPassTrialAwardStorage,
-                                            megaPassTrialDurationInDays
+                        Row(
+                            Modifier
+                                .testTag(AchievementViewTestTags.START_MEGA_PASS_FREE_TRIAL_SECTION)
+                                .clickable {
+                                    Analytics.tracker.trackEvent(StartMEGAPWMFreeTrialEvent)
+                                    onMegaPassFreeTrialClicked(
+                                        megaPassTrialAwardStorage > 0,
+                                        megaPassTrialStorage ?: 0,
+                                        megaPassTrialAwardStorage,
+                                        megaPassTrialDurationInDays
+                                    )
+                                }
+                        ) {
+                            AchievementListItem(
+                                iconId = iconPackR.drawable.ic_mega_pass_free_trial,
+                                titleId = sharedR.string.title_start_mega_pass_free_trial,
+                                zeroFiguresTitle = if (megaPassTrialAwardStorage <= 0) {
+                                    megaPassTrialStorage?.let {
+                                        megaPassTrialDurationInDays.getTextByDurationInDays(
+                                            context = LocalContext.current,
+                                            daysStringId = sharedR.string.figures_storage_achievements_text,
+                                            permanentStringId = sharedR.string.figures_storage_achievements_text_permanent,
+                                            storage = it.toUnitString(LocalContext.current)
                                         )
                                     }
-                            ) {
-                                AchievementListItem(
-                                    iconId = iconPackR.drawable.ic_mega_pass_free_trial,
-                                    titleId = sharedR.string.title_start_mega_pass_free_trial,
-                                    zeroFiguresTitle = if (megaPassTrialAwardStorage <= 0) {
-                                        megaPassTrialStorage?.let {
-                                            megaPassTrialDurationInDays.getTextByDurationInDays(
-                                                context = LocalContext.current,
-                                                daysStringId = sharedR.string.figures_storage_achievements_text,
-                                                permanentStringId = sharedR.string.figures_storage_achievements_text_permanent,
-                                                storage = it.toUnitString(LocalContext.current)
-                                            )
-                                        }
-                                    } else null,
-                                    hasFiguresTitle = if (megaPassTrialAwardStorage > 0) {
-                                        megaPassTrialAwardStorage.toUnitString(LocalContext.current)
-                                    } else null,
-                                    applied = megaPassTrialAwardStorage > 0
-                                )
-                            }
+                                } else null,
+                                hasFiguresTitle = if (megaPassTrialAwardStorage > 0) {
+                                    megaPassTrialAwardStorage.toUnitString(LocalContext.current)
+                                } else null,
+                                applied = megaPassTrialAwardStorage > 0
+                            )
                         }
                     }
                 }
@@ -412,7 +408,6 @@ fun AchievementPreview() {
             installDesktopStorage = 123,
             installDesktopAwardDaysLeft = 10,
             installDesktopAwardStorage = 0,
-            isAchievementEnabled = true,
             hasMegaVPNTrial = true,
             hasMegaPassTrial = true,
             megaPassTrialStorage = 1024 * 1024 * 1024,
@@ -450,7 +445,6 @@ fun AchievementPreviewDark() {
             installDesktopStorage = null,
             installDesktopAwardDaysLeft = 14,
             installDesktopAwardStorage = 12,
-            isAchievementEnabled = true,
             hasMegaVPNTrial = true,
             hasMegaPassTrial = true,
             megaPassTrialStorage = 123456789,

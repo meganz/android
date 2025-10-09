@@ -14,8 +14,6 @@ import mega.privacy.android.domain.entity.achievement.AwardedAchievement
 import mega.privacy.android.domain.entity.achievement.AwardedAchievementInvite
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverviewUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -34,7 +32,6 @@ class AchievementsOverviewViewModelTest {
     private val getAccountAchievementsOverviewUseCase: GetAccountAchievementsOverviewUseCase =
         mock()
     private val areAchievementsEnabled: AreAchievementsEnabledUseCase = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private lateinit var underTest: AchievementsOverviewViewModel
 
     private val fakeAchievements = AchievementsOverview(
@@ -67,8 +64,7 @@ class AchievementsOverviewViewModelTest {
     private fun initViewModel() {
         underTest = AchievementsOverviewViewModel(
             getAccountAchievementsOverviewUseCase = getAccountAchievementsOverviewUseCase,
-            areAchievementsEnabled = areAchievementsEnabled,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
+            areAchievementsEnabled = areAchievementsEnabled
         )
     }
 
@@ -95,23 +91,6 @@ class AchievementsOverviewViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
-
-    @ParameterizedTest(name = "{0}")
-    @ValueSource(booleans = [true, false])
-    fun `test that isFreeTrialAchievementsEnabled is updated correctly when getFeatureFlagValueUseCase returns`(
-        isFreeTrialAchievementsEnabled: Boolean,
-    ) = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.AchievementsFreeTrialReward)).thenReturn(
-            isFreeTrialAchievementsEnabled
-        )
-
-        initViewModel()
-        underTest.state.test {
-            assertThat(awaitItem().isFreeTrialAchievementsEnabled).isEqualTo(
-                isFreeTrialAchievementsEnabled
-            )
-        }
-    }
 
     @Test
     fun `test that currentStorage is updated as expected`() = runTest {

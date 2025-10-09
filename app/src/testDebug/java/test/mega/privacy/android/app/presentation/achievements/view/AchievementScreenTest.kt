@@ -58,7 +58,6 @@ internal class AchievementScreenTest {
         megaVPNTrialStorage: Long? = 0,
         megaVPNTrialAwardStorage: Long = 0,
         onInviteFriendsClicked: (Long) -> Unit = {},
-        isAchievementEnabled: Boolean = false,
         onShowInfoAchievementsClicked: (achievementType: AchievementType) -> Unit = {},
         onReferBonusesClicked: () -> Unit = {},
         onMegaVPNFreeTrialClicked: (Boolean, Long, Long, Int) -> Unit = { _, _, _, _ -> },
@@ -92,7 +91,6 @@ internal class AchievementScreenTest {
                 megaVPNTrialStorage = megaVPNTrialStorage,
                 megaVPNTrialAwardStorage = megaVPNTrialAwardStorage,
                 onInviteFriendsClicked = onInviteFriendsClicked,
-                isAchievementEnabled = isAchievementEnabled,
                 onShowInfoAchievementsClicked = onShowInfoAchievementsClicked,
                 onReferBonusesClicked = onReferBonusesClicked,
                 onMegaVPNFreeTrialClicked = onMegaVPNFreeTrialClicked,
@@ -163,9 +161,7 @@ internal class AchievementScreenTest {
 
     @Test
     fun `test that free trial rewards are not visible`() {
-        setComposeContent(
-            isAchievementEnabled = true,
-        )
+        setComposeContent()
 
         composeTestRule.onNodeWithTag(AchievementViewTestTags.START_MEGA_VPN_FREE_TRIAL_SECTION)
             .assertDoesNotExist()
@@ -177,7 +173,6 @@ internal class AchievementScreenTest {
     fun `test that mega vpn trial reward is visible`() {
         val onMegaVPNFreeTrialClicked = mock<(Boolean, Long, Long, Int) -> Unit>()
         setComposeContent(
-            isAchievementEnabled = true,
             hasMegaVPNTrial = true,
             onMegaVPNFreeTrialClicked = onMegaVPNFreeTrialClicked
         )
@@ -195,7 +190,6 @@ internal class AchievementScreenTest {
     fun `test that mega pass trial reward is visible`() {
         val onMegaPassFreeTrialClicked = mock<(Boolean, Long, Long, Int) -> Unit>()
         setComposeContent(
-            isAchievementEnabled = true,
             hasMegaPassTrial = true,
             onMegaPassFreeTrialClicked = onMegaPassFreeTrialClicked
         )

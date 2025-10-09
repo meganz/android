@@ -16,8 +16,6 @@ import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.AwardedAchievementInvite
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverviewUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.util.Calendar
@@ -31,7 +29,6 @@ import javax.inject.Inject
 class AchievementsOverviewViewModel @Inject constructor(
     private val getAccountAchievementsOverviewUseCase: GetAccountAchievementsOverviewUseCase,
     private val areAchievementsEnabled: AreAchievementsEnabledUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AchievementsUIState())
@@ -43,26 +40,12 @@ class AchievementsOverviewViewModel @Inject constructor(
 
     init {
         logAchievementsEnabled()
-        isFreeTrialAchievementsEnabled()
         getAchievementsInformation()
     }
 
     private fun logAchievementsEnabled() {
         viewModelScope.launch {
             Timber.d("Achievements are enabled: ${areAchievementsEnabled()}")
-        }
-    }
-
-    private fun isFreeTrialAchievementsEnabled() {
-        viewModelScope.launch {
-            val isFreeTrialAchievementsEnabled = runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.AchievementsFreeTrialReward)
-            }.onFailure {
-                Timber.e(it)
-            }.getOrDefault(false)
-            _state.update {
-                it.copy(isFreeTrialAchievementsEnabled = isFreeTrialAchievementsEnabled)
-            }
         }
     }
 
