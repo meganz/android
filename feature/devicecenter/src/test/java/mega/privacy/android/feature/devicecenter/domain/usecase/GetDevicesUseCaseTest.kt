@@ -9,7 +9,7 @@ import mega.privacy.android.domain.usecase.backup.GetDeviceIdAndNameMapUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.feature.devicecenter.domain.entity.OtherDeviceNode
 import mega.privacy.android.feature.devicecenter.domain.entity.OwnDeviceNode
-import mega.privacy.android.feature.devicecenter.domain.repository.DeviceCenterRepository
+import mega.privacy.android.feature.devicecenter.domain.usecase.mapper.DeviceNodeMapper
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -28,7 +28,7 @@ internal class GetDevicesUseCaseTest {
 
     private lateinit var underTest: GetDevicesUseCase
 
-    private val deviceCenterRepository = mock<DeviceCenterRepository>()
+    private val deviceNodeMapper = mock<DeviceNodeMapper>()
     private val getBackupInfoUseCase = mock<GetBackupInfoUseCase>()
     private val getDeviceIdAndNameMapUseCase = mock<GetDeviceIdAndNameMapUseCase>()
     private val getDeviceIdUseCase = mock<GetDeviceIdUseCase>()
@@ -36,7 +36,7 @@ internal class GetDevicesUseCaseTest {
     @BeforeAll
     fun setUp() {
         underTest = GetDevicesUseCase(
-            deviceCenterRepository = deviceCenterRepository,
+            deviceNodeMapper = deviceNodeMapper,
             getBackupInfoUseCase = getBackupInfoUseCase,
             getDeviceIdAndNameMapUseCase = getDeviceIdAndNameMapUseCase,
             getDeviceIdUseCase = getDeviceIdUseCase,
@@ -46,7 +46,7 @@ internal class GetDevicesUseCaseTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            deviceCenterRepository,
+            deviceNodeMapper,
             getBackupInfoUseCase,
             getDeviceIdAndNameMapUseCase,
             getDeviceIdUseCase,
@@ -66,7 +66,7 @@ internal class GetDevicesUseCaseTest {
             whenever(getBackupInfoUseCase()).thenReturn(backupInfoList)
             whenever(getDeviceIdAndNameMapUseCase()).thenReturn(deviceIdAndNameMap)
             whenever(
-                deviceCenterRepository.getDevices(
+                deviceNodeMapper(
                     backupInfoList = backupInfoList,
                     currentDeviceId = currentDeviceId,
                     deviceIdAndNameMap = deviceIdAndNameMap,

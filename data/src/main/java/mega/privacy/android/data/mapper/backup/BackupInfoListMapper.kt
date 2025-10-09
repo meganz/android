@@ -18,13 +18,13 @@ internal class BackupInfoListMapper @Inject constructor(
      * @param sdkBackupInfoList A potentially nullable [MegaBackupInfoList]
      * @return A list of [BackupInfo] objects
      */
-    operator fun invoke(sdkBackupInfoList: MegaBackupInfoList?): List<BackupInfo> {
-        sdkBackupInfoList?.let { backupInfoList ->
+    suspend operator fun invoke(sdkBackupInfoList: MegaBackupInfoList?): List<BackupInfo> {
+        return sdkBackupInfoList?.let { backupInfoList ->
             val backupSize = backupInfoList.size()
-            return if (backupSize <= 0) emptyList()
+            if (backupSize <= 0) emptyList()
             else (0 until backupSize).mapNotNull { index ->
                 backupInfoMapper(backupInfoList.get(index))
             }
-        } ?: return emptyList()
+        } ?: emptyList()
     }
 }

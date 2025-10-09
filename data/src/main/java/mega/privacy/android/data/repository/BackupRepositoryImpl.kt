@@ -97,9 +97,11 @@ internal class BackupRepositoryImpl @Inject constructor(
     override suspend fun getBackupInfo() = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("getBackupInfo") {
-                backupInfoListMapper(it.megaBackupInfoList)
+                it.megaBackupInfoList
             }
             megaApiGateway.getBackupInfo(listener)
+        }.let {
+            backupInfoListMapper(it)
         }
     }
 

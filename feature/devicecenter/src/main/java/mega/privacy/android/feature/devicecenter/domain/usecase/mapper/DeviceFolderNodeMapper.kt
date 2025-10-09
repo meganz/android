@@ -1,12 +1,12 @@
-package mega.privacy.android.feature.devicecenter.data.mapper
+package mega.privacy.android.feature.devicecenter.domain.usecase.mapper
 
 import mega.privacy.android.domain.entity.backup.BackupInfo
 import mega.privacy.android.domain.entity.backup.BackupInfoHeartbeatStatus
 import mega.privacy.android.domain.entity.backup.BackupInfoState
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.sync.SyncError
-import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
+import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderStatus
 import nz.mega.sdk.MegaApiJava
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject

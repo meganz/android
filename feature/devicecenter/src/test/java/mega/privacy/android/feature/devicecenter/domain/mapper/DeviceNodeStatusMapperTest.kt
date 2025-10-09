@@ -1,10 +1,11 @@
-package mega.privacy.android.feature.devicecenter.data.mapper
+package mega.privacy.android.feature.devicecenter.domain.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderStatus
+import mega.privacy.android.feature.devicecenter.domain.usecase.mapper.DeviceNodeStatusMapper
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance

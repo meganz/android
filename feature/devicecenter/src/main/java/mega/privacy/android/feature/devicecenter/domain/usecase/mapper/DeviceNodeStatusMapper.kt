@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.devicecenter.data.mapper
+package mega.privacy.android.feature.devicecenter.domain.usecase.mapper
 
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceStatus

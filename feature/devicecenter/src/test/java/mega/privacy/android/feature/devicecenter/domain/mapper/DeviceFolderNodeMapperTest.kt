@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.devicecenter.data.mapper
+package mega.privacy.android.feature.devicecenter.domain.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.backup.BackupInfo
@@ -8,8 +8,9 @@ import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.backup.BackupInfoUserAgent
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncError
-import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
+import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderStatus
+import mega.privacy.android.feature.devicecenter.domain.usecase.mapper.DeviceFolderNodeMapper
 import nz.mega.sdk.MegaApiJava
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test

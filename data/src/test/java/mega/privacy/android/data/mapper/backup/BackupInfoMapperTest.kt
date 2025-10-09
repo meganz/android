@@ -1,6 +1,8 @@
 package mega.privacy.android.data.mapper.backup
 
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.entity.backup.BackupInfo
 import mega.privacy.android.domain.entity.backup.BackupInfoHeartbeatStatus
 import mega.privacy.android.domain.entity.backup.BackupInfoState
@@ -9,6 +11,7 @@ import mega.privacy.android.domain.entity.backup.BackupInfoUserAgent
 import mega.privacy.android.domain.entity.sync.SyncError
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaBackupInfo
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaSync
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -32,6 +35,7 @@ internal class BackupInfoMapperTest {
     private val syncErrorMapper = mock<SyncErrorMapper>()
     private val backupInfoTypeMapper = mock<BackupInfoTypeMapper>()
     private val backupInfoUserAgentMapper = mock<BackupInfoUserAgentMapper>()
+    private val megaApiGateway = mock<MegaApiGateway>()
 
     // MegaBackupInfo values
     private val id = 123456L
@@ -67,6 +71,7 @@ internal class BackupInfoMapperTest {
             syncErrorMapper = syncErrorMapper,
             backupInfoTypeMapper = backupInfoTypeMapper,
             backupInfoUserAgentMapper = backupInfoUserAgentMapper,
+            megaApiGateway = megaApiGateway,
         )
     }
 
@@ -78,13 +83,16 @@ internal class BackupInfoMapperTest {
             syncErrorMapper,
             backupInfoTypeMapper,
             backupInfoUserAgentMapper,
+            megaApiGateway,
         )
     }
 
     @Test
-    fun `test that the mapping is correct`() {
+    fun `test that the mapping is correct`() = runTest {
         val sdkBackupInfo = initMegaBackupInfo()
+        val mockNode = mock<MegaNode>()
 
+        whenever(megaApiGateway.getMegaNodeByHandle(rootHandle)).thenReturn(mockNode)
         whenever(backupInfoHeartbeatStatusMapper(sdkHeartbeatStatus)).thenReturn(
             expectedHeartbeatStatus
         )
@@ -97,7 +105,7 @@ internal class BackupInfoMapperTest {
     }
 
     @Test
-    fun `test that null is returned when mega backup info is null`() {
+    fun `test that null is returned when mega backup info is null`() = runTest {
         assertThat(underTest(null)).isNull()
         verifyNoInteractions(
             backupInfoHeartbeatStatusMapper,
@@ -105,7 +113,17 @@ internal class BackupInfoMapperTest {
             syncErrorMapper,
             backupInfoTypeMapper,
             backupInfoUserAgentMapper,
+            megaApiGateway,
         )
+    }
+
+    @Test
+    fun `test that null is returned when getMegaNodeByHandle returns null`() = runTest {
+        val sdkBackupInfo = initMegaBackupInfo()
+
+        whenever(megaApiGateway.getMegaNodeByHandle(rootHandle)).thenReturn(null)
+
+        assertThat(underTest(sdkBackupInfo)).isNull()
     }
 
     /**
