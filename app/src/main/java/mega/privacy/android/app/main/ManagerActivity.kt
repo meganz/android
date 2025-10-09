@@ -156,7 +156,7 @@ import mega.privacy.android.app.middlelayer.inappupdate.InAppUpdateHandler
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
-import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
+import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragmentFactory
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
 import mega.privacy.android.app.presentation.backups.BackupsFragment
@@ -471,6 +471,9 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
     @Inject
     lateinit var syncNotificationManager: SyncNotificationManager
+
+    @Inject
+    lateinit var nodeLabelBottomSheetDialogFragmentFactory: NodeLabelBottomSheetDialogFragmentFactory
 
     private lateinit var fabButton: FloatingActionButton
     private var pendingActionsBadge: View? = null
@@ -5641,8 +5644,10 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         if (bottomSheetDialogFragment.isBottomSheetDialogShown()) {
             bottomSheetDialogFragment?.dismiss()
         }
-        bottomSheetDialogFragment = NodeLabelBottomSheetDialogFragment.newInstance(node.longValue)
-        bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
+        lifecycleScope.launch {
+            bottomSheetDialogFragment = nodeLabelBottomSheetDialogFragmentFactory.newInstance(node.longValue)
+            bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
+        }
     }
 
     fun showNodeLabelsPanel(nodeIds: List<NodeId>) {
@@ -5651,8 +5656,10 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             bottomSheetDialogFragment?.dismiss()
         }
         val handles = nodeIds.map { it.longValue }
-        bottomSheetDialogFragment = NodeLabelBottomSheetDialogFragment.newInstance(handles)
-        bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
+        lifecycleScope.launch {
+            bottomSheetDialogFragment = nodeLabelBottomSheetDialogFragmentFactory.newInstance(handles)
+            bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
+        }
     }
 
     fun showNewSortByPanel(orderType: Int) {

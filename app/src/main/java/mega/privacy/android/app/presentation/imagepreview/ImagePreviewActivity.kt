@@ -46,7 +46,7 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToImportActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
-import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
+import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragmentFactory
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
@@ -110,6 +110,9 @@ class ImagePreviewActivity : BaseActivity() {
 
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
+
+    @Inject
+    lateinit var nodeLabelBottomSheetDialogFragmentFactory: NodeLabelBottomSheetDialogFragmentFactory
 
     private val selectMoveFolderLauncher: ActivityResultLauncher<LongArray> =
         registerForActivityResult(
@@ -335,8 +338,10 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     private fun handleLabel(imageNode: ImageNode) {
-        NodeLabelBottomSheetDialogFragment.newInstance(imageNode.id.longValue)
-            .show(supportFragmentManager, TAG)
+        lifecycleScope.launch {
+            nodeLabelBottomSheetDialogFragmentFactory.newInstance(imageNode.id.longValue)
+                .show(supportFragmentManager, TAG)
+        }
     }
 
     private fun handleOpenWith(imageNode: ImageNode) {

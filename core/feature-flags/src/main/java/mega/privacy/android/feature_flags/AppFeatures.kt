@@ -191,7 +191,16 @@ enum class AppFeatures(override val description: String, private val defaultValu
     TimelinePhotosPagination(
         "Enable pagination in timeline photos",
         false,
-    );
+    ),
+
+    /**
+     * Feature flag to control the migration of NodeLabelBottomSheetDialogFragment to Kotlin.
+     */
+    NodeLabelBottomSheetDialogFragmentConversion(
+        "Convert the NodeLabelBottomSheetDialogFragment to Kotlin",
+        true
+    ),
+    ;
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =
