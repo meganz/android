@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.psa.Psa
+import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
@@ -18,18 +19,25 @@ import kotlin.time.Duration.Companion.seconds
 class MonitorPsaUseCaseTest {
     lateinit var underTest: MonitorPsaUseCase
 
-    private val fetchPsaUseCase = mock<FetchPsaUseCase?>()
+    private val fetchPsaUseCase = mock<FetchPsaUseCase>()
+    private val monitorMiscLoadedUseCase = mock<MonitorMiscLoadedUseCase>()
 
     @BeforeEach
     fun setUp() {
         underTest = MonitorPsaUseCase(
             fetchPsaUseCase = fetchPsaUseCase,
-            psaCheckFrequency = 10.seconds
+            monitorMiscLoadedUseCase = monitorMiscLoadedUseCase,
+            psaCheckFrequency = 10.seconds,
         )
     }
 
     @Test
     fun `test that fetch use case is called`() = runTest {
+        monitorMiscLoadedUseCase.stub {
+            on { invoke() }.thenReturn(kotlinx.coroutines.flow.flow {
+                emit(true)
+            })
+        }
         val currentTime: Long = 0
         underTest.invoke { currentTime }.test {
             cancelAndIgnoreRemainingEvents()
@@ -40,6 +48,11 @@ class MonitorPsaUseCaseTest {
 
     @Test
     fun `test that fetch use case is called after every check frequency`() = runTest {
+        monitorMiscLoadedUseCase.stub {
+            on { invoke() }.thenReturn(kotlinx.coroutines.flow.flow {
+                emit(true)
+            })
+        }
         fetchPsaUseCase.stub {
             onBlocking { invoke(any()) }.thenReturn(getPsa(1))
         }

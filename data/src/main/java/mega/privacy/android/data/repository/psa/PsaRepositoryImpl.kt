@@ -26,7 +26,13 @@ internal class PsaRepositoryImpl @Inject constructor(
 ) : PsaRepository {
     override suspend fun fetchPsa(refreshCache: Boolean) = withContext(ioDispatcher) {
         Timber.d("Calling fetch psa. Refresh cache: $refreshCache")
-        if (refreshCache) psaCache.set(getLatestPsa())
+        if (refreshCache) {
+            val latestPsa = getLatestPsa()
+            psaCache.set(latestPsa)
+            if (latestPsa == null) {
+                psaPreferenceGateway.setLastRequestedTime(null)
+            }
+        }
         return@withContext psaCache.get()
     }
 
@@ -42,7 +48,11 @@ internal class PsaRepositoryImpl @Inject constructor(
                                 continuation.resumeWith(Result.success(psa))
                             }
 
-                            MegaError.API_ENOENT -> continuation.resumeWith(Result.success(null))
+                            MegaError.API_ENOENT -> {
+                                Timber.i("No new Psa available")
+                                continuation.resumeWith(Result.success(null))
+                            }
+
                             else -> {
                                 Timber.e("Calling getLatestPsa failed with error code ${error.errorCode}")
                                 continuation.failWithError(error, "getLatestPsa")
