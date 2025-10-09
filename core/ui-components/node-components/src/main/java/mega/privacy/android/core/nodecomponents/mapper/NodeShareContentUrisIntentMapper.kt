@@ -1,10 +1,9 @@
-package mega.privacy.android.app.presentation.meeting.chat.view.message.attachment
+package mega.privacy.android.core.nodecomponents.mapper
 
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.FileProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.NodeShareContentUri
 import javax.inject.Inject
 
@@ -30,7 +29,7 @@ class NodeShareContentUrisIntentMapper @Inject constructor(
             val uris = content.files.map {
                 FileProvider.getUriForFile(
                     context,
-                    Constants.AUTHORITY_STRING_FILE_PROVIDER,
+                    "${context.packageName}.providers.fileprovider",
                     it
                 )
             }
@@ -43,7 +42,7 @@ class NodeShareContentUrisIntentMapper @Inject constructor(
 
         is NodeShareContentUri.RemoteContentUris -> {
             Intent(Intent.ACTION_SEND).apply {
-                type = Constants.TYPE_TEXT_PLAIN
+                type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, content.links.joinToString(separator = "\n\n"))
             }
         }

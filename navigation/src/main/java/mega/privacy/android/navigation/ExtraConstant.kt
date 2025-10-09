@@ -8,4 +8,5 @@ object ExtraConstant {
     const val NEW_CREATION_ACCOUNT = "NEW_CREATION_ACCOUNT"
     const val EXTRA_UPGRADE_ACCOUNT = "EXTRA_UPGRADE_ACCOUNT"
     const val EXTRA_ACCOUNT_TYPE = "EXTRA_ACCOUNT_TYPE"
+    const val TYPE_TEXT_PLAIN = "text/plain"
 }

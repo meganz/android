@@ -42,7 +42,8 @@ class CloudDriveFeatureDestination : FeatureDestination {
                             title = name,
                         )
                     )
-                }
+                },
+                onTransfer = transferHandler::setTransferEvent,
             )
         }
 }

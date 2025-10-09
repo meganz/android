@@ -18,6 +18,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
+import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.resources.R as sharedR
@@ -30,6 +31,7 @@ import java.util.UUID
 @Composable
 fun HandleOfflineNodeAction3(
     uiState: OfflineNodeActionsUiState,
+    applyShareContentUris: (List<File>, String) -> Intent,
     sortOrder: SortOrder = SortOrder.ORDER_NONE,
     consumeShareFilesEvent: () -> Unit = {},
     consumeShareNodeLinksEvent: () -> Unit = {},
@@ -44,8 +46,11 @@ fun HandleOfflineNodeAction3(
     EventEffect(
         event = uiState.shareFilesEvent,
         onConsumed = consumeShareFilesEvent
-    ) {
-        startShareFilesIntent(context = context, files = it)
+    ) { files ->
+        startShareFilesIntent(
+            context = context,
+            intent = applyShareContentUris(files, "*/*")
+        )
     }
 
     EventEffect(
@@ -76,16 +81,9 @@ fun HandleOfflineNodeAction3(
     }
 }
 
-private fun startShareFilesIntent(context: Context, files: List<File>) {
-    val uris = files.map(File::toUri)
-    val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
-        type = "*/*"
-        putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(uris))
-        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-    }
-    context.startActivity(
-        Intent.createChooser(shareIntent, context.getString(R.string.context_share))
-    )
+private fun startShareFilesIntent(context: Context, intent: Intent) {
+    val chooserTitle = context.getString(R.string.context_share)
+    context.startActivity(Intent.createChooser(intent, chooserTitle))
 }
 
 private fun startShareLinksIntent(context: Context, title: String?, links: String) {
@@ -97,7 +95,7 @@ private fun startShareLinksIntent(context: Context, title: String?, links: Strin
             val uniqueId = UUID.randomUUID()
             putExtra(Intent.EXTRA_SUBJECT, "${uniqueId}.url")
         }
-        type = "text/plain"
+        type = ExtraConstant.TYPE_TEXT_PLAIN
     }
     context.startActivity(
         Intent.createChooser(

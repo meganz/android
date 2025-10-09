@@ -2,12 +2,14 @@ package mega.privacy.android.core.nodecomponents.components.offline
 
 import android.content.Intent
 import app.cash.turbine.test
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeShareContentUrisIntentMapper
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
@@ -20,6 +22,7 @@ import mega.privacy.android.domain.entity.UrlFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeContentUri
+import mega.privacy.android.domain.entity.node.NodeShareContentUri
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
@@ -44,7 +47,6 @@ import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
 import java.util.stream.Stream
-import mega.privacy.android.core.nodecomponents.R
 import kotlin.time.Duration
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -57,6 +59,7 @@ class OfflineNodeActionsViewModelTest {
     private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase = mock()
     private val snackBarHandler: SnackBarHandler = mock()
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper = mock()
+    private val nodeShareContentUrisIntentMapper: NodeShareContentUrisIntentMapper = mock()
 
     private lateinit var underTest: OfflineNodeActionsViewModel
 
@@ -81,7 +84,8 @@ class OfflineNodeActionsViewModelTest {
             getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
             getOfflineFileInformationByIdUseCase = mock(),
             snackBarHandler = snackBarHandler,
-            nodeContentUriIntentMapper = nodeContentUriIntentMapper
+            nodeContentUriIntentMapper = nodeContentUriIntentMapper,
+            nodeShareContentUrisIntentMapper = nodeShareContentUrisIntentMapper
         )
     }
 
@@ -110,9 +114,9 @@ class OfflineNodeActionsViewModelTest {
 
             underTest.uiState.test {
                 val res = awaitItem()
-                Truth.assertThat(res.shareFilesEvent)
+                assertThat(res.shareFilesEvent)
                     .isInstanceOf(StateEventWithContentTriggered::class.java)
-                Truth.assertThat((res.shareFilesEvent as StateEventWithContentTriggered).content)
+                assertThat((res.shareFilesEvent as StateEventWithContentTriggered).content)
                     .containsExactly(file)
             }
         }
@@ -155,9 +159,9 @@ class OfflineNodeActionsViewModelTest {
 
             underTest.uiState.test {
                 val res = awaitItem()
-                Truth.assertThat(res.sharesNodeLinksEvent)
+                assertThat(res.sharesNodeLinksEvent)
                     .isInstanceOf(StateEventWithContentTriggered::class.java)
-                Truth.assertThat((res.sharesNodeLinksEvent as StateEventWithContentTriggered).content)
+                assertThat((res.sharesNodeLinksEvent as StateEventWithContentTriggered).content)
                     .isEqualTo("name1" to "link1\n\nlink2")
             }
         }
@@ -205,9 +209,9 @@ class OfflineNodeActionsViewModelTest {
 
         underTest.uiState.test {
             val res = awaitItem()
-            Truth.assertThat(res.openFileEvent)
+            assertThat(res.openFileEvent)
                 .isInstanceOf(StateEventWithContentTriggered::class.java)
-            Truth.assertThat((res.openFileEvent as StateEventWithContentTriggered).content)
+            assertThat((res.openFileEvent as StateEventWithContentTriggered).content)
                 .isInstanceOf(expected::class.java)
         }
     }
@@ -237,9 +241,9 @@ class OfflineNodeActionsViewModelTest {
 
             underTest.uiState.test {
                 val res = awaitItem()
-                Truth.assertThat(res.openFileEvent)
+                assertThat(res.openFileEvent)
                     .isInstanceOf(StateEventWithContentTriggered::class.java)
-                Truth.assertThat((res.openFileEvent as StateEventWithContentTriggered).content)
+                assertThat((res.openFileEvent as StateEventWithContentTriggered).content)
                     .isInstanceOf(OfflineNodeActionUiEntity.Other::class.java)
             }
         }
@@ -266,9 +270,9 @@ class OfflineNodeActionsViewModelTest {
             verify(getPathFromNodeContentUseCase).invoke(NodeContentUri.LocalContentUri(file))
             underTest.uiState.test {
                 val res = awaitItem()
-                Truth.assertThat(res.openFileEvent)
+                assertThat(res.openFileEvent)
                     .isInstanceOf(StateEventWithContentTriggered::class.java)
-                Truth.assertThat((res.openFileEvent as StateEventWithContentTriggered).content)
+                assertThat((res.openFileEvent as StateEventWithContentTriggered).content)
                     .isInstanceOf(OfflineNodeActionUiEntity.Uri::class.java)
             }
         }
@@ -339,6 +343,93 @@ class OfflineNodeActionsViewModelTest {
         verify(nodeContentUriIntentMapper).invoke(intent, nodeContentUri, "audio", true)
     }
 
+    @Test
+    fun `test that applyShareContentUris calls correct mapper with single file`() = runTest {
+        val file = mock<File> {
+            on { name } doReturn "test.txt"
+        }
+        val files = listOf(file)
+        val mimeType = "text/plain"
+        val expectedIntent = mock<Intent>()
+        val expectedContentUri = NodeShareContentUri.LocalContentUris(files)
+
+        whenever(
+            nodeShareContentUrisIntentMapper(
+                title = "test.txt",
+                content = expectedContentUri,
+                mimeType = mimeType
+            )
+        ).thenReturn(expectedIntent)
+
+        val result = underTest.applyShareContentUris(files, mimeType)
+
+        verify(nodeShareContentUrisIntentMapper).invoke(
+            title = "test.txt",
+            content = expectedContentUri,
+            mimeType = mimeType
+        )
+        assertThat(result).isEqualTo(expectedIntent)
+    }
+
+    @Test
+    fun `test that applyShareContentUris calls correct mapper with multiple files`() = runTest {
+        val file1 = mock<File> {
+            on { name } doReturn "file1.txt"
+        }
+        val file2 = mock<File> {
+            on { name } doReturn "file2.pdf"
+        }
+        val file3 = mock<File> {
+            on { name } doReturn "file3.jpg"
+        }
+        val files = listOf(file1, file2, file3)
+        val mimeType = "*/*"
+        val expectedIntent = mock<Intent>()
+        val expectedContentUri = NodeShareContentUri.LocalContentUris(files)
+
+        whenever(
+            nodeShareContentUrisIntentMapper(
+                title = "file1.txt,file2.pdf,file3.jpg",
+                content = expectedContentUri,
+                mimeType = mimeType
+            )
+        ).thenReturn(expectedIntent)
+
+        val result = underTest.applyShareContentUris(files, mimeType)
+
+        verify(nodeShareContentUrisIntentMapper).invoke(
+            title = "file1.txt,file2.pdf,file3.jpg",
+            content = expectedContentUri,
+            mimeType = mimeType
+        )
+        assertThat(result).isEqualTo(expectedIntent)
+    }
+
+    @Test
+    fun `test that applyShareContentUris handles empty file list`() = runTest {
+        val files = emptyList<File>()
+        val mimeType = "*/*"
+        val expectedIntent = mock<Intent>()
+        val expectedContentUri = NodeShareContentUri.LocalContentUris(files)
+
+        whenever(
+            nodeShareContentUrisIntentMapper(
+                title = "",
+                content = expectedContentUri,
+                mimeType = mimeType
+            )
+        ).thenReturn(expectedIntent)
+
+        val result = underTest.applyShareContentUris(files, mimeType)
+
+        verify(nodeShareContentUrisIntentMapper).invoke(
+            title = "",
+            content = expectedContentUri,
+            mimeType = mimeType
+        )
+        assertThat(result).isEqualTo(expectedIntent)
+    }
+
     @AfterEach
     fun resetMocks() {
         reset(
@@ -346,6 +437,7 @@ class OfflineNodeActionsViewModelTest {
             exportNodesUseCase,
             snackBarHandler,
             nodeContentUriIntentMapper,
+            nodeShareContentUrisIntentMapper,
             getOfflineFileUseCase,
             getPathFromNodeContentUseCase
         )

@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeShareContentUrisIntentMapper
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -22,6 +23,7 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeShareContentUri
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
@@ -44,6 +46,7 @@ class OfflineNodeActionsViewModel @Inject constructor(
     private val getOfflineFileInformationByIdUseCase: GetOfflineFileInformationByIdUseCase,
     private val snackBarHandler: SnackBarHandler,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
+    private val nodeShareContentUrisIntentMapper: NodeShareContentUrisIntentMapper,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OfflineNodeActionsUiState())
@@ -273,5 +276,17 @@ class OfflineNodeActionsViewModel @Inject constructor(
     ) {
         val contentUri = NodeContentUri.LocalContentUri(localFile)
         nodeContentUriIntentMapper(intent, contentUri, mimeType, isSupported)
+    }
+
+    fun applyShareContentUris(
+        files: List<File>,
+        mimeType: String,
+    ): Intent {
+        val contentUri = NodeShareContentUri.LocalContentUris(files)
+        return nodeShareContentUrisIntentMapper(
+            title = files.joinToString(",") { it.name },
+            content = contentUri,
+            mimeType = mimeType
+        )
     }
 }

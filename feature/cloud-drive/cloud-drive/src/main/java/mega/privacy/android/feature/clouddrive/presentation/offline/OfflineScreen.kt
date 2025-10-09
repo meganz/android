@@ -47,8 +47,11 @@ import mega.privacy.android.core.nodecomponents.list.NodeGridViewItem
 import mega.privacy.android.core.nodecomponents.list.NodeListViewItem
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.model.CloudDriveAppBarAction
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
@@ -68,6 +71,7 @@ import mega.privacy.android.icon.pack.R as iconPackR
 fun OfflineScreen(
     onBack: () -> Unit,
     onNavigateToFolder: (nodeId: Int, name: String) -> Unit,
+    onTransfer: (TransferTriggerEvent) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: OfflineViewModel = hiltViewModel(),
     actionViewModel: OfflineNodeActionsViewModel = hiltViewModel(),
@@ -77,6 +81,7 @@ fun OfflineScreen(
 
     HandleOfflineNodeAction3(
         uiState = actionUiState,
+        applyShareContentUris = actionViewModel::applyShareContentUris,
         consumeShareFilesEvent = actionViewModel::onShareFilesEventConsumed,
         consumeShareNodeLinksEvent = actionViewModel::onShareNodeLinksEventConsumed,
         consumeOpenFileEvent = actionViewModel::onOpenFileEventConsumed
@@ -95,6 +100,16 @@ fun OfflineScreen(
         onSearch = viewModel::setSearchQuery,
         consumeOpenFolderEvent = viewModel::onOpenFolderInPageEventConsumed,
         consumeOpenFileEvent = viewModel::onOpenOfflineNodeEventConsumed,
+        shareOfflineFiles = {
+            actionViewModel.handleShareOfflineNodes(
+                nodes = uiState.selectedOfflineNodes,
+                isOnline = uiState.isOnline
+            )
+        },
+        saveOfflineFilesToDevice = {
+            val nodes = uiState.selectedNodeHandles.map { NodeId(it) }
+            onTransfer(TransferTriggerEvent.CopyOfflineNode(nodes))
+        },
         modifier = modifier
     )
 }
@@ -112,6 +127,8 @@ internal fun OfflineScreen(
     onOpenFile: (OfflineFileInformation) -> Unit,
     onDismissOfflineWarning: () -> Unit,
     onSearch: (String) -> Unit,
+    shareOfflineFiles: () -> Unit,
+    saveOfflineFilesToDevice: () -> Unit,
     modifier: Modifier = Modifier,
     consumeOpenFolderEvent: () -> Unit = {},
     consumeOpenFileEvent: () -> Unit = {},
@@ -150,12 +167,12 @@ internal fun OfflineScreen(
                         }
 
                         is OfflineSelectionAction.Download -> {
-                            // Todo implement download action
+                            saveOfflineFilesToDevice()
                             deselectAll()
                         }
 
                         is OfflineSelectionAction.Share -> {
-                            // Todo implement share action
+                            shareOfflineFiles()
                             deselectAll()
                         }
                     }
