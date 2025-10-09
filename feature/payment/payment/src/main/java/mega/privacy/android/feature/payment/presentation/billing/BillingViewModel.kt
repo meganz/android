@@ -111,9 +111,8 @@ class BillingViewModel @Inject constructor(
      * Is purchased
      *
      */
-    fun isPurchased(purchase: MegaPurchase): Boolean {
-        return purchase.state == Purchase.PurchaseState.PURCHASED
-    }
+    fun isPurchased(purchase: MegaPurchase): Boolean =
+        purchase.state == Purchase.PurchaseState.PURCHASED
 
     /**
      * Mark handle billing event

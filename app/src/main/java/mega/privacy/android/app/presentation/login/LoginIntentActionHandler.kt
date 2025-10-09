@@ -284,7 +284,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                     }
                 }
             } else {
-                Timber.d("Go to ChooseAccountFragment")
+                Timber.d("Go to ChooseAccountActivity")
                 viewModel.updateIsAccountConfirmed(false)
                 if (MegaApplication.getChatManagement().isPendingJoinLink()) {
                     LoginActivity.isBackFromLoginPage = false
