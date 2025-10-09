@@ -284,10 +284,11 @@ internal class FileFacadeTest {
             val sizeColumn = 3
             val uri = mock<Uri>()
             val contentResolver = mock<ContentResolver>()
+            val projection = arrayOf(OpenableColumns.DISPLAY_NAME)
             val cursor = mock<Cursor>()
             whenever(Uri.parse(testUri)).thenReturn(uri)
             whenever(context.contentResolver) doReturn contentResolver
-            whenever(contentResolver.query(uri, null, null, null, null)) doReturn cursor
+            whenever(contentResolver.query(uri, projection, null, null, null)) doReturn cursor
             whenever(cursor.moveToFirst()) doReturn true
             whenever(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)) doReturn sizeColumn
             whenever(cursor.getString(sizeColumn)) doReturn expected
@@ -306,10 +307,11 @@ internal class FileFacadeTest {
             val sizeColumn = 2
             val uri = mock<Uri>()
             val contentResolver = mock<ContentResolver>()
+            val projection = arrayOf(OpenableColumns.SIZE)
             val cursor = mock<Cursor>()
             whenever(Uri.parse(testUri)).thenReturn(uri)
             whenever(context.contentResolver) doReturn contentResolver
-            whenever(contentResolver.query(uri, null, null, null, null)) doReturn cursor
+            whenever(contentResolver.query(uri, projection, null, null, null)) doReturn cursor
             whenever(cursor.moveToFirst()) doReturn true
             whenever(cursor.getColumnIndex(OpenableColumns.SIZE)) doReturn sizeColumn
             whenever(cursor.getLong(sizeColumn)) doReturn expected
@@ -487,6 +489,62 @@ internal class FileFacadeTest {
         }
 
     @Test
+    fun `test that getDocumentEntities returns the entities from a list of uris when DocumentFile is null`() =
+        runTest {
+            mockStatic(Uri::class.java).use {
+                val uri = mock<Uri> {
+                    on { this.scheme } doReturn "content"
+                }
+                val uriString = "content://com.android.externalstorage.documents/document/primary%3ADownload%2Ffile.txt"
+                val name = "file.txt"
+                val size = 123L
+                val lastModified = 0L
+                val expected = DocumentEntity(
+                    name = name,
+                    size = size,
+                    lastModified = lastModified,
+                    uri = UriPath(uriString),
+                )
+                val contentResolver = mock<ContentResolver>()
+                val cursor = mock<Cursor>()
+                val columnIndex = 0
+                val client = mock<ContentProviderClient>()
+
+                whenever(documentFileWrapper.fromUri(uri)) doReturn null
+                whenever(context.contentResolver) doReturn contentResolver
+                whenever(
+                    contentResolver.query(
+                        uri,
+                        arrayOf(OpenableColumns.DISPLAY_NAME),
+                        null,
+                        null,
+                        null
+                    )
+                ) doReturn cursor
+                whenever(cursor.moveToFirst()) doReturn true
+                whenever(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)) doReturn columnIndex
+                whenever(cursor.getString(columnIndex)) doReturn name
+                whenever(
+                    contentResolver.query(
+                        uri,
+                        arrayOf(OpenableColumns.SIZE),
+                        null,
+                        null,
+                        null
+                    )
+                ) doReturn cursor
+                whenever(cursor.getColumnIndex(OpenableColumns.SIZE)) doReturn columnIndex
+                whenever(cursor.getLong(columnIndex)) doReturn size
+                whenever(contentResolver.acquireContentProviderClient(uri)) doReturn null
+                whenever(uri.toString()) doReturn uriString
+
+                val actual = underTest.getDocumentEntities(listOf(uri))
+
+                assertThat(actual).containsExactly(expected)
+            }
+        }
+
+    @Test
     fun `test that getDocumentMetadata returns the mapped entity from a content uri file`() =
         runTest {
             val uri = mock<Uri> {
@@ -516,6 +574,39 @@ internal class FileFacadeTest {
             }
             val expected = DocumentMetadata(doc.name.orEmpty(), doc.isDirectory)
             whenever(documentFileWrapper.fromUri(uri)) doReturn doc
+
+            val actual = underTest.getDocumentMetadataSync(uri)
+
+            assertThat(actual).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that getDocumentMetadata returns the correct values from a content uri when DocumentFile cannot be get`() =
+        runTest {
+            val name = "file.txt"
+            val uri = mock<Uri> {
+                on { this.scheme } doReturn "content"
+            }
+            val expected = DocumentMetadata(name, false)
+            val contentResolver = mock<ContentResolver>()
+            val cursor = mock<Cursor>()
+            val projection = arrayOf(OpenableColumns.DISPLAY_NAME)
+            val columnIndex = 0
+
+            whenever(context.contentResolver) doReturn contentResolver
+            whenever(
+                contentResolver.query(
+                    uri,
+                    projection,
+                    null,
+                    null,
+                    null
+                )
+            ) doReturn cursor
+            whenever(documentFileWrapper.fromUri(uri)) doReturn null
+            whenever(cursor.moveToFirst()) doReturn true
+            whenever(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)) doReturn columnIndex
+            whenever(cursor.getString(columnIndex)) doReturn name
 
             val actual = underTest.getDocumentMetadataSync(uri)
 
