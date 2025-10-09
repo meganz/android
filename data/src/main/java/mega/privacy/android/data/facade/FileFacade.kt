@@ -454,29 +454,14 @@ internal class FileFacade @Inject constructor(
 
     override suspend fun getFileNameFromUri(uriString: String): String? = with(uriString.toUri()) {
         getDocumentFileFromUri(this)?.let { documentFile ->
-            return documentFile.name
-        }
-
-        val cursor = context.contentResolver.query(this, null, null, null, null)
-        return cursor?.use {
-            if (cursor.moveToFirst()) {
-                cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME).takeIf { it >= 0 }
-                    ?.let { cursor.getString(it) }
-            } else null
-        }
+            documentFile.name
+        } ?: getFileNameFromContentResolver(this)
     }
 
     override suspend fun getFileSizeFromUri(uriString: String): Long? =
         runCatching {
-            val cursor = context.contentResolver.query(uriString.toUri(), null, null, null, null)
-            cursor?.use {
-                if (cursor.moveToFirst()) {
-                    cursor.getColumnIndex(OpenableColumns.SIZE).takeIf { it >= 0 }
-                        ?.let { cursor.getLong(it) }
-                } else null
-            }
-        }
-            .onFailure { Timber.e(it, "Error getting file size from Uri $uriString") }
+            getFileSizeFromContentResolver(uriString.toUri())
+        }.onFailure { Timber.e(it, "Error getting file size from Uri $uriString") }
             .getOrNull()
 
     override suspend fun copyContentUriToFile(sourceUri: UriPath, targetFile: File) {
@@ -812,13 +797,50 @@ internal class FileFacade @Inject constructor(
                         it
                     }
                 }
+            } ?:
+            // We cannot get DocumentFile from some special Uris, like HyperOS Security Share.
+            // Try using content resolver to get the details.
+            getFileNameFromContentResolver(uri)?.let { name ->
+                DocumentEntity(
+                    name = name,
+                    size = getFileSizeFromContentResolver(uri) ?: 0,
+                    lastModified = getLastModifiedFromContentResolver(uri),
+                    uri = UriPath(uri.toString()),
+                )
             }
         }
     }
 
+    private fun getFileNameFromContentResolver(uri: Uri) =
+        context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
+            ?.let { cursor ->
+                cursor.use {
+                    if (cursor.moveToFirst()) {
+                        cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME).takeIf { it >= 0 }
+                            ?.let { cursor.getString(it) }
+                    } else null
+                }
+            }
+
+    private fun getFileSizeFromContentResolver(uri: Uri) =
+        context.contentResolver.query(uri, arrayOf(OpenableColumns.SIZE), null, null, null)
+            ?.let { cursor ->
+                cursor.use {
+                    if (cursor.moveToFirst()) {
+                        cursor.getColumnIndex(OpenableColumns.SIZE).takeIf { it >= 0 }
+                            ?.let { cursor.getLong(it) }
+                    } else null
+                }
+            }
+
     override fun getDocumentMetadataSync(uri: Uri): DocumentMetadata? =
         getDocumentFileFromUri(uri)?.let { doc ->
             DocumentMetadata(doc.name.orEmpty(), doc.isDirectory)
+        } ?:
+        // We cannot get DocumentFile from some special Uris, like HyperOS Security Share.
+        // Try using content resolver to get the file name.
+        getFileNameFromContentResolver(uri)?.let { name ->
+            DocumentMetadata(name, false)
         }
 
     override fun getFolderChildUrisSync(uri: Uri): List<Uri> = runCatching {
