@@ -60,7 +60,6 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/navigation_drawer_user_account_relative_layout_profile_avatar"
                     android:layout_marginTop="16dp"
-                    android:layout_marginBottom="20dp"
                     android:gravity="center_vertical"
                     android:orientation="vertical">
 
@@ -108,21 +107,20 @@
                     android:id="@+id/nv_used_space_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/navigation_drawer_account_information"
-                    android:visibility="gone">
+                    android:layout_below="@+id/navigation_drawer_account_information">
 
                     <ProgressBar
                         android:id="@+id/manager_used_space_bar"
                         style="@style/UsedSpaceProgressBar"
                         android:layout_width="match_parent"
-                        android:layout_height="2dp" />
+                        android:layout_height="2dp"
+                        android:visibility="gone" />
 
                     <TextView
                         android:id="@+id/navigation_drawer_space"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/manager_used_space_bar"
-                        android:layout_marginTop="12dp"
                         android:textAppearance="?attr/textAppearanceSubtitle2"
                         android:textSize="13sp"
                         tools:text="25 GB of 50 GB used" />

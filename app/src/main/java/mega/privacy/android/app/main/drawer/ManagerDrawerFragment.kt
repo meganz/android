@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.util.TypedValueCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -232,9 +234,7 @@ internal class ManagerDrawerFragment : Fragment() {
 
     private fun updateAccountDetailsVisibleInfo() {
         Timber.d("updateAccountDetailsVisibleInfo")
-        val storageState = viewModel.state.value.storageState
         if (isBusinessAccount) {
-            binding.nvUsedSpaceLayout.visibility = View.GONE
             binding.upgradeNavigationView.visibility = View.GONE
             binding.settingsSeparator.visibility = View.GONE
             binding.businessLabel.visibility = View.VISIBLE
@@ -243,10 +243,50 @@ internal class ManagerDrawerFragment : Fragment() {
             binding.upgradeNavigationView.isGone = myAccountInfo.accountType == Constants.PRO_FLEXI
             binding.proFlexiLabel.isVisible = binding.upgradeNavigationView.isGone
             binding.settingsSeparator.visibility = View.GONE
-            var colorString = ColorUtils.getThemeColorHexString(
-                requireContext(),
-                com.google.android.material.R.attr.colorSecondary
+        }
+        updateStorageStateInfo()
+    }
+
+    private fun updateStorageStateInfo() {
+        if (myAccountInfo.usedFormatted.isBlank()) return
+
+        val storageState = viewModel.state.value.storageState
+        var textToShow: CharSequence
+        var colorString = ColorUtils.getThemeColorHexString(
+            requireContext(),
+            com.google.android.material.R.attr.colorSecondary
+        )
+        if (isBusinessAccount || myAccountInfo.accountType == Constants.PRO_FLEXI) {
+            binding.managerUsedSpaceBar.isVisible = false
+            textToShow = String.format(
+                resources.getString(sharedR.string.navigation_drawer_used_space_only),
+                myAccountInfo.usedFormatted
+            ).spanABTextFontColour(
+                context = requireContext(),
+                aColourHex = colorString,
+                bColourHex = ColorUtils.getThemeColorHexString(
+                    requireContext(),
+                    android.R.attr.textColorPrimary
+                ),
             )
+        } else {
+            val resId = when (storageState) {
+                StorageState.Orange -> R.drawable.custom_progress_bar_horizontal_warning
+                StorageState.Red, StorageState.PayWall ->
+                    R.drawable.custom_progress_bar_horizontal_exceed
+
+                else -> R.drawable.custom_progress_bar_horizontal_ok
+            }
+            val drawable = ResourcesCompat.getDrawable(resources, resId, null)
+            binding.managerUsedSpaceBar.apply {
+                isVisible = true
+                progressDrawable = drawable
+                val progress = myAccountInfo.usedPercentage
+                val usedSpace = myAccountInfo.usedStorage
+                Timber.d("Progress: %d, Used space: %d", progress, usedSpace)
+                binding.managerUsedSpaceBar.progress = progress
+            }
+
             when (storageState) {
                 StorageState.Green -> {}
                 StorageState.Orange -> colorString =
@@ -257,7 +297,7 @@ internal class ManagerDrawerFragment : Fragment() {
 
                 else -> {}
             }
-            val textToShow = String.format(
+            textToShow = String.format(
                 resources.getString(R.string.used_space),
                 myAccountInfo.usedFormatted,
                 myAccountInfo.totalFormatted
@@ -269,23 +309,16 @@ internal class ManagerDrawerFragment : Fragment() {
                     android.R.attr.textColorPrimary
                 ),
             )
-            binding.navigationDrawerSpace.text = textToShow
-            val progress: Int = myAccountInfo.usedPercentage
-            val usedSpace: Long = myAccountInfo.usedStorage
-            Timber.d("Progress: %d, Used space: %d", progress, usedSpace)
-            binding.managerUsedSpaceBar.progress = progress
-            binding.nvUsedSpaceLayout.isVisible =
-                myAccountInfo.accountType != Constants.PRO_FLEXI && progress >= 0 && usedSpace >= 0
-        }
-        val resId = when (storageState) {
-            StorageState.Orange -> R.drawable.custom_progress_bar_horizontal_warning
-            StorageState.Red, StorageState.PayWall ->
-                R.drawable.custom_progress_bar_horizontal_exceed
 
-            else -> R.drawable.custom_progress_bar_horizontal_ok
+            binding.navigationDrawerAccountInformation.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                bottomMargin = TypedValueCompat.dpToPx(20F, resources.displayMetrics).toInt()
+            }
+            binding.navigationDrawerSpace.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin = TypedValueCompat.dpToPx(12F, resources.displayMetrics).toInt()
+            }
         }
-        val drawable = ResourcesCompat.getDrawable(resources, resId, null)
-        binding.managerUsedSpaceBar.progressDrawable = drawable
+
+        binding.navigationDrawerSpace.text = textToShow
     }
 
     private fun setNotificationsTitleSection(unread: Int) {
