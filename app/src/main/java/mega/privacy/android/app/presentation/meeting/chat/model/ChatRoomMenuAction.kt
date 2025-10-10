@@ -1,10 +1,11 @@
 package mega.privacy.android.app.presentation.meeting.chat.model
 
-import mega.privacy.android.app.R
-import mega.privacy.android.icon.pack.IconPack
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionString
 import mega.android.core.ui.model.menu.MenuActionWithoutIcon
+import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Chat room menu action.
@@ -30,7 +31,7 @@ sealed interface ChatRoomMenuAction : MenuAction {
      */
     class VideoCall(override val enabled: Boolean) : MenuActionString(
         icon = IconPack.Medium.Thin.Outline.Video,
-        descriptionRes = R.string.video_button,
+        descriptionRes = sharedR.string.start_video_call_button_text,
         testTag = TEST_TAG_VIDEO_CALL_ACTION,
     ), ChatRoomMenuAction {
         override val orderInCategory = 100

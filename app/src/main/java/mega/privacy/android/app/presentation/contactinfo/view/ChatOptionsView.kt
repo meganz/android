@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
@@ -66,7 +67,7 @@ internal fun ChatOptions() = Row(
             )
         }
         Text(
-            text = stringResource(id = R.string.video_button),
+            text = stringResource(id = sharedR.string.start_video_call_button_text),
             style = MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.textColorPrimary),
             textAlign = TextAlign.Center,
         )

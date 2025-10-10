@@ -1697,4 +1697,8 @@
         <item quantity="one">Uploading: %1$d item left</item>
         <item quantity="other">Uploading: %1$d items left</item>
     </plurals>
+    <!-- Text of the button to start a video call -->
+    <string name="start_video_call_button_text">Video</string>
+    <!-- Text of the button for recording a video -->
+    <string name="record_video_button_text">Video</string>
 </resources>

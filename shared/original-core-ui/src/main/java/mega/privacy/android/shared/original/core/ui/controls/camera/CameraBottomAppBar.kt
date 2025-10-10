@@ -50,6 +50,7 @@ import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body2medium
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Camera bottom app bar
@@ -155,7 +156,7 @@ fun CameraBottomAppBar(
                         modifier = Modifier.testTag(TEST_TAG_CAMERA_BOTTOM_APP_BAR_PHOTO)
                     )
                     TextButton(
-                        text = stringResource(id = R.string.video_button),
+                        text = stringResource(id = sharedR.string.record_video_button_text),
                         isSelected = isCaptureVideo,
                         textWidth = textWidth,
                         onClick = onToggleCaptureMode,

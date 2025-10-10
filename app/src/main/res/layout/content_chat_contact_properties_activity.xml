@@ -177,7 +177,7 @@
                         android:layout_centerHorizontal="true"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text="@string/video_button"
+                        android:text="@string/start_video_call_button_text"
                         android:textColor="?android:attr/textColorPrimary"
                         android:textSize="12sp" />
                 </RelativeLayout>

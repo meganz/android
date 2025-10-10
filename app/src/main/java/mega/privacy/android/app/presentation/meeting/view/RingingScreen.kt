@@ -37,7 +37,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.navigateToAppSettings
-import mega.privacy.android.icon.pack.R as IconR
 import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
 import mega.privacy.android.app.presentation.meeting.RingingViewModel
 import mega.privacy.android.app.presentation.meeting.model.RingingUIState
@@ -47,14 +46,16 @@ import mega.privacy.android.app.presentation.meeting.view.RingingViewTestTags.HA
 import mega.privacy.android.app.presentation.meeting.view.RingingViewTestTags.ONE_TO_ONE_AVATAR
 import mega.privacy.android.app.presentation.meeting.view.RingingViewTestTags.VIDEO_BUTTON
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
+import mega.privacy.android.icon.pack.R as IconR
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.CellButton
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.CellButtonType
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Ringing Screen
@@ -284,7 +285,7 @@ fun RingingActionButtons(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CellButton(
-            itemName = stringResource(id = R.string.upload_to_video),
+            itemName = stringResource(id = sharedR.string.start_video_call_button_text),
             modifier = Modifier.testTag(VIDEO_BUTTON),
             type = CellButtonType.On,
             enabled = true,
