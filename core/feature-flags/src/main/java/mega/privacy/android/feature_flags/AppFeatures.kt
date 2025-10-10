@@ -29,11 +29,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
         true
     ),
 
-    AudioPlaybackPosition(
-        "Enable audio playback position feature",
-        true
-    ),
-
     PhotoEditor(
         "Enable photo editor in image viewer",
         true,
@@ -84,14 +79,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     MapLocation(
         "Enable map location feature",
-        true,
-    ),
-
-    /**
-     * Enables new video player
-     */
-    NewVideoPlayer(
-        "Enable new video player",
         true,
     ),
 
