@@ -14,6 +14,7 @@ dependencies {
     // AndroidX
     implementation(androidx.navigation.compose)
     implementation(androidx.navigation3.runtime)
+    implementation(androidx.navigation3.ui)
     implementation(androidx.material3)
 
     // Core components
