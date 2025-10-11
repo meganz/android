@@ -212,7 +212,8 @@ internal fun SharesScreen(
                         uiState = incomingSharesUiState,
                         navigationHandler = navigationHandler,
                         onAction = incomingSharesViewModel::processAction,
-                        onShowNodeOptions = { visibleNodeOptionId = it }
+                        onShowNodeOptions = { visibleNodeOptionId = it },
+                        onSortNodes = incomingSharesViewModel::setSortOrder
                     )
                 }
                 addTextTabWithScrollableContent(

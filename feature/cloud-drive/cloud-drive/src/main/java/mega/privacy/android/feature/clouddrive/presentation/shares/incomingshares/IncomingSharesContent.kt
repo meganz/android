@@ -8,11 +8,14 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -24,6 +27,10 @@ import kotlinx.coroutines.isActive
 import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.core.nodecomponents.model.NodeSortOption
+import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
+import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -34,13 +41,17 @@ import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshare
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.shared.resources.R as sharedR
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IncomingSharesContent(
     uiState: IncomingSharesUiState,
     navigationHandler: NavigationHandler,
     onAction: (IncomingSharesAction) -> Unit,
     onShowNodeOptions: (NodeId) -> Unit,
+    onSortNodes: (NodeSortConfiguration) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     listState: LazyListState = rememberLazyListState(),
@@ -59,6 +70,8 @@ fun IncomingSharesContent(
     }
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
+    val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -102,7 +115,7 @@ fun IncomingSharesContent(
                 onLongClicked = { onAction(IncomingSharesAction.ItemLongClicked(it)) },
                 sortConfiguration = uiState.selectedSortConfiguration,
                 isListView = isListView,
-                onSortOrderClick = { }, // TODO
+                onSortOrderClick = { showSortBottomSheet = true },
                 onChangeViewTypeClicked = { onAction(IncomingSharesAction.ChangeViewTypeClicked) },
                 inSelectionMode = uiState.isInSelectionMode,
             )
@@ -119,6 +132,32 @@ fun IncomingSharesContent(
                 nodeName = node.name,
                 nodeSourceType = NodeSourceType.INCOMING_SHARES
             )
+        )
+    }
+
+    if (showSortBottomSheet) {
+        SortBottomSheet(
+            title = stringResource(sharedR.string.action_sort_by_header),
+            options = NodeSortOption.getOptionsForSourceType(NodeSourceType.INCOMING_SHARES),
+            sheetState = sortBottomSheetState,
+            selectedSort = SortBottomSheetResult(
+                sortOptionItem = uiState.selectedSortConfiguration.sortOption,
+                sortDirection = uiState.selectedSortConfiguration.sortDirection
+            ),
+            onSortOptionSelected = { result ->
+                result?.let {
+                    onSortNodes(
+                        NodeSortConfiguration(
+                            sortOption = it.sortOptionItem,
+                            sortDirection = it.sortDirection
+                        )
+                    )
+                    showSortBottomSheet = false
+                }
+            },
+            onDismissRequest = {
+                showSortBottomSheet = false
+            }
         )
     }
 }

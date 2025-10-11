@@ -24,11 +24,6 @@ sealed interface IncomingSharesAction {
     data object ChangeViewTypeClicked : IncomingSharesAction
 
     /**
-     * Opened file node handled action
-     */
-    data object OpenedFileNodeHandled : IncomingSharesAction
-
-    /**
      * Select all items action
      */
     data object SelectAllItems : IncomingSharesAction
