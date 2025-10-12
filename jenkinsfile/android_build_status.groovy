@@ -132,12 +132,18 @@ pipeline {
                 // Calculate build duration
                 String duration = getBuildDurationStr()
 
+                String lintSummaryMessage = ""
+                if (BUILD_STEP == "Lint Check" && !LINT_REPORT_SUMMARY_MAP.isEmpty()) {
+                    lintSummaryMessage = "\n\n" + buildLintSummaryTable(JSON_LINT_REPORT_LINK, LINT_REPORT_SUMMARY_MAP)
+                }
+
                 def failureMessage = ":x: Build Failed(Build: ${env.BUILD_NUMBER}) (Duration: ${duration})" +
                         "<br/>Failure Stage: ${BUILD_STEP}" +
                         "<br/>Last Commit Message: ${getLastCommitMessage()}" +
                         "Last Commit ID: ${env.GIT_COMMIT}" +
                         "<br/>Build Log: [${env.CONSOLE_LOG_FILE}](${jenkinsLog})" +
-                        unitTestResult
+                        unitTestResult +
+                        lintSummaryMessage
                 common.sendToMR(failureMessage)
             }
         }
@@ -330,14 +336,19 @@ pipeline {
 
                                 def lintModuleList = common.getModuleList()
 
+                                def totalFatalLintErrors = 0
                                 lintModuleList.each { module ->
                                     def lintJsonContent = generateLintSummary(module)
-                                    checkFatalErrors(lintJsonContent)
+                                    totalFatalLintErrors += checkFatalErrors(lintJsonContent)
                                     LINT_REPORT_SUMMARY_MAP.put(module, lintJsonContent)
                                 }
                                 archiveLintReports(lintModuleList)
 
                                 this.JSON_LINT_REPORT_LINK = common.uploadFileToArtifactory(LINT_REPORT_ARCHIVE)
+
+                                if (totalFatalLintErrors > 0) {
+                                    util.failPipeline("!!!!!!!! There are ${totalFatalLintErrors} fatal lint errors. Build is failing.")
+                                }
                             }
                         }
                     }
@@ -556,8 +567,8 @@ def unitTestArchiveLink(String reportPath, String archiveTargetName) {
 }
 
 /**
- * Checks if the specific module has any Fatal Errors or not. The Pipeline automatically fails if
- * at least one Fatal Error was found
+ * Checks if the specific module has any Fatal Errors and returns the count. The caller is
+ * responsible for deciding when to fail the pipeline so that all artifacts can be uploaded first.
  *
  * @param lintJsonContent A List containing the module's Lint Summary.
  * Here's a Sample Result:
@@ -568,8 +579,9 @@ def checkFatalErrors(def lintJsonContent) {
     println("Check if there are Fatal Lint errors. ${lintJsonContent}")
     def fatalCount = lintJsonContent.fatalCount as int
     if (fatalCount > 0) {
-        util.failPipeline("!!!!!!!! There are ${fatalCount} fatal lint errors. Build is failing.")
+        println("Detected ${fatalCount} fatal lint error(s).")
     }
+    return fatalCount
 }
 
 /**
@@ -614,4 +626,3 @@ String getBuildDurationStr() {
     int seconds = (int)((int)(durationMillis / 1000) % 60)
     return String.format("%dm %02ds", minutes, seconds)
 }
-
