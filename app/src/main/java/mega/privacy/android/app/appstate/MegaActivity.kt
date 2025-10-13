@@ -1,6 +1,5 @@
 package mega.privacy.android.app.appstate
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -34,8 +32,6 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginGraph3
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
-import mega.privacy.android.navigation.contract.AppDialogDestinations
-import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -47,12 +43,6 @@ class MegaActivity : ComponentActivity() {
     @Inject
     lateinit var chatRequestHandler: MegaChatRequestHandler
 
-    @Inject
-    lateinit var appDialogDestinations: Set<@JvmSuppressWildcards AppDialogDestinations>
-
-    @Serializable
-    data object LoginLoading : NavKey
-
     @Serializable
     data class LoggedInScreens(val isFromLogin: Boolean = false, val session: String) : NavKey
 
@@ -61,7 +51,6 @@ class MegaActivity : ComponentActivity() {
         this.intent = intent
     }
 
-    @SuppressLint("RememberReturnType")
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         var keepSplashScreen = true
@@ -76,7 +65,7 @@ class MegaActivity : ComponentActivity() {
             val snackbarEventsState by snackbarEventsViewModel.snackbarEventState.collectAsStateWithLifecycle()
             val snackbarHostState = remember { SnackbarHostState() }
             // This is used to recompose the LoginGraph when new login request is made
-            var fromLogin by rememberSaveable { mutableStateOf(false) }
+            var fromLogin by remember { mutableStateOf(false) }
             keepSplashScreen = state is GlobalState.Loading
 
             AndroidTheme(isDark = state.themeMode.isDarkMode()) {
@@ -102,7 +91,6 @@ class MegaActivity : ComponentActivity() {
                                 ),
                             )
                         }
-                        fromLogin = false
                     }
 
                     is GlobalState.RequireLogin -> {

@@ -7,14 +7,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainDispatcher
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.BroadcastFinishActivityUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatError
@@ -48,6 +51,7 @@ class MegaChatRequestHandler @Inject constructor(
     private val myAccountInfo: MyAccountInfo,
     private val broadcastFinishActivityUseCase: BroadcastFinishActivityUseCase,
     private val localLogoutAppUseCase: LocalLogoutAppUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : MegaChatRequestListenerInterface {
     private var isLoggingRunning = false
 
@@ -101,7 +105,14 @@ class MegaChatRequestHandler @Inject constructor(
                             Timber.d("Already in Login Activity, not necessary to launch it again")
                             return@withContext
                         }
-                        val loginIntent = Intent(application, LoginActivity::class.java).apply {
+                        val isSingleActivityEnable = runCatching {
+                            getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
+                        }.getOrDefault(false)
+                        val loginIntent = if (isSingleActivityEnable) {
+                            Intent(application, MegaActivity::class.java)
+                        } else {
+                            Intent(application, LoginActivity::class.java)
+                        }.apply {
                             putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
                             if (MegaApplication.urlConfirmationLink != null) {
                                 putExtra(
