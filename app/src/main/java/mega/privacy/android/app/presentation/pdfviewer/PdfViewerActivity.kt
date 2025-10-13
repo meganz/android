@@ -705,7 +705,9 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     }
 
     override fun finishRenameActionWithSuccess(newName: String) {
-        updateFile()
+        lifecycleScope.launch {
+            updateFile()
+        }
     }
 
     override fun actionConfirmed() {
@@ -1493,10 +1495,11 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         removeLinkDialog.show()
     }
 
-    private fun updateFile() {
-        val file: MegaNode?
+    private suspend fun updateFile() {
         if (pdfFileName != null && handle != -1L) {
-            file = megaApi.getNodeByHandle(handle)
+            val file = withContext(ioDispatcher) {
+                megaApi.getNodeByHandle(handle)
+            }
             if (file != null) {
                 Timber.d("Pdf File: $pdfFileName node file: ${file.name}")
                 if (pdfFileName != file.name) {
@@ -1513,7 +1516,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                     val localPath = FileUtil.getLocalFile(file)
                     if (localPath != null) {
                         val mediaFile = File(localPath)
-                        uri = runCatching { FileUtil.getUriForFile(this, mediaFile) }.getOrNull()
+                        uri = runCatching { FileUtil.getUriForFile(this@PdfViewerActivity, mediaFile) }.getOrNull()
 
                         if (uri == null) {
                             initStreaming(file)
@@ -1527,11 +1530,10 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         }
     }
 
-    private fun initStreaming(node: MegaNode) {
-        megaApi.initStreaming()
-        val url = megaApi.httpServerGetLocalLink(node)
-        if (url != null) {
-            uri = Uri.parse(url)
+    private suspend fun initStreaming(node: MegaNode) {
+        withContext(ioDispatcher) {
+            megaApi.initStreaming()
+            uri = megaApi.httpServerGetLocalLink(node)?.let { Uri.parse(it) }
         }
     }
 
@@ -1726,10 +1728,16 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         super.onResume()
         Timber.d("onResume")
         if (!isOffLine && !fromChat && !isFolderLink && type != Constants.FILE_LINK_ADAPTER && type != Constants.ZIP_ADAPTER) {
-            if (megaApi.getNodeByHandle(handle) == null && inside && !fromDownload) {
-                finish()
+            lifecycleScope.launch {
+                val node = withContext(ioDispatcher) {
+                    megaApi.getNodeByHandle(handle)
+                }
+                if (node == null && inside && !fromDownload) {
+                    finish()
+                    return@launch
+                }
+                updateFile()
             }
-            updateFile()
         }
     }
 
