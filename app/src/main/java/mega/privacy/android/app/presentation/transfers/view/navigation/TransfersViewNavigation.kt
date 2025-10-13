@@ -6,6 +6,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.transfers.model.TransfersViewModel
@@ -17,16 +18,26 @@ internal fun NavGraphBuilder.transfersScreen(
     onNavigateToUpgradeAccount: () -> Unit,
 ) {
     composable<TransfersNavKey> {
-        TransferRoute(onBackPress, onNavigateToUpgradeAccount)
+        val args = it.toRoute<TransfersNavKey>()
+        TransferRoute(
+            args = args,
+            onBackPress = onBackPress,
+            onNavigateToUpgradeAccount = onNavigateToUpgradeAccount
+        )
     }
 }
 
 @Composable
 private fun TransferRoute(
+    args: TransfersNavKey,
     onBackPress: () -> Unit,
     onNavigateToUpgradeAccount: () -> Unit,
 ) {
-    val viewModel = hiltViewModel<TransfersViewModel>()
+    val viewModel = hiltViewModel<TransfersViewModel, TransfersViewModel.Factory>(
+        creationCallback = { factory ->
+            factory.create(args)
+        }
+    )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     TransfersView(
@@ -70,6 +81,6 @@ internal fun EntryProviderBuilder<NavKey>.transfersScreen3(
     onNavigateToUpgradeAccount: () -> Unit,
 ) {
     entry<TransfersNavKey> {
-        TransferRoute(onBackPress, onNavigateToUpgradeAccount)
+        TransferRoute(it, onBackPress, onNavigateToUpgradeAccount)
     }
 }

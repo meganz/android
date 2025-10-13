@@ -52,6 +52,7 @@ import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOv
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
+import mega.privacy.android.navigation.destination.TransfersNavKey
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -190,7 +191,6 @@ class TransfersViewModelTest {
     }
 
     private fun initTestClass() {
-        val savedStateHandle = SavedStateHandle(mapOf(EXTRA_TAB to 0))
         underTest = TransfersViewModel(
             ioDispatcher = UnconfinedTestDispatcher(),
             monitorInProgressTransfersUseCase = monitorInProgressTransfersUseCase,
@@ -213,7 +213,7 @@ class TransfersViewModelTest {
             clearTransferErrorStatusUseCase = clearTransferErrorStatusUseCase,
             getTransferByUniqueIdUseCase = getTransferByUniqueIdUseCase,
             isTransferInErrorStatusUseCase = isTransferInErrorStatusUseCase,
-            savedStateHandle = savedStateHandle,
+            navKey = TransfersNavKey(0),
         )
     }
 

@@ -1,9 +1,10 @@
 package mega.privacy.android.app.presentation.transfers.model
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -51,15 +52,14 @@ import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUs
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * ViewModel for Transfers screen.
  *
  * @property uiState [TransfersUiState] for UI state.
  */
-@HiltViewModel
-class TransfersViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = TransfersViewModel.Factory::class)
+class TransfersViewModel @AssistedInject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorInProgressTransfersUseCase: MonitorInProgressTransfersUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
@@ -80,17 +80,15 @@ class TransfersViewModel @Inject constructor(
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
     private val clearTransferErrorStatusUseCase: ClearTransferErrorStatusUseCase,
     private val getTransferByUniqueIdUseCase: GetTransferByUniqueIdUseCase,
-    isTransferInErrorStatusUseCase: IsTransferInErrorStatusUseCase,
-    savedStateHandle: SavedStateHandle,
+    private val isTransferInErrorStatusUseCase: IsTransferInErrorStatusUseCase,
+    @Assisted private val navKey: TransfersNavKey,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TransfersUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val transfersInfo = savedStateHandle.toRoute<TransfersNavKey>()
-
     init {
-        val initialTabIndex = transfersInfo.tabIndex
+        val initialTabIndex = navKey.tabIndex
             ?: if (isTransferInErrorStatusUseCase()) {
                 FAILED_TAB_INDEX
             } else {
@@ -673,6 +671,11 @@ class TransfersViewModel @Inject constructor(
      */
     fun clearCompletedTransfer(completedTransferId: Int) {
         deleteCompletedTransfersByIds(listOf(completedTransferId))
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(navKey: TransfersNavKey): TransfersViewModel
     }
 
     companion object {

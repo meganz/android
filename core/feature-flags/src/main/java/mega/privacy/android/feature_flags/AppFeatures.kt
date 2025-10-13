@@ -39,7 +39,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     SingleActivity(
         "Enable single activity rewrite",
-        true,
+        false,
     ),
 
     /**
