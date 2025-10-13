@@ -1799,117 +1799,127 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         folderSelected = true
         parentHandleCloud = handle
 
-        when (mode) {
-            MOVE -> {
-                val parentNode = megaApi.getNodeByHandle(handle) ?: megaApi.rootNode
-                val intent = Intent()
-                intent.putExtra("MOVE_TO", parentNode?.handle)
-                intent.putExtra("MOVE_HANDLES", moveFromHandles)
-                setResult(RESULT_OK, intent)
-                Timber.d("finish!")
-                finishAndRemoveTask()
+        lifecycleScope.launch {
+            val (rootNode, parentNode) = withContext(ioDispatcher) {
+                val rootNode = runCatching {
+                    megaApi.rootNode
+                }.getOrNull()
+
+                val parentNode = runCatching {
+                    megaApi.getNodeByHandle(handle) ?: rootNode
+                }.getOrNull()
+
+                Pair(rootNode, parentNode)
             }
 
-            COPY -> {
-                val parentNode = megaApi.getNodeByHandle(handle) ?: megaApi.rootNode
-                val intent = Intent()
-                intent.putExtra("COPY_TO", parentNode?.handle)
-                intent.putExtra("COPY_HANDLES", copyFromHandles)
-                setResult(RESULT_OK, intent)
-                Timber.d("finish!")
-                finishAndRemoveTask()
+            if (parentNode == null) {
+                Timber.e("The parentNode is invalid")
+                return@launch
             }
 
-            UPLOAD, SAVE -> {
-                Timber.d("mode UPLOAD")
-                if (intent.action == ACTION_SAVE_TO_CLOUD) {
-                    logDocumentScanEvent(isCloudDrive = true)
+            when (mode) {
+                MOVE -> {
+                    val intent = Intent()
+                    intent.putExtra("MOVE_TO", parentNode.handle)
+                    intent.putExtra("MOVE_HANDLES", moveFromHandles)
+                    setResult(RESULT_OK, intent)
+                    Timber.d("finish!")
+                    finishAndRemoveTask()
                 }
-                if (viewModel.isImportingText(intent)) {
-                    val parentNode = megaApi.getNodeByHandle(handle) ?: megaApi.rootNode
-                    val info = viewModel.textInfoContent
 
-                    if (info != null) {
-                        val name =
-                            viewModel.uiState.value.namesByOriginalName[info.subject]
-                                ?: info.subject
-                        createFile(name, info.fileContent, parentNode, info.isUrl)
+                COPY -> {
+                    val intent = Intent()
+                    intent.putExtra("COPY_TO", parentNode.handle)
+                    intent.putExtra("COPY_HANDLES", copyFromHandles)
+                    setResult(RESULT_OK, intent)
+                    Timber.d("finish!")
+                    finishAndRemoveTask()
+                }
+
+                UPLOAD, SAVE -> {
+                    Timber.d("mode UPLOAD")
+                    if (intent.action == ACTION_SAVE_TO_CLOUD) {
+                        logDocumentScanEvent(isCloudDrive = true)
+                    }
+                    if (viewModel.isImportingText(intent)) {
+                        val info = viewModel.textInfoContent
+
+                        if (info != null) {
+                            val name =
+                                viewModel.uiState.value.namesByOriginalName[info.subject]
+                                    ?: info.subject
+                            createFile(name, info.fileContent, parentNode, info.isUrl)
+                        }
+
+                        return@launch
                     }
 
-                    return
+                    if (viewModel.getDocuments().isEmpty()) {
+                        viewModel.ownFilePrepareTask(this@FileExplorerActivity, intent)
+                        createAndShowProgressDialog(
+                            false,
+                            resources.getQuantityString(R.plurals.upload_prepare, 1)
+                        )
+                    } else {
+                        onIntentProcessed()
+                    }
                 }
 
-                if (viewModel.getDocuments().isEmpty()) {
-                    viewModel.ownFilePrepareTask(this, intent)
-                    createAndShowProgressDialog(
-                        false,
-                        resources.getQuantityString(R.plurals.upload_prepare, 1)
-                    )
-                } else {
-                    onIntentProcessed()
-                }
-            }
+                IMPORT -> {
+                    if (tabShown == CLOUD_TAB) {
+                        fragmentHandle = rootNode?.handle ?: INVALID_HANDLE
+                    } else if (tabShown == INCOMING_TAB) {
+                        fragmentHandle = -1
+                    }
 
-            IMPORT -> {
-                val parentNode = megaApi.getNodeByHandle(handle) ?: megaApi.rootNode
-
-                if (tabShown == CLOUD_TAB) {
-                    fragmentHandle = megaApi.rootNode?.handle ?: INVALID_HANDLE
-                } else if (tabShown == INCOMING_TAB) {
-                    fragmentHandle = -1
-                }
-
-                val intent = Intent()
-                intent.putExtra(INTENT_EXTRA_KEY_IMPORT_TO, parentNode?.handle)
-                intent.putExtra("fragmentH", fragmentHandle)
-
-                if (importChatHandles != null) {
-                    intent.putExtra("HANDLES_IMPORT_CHAT", importChatHandles)
-                }
-
-                setResult(RESULT_OK, intent)
-                Timber.d("finish!")
-                finishAndRemoveTask()
-            }
-
-            ALBUM_IMPORT -> {
-                val parentNode = megaApi.getNodeByHandle(handle) ?: megaApi.rootNode
-
-                val intent = Intent()
-                intent.putExtra(INTENT_EXTRA_KEY_IMPORT_TO, parentNode?.handle)
-                setResult(RESULT_OK, intent)
-
-                finishAndRemoveTask()
-            }
-
-            SELECT -> {
-                if (isSelectFile) {
                     val intent = Intent()
-                    intent.putExtra(EXTRA_SELECTED_FOLDER, handle)
-                    intent.putStringArrayListExtra(Constants.SELECTED_CONTACTS, selectedContacts)
+                    intent.putExtra(INTENT_EXTRA_KEY_IMPORT_TO, parentNode.handle)
+                    intent.putExtra("fragmentH", fragmentHandle)
+
+                    if (importChatHandles != null) {
+                        intent.putExtra("HANDLES_IMPORT_CHAT", importChatHandles)
+                    }
+
                     setResult(RESULT_OK, intent)
-                    finishAndRemoveTask()
-                } else {
-                    val parentNode = megaApi.getNodeByHandle(handle) ?: megaApi.rootNode
-                    val intent = Intent()
-                    intent.putExtra(EXTRA_SELECTED_FOLDER, parentNode?.handle)
-                    intent.putStringArrayListExtra(Constants.SELECTED_CONTACTS, selectedContacts)
-                    setResult(RESULT_OK, intent)
+                    Timber.d("finish!")
                     finishAndRemoveTask()
                 }
-            }
 
-            SELECT_CAMERA_FOLDER -> {
-                val parentNode = megaApi.getNodeByHandle(handle) ?: megaApi.rootNode
-                if (parentNode?.handle != -1L) {
-                    Timber.d("Successfully selected the new Cloud Drive Folder")
-                } else {
-                    Timber.e("The new Cloud Drive Folder is invalid")
+                ALBUM_IMPORT -> {
+                    val intent = Intent()
+                    intent.putExtra(INTENT_EXTRA_KEY_IMPORT_TO, parentNode.handle)
+                    setResult(RESULT_OK, intent)
+
+                    finishAndRemoveTask()
                 }
-                val intent = Intent()
-                intent.putExtra(EXTRA_MEGA_SELECTED_FOLDER, parentNode?.handle)
-                setResult(RESULT_OK, intent)
-                finishAndRemoveTask()
+
+                SELECT -> {
+                    if (isSelectFile) {
+                        val intent = Intent()
+                        intent.putExtra(EXTRA_SELECTED_FOLDER, handle)
+                        intent.putStringArrayListExtra(Constants.SELECTED_CONTACTS, selectedContacts)
+                        setResult(RESULT_OK, intent)
+                        finishAndRemoveTask()
+                    } else {
+                        val intent = Intent()
+                        intent.putExtra(EXTRA_SELECTED_FOLDER, parentNode.handle)
+                        intent.putStringArrayListExtra(Constants.SELECTED_CONTACTS, selectedContacts)
+                        setResult(RESULT_OK, intent)
+                        finishAndRemoveTask()
+                    }
+                }
+
+                SELECT_CAMERA_FOLDER -> {
+                    if (parentNode.handle != -1L) {
+                        Timber.d("Successfully selected the new Cloud Drive Folder")
+                    } else {
+                        Timber.e("The new Cloud Drive Folder is invalid")
+                    }
+                    val intent = Intent()
+                    intent.putExtra(EXTRA_MEGA_SELECTED_FOLDER, parentNode.handle)
+                    setResult(RESULT_OK, intent)
+                    finishAndRemoveTask()
+                }
             }
         }
     }
