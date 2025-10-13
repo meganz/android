@@ -72,4 +72,6 @@
 
     <!-- Menu option to delete selected items of the offline state -->
     <string name="offline_screen_selection_menu_remove_from_offline">Remove from Offline</string>
+    <!-- Confirmation message before removing something from the Offline section. -->
+    <string name="confirmation_delete_from_save_for_offline">Remove from Offline?</string>
 </resources>

@@ -10,21 +10,26 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.Offline
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineWarningMessageVisibilityUseCase
+import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodesUseCase
 import mega.privacy.android.domain.usecase.offline.SetOfflineWarningMessageVisibilityUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
+import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.OfflineNavKey
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
@@ -42,6 +47,8 @@ class OfflineViewModelTest {
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase = mock()
     private val monitorViewType: MonitorViewType = mock()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
+    private val removeOfflineNodesUseCase: RemoveOfflineNodesUseCase = mock()
+    private val snackbarEventQueue: SnackbarEventQueue = mock()
     private lateinit var underTest: OfflineViewModel
 
     @Before
@@ -69,7 +76,9 @@ class OfflineViewModelTest {
             monitorOfflineWarningMessageVisibilityUseCase = monitorOfflineWarningMessageVisibilityUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
-            monitorViewType = monitorViewType
+            monitorViewType = monitorViewType,
+            removeOfflineNodesUseCase = removeOfflineNodesUseCase,
+            snackbarEventQueue = snackbarEventQueue
         )
     }
 
@@ -439,12 +448,31 @@ class OfflineViewModelTest {
 
         initViewModel(path = path, highlightedFiles = highlighted.name)
 
-        // Test that navigateToPath doesn't throw an exception
         underTest.navigateToPath()
 
-        // Verify that the highlighted files are set correctly in the state
         assertThat(underTest.uiState.value.highlightedFiles).contains(highlighted.name)
         assertThat(underTest.uiState.value.highlightedFiles).isNotEmpty()
+    }
+
+    @Test
+    fun `test that removeOfflineNodes calls removeOfflineNodesUseCase with selected node handles`() =
+        runTest {
+            initViewModel()
+
+            val selectedHandles = listOf(123L, 456L, 789L)
+
+            underTest.removeOfflineNodes(selectedHandles)
+
+            verify(removeOfflineNodesUseCase).invoke(selectedHandles.map { NodeId(it) })
+        }
+
+    @Test
+    fun `test that removeOfflineNodes handles empty selection gracefully`() = runTest {
+        initViewModel()
+
+        underTest.removeOfflineNodes(emptyList())
+
+        verify(removeOfflineNodesUseCase, never()).invoke(any())
     }
 
     private suspend fun stubCommon() {

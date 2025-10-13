@@ -30,6 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.banner.TopWarningBanner
+import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.indicators.LargeHUD
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
@@ -52,6 +53,7 @@ import mega.privacy.android.feature.clouddrive.presentation.offline.model.Offlin
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineSelectionAction
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * OfflineScreen - A purely composable screen for displaying offline files
@@ -104,6 +106,7 @@ fun OfflineScreen(
             val nodes = uiState.selectedNodeHandles.map { NodeId(it) }
             onTransfer(TransferTriggerEvent.CopyOfflineNode(nodes))
         },
+        removeOfflineNodes = viewModel::removeOfflineNodes,
         modifier = modifier
     )
 }
@@ -123,11 +126,13 @@ internal fun OfflineScreen(
     onSearch: (String) -> Unit,
     shareOfflineFiles: () -> Unit,
     saveOfflineFilesToDevice: () -> Unit,
+    removeOfflineNodes: (List<Long>) -> Unit,
     modifier: Modifier = Modifier,
     consumeOpenFolderEvent: () -> Unit = {},
     consumeOpenFileEvent: () -> Unit = {},
 ) {
     var isSearchMode by rememberSaveable { mutableStateOf(false) }
+    var showRemoveDialog by rememberSaveable { mutableStateOf(false) }
 
     EventEffect(
         event = uiState.openFolderInPageEvent,
@@ -156,8 +161,7 @@ internal fun OfflineScreen(
                 onActionPressed = {
                     when (it) {
                         is OfflineSelectionAction.Delete -> {
-                            // Todo implement delete action
-                            deselectAll()
+                            showRemoveDialog = true
                         }
 
                         is OfflineSelectionAction.Download -> {
@@ -265,6 +269,17 @@ internal fun OfflineScreen(
                 }
             }
         }
+
+        if (showRemoveDialog) {
+            RemoveFromOfflineDialog(
+                onRemove = {
+                    removeOfflineNodes(uiState.selectedNodeHandles)
+                    deselectAll()
+                    showRemoveDialog = false
+                },
+                onCancel = { showRemoveDialog = false }
+            )
+        }
     }
 }
 
@@ -275,7 +290,7 @@ private fun OfflineContent(
     onItemLongClicked: (OfflineNodeUiItem) -> Unit,
     onMoreClicked: (OfflineNodeUiItem) -> Unit,
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp)
+    contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     val fileTypeIconMapper = remember { FileTypeIconMapper() }
 
@@ -360,4 +375,18 @@ private fun OfflineContent(
             }
         }
     }
+}
+
+@Composable
+private fun RemoveFromOfflineDialog(
+    onRemove: () -> Unit,
+    onCancel: () -> Unit
+) {
+    BasicDialog(
+        description = stringResource(R.string.confirmation_delete_from_save_for_offline),
+        positiveButtonText = stringResource(sharedResR.string.general_remove),
+        negativeButtonText = stringResource(sharedResR.string.general_dialog_cancel_button),
+        onPositiveButtonClicked = onRemove,
+        onNegativeButtonClicked = onCancel,
+    )
 }

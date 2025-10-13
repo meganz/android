@@ -15,14 +15,17 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineWarningMessageVisibilityUseCase
+import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodesUseCase
 import mega.privacy.android.domain.usecase.offline.SetOfflineWarningMessageVisibilityUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
+import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.OfflineNavKey
 import timber.log.Timber
 import java.io.File
@@ -39,6 +42,8 @@ class OfflineViewModel @AssistedInject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorViewType: MonitorViewType,
     @Assisted private val navKey: OfflineNavKey,
+    private val removeOfflineNodesUseCase: RemoveOfflineNodesUseCase,
+    private val snackbarEventQueue: SnackbarEventQueue,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(
         OfflineUiState(
@@ -302,10 +307,22 @@ class OfflineViewModel @AssistedInject constructor(
     }
 
     /**
-     * Update title
+     * Remove offline nodes
      */
-    fun updateTitle(title: String?) {
-        _uiState.update { it.copy(title = title) }
+    fun removeOfflineNodes(handles: List<Long>) {
+        viewModelScope.launch {
+            if (handles.isEmpty()) return@launch
+            val nodeHandles = handles.map { NodeId(it) }
+
+            runCatching {
+                removeOfflineNodesUseCase(nodeHandles)
+            }.onFailure {
+                Timber.e(it)
+            }.onSuccess {
+                // Todo waiting for snackbar message from content team
+                snackbarEventQueue.queueMessage("${handles.size} items removed")
+            }
+        }
     }
 
     @AssistedFactory

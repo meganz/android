@@ -495,6 +495,7 @@ class OfflineScreenTest {
         onSearch: (String) -> Unit = {},
         shareOfflineFiles: () -> Unit = {},
         saveOfflineFilesToDevice: () -> Unit = {},
+        removeOfflineNodes: (List<Long>) -> Unit = {},
     ) {
         composeRule.setContent {
             CompositionLocalProvider(LocalContext provides composeRule.activity) {
@@ -512,6 +513,7 @@ class OfflineScreenTest {
                         onSearch = onSearch,
                         shareOfflineFiles = shareOfflineFiles,
                         saveOfflineFilesToDevice = saveOfflineFilesToDevice,
+                        removeOfflineNodes = removeOfflineNodes,
                     )
                 }
             }

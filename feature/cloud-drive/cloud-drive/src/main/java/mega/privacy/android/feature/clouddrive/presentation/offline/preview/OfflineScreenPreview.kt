@@ -44,6 +44,7 @@ private fun PreviewOfflineScreenList() {
             onDismissOfflineWarning = {},
             shareOfflineFiles = {},
             saveOfflineFilesToDevice = {},
+            removeOfflineNodes = {}
         )
     }
 }
@@ -82,6 +83,7 @@ private fun PreviewOfflineScreenGrid() {
             onSearch = {},
             shareOfflineFiles = {},
             saveOfflineFilesToDevice = {},
+            removeOfflineNodes = {}
         )
     }
 }
@@ -114,6 +116,7 @@ private fun PreviewEmptyOfflineScreen() {
             onSearch = {},
             shareOfflineFiles = {},
             saveOfflineFilesToDevice = {},
+            removeOfflineNodes = {}
         )
     }
 }
@@ -146,6 +149,7 @@ private fun PreviewLoadingOfflineScreen() {
             onSearch = {},
             shareOfflineFiles = {},
             saveOfflineFilesToDevice = {},
+            removeOfflineNodes = {}
         )
     }
 }
