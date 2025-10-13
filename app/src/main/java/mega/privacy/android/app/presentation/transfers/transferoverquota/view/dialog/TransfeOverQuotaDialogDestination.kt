@@ -3,9 +3,9 @@ package mega.privacy.android.app.presentation.transfers.transferoverquota.view.d
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.dialog
+import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.scene.DialogSceneStrategy
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.login.LoginScreen
 import mega.privacy.android.app.presentation.transfers.transferoverquota.TransferOverQuotaViewModel
@@ -17,7 +17,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 data object TransferOverQuotaDialog : NavKey
 
 data object TransferOverQuotaDialogDestinations : AppDialogDestinations {
-    override val navigationGraph: NavGraphBuilder.(navigationHandler: NavigationHandler, onHandled: () -> Unit) -> Unit =
+    override val navigationGraph: EntryProviderBuilder<NavKey>.(NavigationHandler, () -> Unit) -> Unit =
         { navigationHandler, onHandled ->
             transferOverQuotaDialogDestination(
                 navigateBack = navigationHandler::back,
@@ -27,12 +27,14 @@ data object TransferOverQuotaDialogDestinations : AppDialogDestinations {
         }
 }
 
-fun NavGraphBuilder.transferOverQuotaDialogDestination(
+fun EntryProviderBuilder<NavKey>.transferOverQuotaDialogDestination(
     navigateBack: () -> Unit,
     navigate: (NavKey) -> Unit,
     onDialogHandled: () -> Unit,
 ) {
-    dialog<TransferOverQuotaDialog> {
+    entry<TransferOverQuotaDialog>(
+        metadata = DialogSceneStrategy.dialog()
+    ) {
         val viewModel = hiltViewModel<TransferOverQuotaViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

@@ -63,8 +63,8 @@ internal fun DriveSyncScreen(
     setNavigationItemVisibility: (Boolean) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     openSearch: (Boolean, Long, NodeSourceType) -> Unit,
+    cloudDriveViewModel: CloudDriveViewModel,
     viewModel: DriveSyncViewModel = hiltViewModel(),
-    cloudDriveViewModel: CloudDriveViewModel = hiltViewModel(),
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel()
 ) {
     val cloudDriveUiState by cloudDriveViewModel.uiState.collectAsStateWithLifecycle()

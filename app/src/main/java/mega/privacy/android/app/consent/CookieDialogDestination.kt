@@ -3,11 +3,12 @@ package mega.privacy.android.app.consent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.dialog
+import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.scene.DialogSceneStrategy
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import mega.android.core.ui.components.LocalSnackBarHostState
@@ -20,12 +21,18 @@ import mega.privacy.android.navigation.destination.WebSiteNavKey
 @Serializable
 data object CookieDialog : NavKey
 
-fun NavGraphBuilder.cookieDialogDestination(
+fun EntryProviderBuilder<NavKey>.cookieDialogDestination(
     navigateBack: () -> Unit,
     navigate: (NavKey) -> Unit,
     onDialogHandled: () -> Unit,
 ) {
-    dialog<CookieDialog> {
+    entry<CookieDialog>(
+        metadata = DialogSceneStrategy.dialog(
+            DialogProperties(
+                windowTitle = "Route B dialog"
+            )
+        )
+    ) {
         val viewmodel = hiltViewModel<CookieConsentViewModel>()
         val uiState by viewmodel.state.collectAsStateWithLifecycle()
 

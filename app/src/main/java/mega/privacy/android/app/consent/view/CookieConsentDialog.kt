@@ -41,14 +41,14 @@ fun CookieConsentDialog(
         imagePainter = painterResource(R.drawable.il_cookie),
         positiveButtonText = stringResource(R.string.preference_cookies_accept),
         onPositiveButtonClicked = {
-            onAcceptCookies()
             closeDialog()
+            onAcceptCookies()
         },
         negativeButtonText = stringResource(R.string.settings_about_cookie_settings),
         onNegativeButtonClicked = {
             onAcceptEssentialCookies()
-            onOpenCookieSettings()
             closeDialog()
+            onOpenCookieSettings()
         },
     )
 }

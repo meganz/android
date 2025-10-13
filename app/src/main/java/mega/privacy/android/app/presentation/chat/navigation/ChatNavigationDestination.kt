@@ -2,19 +2,17 @@ package mega.privacy.android.app.presentation.chat.navigation
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
+import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 
-fun NavGraphBuilder.chatLegacyDestination(removeDestination: () -> Unit) {
-    composable<ChatNavKey> {
+fun EntryProviderBuilder<NavKey>.chatLegacyDestination(removeDestination: () -> Unit) {
+    entry<ChatNavKey> { key ->
         val context = LocalContext.current
         val megaNavigator = rememberMegaNavigator()
-        val chat = it.toRoute<ChatNavKey>()
         LaunchedEffect(Unit) {
-            megaNavigator.openChat(context, chat.chatId, chat.action)
+            megaNavigator.openChat(context, key.chatId, key.action)
             removeDestination()
         }
     }

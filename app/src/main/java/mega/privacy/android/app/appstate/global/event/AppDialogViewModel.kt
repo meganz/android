@@ -53,5 +53,4 @@ class AppDialogViewModel @Inject constructor(
             eventHandledSignal.emit(Unit)
         }
     }
-
 }

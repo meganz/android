@@ -1,9 +1,10 @@
 package mega.privacy.android.feature.clouddrive.presentation.rubbishbin
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -54,7 +55,6 @@ import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.model.New
 import mega.privacy.android.navigation.destination.RubbishBinNavKey
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * M3 ViewModel for RubbishBin using new NodeUiItem model
@@ -69,8 +69,8 @@ import javax.inject.Inject
  * @param nodeUiItemMapper [mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper] to convert TypedNode to NodeUiItem
  * @param nodeSortConfigurationUiMapper [mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper] for sort configuration mapping
  */
-@HiltViewModel
-class NewRubbishBinViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = NewRubbishBinViewModel.Factory::class)
+class NewRubbishBinViewModel @AssistedInject constructor(
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val getParentNodeUseCase: GetParentNodeUseCase,
     private val getRubbishBinNodeChildrenUseCase: GetRubbishBinNodeChildrenUseCase,
@@ -89,9 +89,9 @@ class NewRubbishBinViewModel @Inject constructor(
     private val cleanRubbishBinUseCase: CleanRubbishBinUseCase,
     private val nodeUiItemMapper: NodeUiItemMapper,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
-    savedStateHandle: SavedStateHandle,
+    @Assisted private val navKey: RubbishBinNavKey,
 ) : ViewModel() {
-    private val args = savedStateHandle.toRoute<RubbishBinNavKey>()
+    private val args = navKey
 
     /**
      * The RubbishBin UI State
@@ -124,6 +124,7 @@ class NewRubbishBinViewModel @Inject constructor(
 
     private fun setRubbishBinFolderHandle() {
         viewModelScope.launch {
+            Timber.d("Rubbish bin handle: ${args.handle}")
             runCatching {
                 args.handle ?: getRubbishBinFolderUseCase()?.id?.longValue
                 ?: MegaApiJava.INVALID_HANDLE
@@ -482,5 +483,10 @@ class NewRubbishBinViewModel @Inject constructor(
         _uiState.update {
             it.copy(openFolderEvent = consumed())
         }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(navKey: RubbishBinNavKey): NewRubbishBinViewModel
     }
 }

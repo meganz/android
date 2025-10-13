@@ -5,9 +5,9 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.dialog
+import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.scene.DialogSceneStrategy
 import com.google.android.ump.UserMessagingPlatform
 import de.palm.composestateevents.EventEffect
 import kotlinx.serialization.Serializable
@@ -16,11 +16,13 @@ import mega.privacy.android.app.consent.model.AdsConsentState
 @Serializable
 data object AdConsentDialog : NavKey
 
-fun NavGraphBuilder.adConsentDialogDestination(
+fun EntryProviderBuilder<NavKey>.adConsentDialogDestination(
     navigateBack: () -> Unit,
     onDialogHandled: () -> Unit,
 ) {
-    dialog<AdConsentDialog> {
+    entry<AdConsentDialog>(
+        metadata = DialogSceneStrategy.dialog()
+    ) {
         val viewModel = hiltViewModel<AdsConsentViewModel>()
         val uiState by viewModel.state.collectAsStateWithLifecycle()
         val activity = LocalActivity.current
@@ -63,7 +65,6 @@ fun NavGraphBuilder.adConsentDialogDestination(
                     onDialogHandled()
                 }
             }
-
         }
     }
 }

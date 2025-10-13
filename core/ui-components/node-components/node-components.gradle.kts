@@ -48,6 +48,7 @@ dependencies {
     implementation(google.services.mlkit.document.scanner)
     implementation(androidx.navigation3.runtime)
     implementation(lib.mega.analytics)
+    implementation(androidx.navigation3.ui)
 
     //test
     testImplementation(project(":core-test"))

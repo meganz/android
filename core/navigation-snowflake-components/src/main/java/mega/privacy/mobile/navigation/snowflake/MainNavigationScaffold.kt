@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastFirst
+import androidx.navigation3.runtime.NavKey
 import kotlinx.collections.immutable.ImmutableSet
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.analytics.Analytics
@@ -49,8 +50,8 @@ val DefaultNavigationAnimationConfig = NavigationAnimationConfig(
 fun MainNavigationScaffold(
     modifier: Modifier = Modifier,
     mainNavItems: ImmutableSet<NavigationItem>,
-    onDestinationClick: (Any) -> Unit,
-    isSelected: (Any) -> Boolean,
+    onDestinationClick: (NavKey) -> Unit,
+    isSelected: (NavKey) -> Boolean,
     animationConfig: NavigationAnimationConfig = DefaultNavigationAnimationConfig,
     mainNavItemIcon: @Composable (ImageVector, String, Modifier) -> Unit = { icon, label, modifier ->
         MainNavigationIcon(
@@ -104,8 +105,8 @@ private fun MegaNavigationSuite(
     orderedItems: List<NavigationItem>,
     mainNavItemIcon: @Composable ((ImageVector, String, Modifier) -> Unit),
     mainNavItemBadge: @Composable ((String) -> Unit),
-    isSelected: (Any) -> Boolean,
-    onDestinationClick: (Any) -> Unit,
+    isSelected: (NavKey) -> Boolean,
+    onDestinationClick: (NavKey) -> Unit,
 ) {
     val scaffoldColors = NavigationScaffoldColors.scaffoldColors()
     val itemColors = NavigationScaffoldColors.itemColors()

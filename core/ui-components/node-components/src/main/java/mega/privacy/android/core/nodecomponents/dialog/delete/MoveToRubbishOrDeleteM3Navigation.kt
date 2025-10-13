@@ -1,10 +1,9 @@
 package mega.privacy.android.core.nodecomponents.dialog.delete
 
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.dialog
-import androidx.navigation.toRoute
+import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.scene.DialogSceneStrategy
+import androidx.compose.ui.window.DialogProperties
 import kotlinx.serialization.Serializable
 
 /**
@@ -24,15 +23,19 @@ data class MoveToRubbishOrDeleteDialogArgs(
  *
  * @param onBack Callback when navigating back
  */
-internal fun NavGraphBuilder.moveToRubbishOrDeleteDialogM3(
+internal fun EntryProviderBuilder<NavKey>.moveToRubbishOrDeleteDialogM3(
     onBack: () -> Unit,
 ) {
-    dialog<MoveToRubbishOrDeleteDialogArgs> {
-        val args = it.toRoute<MoveToRubbishOrDeleteDialogArgs>()
-
+    entry<MoveToRubbishOrDeleteDialogArgs>(
+        metadata = DialogSceneStrategy.dialog(
+            DialogProperties(
+                windowTitle = "Move to Rubbish or Delete Dialog"
+            )
+        )
+    ) { key ->
         MoveToRubbishOrDeleteNodeDialogM3(
-            nodes = args.nodeHandles,
-            isNodeInRubbish = args.isInRubbish,
+            nodes = key.nodeHandles,
+            isNodeInRubbish = key.isInRubbish,
             onDismiss = onBack
         )
     }

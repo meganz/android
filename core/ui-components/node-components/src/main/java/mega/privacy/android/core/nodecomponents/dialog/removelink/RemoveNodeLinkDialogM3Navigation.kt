@@ -1,24 +1,29 @@
 package mega.privacy.android.core.nodecomponents.dialog.removelink
 
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.dialog
-import androidx.navigation.toRoute
+import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.scene.DialogSceneStrategy
+import androidx.compose.ui.window.DialogProperties
 import kotlinx.serialization.Serializable
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 
 @Serializable
 data class RemoveNodeLinkDialogNavKey(val nodes: String) : NavKey
 
-fun NavGraphBuilder.removeNodeLinkDialogM3(
+fun EntryProviderBuilder<NavKey>.removeNodeLinkDialogM3(
     onDismiss: () -> Unit,
 ) {
-    dialog<RemoveNodeLinkDialogNavKey> {
-        val args = it.toRoute<RemoveNodeLinkDialogNavKey>()
+    entry<RemoveNodeLinkDialogNavKey>(
+        metadata = DialogSceneStrategy.dialog(
+            DialogProperties(
+                windowTitle = "Remove Node Link Dialog"
+            )
+        )
+    ) { key ->
         val mapper = NodeHandlesToJsonMapper()
 
         RemoveNodeLinkDialogM3(
-            nodes = mapper(args.nodes),
+            nodes = mapper(key.nodes),
             onDismiss = onDismiss,
         )
     }

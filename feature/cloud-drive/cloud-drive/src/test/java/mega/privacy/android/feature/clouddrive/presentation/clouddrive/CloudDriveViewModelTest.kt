@@ -1,8 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.clouddrive
 
 
-import androidx.lifecycle.SavedStateHandle
-import androidx.navigation.testing.invoke
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -152,9 +150,7 @@ class CloudDriveViewModelTest {
         monitorStorageStateUseCase = monitorStorageStateUseCase,
         monitorAlmostFullStorageBannerVisibilityUseCase = monitorAlmostFullStorageBannerVisibilityUseCase,
         setAlmostFullStorageBannerClosingTimestampUseCase = setAlmostFullStorageBannerClosingTimestampUseCase,
-        savedStateHandle = SavedStateHandle.Companion.invoke(
-            route = CloudDriveNavKey(nodeHandle)
-        ),
+        navKey = CloudDriveNavKey(nodeHandle),
     )
 
     private suspend fun setupTestData(items: List<TypedNode>) {

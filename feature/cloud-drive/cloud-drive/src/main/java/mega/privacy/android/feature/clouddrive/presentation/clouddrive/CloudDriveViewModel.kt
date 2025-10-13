@@ -1,9 +1,10 @@
 package mega.privacy.android.feature.clouddrive.presentation.clouddrive
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -55,10 +56,9 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import timber.log.Timber
-import javax.inject.Inject
 
-@HiltViewModel
-class CloudDriveViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = CloudDriveViewModel.Factory::class)
+class CloudDriveViewModel @AssistedInject constructor(
     private val getNodeNameByIdUseCase: GetNodeNameByIdUseCase,
     private val getFileBrowserNodeChildrenUseCase: GetFileBrowserNodeChildrenUseCase,
     private val setViewTypeUseCase: SetViewType,
@@ -78,18 +78,17 @@ class CloudDriveViewModel @Inject constructor(
     private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
     private val monitorAlmostFullStorageBannerVisibilityUseCase: MonitorAlmostFullStorageBannerVisibilityUseCase,
     private val setAlmostFullStorageBannerClosingTimestampUseCase: SetAlmostFullStorageBannerClosingTimestampUseCase,
-    savedStateHandle: SavedStateHandle,
+    @Assisted private val navKey: CloudDriveNavKey,
 ) : ViewModel() {
 
-    private val args = savedStateHandle.toRoute<CloudDriveNavKey>()
-    private val highlightedNodeId = args.highlightedNodeHandle?.let { NodeId(it) }
-    private val highlightedNodeNames = args.highlightedNodeNames
-    internal val nodeSourceType = args.nodeSourceType
+    private val highlightedNodeId = navKey.highlightedNodeHandle?.let { NodeId(it) }
+    private val highlightedNodeNames = navKey.highlightedNodeNames
+    internal val nodeSourceType = navKey.nodeSourceType
     private val _uiState = MutableStateFlow(
         CloudDriveUiState(
-            title = LocalizedText.Literal(args.nodeName ?: ""),
-            currentFolderId = NodeId(args.nodeHandle),
-            isCloudDriveRoot = args.nodeHandle == -1L,
+            title = LocalizedText.Literal(navKey.nodeName ?: ""),
+            currentFolderId = NodeId(navKey.nodeHandle),
+            isCloudDriveRoot = navKey.nodeHandle == -1L,
         )
     )
     internal val uiState = _uiState.asStateFlow()
@@ -239,7 +238,7 @@ class CloudDriveViewModel @Inject constructor(
 
     private fun monitorNodeUpdates() {
         viewModelScope.launch {
-            monitorNodeUpdatesByIdUseCase(NodeId(args.nodeHandle)).collectLatest { change ->
+            monitorNodeUpdatesByIdUseCase(NodeId(navKey.nodeHandle)).collectLatest { change ->
                 if (change == NodeChanges.Remove) {
                     // If current folder is moved to rubbish bin, navigate back
                     _uiState.update {
@@ -507,5 +506,10 @@ class CloudDriveViewModel @Inject constructor(
                 setAlmostFullStorageBannerClosingTimestampUseCase()
             }.onFailure { Timber.e(it) }
         }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(navKey: CloudDriveNavKey): CloudDriveViewModel
     }
 }

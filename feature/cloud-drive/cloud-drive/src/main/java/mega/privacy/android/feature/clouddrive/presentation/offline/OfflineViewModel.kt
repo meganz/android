@@ -1,9 +1,10 @@
 package mega.privacy.android.feature.clouddrive.presentation.offline
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -25,28 +26,26 @@ import mega.privacy.android.feature.clouddrive.presentation.offline.model.Offlin
 import mega.privacy.android.navigation.destination.OfflineNavKey
 import timber.log.Timber
 import java.io.File
-import javax.inject.Inject
 
 /**
  * ViewModel for the OfflineScreen
  */
-@HiltViewModel
-class OfflineViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+@HiltViewModel(assistedFactory = OfflineViewModel.Factory::class)
+class OfflineViewModel @AssistedInject constructor(
     private val getOfflineNodesByParentIdUseCase: GetOfflineNodesByParentIdUseCase,
     private val setOfflineWarningMessageVisibilityUseCase: SetOfflineWarningMessageVisibilityUseCase,
     private val monitorOfflineWarningMessageVisibilityUseCase: MonitorOfflineWarningMessageVisibilityUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorViewType: MonitorViewType,
+    @Assisted private val navKey: OfflineNavKey,
 ) : ViewModel() {
-    private val args = savedStateHandle.toRoute<OfflineNavKey>()
     private val _uiState = MutableStateFlow(
         OfflineUiState(
-            nodeId = args.nodeId,
-            title = args.title,
-            path = args.path,
-            highlightedFiles = args
+            nodeId = navKey.nodeId,
+            title = navKey.title,
+            path = navKey.path,
+            highlightedFiles = navKey
                 .highlightedFiles
                 ?.split(",")
                 ?.toSet()
@@ -72,7 +71,7 @@ class OfflineViewModel @Inject constructor(
      * Navigates to the specified path, if exists
      */
     fun navigateToPath() {
-        val path = args.path
+        val path = navKey.path
         if (path.isNullOrBlank() || path == File.separator) return
         isLoadingChildFolders(true)
         viewModelScope.launch {
@@ -309,4 +308,8 @@ class OfflineViewModel @Inject constructor(
         _uiState.update { it.copy(title = title) }
     }
 
+    @AssistedFactory
+    interface Factory {
+        fun create(navKey: OfflineNavKey): OfflineViewModel
+    }
 }

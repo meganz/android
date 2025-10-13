@@ -1,20 +1,24 @@
 package mega.privacy.android.core.nodecomponents.dialog.contact
 
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.dialog
-import androidx.navigation.toRoute
+import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.scene.DialogSceneStrategy
+import androidx.compose.ui.window.DialogProperties
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class CannotVerifyContactDialogNavKey(val email: String) : NavKey
 
-fun NavGraphBuilder.cannotVerifyContactDialogM3(
+fun EntryProviderBuilder<NavKey>.cannotVerifyContactDialogM3(
     onBack: () -> Unit,
 ) {
-    dialog<CannotVerifyContactDialogNavKey> {
-        val args = it.toRoute<CannotVerifyContactDialogNavKey>()
-
-        CannotVerifyContactDialogM3(email = args.email, onDismiss = onBack)
+    entry<CannotVerifyContactDialogNavKey>(
+        metadata = DialogSceneStrategy.dialog(
+            DialogProperties(
+                windowTitle = "Cannot Verify Contact Dialog"
+            )
+        )
+    ) { key ->
+        CannotVerifyContactDialogM3(email = key.email, onDismiss = onBack)
     }
 }

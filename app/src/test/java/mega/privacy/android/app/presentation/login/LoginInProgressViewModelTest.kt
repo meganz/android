@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.login
 
-import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -15,6 +14,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.triggeredContent
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.Progress
@@ -106,8 +106,6 @@ class LoginInProgressViewModelTest {
     }
 
     private fun initViewModel() {
-        val savedStateHandle = SavedStateHandle(mapOf("session" to "test-session"))
-
         underTest = LoginInProgressViewModel(
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             rootNodeExistsUseCase = rootNodeExistsUseCase,
@@ -120,8 +118,11 @@ class LoginInProgressViewModelTest {
             resetChatSettingsUseCase = resetChatSettingsUseCase,
             monitorAccountBlockedUseCase = monitorAccountBlockedUseCase,
             isMegaApiLoggedInUseCase = isMegaApiLoggedInUseCase,
-            savedStateHandle = savedStateHandle,
-            getUserDataUseCase = getUserDataUseCase
+            getUserDataUseCase = getUserDataUseCase,
+            route = MegaActivity.LoggedInScreens(
+                isFromLogin = false,
+                session = "test-session"
+            )
         )
     }
 

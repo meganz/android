@@ -6,42 +6,26 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
 import mega.android.core.ui.components.LocalSnackBarHostState
-import mega.privacy.android.app.appstate.content.model.AppContentState
-import mega.privacy.android.app.appstate.content.navigation.NavigationHandlerImpl
-import mega.privacy.android.app.appstate.content.navigation.view.MainNavigationScaffoldDestination
-import mega.privacy.android.app.appstate.content.navigation.view.mainNavigationScaffold
-import mega.privacy.android.app.appstate.transfer.AppTransferViewModel
-import mega.privacy.android.app.appstate.transfer.TransferHandlerImpl
+import mega.privacy.android.app.appstate.content.navigation.view.MainNavigationScaffold
+import mega.privacy.android.app.appstate.transfer.AppTransferUiState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
-import mega.privacy.android.navigation.contract.bottomsheet.MegaBottomSheetNavigationProvider
-import mega.privacy.android.navigation.contract.bottomsheet.rememberBottomSheetNavigator
+import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.TransferHandler
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MegaApp(
-    appContentState: AppContentState.Data,
     snackbarHostState: SnackbarHostState,
+    navigationHandler: NavigationHandler,
+    transferHandler: TransferHandler,
+    transferState: AppTransferUiState,
+    consumedTransferEvent: () -> Unit,
     onInteraction: () -> Unit,
 ) {
-    val context = LocalContext.current
-    val bottomSheetNavigator = rememberBottomSheetNavigator()
-    val navController = rememberNavController(bottomSheetNavigator)
-    val appTransferViewModel = hiltViewModel<AppTransferViewModel>()
-    val navigationHandler = remember { NavigationHandlerImpl(navController) }
-    val transferHandler = remember { TransferHandlerImpl(appTransferViewModel) }
-    val transferState by appTransferViewModel.state.collectAsStateWithLifecycle()
-
     Box(modifier = Modifier.pointerInput(Unit) {
         awaitEachGesture {
             do {
@@ -55,27 +39,14 @@ fun MegaApp(
         CompositionLocalProvider(
             LocalSnackBarHostState provides snackbarHostState
         ) {
-            MegaBottomSheetNavigationProvider(
-                megaBottomSheetNavigator = bottomSheetNavigator
-            ) {
-                NavHost(
-                    navController = navController,
-                    startDestination = MainNavigationScaffoldDestination,
-                ) {
-                    mainNavigationScaffold(
-                        transferHandler = transferHandler,
-                        navigationHandler = navigationHandler,
-                    )
-                    appContentState.featureDestinations
-                        .forEach {
-                            it.navigationGraph(this, navigationHandler, transferHandler)
-                        }
-                }
-            }
+            MainNavigationScaffold(
+                transferHandler = transferHandler,
+                navigationHandler = navigationHandler,
+            )
 
             StartTransferComponent(
                 event = transferState.transferEvent,
-                onConsumeEvent = appTransferViewModel::consumedTransferEvent,
+                onConsumeEvent = consumedTransferEvent,
             )
         }
     }

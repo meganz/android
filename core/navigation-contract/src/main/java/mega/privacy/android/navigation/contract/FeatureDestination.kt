@@ -1,7 +1,8 @@
 package mega.privacy.android.navigation.contract
 
-import androidx.navigation.NavGraphBuilder
+import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.NavKey
 
 interface FeatureDestination {
-    val navigationGraph: NavGraphBuilder.(navigationHandler: NavigationHandler, transferHandler: TransferHandler) -> Unit
+    val navigationGraph: EntryProviderBuilder<NavKey>.(navigationHandler: NavigationHandler, transferHandler: TransferHandler) -> Unit
 }

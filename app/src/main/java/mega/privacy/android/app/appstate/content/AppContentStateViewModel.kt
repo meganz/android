@@ -21,6 +21,7 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.chat.RetryConnectionsAndSignalPresenceUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
+import mega.privacy.android.navigation.contract.AppDialogDestinations
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
@@ -34,6 +35,7 @@ class AppContentStateViewModel @Inject constructor(
     private val retryConnectionsAndSignalPresenceUseCase: RetryConnectionsAndSignalPresenceUseCase,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
+    private val appDialogDestinations: Set<@JvmSuppressWildcards AppDialogDestinations>,
 ) : ViewModel() {
 
     private val updatePresenceFlow = MutableStateFlow(false)
@@ -50,6 +52,7 @@ class AppContentStateViewModel @Inject constructor(
             if (rootNodeExist) {
                 AppContentState.Data(
                     featureDestinations = featureItems.toImmutableSet(),
+                    appDialogDestinations = appDialogDestinations.toImmutableSet()
                 )
             } else {
                 AppContentState.FetchingNodes
@@ -91,5 +94,4 @@ class AppContentStateViewModel @Inject constructor(
     fun signalPresence() {
         updatePresenceFlow.update { !it }
     }
-
 }

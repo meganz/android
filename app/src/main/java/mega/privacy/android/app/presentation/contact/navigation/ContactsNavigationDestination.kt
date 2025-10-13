@@ -2,9 +2,8 @@ package mega.privacy.android.app.presentation.contact.navigation
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
+import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.navigation.destination.ContactsNavKey
 
@@ -19,13 +18,12 @@ import mega.privacy.android.navigation.destination.ContactsNavKey
  * - Navigate to sent requests: navController.navigate(ContactsNavKey(ContactsNavKey.ContactsNavType.SentRequests))
  * - Navigate to received requests: navController.navigate(ContactsNavKey(ContactsNavKey.ContactsNavType.ReceivedRequests))
  */
-fun NavGraphBuilder.contactsLegacyDestination(removeDestination: () -> Unit) {
-    composable<ContactsNavKey> {
+fun EntryProviderBuilder<NavKey>.contactsLegacyDestination(removeDestination: () -> Unit) {
+    entry<ContactsNavKey> { key ->
         val context = LocalContext.current
-        val contactsNavKey = it.toRoute<ContactsNavKey>()
 
-        LaunchedEffect(contactsNavKey.navType) {
-            val intent = when (contactsNavKey.navType) {
+        LaunchedEffect(key.navType) {
+            val intent = when (key.navType) {
                 ContactsNavKey.NavType.List -> ContactsActivity.getListIntent(context)
                 ContactsNavKey.NavType.SentRequests -> ContactsActivity.getSentRequestsIntent(
                     context

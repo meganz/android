@@ -1,6 +1,7 @@
 package mega.privacy.android.core.nodecomponents.navigation
 
-import androidx.navigation.NavGraphBuilder
+import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.core.nodecomponents.dialog.contact.cannotVerifyContactDialogM3
 import mega.privacy.android.core.nodecomponents.dialog.delete.moveToRubbishOrDeleteDialogM3
 import mega.privacy.android.core.nodecomponents.dialog.leaveshare.leaveShareDialogM3
@@ -15,10 +16,8 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 
 class NodeComponentsFeatureDestination : FeatureDestination {
-    override val navigationGraph: NavGraphBuilder.(NavigationHandler, TransferHandler) -> Unit =
+    override val navigationGraph: EntryProviderBuilder<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
         { navigationHandler, transferHandler ->
-            nodeOptionsBottomSheet(navigationHandler, transferHandler::setTransferEvent)
-            changeLabelBottomSheetNavigation(navigationHandler::back)
             renameNodeDialogM3(navigationHandler::back)
             moveToRubbishOrDeleteDialogM3(navigationHandler::back)
             removeNodeLinkDialogM3(navigationHandler::back)
@@ -26,5 +25,7 @@ class NodeComponentsFeatureDestination : FeatureDestination {
             cannotVerifyContactDialogM3(navigationHandler::back)
             leaveShareDialogM3(navigationHandler::back)
             shareFolderAccessDialogM3(navigationHandler::back)
+            nodeOptionsBottomSheet(navigationHandler, transferHandler::setTransferEvent)
+            changeLabelBottomSheetNavigation(navigationHandler::back)
         }
 }

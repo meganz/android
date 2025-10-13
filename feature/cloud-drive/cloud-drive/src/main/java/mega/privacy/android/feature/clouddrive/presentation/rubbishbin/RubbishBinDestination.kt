@@ -1,19 +1,27 @@
 package mega.privacy.android.feature.clouddrive.presentation.rubbishbin
 
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.RubbishBinNavKey
 import mega.privacy.android.navigation.destination.SearchNodeNavKey
 
-fun NavGraphBuilder.rubbishBin(
+fun EntryProviderBuilder<NavKey>.rubbishBin(
     navigationHandler: NavigationHandler,
     transferHandler: TransferHandler,
 ) {
-    composable<RubbishBinNavKey> {
+    entry<RubbishBinNavKey> { key ->
+        val viewModel = hiltViewModel<NewRubbishBinViewModel, NewRubbishBinViewModel.Factory>(
+            creationCallback = { factory ->
+                factory.create(key)
+            }
+        )
+
         RubbishBinScreen(
+            viewModel = viewModel,
             navigationHandler = navigationHandler,
             onTransfer = transferHandler::setTransferEvent,
             onFolderClick = {

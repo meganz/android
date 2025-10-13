@@ -262,6 +262,7 @@ class AppContentStateViewModelTest {
             retryConnectionsAndSignalPresenceUseCase = retryConnectionsAndSignalPresenceUseCase,
             monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
             rootNodeExistsUseCase = rootNodeExistsUseCase,
+            appDialogDestinations = emptySet(),
         )
     }
 }

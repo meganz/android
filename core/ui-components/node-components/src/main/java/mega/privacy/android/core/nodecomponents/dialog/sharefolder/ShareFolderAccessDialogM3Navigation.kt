@@ -1,9 +1,9 @@
 package mega.privacy.android.core.nodecomponents.dialog.sharefolder
 
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.dialog
-import androidx.navigation.toRoute
+import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.scene.DialogSceneStrategy
+import androidx.compose.ui.window.DialogProperties
 import kotlinx.serialization.Serializable
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 
@@ -14,19 +14,24 @@ data class ShareFolderAccessDialogNavKey(
     val isFromBackups: Boolean
 ) : NavKey
 
-fun NavGraphBuilder.shareFolderAccessDialogM3(
+fun EntryProviderBuilder<NavKey>.shareFolderAccessDialogM3(
     onDismiss: () -> Unit,
 ) {
-    dialog<ShareFolderAccessDialogNavKey> {
-        val args = it.toRoute<ShareFolderAccessDialogNavKey>()
+    entry<ShareFolderAccessDialogNavKey>(
+        metadata = DialogSceneStrategy.dialog(
+            DialogProperties(
+                windowTitle = "Share Folder Access Dialog"
+            )
+        )
+    ) { key ->
         val mapper = NodeHandlesToJsonMapper()
-        val handles = mapper(args.nodes)
-        val contacts = args.contacts.split(",").filter { contact -> contact.isNotBlank() }
+        val handles = mapper(key.nodes)
+        val contacts = key.contacts.split(",").filter { contact -> contact.isNotBlank() }
 
         ShareFolderAccessDialogM3(
             handles = handles,
             contactData = contacts,
-            isFromBackups = args.isFromBackups,
+            isFromBackups = key.isFromBackups,
             onDismiss = onDismiss,
         )
     }

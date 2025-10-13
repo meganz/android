@@ -76,11 +76,11 @@ import kotlin.time.Duration.Companion.milliseconds
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun RubbishBinScreen(
+    viewModel: NewRubbishBinViewModel,
     navigationHandler: NavigationHandler,
     onTransfer: (TransferTriggerEvent) -> Unit,
     onFolderClick: (NodeId) -> Unit,
     openSearch: (Boolean, Long) -> Unit,
-    viewModel: NewRubbishBinViewModel = hiltViewModel(),
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current

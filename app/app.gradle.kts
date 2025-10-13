@@ -195,6 +195,7 @@ dependencies {
     implementation(project(":navigation"))
     implementation("androidx.profileinstaller:profileinstaller:1.3.1")
     implementation(project(":shared:sync"))
+    implementation("androidx.lifecycle:lifecycle-viewmodel-navigation3:2.10.0-alpha04")
     "baselineProfile"(project(":baselineprofile"))
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":icon-pack"))
@@ -230,6 +231,7 @@ dependencies {
     // Android X
     implementation(androidx.bundles.lifecycle)
     implementation(androidx.bundles.navigation)
+    implementation(androidx.navigation3.ui)
     implementation(androidx.appcompat)
     implementation(androidx.biometric)
     implementation(androidx.camera.camera2)

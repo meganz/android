@@ -3,9 +3,8 @@ package mega.privacy.android.app.presentation.testpassword.navigation
 import android.content.Intent
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
+import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.navigation.destination.TestPasswordNavKey
 
@@ -18,16 +17,15 @@ import mega.privacy.android.navigation.destination.TestPasswordNavKey
  * - Navigate in test mode: navController.navigate(TestPasswordNavKey(isTestPasswordMode = true))
  * - Navigate in logout mode: navController.navigate(TestPasswordNavKey(isLogoutMode = true))
  */
-fun NavGraphBuilder.testPasswordLegacyDestination(removeDestination: () -> Unit) {
-    composable<TestPasswordNavKey> {
+fun EntryProviderBuilder<NavKey>.testPasswordLegacyDestination(removeDestination: () -> Unit) {
+    entry<TestPasswordNavKey> { key ->
         val context = LocalContext.current
-        val testPasswordNavKey = it.toRoute<TestPasswordNavKey>()
 
-        LaunchedEffect(testPasswordNavKey) {
+        LaunchedEffect(key) {
             val intent = Intent(context, TestPasswordActivity::class.java).apply {
-                putExtra(TestPasswordActivity.WRONG_PASSWORD_COUNTER, testPasswordNavKey.wrongPasswordCounter)
-                putExtra(TestPasswordActivity.KEY_TEST_PASSWORD_MODE, testPasswordNavKey.isTestPasswordMode)
-                putExtra(TestPasswordActivity.KEY_IS_LOGOUT, testPasswordNavKey.isLogoutMode)
+                putExtra(TestPasswordActivity.WRONG_PASSWORD_COUNTER, key.wrongPasswordCounter)
+                putExtra(TestPasswordActivity.KEY_TEST_PASSWORD_MODE, key.isTestPasswordMode)
+                putExtra(TestPasswordActivity.KEY_IS_LOGOUT, key.isLogoutMode)
             }
             context.startActivity(intent)
             removeDestination()

@@ -1,9 +1,10 @@
 package mega.privacy.android.app.presentation.login
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -42,14 +43,13 @@ import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMoni
 import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusProgressEventUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  *
  * @property state View state as [LoginState]
  */
-@HiltViewModel
-class LoginInProgressViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = LoginInProgressViewModel.Factory::class)
+class LoginInProgressViewModel @AssistedInject constructor(
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val fastLoginUseCase: FastLoginUseCase,
@@ -62,13 +62,11 @@ class LoginInProgressViewModel @Inject constructor(
     private val monitorAccountBlockedUseCase: MonitorAccountBlockedUseCase,
     private val isMegaApiLoggedInUseCase: IsMegaApiLoggedInUseCase,
     private val getUserDataUseCase: GetUserDataUseCase,
-    savedStateHandle: SavedStateHandle,
+    @Assisted val route: MegaActivity.LoggedInScreens
 ) : ViewModel() {
-    private val route = savedStateHandle.toRoute<MegaActivity.LoggedInScreens>()
 
     private val _state = MutableStateFlow(LoginInProgressUiState(isFromLogin = route.isFromLogin))
     val state: StateFlow<LoginInProgressUiState> = _state
-
 
     /**
      * Is connected
@@ -325,5 +323,10 @@ class LoginInProgressViewModel @Inject constructor(
          * Intent action for opening app.
          */
         private const val ACTION_OPEN_APP = "OPEN_APP"
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(navKey: MegaActivity.LoggedInScreens): LoginInProgressViewModel
     }
 }

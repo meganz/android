@@ -2,13 +2,13 @@ package mega.privacy.android.app.activities.destinations
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
+import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.megaNavigator
 
-fun NavGraphBuilder.myAccount(removeDestination: () -> Unit) {
-    composable<MyAccountNavKey> {
+fun EntryProviderBuilder<NavKey>.myAccount(removeDestination: () -> Unit) {
+    entry<MyAccountNavKey> { key ->
         val context = LocalContext.current
         LaunchedEffect(Unit) {
             context.megaNavigator.openMyAccountActivity(context)
@@ -16,6 +16,5 @@ fun NavGraphBuilder.myAccount(removeDestination: () -> Unit) {
             // Immediately pop this destination from the back stack
             removeDestination()
         }
-
     }
 }

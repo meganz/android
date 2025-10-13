@@ -2,9 +2,11 @@ package mega.privacy.android.core.nodecomponents.sheet.changelabel
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.toRoute
+import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.navigation.contract.bottomsheet.bottomSheetMetadata
 import mega.privacy.android.navigation.contract.bottomsheet.megaBottomSheet
 
 @Serializable
@@ -18,6 +20,18 @@ internal fun NavGraphBuilder.changeLabelBottomSheetNavigation(
 
         ChangeLabelBottomSheetContentM3(
             nodeId = NodeId(args.nodeId),
+            onDismiss = onBack
+        )
+    }
+}
+
+internal fun EntryProviderBuilder<NavKey>.changeLabelBottomSheetNavigation(
+    onBack: () -> Unit,
+) {
+    entry<ChangeLabelBottomSheet>(metadata = bottomSheetMetadata()) {
+
+        ChangeLabelBottomSheetContentM3(
+            nodeId = NodeId(it.nodeId),
             onDismiss = onBack
         )
     }

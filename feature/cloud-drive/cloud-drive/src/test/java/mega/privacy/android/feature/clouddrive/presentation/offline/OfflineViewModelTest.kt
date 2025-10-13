@@ -1,7 +1,5 @@
 package mega.privacy.android.feature.clouddrive.presentation.offline
 
-import androidx.lifecycle.SavedStateHandle
-import androidx.navigation.testing.invoke
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -60,13 +58,11 @@ class OfflineViewModelTest {
         highlightedFiles: String? = null,
     ) {
         underTest = OfflineViewModel(
-            savedStateHandle = SavedStateHandle.Companion.invoke(
-                route = OfflineNavKey(
-                    title = title,
-                    nodeId = nodeId,
-                    path = path,
-                    highlightedFiles = highlightedFiles
-                )
+            navKey = OfflineNavKey(
+                title = title,
+                nodeId = nodeId,
+                path = path,
+                highlightedFiles = highlightedFiles
             ),
             getOfflineNodesByParentIdUseCase = getOfflineNodesByParentIdUseCase,
             setOfflineWarningMessageVisibilityUseCase = setOfflineWarningMessageVisibilityUseCase,

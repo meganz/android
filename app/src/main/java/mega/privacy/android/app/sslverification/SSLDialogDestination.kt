@@ -3,9 +3,9 @@ package mega.privacy.android.app.sslverification
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.dialog
+import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.scene.DialogSceneStrategy
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.sslverification.model.SSLDialogState
 import mega.privacy.android.app.sslverification.view.SSLErrorDialog
@@ -17,7 +17,7 @@ import mega.privacy.android.navigation.destination.WebSiteNavKey
 data object SSLErrorDialog : NavKey
 
 data object SSLAppDialogDestinations : AppDialogDestinations {
-    override val navigationGraph: NavGraphBuilder.(NavigationHandler, () -> Unit) -> Unit =
+    override val navigationGraph: EntryProviderBuilder<NavKey>.(NavigationHandler, () -> Unit) -> Unit =
         { navigationHandler, onHandled ->
             sslDialogDestination(
                 navigateBack = navigationHandler::back,
@@ -27,12 +27,14 @@ data object SSLAppDialogDestinations : AppDialogDestinations {
         }
 }
 
-fun NavGraphBuilder.sslDialogDestination(
+fun EntryProviderBuilder<NavKey>.sslDialogDestination(
     navigateBack: () -> Unit,
     navigateAndClear: (NavKey, NavKey, Boolean) -> Unit,
     onDialogHandled: () -> Unit,
 ) {
-    dialog<SSLErrorDialog> {
+    entry<SSLErrorDialog>(
+        metadata = DialogSceneStrategy.dialog()
+    ) {
         val viewModel = hiltViewModel<SSLErrorViewModel>()
         val uiState by viewModel.state.collectAsStateWithLifecycle()
 

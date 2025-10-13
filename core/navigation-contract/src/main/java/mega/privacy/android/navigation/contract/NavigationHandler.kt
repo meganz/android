@@ -54,6 +54,13 @@ interface NavigationHandler {
     fun <T> returnResult(key: String, value: T)
 
     /**
+     * Clear result for a given key
+     *
+     * @param key
+     */
+    fun clearResult(key: String)
+
+    /**
      * Monitor result
      *
      * @param T

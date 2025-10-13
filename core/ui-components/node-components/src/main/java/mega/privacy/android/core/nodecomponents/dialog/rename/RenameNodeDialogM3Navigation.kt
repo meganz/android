@@ -1,23 +1,27 @@
 package mega.privacy.android.core.nodecomponents.dialog.rename
 
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.dialog
-import androidx.navigation.toRoute
+import androidx.compose.ui.window.DialogProperties
+import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.scene.DialogSceneStrategy
 import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.node.NodeId
 
 @Serializable
 data class RenameNodeDialogNavKey(val nodeId: Long) : NavKey
 
-fun NavGraphBuilder.renameNodeDialogM3(
+fun EntryProviderBuilder<NavKey>.renameNodeDialogM3(
     onDismiss: () -> Unit,
 ) {
-    dialog<RenameNodeDialogNavKey> {
-        val args = it.toRoute<RenameNodeDialogNavKey>()
-
+    entry<RenameNodeDialogNavKey>(
+        metadata = DialogSceneStrategy.dialog(
+            DialogProperties(
+                windowTitle = "Rename Node Dialog"
+            )
+        )
+    ) { key ->
         RenameNodeDialogM3(
-            nodeId = NodeId(args.nodeId),
+            nodeId = NodeId(key.nodeId),
             onDismiss = onDismiss,
         )
     }

@@ -7,6 +7,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
+import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.login.LoginGraph
@@ -17,9 +19,10 @@ import mega.privacy.android.app.presentation.login.StartRoute
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailScreen
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountRoute
 import mega.privacy.android.app.presentation.login.onboarding.view.NewTourRoute
+import mega.privacy.android.navigation.contract.NavigationHandler
 
 @Serializable
-data object TourScreen
+data object TourScreen : NavKey
 
 internal fun NavGraphBuilder.tourScreen(
     navController: NavController,
@@ -47,6 +50,35 @@ internal fun NavGraphBuilder.tourScreen(
                 })
             },
             navigateToConfirmationEmailScreen = { navController.navigate(ConfirmationEmailScreen) },
+            viewModel = sharedViewModel,
+            chatRequestHandler = chatRequestHandler,
+            onFinish = onFinish,
+            stopShowingSplashScreen = stopShowingSplashScreen,
+        ) {
+            NewTourRoute(
+                activityViewModel = sharedViewModel,
+                onBackPressed = onBackPressed,
+            )
+        }
+    }
+}
+
+internal fun EntryProviderBuilder<NavKey>.tourScreen3(
+    navigationHandler: NavigationHandler,
+    chatRequestHandler: MegaChatRequestHandler,
+    onFinish: () -> Unit,
+    sharedViewModel: LoginViewModel,
+    stopShowingSplashScreen: () -> Unit,
+    onBackPressed: () -> Unit,
+) {
+    entry<TourScreen> { key ->
+        LoginGraphContent(
+            navigateToLoginScreen = { navigationHandler.navigate(LoginScreen) },
+            navigateToCreateAccountScreen = { navigationHandler.navigate(CreateAccountRoute) },
+            navigateToTourScreen = {
+                navigationHandler.navigateAndClearBackStack(TourScreen)
+            },
+            navigateToConfirmationEmailScreen = { navigationHandler.navigate(ConfirmationEmailScreen) },
             viewModel = sharedViewModel,
             chatRequestHandler = chatRequestHandler,
             onFinish = onFinish,

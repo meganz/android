@@ -2,16 +2,14 @@ package mega.privacy.android.app.presentation.contact.navigation
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.runtime.LaunchedEffect
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
+import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.navigation.destination.AddContactToShareNavKey
 
-fun NavGraphBuilder.addContactLegacyDestination(
+fun EntryProviderBuilder<NavKey>.addContactLegacyDestination(
     returnResult: (String, List<String>?) -> Unit,
 ) {
-    composable<AddContactToShareNavKey> {
-        val addContactToShare = it.toRoute<AddContactToShareNavKey>()
+    entry<AddContactToShareNavKey> { addContactToShare ->
         val launcher = rememberLauncherForActivityResult(
             contract = AddContactsContract()
         ) { result ->

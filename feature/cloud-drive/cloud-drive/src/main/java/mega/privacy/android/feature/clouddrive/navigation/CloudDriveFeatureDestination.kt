@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.clouddrive.navigation
 
-import androidx.navigation.NavGraphBuilder
+import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.cloudDriveScreen
 import mega.privacy.android.feature.clouddrive.presentation.offline.offlineScreen
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.rubbishBin
@@ -12,7 +13,7 @@ import mega.privacy.android.navigation.destination.OfflineNavKey
 import mega.privacy.android.navigation.destination.SearchNodeNavKey
 
 class CloudDriveFeatureDestination : FeatureDestination {
-    override val navigationGraph: NavGraphBuilder.(NavigationHandler, TransferHandler) -> Unit =
+    override val navigationGraph: EntryProviderBuilder<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
         { navigationHandler, transferHandler ->
             cloudDriveScreen(
                 navigationHandler = navigationHandler,

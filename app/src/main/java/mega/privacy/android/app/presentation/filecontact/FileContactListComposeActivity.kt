@@ -7,14 +7,19 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation3.runtime.NavKey
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
+import androidx.navigation3.scene.rememberSceneSetupNavEntryDecorator
+import androidx.navigation3.ui.NavDisplay
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.mapNotNull
+import mega.privacy.android.app.appstate.content.navigation.NavigationHandlerImpl
 import mega.privacy.android.app.appstate.transfer.AppTransferViewModel
 import mega.privacy.android.app.appstate.transfer.TransferHandlerImpl
 import mega.privacy.android.app.presentation.container.SharedAppContainer
@@ -22,7 +27,6 @@ import mega.privacy.android.app.presentation.filecontact.navigation.FileContactF
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import timber.log.Timber
 import javax.inject.Inject
@@ -51,55 +55,13 @@ internal class FileContactListComposeActivity : AppCompatActivity() {
         setContent {
             val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val appTransferViewModel = hiltViewModel<AppTransferViewModel>()
-            val navController = rememberNavController()
-            val navigationHandlerImpl = object : NavigationHandler {
-                override fun back() {
-                    if (!navController.popBackStack()) {
-                        finish()
-                    }
-                }
-
-                override fun navigate(destination: NavKey) {
-                    navController.navigate(destination)
-                }
-
-                override fun backTo(destination: NavKey, inclusive: Boolean) {
-                    navController.popBackStack(destination, inclusive)
-                }
-
-                override fun navigateAndClearBackStack(destination: NavKey) {
-                    navController.navigate(destination) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
-
-                override fun navigateAndClearTo(
-                    destination: NavKey,
-                    newParent: NavKey,
-                    inclusive: Boolean,
-                ) {
-                    navController.navigate(destination) {
-                        popUpTo(newParent) { this.inclusive = inclusive }
-                    }
-                }
-
-                override fun <T> returnResult(key: String, value: T) {
-                    navController.previousBackStackEntry?.savedStateHandle?.set(
-                        key = key,
-                        value = value
-                    )
-                    navController.popBackStack()
-                }
-
-                override fun <T> monitorResult(key: String) =
-                    navController.currentBackStackEntryFlow.mapNotNull {
-                        if (it.savedStateHandle.contains(key)) {
-                            val result = it.savedStateHandle.get<T>(key)
-                            it.savedStateHandle.remove<T>(key)
-                            result
-                        } else null
-                    }
-            }
+            val backStack = rememberNavBackStack(
+                FileContactInfoNavKey(
+                    folderHandle = nodeHandle,
+                    folderName = nodeName,
+                )
+            )
+            val navigationHandler = NavigationHandlerImpl(backStack)
 
             SharedAppContainer(
                 themeMode = themeMode,
@@ -107,28 +69,28 @@ internal class FileContactListComposeActivity : AppCompatActivity() {
             ) {
                 BackHandler(
                     onBack = {
-                        if (!navController.popBackStack()) {
-                            finish()
-                        }
+                        navigationHandler.back()
                     }
                 )
 
-                NavHost(
-                    navController = navController,
-                    startDestination = FileContactInfoNavKey(
-                        folderHandle = nodeHandle,
-                        folderName = nodeName,
-                    )
-                ) {
-                    FileContactFeatureDestination().navigationGraph(
-                        this,
-                        navigationHandlerImpl,
-                        TransferHandlerImpl(appTransferViewModel)
-                    )
-                }
+                NavDisplay(
+                    modifier = Modifier.fillMaxSize(),
+                    backStack = backStack,
+                    onBack = { backStack.removeLastOrNull() },
+                    entryDecorators = listOf(
+                        rememberSceneSetupNavEntryDecorator(),
+                        rememberSavedStateNavEntryDecorator(),
+                        rememberViewModelStoreNavEntryDecorator()
+                    ),
+                    entryProvider = entryProvider {
+                        FileContactFeatureDestination().navigationGraph(
+                            this,
+                            navigationHandler,
+                            TransferHandlerImpl(appTransferViewModel)
+                        )
+                    }
+                )
             }
-
-
         }
     }
 
