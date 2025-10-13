@@ -48,7 +48,7 @@ import mega.privacy.android.domain.exception.LoginException
  * @property loginException             [LoginException].
  * @property ongoingTransfersExist      True if exist ongoing transfers, false if not. Null if pending to check.
  * @property isPendingToFinishActivity  True if should finish the activity, false otherwise.
- * @property isPendingToShowFragment    [LoginFragmentType] if pending, null otherwise.
+ * @property isPendingToShowFragment    [LoginScreen] if pending, null otherwise.
  * @property isCheckingSignupLink       True if it is checking a signup link, false otherwise.
  * @property snackbarMessage            Message to show in Snackbar.
  * @property isFastLoginInProgress      True if a fast login is in progress, false otherwise.
@@ -95,7 +95,7 @@ data class LoginState(
     val loginException: LoginException? = null,
     val ongoingTransfersExist: Boolean? = null,
     val isPendingToFinishActivity: Boolean = false,
-    val isPendingToShowFragment: LoginFragmentType? = null,
+    val isPendingToShowFragment: StateEventWithContent<LoginScreen> = consumed(),
     val isCheckingSignupLink: Boolean = false,
     val snackbarMessage: StateEventWithContent<Int> = consumed(),
     val loginTemporaryError: TemporaryWaitingError? = null,

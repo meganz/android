@@ -19,7 +19,7 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.login.model.LoginFragmentType
+import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountBlockedEvent
@@ -70,7 +70,7 @@ class LoginActivity : BaseActivity() {
         val visibleFragment =
             intent.getIntExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
 
-        LoginFragmentType.entries.find { it.value == visibleFragment }?.let {
+        LoginScreen.entries.find { it.value == visibleFragment }?.let {
             viewModel.setPendingFragmentToShow(it)
         }
     }

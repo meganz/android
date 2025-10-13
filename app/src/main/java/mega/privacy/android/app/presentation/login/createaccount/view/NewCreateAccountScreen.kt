@@ -99,7 +99,7 @@ import mega.privacy.android.app.presentation.login.createaccount.view.CreateAcco
 import mega.privacy.android.app.presentation.login.createaccount.view.CreateAccountTestTags.PASSWORD_HINT
 import mega.privacy.android.app.presentation.login.createaccount.view.CreateAccountTestTags.TERMS_CONDITION_CHECKBOX
 import mega.privacy.android.app.presentation.login.createaccount.view.CreateAccountTestTags.TOOLBAR
-import mega.privacy.android.app.presentation.login.model.LoginFragmentType
+import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.login.view.tabletScreenWidth
 import mega.privacy.android.app.utils.Constants.TERMS_OF_SERVICE_URL
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
@@ -119,7 +119,7 @@ internal fun NewCreateAccountRoute(
 
     BackHandler(
         onBack = {
-            activityViewModel.setPendingFragmentToShow(LoginFragmentType.Tour)
+            activityViewModel.setPendingFragmentToShow(LoginScreen.Tour)
         },
     )
     val snackBarHostState = remember { SnackbarHostState() }
@@ -134,7 +134,7 @@ internal fun NewCreateAccountRoute(
         onCreateAccountClicked = viewModel::createAccount,
         onTermsOfServiceAgreedChanged = viewModel::termsOfServiceAgreedChanged,
         onLoginClicked = {
-            activityViewModel.setPendingFragmentToShow(LoginFragmentType.Login)
+            activityViewModel.setPendingFragmentToShow(LoginScreen.LoginScreen)
         },
         openLink = { url ->
             context.launchUrl(url)

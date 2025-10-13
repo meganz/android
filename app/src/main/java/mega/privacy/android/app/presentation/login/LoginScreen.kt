@@ -25,7 +25,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
-import mega.privacy.android.app.presentation.login.model.LoginFragmentType
+import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.login.view.NewLoginView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.exception.MegaException
@@ -97,7 +97,7 @@ fun LoginScreen(
 
                 else -> {
                     LoginActivity.isBackFromLoginPage = true
-                    viewModel.setPendingFragmentToShow(LoginFragmentType.Tour)
+                    viewModel.setPendingFragmentToShow(LoginScreen.Tour)
                 }
             }
         }
@@ -118,7 +118,7 @@ fun LoginScreen(
         },
         onForgotPassword = viewModel::onForgotPassword,
         onCreateAccount = {
-            viewModel.setPendingFragmentToShow(LoginFragmentType.CreateAccount)
+            viewModel.setPendingFragmentToShow(LoginScreen.CreateAccount)
         },
         onSnackbarMessageConsumed = viewModel::onSnackbarMessageConsumed,
         on2FAChanged = viewModel::on2FAChanged,

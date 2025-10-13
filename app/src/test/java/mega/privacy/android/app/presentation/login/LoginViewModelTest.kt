@@ -28,7 +28,7 @@ import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerDetai
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
 import mega.privacy.android.app.presentation.login.model.AccountBlockedUiState
 import mega.privacy.android.app.presentation.login.model.LoginError
-import mega.privacy.android.app.presentation.login.model.LoginFragmentType
+import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.login.model.RkLink
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -322,7 +322,7 @@ internal class LoginViewModelTest {
                 assertThat(loginException).isNull()
                 assertThat(ongoingTransfersExist).isNull()
                 assertThat(isPendingToFinishActivity).isFalse()
-                assertThat(isPendingToShowFragment).isEqualTo(LoginFragmentType.Tour)
+                assertThat(isPendingToShowFragment).isEqualTo(triggered(LoginScreen.Tour))
                 assertThat(isCheckingSignupLink).isFalse()
                 assertThat(snackbarMessage).isInstanceOf(consumed().javaClass)
                 assertThat(isFirstTimeLaunch).isFalse()

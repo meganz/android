@@ -29,7 +29,7 @@ import mega.privacy.android.app.appstate.global.util.show
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.login.LoginGraph3
+import mega.privacy.android.app.presentation.login.LoginNavDisplay
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import javax.inject.Inject
@@ -95,7 +95,7 @@ class MegaActivity : ComponentActivity() {
 
                     is GlobalState.RequireLogin -> {
                         fromLogin = true
-                        LoginGraph3(
+                        LoginNavDisplay(
                             chatRequestHandler = chatRequestHandler,
                             onFinish = ::finish,
                             stopShowingSplashScreen = {

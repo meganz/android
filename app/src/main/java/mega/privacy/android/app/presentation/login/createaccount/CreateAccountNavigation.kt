@@ -13,9 +13,9 @@ import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
+import mega.privacy.android.app.presentation.login.Login
 import mega.privacy.android.app.presentation.login.LoginGraph
 import mega.privacy.android.app.presentation.login.LoginGraphContent
-import mega.privacy.android.app.presentation.login.LoginScreen
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.StartRoute
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailScreen
@@ -41,7 +41,7 @@ internal fun NavGraphBuilder.createAccountScreen(
             hiltViewModel<LoginViewModel>(parentEntry)
         }
         LoginGraphContent(
-            navigateToLoginScreen = { navController.navigate(LoginScreen) },
+            navigateToLoginScreen = { navController.navigate(Login) },
             navigateToCreateAccountScreen = { navController.navigate(CreateAccountRoute) },
             navigateToTourScreen = {
                 navController.navigate(TourScreen, navOptions {
@@ -64,7 +64,7 @@ internal fun NavGraphBuilder.createAccountScreen(
     }
 }
 
-internal fun EntryProviderBuilder<NavKey>.createAccountScreen3(
+internal fun EntryProviderBuilder<NavKey>.createAccountScreen(
     navigationHandler: NavigationHandler,
     chatRequestHandler: MegaChatRequestHandler,
     onFinish: () -> Unit,
@@ -73,7 +73,7 @@ internal fun EntryProviderBuilder<NavKey>.createAccountScreen3(
 ) {
     entry<CreateAccountRoute> { key ->
         LoginGraphContent(
-            navigateToLoginScreen = { navigationHandler.navigate(LoginScreen) },
+            navigateToLoginScreen = { navigationHandler.navigate(Login) },
             navigateToCreateAccountScreen = { navigationHandler.navigate(CreateAccountRoute) },
             navigateToTourScreen = {
                 navigationHandler.navigateAndClearBackStack(TourScreen)

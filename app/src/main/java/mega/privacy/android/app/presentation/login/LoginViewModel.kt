@@ -35,8 +35,8 @@ import mega.privacy.android.app.presentation.extensions.newError
 import mega.privacy.android.app.presentation.login.LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
 import mega.privacy.android.app.presentation.login.model.AccountBlockedUiState
 import mega.privacy.android.app.presentation.login.model.LoginError
-import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.model.LoginIntentState
+import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
 import mega.privacy.android.app.presentation.login.model.RkLink
@@ -236,7 +236,7 @@ class LoginViewModel @Inject constructor(
         runCatching { monitorEphemeralCredentialsUseCase().firstOrNull() }
             .onSuccess { ephemeral ->
                 if (ephemeral != null && !ephemeral.session.isNullOrEmpty()) {
-                    setPendingFragmentToShow(LoginFragmentType.ConfirmEmail)
+                    setPendingFragmentToShow(LoginScreen.ConfirmEmail)
                     _state.update { it.copy(temporalEmail = ephemeral.email) }
                     resumeCreateAccount(ephemeral.session.orEmpty())
                     return@launch
@@ -249,8 +249,8 @@ class LoginViewModel @Inject constructor(
                 if (session.isNullOrEmpty()) Constants.TOUR_FRAGMENT else Constants.LOGIN_FRAGMENT
             }
 
-        setPendingFragmentToShow(LoginFragmentType.entries.find { it.value == visibleFragment }
-            ?: LoginFragmentType.Login)
+        setPendingFragmentToShow(LoginScreen.entries.find { it.value == visibleFragment }
+            ?: LoginScreen.LoginScreen)
     }
 
     private fun enableAndMonitorRequestStatusProgressEvent() {
@@ -381,14 +381,14 @@ class LoginViewModel @Inject constructor(
      * Sets confirm email fragment as pending in state.
      */
     fun setIsWaitingForConfirmAccount() {
-        _state.update { state -> state.copy(isPendingToShowFragment = LoginFragmentType.ConfirmEmail) }
+        _state.update { state -> state.copy(isPendingToShowFragment = triggered(LoginScreen.ConfirmEmail)) }
     }
 
     /**
      * Sets tour as pending fragment in state.
      */
     private fun setTourAsPendingFragment() {
-        _state.update { state -> state.copy(isPendingToShowFragment = LoginFragmentType.Tour) }
+        _state.update { state -> state.copy(isPendingToShowFragment = triggered(LoginScreen.Tour)) }
     }
 
     /**
@@ -396,15 +396,15 @@ class LoginViewModel @Inject constructor(
      *
      * @param fragmentType
      */
-    fun setPendingFragmentToShow(fragmentType: LoginFragmentType) {
-        _state.update { state -> state.copy(isPendingToShowFragment = fragmentType) }
+    fun setPendingFragmentToShow(fragmentType: LoginScreen) {
+        _state.update { state -> state.copy(isPendingToShowFragment = triggered(fragmentType)) }
     }
 
     /**
      * Update state with isPendingToShowFragment as null.
      */
     fun isPendingToShowFragmentConsumed() {
-        _state.update { state -> state.copy(isPendingToShowFragment = null) }
+        _state.update { state -> state.copy(isPendingToShowFragment = consumed()) }
     }
 
     /**

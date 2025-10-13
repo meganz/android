@@ -15,11 +15,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.collectLatest
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.privacy.android.app.R
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
-import mega.privacy.android.app.presentation.login.model.LoginFragmentType
+import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.shared.resources.R as sharedResR
 
@@ -80,27 +81,24 @@ fun LoginGraphContent(
         }
     }
 
-    LaunchedEffect(uiState.isPendingToShowFragment) {
-        val fragmentType = uiState.isPendingToShowFragment
-        if (fragmentType != null) {
-            if (fragmentType != LoginFragmentType.Login) {
-                stopShowingSplashScreen()
+    EventEffect(uiState.isPendingToShowFragment, viewModel::isPendingToShowFragmentConsumed) {
+        if (it != LoginScreen.LoginScreen) {
+            stopShowingSplashScreen()
+        }
+
+        when (it) {
+            LoginScreen.LoginScreen -> navigateToLoginScreen()
+            LoginScreen.CreateAccount -> navigateToCreateAccountScreen()
+
+            LoginScreen.Tour -> {
+                focusManager.clearFocus()
+                navigateToTourScreen()
             }
 
-            when (fragmentType) {
-                LoginFragmentType.Login -> navigateToLoginScreen()
-                LoginFragmentType.CreateAccount -> navigateToCreateAccountScreen()
-
-                LoginFragmentType.Tour -> {
-                    focusManager.clearFocus()
-                    navigateToTourScreen()
-                }
-
-                LoginFragmentType.ConfirmEmail -> navigateToConfirmationEmailScreen()
-            }
-            viewModel.isPendingToShowFragmentConsumed()
+            LoginScreen.ConfirmEmail -> navigateToConfirmationEmailScreen()
         }
     }
+
     content()
     if (showLoggedOutDialog) {
         BasicDialog(

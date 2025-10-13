@@ -7,7 +7,7 @@ import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import kotlinx.serialization.Serializable
-import mega.privacy.android.app.presentation.login.LoginScreen
+import mega.privacy.android.app.presentation.login.Login
 import mega.privacy.android.app.presentation.transfers.transferoverquota.TransferOverQuotaViewModel
 import mega.privacy.android.feature.payment.UpgradeAccountNavKey
 import mega.privacy.android.navigation.contract.AppDialogDestinations
@@ -44,7 +44,7 @@ fun EntryProviderBuilder<NavKey>.transferOverQuotaDialogDestination(
                 navigate(UpgradeAccountNavKey())
             },
             navigateToLogin = {
-                navigate(LoginScreen)
+                navigate(Login)
             },
             onDismiss = {
                 viewModel.bandwidthOverQuotaDelayConsumed()

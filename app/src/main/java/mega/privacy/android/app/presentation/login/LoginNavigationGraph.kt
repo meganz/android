@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.login
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalFocusManager
@@ -19,26 +18,20 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.scene.rememberSceneSetupNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import de.palm.composestateevents.EventEffect
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.appstate.content.navigation.NavigationHandlerImpl
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
-import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailScreen
 import mega.privacy.android.app.presentation.login.confirmemail.changeemail.ChangeEmailAddressViewModel
 import mega.privacy.android.app.presentation.login.confirmemail.changeemail.changeEmailAddress
-import mega.privacy.android.app.presentation.login.confirmemail.changeemail.changeEmailAddress3
 import mega.privacy.android.app.presentation.login.confirmemail.confirmationEmailScreen
-import mega.privacy.android.app.presentation.login.confirmemail.confirmationEmailScreen3
 import mega.privacy.android.app.presentation.login.confirmemail.openConfirmationEmailScreen
-import mega.privacy.android.app.presentation.login.createaccount.CreateAccountRoute
 import mega.privacy.android.app.presentation.login.createaccount.createAccountScreen
-import mega.privacy.android.app.presentation.login.createaccount.createAccountScreen3
 import mega.privacy.android.app.presentation.login.createaccount.openCreateAccountScreen
-import mega.privacy.android.app.presentation.login.model.LoginFragmentType
-import mega.privacy.android.app.presentation.login.onboarding.TourScreen
+import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.login.onboarding.openTourScreen
 import mega.privacy.android.app.presentation.login.onboarding.tourScreen
-import mega.privacy.android.app.presentation.login.onboarding.tourScreen3
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
 
@@ -75,29 +68,29 @@ fun NavGraphBuilder.loginNavigationGraph(
             val uiState by sharedViewModel.state.collectAsStateWithLifecycle()
             val focusManager = LocalFocusManager.current
             // start composable to handle the initial state and navigation logic
-            LaunchedEffect(uiState.isPendingToShowFragment) {
-                val fragmentType = uiState.isPendingToShowFragment
-                if (fragmentType != null) {
-                    if (fragmentType != LoginFragmentType.Login) {
-                        stopShowingSplashScreen()
+            EventEffect(
+                uiState.isPendingToShowFragment,
+                sharedViewModel::isPendingToShowFragmentConsumed
+            ) {
+
+                if (it != LoginScreen.LoginScreen) {
+                    stopShowingSplashScreen()
+                }
+
+                when (it) {
+                    LoginScreen.LoginScreen -> navController.openLoginScreen()
+                    LoginScreen.CreateAccount -> navController.openCreateAccountScreen()
+
+                    LoginScreen.Tour -> {
+                        focusManager.clearFocus()
+                        navController.openTourScreen(
+                            NavOptions.Builder()
+                                .setPopUpTo(route = StartRoute, inclusive = false)
+                                .build()
+                        )
                     }
 
-                    when (fragmentType) {
-                        LoginFragmentType.Login -> navController.openLoginScreen()
-                        LoginFragmentType.CreateAccount -> navController.openCreateAccountScreen()
-
-                        LoginFragmentType.Tour -> {
-                            focusManager.clearFocus()
-                            navController.openTourScreen(
-                                NavOptions.Builder()
-                                    .setPopUpTo(route = StartRoute, inclusive = false)
-                                    .build()
-                            )
-                        }
-
-                        LoginFragmentType.ConfirmEmail -> navController.openConfirmationEmailScreen()
-                    }
-                    sharedViewModel.isPendingToShowFragmentConsumed()
+                    LoginScreen.ConfirmEmail -> navController.openConfirmationEmailScreen()
                 }
             }
         }
@@ -147,7 +140,7 @@ fun NavGraphBuilder.loginNavigationGraph(
 }
 
 @Composable
-fun LoginGraph3(
+fun LoginNavDisplay(
     chatRequestHandler: MegaChatRequestHandler,
     onFinish: () -> Unit,
     activityViewModel: LoginViewModel? = null,
@@ -169,41 +162,14 @@ fun LoginGraph3(
             rememberViewModelStoreNavEntryDecorator()
         ),
         entryProvider = entryProvider {
-            entry<StartRoute> { key ->
-                val uiState by sharedViewModel.state.collectAsStateWithLifecycle()
-                val focusManager = LocalFocusManager.current
-                // start composable to handle the initial state and navigation logic
-                LaunchedEffect(uiState.isPendingToShowFragment) {
-                    val fragmentType = uiState.isPendingToShowFragment
-                    if (fragmentType != null) {
-                        if (fragmentType != LoginFragmentType.Login) {
-                            stopShowingSplashScreen()
-                        }
 
-                        when (fragmentType) {
-                            LoginFragmentType.Login -> {
-                                loginNavigationHandler.navigate(LoginScreen)
-                            }
+            loginStartScreen(
+                sharedViewModel = sharedViewModel,
+                navigationHandler = loginNavigationHandler,
+                stopShowingSplashScreen = stopShowingSplashScreen
+            )
 
-                            LoginFragmentType.CreateAccount -> {
-                                loginNavigationHandler.navigate(CreateAccountRoute)
-                            }
-
-                            LoginFragmentType.Tour -> {
-                                focusManager.clearFocus()
-                                loginNavigationHandler.navigateAndClearBackStack(TourScreen)
-                            }
-
-                            LoginFragmentType.ConfirmEmail -> {
-                                loginNavigationHandler.navigate(ConfirmationEmailScreen)
-                            }
-                        }
-                        sharedViewModel.isPendingToShowFragmentConsumed()
-                    }
-                }
-            }
-
-            loginScreen3(
+            loginScreen(
                 navigationHandler = loginNavigationHandler,
                 chatRequestHandler = chatRequestHandler,
                 onFinish = onFinish,
@@ -212,7 +178,7 @@ fun LoginGraph3(
                 billingViewModel = billingViewModel
             )
 
-            createAccountScreen3(
+            createAccountScreen(
                 navigationHandler = loginNavigationHandler,
                 chatRequestHandler = chatRequestHandler,
                 onFinish = onFinish,
@@ -220,7 +186,7 @@ fun LoginGraph3(
                 sharedViewModel = sharedViewModel
             )
 
-            tourScreen3(
+            tourScreen(
                 navigationHandler = loginNavigationHandler,
                 chatRequestHandler = chatRequestHandler,
                 onFinish = onFinish,
@@ -229,7 +195,7 @@ fun LoginGraph3(
                 onBackPressed = onFinish
             )
 
-            confirmationEmailScreen3(
+            confirmationEmailScreen(
                 navigationHandler = loginNavigationHandler,
                 chatRequestHandler = chatRequestHandler,
                 onFinish = onFinish,
@@ -237,7 +203,7 @@ fun LoginGraph3(
                 sharedViewModel = sharedViewModel
             )
 
-            changeEmailAddress3(
+            changeEmailAddress(
                 navigationHandler = loginNavigationHandler,
                 chatRequestHandler = chatRequestHandler,
                 onFinish = onFinish,

@@ -46,7 +46,7 @@ import mega.android.core.ui.theme.devicetype.LocalDeviceType
 import mega.android.core.ui.theme.spacing.LocalSpacing
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.presentation.login.LoginViewModel
-import mega.privacy.android.app.presentation.login.model.LoginFragmentType
+import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.login.onboarding.view.TourTestTags.CREATE_ACCOUNT_BUTTON
 import mega.privacy.android.app.presentation.login.onboarding.view.TourTestTags.LOG_IN_BUTTON
 import mega.privacy.android.app.presentation.login.onboarding.view.TourTestTags.ONBOARDING_IMAGE
@@ -72,11 +72,11 @@ internal fun NewTourRoute(
             .semantics { testTagsAsResourceId = true },
         onLoginClick = {
             Timber.d("onLoginClick")
-            activityViewModel.setPendingFragmentToShow(LoginFragmentType.Login)
+            activityViewModel.setPendingFragmentToShow(LoginScreen.LoginScreen)
         },
         onCreateAccountClick = {
             Timber.d("onRegisterClick")
-            activityViewModel.setPendingFragmentToShow(LoginFragmentType.CreateAccount)
+            activityViewModel.setPendingFragmentToShow(LoginScreen.CreateAccount)
         }
     )
 }

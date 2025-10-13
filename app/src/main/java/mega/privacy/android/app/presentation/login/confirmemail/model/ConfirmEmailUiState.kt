@@ -2,14 +2,14 @@ package mega.privacy.android.app.presentation.login.confirmemail.model
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.app.presentation.login.model.LoginFragmentType
+import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.domain.entity.ThemeMode
 
 /**
  * Data class defining the state of [mega.privacy.android.app.presentation.login.LoginFragment].
  *
  * @property isLoading is loading
- * @property isPendingToShowFragment [LoginFragmentType] if pending, null otherwise.
+ * @property isPendingToShowScreen event effect with content of type [LoginScreen] if pending, consumed otherwise.
  * @property registeredEmail The new registered email.
  * @property firstName The name of the user.
  * @property shouldShowSuccessMessage True if we should show a success message, false otherwise.
@@ -21,7 +21,7 @@ import mega.privacy.android.domain.entity.ThemeMode
  */
 data class ConfirmEmailUiState(
     val isLoading: Boolean = false,
-    val isPendingToShowFragment: LoginFragmentType? = null,
+    val isPendingToShowScreen: LoginScreen? = null,
     val registeredEmail: String? = null,
     val firstName: String? = null,
     val shouldShowSuccessMessage: Boolean = false,

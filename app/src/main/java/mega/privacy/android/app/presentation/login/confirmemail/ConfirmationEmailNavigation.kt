@@ -15,9 +15,9 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
+import mega.privacy.android.app.presentation.login.Login
 import mega.privacy.android.app.presentation.login.LoginGraph
 import mega.privacy.android.app.presentation.login.LoginGraphContent
-import mega.privacy.android.app.presentation.login.LoginScreen
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.StartRoute
 import mega.privacy.android.app.presentation.login.confirmemail.changeemail.ChangeEmailAddressScreen
@@ -51,7 +51,7 @@ internal fun NavGraphBuilder.confirmationEmailScreen(
         }
 
         LoginGraphContent(
-            navigateToLoginScreen = { navController.navigate(LoginScreen) },
+            navigateToLoginScreen = { navController.navigate(Login) },
             navigateToCreateAccountScreen = { navController.navigate(CreateAccountRoute) },
             navigateToTourScreen = {
                 navController.navigate(TourScreen, navOptions {
@@ -87,7 +87,7 @@ internal fun NavGraphBuilder.confirmationEmailScreen(
     }
 }
 
-internal fun EntryProviderBuilder<NavKey>.confirmationEmailScreen3(
+internal fun EntryProviderBuilder<NavKey>.confirmationEmailScreen(
     navigationHandler: NavigationHandler,
     chatRequestHandler: MegaChatRequestHandler,
     onFinish: () -> Unit,
@@ -99,7 +99,7 @@ internal fun EntryProviderBuilder<NavKey>.confirmationEmailScreen3(
         val result by navigationHandler.monitorResult<String>(ChangeEmailAddressViewModel.EMAIL)
             .collectAsStateWithLifecycle("")
         LoginGraphContent(
-            navigateToLoginScreen = { navigationHandler.navigate(LoginScreen) },
+            navigateToLoginScreen = { navigationHandler.navigate(Login) },
             navigateToCreateAccountScreen = { navigationHandler.navigate(CreateAccountRoute) },
             navigateToTourScreen = {
                 navigationHandler.navigateAndClearBackStack(TourScreen)

@@ -68,7 +68,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailViewModel
 import mega.privacy.android.app.presentation.login.confirmemail.model.ConfirmEmailUiState
-import mega.privacy.android.app.presentation.login.model.LoginFragmentType
+import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.login.view.tabletScreenWidth
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ChangeEmailAddressButtonPressedEvent
@@ -77,7 +77,7 @@ import mega.privacy.mobile.analytics.event.ResendEmailConfirmationButtonPressedE
 @Composable
 fun NewConfirmEmailRoute(
     newEmail: String?,
-    onShowPendingFragment: (loginFragmentType: LoginFragmentType) -> Unit,
+    onShowPendingFragment: (loginScreen: LoginScreen) -> Unit,
     onNavigateToChangeEmailAddress: (String, String) -> Unit,
     onNavigateToHelpCentre: () -> Unit,
     onBackPressed: () -> Unit,
@@ -102,7 +102,7 @@ fun NewConfirmEmailRoute(
 
     LaunchedEffect(uiState.isAccountConfirmed) {
         if (uiState.isAccountConfirmed) {
-            onShowPendingFragment(LoginFragmentType.Login)
+            onShowPendingFragment(LoginScreen.LoginScreen)
             checkTemporalCredentials()
         }
     }
@@ -115,8 +115,8 @@ fun NewConfirmEmailRoute(
         }
     }
 
-    LaunchedEffect(uiState.isPendingToShowFragment) {
-        uiState.isPendingToShowFragment?.let {
+    LaunchedEffect(uiState.isPendingToShowScreen) {
+        uiState.isPendingToShowScreen?.let {
             onShowPendingFragment(it)
             viewModel.isPendingToShowFragmentConsumed()
         }

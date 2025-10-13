@@ -11,9 +11,9 @@ import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
+import mega.privacy.android.app.presentation.login.Login
 import mega.privacy.android.app.presentation.login.LoginGraph
 import mega.privacy.android.app.presentation.login.LoginGraphContent
-import mega.privacy.android.app.presentation.login.LoginScreen
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.StartRoute
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailScreen
@@ -40,7 +40,7 @@ fun NavGraphBuilder.changeEmailAddress(
             hiltViewModel<LoginViewModel>(parentEntry)
         }
         LoginGraphContent(
-            navigateToLoginScreen = { navController.navigate(LoginScreen) },
+            navigateToLoginScreen = { navController.navigate(Login) },
             navigateToCreateAccountScreen = { navController.navigate(CreateAccountRoute) },
             navigateToTourScreen = {
                 navController.navigate(TourScreen, navOptions {
@@ -69,7 +69,7 @@ data class ChangeEmailAddressScreen(
 ) : NavKey
 
 
-internal fun EntryProviderBuilder<NavKey>.changeEmailAddress3(
+internal fun EntryProviderBuilder<NavKey>.changeEmailAddress(
     navigationHandler: NavigationHandler,
     chatRequestHandler: MegaChatRequestHandler,
     onFinish: () -> Unit,
@@ -79,7 +79,7 @@ internal fun EntryProviderBuilder<NavKey>.changeEmailAddress3(
 ) {
     entry<ChangeEmailAddressScreen> { key ->
         LoginGraphContent(
-            navigateToLoginScreen = { navigationHandler.navigate(LoginScreen) },
+            navigateToLoginScreen = { navigationHandler.navigate(Login) },
             navigateToCreateAccountScreen = { navigationHandler.navigate(CreateAccountRoute) },
             navigateToTourScreen = {
                 navigationHandler.navigateAndClearBackStack(TourScreen)

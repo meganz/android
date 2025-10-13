@@ -70,7 +70,7 @@ class ConfirmEmailViewModel @Inject constructor(
      * Update state with isPendingToShowFragment as null.
      */
     internal fun isPendingToShowFragmentConsumed() {
-        _uiState.update { state -> state.copy(isPendingToShowFragment = null) }
+        _uiState.update { state -> state.copy(isPendingToShowScreen = null) }
     }
 
     /**
