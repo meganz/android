@@ -17,10 +17,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -34,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import mega.privacy.android.app.R
@@ -50,10 +47,7 @@ import mega.privacy.android.app.presentation.photos.view.isScrolledToEnd
 import mega.privacy.android.app.presentation.photos.view.isScrolledToTop
 import mega.privacy.android.app.presentation.photos.view.isScrollingDown
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
-import mega.privacy.android.shared.original.core.ui.theme.accent_050
-import mega.privacy.android.shared.original.core.ui.theme.accent_900
-import mega.privacy.android.shared.original.core.ui.theme.black
-import mega.privacy.android.shared.original.core.ui.theme.white
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 
@@ -73,20 +67,18 @@ fun TimelineView(
     onClickCameraUploadsSync: () -> Unit = {},
     onClickCameraUploadsUploading: () -> Unit = {},
     onChangeCameraUploadsPermissions: () -> Unit = {},
-    onUpdateCameraUploadsLimitedAccessState: (Boolean) -> Unit = {},
-    onEnableCameraUploads: () -> Unit = {},
-    onPendingCountBannerClick: () -> Unit = {},
     clearCameraUploadsMessage: () -> Unit = {},
     clearCameraUploadsChangePermissionsMessage: () -> Unit = {},
     clearCameraUploadsCompletedMessage: () -> Unit = {},
     loadPhotos: () -> Unit = {},
+    cameraUploadsBanners: @Composable () -> Unit = {},
 ) {
     val context = LocalContext.current
+    val resource = LocalResources.current
     val isScrollingDown by lazyGridState.isScrollingDown()
     val isScrolledToEnd by lazyGridState.isScrolledToEnd()
     val isScrolledToTop by lazyGridState.isScrolledToTop()
     val scaffoldState = rememberScaffoldState()
-    val isLight = MaterialTheme.colors.isLight
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
     val showEnableCUPage = timelineViewState.enableCameraUploadPageShowing
             && timelineViewState.currentMediaSource != TimelinePhotosSource.CLOUD_DRIVE
@@ -114,7 +106,7 @@ fun TimelineView(
     LaunchedEffect(timelineViewState.showCameraUploadsCompletedMessage) {
         if (timelineViewState.showCameraUploadsCompletedMessage) {
             scaffoldState.snackbarHostState.showAutoDurationSnackbar(
-                message = context.resources.getQuantityString(
+                message = resource.getQuantityString(
                     R.plurals.photos_camera_uploads_completed,
                     timelineViewState.cameraUploadsTotalUploaded,
                     timelineViewState.cameraUploadsTotalUploaded,
@@ -145,21 +137,8 @@ fun TimelineView(
         }
     }
 
-    Scaffold(
+    MegaScaffold(
         scaffoldState = scaffoldState,
-        snackbarHost = { snackBarHostState ->
-            SnackbarHost(
-                hostState = snackBarHostState,
-                snackbar = { snackBarData ->
-                    Snackbar(
-                        snackbarData = snackBarData,
-                        actionOnNewLine = true,
-                        backgroundColor = black.takeIf { isLight } ?: white,
-                        actionColor = accent_050.takeIf { isLight } ?: accent_900,
-                    )
-                }
-            )
-        },
         floatingActionButton = {
             Row(
                 modifier = Modifier.padding(
@@ -248,10 +227,7 @@ fun TimelineView(
                             photoDownload = photoDownload,
                             onCardClick = onCardClick,
                             onTimeBarTabSelected = onTimeBarTabSelected,
-                            onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
-                            onUpdateCameraUploadsLimitedAccessState = onUpdateCameraUploadsLimitedAccessState,
-                            onEnableCameraUploads = onEnableCameraUploads,
-                            onNavigateToCameraUploadsTransferScreen = onPendingCountBannerClick
+                            stickyHeaderView = cameraUploadsBanners,
                         )
                     }
                 } else {
@@ -274,126 +250,102 @@ private fun HandlePhotosGridView(
     photoDownload: PhotoDownload,
     onCardClick: (DateCard) -> Unit,
     onTimeBarTabSelected: (TimeBarTab) -> Unit,
-    onChangeCameraUploadsPermissions: () -> Unit,
-    onUpdateCameraUploadsLimitedAccessState: (Boolean) -> Unit,
-    onEnableCameraUploads: () -> Unit,
-    onNavigateToCameraUploadsTransferScreen: () -> Unit,
+    stickyHeaderView: @Composable () -> Unit = {},
 ) {
-    var isBannerShown by remember { mutableStateOf(false) }
-    var isWarningBannerShown by remember { mutableStateOf(false) }
-
-    LaunchedEffect(
-        timelineViewState.scrollStartIndex,
-        timelineViewState.scrollStartOffset,
-        timelineViewState.selectedTimeBarTab,
-    ) {
-        lazyGridState.scrollToItem(
-            timelineViewState.scrollStartIndex,
-            timelineViewState.scrollStartOffset
-        )
-    }
-
-    LaunchedEffect(
-        isScrollingDown,
-        isScrolledToEnd,
-        isScrolledToTop,
-        timelineViewState.isCameraUploadsLimitedAccess
-    ) {
-        isBannerShown = (!isScrollingDown && !isScrolledToEnd) || isScrolledToTop
-
-        if (lazyGridState.isScrollInProgress
-            && (isScrollingDown || isScrolledToEnd)
-            && timelineViewState.isCameraUploadsLimitedAccess
-        ) {
-            onUpdateCameraUploadsLimitedAccessState(false)
-        }
-        isWarningBannerShown = (!isScrollingDown && !isScrolledToEnd)
-                || isScrolledToTop
-                || timelineViewState.isCameraUploadsLimitedAccess
-    }
-
     // Load Photos
-    Column {
-        val bannerType = getCameraUploadsBannerType(timelineViewState)
-        val pendingCount = timelineViewState.pending
-
-        when (bannerType) {
-            CameraUploadsBannerType.NoFullAccess -> {
-                SlideBanner(visible = isWarningBannerShown) {
-                    CameraUploadsWarningBanner(
-                        bannerType = bannerType,
-                        onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
-                        onUpdateCameraUploadsLimitedAccessState = { isVisible ->
-                            isWarningBannerShown = isVisible
-                            onUpdateCameraUploadsLimitedAccessState(isVisible)
-                        }
-                    )
+    Box {
+        when (timelineViewState.selectedTimeBarTab) {
+            TimeBarTab.All -> {
+                Column {
+                    photosGridView()
                 }
             }
 
             else -> {
-                SlideBanner(visible = isBannerShown) {
-                    CameraUploadsBanner(
-                        bannerType = bannerType,
-                        pendingCount = pendingCount,
-                        isTransferScreenAvailable = timelineViewState.isCameraUploadsTransferScreenEnabled,
-                        onEnableCameraUploads = onEnableCameraUploads,
-                        onNavigateToCameraUploadsTransferScreen = {
-                            if (timelineViewState.isCameraUploadsTransferScreenEnabled) {
-                                onNavigateToCameraUploadsTransferScreen()
-                            }
-                        },
-                    )
+                val dateCards = when (timelineViewState.selectedTimeBarTab) {
+                    TimeBarTab.Years -> timelineViewState.yearsCardPhotos
+                    TimeBarTab.Months -> timelineViewState.monthsCardPhotos
+                    TimeBarTab.Days -> timelineViewState.daysCardPhotos
+                    else -> timelineViewState.daysCardPhotos
                 }
+                CardListView(
+                    state = lazyGridState,
+                    dateCards = dateCards,
+                    shouldApplySensitiveMode = timelineViewState.hiddenNodeEnabled
+                            && timelineViewState.accountType?.isPaid == true
+                            && !timelineViewState.isBusinessAccountExpired,
+                    photoDownload = photoDownload,
+                    onCardClick = onCardClick,
+                    cameraUploadsBanners = stickyHeaderView,
+                )
             }
         }
 
-        Box {
-            when (timelineViewState.selectedTimeBarTab) {
-                TimeBarTab.All -> {
-                    Column {
-                        photosGridView()
-                    }
-                }
-
-                else -> {
-                    val dateCards = when (timelineViewState.selectedTimeBarTab) {
-                        TimeBarTab.Years -> timelineViewState.yearsCardPhotos
-                        TimeBarTab.Months -> timelineViewState.monthsCardPhotos
-                        TimeBarTab.Days -> timelineViewState.daysCardPhotos
-                        else -> timelineViewState.daysCardPhotos
-                    }
-                    CardListView(
-                        state = lazyGridState,
-                        dateCards = dateCards,
-                        shouldApplySensitiveMode = timelineViewState.hiddenNodeEnabled
-                                && timelineViewState.accountType?.isPaid == true
-                                && !timelineViewState.isBusinessAccountExpired,
-                        photoDownload = photoDownload,
-                        onCardClick = onCardClick,
-                    )
-                }
-            }
-
-            if (timelineViewState.selectedPhotoCount == 0) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.BottomEnd,
+        if (timelineViewState.selectedPhotoCount == 0) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.BottomEnd,
+            ) {
+                TimeSwitchBar(
+                    timeBarTabs = timelineViewState.timeBarTabs,
+                    onTimeBarTabSelected = onTimeBarTabSelected,
+                    selectedTimeBarTab = timelineViewState.selectedTimeBarTab,
                 ) {
-                    TimeSwitchBar(
-                        timeBarTabs = timelineViewState.timeBarTabs,
-                        onTimeBarTabSelected = onTimeBarTabSelected,
-                        selectedTimeBarTab = timelineViewState.selectedTimeBarTab,
-                    ) {
-                        (!isScrollingDown && !isScrolledToEnd) || isScrolledToTop
-                    }
+                    (!isScrollingDown && !isScrolledToEnd) || isScrolledToTop
                 }
             }
         }
     }
 }
 
-private fun getCameraUploadsBannerType(
+@Composable
+internal fun CameraUploadsBanners(
+    timelineViewState: TimelineViewState,
+    bannerType: CameraUploadsBannerType,
+    isWarningBannerShown: Boolean,
+    isBannerShown: Boolean,
+    onChangeCameraUploadsPermissions: () -> Unit,
+    onUpdateCameraUploadsLimitedAccessState: (Boolean) -> Unit,
+    onEnableCameraUploads: () -> Unit,
+    onNavigateToCameraUploadsTransferScreen: () -> Unit,
+) {
+    val pendingCount = timelineViewState.pending
+    val selectPhotoCount = timelineViewState.selectedPhotoCount
+
+    if (selectPhotoCount > 0 || bannerType == CameraUploadsBannerType.NONE) {
+        return
+    }
+
+    when (bannerType) {
+        CameraUploadsBannerType.NoFullAccess -> {
+            SlideBanner(visible = isWarningBannerShown) {
+                CameraUploadsWarningBanner(
+                    bannerType = bannerType,
+                    onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
+                    onUpdateCameraUploadsLimitedAccessState = onUpdateCameraUploadsLimitedAccessState
+                )
+            }
+        }
+
+        else -> {
+            SlideBanner(visible = isBannerShown) {
+                CameraUploadsBanner(
+                    bannerType = bannerType,
+                    pendingCount = pendingCount,
+                    isTransferScreenAvailable = timelineViewState.isCameraUploadsTransferScreenEnabled,
+                    onEnableCameraUploads = onEnableCameraUploads,
+                    onNavigateToCameraUploadsTransferScreen = {
+                        if (timelineViewState.isCameraUploadsTransferScreenEnabled) {
+                            onNavigateToCameraUploadsTransferScreen()
+                        }
+                    },
+                )
+            }
+        }
+    }
+}
+
+internal fun getCameraUploadsBannerType(
     timelineViewState: TimelineViewState,
 ): CameraUploadsBannerType {
     return when {

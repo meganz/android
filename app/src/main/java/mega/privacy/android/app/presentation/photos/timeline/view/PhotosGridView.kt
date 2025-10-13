@@ -2,6 +2,8 @@ package mega.privacy.android.app.presentation.photos.timeline.view
 
 import android.content.res.Configuration
 import android.text.format.DateFormat.getBestDateTimePattern
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,6 +31,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
+import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsBannerType
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.view.isDownloadPreview
@@ -63,6 +66,8 @@ fun PhotosGridView(
     onLongPress: (Photo) -> Unit = {},
     onZoomIn: () -> Unit = {},
     onZoomOut: () -> Unit = {},
+    bannerType: CameraUploadsBannerType = CameraUploadsBannerType.NONE,
+    cameraUploadsBanners: @Composable () -> Unit = {},
 ) {
     val configuration = LocalConfiguration.current
     val spanCount = remember(configuration.orientation, timelineViewState.currentZoomLevel) {
@@ -119,6 +124,14 @@ fun PhotosGridView(
         },
         userScrollEnabled = userScrollEnabled
     ) {
+        if (bannerType != CameraUploadsBannerType.NONE) {
+            stickyHeader {
+                Box(modifier = Modifier.background(colorResource(R.color.white_black))) {
+                    cameraUploadsBanners()
+                }
+            }
+        }
+
         this.items(
             items = uiPhotoList,
             key = { it.key },

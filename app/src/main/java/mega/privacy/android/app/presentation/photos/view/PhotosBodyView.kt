@@ -51,20 +51,11 @@ fun PhotosBodyView(
     timelineViewState: TimelineViewState = TimelineViewState(),
     albumsViewState: AlbumsViewState = AlbumsViewState(),
 ) {
-
-    val isBarVisibleTimeline by remember {
-        derivedStateOf {
-            timelineLazyGridState.firstVisibleItemIndex == 0
-        }
-    }
+    val isBarVisibleTimeline by timelineLazyGridState.isScrolledToTop()
     val isScrollingDownTimeline by timelineLazyGridState.isScrollingDown()
     val isScrolledToEndTimeline by timelineLazyGridState.isScrolledToEnd()
 
-    val isBarVisibleAlbums by remember {
-        derivedStateOf {
-            albumsLazyGridState.firstVisibleItemIndex == 0
-        }
-    }
+    val isBarVisibleAlbums by albumsLazyGridState.isScrolledToTop()
     val isScrollingDownAlbums by albumsLazyGridState.isScrollingDown()
     val isScrolledToEndAlbums by albumsLazyGridState.isScrolledToEnd()
 
@@ -98,11 +89,11 @@ fun PhotosBodyView(
  */
 @Composable
 fun PhotosTabs(
-    modifier: Modifier = Modifier,
     tabs: List<PhotosTab>,
     selectedTab: PhotosTab,
     isTabSelectionEnabled: Boolean,
     onTabSelected: (PhotosTab) -> Unit,
+    modifier: Modifier = Modifier,
     isVisible: () -> Boolean = { true },
 ) {
     val selectedTabIndex = selectedTab.ordinal
@@ -154,9 +145,9 @@ fun PagerView(
     pagerState: PagerState,
     timelineView: @Composable () -> Unit,
     albumsView: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
     timelineViewState: TimelineViewState,
     albumsViewState: AlbumsViewState,
+    modifier: Modifier = Modifier,
 ) {
     HorizontalPager(
         state = pagerState,

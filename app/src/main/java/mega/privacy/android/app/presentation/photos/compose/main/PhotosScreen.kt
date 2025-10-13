@@ -2,13 +2,16 @@ package mega.privacy.android.app.presentation.photos.compose.main
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -27,16 +30,22 @@ import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
+import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsBannerType
+import mega.privacy.android.app.presentation.photos.timeline.view.CameraUploadsBanners
 import mega.privacy.android.app.presentation.photos.timeline.view.EmptyState
 import mega.privacy.android.app.presentation.photos.timeline.view.EnableCameraUploadsScreen
 import mega.privacy.android.app.presentation.photos.timeline.view.PhotosGridView
 import mega.privacy.android.app.presentation.photos.timeline.view.TimelineView
+import mega.privacy.android.app.presentation.photos.timeline.view.getCameraUploadsBannerType
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.getCurrentSort
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.getFilterType
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.getMediaSource
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.shouldEnableCUPage
 import mega.privacy.android.app.presentation.photos.view.PhotosBodyView
+import mega.privacy.android.app.presentation.photos.view.isScrolledToEnd
+import mega.privacy.android.app.presentation.photos.view.isScrolledToTop
+import mega.privacy.android.app.presentation.photos.view.isScrollingDown
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.CameraUploadsBusinessAccountDialog
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.StorageState
@@ -106,6 +115,56 @@ fun PhotosScreen(
         }
     }
 
+    var isBannerShown by remember { mutableStateOf(false) }
+    var isWarningBannerShown by remember { mutableStateOf(false) }
+    var bannerType by remember { mutableStateOf(CameraUploadsBannerType.NONE) }
+
+    val isScrollingDown by timelineLazyGridState.isScrollingDown()
+    val isScrolledToEnd by timelineLazyGridState.isScrolledToEnd()
+    val isScrolledToTop by timelineLazyGridState.isScrolledToTop()
+
+    LaunchedEffect(
+        timelineViewState.enableCameraUploadButtonShowing,
+        timelineViewState.selectedPhotoCount,
+        timelineViewState.showCameraUploadsWarning,
+        timelineViewState.cameraUploadsStatus
+    ) {
+        bannerType = getCameraUploadsBannerType(timelineViewState)
+    }
+
+    LaunchedEffect(
+        timelineViewState.scrollStartIndex,
+        timelineViewState.scrollStartOffset,
+        timelineViewState.selectedTimeBarTab,
+    ) {
+        timelineLazyGridState.scrollToItem(
+            timelineViewState.scrollStartIndex,
+            timelineViewState.scrollStartOffset
+        )
+    }
+
+    LaunchedEffect(
+        isScrollingDown,
+        isScrolledToEnd,
+        isScrolledToTop
+    ) {
+        isBannerShown = (!isScrollingDown && !isScrolledToEnd) || isScrolledToTop
+
+        if (timelineLazyGridState.isScrollInProgress
+            && (isScrollingDown || isScrolledToEnd)
+            && timelineViewState.isCameraUploadsLimitedAccess
+        ) {
+            timelineViewModel.setCameraUploadsLimitedAccess(false)
+        }
+        isWarningBannerShown = (!isScrollingDown && !isScrolledToEnd)
+                || isScrolledToTop
+                || timelineViewState.isCameraUploadsLimitedAccess
+    }
+
+    LaunchedEffect(timelineViewState.isCameraUploadsLimitedAccess) {
+        isWarningBannerShown = timelineViewState.isCameraUploadsLimitedAccess
+    }
+
     LaunchedEffect(pagerState.currentPage) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
             photosViewModel.onTabSelected(selectedTab = photosViewState.tabs[page])
@@ -135,10 +194,7 @@ fun PhotosScreen(
                 lazyGridState = timelineLazyGridState,
                 onCardClick = timelineViewModel::onCardClick,
                 onTimeBarTabSelected = timelineViewModel::onTimeBarTabSelected,
-                onEnableCameraUploads = onNavigateCameraUploadsSettings,
-                onPendingCountBannerClick = onNavigateCameraUploadsTransferScreen,
                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
-                onUpdateCameraUploadsLimitedAccessState = timelineViewModel::setCameraUploadsLimitedAccess,
                 enableCUView = {
                     EnableCameraUploadsScreen(
                         onEnable = onNavigateCameraUploadsSettings,
@@ -153,14 +209,47 @@ fun PhotosScreen(
                         onLongPress = timelineViewModel::onLongPress,
                         onZoomIn = onZoomIn,
                         onZoomOut = onZoomOut,
-                        fileTypeIconMapper = fileTypeIconMapper
+                        fileTypeIconMapper = fileTypeIconMapper,
+                        bannerType = bannerType,
+                        cameraUploadsBanners = {
+                            CameraUploadsBanners(
+                                timelineViewState = timelineViewState,
+                                bannerType = bannerType,
+                                isWarningBannerShown = isWarningBannerShown,
+                                isBannerShown = isBannerShown,
+                                onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
+                                onUpdateCameraUploadsLimitedAccessState = { isVisible ->
+                                    isWarningBannerShown = isVisible
+                                    timelineViewModel.setCameraUploadsLimitedAccess(isVisible)
+                                },
+                                onEnableCameraUploads = onNavigateCameraUploadsSettings,
+                                onNavigateToCameraUploadsTransferScreen = onNavigateCameraUploadsTransferScreen,
+                            )
+                        },
                     )
                 },
                 emptyView = {
-                    EmptyState(
-                        timelineViewState = timelineViewState,
-                        setEnableCUPage = timelineViewModel::shouldEnableCUPage,
-                    )
+                    Column {
+                        CameraUploadsBanners(
+                            timelineViewState = timelineViewState,
+                            bannerType = bannerType,
+                            isWarningBannerShown = timelineViewState.isCameraUploadsLimitedAccess,
+                            isBannerShown = true,
+                            onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
+                            onUpdateCameraUploadsLimitedAccessState = { isVisible ->
+                                isWarningBannerShown = isVisible
+                                timelineViewModel.setCameraUploadsLimitedAccess(isVisible)
+                            },
+                            onEnableCameraUploads = onNavigateCameraUploadsSettings,
+                            onNavigateToCameraUploadsTransferScreen = onNavigateCameraUploadsTransferScreen,
+                        )
+
+                        EmptyState(
+                            timelineViewState = timelineViewState,
+                            setEnableCUPage = timelineViewModel::shouldEnableCUPage,
+                        )
+                    }
+
                 },
                 onClickCameraUploadsSync = { /* TODO */ },
                 onClickCameraUploadsUploading = {
@@ -181,7 +270,22 @@ fun PhotosScreen(
                 clearCameraUploadsCompletedMessage = {
                     timelineViewModel.setCameraUploadsCompletedMessage(false)
                 },
-                loadPhotos = timelineViewModel::loadPhotos
+                loadPhotos = timelineViewModel::loadPhotos,
+                cameraUploadsBanners = {
+                    CameraUploadsBanners(
+                        timelineViewState = timelineViewState,
+                        bannerType = bannerType,
+                        isWarningBannerShown = isWarningBannerShown,
+                        isBannerShown = isBannerShown,
+                        onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
+                        onUpdateCameraUploadsLimitedAccessState = { isVisible ->
+                            isWarningBannerShown = isVisible
+                            timelineViewModel.setCameraUploadsLimitedAccess(isVisible)
+                        },
+                        onEnableCameraUploads = onNavigateCameraUploadsSettings,
+                        onNavigateToCameraUploadsTransferScreen = onNavigateCameraUploadsTransferScreen,
+                    )
+                }
             )
         },
         albumsView = {

@@ -1,14 +1,11 @@
 package mega.privacy.android.app.presentation.photos.timeline.view
 
-import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.presentation.photos.model.DateCard
-import mega.privacy.android.app.presentation.photos.model.PhotoDownload
-import mega.privacy.android.app.presentation.photos.model.TimeBarTab
+import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsBannerType
 import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsStatus
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.domain.entity.photos.Photo
@@ -16,6 +13,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 class TimelineViewTest {
@@ -23,43 +21,25 @@ class TimelineViewTest {
     var composeRule = createComposeRule()
 
     private fun setComposeContent(
-        photoDownload: PhotoDownload = mock(),
         timelineViewState: TimelineViewState,
-        lazyGridState: LazyGridState = LazyGridState(),
-        onCardClick: (DateCard) -> Unit = {},
-        onTimeBarTabSelected: (TimeBarTab) -> Unit = {},
-        enableCUView: @Composable () -> Unit = {},
-        photosGridView: @Composable () -> Unit = {},
-        emptyView: @Composable () -> Unit = {},
-        onClickCameraUploadsSync: () -> Unit = {},
-        onClickCameraUploadsUploading: () -> Unit = {},
+        bannerType: CameraUploadsBannerType = CameraUploadsBannerType.NONE,
+        isWarningBannerShown: Boolean = false,
+        isBannerShown: Boolean = false,
         onChangeCameraUploadsPermissions: () -> Unit = {},
         onUpdateCameraUploadsLimitedAccessState: (Boolean) -> Unit = {},
         onEnableCameraUploads: () -> Unit = {},
-        clearCameraUploadsMessage: () -> Unit = {},
-        clearCameraUploadsChangePermissionsMessage: () -> Unit = {},
-        clearCameraUploadsCompletedMessage: () -> Unit = {},
-        loadPhotos: () -> Unit = {},
+        onNavigateToCameraUploadsTransferScreen: () -> Unit = {},
     ) {
         composeRule.setContent {
-            TimelineView(
-                photoDownload = photoDownload,
+            CameraUploadsBanners(
                 timelineViewState = timelineViewState,
-                lazyGridState = lazyGridState,
-                onCardClick = onCardClick,
-                onTimeBarTabSelected = onTimeBarTabSelected,
-                enableCUView = enableCUView,
-                photosGridView = photosGridView,
-                emptyView = emptyView,
-                onClickCameraUploadsSync = onClickCameraUploadsSync,
-                onClickCameraUploadsUploading = onClickCameraUploadsUploading,
+                bannerType = bannerType,
+                isWarningBannerShown = isWarningBannerShown,
+                isBannerShown = isBannerShown,
                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
                 onUpdateCameraUploadsLimitedAccessState = onUpdateCameraUploadsLimitedAccessState,
                 onEnableCameraUploads = onEnableCameraUploads,
-                clearCameraUploadsMessage = clearCameraUploadsMessage,
-                clearCameraUploadsChangePermissionsMessage = clearCameraUploadsChangePermissionsMessage,
-                clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
-                loadPhotos = loadPhotos,
+                onNavigateToCameraUploadsTransferScreen = onNavigateToCameraUploadsTransferScreen
             )
         }
     }
@@ -67,11 +47,20 @@ class TimelineViewTest {
     @Test
     fun `test EnableCameraUploadsBanner is displayed when camera uploads is disabled and no photos selected`() {
         val timelineViewState = createTimelineViewStateForEnableBanner()
+        val onEnableCameraUploads = mock<() -> Unit>()
+        val bannerType = getCameraUploadsBannerType(timelineViewState)
 
-        setComposeContent(timelineViewState = timelineViewState)
+        setComposeContent(
+            timelineViewState = timelineViewState,
+            bannerType = bannerType,
+            isBannerShown = true,
+            onEnableCameraUploads = onEnableCameraUploads
+        )
 
-        composeRule.onNodeWithTag(TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_TEST_TAG)
-            .assertIsDisplayed()
+        val banner = composeRule.onNodeWithTag(TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_TEST_TAG)
+        banner.assertIsDisplayed()
+        banner.performClick()
+        verify(onEnableCameraUploads).invoke()
     }
 
     @Test
@@ -79,8 +68,13 @@ class TimelineViewTest {
         val timelineViewState = createTimelineViewStateForEnableBanner(
             enableCameraUploadButtonShowing = false
         )
+        val bannerType = getCameraUploadsBannerType(timelineViewState)
 
-        setComposeContent(timelineViewState = timelineViewState)
+        setComposeContent(
+            timelineViewState = timelineViewState,
+            bannerType = bannerType,
+            isBannerShown = true
+        )
 
         composeRule.onNodeWithTag(TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_TEST_TAG)
             .assertDoesNotExist()
@@ -91,8 +85,13 @@ class TimelineViewTest {
         val timelineViewState = createTimelineViewStateForEnableBanner(
             selectedPhotoCount = 5
         )
+        val bannerType = getCameraUploadsBannerType(timelineViewState)
 
-        setComposeContent(timelineViewState = timelineViewState)
+        setComposeContent(
+            timelineViewState = timelineViewState,
+            bannerType = bannerType,
+            isBannerShown = true
+        )
 
         composeRule.onNodeWithTag(TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_TEST_TAG)
             .assertDoesNotExist()
@@ -101,8 +100,13 @@ class TimelineViewTest {
     @Test
     fun `test CameraUploadsCheckingUploadsBanner is displayed when camera uploads status is Sync`() {
         val timelineViewState = createTimelineViewStateForCheckingUploadsBanner()
+        val bannerType = getCameraUploadsBannerType(timelineViewState)
 
-        setComposeContent(timelineViewState = timelineViewState)
+        setComposeContent(
+            timelineViewState = timelineViewState,
+            bannerType = bannerType,
+            isBannerShown = true
+        )
 
         composeRule.onNodeWithTag(TIMELINE_CAMERA_UPLOADS_CHECKING_UPLOADS_BANNER_TEST_TAG)
             .assertIsDisplayed()
@@ -111,21 +115,36 @@ class TimelineViewTest {
     @Test
     fun `test CameraUploadsPendingCountBanner is displayed when camera uploads status is Uploading`() {
         val timelineViewState = createTimelineViewStateForPendingCountBanner()
+        val bannerType = getCameraUploadsBannerType(timelineViewState)
 
-        setComposeContent(timelineViewState = timelineViewState)
+        setComposeContent(
+            timelineViewState = timelineViewState,
+            bannerType = bannerType,
+            isBannerShown = true
+        )
 
         composeRule.onNodeWithTag(TIMELINE_CAMERA_UPLOADS_PENDING_COUNT_BANNER_TEST_TAG)
             .assertIsDisplayed()
     }
 
     @Test
-    fun `test CameraUploadsNoFullAccessBanner is displayed when showCameraUploadsWarning is true`() {
+    fun `test CameraUploadsNoFullAccessBanner is displayed when isWarningBannerShown is true`() {
         val timelineViewState = createTimelineViewStateForNoFullAccessBanner()
+        val onChangeCameraUploadsPermissions = mock<() -> Unit>()
+        val bannerType = getCameraUploadsBannerType(timelineViewState)
 
-        setComposeContent(timelineViewState = timelineViewState)
+        setComposeContent(
+            timelineViewState = timelineViewState,
+            bannerType = bannerType,
+            isWarningBannerShown = true,
+            onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions
+        )
 
-        composeRule.onNodeWithTag(TIMELINE_CAMERA_UPLOADS_NO_FULL_ACCESS_BANNER_TEST_TAG)
-            .assertIsDisplayed()
+        val banner =
+            composeRule.onNodeWithTag(TIMELINE_CAMERA_UPLOADS_NO_FULL_ACCESS_BANNER_TEST_TAG)
+        banner.assertIsDisplayed()
+        banner.performClick()
+        verify(onChangeCameraUploadsPermissions).invoke()
     }
 
     @Test
@@ -139,30 +158,19 @@ class TimelineViewTest {
             currentShowingPhotos = listOf<Photo.Video>(mock(), mock()),
             loadPhotosDone = true
         )
+        val bannerType = getCameraUploadsBannerType(timelineViewState)
 
-        setComposeContent(timelineViewState = timelineViewState)
+        setComposeContent(
+            timelineViewState = timelineViewState,
+            bannerType = bannerType,
+            isBannerShown = true
+        )
 
         // Should show warning banner instead of enable camera uploads banner
         composeRule.onNodeWithTag(TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_TEST_TAG)
             .assertIsDisplayed()
         composeRule.onNodeWithTag(TIMELINE_CAMERA_UPLOADS_NO_FULL_ACCESS_BANNER_TEST_TAG)
             .assertDoesNotExist()
-    }
-
-    @Test
-    fun `test banner visibility when scrolling states change`() {
-        val timelineViewState = TimelineViewState(
-            enableCameraUploadButtonShowing = true,
-            selectedPhotoCount = 0,
-            currentShowingPhotos = listOf<Photo.Video>(mock(), mock()),
-            loadPhotosDone = true
-        )
-
-        setComposeContent(timelineViewState = timelineViewState)
-
-        // Banner should be visible initially
-        composeRule.onNodeWithTag(TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_TEST_TAG)
-            .assertIsDisplayed()
     }
 
     @Test
@@ -176,8 +184,13 @@ class TimelineViewTest {
             currentShowingPhotos = listOf<Photo.Video>(mock(), mock()),
             loadPhotosDone = true
         )
+        val bannerType = getCameraUploadsBannerType(timelineViewState)
 
-        setComposeContent(timelineViewState = timelineViewState)
+        setComposeContent(
+            timelineViewState = timelineViewState,
+            bannerType = bannerType,
+            isBannerShown = true
+        )
 
         composeRule.onNodeWithTag(TIMELINE_CAMERA_UPLOADS_PENDING_COUNT_BANNER_TEST_TAG)
             .assertIsDisplayed()
@@ -188,8 +201,14 @@ class TimelineViewTest {
         val timelineViewState = createTimelineViewStateForCheckingUploadsBanner(
             cameraUploadsStatus = CameraUploadsStatus.None
         )
+        val bannerType = getCameraUploadsBannerType(timelineViewState)
 
-        setComposeContent(timelineViewState = timelineViewState)
+        setComposeContent(
+            timelineViewState = timelineViewState,
+            bannerType = bannerType,
+            isBannerShown = true,
+            isWarningBannerShown = true
+        )
 
         composeRule.onNodeWithTag(TIMELINE_CAMERA_UPLOADS_CHECKING_UPLOADS_BANNER_TEST_TAG)
             .assertDoesNotExist()
@@ -200,8 +219,9 @@ class TimelineViewTest {
         val timelineViewState = createTimelineViewStateForNoFullAccessBanner(
             showCameraUploadsWarning = false
         )
+        val bannerType = getCameraUploadsBannerType(timelineViewState)
 
-        setComposeContent(timelineViewState = timelineViewState)
+        setComposeContent(timelineViewState = timelineViewState, bannerType = bannerType)
 
         composeRule.onNodeWithTag(TIMELINE_CAMERA_UPLOADS_NO_FULL_ACCESS_BANNER_TEST_TAG)
             .assertDoesNotExist()
@@ -219,8 +239,13 @@ class TimelineViewTest {
             currentShowingPhotos = listOf<Photo.Video>(mock(), mock()),
             loadPhotosDone = true
         )
+        val bannerType = getCameraUploadsBannerType(timelineViewState)
 
-        setComposeContent(timelineViewState = timelineViewState)
+        setComposeContent(
+            timelineViewState = timelineViewState,
+            bannerType = bannerType,
+            isBannerShown = true
+        )
 
         // Warning banner should have highest priority
         composeRule.onNodeWithTag(TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_TEST_TAG)
@@ -244,8 +269,13 @@ class TimelineViewTest {
             currentShowingPhotos = listOf<Photo.Video>(mock(), mock()),
             loadPhotosDone = true
         )
+        val bannerType = getCameraUploadsBannerType(timelineViewState)
 
-        setComposeContent(timelineViewState = timelineViewState)
+        setComposeContent(
+            timelineViewState = timelineViewState,
+            bannerType = bannerType,
+            isBannerShown = true
+        )
 
         // Enable camera uploads banner should have priority over sync status
         composeRule.onNodeWithTag(TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_TEST_TAG)
@@ -264,8 +294,13 @@ class TimelineViewTest {
             currentShowingPhotos = listOf<Photo.Video>(mock(), mock()),
             loadPhotosDone = true
         )
+        val bannerType = getCameraUploadsBannerType(timelineViewState)
 
-        setComposeContent(timelineViewState = timelineViewState)
+        setComposeContent(
+            timelineViewState = timelineViewState,
+            bannerType = bannerType,
+            isBannerShown = true
+        )
 
         // Sync status banner should be shown
         composeRule.onNodeWithTag(TIMELINE_CAMERA_UPLOADS_CHECKING_UPLOADS_BANNER_TEST_TAG)

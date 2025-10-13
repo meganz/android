@@ -51,6 +51,7 @@ fun CardListView(
     state: LazyGridState = rememberLazyGridState(),
     shouldApplySensitiveMode: Boolean = false,
     cardListViewHeaderView: @Composable () -> Unit = {},
+    cameraUploadsBanners: @Composable () -> Unit = {},
 ) {
     val spanCount =
         if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -68,6 +69,12 @@ fun CardListView(
             dateCards.getOrNull(index)?.date ?: ""
         },
     ) {
+        stickyHeader {
+            Box(modifier = Modifier.background(colorResource(R.color.white_black))) {
+                cameraUploadsBanners()
+            }
+        }
+
         item(
             span = { GridItemSpan(currentLineSpan = maxCurrentLineSpan) }
         ) {

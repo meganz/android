@@ -65,8 +65,8 @@ fun CameraUploadsStatusSync(
 
 @Composable
 fun CameraUploadsStatusUploading(
-    modifier: Modifier = Modifier,
     progress: Float,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
     CameraUploadsStatus(
@@ -108,9 +108,9 @@ fun CameraUploadsStatusCompleted(
 
 @Composable
 fun CameraUploadsStatusWarning(
+    progress: Float,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
-    progress: Float,
 ) {
     CameraUploadsStatus(
         loadingIndicatorColor = amber_400,
@@ -130,11 +130,11 @@ fun CameraUploadsStatusWarning(
 
 @Composable
 private fun CameraUploadsStatus(
-    modifier: Modifier = Modifier,
     loadingIndicatorColor: Color,
+    statusIcon: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
     progress: Float = 0f,
-    statusIcon: @Composable () -> Unit,
 ) {
     FloatingActionButton(
         onClick = onClick,
