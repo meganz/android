@@ -27,6 +27,8 @@ dependencies {
     implementation(project(":core:navigation-contract"))
     implementation(project(":navigation"))
     implementation(project(":domain"))
+    implementation(project(":icon-pack"))
+    implementation(project(":shared:resources"))
     implementation(project(":feature:photos:photos-snowflake-components"))
 
     implementation(lib.mega.core.ui)

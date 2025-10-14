@@ -228,6 +228,7 @@ interface IconPackInterface {
                 val Heart: ImageVector
                 val CheckCircle: ImageVector
                 val CheckSquare: ImageVector
+                val Image01: ImageVector
             }
         }
     }
