@@ -3165,7 +3165,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
             DrawerItem.CHAT -> {
                 setAppBarVisibility(true)
-                supportActionBar?.title = getString(R.string.section_chat)
+                supportActionBar?.title = getString(sharedR.string.general_chat)
                 viewModel.setIsFirstNavigationLevel(true)
             }
 

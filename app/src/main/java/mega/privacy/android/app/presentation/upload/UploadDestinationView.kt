@@ -37,6 +37,7 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Upload View
@@ -197,7 +198,7 @@ private fun UploadDestinationFooterView(
 
     TextMegaButton(
         modifier = Modifier.testTag(UPLOAD_DESTINATION_VIEW_CHAT),
-        text = stringResource(id = R.string.section_chat),
+        text = stringResource(id = sharedR.string.general_chat),
         onClick = {
             if (isValidNameForUpload()) {
                 navigateToChats()

@@ -1707,4 +1707,6 @@
     <string name="transfers_transfer_cancelled">Transfer cancelled</string>
     <!-- Undo label for any undo action -->
     <string name="general_undo">Undo</string>
+    <!-- General label for chat, for instance in the menu section-->
+    <string name="general_chat">Chat</string>
 </resources>

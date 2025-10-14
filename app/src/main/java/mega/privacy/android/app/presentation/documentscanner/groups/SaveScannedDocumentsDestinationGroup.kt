@@ -70,7 +70,7 @@ internal fun SaveScannedDocumentsDestinationGroup(
             val isChatSelected = selectedScanDestination == ScanDestination.Chat
             MegaChip(
                 selected = isChatSelected,
-                text = stringResource(SharedR.string.document_scanning_confirmation_destination_chat),
+                text = stringResource(SharedR.string.general_chat),
                 modifier = Modifier.testTag(SAVE_SCANNED_DOCUMENTS_DESTINATION_GROUP_CHIP_CHAT),
                 style = if (isChatSelected) DefaultChipStyle else TransparentChipStyle,
                 leadingIcon = if (isChatSelected) CoreR.drawable.ic_filter_selected else null

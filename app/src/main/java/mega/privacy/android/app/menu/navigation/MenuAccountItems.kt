@@ -5,6 +5,7 @@ import mega.privacy.android.feature.payment.UpgradeAccountNavKey
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import mega.privacy.android.navigation.destination.AchievementNavKey
+import mega.privacy.android.navigation.destination.ChatsNavKey
 import mega.privacy.android.navigation.destination.ContactsNavKey
 import mega.privacy.android.navigation.destination.DeviceCenterNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsNavKey
@@ -44,6 +45,12 @@ object SharedItemsItem : NavDrawerItem.Account(
     destination = SharesNavKey,
     icon = IconPack.Medium.Thin.Outline.FolderUsers,
     title = sharedR.string.video_section_videos_location_option_shared_items
+)
+
+object ChatItem : NavDrawerItem.Account(
+    destination = ChatsNavKey,
+    icon = IconPack.Medium.Thin.Outline.MessageChatCircle,
+    title = sharedR.string.general_chat,
 )
 
 object DeviceCentreItem : NavDrawerItem.Account(

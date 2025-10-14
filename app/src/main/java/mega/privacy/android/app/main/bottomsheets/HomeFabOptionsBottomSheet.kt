@@ -121,7 +121,7 @@ fun HomeFabOptionsBottomSheet(
             },
         )
         MegaText(
-            text = stringResource(R.string.section_chat),
+            text = stringResource(sharedResR.string.general_chat),
             textColor = TextColor.Secondary,
             modifier = Modifier.padding(8.dp),
             style = MaterialTheme.typography.subtitle2,

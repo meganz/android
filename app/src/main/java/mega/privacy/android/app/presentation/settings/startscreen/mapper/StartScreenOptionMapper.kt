@@ -44,7 +44,7 @@ internal fun mapStartScreenOption(screen: StartScreen) = when (screen) {
     StartScreen.Chat -> {
         StartScreenOption(
             startScreen = screen,
-            title = R.string.section_chat,
+            title = sharedR.string.general_chat,
             icon = IconPack.Medium.Thin.Outline.MessageChatCircle,
         )
     }

@@ -148,6 +148,7 @@ import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedR
 
 
 /**
@@ -904,7 +905,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             ) { tab: TabLayout.Tab, tabPosition: Int ->
                 tab.text = when (tabPosition) {
                     1 -> getString(R.string.tab_incoming_shares)
-                    2 -> getString(R.string.section_chat)
+                    2 -> getString(sharedR.string.general_chat)
                     0 -> getString(R.string.section_cloud_drive)
                     else -> getString(R.string.section_cloud_drive)
                 }

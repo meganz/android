@@ -31,6 +31,9 @@ data class ContactsNavKey(val navType: NavType = NavType.List) : NavKey {
 data class ChatNavKey(val chatId: Long, val action: String?) : NavKey
 
 @Serializable
+data object ChatsNavKey : NavKey
+
+@Serializable
 data class AddContactToShareNavKey(
     val contactType: ContactType,
     val nodeHandle: List<Long>,

@@ -8,6 +8,7 @@ import dagger.multibindings.IntKey
 import dagger.multibindings.IntoMap
 import dagger.multibindings.IntoSet
 import mega.privacy.android.app.menu.navigation.AchievementsItem
+import mega.privacy.android.app.menu.navigation.ChatItem
 import mega.privacy.android.app.menu.navigation.ContactsItem
 import mega.privacy.android.app.menu.navigation.CurrentPlanItem
 import mega.privacy.android.app.menu.navigation.DeviceCentreItem
@@ -55,6 +56,11 @@ class NavigationModule {
     @IntoMap
     @IntKey(50)
     fun provideSharedItemsItem(): NavDrawerItem = SharedItemsItem
+
+    @Provides
+    @IntoMap
+    @IntKey(55)
+    fun provideChatItem(): NavDrawerItem = ChatItem
 
     @Provides
     @IntoMap

@@ -43,7 +43,7 @@ class HomeFabOptionsBottomSheetTest {
             .assertExists().assertIsDisplayed()
         composeRule.onNodeWithText(sharedResR.string.device_center_sync_add_new_backup_button_option)
             .assertExists().assertIsDisplayed()
-        composeRule.onNodeWithText(R.string.section_chat).assertExists().assertIsDisplayed()
+        composeRule.onNodeWithText(sharedResR.string.general_chat).assertExists().assertIsDisplayed()
         composeRule.onNodeWithText(R.string.fab_label_new_chat).assertExists().assertIsDisplayed()
     }
 

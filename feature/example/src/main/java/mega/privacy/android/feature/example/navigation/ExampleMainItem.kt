@@ -29,7 +29,7 @@ class ExampleMainItem : MainNavItem {
     override val badge: Flow<String?>? = null
 
     @StringRes
-    override val label: Int = sharedR.string.document_scanning_confirmation_destination_chat
+    override val label: Int = sharedR.string.general_chat
     override val preferredSlot: PreferredSlot = PreferredSlot.Ordered(1)
     override val availableOffline: Boolean = false
     override val analyticsEventIdentifier: NavigationEventIdentifier = ExampleNavigationIdentifier

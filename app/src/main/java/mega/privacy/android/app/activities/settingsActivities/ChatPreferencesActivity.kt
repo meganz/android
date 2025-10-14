@@ -17,6 +17,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.presentation.settings.chat.SettingsChatFragment
 import mega.privacy.android.app.utils.Constants
 import timber.log.Timber
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * ChatPreferencesActivity
@@ -32,7 +33,7 @@ class ChatPreferencesActivity : PreferencesBaseActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding.toolbarSettings.title = getString(R.string.section_chat)
+        binding.toolbarSettings.title = getString(sharedR.string.general_chat)
         sttChat = SettingsChatFragment()
         sttChat?.let { replaceFragment(it) }
         collectFlows()
