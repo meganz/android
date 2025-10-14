@@ -22,6 +22,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -41,7 +42,6 @@ import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeAc
 import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.list.NodeGridViewItem
 import mega.privacy.android.core.nodecomponents.list.NodeListViewItem
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
@@ -53,6 +53,7 @@ import mega.privacy.android.feature.clouddrive.presentation.offline.model.Offlin
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineSelectionAction
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
@@ -68,12 +69,15 @@ fun OfflineScreen(
     onBack: () -> Unit,
     onNavigateToFolder: (nodeId: Int, name: String) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
+    openFileInformation: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: OfflineViewModel = hiltViewModel(),
     actionViewModel: OfflineNodeActionsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val actionUiState by actionViewModel.uiState.collectAsStateWithLifecycle()
+    val megaNavigator = rememberMegaNavigator()
+    val context = LocalContext.current
 
     HandleOfflineNodeAction3(
         uiState = actionUiState,
@@ -107,6 +111,7 @@ fun OfflineScreen(
             onTransfer(TransferTriggerEvent.CopyOfflineNode(nodes))
         },
         removeOfflineNodes = viewModel::removeOfflineNodes,
+        openFileInformation = openFileInformation,
         modifier = modifier
     )
 }
@@ -127,6 +132,7 @@ internal fun OfflineScreen(
     shareOfflineFiles: () -> Unit,
     saveOfflineFilesToDevice: () -> Unit,
     removeOfflineNodes: (List<Long>) -> Unit,
+    openFileInformation: (String) -> Unit,
     modifier: Modifier = Modifier,
     consumeOpenFolderEvent: () -> Unit = {},
     consumeOpenFileEvent: () -> Unit = {},
@@ -221,6 +227,8 @@ internal fun OfflineScreen(
             }
         }
     ) { paddingValues ->
+        var visibleOfflineInformation by remember { mutableStateOf<OfflineFileInformation?>(null) }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -259,7 +267,7 @@ internal fun OfflineScreen(
                             onItemClicked = onItemClicked,
                             onItemLongClicked = onItemLongClicked,
                             onMoreClicked = {
-                                // Todo implement NodeOptionsBottomSheet
+                                visibleOfflineInformation = it.offlineFileInformation
                             },
                             contentPadding = PaddingValues(
                                 bottom = paddingValues.calculateBottomPadding()
@@ -268,6 +276,21 @@ internal fun OfflineScreen(
                     }
                 }
             }
+        }
+
+        visibleOfflineInformation?.let { file ->
+            OfflineOptionsBottomSheet(
+                offlineFileInformation = file,
+                onShareOfflineFile = { /* TODO */ },
+                onSaveOfflineFileToDevice = { /* TODO */ },
+                onOpenOfflineFile = {
+                    openFileInformation(file.handle)
+                    visibleOfflineInformation = null
+                },
+                onOpenWithFile = { /* TODO */ },
+                onDeleteOfflineFile = { /* TODO */ },
+                onDismiss = { visibleOfflineInformation = null }
+            )
         }
 
         if (showRemoveDialog) {
@@ -292,8 +315,6 @@ private fun OfflineContent(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
-    val fileTypeIconMapper = remember { FileTypeIconMapper() }
-
     when (uiState.currentViewType) {
         ViewType.LIST -> {
             LazyColumn(
@@ -312,19 +333,10 @@ private fun OfflineContent(
                         } else {
                             getFileTypeIcon(node.offlineFileInformation.name) ?: return@items
                         },
-                        description = null,
-                        tags = null,
                         thumbnailData = node.offlineFileInformation.thumbnail,
                         highlightText = uiState.searchQuery ?: "",
                         isSelected = node.isSelected,
                         isInSelectionMode = uiState.selectedNodeHandles.isNotEmpty(),
-                        showIsVerified = false,
-                        isTakenDown = false,
-                        label = null,
-                        showLink = false,
-                        showFavourite = false,
-                        isSensitive = false,
-                        showBlurEffect = false,
                         isHighlighted = node.isHighlighted,
                         onMoreClicked = { onMoreClicked(node) },
                         onItemClicked = { onItemClicked(node) },
@@ -355,17 +367,12 @@ private fun OfflineContent(
                         },
                         thumbnailData = node.offlineFileInformation.thumbnail,
                         isTakenDown = false,
-                        duration = null,
                         isSelected = node.isSelected,
                         isInSelectionMode = uiState.selectedNodeHandles.isNotEmpty(),
                         isFolderNode = node.offlineFileInformation.isFolder,
                         isVideoNode = false, // TODO: Add video detection
                         highlightText = uiState.searchQuery ?: "",
-                        isSensitive = false,
-                        showBlurEffect = false,
                         isHighlighted = node.isHighlighted,
-                        showLink = false,
-                        showFavourite = false,
                         label = null,
                         onClick = { onItemClicked(node) },
                         onLongClick = { onItemLongClicked(node) },

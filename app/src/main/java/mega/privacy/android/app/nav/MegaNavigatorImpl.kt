@@ -9,6 +9,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.core.net.toUri
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.getLink.GetLinkActivity
@@ -644,7 +645,7 @@ internal class MegaNavigatorImpl @Inject constructor(
     override fun openImageViewerForOfflineNode(
         context: Context,
         node: NodeId,
-        path: String
+        path: String,
     ) {
         val intent = ImagePreviewActivity.createIntent(
             context = context,
@@ -692,6 +693,16 @@ internal class MegaNavigatorImpl @Inject constructor(
     override fun openFileInfoActivity(context: Context, handle: Long) {
         context.startActivity(
             Intent(context, FileInfoActivity::class.java)
+                .putExtra(Constants.HANDLE, handle)
+        )
+    }
+
+    override fun openOfflineFileInfoActivity(
+        context: Context,
+        handle: String,
+    ) {
+        context.startActivity(
+            Intent(context, OfflineFileInfoActivity::class.java)
                 .putExtra(Constants.HANDLE, handle)
         )
     }

@@ -69,3 +69,6 @@ data class TestPasswordNavKey(
     val isTestPasswordMode: Boolean = false,
     val isLogoutMode: Boolean = false,
 ) : NavKey
+
+@Serializable
+data class OfflineInfoNavKey(val handle: String) : NavKey

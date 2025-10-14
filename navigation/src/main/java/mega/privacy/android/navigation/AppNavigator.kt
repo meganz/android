@@ -427,6 +427,17 @@ interface AppNavigator {
     )
 
     /**
+     * Open Offline File Info Activity
+     *
+     * @param context Context
+     * @param handle Node handle
+     */
+    fun openOfflineFileInfoActivity(
+        context: Context,
+        handle: String,
+    )
+
+    /**
      * Open File Contact List Activity
      *
      * @param context Context
