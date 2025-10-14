@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @property failedTransfers List of cancelled or failed completed transfers.
  * @property selectedFailedTransfersIds List of selected failed or cancelled transfers. If not null, even empty, indicates selected mode is on.
  * @property startEvent event to start a new transfer
+ * @property transfersPendingToCancel Map of transfers pending to cancel from swipe gesture.
  */
 data class TransfersUiState(
     val selectedTab: Int = ACTIVE_TAB_INDEX,
@@ -36,12 +37,8 @@ data class TransfersUiState(
     val failedTransfers: List<CompletedTransfer> = listOf(),
     val selectedFailedTransfersIds: List<Int>? = null,
     val startEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
+    val transfersPendingToCancel: Map<Long, TransferPendingToCancel> = emptyMap(),
 ) {
-
-    /**
-     * Whether the storage or transfer is over quota.
-     */
-    val isOverQuota = isStorageOverQuota || isTransferOverQuota
 
     /**
      * true if it's in select mode, false otherwise
@@ -99,3 +96,15 @@ sealed class QuotaWarning {
      */
     data object StorageAndTransfer : QuotaWarning()
 }
+
+/**
+ * Data class storing info required for cancelling a transfer from swipe gesture.
+ *
+ * @property tag Transfer tag.
+ * @property isPaused Paused state when the swipe gesture takes place.
+ *                    Used to restore it if undo action is pressed.
+ */
+data class TransferPendingToCancel(
+    val tag: Int,
+    val isPaused: Boolean,
+)

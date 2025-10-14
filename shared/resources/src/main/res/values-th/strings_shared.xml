@@ -1165,9 +1165,9 @@
     <!-- text of how it works for mega pass free trial in achivements section -->
     <string name="text_how_it_works_mega_pass_free_trial">ติดตั้งแอป MEGA&#160;Pass เข้าสู่ระบบด้วยบัญชี MEGA ของคุณ แล้วเริ่มทดลองใช้ฟรี พื้นที่เก็บข้อมูลโบนัสของคุณจะถูกเพิ่มให้โดยอัตโนมัติหลังจากที่คุณเริ่มทดลองใช้ฟรี</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">You’ve received %1$s extra storage space for starting a MEGA&#160;VPN free trial</string>
+    <string name="text_received_mega_vpn_free_trial">คุณได้รับพื้นที่เก็บข้อมูลเพิ่ม %1$s สำหรับการเริ่มทดลองใช้งาน MEGA&#160;VPN ฟรี</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">You’ve received %1$s extra storage space for starting a MEGA&#160;Pass free trial</string>
+    <string name="text_received_mega_pass_free_trial">คุณได้รับพื้นที่เก็บข้อมูลเพิ่ม %1$s สำหรับการเริ่มทดลองใช้งาน MEGA&#160;Pass ฟรี</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">โฟลเดอร์บางรายการไม่สามารถซิงค์หรือสำรองข้อมูลได้ เนื่องจากแอป MEGA สูญเสียสิทธิ์ในการเข้าถึงโฟลเดอร์ในเครื่อง แตะ ดำเนินการต่อ เพื่อเพิ่มสิทธิ์สำหรับแต่ละโฟลเดอร์ที่ได้รับผลกระทบอีกครั้ง</string>
     <!-- Title for the free plan card when the user is an existing account -->
@@ -1652,4 +1652,16 @@
     <string name="camera_uploads_tranfer_empty_view_title">ทุกอย่างเป็นปัจจุบันแล้ว</string>
     <!--description for the Camera Uploads transfer empty view -->
     <string name="camera_uploads_tranfer_empty_view_description">เมื่อคุณถ่ายรูปและวิดีโอ รายการใหม่ ๆ จะปรากฏในส่วนนี้</string>
+    <!--Title for the Camera Uploads transfer top bar -->
+    <string name="camera_uploads_tranfer_top_bar_title">ความคืบหน้า</string>
+    <!--Subtitle for the Camera Uploads transfer top bar -->
+    <plurals name="camera_uploads_tranfer_top_bar_subtitle">
+        <item quantity="other">กำลังอัปโหลด เหลืออีก %1$d รายการ</item>
+    </plurals>
+    <!-- Text of the button to start a video call -->
+    <string name="start_video_call_button_text">วิดีโอ</string>
+    <!-- Text of the button for recording a video -->
+    <string name="record_video_button_text">วิดีโอ</string>
+    <!-- Label shown the total the used space for business/pro flexi account -->
+    <string name="navigation_drawer_used_space_only">[A]%1$s[/A] used</string>
 </resources>

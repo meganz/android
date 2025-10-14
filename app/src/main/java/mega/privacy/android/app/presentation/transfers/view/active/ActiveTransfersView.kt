@@ -5,22 +5,30 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.list.MegaReorderableLazyColumn
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollForLazyColumn
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.extensions.transfers.getProgressPercentString
 import mega.privacy.android.app.presentation.extensions.transfers.getProgressSizeString
 import mega.privacy.android.app.presentation.extensions.transfers.getSpeedString
+import mega.privacy.android.app.presentation.snackbar.SnackbarHostStateWrapper
+import mega.privacy.android.app.presentation.snackbar.showAutoDurationSnackbar
 import mega.privacy.android.app.presentation.transfers.model.QuotaWarning
 import mega.privacy.android.app.presentation.transfers.model.image.ActiveTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.view.EmptyTransfersView
@@ -48,11 +56,19 @@ internal fun ActiveTransfersView(
     onUpgradeClick: () -> Unit,
     onConsumeQuotaWarning: () -> Unit,
     onCancelActiveTransfer: (InProgressTransfer) -> Unit,
+    onSetActiveTransferToCancel: (InProgressTransfer) -> Unit,
+    onUndoCancelActiveTransfer: (InProgressTransfer) -> Unit,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
 ) {
     val selectMode = remember(selectedActiveTransfersIds) { selectedActiveTransfersIds != null }
     var draggedTransfer by remember { mutableStateOf<InProgressTransfer?>(null) }
+    val localSnackbarHostState = LocalSnackBarHostState.current
+    val snackBarHostState = LocalSnackBarHostState.current?.let {
+        SnackbarHostStateWrapper(it)
+    }
+    val context = LocalContext.current
 
     if (activeTransfers.isEmpty()) {
         EmptyTransfersView(
@@ -102,7 +118,24 @@ internal fun ActiveTransfersView(
                         isDraggable = selectedActiveTransfersIds == null,
                         isBeingDragged = item == draggedTransfer,
                         onPlayPauseClicked = { onPlayPauseClicked(item.tag) },
-                        onCancel = { onCancelActiveTransfer(item) },
+                        onSetToCancel = {
+                            onSetActiveTransferToCancel(item)
+
+                            coroutineScope.launch {
+                                localSnackbarHostState?.currentSnackbarData?.dismiss()
+                                val result = snackBarHostState.showAutoDurationSnackbar(
+                                    context.getString(sharedR.string.transfers_transfer_cancelled),
+                                    context.getString(sharedR.string.general_undo),
+                                )
+                                when (result) {
+                                    SnackbarResult.ActionPerformed ->
+                                        onUndoCancelActiveTransfer(item)
+
+                                    SnackbarResult.Dismissed ->
+                                        onCancelActiveTransfer(item)
+                                }
+                            }
+                        },
                         modifier = Modifier
                             .animateItem()
                             .clickable(enabled = selectMode) {
@@ -126,7 +159,7 @@ internal fun ActiveTransferItem(
     isBeingDragged: Boolean,
     enableSwipeToDismiss: Boolean,
     onPlayPauseClicked: () -> Unit,
-    onCancel: () -> Unit,
+    onSetToCancel: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ActiveTransferImageViewModel = hiltViewModel(),
 ) = with(activeTransfer) {
@@ -162,8 +195,8 @@ internal fun ActiveTransferItem(
                 else ActiveTransfersIndividualPauseButtonButtonPressedEvent
             )
         },
-        onCancel = {
-            onCancel()
+        onSetToCancel = {
+            onSetToCancel()
 //            Analytics.tracker.trackEvent()
         },
         modifier = modifier,

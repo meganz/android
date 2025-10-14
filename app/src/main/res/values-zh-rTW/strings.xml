@@ -252,10 +252,6 @@
     <string name="option_decryption_key">解密金鑰</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="download_preparing_files">正在準備檔案</string>
-    <!-- Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
-    <plurals name="upload_began">
-        <item quantity="other">%1$d個上傳已開始</item>
-    </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">查看傳輸</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
@@ -1198,15 +1194,15 @@
     <!-- title of the section for unlocked storage quota -->
     <string name="unlocked_storage_title">儲存空間</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_referral_bonuses">Invite people to MEGA</string>
+    <string name="title_referral_bonuses">邀請朋友加入MEGA</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">安裝我們的手機應用程式</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">註冊獎勵</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Install our desktop app</string>
+    <string name="title_install_desktop">安裝我們的桌面應用程式</string>
     <!-- indicates the number of days left related to a achievement -->
-    <string name="general_num_days_left">%1$d days left</string>
+    <string name="general_num_days_left">還剩%1$d天</string>
     <!-- State to indicate an achievement has expired -->
     <string name="expired_label">已過期</string>
     <!-- title of the advanced setting to choose the use of https -->
@@ -1224,9 +1220,9 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">電子郵件地址格式錯誤</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">You’ve received %1$s extra storage space for installing our desktop app</string>
+    <string name="result_paragraph_info_achievement_install_desktop">您已安裝我們的MEGA桌面應用程式並獲得%1$s儲存空間了。</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">You’ve received %1$s extra storage space for installing our mobile app</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">您已安裝我們的行動應用程式並獲得%1$s儲存空間了。</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">您已收到%1$s儲存空間作為免費註冊的獎勵。</string>
     <!-- menu items -->

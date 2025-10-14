@@ -1199,9 +1199,9 @@
     <!-- text of how it works for mega pass free trial in achivements section -->
     <string name="text_how_it_works_mega_pass_free_trial">Instalează aplicația MEGA&#160;Pass, conectează-te cu contul tău MEGA și începe perioada de probă gratuită. Spațiul de stocare bonus este adăugat automat după începerea perioadei de probă gratuite.</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">You’ve received %1$s extra storage space for starting a MEGA&#160;VPN free trial</string>
+    <string name="text_received_mega_vpn_free_trial">Ați primit %1$s spațiu de stocare suplimentar pentru pornirea unui MEGA&#160;VPN de încercare gratuită</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">You’ve received %1$s extra storage space for starting a MEGA&#160;Pass free trial</string>
+    <string name="text_received_mega_pass_free_trial">Ați primit %1$s spațiu de stocare suplimentar pentru pornirea unui MEGA&#160;Pass de încercare gratuită</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">Unele foldere nu pot fi sincronizate sau copiate de rezervă, deoarece aplicația MEGA a pierdut permisiunile de acces la folderele locale. Atingeți Reluare pentru a adăuga din nou permisiunile pentru fiecare folder afectat.</string>
     <!-- Title for the free plan card when the user is an existing account -->
@@ -1723,9 +1723,23 @@
     <!--header for the Camera Uploads transfer in progress items -->
     <string name="camera_uploads_tranfer_header_in_progress">În curs</string>
     <!--header for the Camera Uploads transfer in queue items -->
-    <string name="camera_uploads_tranfer_header_in_queue">Queueing</string>
+    <string name="camera_uploads_tranfer_header_in_queue">În coadă</string>
     <!--Title for the Camera Uploads transfer empty view -->
-    <string name="camera_uploads_tranfer_empty_view_title">All caught up</string>
+    <string name="camera_uploads_tranfer_empty_view_title">Toate la zi</string>
     <!--description for the Camera Uploads transfer empty view -->
-    <string name="camera_uploads_tranfer_empty_view_description">New photos and videos will appear here after you take them</string>
+    <string name="camera_uploads_tranfer_empty_view_description">Fotografii și videoclipuri noi vor apărea aici după ce le faci</string>
+    <!--Title for the Camera Uploads transfer top bar -->
+    <string name="camera_uploads_tranfer_top_bar_title">Progres</string>
+    <!--Subtitle for the Camera Uploads transfer top bar -->
+    <plurals name="camera_uploads_tranfer_top_bar_subtitle">
+        <item quantity="one">Se încarcă: %1$d element rămas</item>
+        <item quantity="few">Se încarcă: %1$d elemente rămase</item>
+        <item quantity="other">Se încarcă: %1$d de elemente rămase</item>
+    </plurals>
+    <!-- Text of the button to start a video call -->
+    <string name="start_video_call_button_text">Video</string>
+    <!-- Text of the button for recording a video -->
+    <string name="record_video_button_text">Video</string>
+    <!-- Label shown the total the used space for business/pro flexi account -->
+    <string name="navigation_drawer_used_space_only">[A]%1$s[/A] used</string>
 </resources>

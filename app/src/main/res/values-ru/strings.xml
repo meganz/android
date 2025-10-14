@@ -261,13 +261,6 @@
     <string name="option_decryption_key">Ключ дешифрования</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="download_preparing_files">Подготовка файлов</string>
-    <!-- Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
-    <plurals name="upload_began">
-        <item quantity="one">Загрузка началась</item>
-        <item quantity="few">Начато %1$d загрузки</item>
-        <item quantity="many">Начато %1$d загрузок</item>
-        <item quantity="other">Начато %1$d загрузок</item>
-    </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Просмотр передач</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->

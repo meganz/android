@@ -255,11 +255,6 @@
     <string name="option_decryption_key">Decoderingssleutel</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="download_preparing_files">Bestanden voorbereiden</string>
-    <!-- Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
-    <plurals name="upload_began">
-        <item quantity="one">Upload is gestart</item>
-        <item quantity="other">Er zijn %1$d uploads gestart</item>
-    </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Overdrachten weergeven</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->

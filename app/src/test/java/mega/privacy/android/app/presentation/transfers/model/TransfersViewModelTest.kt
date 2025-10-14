@@ -1284,6 +1284,293 @@ class TransfersViewModelTest {
         verify(deleteCompletedTransfersByIdUseCase).invoke(listOf(id))
     }
 
+    @Nested
+    inner class PendingToCancelTransfers {
+
+        @Test
+        fun `test that transfer is set as pending to cancel and filtered in active transfers`() =
+            runTest {
+                val initialActiveTransfers = (1..10).map { index ->
+                    mock<InProgressTransfer.Download> {
+                        on { this.priority } doReturn index.toBigInteger()
+                        on { this.tag } doReturn index
+                        on { this.uniqueId } doReturn index.toLong()
+                        on { this.isPaused } doReturn false
+                    }
+                }
+                val map = initialActiveTransfers.associateBy { it.uniqueId }
+                val inProgressTransfer = initialActiveTransfers[3]
+                val updatedActiveTransfers = initialActiveTransfers - inProgressTransfer
+                val expected = TransferPendingToCancel(
+                    inProgressTransfer.tag,
+                    inProgressTransfer.isPaused
+                )
+
+                whenever(monitorInProgressTransfersUseCase()).thenReturn(map.asHotFlow())
+
+                initTestClass()
+
+                underTest.uiState.test {
+                    val initial = awaitItem()
+                    assertThat(initial.transfersPendingToCancel).isEmpty()
+                    assertThat(initial.activeTransfers).isEqualTo(initialActiveTransfers)
+
+                    underTest.setActiveTransferToCancel(inProgressTransfer)
+
+                    val actual = awaitItem()
+                    assertThat(actual.transfersPendingToCancel)
+                        .isEqualTo(mapOf(inProgressTransfer.uniqueId to expected))
+                    assertThat(actual.activeTransfers).isEqualTo(updatedActiveTransfers)
+                }
+            }
+
+        @Test
+        fun `test that pending to cancel transfers are filtered with active transfers updates`() =
+            runTest {
+                val flow = MutableSharedFlow<Map<Long, InProgressTransfer>>()
+                val transfer1 = mock<InProgressTransfer.Upload> {
+                    on { uniqueId } doReturn 1L
+                    on { priority } doReturn BigInteger.ONE
+                    on { tag } doReturn 1
+                    on { isPaused } doReturn false
+                }
+                val transfer2 = mock<InProgressTransfer.Download> {
+                    on { uniqueId } doReturn 2L
+                    on { priority } doReturn BigInteger.TWO
+                    on { tag } doReturn 2
+                    on { isPaused } doReturn false
+                }
+                val transfer1Updated = mock<InProgressTransfer.Upload> {
+                    on { uniqueId } doReturn 1L
+                    on { priority } doReturn BigInteger.ZERO
+                    on { tag } doReturn 1
+                    on { isPaused } doReturn false
+                }
+                val map = mapOf(1L to transfer1, 2L to transfer2)
+                val mapUpdated = mapOf(1L to transfer1Updated, 2L to transfer2)
+
+                whenever(monitorInProgressTransfersUseCase()).thenReturn(flow)
+
+                initTestClass()
+                flow.emit(map)
+                advanceUntilIdle()
+
+                underTest.uiState.map { it.activeTransfers }.test {
+                    assertThat(awaitItem()).containsExactly(transfer1, transfer2)
+
+                    underTest.setActiveTransferToCancel(transfer2)
+
+                    assertThat(awaitItem()).containsExactly(transfer1)
+
+                    flow.emit(mapUpdated)
+
+                    assertThat(awaitItem()).containsExactly(transfer1Updated)
+                }
+            }
+
+        @Test
+        fun `test that transfer is removed as pending to cancel when undoCancelActiveTransfer is invoked`() =
+            runTest {
+                val initialActiveTransfers = (1..10).map { index ->
+                    mock<InProgressTransfer.Download> {
+                        on { this.priority } doReturn index.toBigInteger()
+                        on { this.tag } doReturn index
+                        on { this.uniqueId } doReturn index.toLong()
+                        on { this.isPaused } doReturn true
+                    }
+                }
+                val map = initialActiveTransfers.associateBy { it.uniqueId }
+                val inProgressTransfer = initialActiveTransfers[3]
+                val transferPendingToCancel = TransferPendingToCancel(
+                    inProgressTransfer.tag,
+                    inProgressTransfer.isPaused
+                )
+
+                whenever(monitorInProgressTransfersUseCase()).thenReturn(map.asHotFlow())
+
+                initTestClass()
+
+                underTest.uiState.test {
+                    assertThat(awaitItem().transfersPendingToCancel).isEmpty()
+
+                    underTest.setActiveTransferToCancel(inProgressTransfer)
+
+                    assertThat(awaitItem().transfersPendingToCancel)
+                        .isEqualTo(mapOf(inProgressTransfer.uniqueId to transferPendingToCancel))
+
+                    underTest.undoCancelActiveTransfer(inProgressTransfer)
+
+                    assertThat(awaitItem().transfersPendingToCancel).isEmpty()
+                }
+            }
+
+        @ParameterizedTest
+        @ValueSource(booleans = [true, false])
+        fun `test that transfer is paused if corresponds if set as pending to cancel`(isPaused: Boolean) =
+            runTest {
+                val flow = MutableSharedFlow<Map<Long, InProgressTransfer>>()
+                val transfer = mock<InProgressTransfer.Upload> {
+                    on { uniqueId } doReturn 1L
+                    on { priority } doReturn BigInteger.ONE
+                    on { tag } doReturn 1
+                    on { this.isPaused } doReturn isPaused
+                }
+                val map = mapOf(1L to transfer)
+
+                whenever(monitorInProgressTransfersUseCase()).thenReturn(flow)
+                whenever(pauseTransferByTagUseCase(transfer.tag, true)).thenReturn(true)
+
+                initTestClass()
+                flow.emit(map)
+                advanceUntilIdle()
+
+                underTest.setActiveTransferToCancel(transfer)
+
+                if (isPaused) {
+                    verifyNoInteractions(pauseTransferByTagUseCase)
+                } else {
+                    verify(pauseTransferByTagUseCase).invoke(transfer.tag, true)
+                }
+            }
+
+        @ParameterizedTest
+        @ValueSource(booleans = [true, false])
+        fun `test that transfer is resumed if corresponds if removed as pending to cancel`(isPaused: Boolean) =
+            runTest {
+                val flow = MutableSharedFlow<Map<Long, InProgressTransfer>>()
+                val transfer = mock<InProgressTransfer.Upload> {
+                    on { uniqueId } doReturn 1L
+                    on { priority } doReturn BigInteger.ONE
+                    on { tag } doReturn 1
+                    on { this.isPaused } doReturn isPaused
+                }
+                val map = mapOf(1L to transfer)
+
+                whenever(monitorInProgressTransfersUseCase()).thenReturn(flow)
+                whenever(pauseTransferByTagUseCase(transfer.tag, false)).thenReturn(true)
+
+                initTestClass()
+                flow.emit(map)
+                advanceUntilIdle()
+
+                underTest.setActiveTransferToCancel(transfer)
+                underTest.undoCancelActiveTransfer(transfer)
+
+                if (isPaused) {
+                    verifyNoInteractions(pauseTransferByTagUseCase)
+                } else {
+                    verify(pauseTransferByTagUseCase).invoke(transfer.tag, true)
+                    verify(pauseTransferByTagUseCase).invoke(transfer.tag, false)
+                }
+            }
+
+        @Test
+        fun `test that all pending transfers to cancel are cancelled if onClear is invoked`() =
+            runTest {
+                val flow = MutableSharedFlow<Map<Long, InProgressTransfer>>()
+                val transfer1 = mock<InProgressTransfer.Upload> {
+                    on { uniqueId } doReturn 1L
+                    on { priority } doReturn BigInteger.ONE
+                    on { tag } doReturn 1
+                    on { isPaused } doReturn false
+                }
+                val transfer2 = mock<InProgressTransfer.Download> {
+                    on { uniqueId } doReturn 2L
+                    on { priority } doReturn BigInteger.TWO
+                    on { tag } doReturn 2
+                    on { isPaused } doReturn false
+                }
+                val map = mapOf(1L to transfer1, 2L to transfer2)
+
+                whenever(monitorInProgressTransfersUseCase()).thenReturn(flow)
+                whenever(cancelTransferByTagUseCase(any())).thenReturn(Unit)
+
+                initTestClass()
+                flow.emit(map)
+                advanceUntilIdle()
+
+                underTest.setActiveTransferToCancel(transfer1)
+                underTest.setActiveTransferToCancel(transfer2)
+                underTest.clear()
+
+                verify(cancelTransferByTagUseCase).invoke((transfer1.tag))
+                verify(cancelTransferByTagUseCase).invoke((transfer2.tag))
+            }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that pauseOrResumeTransfer invokes correctly`(isPaused: Boolean) = runTest {
+        val tag = 123
+        val inProgressTransfer = mock<InProgressTransfer.Upload> {
+            on { this.uniqueId } doReturn 1243L
+            on { this.tag } doReturn tag
+            on { this.isPaused } doReturn isPaused
+        }
+
+        whenever(pauseTransferByTagUseCase(tag, !isPaused)) doReturn !isPaused
+
+        initTestClass()
+        underTest.pauseOrResumeTransfer(inProgressTransfer)
+
+        verify(pauseTransferByTagUseCase).invoke(tag, !isPaused)
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that pauseOrResumeTransfer invokes correctly when first try fails and transfer is found`(
+        isPaused: Boolean,
+    ) = runTest {
+        val tag = 123
+        val uniqueId = 321L
+        val inProgressTransfer = mock<InProgressTransfer.Upload> {
+            on { this.tag } doReturn tag
+            on { this.uniqueId } doReturn uniqueId
+            on { this.isPaused } doReturn isPaused
+        }
+        val updatedTag = 234
+        val transfer = mock<Transfer> {
+            on { this.tag } doReturn updatedTag
+        }
+
+        whenever(pauseTransferByTagUseCase(tag, !isPaused))
+            .thenThrow(RuntimeException("something wrong"))
+        whenever(getTransferByUniqueIdUseCase(uniqueId)) doReturn transfer
+        whenever(pauseTransferByTagUseCase(updatedTag, !isPaused)) doReturn !isPaused
+
+        initTestClass()
+        underTest.pauseOrResumeTransfer(inProgressTransfer)
+
+        verify(pauseTransferByTagUseCase).invoke(tag, !isPaused)
+        verify(getTransferByUniqueIdUseCase).invoke(uniqueId)
+        verify(pauseTransferByTagUseCase).invoke(updatedTag, !isPaused)
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that pauseOrResumeTransfer invokes correctly when first try fails and transfer is not found`(
+        isPaused: Boolean,
+    ) = runTest {
+        val tag = 123
+        val uniqueId = 321L
+        val inProgressTransfer = mock<InProgressTransfer.Upload> {
+            on { this.tag } doReturn tag
+            on { this.uniqueId } doReturn uniqueId
+            on { this.isPaused } doReturn isPaused
+        }
+
+        whenever(pauseTransferByTagUseCase(tag, !isPaused))
+            .thenThrow(RuntimeException("something wrong"))
+        whenever(getTransferByUniqueIdUseCase(uniqueId)) doReturn null
+
+        initTestClass()
+        underTest.pauseOrResumeTransfer(inProgressTransfer)
+
+        verify(pauseTransferByTagUseCase).invoke(tag, !isPaused)
+        verify(getTransferByUniqueIdUseCase).invoke(uniqueId)
+        verifyNoMoreInteractions(pauseTransferByTagUseCase)
+    }
+
     private fun stubCompletedTransfers() = whenever(
         monitorCompletedTransfersByStateWithLimitUseCase(
             MAX_COMPLETED_TRANSFER_FOR_STATE,

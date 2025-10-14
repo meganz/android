@@ -1652,4 +1652,17 @@
     <string name="camera_uploads_tranfer_empty_view_title">全部已获取</string>
     <!--description for the Camera Uploads transfer empty view -->
     <string name="camera_uploads_tranfer_empty_view_description">拍摄了新的照片和视频后将出现在这里</string>
+    <!--Title for the Camera Uploads transfer top bar -->
+    <string name="camera_uploads_tranfer_top_bar_title">进行状况</string>
+    <!--Subtitle for the Camera Uploads transfer top bar -->
+    <plurals name="camera_uploads_tranfer_top_bar_subtitle">
+        <item quantity="one">Uploading: %1$d item left</item>
+        <item quantity="other">Uploading: %1$d items left</item>
+    </plurals>
+    <!-- Text of the button to start a video call -->
+    <string name="start_video_call_button_text">视频</string>
+    <!-- Text of the button for recording a video -->
+    <string name="record_video_button_text">视频</string>
+    <!-- Label shown the total the used space for business/pro flexi account -->
+    <string name="navigation_drawer_used_space_only">[A]%1$s[/A] used</string>
 </resources>

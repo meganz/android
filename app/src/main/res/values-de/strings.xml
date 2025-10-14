@@ -255,11 +255,6 @@
     <string name="option_decryption_key">Schlüssel</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="download_preparing_files">Dateien werden vorbereitet</string>
-    <!-- Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
-    <plurals name="upload_began">
-        <item quantity="one">Upload gestartet</item>
-        <item quantity="other">%1$d Uploads gestartet</item>
-    </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Transferübersicht</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->

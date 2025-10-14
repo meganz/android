@@ -73,6 +73,8 @@ private fun TransferRoute(
         onConsumeQuotaWarning = viewModel::onConsumeQuotaWarning,
         onCancelActiveTransfer = viewModel::cancelActiveTransfer,
         onClearCompletedTransfer = viewModel::clearCompletedTransfer,
+        onSetActiveTransferToCancel = viewModel::setActiveTransferToCancel,
+        onUndoCancelActiveTransfer = viewModel::undoCancelActiveTransfer,
     )
 }
 

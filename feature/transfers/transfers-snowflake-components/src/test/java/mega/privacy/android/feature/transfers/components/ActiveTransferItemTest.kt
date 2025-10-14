@@ -132,7 +132,7 @@ class ActiveTransferItemTest {
                     enableSwipeToDismiss = true,
                     areTransfersPaused = areTransfersPaused,
                     onPlayPauseClicked = onPlayPauseClicked,
-                    onCancel = mock(),
+                    onSetToCancel = mock(),
                 )
             }
         }

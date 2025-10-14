@@ -252,10 +252,6 @@
     <string name="option_decryption_key">解密密钥</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="download_preparing_files">正在准备文件</string>
-    <!-- Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
-    <plurals name="upload_began">
-        <item quantity="other">%1$d个上传已开始</item>
-    </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">查看传输</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->

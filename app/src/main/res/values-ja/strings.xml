@@ -252,10 +252,6 @@
     <string name="option_decryption_key">復号キー</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="download_preparing_files">ファイルを準備中</string>
-    <!-- Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
-    <plurals name="upload_began">
-        <item quantity="other">%1$d個のアップロードが開始されました</item>
-    </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">転送を表示</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->

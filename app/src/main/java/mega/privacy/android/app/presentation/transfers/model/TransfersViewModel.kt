@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.extensions.matchOrderWithNewAtEnd
@@ -120,7 +122,8 @@ class TransfersViewModel @AssistedInject constructor(
     private fun setTransfers(activeTransfers: List<InProgressTransfer>) {
         _uiState.update { state ->
             state.copy(
-                activeTransfers = activeTransfers,
+                activeTransfers = activeTransfers
+                    .filter { state.transfersPendingToCancel.contains(it.uniqueId).not() },
                 selectedActiveTransfersIds = state.selectedActiveTransfersIds
                     ?.takeIf { activeTransfers.isNotEmpty() }
                     ?.filter { id -> activeTransfers.any { it.uniqueId == id } }
@@ -653,24 +656,104 @@ class TransfersViewModel @AssistedInject constructor(
      */
     fun cancelActiveTransfer(inProgressTransfer: InProgressTransfer) = with(inProgressTransfer) {
         viewModelScope.launch {
+            cancelActiveTransfer(tag, uniqueId)
+        }
+    }
+
+    private suspend fun cancelActiveTransfer(tag: Int, uniqueId: Long) {
+        runCatching {
+            cancelTransferByTagUseCase(tag)
+        }.onFailure {
+            Timber.e(it, "Retrying cancel transfer")
+            // In case of resumed and not yet updated transfer, the tag could be changed.
+            getTransferByUniqueIdUseCase(uniqueId)?.let { transfer ->
+                runCatching { cancelTransferByTagUseCase(transfer.tag) }
+                    .onFailure { Timber.e(it, "Retry cancel transfer failed") }
+            } ?: Timber.e("Transfer not found, probably already finished")
+        }
+    }
+
+    fun setActiveTransferToCancel(inProgressTransfer: InProgressTransfer) =
+        with(inProgressTransfer) {
+            val transferPendingToCancel = TransferPendingToCancel(tag, isPaused)
+            _uiState.update { state ->
+                state.copy(
+                    activeTransfers = state.activeTransfers.filter { it.uniqueId != uniqueId },
+                    transfersPendingToCancel = state.transfersPendingToCancel + (uniqueId to transferPendingToCancel)
+                )
+            }
+
+            if (!isPaused) {
+                pauseOrResumeTransfer(pause = true, tag = tag, uniqueId = uniqueId)
+            }
+        }
+
+    fun pauseOrResumeTransfer(inProgressTransfer: InProgressTransfer) =
+        with(inProgressTransfer) {
+            pauseOrResumeTransfer(!isPaused, tag, uniqueId)
+        }
+
+    private fun pauseOrResumeTransfer(pause: Boolean, tag: Int, uniqueId: Long) {
+        viewModelScope.launch {
             runCatching {
-                cancelTransferByTagUseCase(tag)
+                pauseTransferByTagUseCase(tag, pause)
             }.onFailure {
-                Timber.e(it, "Retrying cancel transfer")
+                Timber.e(it, "Retrying pause transfer")
                 // In case of resumed and not yet updated transfer, the tag could be changed.
-                getTransferByUniqueIdUseCase(uniqueId)?.let { transfer ->
-                    runCatching { cancelTransferByTagUseCase(transfer.tag) }
-                        .onFailure { Timber.e(it, "Retry cancel transfer failed") }
-                } ?: Timber.e("Transfer not found, probably already finished")
+                runCatching { getTransferByUniqueIdUseCase(uniqueId) }
+                    .onFailure { e ->
+                        Timber.e(e, "Transfer not found, probably already finished")
+                    }
+                    .getOrNull()?.let { transfer ->
+                        runCatching {
+                            pauseTransferByTagUseCase(transfer.tag, pause)
+                        }.onFailure { e -> Timber.e(e, "Retry pause transfer failed") }
+                    }
             }
         }
     }
+
+    fun undoCancelActiveTransfer(inProgressTransfer: InProgressTransfer) =
+        with(inProgressTransfer) {
+            if (!isPaused) {
+                pauseOrResumeTransfer(pause = false, tag = tag, uniqueId = uniqueId)
+            }
+
+            _uiState.update { state ->
+                state.copy(transfersPendingToCancel = state.transfersPendingToCancel - uniqueId)
+            }
+
+            viewModelScope.launch {
+                setTransfers(monitorInProgressTransfersUseCase().lastOrNull()?.values?.sortedBy { it.priority }
+                    ?: emptyList())
+            }
+        }
 
     /**
      * Clear a completed transfer
      */
     fun clearCompletedTransfer(completedTransferId: Int) {
         deleteCompletedTransfersByIds(listOf(completedTransferId))
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        cancelAllTransfersPendingToCancel()
+    }
+
+    /**
+     * Only for testing purposes.
+     */
+    internal fun clear() {
+        onCleared()
+    }
+
+    private fun cancelAllTransfersPendingToCancel() {
+        viewModelScope.launch(NonCancellable) {
+            for ((uniqueId, pendingToCancel) in uiState.value.transfersPendingToCancel) {
+                cancelActiveTransfer(pendingToCancel.tag, uniqueId)
+            }
+        }
     }
 
     @AssistedFactory

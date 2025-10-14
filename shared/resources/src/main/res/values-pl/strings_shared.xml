@@ -1766,4 +1766,19 @@
     <string name="camera_uploads_tranfer_empty_view_title">Wszystko nadrobione</string>
     <!--description for the Camera Uploads transfer empty view -->
     <string name="camera_uploads_tranfer_empty_view_description">Nowe zdjęcia i filmy pojawią się tutaj po ich zrobieniu</string>
+    <!--Title for the Camera Uploads transfer top bar -->
+    <string name="camera_uploads_tranfer_top_bar_title">Postęp</string>
+    <!--Subtitle for the Camera Uploads transfer top bar -->
+    <plurals name="camera_uploads_tranfer_top_bar_subtitle">
+        <item quantity="one">Wgraj: pozostał %1$d element</item>
+        <item quantity="few">Wgraj: pozostało %1$d elementów</item>
+        <item quantity="many">Wgraj: pozostało %1$d elementów</item>
+        <item quantity="other">Wgraj: pozostało %1$d elementów</item>
+    </plurals>
+    <!-- Text of the button to start a video call -->
+    <string name="start_video_call_button_text">Film</string>
+    <!-- Text of the button for recording a video -->
+    <string name="record_video_button_text">Film</string>
+    <!-- Label shown the total the used space for business/pro flexi account -->
+    <string name="navigation_drawer_used_space_only">[A]%1$s[/A] used</string>
 </resources>

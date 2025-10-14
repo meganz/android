@@ -1652,4 +1652,16 @@
     <string name="camera_uploads_tranfer_empty_view_title">すべてアップロード完了</string>
     <!--description for the Camera Uploads transfer empty view -->
     <string name="camera_uploads_tranfer_empty_view_description">新しい写真や動画を撮影するとここに表示されます</string>
+    <!--Title for the Camera Uploads transfer top bar -->
+    <string name="camera_uploads_tranfer_top_bar_title">進行状況</string>
+    <!--Subtitle for the Camera Uploads transfer top bar -->
+    <plurals name="camera_uploads_tranfer_top_bar_subtitle">
+        <item quantity="other">アップロード中：残り%1$d件</item>
+    </plurals>
+    <!-- Text of the button to start a video call -->
+    <string name="start_video_call_button_text">動画</string>
+    <!-- Text of the button for recording a video -->
+    <string name="record_video_button_text">動画</string>
+    <!-- Label shown the total the used space for business/pro flexi account -->
+    <string name="navigation_drawer_used_space_only">[A]%1$s[/A]使用済み</string>
 </resources>

@@ -109,6 +109,8 @@ internal fun TransfersView(
     onConsumeQuotaWarning: () -> Unit,
     onCancelActiveTransfer: (InProgressTransfer) -> Unit,
     onClearCompletedTransfer: (Int) -> Unit,
+    onSetActiveTransferToCancel: (InProgressTransfer) -> Unit,
+    onUndoCancelActiveTransfer: (InProgressTransfer) -> Unit,
 ) = with(uiState) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -300,7 +302,10 @@ internal fun TransfersView(
                             onUpgradeClick = onNavigateToUpgradeAccount,
                             onConsumeQuotaWarning = onConsumeQuotaWarning,
                             onCancelActiveTransfer = onCancelActiveTransfer,
+                            onSetActiveTransferToCancel = onSetActiveTransferToCancel,
+                            onUndoCancelActiveTransfer = onUndoCancelActiveTransfer,
                             modifier = modifier,
+                            coroutineScope = coroutineScope,
                         )
                     }
                     addTextTabWithScrollableContent(
@@ -485,6 +490,8 @@ private fun TransfersViewPreview() {
             onConsumeQuotaWarning = {},
             onCancelActiveTransfer = {},
             onClearCompletedTransfer = {},
+            onSetActiveTransferToCancel = {},
+            onUndoCancelActiveTransfer = {},
         )
     }
 }

@@ -252,10 +252,6 @@
     <string name="option_decryption_key">복호화 키</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="download_preparing_files">파일 준비 중</string>
-    <!-- Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
-    <plurals name="upload_began">
-        <item quantity="other">업로드 %1$d개 시작</item>
-    </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">전송 보기</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->

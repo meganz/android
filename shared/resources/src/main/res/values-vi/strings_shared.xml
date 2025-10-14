@@ -1165,9 +1165,9 @@
     <!-- text of how it works for mega pass free trial in achivements section -->
     <string name="text_how_it_works_mega_pass_free_trial">Cài ứng&#160;dụng MEGA&#160;Pass, đăng&#160;nhập bằng tài&#160;khoản MEGA của bạn và bắt&#160;đầu hạn dùng thử miễn&#160;phí. Phần thưởng không&#160;gian lưu&#160;trữ sẽ được thêm tự&#160;động sau khi hạn dùng thử bắt&#160;đầu.</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">You’ve received %1$s extra storage space for starting a MEGA&#160;VPN free trial</string>
+    <string name="text_received_mega_vpn_free_trial">Bạn đã nhận được %1$s cho không&#160;gian lưu&#160;trữ vì dùng thử hạn miễn&#160;phí của MEGA&#160;VPN</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">You’ve received %1$s extra storage space for starting a MEGA&#160;Pass free trial</string>
+    <string name="text_received_mega_pass_free_trial">Bạn đã nhận được %1$s cho không&#160;gian lưu&#160;trữ vì dùng thử hạn miễn&#160;phí của MEGA&#160;Pass</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">Một số thư mục không thể đồng bộ hóa hoặc sao lưu được vì ứng dụng MEGA đã mất quyền truy cập các thư mục cục&#160;bộ. Nhấn Tiếp&#160;tục để cấp lại quyền cho từng thư&#160;mục đã bị ảnh&#160;hưởng.</string>
     <!-- Title for the free plan card when the user is an existing account -->
@@ -1454,7 +1454,7 @@
         <item quantity="other"></item>
     </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="context_share_correctly_removed">Access removed</string>
+    <string name="context_share_correctly_removed">Truy cập bị loại bỏ</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Có</string>
     <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1465,8 +1465,7 @@
     </plurals>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
-        <item quantity="one">This folder is shared with %1$d contact. Stop sharing?</item>
-        <item quantity="other">This folder is shared with %1$d contacts. Stop sharing?</item>
+        <item quantity="other">Thư mục này đang được chia sẻ cho %1$d tên liên lạc. Muốn dừng chia sẻ?</item>
     </plurals>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
     <plurals name="alert_remove_several_shares">
@@ -1539,7 +1538,7 @@
     <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="file_properties_shared_folder_read_write">Xem và ghi</string>
     <!-- Text shown in the app bar when nodes are being selected in selection mode -->
-    <string name="general_selecting">Selecting</string>
+    <string name="general_selecting">Chọn mục</string>
     <!-- Snackbar message when retry failed on failed transfers tab. -->
     <string name="transfers_retry_failed_snackbar_message">Unable to restart transfers</string>
     <!-- Action for the Snackbar when retry failed on failed transfers tab. -->
@@ -1551,7 +1550,7 @@
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">Đã được khôi&#160;phục vào %s</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Mục đã được di chuyển</string>
+    <string name="context_correctly_moved">Mục đã di chuyển</string>
     <!-- error message when a node was restore from Rubbish bin -->
     <string name="context_no_restored">Lỗi phát sinh. Mục không thể khôi phục.</string>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
@@ -1597,9 +1596,9 @@
     <!-- Snackbar message when retry success on failed transfers tab, plural form. -->
     <string name="transfers_retry_feedback_snackbar_message_plural">Retrying transfers, see the Active tab for progress</string>
     <!--Default file name for scanned documents. Placeholder value is for the current date and time values eg:   Scanned_2025091120323.  -->
-    <string name="document_scanning_default_file_name">Scanned_%1$s</string>
+    <string name="document_scanning_default_file_name">Bảnquét_%1$s</string>
     <!-- Benefit: Rewind up to specified days of deleted data -->
-    <string name="pro_plan_benefit_rewind_days">Rewind up to %1$d days of deleted data</string>
+    <string name="pro_plan_benefit_rewind_days">Tua lại dữ&#160;liệu bị xóa lên đến %1$d ngày</string>
     <!-- Error message when removing 1 or more public links from nodes. -->
     <string name="public_link_node_removal_error_message">Link removal failed, try again later</string>
     <!-- Warning that appears prior to remove links of files-->
@@ -1607,13 +1606,13 @@
     <!-- Success message after removing a share of a folder. a contact has no access to the folder now -->
     <string name="stop_sharing_folder_success_message">Folder sharing stopped</string>
     <!-- Positive button text for the confirmation dialog before removing the outgoing shares of several folders. -->
-    <string name="stop_sharing_dialog_positive_button_text">Ngừng chia&#160;sẻ</string>
+    <string name="stop_sharing_dialog_positive_button_text">Dừng chia&#160;sẻ</string>
     <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
     <string name="leave_shared_folder_failed_message">Couldn’t leave one or more shared folders</string>
     <!-- Confirmation message before leaving incoming shared folders -->
     <string name="leave_shared_folder_confirmation_message">Leaving a shared folder means you won’t be able to see it again</string>
     <!-- Message when a single public link is removed successfully. -->
-    <string name="link_removed_success_message">Đường liên&#160;kết đã xóa</string>
+    <string name="link_removed_success_message">Đường liên&#160;kết đã loại bỏ</string>
     <!-- Message when a single public link is removed successfully. -->
     <string name="links_removed_success_message">Các đường liên kết đã được xóa</string>
     <!--Alert warning shown to the user when attempting to remove sharing from 1 or more folders-->
@@ -1629,7 +1628,7 @@
     <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="share_folder_dialog_read_write_radio_option">Xem và ghi</string>
     <!-- Text shown in the app bar when nodes are being selected in selection mode -->
-    <string name="app_bar_selection_mode_description">Selecting</string>
+    <string name="app_bar_selection_mode_description">Chọn mục</string>
     <!-- success message when moving a node -->
     <string name="node_moved_success_message">Mục đã được di chuyển</string>
     <!-- success message when a node was restore from Rubbish bin to a location -->
@@ -1652,9 +1651,21 @@
     <!--header for the Camera Uploads transfer in progress items -->
     <string name="camera_uploads_tranfer_header_in_progress">Đang truyền</string>
     <!--header for the Camera Uploads transfer in queue items -->
-    <string name="camera_uploads_tranfer_header_in_queue">Queueing</string>
+    <string name="camera_uploads_tranfer_header_in_queue">Đang chờ tới lượt</string>
     <!--Title for the Camera Uploads transfer empty view -->
-    <string name="camera_uploads_tranfer_empty_view_title">All caught up</string>
+    <string name="camera_uploads_tranfer_empty_view_title">Đã xong hết</string>
     <!--description for the Camera Uploads transfer empty view -->
     <string name="camera_uploads_tranfer_empty_view_description">New photos and videos will appear here after you take them</string>
+    <!--Title for the Camera Uploads transfer top bar -->
+    <string name="camera_uploads_tranfer_top_bar_title">Tiến trình</string>
+    <!--Subtitle for the Camera Uploads transfer top bar -->
+    <plurals name="camera_uploads_tranfer_top_bar_subtitle">
+        <item quantity="other">Đang tải lên: %1$d mục còn lại</item>
+    </plurals>
+    <!-- Text of the button to start a video call -->
+    <string name="start_video_call_button_text">Video</string>
+    <!-- Text of the button for recording a video -->
+    <string name="record_video_button_text">Video</string>
+    <!-- Label shown the total the used space for business/pro flexi account -->
+    <string name="navigation_drawer_used_space_only">[A]%1$s[/A] used</string>
 </resources>

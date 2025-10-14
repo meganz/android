@@ -258,12 +258,6 @@
     <string name="option_decryption_key">Cheie de decriptare</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="download_preparing_files">Se pregătesc fișierele</string>
-    <!-- Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
-    <plurals name="upload_began">
-        <item quantity="one">Încărcarea a început</item>
-        <item quantity="few">%1$d încărcări au început</item>
-        <item quantity="other">%1$d de încărcări au început</item>
-    </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Vezi transferurile</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
@@ -1246,15 +1240,15 @@
     <!-- title of the section for unlocked storage quota -->
     <string name="unlocked_storage_title">Cotă de transfer</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_referral_bonuses">Invite people to MEGA</string>
+    <string name="title_referral_bonuses">Invitați oameni la MEGA</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">Instalează aplicația noastră mobilă</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Bonus de înscriere</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Install our desktop app</string>
+    <string name="title_install_desktop">Instalați aplicația desktop</string>
     <!-- indicates the number of days left related to a achievement -->
-    <string name="general_num_days_left">%1$d days left</string>
+    <string name="general_num_days_left">%1$d zile rămase</string>
     <!-- State to indicate an achievement has expired -->
     <string name="expired_label">Expirat</string>
     <!-- title of the advanced setting to choose the use of https -->
@@ -1272,9 +1266,9 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Adresa de e-mail este malformată</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">You’ve received %1$s extra storage space for installing our desktop app</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Ați primit %1$s spațiu de stocare suplimentar pentru instalarea aplicația desktop</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">You’ve received %1$s extra storage space for installing our mobile app</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Ai primit %1$s spațiu de stocare suplimentar pentru instalarea aplicației noastre mobile</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Ați primit %1$s spațiu de stocare ca bonus de înscriere gratuit.</string>
     <!-- menu items -->

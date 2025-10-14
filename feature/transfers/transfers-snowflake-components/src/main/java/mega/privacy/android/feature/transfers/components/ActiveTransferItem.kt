@@ -64,7 +64,7 @@ fun ActiveTransferItem(
     areTransfersPaused: Boolean,
     enableSwipeToDismiss: Boolean,
     onPlayPauseClicked: () -> Unit,
-    onCancel: () -> Unit,
+    onSetToCancel: () -> Unit,
     modifier: Modifier = Modifier,
     isDraggable: Boolean = true,
     isSelected: Boolean? = null,
@@ -73,7 +73,7 @@ fun ActiveTransferItem(
     val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
         confirmValueChange = { swipeToDismissBoxValue ->
             if (swipeToDismissBoxValue == SwipeToDismissBoxValue.EndToStart) {
-                onCancel()
+                onSetToCancel()
             }
 
             swipeToDismissBoxValue != SwipeToDismissBoxValue.StartToEnd
@@ -243,7 +243,7 @@ private fun Preview(activeTransferUI: ActiveTransferUI) {
                 enableSwipeToDismiss = true,
                 isSelected = isSelected,
                 onPlayPauseClicked = {},
-                onCancel = {},
+                onSetToCancel = {},
             )
         }
     }

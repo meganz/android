@@ -622,6 +622,8 @@ class TransfersViewTest {
                     onConsumeQuotaWarning = {},
                     onCancelActiveTransfer = {},
                     onClearCompletedTransfer = {},
+                    onSetActiveTransferToCancel = {},
+                    onUndoCancelActiveTransfer = {},
                 )
             }
         }

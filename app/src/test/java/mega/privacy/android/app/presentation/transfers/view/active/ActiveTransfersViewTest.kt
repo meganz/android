@@ -225,6 +225,8 @@ class ActiveTransfersViewTest {
                     onUpgradeClick = onUpgradeClick,
                     onConsumeQuotaWarning = onConsumeQuotaWarning,
                     onCancelActiveTransfer = {},
+                    onSetActiveTransferToCancel = {},
+                    onUndoCancelActiveTransfer = {},
                 )
             }
         }

@@ -1662,4 +1662,16 @@
     <string name="camera_uploads_tranfer_empty_view_title">모두 완료</string>
     <!--description for the Camera Uploads transfer empty view -->
     <string name="camera_uploads_tranfer_empty_view_description">새 사진과 동영상이 촬영되면 여기에 나타납니다</string>
+    <!--Title for the Camera Uploads transfer top bar -->
+    <string name="camera_uploads_tranfer_top_bar_title">진행 상태</string>
+    <!--Subtitle for the Camera Uploads transfer top bar -->
+    <plurals name="camera_uploads_tranfer_top_bar_subtitle">
+        <item quantity="other">업로드 중: %1$d개 항목 남음</item>
+    </plurals>
+    <!-- Text of the button to start a video call -->
+    <string name="start_video_call_button_text">동영상</string>
+    <!-- Text of the button for recording a video -->
+    <string name="record_video_button_text">동영상</string>
+    <!-- Label shown the total the used space for business/pro flexi account -->
+    <string name="navigation_drawer_used_space_only">[A]%1$s[/A] 이용됨</string>
 </resources>

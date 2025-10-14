@@ -1766,4 +1766,19 @@
     <string name="camera_uploads_tranfer_empty_view_title">Всё синхронизировано</string>
     <!--description for the Camera Uploads transfer empty view -->
     <string name="camera_uploads_tranfer_empty_view_description">Новые фото и видео будут появляться здесь после съёмки</string>
+    <!--Title for the Camera Uploads transfer top bar -->
+    <string name="camera_uploads_tranfer_top_bar_title">Прогресс</string>
+    <!--Subtitle for the Camera Uploads transfer top bar -->
+    <plurals name="camera_uploads_tranfer_top_bar_subtitle">
+        <item quantity="one">Загрузка: остался %1$d элемент</item>
+        <item quantity="few">Загрузка: осталось %1$d элемента</item>
+        <item quantity="many">Загрузка: осталось %1$d элементов</item>
+        <item quantity="other">Загрузка: осталось %1$d элемента</item>
+    </plurals>
+    <!-- Text of the button to start a video call -->
+    <string name="start_video_call_button_text">Видео</string>
+    <!-- Text of the button for recording a video -->
+    <string name="record_video_button_text">Видео</string>
+    <!-- Label shown the total the used space for business/pro flexi account -->
+    <string name="navigation_drawer_used_space_only">[A]%1$s[/A] used</string>
 </resources>
