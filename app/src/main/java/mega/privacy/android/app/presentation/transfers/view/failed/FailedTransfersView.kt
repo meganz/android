@@ -34,6 +34,8 @@ import mega.privacy.android.feature.transfers.components.FailedTransferItem
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.FailedTransfersItemMoreOptionsMenuItemEvent
 import mega.privacy.mobile.analytics.event.FailedTransfersItemTapAndHoldSelectedEvent
+import mega.privacy.mobile.analytics.event.FailedTransfersSwipeToClearEvent
+import mega.privacy.mobile.analytics.event.FailedTransfersSwipeToRetryEvent
 
 @Composable
 internal fun FailedTransfersView(
@@ -73,11 +75,11 @@ internal fun FailedTransfersView(
                         failedItemSelected = it
                     },
                     onRetry = {
-                        // Analytics.tracker.trackEvent()
+                        Analytics.tracker.trackEvent(FailedTransfersSwipeToRetryEvent)
                         onRetryTransfer(item)
                     },
                     onClear = {
-                        // Analytics.tracker.trackEvent()
+                        Analytics.tracker.trackEvent(FailedTransfersSwipeToClearEvent)
                         onClearFailedTransfer(item.id ?: 0)
                     },
                     modifier = Modifier

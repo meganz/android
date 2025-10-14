@@ -41,6 +41,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
 import mega.privacy.android.app.constants.IntentConstants
@@ -82,6 +83,7 @@ import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicke
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.mobile.analytics.event.FailedTransfersRetrySnackbarActionEvent
 import timber.log.Timber
 import java.io.File
 
@@ -582,6 +584,7 @@ private suspend fun consumeMessage(
         event.actionEvent?.let { actionEvent ->
             when (actionEvent) {
                 is StartTransferEvent.Message.ActionEvent.ReRetry -> {
+                    Analytics.tracker.trackEvent(FailedTransfersRetrySnackbarActionEvent)
                     retryTransfers(actionEvent.transferTriggerEvent)
                 }
             }

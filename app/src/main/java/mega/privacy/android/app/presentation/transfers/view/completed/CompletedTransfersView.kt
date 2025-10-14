@@ -31,6 +31,7 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.feature.transfers.components.CompletedTransferItem
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CompletedTransfersItemTapAndHoldSelectedEvent
+import mega.privacy.mobile.analytics.event.CompletedTransfersSwipeToClearEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
@@ -67,7 +68,7 @@ internal fun CompletedTransfersView(
                     enableSwipeToDismiss = enableSwipeToDismiss,
                     onMoreClicked = { completedItemSelected = it },
                     onClear = {
-                        // Analytics.tracker.trackEvent()
+                        Analytics.tracker.trackEvent(CompletedTransfersSwipeToClearEvent)
                         onClearCompletedTransfer(item.id ?: 0)
                     },
                     modifier = Modifier

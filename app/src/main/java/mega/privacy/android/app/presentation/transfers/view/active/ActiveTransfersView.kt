@@ -39,6 +39,8 @@ import mega.privacy.android.feature.transfers.components.OverQuotaBanner
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ActiveTransfersIndividualPauseButtonButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ActiveTransfersIndividualPlayButtonButtonPressedEvent
+import mega.privacy.mobile.analytics.event.ActiveTransfersSwipeToCancelEvent
+import mega.privacy.mobile.analytics.event.ActiveTransfersUndoSwipeToCancelSnackbarActionEvent
 
 @Composable
 internal fun ActiveTransfersView(
@@ -128,11 +130,16 @@ internal fun ActiveTransfersView(
                                     context.getString(sharedR.string.general_undo),
                                 )
                                 when (result) {
-                                    SnackbarResult.ActionPerformed ->
+                                    SnackbarResult.ActionPerformed -> {
+                                        Analytics.tracker.trackEvent(
+                                            ActiveTransfersUndoSwipeToCancelSnackbarActionEvent
+                                        )
                                         onUndoCancelActiveTransfer(item)
+                                    }
 
-                                    SnackbarResult.Dismissed ->
+                                    SnackbarResult.Dismissed -> {
                                         onCancelActiveTransfer(item)
+                                    }
                                 }
                             }
                         },
@@ -196,8 +203,8 @@ internal fun ActiveTransferItem(
             )
         },
         onSetToCancel = {
+            Analytics.tracker.trackEvent(ActiveTransfersSwipeToCancelEvent)
             onSetToCancel()
-//            Analytics.tracker.trackEvent()
         },
         modifier = modifier,
         isSelected = isSelected,
