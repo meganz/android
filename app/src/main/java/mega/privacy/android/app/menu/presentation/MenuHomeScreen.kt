@@ -33,6 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffold
+import mega.android.core.ui.components.badge.NotificationBadge
 import mega.android.core.ui.components.button.PrimaryFilledButton
 import mega.android.core.ui.components.button.SecondaryFilledButton
 import mega.android.core.ui.components.image.MegaIcon
@@ -44,6 +45,7 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.ACCOUNT_ITEM
+import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.BADGE
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.LOGOUT_BUTTON
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.MY_ACCOUNT_ITEM
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.NOTIFICATION_ICON
@@ -57,6 +59,7 @@ import mega.privacy.android.navigation.contract.NavDrawerItem
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.NotificationsNavKey
 import mega.privacy.android.navigation.destination.TestPasswordNavKey
+import mega.privacy.android.shared.original.core.ui.utils.composeLet
 
 @Composable
 fun MenuHomeScreen(
@@ -218,6 +221,7 @@ private fun AccountItem(
 ) {
     val hasActionLabel = item.actionLabel != null
     val subtitle by item.subTitle?.collectAsState(null) ?: remember { mutableStateOf(null) }
+    val badge by item.badge?.collectAsState(null) ?: remember { mutableStateOf(null) }
     FlexibleLineListItem(
         modifier = Modifier
             .fillMaxWidth()
@@ -247,7 +251,10 @@ private fun AccountItem(
             )
         },
         enableClick = hasActionLabel.not(),
-        onClickListener = onNavigate
+        onClickListener = onNavigate,
+        titleTrailingElement = badge?.composeLet { count ->
+            NotificationBadge(count, Modifier.testTag(BADGE))
+        },
     )
 }
 
@@ -340,4 +347,5 @@ internal object MenuHomeScreenUiTestTags {
     const val PRIVACY_SUITE_HEADER = "$MENU_HOME_SCREEN:privacy_suite_header"
     const val PRIVACY_SUITE_ITEM = "$MENU_HOME_SCREEN:privacy_suite_item"
     const val LOGOUT_BUTTON = "$MENU_HOME_SCREEN:logout_button"
+    const val BADGE = "$MENU_HOME_SCREEN:badge"
 }

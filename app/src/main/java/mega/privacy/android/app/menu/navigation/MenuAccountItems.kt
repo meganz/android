@@ -1,6 +1,8 @@
 package mega.privacy.android.app.menu.navigation
 
 import androidx.navigation3.runtime.NavKey
+import kotlinx.coroutines.flow.map
+import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
 import mega.privacy.android.feature.payment.UpgradeAccountNavKey
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavDrawerItem
@@ -47,10 +49,13 @@ object SharedItemsItem : NavDrawerItem.Account(
     title = sharedR.string.video_section_videos_location_option_shared_items
 )
 
-object ChatItem : NavDrawerItem.Account(
+class ChatItem(getNumUnreadChatsUseCase: GetNumUnreadChatsUseCase) : NavDrawerItem.Account(
     destination = ChatsNavKey,
     icon = IconPack.Medium.Thin.Outline.MessageChatCircle,
     title = sharedR.string.general_chat,
+    badge = getNumUnreadChatsUseCase().map { count ->
+        count.takeIf { it > 0 }
+    }
 )
 
 object DeviceCentreItem : NavDrawerItem.Account(

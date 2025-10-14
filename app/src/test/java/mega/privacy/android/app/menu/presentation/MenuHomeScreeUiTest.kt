@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
@@ -20,6 +21,7 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.parcelize.Parcelize
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.ACCOUNT_ITEM
+import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.BADGE
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.LOGOUT_BUTTON
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.MY_ACCOUNT_ITEM
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.NOTIFICATION_ICON
@@ -44,6 +46,8 @@ class MenuHomeScreeUiTest {
     @Parcelize
     object TestDestination : Parcelable, NavKey
 
+    val badgeFlow = MutableStateFlow<Int?>(null)
+
     val myAccountItems = mapOf(
         1 to NavDrawerItem.Account(
             destination = TestDestination,
@@ -57,7 +61,8 @@ class MenuHomeScreeUiTest {
             icon = Icons.Default.Settings,
             title = android.R.string.cancel,
             subTitle = MutableStateFlow("Free"),
-            actionLabel = null
+            actionLabel = null,
+            badge = badgeFlow
         )
     )
 
@@ -265,5 +270,13 @@ class MenuHomeScreeUiTest {
 
         verify(navigateToFeature, never()).invoke(any())
         verify(onResetLogoutConfirmationEvent, never()).invoke()
+    }
+
+    @Test
+    fun `test that badge is updated when flow is updated`() {
+        setupRule()
+        composeRule.onNodeWithTag(BADGE, useUnmergedTree = true).assertDoesNotExist()
+        badgeFlow.value = 1
+        composeRule.onNodeWithTag(BADGE, useUnmergedTree = true).assertTextEquals("1")
     }
 } 

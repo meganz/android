@@ -28,7 +28,7 @@ sealed interface NavDrawerItem {
         override val icon: ImageVector,
         @StringRes override val title: Int,
         val subTitle: Flow<String?>? = null,
-        val badge: Flow<String?>? = null,
+        val badge: Flow<Int?>? = null,
         @StringRes val actionLabel: Int? = null,
     ) : NavDrawerItem
 
