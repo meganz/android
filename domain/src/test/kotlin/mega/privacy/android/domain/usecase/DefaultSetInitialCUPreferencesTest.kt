@@ -3,7 +3,6 @@ package mega.privacy.android.domain.usecase
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.SettingsRepository
-import mega.privacy.android.domain.usecase.passcode.DisablePasscodeUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -15,14 +14,12 @@ class DefaultSetInitialCUPreferencesTest {
     private val settingsRepository = mock<SettingsRepository>()
 
     private val accountRepository = mock<AccountRepository>()
-    private val disablePasscodeUseCase = mock<DisablePasscodeUseCase>()
 
     @Before
     fun setUp() {
         underTest = DefaultSetInitialCUPreferences(
             settingsRepository = settingsRepository,
-            accountRepository = accountRepository,
-            disablePasscodeUseCase = disablePasscodeUseCase
+            accountRepository = accountRepository
         )
     }
 
@@ -43,13 +40,6 @@ class DefaultSetInitialCUPreferencesTest {
         runTest {
             underTest()
             verify(settingsRepository).setDefaultDownloadLocation()
-        }
-
-    @Test
-    fun `test that disablePasscodeUseCase invokes correctly`() =
-        runTest {
-            underTest()
-            verify(disablePasscodeUseCase).invoke()
         }
 
     @Test
