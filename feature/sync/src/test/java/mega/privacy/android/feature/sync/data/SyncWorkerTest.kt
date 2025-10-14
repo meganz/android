@@ -14,13 +14,11 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
@@ -51,7 +49,6 @@ import org.mockito.kotlin.whenever
 import java.util.UUID
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -156,8 +153,6 @@ internal class SyncWorkerTest {
 
     @Test
     fun `test that sync worker is running until all of the folders have been synced`() = runTest {
-        val testDispatcher = StandardTestDispatcher()
-        val testScope = TestScope(testDispatcher)
         val firstSync = FolderPair(
             id = 1,
             syncType = SyncType.TYPE_TWOWAY,
@@ -174,21 +169,17 @@ internal class SyncWorkerTest {
             remoteFolder = RemoteFolder(id = NodeId(1232L), name = "second"),
             syncStatus = SyncStatus.SYNCED
         )
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(firstSync, secondSync)))
 
-        val deferredResult = testScope.async { underTest.doWork() }
-
-        testScope.advanceTimeBy(SYNC_WORKER_RECHECK_DELAY)
+        // Create a flow that emits the initial state, then after a delay emits the completed state
         whenever(monitorSyncsUseCase()).thenReturn(
-            flowOf(
-                listOf(
-                    firstSync.copy(syncStatus = SyncStatus.SYNCED), secondSync
-                )
-            )
+            flow {
+                emit(listOf(firstSync, secondSync))
+                delay(SYNC_WORKER_RECHECK_DELAY + 100) // Wait a bit longer than the recheck delay
+                emit(listOf(firstSync.copy(syncStatus = SyncStatus.SYNCED), secondSync))
+            }
         )
-        testScope.advanceTimeBy(SYNC_WORKER_RECHECK_DELAY)
 
-        val result = deferredResult.await()
+        val result = underTest.doWork()
 
         assertThat(result).isEqualTo(Result.success())
     }
@@ -251,12 +242,18 @@ internal class SyncWorkerTest {
     }
 
     @Test
-    fun `test that sync worker retries on timeout`() = runTest(StandardTestDispatcher()) {
-        whenever(monitorSyncStalledIssuesUseCase()).thenReturn(flowOf(emptyList()))
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(mock())))
+    fun `test that sync worker retries on timeout`() = runTest {
+        // Create a flow that never completes (always syncing)
+        whenever(monitorSyncsUseCase()).thenReturn(
+            flow {
+                while (true) {
+                    emit(listOf(mock<FolderPair>()))
+                    delay(1000)
+                }
+            }
+        )
 
         val result = underTest.doWork()
-        testScheduler.advanceTimeBy(TimeUnit.MINUTES.toMillis(10)) // Simulate timeout
 
         assertThat(result).isEqualTo(Result.retry())
     }

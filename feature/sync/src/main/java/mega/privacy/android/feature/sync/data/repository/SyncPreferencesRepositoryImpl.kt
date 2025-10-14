@@ -58,8 +58,7 @@ internal class SyncPreferencesRepositoryImpl @Inject constructor(
         syncPreferencesDatastore.setSyncFrequencyInMinutes(frequencyInMinutes)
     }
 
-    override suspend fun getSyncFrequencyMinutes(): Int =
-        syncPreferencesDatastore.getSyncFrequencyMinutes() ?: SYNC_FREQUENCY_DEFAULT_IN_MINUTES
+    override suspend fun getSyncFrequencyMinutes(): Int = SYNC_FREQUENCY_DEFAULT_IN_MINUTES
 
     private companion object {
         const val SYNC_FREQUENCY_DEFAULT_IN_MINUTES = 15

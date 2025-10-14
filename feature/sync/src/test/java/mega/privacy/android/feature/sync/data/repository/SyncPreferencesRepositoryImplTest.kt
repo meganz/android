@@ -147,19 +147,8 @@ internal class SyncPreferencesRepositoryImplTest {
         }
 
     @Test
-    fun `test that getSyncFrequencyMinutes returns value from datastore`() = runTest {
-        val frequency = 30
-        whenever(syncPreferencesDatastore.getSyncFrequencyMinutes()).thenReturn(frequency)
-
-        val result = underTest.getSyncFrequencyMinutes()
-
-        assertThat(result).isEqualTo(frequency)
-    }
-
-    @Test
-    fun `test that getSyncFrequencyMinutes returns default value when datastore returns null`() =
+    fun `test that getSyncFrequencyMinutes returns default value`() =
         runTest {
-            whenever(syncPreferencesDatastore.getSyncFrequencyMinutes()).thenReturn(null)
 
             val result = underTest.getSyncFrequencyMinutes()
 

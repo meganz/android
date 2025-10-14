@@ -12,7 +12,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -33,6 +33,8 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorShoul
 import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import timber.log.Timber
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Sync Worker designed to run the Sync process periodically in the background
@@ -55,45 +57,56 @@ internal class SyncWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, workerParams) {
 
     private var monitorNotificationsJob: Job? = null
+    private var syncs: List<FolderPair> = emptyList()
 
     override suspend fun doWork(): Result = coroutineScope {
         Timber.d("SyncWorker started")
         if (isLoginSuccessful()) {
             monitorNotificationsJob = monitorNotifications()
-            val result = withTimeoutOrNull(MAX_DURATION) {
-                runCatching {
-                    while (true) {
-                        delay(SYNC_WORKER_RECHECK_DELAY)
-                        val syncs = monitorSyncsUseCase().first()
-                        if (isSyncingCompleted(syncs)) {
-                            return@withTimeoutOrNull Result.success()
-                        }
-                    }
-                }.onFailure {
-                    return@withTimeoutOrNull Result.retry()
-                }
-            }
-            Timber.d("SyncWorker finished, result: $result")
+            val result = withTimeoutOrNull(MAX_DURATION.minutes) {
+                checkSyncStatus()
+            } ?: Result.retry()
+            Timber.d("withTimeoutOrNull returned $result")
             cancelNotificationJob()
-            return@coroutineScope (result ?: run {
-                Timber.d("SyncWorker timed out")
-                Result.retry()
-            }) as Result
+            Timber.d("SyncWorker finished, result: $result")
+            return@coroutineScope result
         } else {
             // login failed after few attempts
+            Timber.d("Login failed")
             cancelNotificationJob()
-            Result.retry()
+            Timber.d("SyncWorker finished")
+            return@coroutineScope Result.retry()
         }
+    }
+
+    private suspend fun CoroutineScope.checkSyncStatus(): Result {
+        val job = launch {
+            monitorSyncsUseCase().onEach {
+                Timber.d("SyncWorker syncs: ${it.map { sync -> sync.syncStatus }}")
+                syncs = it
+            }.catch {
+                Timber.e(it, "monitorSyncsUseCase exception")
+            }.launchIn(this)
+        }
+        // add initial delay before checking the sync status
+        delay(1.minutes)
+        while (syncs.isEmpty() || isSyncingCompleted(syncs).not()) {
+            delay(SYNC_WORKER_RECHECK_DELAY)
+            Timber.d("checking sync status...")
+        }
+        Timber.d("all syncs completed")
+        job.cancelAndJoin()
+        return Result.success()
     }
 
     private suspend fun cancelNotificationJob() {
         monitorNotificationsJob?.cancelAndJoin()
         monitorNotificationsJob = null
-        Timber.d("SyncWorker monitorNotificationsJob cancelled")
+        Timber.d("monitorNotificationsJob cancelled")
     }
 
     private fun isSyncingCompleted(syncs: List<FolderPair>): Boolean {
-        return syncs.all { it.syncStatus == SyncStatus.SYNCED || it.syncStatus == SyncStatus.PAUSED }
+        return syncs.isNotEmpty() && syncs.all { it.syncStatus == SyncStatus.SYNCED || it.syncStatus == SyncStatus.PAUSED }
     }
 
     /**
@@ -109,7 +122,7 @@ internal class SyncWorker @AssistedInject constructor(
             var retry = 3
             while (loginMutex.isLocked && retry > 0) {
                 Timber.d("Wait for the login lock to be available")
-                delay(1000)
+                delay(1.seconds)
                 retry--
             }
 
@@ -117,7 +130,7 @@ internal class SyncWorker @AssistedInject constructor(
                 val result = runCatching { backgroundFastLoginUseCase() }.onFailure {
                     Timber.e(it, "performCompleteFastLogin exception")
                 }
-                Timber.d("Complete Fast Login procedure successful. Get cookies settings after login")
+                Timber.d("Complete Fast Login procedure successful")
                 result.isSuccess
             } else {
                 isRootNodeExistsUseCase().also { rootNodeExists ->
@@ -165,6 +178,7 @@ internal class SyncWorker @AssistedInject constructor(
                     syncNotificationMessage = notification,
                     notificationId = notificationId,
                 )
+                Timber.d("displayNotification: ${notification.syncNotificationType}")
             }
         }
     }
@@ -184,6 +198,6 @@ internal class SyncWorker @AssistedInject constructor(
         /**
          * Max Duration for the sync worker to run
          */
-        const val MAX_DURATION = 9 * 60 * 1000L // 9 minutes in milliseconds
+        const val MAX_DURATION = 9 // 9 minutes in milliseconds
     }
 }
