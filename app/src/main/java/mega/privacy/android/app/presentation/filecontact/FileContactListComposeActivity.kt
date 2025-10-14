@@ -20,8 +20,8 @@ import androidx.navigation3.scene.rememberSceneSetupNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.appstate.content.navigation.NavigationHandlerImpl
-import mega.privacy.android.app.appstate.transfer.AppTransferViewModel
-import mega.privacy.android.app.appstate.transfer.TransferHandlerImpl
+import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
+import mega.privacy.android.app.appstate.content.transfer.TransferHandlerImpl
 import mega.privacy.android.app.presentation.container.SharedAppContainer
 import mega.privacy.android.app.presentation.filecontact.navigation.FileContactFeatureDestination
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory

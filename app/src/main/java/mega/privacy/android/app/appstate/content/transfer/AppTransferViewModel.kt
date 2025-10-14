@@ -1,4 +1,4 @@
-package mega.privacy.android.app.appstate.transfer
+package mega.privacy.android.app.appstate.content.transfer
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel

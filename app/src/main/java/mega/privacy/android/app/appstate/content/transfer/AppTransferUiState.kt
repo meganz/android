@@ -1,4 +1,4 @@
-package mega.privacy.android.app.appstate.transfer
+package mega.privacy.android.app.appstate.content.transfer
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed

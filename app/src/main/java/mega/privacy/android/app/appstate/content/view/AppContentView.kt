@@ -2,6 +2,7 @@ package mega.privacy.android.app.appstate.content.view
 
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -15,15 +16,17 @@ import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.scene.rememberSceneSetupNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import de.palm.composestateevents.EventEffect
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.appstate.content.AppContentStateViewModel
 import mega.privacy.android.app.appstate.content.model.AppContentState
 import mega.privacy.android.app.appstate.content.navigation.NavigationHandlerImpl
 import mega.privacy.android.app.appstate.content.navigation.view.MainNavigationScaffoldDestination
+import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
+import mega.privacy.android.app.appstate.content.transfer.TransferHandlerImpl
 import mega.privacy.android.app.appstate.global.event.AppDialogViewModel
-import mega.privacy.android.app.appstate.transfer.AppTransferViewModel
-import mega.privacy.android.app.appstate.transfer.TransferHandlerImpl
 import mega.privacy.android.app.presentation.login.LoginInProgressViewModel
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
 
 @Composable
@@ -49,45 +52,51 @@ internal fun AppContentView(
 
     when (val appState = state) {
         is AppContentState.Data -> {
-            NavDisplay(
-                backStack = backStack,
-                onBack = { backStack.removeLastOrNull() },
-                sceneStrategy = dialogStrategy.then(bottomSheetStrategy),
-                entryDecorators = listOf(
-                    rememberSceneSetupNavEntryDecorator(),
-                    rememberSavedStateNavEntryDecorator(),
-                    rememberViewModelStoreNavEntryDecorator()
-                ),
-                entryProvider = entryProvider {
-                    appState.featureDestinations
-                        .forEach { destination ->
+            CompositionLocalProvider(
+                LocalSnackBarHostState provides snackbarHostState
+            ) {
+                NavDisplay(
+                    backStack = backStack,
+                    onBack = { backStack.removeLastOrNull() },
+                    sceneStrategy = dialogStrategy.then(bottomSheetStrategy),
+                    entryDecorators = listOf(
+                        rememberSceneSetupNavEntryDecorator(),
+                        rememberSavedStateNavEntryDecorator(),
+                        rememberViewModelStoreNavEntryDecorator()
+                    ),
+                    entryProvider = entryProvider {
+                        appState.featureDestinations
+                            .forEach { destination ->
+                                destination.navigationGraph(
+                                    this,
+                                    navigationHandler,
+                                    transferHandler
+                                )
+                            }
+
+                        appState.appDialogDestinations.forEach { destination ->
                             destination.navigationGraph(
                                 this,
                                 navigationHandler,
-                                transferHandler
+                                appDialogViewModel::eventHandled
                             )
                         }
 
-                    appState.appDialogDestinations.forEach { destination ->
-                        destination.navigationGraph(
-                            this,
-                            navigationHandler,
-                            appDialogViewModel::eventHandled
-                        )
+                        entry<MainNavigationScaffoldDestination> {
+                            MegaApp(
+                                onInteraction = viewModel::signalPresence,
+                                navigationHandler = navigationHandler,
+                                transferHandler = transferHandler,
+                            )
+                        }
                     }
+                )
 
-                    entry<MainNavigationScaffoldDestination> {
-                        MegaApp(
-                            snackbarHostState = snackbarHostState,
-                            onInteraction = viewModel::signalPresence,
-                            navigationHandler = navigationHandler,
-                            transferHandler = transferHandler,
-                            transferState = transferState,
-                            consumedTransferEvent = appTransferViewModel::consumedTransferEvent
-                        )
-                    }
-                }
-            )
+                StartTransferComponent(
+                    event = transferState.transferEvent,
+                    onConsumeEvent = appTransferViewModel::consumedTransferEvent,
+                )
+            }
         }
 
         AppContentState.Loading -> {}

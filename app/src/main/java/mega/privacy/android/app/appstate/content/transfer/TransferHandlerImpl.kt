@@ -1,4 +1,4 @@
-package mega.privacy.android.app.appstate.transfer
+package mega.privacy.android.app.appstate.content.transfer
 
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.TransferHandler
