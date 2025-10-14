@@ -6,14 +6,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioGroup
 import androidx.annotation.IdRes
-import androidx.lifecycle.ViewModelProvider
-import mega.privacy.android.app.databinding.BottomSheetNodeLabelBinding
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.databinding.BottomSheetNodeLabelV2Binding
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
+import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragmentViewModelV2
+import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelUiState
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.domain.entity.NodeLabel
-import mega.privacy.android.shared.resources.R
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaNode
 import timber.log.Timber
 
 /**
@@ -27,12 +36,17 @@ import timber.log.Timber
  * and handle label changes. It uses Hilt for dependency injection and follows the Clean Architecture
  * principles, separating presentation logic from domain and data layers.
  */
+@Deprecated(
+    message = "NodeLabelBottomSheetDialogFragmentV2 is deprecated. " +
+            "Use ChangeLabelBottomSheetContentM3 instead for new features and ongoing support.",
+    replaceWith = ReplaceWith("ChangeLabelBottomSheetContentM3")
+)
 class NodeLabelBottomSheetDialogFragmentV2 : BaseBottomSheetDialogFragment() {
-    private lateinit var binding: BottomSheetNodeLabelBinding
-    private var node: MegaNode? = null
-    private val nodes: MutableList<MegaNode> = mutableListOf()
+    private lateinit var binding: BottomSheetNodeLabelV2Binding
+    private var node: TypedNode? = null
+    private val nodes: MutableList<TypedNode> = mutableListOf()
     private var isMultipleSelection = false
-    private var viewModel: NodeLabelBottomSheetDialogFragmentViewModel? = null
+    private val viewModel: NodeLabelBottomSheetDialogFragmentViewModelV2 by viewModels()
     private var isUpdatingProgrammatically = false
 
     override fun onCreateView(
@@ -40,8 +54,8 @@ class NodeLabelBottomSheetDialogFragmentV2 : BaseBottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        binding = BottomSheetNodeLabelBinding.inflate(layoutInflater)
-        contentView = binding.root.rootView
+        binding = BottomSheetNodeLabelV2Binding.inflate(layoutInflater)
+        contentView = binding.root
         itemsLayout = binding.radioGroupLabel
         return contentView
     }
@@ -53,26 +67,21 @@ class NodeLabelBottomSheetDialogFragmentV2 : BaseBottomSheetDialogFragment() {
             return
         }
 
-        // Initialize ViewModel
-        viewModel = ViewModelProvider(this)[NodeLabelBottomSheetDialogFragmentViewModel::class.java]
-
         setTextResourcesForLabel()
-        setupLiveDataObservers()
+        setupUiStateObserver()
 
         isMultipleSelection = arguments.getBoolean(IS_MULTIPLE_SELECTION, false)
 
-        viewModel?.let { viewModel ->
-            if (isMultipleSelection) {
-                val handles = arguments.getLongArray(NODE_HANDLES)
-                if (handles != null) {
-                    // Use ViewModel to load nodes with LiveData
-                    viewModel.loadNodes(handles, megaApi)
-                }
-            } else {
-                val nodeHandle = arguments.getLong(Constants.HANDLE, MegaApiJava.INVALID_HANDLE)
-                // Use ViewModel to load node with LiveData
-                viewModel.loadNode(nodeHandle, megaApi)
+        if (isMultipleSelection) {
+            val handles = arguments.getLongArray(NODE_HANDLES)
+            if (handles != null) {
+                // Use ViewModel to load nodes
+                viewModel.loadNodes(handles)
             }
+        } else {
+            val nodeHandle = arguments.getLong(Constants.HANDLE, MegaApiJava.INVALID_HANDLE)
+            // Use ViewModel to load node
+            viewModel.loadNode(nodeHandle)
         }
 
         binding.radioGroupLabel.setOnCheckedChangeListener { group: RadioGroup?, checkedId: Int ->
@@ -92,84 +101,91 @@ class NodeLabelBottomSheetDialogFragmentV2 : BaseBottomSheetDialogFragment() {
     }
 
     /**
-     * Sets up LiveData observers for ViewModel operations
+     * Sets up UI state observer for ViewModel operations
      */
-    private fun setupLiveDataObservers() {
-        viewModel?.let { viewModel ->
-            // Observer for single node loading
-            viewModel.nodeLoadResult.observe(this) { result ->
-                when (result) {
-                    is NodeLoadResult.Success -> {
-                        node = result.node
-                        showCurrentNodeLabel()
-                    }
+    private fun setupUiStateObserver() {
+        collectFlow(viewModel.uiState) { uiState ->
+            handleUiState(uiState)
+        }
+    }
 
-                    is NodeLoadResult.Error -> {
-                        Timber.e(result.exception, "Failed to load node")
-                        showErrorAndDismiss("Failed to load node")
-                    }
+    /**
+     * Handles UI state changes
+     */
+    private fun handleUiState(uiState: NodeLabelUiState) {
+        Timber.d("UI State changed: isLoading=${uiState.isLoading}")
 
-                    is NodeLoadResult.Loading -> {
-                        // Handle loading state if needed
-                    }
+        // Handle loading states - show loading indicator
+        if (uiState.isLoading) {
+            showLoadingIndicator(true)
+        } else {
+            // Hide loading indicator
+            showLoadingIndicator(false)
+        }
+
+        // Handle node data updates (independent of loading/error states)
+        if (uiState.hasNodes) {
+            if (uiState.isMultipleSelection) {
+                nodes.clear()
+                nodes.addAll(uiState.nodes)
+                showMultipleNodesLabel()
+            } else {
+                node = uiState.node
+                showCurrentNodeLabel()
+            }
+        }
+
+        // Handle error state - show general error message
+        if (uiState.hasError) {
+            showGeneralError()
+        }
+
+        // Handle dismiss state - only dismiss after successful operations
+        if (uiState.shouldDismiss) {
+            // Dismiss immediately for better UX
+            dismiss()
+        }
+    }
+
+    /**
+     * Shows or hides the loading indicator with better UX
+     */
+    private fun showLoadingIndicator(isLoading: Boolean) {
+        if (isLoading) {
+            // Show loading container and hide radio group
+            binding.loadingContainer.visibility = View.VISIBLE
+            binding.radioGroupLabel.visibility = View.GONE
+        } else {
+            // Hide loading container and show radio group
+            binding.loadingContainer.visibility = View.GONE
+            binding.radioGroupLabel.visibility = View.VISIBLE
+
+            // Recalculate bottom sheet height and position when switching to content
+            view?.post {
+                calculatePeekHeight()
+                // Force the bottom sheet to show all content
+                val behavior = BottomSheetBehavior.from(contentView.parent as View)
+                if (behavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                    behavior.state = BottomSheetBehavior.STATE_EXPANDED
                 }
             }
+        }
+    }
 
-            // Observer for multiple nodes loading
-            viewModel.nodesLoadResult.observe(this) { result ->
-                when (result) {
-                    is NodesLoadResult.Success -> {
-                        nodes.clear()
-                        nodes.addAll(result.nodes)
-                        showMultipleNodesLabel()
-                    }
-
-                    is NodesLoadResult.Error -> {
-                        Timber.e(result.exception, "Failed to load nodes")
-                        showErrorAndDismiss("Failed to load nodes")
-                    }
-
-                    is NodesLoadResult.Loading -> {
-                        // Handle loading state if needed
-                    }
-                }
-            }
-
-            // Observer for single node label update
-            viewModel.labelUpdateResult.observe(this) { result ->
-                when (result) {
-                    is LabelUpdateResult.Success -> {
-                        dismiss()
-                    }
-
-                    is LabelUpdateResult.Error -> {
-                        Timber.e(result.exception, "Failed to update node label")
-                        showErrorAndDismiss("Failed to update node label")
-                    }
-
-                    is LabelUpdateResult.Loading -> {
-                        // Handle loading state if needed
-                    }
-                }
-            }
-
-            // Observer for multiple nodes label update
-            viewModel.multipleLabelsUpdateResult.observe(this) { result ->
-                when (result) {
-                    is LabelUpdateResult.Success -> {
-                        dismiss()
-                    }
-
-                    is LabelUpdateResult.Error -> {
-                        Timber.e(result.exception, "Failed to update multiple node labels")
-                        showErrorAndDismiss("Failed to update multiple node labels")
-                    }
-
-                    is LabelUpdateResult.Loading -> {
-                        // Handle loading state if needed
-                    }
-                }
-            }
+    /**
+     * Shows a general error message using the app's standard error handling
+     */
+    private fun showGeneralError() {
+        try {
+            val context = requireContext()
+            Util.showSnackbar(
+                context,
+                SNACKBAR_TYPE,
+                getString(R.string.general_error),
+                MegaApiJava.INVALID_HANDLE
+            )
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to show general error snackbar")
         }
     }
 
@@ -186,7 +202,7 @@ class NodeLabelBottomSheetDialogFragmentV2 : BaseBottomSheetDialogFragment() {
     private fun showCurrentNodeLabel() {
         val currentNode = node ?: return
 
-        @IdRes val radioButtonResId = getRadioButtonResIdForLabel(currentNode.label)
+        @IdRes val radioButtonResId = getRadioButtonResIdForTypedNode(currentNode)
 
         if (binding.radioGroupLabel.checkedRadioButtonId != radioButtonResId) {
             isUpdatingProgrammatically = true
@@ -197,8 +213,6 @@ class NodeLabelBottomSheetDialogFragmentV2 : BaseBottomSheetDialogFragment() {
     }
 
     private fun showMultipleNodesLabel() {
-        val viewModel = viewModel ?: return
-
         // Count how many nodes have labels
         val labeledCount = nodes.count { hasLabel(it) }
 
@@ -210,8 +224,7 @@ class NodeLabelBottomSheetDialogFragmentV2 : BaseBottomSheetDialogFragment() {
         // If ALL nodes have the same label, pre-select this option
         val uniformLabel = viewModel.getUniformLabel(nodes)
         if (uniformLabel != null) {
-            val labelInt = viewModel.getIntFromNodeLabel(uniformLabel)
-            @IdRes val radioButtonResId = getRadioButtonResIdForLabel(labelInt)
+            @IdRes val radioButtonResId = getRadioButtonResIdForNodeLabel(uniformLabel)
             if (binding.radioGroupLabel.checkedRadioButtonId != radioButtonResId) {
                 isUpdatingProgrammatically = true
                 binding.radioGroupLabel.check(radioButtonResId)
@@ -221,42 +234,39 @@ class NodeLabelBottomSheetDialogFragmentV2 : BaseBottomSheetDialogFragment() {
         }
     }
 
-    fun hasLabel(node: MegaNode): Boolean {
-        return viewModel?.hasLabel(node) ?: false
+    private fun hasLabel(node: TypedNode): Boolean {
+        return viewModel.hasLabel(node)
     }
 
     private fun updateNodeLabel(checkedId: Int) {
         val nodeLabel = getNodeLabelFromCheckedId(checkedId)
-        val isRemoveLabel = (checkedId == mega.privacy.android.app.R.id.radio_remove)
+        val isRemoveLabel = (checkedId == R.id.radio_remove)
 
-        viewModel?.let { viewModel ->
-            if (isMultipleSelection) {
-                updateMultipleNodeLabels(viewModel, nodeLabel, isRemoveLabel)
-            } else {
-                updateSingleNodeLabel(viewModel, nodeLabel, isRemoveLabel)
-            }
+        if (isMultipleSelection) {
+            updateMultipleNodeLabels(nodeLabel, isRemoveLabel)
+        } else {
+            updateSingleNodeLabel(nodeLabel, isRemoveLabel)
         }
     }
 
     private fun getNodeLabelFromCheckedId(checkedId: Int): NodeLabel? {
         return when (checkedId) {
-            mega.privacy.android.app.R.id.radio_label_red -> NodeLabel.RED
-            mega.privacy.android.app.R.id.radio_label_orange -> NodeLabel.ORANGE
-            mega.privacy.android.app.R.id.radio_label_yellow -> NodeLabel.YELLOW
-            mega.privacy.android.app.R.id.radio_label_green -> NodeLabel.GREEN
-            mega.privacy.android.app.R.id.radio_label_blue -> NodeLabel.BLUE
-            mega.privacy.android.app.R.id.radio_label_purple -> NodeLabel.PURPLE
-            mega.privacy.android.app.R.id.radio_label_grey -> NodeLabel.GREY
+            R.id.radio_label_red -> NodeLabel.RED
+            R.id.radio_label_orange -> NodeLabel.ORANGE
+            R.id.radio_label_yellow -> NodeLabel.YELLOW
+            R.id.radio_label_green -> NodeLabel.GREEN
+            R.id.radio_label_blue -> NodeLabel.BLUE
+            R.id.radio_label_purple -> NodeLabel.PURPLE
+            R.id.radio_label_grey -> NodeLabel.GREY
             else -> null
         }
     }
 
     private fun updateMultipleNodeLabels(
-        viewModel: NodeLabelBottomSheetDialogFragmentViewModel,
         nodeLabel: NodeLabel?,
         isRemoveLabel: Boolean,
     ) {
-        val nodeHandles = nodes.map { it.handle }
+        val nodeHandles = nodes.map { it.id.longValue }
         viewModel.updateMultipleNodeLabels(
             nodeHandles,
             if (isRemoveLabel) null else nodeLabel
@@ -264,45 +274,42 @@ class NodeLabelBottomSheetDialogFragmentV2 : BaseBottomSheetDialogFragment() {
     }
 
     private fun updateSingleNodeLabel(
-        viewModel: NodeLabelBottomSheetDialogFragmentViewModel,
         nodeLabel: NodeLabel?,
         isRemoveLabel: Boolean,
     ) {
         val currentNode = node ?: return
         viewModel.updateNodeLabel(
-            currentNode.handle,
+            currentNode.id.longValue,
             if (isRemoveLabel) null else nodeLabel
         )
     }
 
     /**
-     * Shows an error message and dismisses the dialog
+     * Maps a TypedNode to the corresponding RadioButton resource ID.
      *
-     * @param message The error message to log
+     * @param typedNode the TypedNode to get label from
+     * @return the matching RadioButton resource ID, or -1 if the label is not recognized
      */
-    private fun showErrorAndDismiss(message: String) {
-        Timber.e(message)
-        // TODO: Show error message to user (e.g., using Snackbar or Toast)
-        dismiss()
+    private fun getRadioButtonResIdForTypedNode(typedNode: TypedNode): Int {
+        return getRadioButtonResIdForNodeLabel(typedNode.nodeLabel)
     }
 
     /**
-     * Maps a MegaNode label value to the corresponding RadioButton resource ID.
+     * Maps a NodeLabel to the corresponding RadioButton resource ID.
      *
-     * @param label the label value from MegaNode (e.g., MegaNode.NODE_LBL_RED)
+     * @param nodeLabel the NodeLabel enum
      * @return the matching RadioButton resource ID, or -1 if the label is not recognized
      */
-    private fun getRadioButtonResIdForLabel(label: Int): Int {
-        return when (label) {
-            MegaNode.NODE_LBL_RED -> mega.privacy.android.app.R.id.radio_label_red
-            MegaNode.NODE_LBL_ORANGE -> mega.privacy.android.app.R.id.radio_label_orange
-            MegaNode.NODE_LBL_YELLOW -> mega.privacy.android.app.R.id.radio_label_yellow
-            MegaNode.NODE_LBL_GREEN -> mega.privacy.android.app.R.id.radio_label_green
-            MegaNode.NODE_LBL_BLUE -> mega.privacy.android.app.R.id.radio_label_blue
-            MegaNode.NODE_LBL_PURPLE -> mega.privacy.android.app.R.id.radio_label_purple
-            MegaNode.NODE_LBL_GREY -> mega.privacy.android.app.R.id.radio_label_grey
-            else ->                 // Unknown label → no matching RadioButton
-                -1
+    private fun getRadioButtonResIdForNodeLabel(nodeLabel: NodeLabel?): Int {
+        return when (nodeLabel) {
+            NodeLabel.RED -> R.id.radio_label_red
+            NodeLabel.ORANGE -> R.id.radio_label_orange
+            NodeLabel.YELLOW -> R.id.radio_label_yellow
+            NodeLabel.GREEN -> R.id.radio_label_green
+            NodeLabel.BLUE -> R.id.radio_label_blue
+            NodeLabel.PURPLE -> R.id.radio_label_purple
+            NodeLabel.GREY -> R.id.radio_label_grey
+            else -> -1             // Unknown label → no matching RadioButton
         }
     }
 
