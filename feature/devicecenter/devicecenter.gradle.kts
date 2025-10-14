@@ -22,6 +22,7 @@ dependencies {
     implementation(project(":core:formatter"))
     lintChecks(project(":lint"))
 
+    implementation(project(":core:navigation-contract"))
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":domain"))
     implementation(project(":navigation"))
@@ -43,6 +44,7 @@ dependencies {
     implementation(google.material)
     implementation(androidx.lifecycle.viewmodel)
     implementation(androidx.lifecycle.service)
+    implementation(androidx.navigation3.runtime)
 
     // Compose
     implementation(androidx.lifecycle.runtime.compose)
@@ -53,6 +55,7 @@ dependencies {
     implementation(androidx.hilt.navigation)
     implementation(androidx.constraintlayout.compose)
     implementation(lib.compose.state.events)
+    implementation(androidx.material3)
 
     testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.bundles.unit.test)

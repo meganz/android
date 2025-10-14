@@ -6,6 +6,7 @@ import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import mega.privacy.android.navigation.destination.AchievementNavKey
 import mega.privacy.android.navigation.destination.ContactsNavKey
+import mega.privacy.android.navigation.destination.DeviceCenterNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.OfflineNavKey
@@ -46,7 +47,7 @@ object SharedItemsItem : NavDrawerItem.Account(
 )
 
 object DeviceCentreItem : NavDrawerItem.Account(
-    destination = object : NavKey {},
+    destination = DeviceCenterNavKey,
     icon = IconPack.Medium.Thin.Outline.Devices,
     title = sharedR.string.general_section_device_centre
 )
