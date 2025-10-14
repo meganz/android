@@ -3,7 +3,6 @@ package mega.privacy.android.feature.clouddrive.presentation.shares.incomingshar
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.SortOrder
@@ -13,7 +12,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 
 /**
  * UI state for Incoming Shares
- * @param title Name of the folder
+ *
  * @property currentFolderId The current folder id being displayed
  * @property items List of nodes in the current folder
  * @property currentViewType The current view type of the Cloud Drive
@@ -23,7 +22,6 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property hasMediaItems True if there are media(image, video) items in the current folder
  */
 data class IncomingSharesUiState(
-    val title: LocalizedText = LocalizedText.Literal(""),
     val isLoading: Boolean = true,
     val currentFolderId: NodeId = NodeId(-1L),
     val items: List<NodeUiItem<TypedNode>> = emptyList(),

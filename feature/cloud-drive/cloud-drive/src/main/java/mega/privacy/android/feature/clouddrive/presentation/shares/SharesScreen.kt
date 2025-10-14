@@ -13,7 +13,6 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -46,7 +45,11 @@ import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSel
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderAccessDialogNavKey
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogM3
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetRoute
+import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
+import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -63,6 +66,8 @@ import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshare
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
+import mega.privacy.android.shared.resources.R as sharedR
+
 
 /**
  * Shares screen containing incoming shares, outgoing shares and links tabs
@@ -79,7 +84,7 @@ internal fun SharesScreen(
     val megaNavigator = rememberMegaNavigator()
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackBarHostState.current
-    var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
+    var selectedTab by rememberSaveable { mutableStateOf(SharesTab.IncomingShares) }
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val nodeActionHandler = rememberNodeActionHandler(
         navigationHandler = navigationHandler,
@@ -88,6 +93,10 @@ internal fun SharesScreen(
     )
     val incomingSharesUiState by incomingSharesViewModel.uiState.collectAsStateWithLifecycle()
     val outgoingSharesUiState by outgoingSharesViewModel.uiState.collectAsStateWithLifecycle()
+
+    // Sort modal
+    val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
 
     // Node options modal state
     var visibleNodeOptionId by remember { mutableStateOf<NodeId?>(null) }
@@ -114,42 +123,36 @@ internal fun SharesScreen(
         }
     }
 
-    val (isInSelectionMode, selectedItemsCount) = when (selectedTabIndex) {
-        0 -> incomingSharesUiState.isInSelectionMode to incomingSharesUiState.selectedItemsCount
-        1 -> outgoingSharesUiState.isInSelectionMode to outgoingSharesUiState.selectedItemsCount
-        else -> false to 0 // TODO Selection mode for links
+    val (isInSelectionMode, selectedItemsCount) = when (selectedTab) {
+        SharesTab.IncomingShares -> incomingSharesUiState.isInSelectionMode to incomingSharesUiState.selectedItemsCount
+        SharesTab.OutgoingShares -> outgoingSharesUiState.isInSelectionMode to outgoingSharesUiState.selectedItemsCount
+        SharesTab.Links -> false to 0 // TODO Selection mode for links
     }
 
     fun deselectAllItems() {
-        when (selectedTabIndex) {
-            0 -> incomingSharesViewModel.processAction(IncomingSharesAction.DeselectAllItems)
-            1 -> outgoingSharesViewModel.processAction(OutgoingSharesAction.DeselectAllItems)
-            else -> {} // TODO Selection mode for links
+        when (selectedTab) {
+            SharesTab.IncomingShares -> incomingSharesViewModel.processAction(IncomingSharesAction.DeselectAllItems)
+            SharesTab.OutgoingShares -> outgoingSharesViewModel.processAction(OutgoingSharesAction.DeselectAllItems)
+            SharesTab.Links -> {} // TODO Selection mode for links
         }
     }
 
     fun selectAllItems() {
-        when (selectedTabIndex) {
-            0 -> incomingSharesViewModel.processAction(IncomingSharesAction.SelectAllItems)
-            1 -> outgoingSharesViewModel.processAction(OutgoingSharesAction.SelectAllItems)
-            else -> {} // TODO Selection mode for links
+        when (selectedTab) {
+            SharesTab.IncomingShares -> incomingSharesViewModel.processAction(IncomingSharesAction.SelectAllItems)
+            SharesTab.OutgoingShares -> outgoingSharesViewModel.processAction(OutgoingSharesAction.SelectAllItems)
+            SharesTab.Links -> {} // TODO Selection mode for links
         }
     }
 
     fun getSelectedNodes() = if (isInSelectionMode) {
-        when (selectedTabIndex) {
-            0 -> incomingSharesUiState.selectedNodes
-            1 -> outgoingSharesUiState.selectedNodes
-            else -> emptyList() // TODO Selection mode for links
+        when (selectedTab) {
+            SharesTab.IncomingShares -> incomingSharesUiState.selectedNodes
+            SharesTab.OutgoingShares -> outgoingSharesUiState.selectedNodes
+            SharesTab.Links -> emptyList() // TODO Selection mode for links
         }
     } else {
         emptyList()
-    }
-
-    fun getNodeSourceType() = when (selectedTabIndex) {
-        0 -> NodeSourceType.INCOMING_SHARES
-        1 -> NodeSourceType.OUTGOING_SHARES
-        else -> NodeSourceType.LINKS
     }
 
     BackHandler(enabled = isInSelectionMode) {
@@ -213,7 +216,7 @@ internal fun SharesScreen(
                         navigationHandler = navigationHandler,
                         onAction = incomingSharesViewModel::processAction,
                         onShowNodeOptions = { visibleNodeOptionId = it },
-                        onSortNodes = incomingSharesViewModel::setSortOrder
+                        onSortOrderClick = { showSortBottomSheet = true }
                     )
                 }
                 addTextTabWithScrollableContent(
@@ -224,7 +227,8 @@ internal fun SharesScreen(
                         uiState = outgoingSharesUiState,
                         navigationHandler = navigationHandler,
                         onAction = outgoingSharesViewModel::processAction,
-                        onShowNodeOptions = { visibleNodeOptionId = it }
+                        onShowNodeOptions = { visibleNodeOptionId = it },
+                        onSortOrderClick = { showSortBottomSheet = true }
                     )
                 }
                 addTextTabWithScrollableContent(
@@ -241,9 +245,9 @@ internal fun SharesScreen(
                     }
                 }
             },
-            initialSelectedIndex = 0,
+            initialSelectedIndex = SharesTab.IncomingShares.ordinal,
             onTabSelected = {
-                selectedTabIndex = it
+                selectedTab = SharesTab.fromOrdinal(it)
                 true
             }
         )
@@ -262,7 +266,8 @@ internal fun SharesScreen(
             when (collisionType) {
                 NodeNameCollisionType.MOVE -> nodeOptionsActionViewModel.moveNodes(nodes)
                 NodeNameCollisionType.COPY -> nodeOptionsActionViewModel.copyNodes(nodes)
-                else -> { /* No-op for other types */ }
+                else -> { /* No-op for other types */
+                }
             }
         },
     )
@@ -270,7 +275,7 @@ internal fun SharesScreen(
     LaunchedEffect(selectedItemsCount) {
         nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
             selectedNodes = getSelectedNodes().toSet(),
-            nodeSourceType = getNodeSourceType()
+            nodeSourceType = selectedTab.toNodeSourceType()
         )
     }
 
@@ -344,7 +349,7 @@ internal fun SharesScreen(
                     visibleNodeOptionId = null
                 },
                 nodeId = nodeId.longValue,
-                nodeSourceType = getNodeSourceType(),
+                nodeSourceType = selectedTab.toNodeSourceType(),
                 onTransfer = onTransfer,
                 actionHandler = nodeActionHandler,
                 nodeOptionsActionViewModel = nodeOptionsActionViewModel,
@@ -378,4 +383,64 @@ internal fun SharesScreen(
             )
         },
     )
+
+    if (showSortBottomSheet) {
+        val selectedSortConfiguration = when (selectedTab) {
+            SharesTab.IncomingShares -> incomingSharesUiState.selectedSortConfiguration
+            SharesTab.OutgoingShares -> outgoingSharesUiState.selectedSortConfiguration
+            SharesTab.Links -> NodeSortConfiguration.default // TODO Sort configuration for links
+        }
+
+        SortBottomSheet(
+            title = stringResource(sharedR.string.action_sort_by_header),
+            options = NodeSortOption.getOptionsForSourceType(selectedTab.toNodeSourceType()),
+            sheetState = sortBottomSheetState,
+            selectedSort = SortBottomSheetResult(
+                sortOptionItem = selectedSortConfiguration.sortOption,
+                sortDirection = selectedSortConfiguration.sortDirection
+            ),
+            onSortOptionSelected = { result ->
+                result?.let {
+                    val sortConfig = NodeSortConfiguration(
+                        sortOption = it.sortOptionItem,
+                        sortDirection = it.sortDirection
+                    )
+                    when (selectedTab) {
+                        SharesTab.IncomingShares -> incomingSharesViewModel.setSortOrder(sortConfig)
+                        SharesTab.OutgoingShares -> outgoingSharesViewModel.setSortOrder(sortConfig)
+                        SharesTab.Links -> {} // TODO Sort configuration for links
+                    }
+                    showSortBottomSheet = false
+                }
+            },
+            onDismissRequest = {
+                showSortBottomSheet = false
+            }
+        )
+    }
+}
+
+/**
+ * Enum representing the different tabs in the Shares screen
+ */
+private enum class SharesTab {
+    IncomingShares,
+    OutgoingShares,
+    Links;
+
+    /**
+     * Converts the tab to its corresponding NodeSourceType
+     */
+    fun toNodeSourceType(): NodeSourceType = when (this) {
+        IncomingShares -> NodeSourceType.INCOMING_SHARES
+        OutgoingShares -> NodeSourceType.OUTGOING_SHARES
+        Links -> NodeSourceType.LINKS
+    }
+
+    companion object {
+        /**
+         * Gets the SharesTab from by its ordinal value
+         */
+        fun fromOrdinal(ordinal: Int) = entries.getOrNull(ordinal) ?: IncomingShares
+    }
 }

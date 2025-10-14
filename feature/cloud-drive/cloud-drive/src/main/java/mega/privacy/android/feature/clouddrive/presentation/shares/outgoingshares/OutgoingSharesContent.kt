@@ -41,6 +41,7 @@ fun OutgoingSharesContent(
     navigationHandler: NavigationHandler,
     onAction: (OutgoingSharesAction) -> Unit,
     onShowNodeOptions: (NodeId) -> Unit,
+    onSortOrderClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     listState: LazyListState = rememberLazyListState(),
@@ -101,7 +102,7 @@ fun OutgoingSharesContent(
                 onLongClicked = { onAction(OutgoingSharesAction.ItemLongClicked(it)) },
                 sortConfiguration = uiState.selectedSortConfiguration,
                 isListView = isListView,
-                onSortOrderClick = { }, // TODO
+                onSortOrderClick = onSortOrderClick,
                 onChangeViewTypeClicked = { onAction(OutgoingSharesAction.ChangeViewTypeClicked) },
                 inSelectionMode = uiState.isInSelectionMode,
             )
