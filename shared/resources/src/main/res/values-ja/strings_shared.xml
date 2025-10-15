@@ -1664,4 +1664,12 @@
     <string name="record_video_button_text">動画</string>
     <!-- Label shown the total the used space for business/pro flexi account -->
     <string name="navigation_drawer_used_space_only">[A]%1$s[/A]使用済み</string>
+    <!-- Message informing a transfer was cancelled -->
+    <string name="transfers_transfer_cancelled">転送がキャンセルされました</string>
+    <!-- Undo label for any undo action -->
+    <string name="general_undo">元に戻す</string>
+    <!-- Label for chat in the menu section-->
+    <string name="general_chat">チャット</string>
+    <!-- Photos section. -->
+    <string name="general_section_photos">写真</string>
 </resources>

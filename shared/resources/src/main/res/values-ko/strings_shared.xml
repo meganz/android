@@ -1674,4 +1674,12 @@
     <string name="record_video_button_text">동영상</string>
     <!-- Label shown the total the used space for business/pro flexi account -->
     <string name="navigation_drawer_used_space_only">[A]%1$s[/A] 이용됨</string>
+    <!-- Message informing a transfer was cancelled -->
+    <string name="transfers_transfer_cancelled">전송 취소됨</string>
+    <!-- Undo label for any undo action -->
+    <string name="general_undo">실행 취소</string>
+    <!-- Label for chat in the menu section-->
+    <string name="general_chat">대화</string>
+    <!-- Photos section. -->
+    <string name="general_section_photos">사진</string>
 </resources>

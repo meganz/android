@@ -1741,4 +1741,12 @@
     <string name="record_video_button_text">Video</string>
     <!-- Label shown the total the used space for business/pro flexi account -->
     <string name="navigation_drawer_used_space_only">[A]%1$s[/A] used</string>
+    <!-- Message informing a transfer was cancelled -->
+    <string name="transfers_transfer_cancelled">Trasferimento cancellato</string>
+    <!-- Undo label for any undo action -->
+    <string name="general_undo">Annulla</string>
+    <!-- Label for chat in the menu section-->
+    <string name="general_chat">Chat</string>
+    <!-- Photos section. -->
+    <string name="general_section_photos">Foto</string>
 </resources>

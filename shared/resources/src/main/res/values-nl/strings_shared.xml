@@ -1702,5 +1702,13 @@
     <!-- Text of the button for recording a video -->
     <string name="record_video_button_text">Video</string>
     <!-- Label shown the total the used space for business/pro flexi account -->
-    <string name="navigation_drawer_used_space_only">[A]%1$s[/A] used</string>
+    <string name="navigation_drawer_used_space_only">[A]%1$s[/A] gebruikt</string>
+    <!-- Message informing a transfer was cancelled -->
+    <string name="transfers_transfer_cancelled">Overdracht geannuleerd</string>
+    <!-- Undo label for any undo action -->
+    <string name="general_undo">Ongedaan maken</string>
+    <!-- Label for chat in the menu section-->
+    <string name="general_chat">Chat</string>
+    <!-- Photos section. -->
+    <string name="general_section_photos">Foto’s</string>
 </resources>

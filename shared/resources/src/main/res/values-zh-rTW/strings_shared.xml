@@ -1663,5 +1663,13 @@
     <!-- Text of the button for recording a video -->
     <string name="record_video_button_text">影片</string>
     <!-- Label shown the total the used space for business/pro flexi account -->
-    <string name="navigation_drawer_used_space_only">[A]%1$s[/A] used</string>
+    <string name="navigation_drawer_used_space_only">已使用[A]%1$s[/A]</string>
+    <!-- Message informing a transfer was cancelled -->
+    <string name="transfers_transfer_cancelled">已取消傳輸</string>
+    <!-- Undo label for any undo action -->
+    <string name="general_undo">還原</string>
+    <!-- Label for chat in the menu section-->
+    <string name="general_chat">對話</string>
+    <!-- Photos section. -->
+    <string name="general_section_photos">照片</string>
 </resources>
