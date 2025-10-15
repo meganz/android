@@ -57,7 +57,7 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.mobile.analytics.event.ActiveTransferPriorityChangedEvent
+import mega.privacy.mobile.analytics.event.ActiveTransferDragAndDropToChangePriorityEvent
 import mega.privacy.mobile.analytics.event.ActiveTransfersCancelSelectedMenuItemEvent
 import mega.privacy.mobile.analytics.event.ActiveTransfersGlobalPauseMenuItemEvent
 import mega.privacy.mobile.analytics.event.ActiveTransfersGlobalPlayMenuItemEvent
@@ -294,7 +294,9 @@ internal fun TransfersView(
                             },
                             onReorderPreview = onActiveTransfersReorderPreview,
                             onReorderConfirmed = {
-                                Analytics.tracker.trackEvent(ActiveTransferPriorityChangedEvent)
+                                Analytics.tracker.trackEvent(
+                                    ActiveTransferDragAndDropToChangePriorityEvent
+                                )
                                 onActiveTransfersReorderConfirmed(it)
                             },
                             onActiveTransferSelected = onActiveTransferSelected,
