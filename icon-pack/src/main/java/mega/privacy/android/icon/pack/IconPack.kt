@@ -61,6 +61,7 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineHardDriveIm
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineHeartBrokenImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineHeartImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineHelpCircleImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineHomeImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineImage01ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineImagesImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineInfoImageVector
@@ -128,7 +129,9 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinSolidCheckCircleIm
 import mega.privacy.android.icon.pack.vectors.createMediumThinSolidCheckSquareImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinSolidEmojiSmileImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinSolidEyeImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinSolidFolderImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinSolidHeartImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinSolidHomeImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinSolidImage01ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinSolidLink01ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinSolidPlayCircleImageVector
@@ -305,6 +308,8 @@ public object IconPack : IconPackInterface {
 
                 override val HelpCircle: ImageVector by lazy {
                         createMediumThinOutlineHelpCircleImageVector() }
+
+                override val Home: ImageVector by lazy { createMediumThinOutlineHomeImageVector() }
 
                 override val Image01: ImageVector by lazy {
                         createMediumThinOutlineImage01ImageVector() }
@@ -497,7 +502,12 @@ public object IconPack : IconPackInterface {
 
                 override val Eye: ImageVector by lazy { createMediumThinSolidEyeImageVector() }
 
+                override val Folder: ImageVector by lazy { createMediumThinSolidFolderImageVector()
+                        }
+
                 override val Heart: ImageVector by lazy { createMediumThinSolidHeartImageVector() }
+
+                override val Home: ImageVector by lazy { createMediumThinSolidHomeImageVector() }
 
                 override val Image01: ImageVector by lazy {
                         createMediumThinSolidImage01ImageVector() }
