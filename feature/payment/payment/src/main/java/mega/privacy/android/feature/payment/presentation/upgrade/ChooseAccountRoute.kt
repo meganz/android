@@ -17,7 +17,6 @@ import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.feature.payment.model.AccountTypeInt
 import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
 import mega.privacy.android.feature.payment.presentation.storage.AccountStorageViewModel
-import mega.privacy.android.feature.payment.util.PaymentUtils
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
@@ -95,8 +94,11 @@ fun ChooseAccountRoute(
             )
             activity?.let {
                 billingViewModel.startPurchase(
-                    activity,
-                    PaymentUtils.getProductId(isMonthly, accountType),
+                    activity = activity,
+                    productId = chooseAccountViewModel.getProductId(
+                        isMonthly = isMonthly,
+                        accountType = accountType
+                    ),
                 )
             }
         },

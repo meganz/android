@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -20,6 +21,7 @@ import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCas
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
 import mega.privacy.android.feature.payment.model.ChooseAccountState
+import mega.privacy.android.feature.payment.model.mapper.AccountTypeToProductIdMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
 import timber.log.Timber
 import javax.inject.Inject
@@ -43,6 +45,7 @@ class ChooseAccountViewModel @Inject constructor(
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
     private val getRecommendedSubscriptionUseCase: GetRecommendedSubscriptionUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val accountTypeToProductIdMapper: AccountTypeToProductIdMapper,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -136,6 +139,10 @@ class ChooseAccountViewModel @Inject constructor(
                 it.copy(product = pricing.products)
             }
         }
+    }
+
+    fun getProductId(accountType: AccountType, isMonthly: Boolean): String {
+        return accountTypeToProductIdMapper(accountType = accountType, isMonthly = isMonthly)
     }
 
     companion object {

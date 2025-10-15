@@ -15,17 +15,17 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.feature.payment.presentation.storage.AccountStorageViewModel
 import mega.privacy.android.app.presentation.cancelaccountplan.model.CancellationInstructionsType
 import mega.privacy.android.app.presentation.cancelaccountplan.view.CancelAccountPlanView
 import mega.privacy.android.app.presentation.cancelaccountplan.view.CancelSubscriptionSurveyView
 import mega.privacy.android.app.presentation.cancelaccountplan.view.instructionscreens.CancellationInstructionsView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.feature.payment.util.PaymentUtils.getProductId
 import mega.privacy.android.app.utils.MANAGE_PLAY_STORE_SUBSCRIPTION_URL
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.feature.payment.model.mapper.AccountTypeToProductIdMapper
+import mega.privacy.android.feature.payment.presentation.storage.AccountStorageViewModel
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.CancelSubscriptionContinueCancellationButtonPressedEvent
 import mega.privacy.mobile.analytics.event.CancelSubscriptionKeepPlanButtonPressedEvent
@@ -47,6 +47,9 @@ class CancelAccountPlanActivity : AppCompatActivity() {
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
+    @Inject
+    lateinit var accountTypeToProductIdMapper: AccountTypeToProductIdMapper
 
     private val viewModel: CancelAccountPlanViewModel by viewModels()
     private val accountStorageViewModel: AccountStorageViewModel by viewModels()
@@ -164,7 +167,10 @@ class CancelAccountPlanActivity : AppCompatActivity() {
         isMonthly: Boolean,
     ) {
         val appPackage = applicationContext.packageName
-        val productID = getProductId(isMonthly, accountType)
+        val productID = accountTypeToProductIdMapper(
+            accountType = accountType,
+            isMonthly = isMonthly
+        )
         val link = "${MANAGE_PLAY_STORE_SUBSCRIPTION_URL}${productID}&package=${appPackage}"
         val uriUrl = Uri.parse(link)
         val launchBrowser = Intent(ACTION_VIEW, uriUrl)
