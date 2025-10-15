@@ -9,7 +9,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
@@ -64,7 +64,7 @@ internal fun NavGraphBuilder.createAccountScreen(
     }
 }
 
-internal fun EntryProviderBuilder<NavKey>.createAccountScreen(
+internal fun EntryProviderScope<NavKey>.createAccountScreen(
     navigationHandler: NavigationHandler,
     chatRequestHandler: MegaChatRequestHandler,
     onFinish: () -> Unit,

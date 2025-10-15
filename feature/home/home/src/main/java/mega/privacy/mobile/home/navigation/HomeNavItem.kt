@@ -1,7 +1,7 @@
 package mega.privacy.mobile.home.navigation
 
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.icon.pack.IconPack
@@ -18,7 +18,7 @@ import mega.privacy.mobile.home.presentation.home.homeScreen
 
 class HomeNavItem : MainNavItem {
     override val destination: NavKey = Home
-    override val screen: EntryProviderBuilder<NavKey>.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
+    override val screen: EntryProviderScope<NavKey>.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
         { navigationHandler, navigationController, transferHandler ->
             homeScreen(
                 navigationHandler = navigationHandler,

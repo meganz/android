@@ -7,7 +7,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.transfers.model.TransfersViewModel
 import mega.privacy.android.app.presentation.transfers.view.TransfersView
@@ -78,7 +78,7 @@ private fun TransferRoute(
     )
 }
 
-internal fun EntryProviderBuilder<NavKey>.transfersScreen3(
+internal fun EntryProviderScope<NavKey>.transfersScreen3(
     onBackPress: () -> Unit,
     onNavigateToUpgradeAccount: () -> Unit,
 ) {

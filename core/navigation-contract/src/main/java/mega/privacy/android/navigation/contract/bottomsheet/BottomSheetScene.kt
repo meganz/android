@@ -15,7 +15,7 @@ class BottomSheetScene<T : Any>(
     override val previousEntries: List<NavEntry<T>>,
     override val overlaidEntries: List<NavEntry<T>>,
     private val sheetEntry: NavEntry<T>,
-    private val onBack: (Int) -> Unit,
+    private val onBack: () -> Unit,
     private val skipPartiallyExpanded: Boolean,
 ) : OverlayScene<T> {
 
@@ -27,13 +27,13 @@ class BottomSheetScene<T : Any>(
             rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
 
         BackHandler(enabled = sheetState.isVisible) {
-            onBack(1)
+            onBack()
         }
 
         MegaModalBottomSheet(
             sheetState = sheetState,
             onDismissRequest = {
-                onBack(1)
+                onBack()
             },
             modifier = Modifier.Companion,
             bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,

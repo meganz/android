@@ -10,7 +10,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import kotlinx.serialization.Serializable
@@ -62,7 +62,7 @@ internal fun NavGraphBuilder.loginScreen(
     }
 }
 
-internal fun EntryProviderBuilder<NavKey>.loginScreen(
+internal fun EntryProviderScope<NavKey>.loginScreen(
     navigationHandler: NavigationHandler,
     chatRequestHandler: MegaChatRequestHandler,
     onFinish: () -> Unit,
@@ -91,7 +91,7 @@ internal fun EntryProviderBuilder<NavKey>.loginScreen(
     }
 }
 
-internal fun EntryProviderBuilder<NavKey>.loginStartScreen(
+internal fun EntryProviderScope<NavKey>.loginStartScreen(
     sharedViewModel: LoginViewModel,
     navigationHandler: NavigationHandler,
     stopShowingSplashScreen: () -> Unit,

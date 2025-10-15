@@ -7,7 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.analytics.Analytics
@@ -18,7 +18,7 @@ import mega.privacy.android.navigation.destination.ContactInfoNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import mega.privacy.mobile.analytics.event.FileContactListScreenViewEvent
 
-internal fun EntryProviderBuilder<NavKey>.fileContacts(
+internal fun EntryProviderScope<NavKey>.fileContacts(
     onNavigateBack: () -> Unit,
     onNavigate: (NavKey) -> Unit,
     resultFlow: (String) -> Flow<List<String>?>,

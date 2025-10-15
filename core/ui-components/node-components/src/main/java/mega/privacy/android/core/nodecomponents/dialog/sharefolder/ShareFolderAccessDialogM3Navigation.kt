@@ -1,6 +1,6 @@
 package mega.privacy.android.core.nodecomponents.dialog.sharefolder
 
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.compose.ui.window.DialogProperties
@@ -14,7 +14,7 @@ data class ShareFolderAccessDialogNavKey(
     val isFromBackups: Boolean
 ) : NavKey
 
-fun EntryProviderBuilder<NavKey>.shareFolderAccessDialogM3(
+fun EntryProviderScope<NavKey>.shareFolderAccessDialogM3(
     onDismiss: () -> Unit,
 ) {
     entry<ShareFolderAccessDialogNavKey>(

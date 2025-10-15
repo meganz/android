@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.transfers.transferoverquota.view.d
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import kotlinx.serialization.Serializable
@@ -17,7 +17,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 data object TransferOverQuotaDialog : NavKey
 
 data object TransferOverQuotaDialogDestinations : AppDialogDestinations {
-    override val navigationGraph: EntryProviderBuilder<NavKey>.(NavigationHandler, () -> Unit) -> Unit =
+    override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, () -> Unit) -> Unit =
         { navigationHandler, onHandled ->
             transferOverQuotaDialogDestination(
                 navigateBack = navigationHandler::back,
@@ -27,7 +27,7 @@ data object TransferOverQuotaDialogDestinations : AppDialogDestinations {
         }
 }
 
-fun EntryProviderBuilder<NavKey>.transferOverQuotaDialogDestination(
+fun EntryProviderScope<NavKey>.transferOverQuotaDialogDestination(
     navigateBack: () -> Unit,
     navigate: (NavKey) -> Unit,
     onDialogHandled: () -> Unit,

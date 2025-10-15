@@ -15,8 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
-import androidx.navigation3.scene.rememberSceneSetupNavEntryDecorator
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.appstate.content.navigation.NavigationHandlerImpl
@@ -78,8 +77,7 @@ internal class FileContactListComposeActivity : AppCompatActivity() {
                     backStack = backStack,
                     onBack = { backStack.removeLastOrNull() },
                     entryDecorators = listOf(
-                        rememberSceneSetupNavEntryDecorator(),
-                        rememberSavedStateNavEntryDecorator(),
+                        rememberSaveableStateHolderNavEntryDecorator(),
                         rememberViewModelStoreNavEntryDecorator()
                     ),
                     entryProvider = entryProvider {

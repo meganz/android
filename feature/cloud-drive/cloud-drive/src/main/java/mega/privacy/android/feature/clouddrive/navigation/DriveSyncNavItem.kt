@@ -2,7 +2,7 @@ package mega.privacy.android.feature.clouddrive.navigation
 
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.feature.clouddrive.presentation.drivesync.DriveSync
@@ -20,7 +20,7 @@ import mega.privacy.mobile.analytics.event.CloudDriveBottomNavigationItemEvent
 
 class DriveSyncNavItem : MainNavItem {
     override val destination: NavKey = DriveSync
-    override val screen: EntryProviderBuilder<NavKey>.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
+    override val screen: EntryProviderScope<NavKey>.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
         { navigationHandler, navigationController, transferHandler ->
             driveSyncScreen(
                 navigationHandler = navigationHandler,

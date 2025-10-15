@@ -11,9 +11,8 @@ import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDe
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
-import androidx.navigation3.scene.rememberSceneSetupNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.LocalSnackBarHostState
@@ -62,8 +61,7 @@ internal fun AppContentView(
                     onBack = { backStack.removeLastOrNull() },
                     sceneStrategy = transparentStrategy.then(dialogStrategy).then(bottomSheetStrategy),
                     entryDecorators = listOf(
-                        rememberSceneSetupNavEntryDecorator(),
-                        rememberSavedStateNavEntryDecorator(),
+                        rememberSaveableStateHolderNavEntryDecorator(),
                         rememberViewModelStoreNavEntryDecorator()
                     ),
                     entryProvider = entryProvider {

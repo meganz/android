@@ -3,7 +3,7 @@ package mega.privacy.android.core.nodecomponents.sheet.options
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.toRoute
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -42,7 +42,7 @@ internal fun NavGraphBuilder.nodeOptionsBottomSheet(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-internal fun EntryProviderBuilder<NavKey>.nodeOptionsBottomSheet(
+internal fun EntryProviderScope<NavKey>.nodeOptionsBottomSheet(
     navigationHandler: NavigationHandler,
     onTransfer: (TransferTriggerEvent) -> Unit,
 ) {

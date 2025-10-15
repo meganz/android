@@ -7,7 +7,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
@@ -69,7 +69,7 @@ data class ChangeEmailAddressScreen(
 ) : NavKey
 
 
-internal fun EntryProviderBuilder<NavKey>.changeEmailAddress(
+internal fun EntryProviderScope<NavKey>.changeEmailAddress(
     navigationHandler: NavigationHandler,
     chatRequestHandler: MegaChatRequestHandler,
     onFinish: () -> Unit,

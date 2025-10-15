@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.contact.navigation
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
@@ -19,7 +19,7 @@ import mega.privacy.android.navigation.destination.ContactsNavKey
  * - Navigate to sent requests: navController.navigate(ContactsNavKey(ContactsNavKey.ContactsNavType.SentRequests))
  * - Navigate to received requests: navController.navigate(ContactsNavKey(ContactsNavKey.NavType.ReceivedRequests))
  */
-fun EntryProviderBuilder<NavKey>.contactsLegacyDestination(removeDestination: () -> Unit) {
+fun EntryProviderScope<NavKey>.contactsLegacyDestination(removeDestination: () -> Unit) {
     entry<ContactsNavKey>(
         metadata = transparentMetadata()
     ) { key ->

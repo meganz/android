@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.filecontact.navigation
 
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.contact.navigation.addContactLegacyDestination
 import mega.privacy.android.app.presentation.contactinfo.navigation.contactInfoLegacyDestination
@@ -9,7 +9,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 
 class FileContactFeatureDestination : FeatureDestination {
-    override val navigationGraph: EntryProviderBuilder<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
+    override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
         { navigationHandler, transferHandler ->
             fileContacts(
                 onNavigateBack = navigationHandler::back,

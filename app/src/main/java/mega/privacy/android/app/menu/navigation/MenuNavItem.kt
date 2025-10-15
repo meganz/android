@@ -1,7 +1,7 @@
 package mega.privacy.android.app.menu.navigation
 
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.menu.presentation.MenuHomeScreen
@@ -19,7 +19,7 @@ import mega.privacy.mobile.analytics.event.MenuBottomNavigationItemEvent
 
 class MenuNavItem : MainNavItem {
     override val destination: NavKey = MenuHomeScreen
-    override val screen: EntryProviderBuilder<NavKey>.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
+    override val screen: EntryProviderScope<NavKey>.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
         { navigationHandler, _, _ -> menuHomeScreen(navigationHandler::navigate) }
     override val icon: ImageVector = IconPack.Medium.Thin.Outline.Menu01
     override val selectedIcon: ImageVector? = null

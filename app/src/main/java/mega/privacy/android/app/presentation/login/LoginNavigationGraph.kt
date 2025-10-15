@@ -15,8 +15,7 @@ import androidx.navigation.navigation
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
-import androidx.navigation3.scene.rememberSceneSetupNavEntryDecorator
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import de.palm.composestateevents.EventEffect
 import kotlinx.serialization.SerialName
@@ -157,8 +156,7 @@ fun LoginNavDisplay(
     NavDisplay(
         backStack = backStack,
         entryDecorators = listOf(
-            rememberSceneSetupNavEntryDecorator(),
-            rememberSavedStateNavEntryDecorator(),
+            rememberSaveableStateHolderNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator()
         ),
         entryProvider = entryProvider {

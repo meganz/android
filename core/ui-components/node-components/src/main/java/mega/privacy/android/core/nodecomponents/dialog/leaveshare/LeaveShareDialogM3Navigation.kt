@@ -1,6 +1,6 @@
 package mega.privacy.android.core.nodecomponents.dialog.leaveshare
 
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.compose.ui.window.DialogProperties
@@ -10,7 +10,7 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 @Serializable
 data class LeaveShareDialogNavKey(val handles: String) : NavKey
 
-fun EntryProviderBuilder<NavKey>.leaveShareDialogM3(
+fun EntryProviderScope<NavKey>.leaveShareDialogM3(
     onBack: () -> Unit,
 ) {
     entry<LeaveShareDialogNavKey>(

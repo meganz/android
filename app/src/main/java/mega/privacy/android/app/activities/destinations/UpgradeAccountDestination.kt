@@ -2,13 +2,13 @@ package mega.privacy.android.app.activities.destinations
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.feature.payment.UpgradeAccountNavKey
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.megaNavigator
 
-fun EntryProviderBuilder<NavKey>.upgradeAccount(removeDestination: () -> Unit) {
+fun EntryProviderScope<NavKey>.upgradeAccount(removeDestination: () -> Unit) {
     entry<UpgradeAccountNavKey>(
         metadata = transparentMetadata()
     ) { key ->

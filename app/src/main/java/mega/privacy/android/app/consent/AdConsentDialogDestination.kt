@@ -5,7 +5,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import com.google.android.ump.UserMessagingPlatform
@@ -16,7 +16,7 @@ import mega.privacy.android.app.consent.model.AdsConsentState
 @Serializable
 data object AdConsentDialog : NavKey
 
-fun EntryProviderBuilder<NavKey>.adConsentDialogDestination(
+fun EntryProviderScope<NavKey>.adConsentDialogDestination(
     navigateBack: () -> Unit,
     onDialogHandled: () -> Unit,
 ) {

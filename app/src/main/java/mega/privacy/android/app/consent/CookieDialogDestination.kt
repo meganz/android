@@ -6,7 +6,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import kotlinx.coroutines.launch
@@ -21,7 +21,7 @@ import mega.privacy.android.navigation.destination.WebSiteNavKey
 @Serializable
 data object CookieDialog : NavKey
 
-fun EntryProviderBuilder<NavKey>.cookieDialogDestination(
+fun EntryProviderScope<NavKey>.cookieDialogDestination(
     navigateBack: () -> Unit,
     navigate: (NavKey) -> Unit,
     onDialogHandled: () -> Unit,

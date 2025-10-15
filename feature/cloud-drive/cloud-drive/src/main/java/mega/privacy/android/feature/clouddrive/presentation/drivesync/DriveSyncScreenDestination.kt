@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.clouddrive.presentation.drivesync
 
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -13,7 +13,7 @@ import mega.privacy.android.navigation.destination.CloudDriveNavKey
 @Serializable
 data object DriveSync : NavKey
 
-fun EntryProviderBuilder<NavKey>.driveSyncScreen(
+fun EntryProviderScope<NavKey>.driveSyncScreen(
     navigationHandler: NavigationHandler,
     setNavigationVisibility: (Boolean) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,

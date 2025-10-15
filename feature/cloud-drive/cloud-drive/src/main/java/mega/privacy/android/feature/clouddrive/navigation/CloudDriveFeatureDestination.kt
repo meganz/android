@@ -1,6 +1,6 @@
 package mega.privacy.android.feature.clouddrive.navigation
 
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.cloudDriveScreen
 import mega.privacy.android.feature.clouddrive.presentation.offline.offlineInfoScreen
@@ -15,7 +15,7 @@ import mega.privacy.android.navigation.destination.OfflineNavKey
 import mega.privacy.android.navigation.destination.SearchNodeNavKey
 
 class CloudDriveFeatureDestination : FeatureDestination {
-    override val navigationGraph: EntryProviderBuilder<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
+    override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
         { navigationHandler, transferHandler ->
             cloudDriveScreen(
                 navigationHandler = navigationHandler,

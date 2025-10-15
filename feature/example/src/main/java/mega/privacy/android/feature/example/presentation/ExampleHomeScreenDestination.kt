@@ -3,7 +3,7 @@ package mega.privacy.android.feature.example.presentation
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
@@ -16,7 +16,7 @@ data object HomeScreen : NavKey
 @Serializable
 data object HomeScreen2 : NavKey
 
-fun EntryProviderBuilder<NavKey>.exampleHomeScreen(
+fun EntryProviderScope<NavKey>.exampleHomeScreen(
     setNavigationVisibility: (Boolean) -> Unit,
 ) {
     entry<HomeScreen> {
@@ -24,7 +24,7 @@ fun EntryProviderBuilder<NavKey>.exampleHomeScreen(
     }
 }
 
-fun EntryProviderBuilder<NavKey>.otherExampleHomeScreen(
+fun EntryProviderScope<NavKey>.otherExampleHomeScreen(
     onNavigate: (NavKey) -> Unit,
     resultFlow: (String) -> Flow<Int?>,
 ) {

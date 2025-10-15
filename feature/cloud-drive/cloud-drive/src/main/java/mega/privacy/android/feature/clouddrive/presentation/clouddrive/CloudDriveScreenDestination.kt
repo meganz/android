@@ -7,7 +7,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
@@ -17,7 +17,7 @@ import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 
-fun EntryProviderBuilder<NavKey>.cloudDriveScreen(
+fun EntryProviderScope<NavKey>.cloudDriveScreen(
     navigationHandler: NavigationHandler,
     onBack: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,

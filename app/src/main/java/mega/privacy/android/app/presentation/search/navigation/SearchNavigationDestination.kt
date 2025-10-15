@@ -2,13 +2,13 @@ package mega.privacy.android.app.presentation.search.navigation
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.SearchNodeNavKey
 import mega.privacy.android.navigation.megaNavigator
 
-fun EntryProviderBuilder<NavKey>.searchLegacyDestination(
+fun EntryProviderScope<NavKey>.searchLegacyDestination(
     removeDestination: () -> Unit,
 ) {
     entry<SearchNodeNavKey>(

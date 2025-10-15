@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.photos.navigation
 
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.feature.photos.presentation.home.PhotosNavKey
@@ -18,7 +18,7 @@ import mega.privacy.mobile.analytics.event.PhotosBottomNavigationItemEvent
 
 class PhotosNavItem : MainNavItem {
     override val destination: NavKey = PhotosNavKey
-    override val screen: EntryProviderBuilder<NavKey>.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
+    override val screen: EntryProviderScope<NavKey>.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
         { navigationHandler, navigationController, transferHandler ->
             photosScreen(
                 navigationHandler = navigationHandler,

@@ -3,7 +3,7 @@ package mega.privacy.mobile.home.presentation.home
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -13,7 +13,7 @@ import mega.privacy.mobile.home.presentation.configuration.HomeConfiguration
 @Serializable
 data object Home : NavKey
 
-fun EntryProviderBuilder<NavKey>.homeScreen(
+fun EntryProviderScope<NavKey>.homeScreen(
     navigationHandler: NavigationHandler,
     onTransfer: (TransferTriggerEvent) -> Unit,
 ) {

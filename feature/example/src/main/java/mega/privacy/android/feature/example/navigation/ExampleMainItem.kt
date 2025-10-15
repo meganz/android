@@ -2,7 +2,7 @@ package mega.privacy.android.feature.example.navigation
 
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -22,7 +22,7 @@ import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdenti
 
 class ExampleMainItem : MainNavItem {
     override val destination: NavKey = HomeScreen
-    override val screen: EntryProviderBuilder<NavKey>.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
+    override val screen: EntryProviderScope<NavKey>.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
         { navigationHandler, navigationUiController, _ -> exampleHomeScreen(setNavigationVisibility = navigationUiController::showNavigation) }
 
     override val icon: ImageVector = IconPack.Medium.Thin.Outline.MessageChatCircle
@@ -37,7 +37,7 @@ class ExampleMainItem : MainNavItem {
 
 class OtherExampleMainItem : MainNavItem {
     override val destination: NavKey = HomeScreen2
-    override val screen: EntryProviderBuilder<NavKey>.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
+    override val screen: EntryProviderScope<NavKey>.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
         { navigationHandler, _, _ ->
             otherExampleHomeScreen(
                 onNavigate = navigationHandler::navigate,

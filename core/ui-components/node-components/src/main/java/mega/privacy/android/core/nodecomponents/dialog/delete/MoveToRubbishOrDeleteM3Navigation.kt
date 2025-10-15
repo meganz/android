@@ -1,6 +1,6 @@
 package mega.privacy.android.core.nodecomponents.dialog.delete
 
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.compose.ui.window.DialogProperties
@@ -23,7 +23,7 @@ data class MoveToRubbishOrDeleteDialogArgs(
  *
  * @param onBack Callback when navigating back
  */
-internal fun EntryProviderBuilder<NavKey>.moveToRubbishOrDeleteDialogM3(
+internal fun EntryProviderScope<NavKey>.moveToRubbishOrDeleteDialogM3(
     onBack: () -> Unit,
 ) {
     entry<MoveToRubbishOrDeleteDialogArgs>(

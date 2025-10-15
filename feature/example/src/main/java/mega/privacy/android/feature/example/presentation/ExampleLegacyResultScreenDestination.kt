@@ -2,12 +2,12 @@ package mega.privacy.android.feature.example.presentation
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.runtime.LaunchedEffect
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.navigation.destination.ExampleLegacyResultScreen
 
 
-fun EntryProviderBuilder<NavKey>.exampleLegacyResultScreen(
+fun EntryProviderScope<NavKey>.exampleLegacyResultScreen(
     returnResult: (String, Int?) -> Unit,
     onResultHandled: (String) -> Unit,
 ) {
