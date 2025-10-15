@@ -24,6 +24,7 @@ import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCas
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
+import mega.privacy.android.feature.payment.model.mapper.AccountTypeToProductIdMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
@@ -60,6 +61,7 @@ class ChooseAccountViewModelTest {
     private val getRecommendedSubscriptionUseCase =
         mock<GetRecommendedSubscriptionUseCase>()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
+    private val accountTypeToProductIdMapper: AccountTypeToProductIdMapper = mock()
 
     @BeforeEach
     fun setUp() {
@@ -83,7 +85,8 @@ class ChooseAccountViewModelTest {
             localisedSubscriptionMapper = localisedSubscriptionMapper,
             getRecommendedSubscriptionUseCase = getRecommendedSubscriptionUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
-            savedStateHandle = mock { on { get<Boolean>(any()) }.thenReturn(true) }
+            savedStateHandle = mock { on { get<Boolean>(any()) }.thenReturn(true) },
+            accountTypeToProductIdMapper = accountTypeToProductIdMapper
         )
     }
 
