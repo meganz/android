@@ -5,10 +5,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.feature.payment.UpgradeAccountNavKey
+import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.megaNavigator
 
 fun EntryProviderBuilder<NavKey>.upgradeAccount(removeDestination: () -> Unit) {
-    entry<UpgradeAccountNavKey> { key ->
+    entry<UpgradeAccountNavKey>(
+        metadata = transparentMetadata()
+    ) { key ->
         val context = LocalContext.current
         LaunchedEffect(Unit) {
             context.megaNavigator.openUpgradeAccount(
@@ -21,3 +24,4 @@ fun EntryProviderBuilder<NavKey>.upgradeAccount(removeDestination: () -> Unit) {
         }
     }
 }
+

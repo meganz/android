@@ -7,12 +7,15 @@ import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
 
 fun EntryProviderBuilder<NavKey>.contactInfoLegacyDestination(
     removeDestination: () -> Unit,
 ) {
-    entry<ContactInfoNavKey> { contactInfo ->
+    entry<ContactInfoNavKey>(
+        metadata = transparentMetadata()
+    ) { contactInfo ->
 
         val context = LocalContext.current
         LaunchedEffect(Unit) {

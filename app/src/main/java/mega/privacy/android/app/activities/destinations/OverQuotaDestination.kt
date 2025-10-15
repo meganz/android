@@ -6,10 +6,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
+import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.OverDiskQuotaPaywallWarningNavKey
 
 fun EntryProviderBuilder<NavKey>.overDiskQuotaPaywallWarning(removeDestination: () -> Unit) {
-    entry<OverDiskQuotaPaywallWarningNavKey> { key ->
+    entry<OverDiskQuotaPaywallWarningNavKey>(
+        metadata = transparentMetadata()
+    ) { key ->
         val context = LocalContext.current
         LaunchedEffect(Unit) {
             val intent = Intent(

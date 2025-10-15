@@ -6,6 +6,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
+import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.TestPasswordNavKey
 
 /**
@@ -18,7 +19,9 @@ import mega.privacy.android.navigation.destination.TestPasswordNavKey
  * - Navigate in logout mode: navController.navigate(TestPasswordNavKey(isLogoutMode = true))
  */
 fun EntryProviderBuilder<NavKey>.testPasswordLegacyDestination(removeDestination: () -> Unit) {
-    entry<TestPasswordNavKey> { key ->
+    entry<TestPasswordNavKey>(
+        metadata = transparentMetadata()
+    ) { key ->
         val context = LocalContext.current
 
         LaunchedEffect(key) {

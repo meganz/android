@@ -10,3 +10,4 @@ data class ResetPasswordLinkInfo(
     val email: String,
     val isRequiredRecoveryKey: Boolean,
 )
+

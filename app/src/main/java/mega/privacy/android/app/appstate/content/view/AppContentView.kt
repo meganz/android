@@ -28,6 +28,7 @@ import mega.privacy.android.app.appstate.global.event.AppDialogViewModel
 import mega.privacy.android.app.presentation.login.LoginInProgressViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
+import mega.privacy.android.navigation.contract.transparent.TransparentSceneStrategy
 
 @Composable
 internal fun AppContentView(
@@ -43,6 +44,7 @@ internal fun AppContentView(
     val transferState by appTransferViewModel.state.collectAsStateWithLifecycle()
     val appDialogViewModel = hiltViewModel<AppDialogViewModel>()
     val dialogEvents by appDialogViewModel.dialogEvents.collectAsStateWithLifecycle()
+    val transparentStrategy = remember { TransparentSceneStrategy<NavKey>() }
     val dialogStrategy = remember { DialogSceneStrategy<NavKey>() }
     val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
 
@@ -58,7 +60,7 @@ internal fun AppContentView(
                 NavDisplay(
                     backStack = backStack,
                     onBack = { backStack.removeLastOrNull() },
-                    sceneStrategy = dialogStrategy.then(bottomSheetStrategy),
+                    sceneStrategy = transparentStrategy.then(dialogStrategy).then(bottomSheetStrategy),
                     entryDecorators = listOf(
                         rememberSceneSetupNavEntryDecorator(),
                         rememberSavedStateNavEntryDecorator(),

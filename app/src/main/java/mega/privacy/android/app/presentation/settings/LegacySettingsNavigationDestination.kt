@@ -7,10 +7,13 @@ import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.LegacySettingsNavKey
 
 fun EntryProviderBuilder<NavKey>.legacySettingsScreen(removeDestination: () -> Unit) {
-    entry<LegacySettingsNavKey> { key ->
+    entry<LegacySettingsNavKey>(
+        metadata = transparentMetadata()
+    ) { key ->
         val targetPreference = key.targetPreference
         val context = LocalContext.current
         LaunchedEffect(Unit) {

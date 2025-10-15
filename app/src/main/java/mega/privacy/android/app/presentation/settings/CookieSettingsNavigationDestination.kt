@@ -6,10 +6,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity
+import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.CookieSettingsNavKey
 
 fun EntryProviderBuilder<NavKey>.cookieSettingsNavigationDestination(removeDestination: () -> Unit) {
-    entry<CookieSettingsNavKey> {
+    entry<CookieSettingsNavKey>(
+        metadata = transparentMetadata()
+    ) {
         val context = LocalContext.current
         LaunchedEffect(Unit) {
             val intent = Intent(context, CookiePreferencesActivity::class.java)

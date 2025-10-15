@@ -6,6 +6,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
 import mega.privacy.android.navigation.destination.OfflineNavKey
 import mega.privacy.android.navigation.megaNavigator
@@ -36,7 +37,9 @@ fun EntryProviderBuilder<NavKey>.offlineScreen(
 fun EntryProviderBuilder<NavKey>.offlineInfoScreen(
     removeDestination: () -> Unit,
 ) {
-    entry<OfflineInfoNavKey> { args ->
+    entry<OfflineInfoNavKey>(
+        metadata = transparentMetadata()
+    ) { args ->
         val context = LocalContext.current
 
         LaunchedEffect(Unit) {

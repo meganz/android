@@ -5,6 +5,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.contacts.ContactsActivity
+import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.ContactsNavKey
 
 /**
@@ -16,10 +17,12 @@ import mega.privacy.android.navigation.destination.ContactsNavKey
  * Usage examples:
  * - Navigate to contact list: navController.navigate(ContactsNavKey())
  * - Navigate to sent requests: navController.navigate(ContactsNavKey(ContactsNavKey.ContactsNavType.SentRequests))
- * - Navigate to received requests: navController.navigate(ContactsNavKey(ContactsNavKey.ContactsNavType.ReceivedRequests))
+ * - Navigate to received requests: navController.navigate(ContactsNavKey(ContactsNavKey.NavType.ReceivedRequests))
  */
 fun EntryProviderBuilder<NavKey>.contactsLegacyDestination(removeDestination: () -> Unit) {
-    entry<ContactsNavKey> { key ->
+    entry<ContactsNavKey>(
+        metadata = transparentMetadata()
+    ) { key ->
         val context = LocalContext.current
 
         LaunchedEffect(key.navType) {
