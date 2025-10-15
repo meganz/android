@@ -1,4 +1,4 @@
-package mega.privacy.android.legacy.core.ui.controls.lists
+package mega.privacy.android.shared.original.core.ui.controls.lists
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -44,5 +44,18 @@ internal class MenuActionNodeHeaderWithBodyTest {
             )
         }
         composeTestRule.onNodeWithTag(HEADER_NODE_BODY_ICON).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the optional subtitle is shown`() {
+        composeTestRule.setContent {
+            MenuActionNodeHeaderWithBody(
+                title = "Node Title",
+                body = "Node Body",
+                nodeIcon = mega.privacy.android.icon.pack.R.drawable.ic_mic_medium_thin_solid,
+                subTitle = "Subtitle Text",
+            )
+        }
+        composeTestRule.onNodeWithTag(HEADER_NODE_SUBTITLE).assertIsDisplayed()
     }
 }

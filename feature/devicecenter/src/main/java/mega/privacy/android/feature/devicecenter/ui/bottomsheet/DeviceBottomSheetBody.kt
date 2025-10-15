@@ -10,12 +10,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
-import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
-import mega.privacy.android.shared.original.core.ui.controls.status.getStatusIconColor
-import mega.privacy.android.shared.original.core.ui.controls.status.getStatusTextColor
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.body.OtherDeviceBottomSheetBody
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.body.OwnDeviceBottomSheetBody
@@ -25,8 +19,14 @@ import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceCenterUINodeIcon
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionNodeHeaderWithBody
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionNodeHeaderWithBody
+import mega.privacy.android.shared.original.core.ui.controls.status.getStatusIconColor
+import mega.privacy.android.shared.original.core.ui.controls.status.getStatusTextColor
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 
 /**
  * Test Tags for the Device Bottom Sheet
@@ -69,7 +69,6 @@ internal fun DeviceBottomSheetBody(
             bodyIcon = device.status.icon,
             bodyColor = device.status.color.getStatusTextColor(),
             bodyIconColor = device.status.color.getStatusIconColor(),
-            nodeIconColor = getNodeIconColor(device.icon),
         )
         MegaDivider(dividerType = DividerType.SmallStartPadding)
         // Display the Options depending on the Device type

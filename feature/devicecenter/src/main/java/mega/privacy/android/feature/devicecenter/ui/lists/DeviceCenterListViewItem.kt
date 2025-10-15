@@ -11,8 +11,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import mega.privacy.android.shared.original.core.ui.controls.lists.StatusListViewItem
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.model.BackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
@@ -23,6 +21,10 @@ import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceCenterUINod
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.controls.lists.StatusListViewItem
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
@@ -101,7 +103,7 @@ internal fun DeviceCenterListViewItem(
                 onInfoClicked(uiNode)
             },
         )
-        CustomDivider(
+        MegaDivider(
             modifier = Modifier
                 .testTag(DEVICE_CENTER_LIST_VIEW_ITEM_DIVIDER_TAG)
                 .constrainAs(divider) {
@@ -109,7 +111,7 @@ internal fun DeviceCenterListViewItem(
                     end.linkTo(parent.end)
                     bottom.linkTo(parent.bottom)
                 },
-            withStartPadding = true,
+            dividerType = DividerType.BigStartPadding,
         )
     }
 }

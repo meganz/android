@@ -1,13 +1,21 @@
 package mega.privacy.android.feature.devicecenter.ui.view
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.lists.DeviceCenterListViewItem
 import mega.privacy.android.feature.devicecenter.ui.model.BackupDeviceFolderUINode
@@ -17,7 +25,6 @@ import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OtherDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
@@ -66,7 +73,7 @@ internal fun DeviceCenterContent(
             } else {
                 if (currentlyUsedDevices.isNotEmpty()) {
                     item {
-                        MenuActionHeader(
+                        ItemHeader(
                             modifier = Modifier.Companion.testTag(DEVICE_CENTER_THIS_DEVICE_HEADER),
                             text = stringResource(R.string.device_center_list_view_item_header_this_device),
                         )
@@ -83,7 +90,7 @@ internal fun DeviceCenterContent(
                 }
                 if (otherDevices.isNotEmpty()) {
                     item {
-                        MenuActionHeader(
+                        ItemHeader(
                             modifier = Modifier.Companion.testTag(DEVICE_CENTER_OTHER_DEVICES_HEADER),
                             text = stringResource(R.string.device_center_list_view_item_header_other_devices),
                         )
@@ -102,6 +109,27 @@ internal fun DeviceCenterContent(
         }
     } else {
         DeviceCenterNothingSetupState()
+    }
+}
+
+@Composable
+private fun ItemHeader(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .height(48.dp)
+            .padding(horizontal = 16.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        MegaText(
+            text = text,
+            style = MaterialTheme.typography.subtitle1,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textColor = TextColor.Secondary
+        )
     }
 }
 

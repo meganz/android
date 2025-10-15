@@ -1,6 +1,5 @@
-package mega.privacy.android.legacy.core.ui.controls.lists
+package mega.privacy.android.shared.original.core.ui.controls.lists
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -11,23 +10,24 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 
 /**
  * Test Tags for the Menu Action List Tile With Body
@@ -40,14 +40,16 @@ internal const val TILE_WITH_BODY_TEXT_BODY = "menu_action_list_tile_with_body:t
 internal const val TILE_WITH_BODY_DIVIDER = "menu_action_list_tile_with_body:divider_tile_divider"
 
 /**
- * A [Composable] Bottom Dialog Tile that displays three UI Elements: the [icon], [title] and [body]
+ * A [Composable] Bottom Sheet Tile that displays three UI Elements: the [icon], [title] and [body]
+ *
+ * Material 3 version using MegaText and Material 3 theming.
  *
  * @param title The functionality Title
  * @param body The functionality Body
  * @param icon The functionality Icon
  * @param modifier The [Modifier] object
  * @param dividerType type for the divider below menu action. Hidden if NULL
- * @param iconTint The [Color] tint applied for [icon], which defaults to [textColorSecondary]
+ * @param iconTint The [Color] tint applied for [icon]
  * @param onActionClicked Lambda that executes a specific action when the Tile is clicked. No action
  * is configured by default
  */
@@ -58,7 +60,7 @@ fun MenuActionListTileWithBody(
     @DrawableRes icon: Int,
     modifier: Modifier = Modifier,
     dividerType: DividerType? = DividerType.BigStartPadding,
-    iconTint: Color = MaterialTheme.colors.textColorSecondary,
+    iconTint: Color? = null,
     onActionClicked: (() -> Unit)? = null,
 ) {
     Column {
@@ -79,26 +81,28 @@ fun MenuActionListTileWithBody(
                     .size(24.dp),
                 painter = painterResource(icon),
                 contentDescription = "Tile Icon",
-                tint = iconTint,
+                tint = iconTint ?: DSTokens.colors.icon.secondary
             )
             Column(
                 modifier = modifier.fillMaxWidth()
             ) {
-                Text(
+                MegaText(
+                    text = buildAnnotatedString { append(title) },
+                    textColor = TextColor.Primary,
+                    maxLines = Int.MAX_VALUE,
                     modifier = modifier
                         .testTag(TILE_WITH_BODY_TEXT_TITLE)
                         .padding(end = 16.dp),
-                    text = title,
                     style = MaterialTheme.typography.subtitle1,
-                    color = MaterialTheme.colors.textColorPrimary,
                 )
-                Text(
+                MegaText(
+                    text = buildAnnotatedString { append(body) },
+                    textColor = TextColor.Secondary,
+                    maxLines = Int.MAX_VALUE,
                     modifier = modifier
                         .testTag(TILE_WITH_BODY_TEXT_BODY)
                         .padding(top = 1.dp, end = 16.dp),
-                    text = body,
                     style = MaterialTheme.typography.subtitle2,
-                    color = MaterialTheme.colors.textColorSecondary
                 )
             }
         }
@@ -117,45 +121,28 @@ fun MenuActionListTileWithBody(
  */
 @CombinedThemePreviews
 @Composable
-private fun PreviewTile() {
+private fun PreviewMenuActionListTileWithBody() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTileWithBody(
-            title = "Tile Title",
-            body = "Tile Body",
-            icon = IconPackR.drawable.ic_folder_medium_solid,
+            title = "Camera uploads",
+            body = "Enabled",
+            icon = IconPackR.drawable.ic_camera_medium_thin_outline,
         )
     }
 }
 
 /**
- * A Preview Composable that displays content without the [Divider]
+ * A Preview Composable that displays content with a click action
  */
 @CombinedThemePreviews
 @Composable
-private fun PreviewTileWithoutDivider() {
+private fun PreviewMenuActionListTileWithBodyClickable() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTileWithBody(
-            title = "Tile Title",
-            body = "Tile Body",
-            icon = IconPackR.drawable.ic_folder_medium_solid,
-            dividerType = null,
-        )
-    }
-}
-
-/**
- * A Preview Composable that displays content with a very long Body
- *
- * The Container height automatically adjusts to display the entire Body
- */
-@CombinedThemePreviews
-@Composable
-private fun PreviewTileWithVeryLongBody() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
-        MenuActionListTileWithBody(
-            title = "Tile Title",
-            body = "This is a really long body text used to check if the container height dynamically expands or not",
-            icon = IconPackR.drawable.ic_folder_medium_solid,
+            title = "Camera uploads",
+            body = "Disabled",
+            icon = IconPackR.drawable.ic_camera_medium_thin_outline,
+            onActionClicked = {},
         )
     }
 }

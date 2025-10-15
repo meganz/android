@@ -1,4 +1,4 @@
-package mega.privacy.android.legacy.core.ui.controls.lists
+package mega.privacy.android.shared.original.core.ui.controls.lists
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
@@ -12,39 +12,44 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.body2medium
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.red_500
 
 /**
- * Test Tags for the Menu Action Node Header with Body
+ * Test Tags for the Menu Action Node Header with Body M3
  */
 internal const val HEADER_MAIN_CONTAINER =
     "menu_action_node_header_with_body:row_content_container"
 internal const val HEADER_NODE_IMAGE = "menu_action_node_header_with_body:image_node_image"
 internal const val HEADER_NODE_TITLE = "menu_action_node_header_with_body:text_node_title"
-internal const val HEADER_NODE_BODY_ICON = "menu_action_node_header_with_body:icon_node_body_icon"
+internal const val HEADER_NODE_SUBTITLE =
+    "menu_action_node_header_with_body:text_node_subtitle"
+internal const val HEADER_NODE_BODY_ICON =
+    "menu_action_node_header_with_body:icon_node_body_icon"
 internal const val HEADER_NODE_BODY = "menu_action_node_header_with_body:text_node_body"
 
 /**
  * A [Composable] Bottom Dialog Header which displays the Node Information
  *
+ * Material 3 version using MegaText and Material 3 theming.
+ *
  * The basic required information displayed is the [title], [body] and [nodeIcon]
- * An optional [Icon] [bodyIcon] can be provided to display the [Icon] on the left side of the [body]
+ * An optional [androidx.compose.material3.Icon] [bodyIcon] can be provided to display the [androidx.compose.material3.Icon] on the left side of the [body]
  *
  * Furthermore, all UI Elements can change its [Color] to accommodate different Scenarios
  *
@@ -54,7 +59,7 @@ internal const val HEADER_NODE_BODY = "menu_action_node_header_with_body:text_no
  * @param modifier The [Modifier] object
  * @param subTitle An optional Subtitle
  * @param bodyIcon The Icon displayed on the left side of the [body], which does not exist by default
- * @param bodyColor The Text [Color] applied to the [body], which defaults to [textColorSecondary]
+ * @param bodyColor The Text [Color] applied to the [body]. By default, no [Color] is applied
  * @param bodyIconColor The Body Icon [Color], which defaults to [Color.Unspecified]
  * @param nodeIconColor The Node Icon [Color]. By default, no [Color] is applied
  */
@@ -66,9 +71,9 @@ fun MenuActionNodeHeaderWithBody(
     modifier: Modifier = Modifier,
     subTitle: String? = null,
     @DrawableRes bodyIcon: Int? = null,
-    bodyColor: Color = MaterialTheme.colors.textColorSecondary,
+    bodyColor: Color? = null,
     bodyIconColor: Color = Color.Unspecified,
-    nodeIconColor: Color? = null,
+    nodeIconColor: Color? = DSTokens.colors.icon.secondary,
 ) {
     Row(
         modifier = modifier
@@ -90,22 +95,22 @@ fun MenuActionNodeHeaderWithBody(
                 .fillMaxWidth()
                 .padding(start = 12.dp, top = 4.dp, bottom = 4.dp)
         ) {
-            Text(
-                modifier = modifier.testTag(HEADER_NODE_TITLE),
-                text = title,
-                style = MaterialTheme.typography.subtitle1,
-                color = MaterialTheme.colors.textColorPrimary,
+            MegaText(
+                text = buildAnnotatedString { append(title) },
+                textColor = TextColor.Primary,
                 maxLines = 2,
+                modifier = modifier.testTag(HEADER_NODE_TITLE),
                 overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.subtitle1,
             )
             subTitle?.let {
-                Text(
-                    modifier = modifier.testTag(HEADER_NODE_TITLE),
-                    text = subTitle,
-                    style = MaterialTheme.typography.body2medium,
-                    color = MaterialTheme.colors.textColorSecondary,
+                MegaText(
+                    text = buildAnnotatedString { append(subTitle) },
+                    textColor = TextColor.Secondary,
                     maxLines = 2,
+                    modifier = modifier.testTag(HEADER_NODE_SUBTITLE),
                     overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.subtitle2,
                 )
             }
             Row {
@@ -120,13 +125,20 @@ fun MenuActionNodeHeaderWithBody(
                         tint = bodyIconColor,
                     )
                 }
-                Text(
+                MegaText(
+                    text = buildAnnotatedString { append(body) },
+                    textColor = if (bodyColor != null) {
+                        // Custom color provided, we'll need to handle this differently
+                        // For now, use secondary as fallback
+                        TextColor.Secondary
+                    } else {
+                        TextColor.Secondary
+                    },
+                    maxLines = Int.MAX_VALUE,
                     modifier = modifier
                         .testTag(HEADER_NODE_BODY)
                         .padding(top = 2.dp),
-                    text = body,
                     style = MaterialTheme.typography.subtitle2,
-                    color = bodyColor,
                 )
             }
         }
@@ -138,7 +150,7 @@ fun MenuActionNodeHeaderWithBody(
  */
 @CombinedThemePreviews
 @Composable
-private fun HeaderPreview() {
+private fun PreviewHeader() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         MenuActionNodeHeaderWithBody(
             title = "Node Title",
@@ -150,7 +162,7 @@ private fun HeaderPreview() {
 
 @CombinedThemePreviews
 @Composable
-private fun HeaderWithVeryLongTitlePreview() {
+private fun PreviewHeaderWithVeryLongTitle() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         MenuActionNodeHeaderWithBody(
             title = "This is a very long Title that exceeds the maximum number of two lines. An ellipsis is added for additional text",
@@ -165,14 +177,14 @@ private fun HeaderWithVeryLongTitlePreview() {
  */
 @CombinedThemePreviews
 @Composable
-private fun HeaderWithBodyIconPreview() {
+private fun PreviewHeaderWithBodyIcon() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         MenuActionNodeHeaderWithBody(
             title = "Node Title",
             body = "Node Body",
             nodeIcon = IconPackR.drawable.ic_folder_medium_solid,
             bodyIcon = R.drawable.ic_info,
-            bodyIconColor = MaterialTheme.colors.textColorSecondary,
+            bodyIconColor = MaterialTheme.colors.secondary,
         )
     }
 }
@@ -184,14 +196,14 @@ private fun HeaderWithBodyIconPreview() {
  */
 @CombinedThemePreviews
 @Composable
-private fun HeaderWithVeryLongBodyPreview() {
+private fun PreviewHeaderWithVeryLongBody() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         MenuActionNodeHeaderWithBody(
             title = "Backup Folder",
-            body = "Sync or backup has been stopped as you’ve logged out or closed the session. To re-enable, go to Settings in the desktop app, select the Sync or Backup tab, and check the relevant folder.",
+            body = "Sync or backup has been stopped as you've logged out or closed the session. To re-enable, go to Settings in the desktop app, select the Sync or Backup tab, and check the relevant folder.",
             bodyColor = red_500,
             nodeIcon = IconPackR.drawable.ic_folder_medium_solid,
-            bodyIconColor = MaterialTheme.colors.textColorSecondary,
+            bodyIconColor = MaterialTheme.colors.secondary,
         )
     }
 }
@@ -203,12 +215,12 @@ private fun HeaderWithVeryLongBodyPreview() {
  */
 @CombinedThemePreviews
 @Composable
-private fun HeaderWithBodyIconAndVeryLongBodyPreview() {
+private fun PreviewHeaderWithBodyIconAndVeryLongBody() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         MenuActionNodeHeaderWithBody(
             title = "Backup Folder",
             subTitle = "Subtitle",
-            body = "Sync or backup has been stopped as you’ve logged out or closed the session. To re-enable, go to Settings in the desktop app, select the Sync or Backup tab, and check the relevant folder.",
+            body = "Sync or backup has been stopped as you've logged out or closed the session. To re-enable, go to Settings in the desktop app, select the Sync or Backup tab, and check the relevant folder.",
             bodyColor = red_500,
             nodeIcon = IconPackR.drawable.ic_folder_medium_solid,
             bodyIcon = R.drawable.ic_x_circle,

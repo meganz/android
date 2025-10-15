@@ -1,9 +1,10 @@
-package mega.privacy.android.legacy.core.ui.controls.lists
+package mega.privacy.android.shared.original.core.ui.controls.lists
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.icon.pack.R
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,7 +24,7 @@ internal class MenuActionListTileWithBodyTest {
             MenuActionListTileWithBody(
                 title = "Tile Title",
                 body = "Tile Body",
-                icon = mega.privacy.android.icon.pack.R.drawable.ic_mic_medium_thin_solid
+                icon = R.drawable.ic_mic_medium_thin_solid
             )
         }
         composeTestRule.onNodeWithTag(TILE_WITH_BODY_MAIN_CONTAINER).assertIsDisplayed()
@@ -39,7 +40,7 @@ internal class MenuActionListTileWithBodyTest {
             MenuActionListTileWithBody(
                 title = "Tile Title",
                 body = "Tile Body",
-                icon = mega.privacy.android.icon.pack.R.drawable.ic_mic_medium_thin_solid,
+                icon = R.drawable.ic_mic_medium_thin_solid,
                 dividerType = null,
             )
         }
