@@ -34,6 +34,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.mobile.navigation.snowflake.IndicatorDot
 import mega.privacy.mobile.navigation.snowflake.MainNavigationScaffold
+import timber.log.Timber
 
 @Serializable
 data object MainNavigationScaffoldDestination : NavKey
@@ -84,7 +85,9 @@ fun MainNavigationScaffold(
                                 // keep only the first initial destination and remove others
                                 backStack.removeLastOrNull()
                             }
-                            backStack.add(destination)
+                            if (destination != backStack.firstOrNull()) {
+                                backStack.add(destination)
+                            }
                         }
                     },
                     isSelected = { destination ->
