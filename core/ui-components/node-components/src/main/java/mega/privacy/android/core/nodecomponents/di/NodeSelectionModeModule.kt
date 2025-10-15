@@ -27,6 +27,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.Unhi
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.domain.qualifier.features.CloudDrive
 import mega.privacy.android.domain.qualifier.features.IncomingShares
+import mega.privacy.android.domain.qualifier.features.Links
 import mega.privacy.android.domain.qualifier.features.OutgoingShares
 import mega.privacy.android.domain.qualifier.features.RubbishBin
 import javax.inject.Singleton
@@ -133,6 +134,33 @@ abstract class NodeSelectionModeModule {
             shareFolderSelectionMenuItem,
             removeShareSelectionMenuItem,
             disputeTakeDownSelectionMenuItem,
+            shareSelectionMenuItem
+        )
+
+
+        @Provides
+        @ElementsIntoSet
+        @Links
+        @Singleton
+        fun provideLinksToolbarItems(
+            downloadSelectionMenuItem: DownloadSelectionMenuItem,
+            getLinkSelectionMenuItem: GetLinkSelectionMenuItem,
+            manageLinkSelectionMenuAction: ManageLinkSelectionMenuItem,
+            removeLinkSelectionMenuItem: RemoveLinkSelectionMenuItem,
+            shareSelectionMenuItem: ShareSelectionMenuItem,
+            sendToChatSelectionMenuItem: SendToChatSelectionMenuItem,
+            renameSelectionMenuItem: RenameSelectionMenuItem,
+            copySelectionModeMenuAction: CopySelectionMenuItem,
+            rubbishBinSelectionMenuAction: RubbishBinSelectionMenuItem
+        ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
+            copySelectionModeMenuAction,
+            rubbishBinSelectionMenuAction,
+            manageLinkSelectionMenuAction,
+            downloadSelectionMenuItem,
+            renameSelectionMenuItem,
+            getLinkSelectionMenuItem,
+            removeLinkSelectionMenuItem,
+            sendToChatSelectionMenuItem,
             shareSelectionMenuItem
         )
     }

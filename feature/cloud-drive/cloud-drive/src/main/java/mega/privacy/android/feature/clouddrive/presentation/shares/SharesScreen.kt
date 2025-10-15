@@ -2,7 +2,6 @@ package mega.privacy.android.feature.clouddrive.presentation.shares
 
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -18,7 +17,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -30,7 +28,6 @@ import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
-import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.components.tabs.MegaScrollableTabRow
@@ -60,6 +57,9 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.Hand
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesContent
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesViewModel
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.model.IncomingSharesAction
+import mega.privacy.android.feature.clouddrive.presentation.shares.links.LinksContent
+import mega.privacy.android.feature.clouddrive.presentation.shares.links.LinksViewModel
+import mega.privacy.android.feature.clouddrive.presentation.shares.links.model.LinksAction
 import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.OutgoingSharesContent
 import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.OutgoingSharesViewModel
 import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.model.OutgoingSharesAction
@@ -80,6 +80,7 @@ internal fun SharesScreen(
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
     incomingSharesViewModel: IncomingSharesViewModel = hiltViewModel(),
     outgoingSharesViewModel: OutgoingSharesViewModel = hiltViewModel(),
+    linksViewModel: LinksViewModel = hiltViewModel(),
 ) {
     val megaNavigator = rememberMegaNavigator()
     val coroutineScope = rememberCoroutineScope()
@@ -93,6 +94,7 @@ internal fun SharesScreen(
     )
     val incomingSharesUiState by incomingSharesViewModel.uiState.collectAsStateWithLifecycle()
     val outgoingSharesUiState by outgoingSharesViewModel.uiState.collectAsStateWithLifecycle()
+    val linksUiState by linksViewModel.uiState.collectAsStateWithLifecycle()
 
     // Sort modal
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -126,14 +128,14 @@ internal fun SharesScreen(
     val (isInSelectionMode, selectedItemsCount) = when (selectedTab) {
         SharesTab.IncomingShares -> incomingSharesUiState.isInSelectionMode to incomingSharesUiState.selectedItemsCount
         SharesTab.OutgoingShares -> outgoingSharesUiState.isInSelectionMode to outgoingSharesUiState.selectedItemsCount
-        SharesTab.Links -> false to 0 // TODO Selection mode for links
+        SharesTab.Links -> linksUiState.isInSelectionMode to linksUiState.selectedItemsCount
     }
 
     fun deselectAllItems() {
         when (selectedTab) {
             SharesTab.IncomingShares -> incomingSharesViewModel.processAction(IncomingSharesAction.DeselectAllItems)
             SharesTab.OutgoingShares -> outgoingSharesViewModel.processAction(OutgoingSharesAction.DeselectAllItems)
-            SharesTab.Links -> {} // TODO Selection mode for links
+            SharesTab.Links -> linksViewModel.processAction(LinksAction.DeselectAllItems)
         }
     }
 
@@ -141,7 +143,8 @@ internal fun SharesScreen(
         when (selectedTab) {
             SharesTab.IncomingShares -> incomingSharesViewModel.processAction(IncomingSharesAction.SelectAllItems)
             SharesTab.OutgoingShares -> outgoingSharesViewModel.processAction(OutgoingSharesAction.SelectAllItems)
-            SharesTab.Links -> {} // TODO Selection mode for links
+            SharesTab.Links -> linksViewModel.processAction(LinksAction.SelectAllItems)
+
         }
     }
 
@@ -149,7 +152,8 @@ internal fun SharesScreen(
         when (selectedTab) {
             SharesTab.IncomingShares -> incomingSharesUiState.selectedNodes
             SharesTab.OutgoingShares -> outgoingSharesUiState.selectedNodes
-            SharesTab.Links -> emptyList() // TODO Selection mode for links
+            SharesTab.Links -> linksUiState.selectedNodes
+
         }
     } else {
         emptyList()
@@ -234,15 +238,15 @@ internal fun SharesScreen(
                 addTextTabWithScrollableContent(
                     tabItem = TabItems(stringResource(R.string.tab_links_shares)),
                 ) { _, modifier ->
-                    // TODO
-                    Box(
-                        modifier = modifier
-                            .fillMaxSize()
-                            .align(Alignment.Center)
-                            .padding(paddingValues)
-                    ) {
-                        MegaText("Links Screen")
-                    }
+                    LinksContent(
+                        modifier = modifier,
+                        uiState = linksUiState,
+                        navigationHandler = navigationHandler,
+                        onAction = linksViewModel::processAction,
+                        onShowNodeOptions = { visibleNodeOptionId = it },
+                        onSortOrderClick = { showSortBottomSheet = true },
+                        onTransfer = onTransfer
+                    )
                 }
             },
             initialSelectedIndex = SharesTab.IncomingShares.ordinal,
@@ -388,7 +392,7 @@ internal fun SharesScreen(
         val selectedSortConfiguration = when (selectedTab) {
             SharesTab.IncomingShares -> incomingSharesUiState.selectedSortConfiguration
             SharesTab.OutgoingShares -> outgoingSharesUiState.selectedSortConfiguration
-            SharesTab.Links -> NodeSortConfiguration.default // TODO Sort configuration for links
+            SharesTab.Links -> linksUiState.selectedSortConfiguration
         }
 
         SortBottomSheet(
@@ -408,7 +412,7 @@ internal fun SharesScreen(
                     when (selectedTab) {
                         SharesTab.IncomingShares -> incomingSharesViewModel.setSortOrder(sortConfig)
                         SharesTab.OutgoingShares -> outgoingSharesViewModel.setSortOrder(sortConfig)
-                        SharesTab.Links -> {} // TODO Sort configuration for links
+                        SharesTab.Links -> linksViewModel.setSortOrder(sortConfig)
                     }
                     showSortBottomSheet = false
                 }
