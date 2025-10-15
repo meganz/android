@@ -5,7 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -18,6 +20,16 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
+import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_BOTTOM_SHEET_TAG
+import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_DEFAULT_TOP_APP_BAR_TAG
+import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_EMPTY_TAG
+import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_GRID_COLUMN_TAG
+import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_LIST_COLUMN_TAG
+import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_LOADING_TAG
+import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_REMOVE_FROM_OFFLINE_TAG
+import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_SEARCH_TOP_APP_BAR_TAG
+import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_SELECTION_MODE_BOTTOM_BAR_TAG
+import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_TOP_WARNING_BANNER_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -389,7 +401,7 @@ class OfflineScreenTest {
 
     @Test
     fun `test that OfflineScreen handles share offline files callback`() {
-        val mockCallback: () -> Unit = mock()
+        val mockCallback: (List<OfflineFileInformation>) -> Unit = mock()
         val uiState = OfflineUiState(
             isLoadingCurrentFolder = false,
             offlineNodes = emptyList(),
@@ -406,7 +418,7 @@ class OfflineScreenTest {
 
     @Test
     fun `test that OfflineScreen handles save offline files to device callback`() {
-        val mockCallback: () -> Unit = mock()
+        val mockCallback: (List<Long>) -> Unit = mock()
         val uiState = OfflineUiState(
             isLoadingCurrentFolder = false,
             offlineNodes = emptyList(),
@@ -481,6 +493,195 @@ class OfflineScreenTest {
         verify(mockNavigateCallback).invoke(999, "test_folder")
     }
 
+    @Test
+    fun `test that loading tag is visible when isLoading is true`() {
+        val uiState = OfflineUiState(isLoadingCurrentFolder = true)
+        setupComposeContent(uiState)
+
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_LOADING_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_EMPTY_TAG).assertDoesNotExist()
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_LIST_COLUMN_TAG).assertDoesNotExist()
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_GRID_COLUMN_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that empty tag is visible when offlineNodes is empty and not loading`() {
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            offlineNodes = emptyList()
+        )
+        setupComposeContent(uiState)
+
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_EMPTY_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_LOADING_TAG).assertDoesNotExist()
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_LIST_COLUMN_TAG).assertDoesNotExist()
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_GRID_COLUMN_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that warning banner tag is visible when showOfflineWarning is true`() {
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            offlineNodes = emptyList(),
+            showOfflineWarning = true
+        )
+        setupComposeContent(uiState)
+
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_TOP_WARNING_BANNER_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that warning banner tag is not visible when showOfflineWarning is false`() {
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            offlineNodes = emptyList(),
+            showOfflineWarning = false
+        )
+        setupComposeContent(uiState)
+
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_TOP_WARNING_BANNER_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that list column tag is visible when currentViewType is LIST`() {
+        val offlineNodes = listOf(
+            createOfflineNodeUiItem("test_file.txt", isFolder = false, handle = "1")
+        )
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            offlineNodes = offlineNodes,
+            currentViewType = ViewType.LIST
+        )
+        setupComposeContent(uiState)
+
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_LIST_COLUMN_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_GRID_COLUMN_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that grid column tag is visible when currentViewType is GRID`() {
+        val offlineNodes = listOf(
+            createOfflineNodeUiItem("test_file.txt", isFolder = false, handle = "1")
+        )
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            offlineNodes = offlineNodes,
+            currentViewType = ViewType.GRID
+        )
+        setupComposeContent(uiState)
+
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_GRID_COLUMN_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_LIST_COLUMN_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that selection mode bottom bar tag is visible when nodes are selected`() {
+        val offlineNodes = listOf(
+            createOfflineNodeUiItem("test_file.txt", isFolder = false, handle = "1")
+        )
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            offlineNodes = offlineNodes,
+            selectedNodeHandles = listOf(1L)
+        )
+        setupComposeContent(uiState)
+
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_SELECTION_MODE_BOTTOM_BAR_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that selection mode bottom bar tag is not visible when no nodes are selected`() {
+        val offlineNodes = listOf(
+            createOfflineNodeUiItem("test_file.txt", isFolder = false, handle = "1")
+        )
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            offlineNodes = offlineNodes,
+            selectedNodeHandles = emptyList()
+        )
+        setupComposeContent(uiState)
+
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_SELECTION_MODE_BOTTOM_BAR_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that search top app bar tag is visible when no nodes are selected`() {
+        val offlineNodes = listOf(
+            createOfflineNodeUiItem("test_file.txt", isFolder = false, handle = "1")
+        )
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            offlineNodes = offlineNodes,
+            selectedNodeHandles = emptyList()
+        )
+        setupComposeContent(uiState)
+
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_SEARCH_TOP_APP_BAR_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_DEFAULT_TOP_APP_BAR_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that default top app bar tag is visible when nodes are selected`() {
+        val offlineNodes = listOf(
+            createOfflineNodeUiItem("test_file.txt", isFolder = false, handle = "1")
+        )
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            offlineNodes = offlineNodes,
+            selectedNodeHandles = listOf(1L)
+        )
+        setupComposeContent(uiState)
+
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_DEFAULT_TOP_APP_BAR_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_SEARCH_TOP_APP_BAR_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that bottom sheet tag is not visible by default`() {
+        val offlineNodes = listOf(
+            createOfflineNodeUiItem("test_file.txt", isFolder = false, handle = "1")
+        )
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            offlineNodes = offlineNodes
+        )
+        setupComposeContent(uiState)
+
+        // The bottom sheet should not be visible by default
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_BOTTOM_SHEET_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that remove from offline dialog tag is not visible by default`() {
+        val offlineNodes = listOf(
+            createOfflineNodeUiItem("test_file.txt", isFolder = false, handle = "1")
+        )
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            offlineNodes = offlineNodes,
+            selectedNodeHandles = listOf(1L)
+        )
+        setupComposeContent(uiState)
+
+        // The remove dialog should not be visible by default
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_REMOVE_FROM_OFFLINE_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that remove from offline dialog tag is not visible when not in remove state`() {
+        val offlineNodes = listOf(
+            createOfflineNodeUiItem("test_file.txt", isFolder = false, handle = "1")
+        )
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            offlineNodes = offlineNodes,
+            selectedNodeHandles = emptyList()
+        )
+        setupComposeContent(uiState)
+
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_REMOVE_FROM_OFFLINE_TAG).assertDoesNotExist()
+    }
+
     private fun setupComposeContent(
         uiState: OfflineUiState,
         onItemClicked: (OfflineNodeUiItem) -> Unit = {},
@@ -492,8 +693,8 @@ class OfflineScreenTest {
         selectAll: () -> Unit = {},
         deselectAll: () -> Unit = {},
         onSearch: (String) -> Unit = {},
-        shareOfflineFiles: () -> Unit = {},
-        saveOfflineFilesToDevice: () -> Unit = {},
+        shareOfflineFiles: (List<OfflineFileInformation>) -> Unit = {},
+        saveOfflineFilesToDevice: (List<Long>) -> Unit = {},
         removeOfflineNodes: (List<Long>) -> Unit = {},
         openFileInformation: (String) -> Unit = {},
     ) {

@@ -22,7 +22,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -32,7 +32,6 @@ import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.banner.TopWarningBanner
 import mega.android.core.ui.components.dialogs.BasicDialog
-import mega.android.core.ui.components.indicators.LargeHUD
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
@@ -42,6 +41,7 @@ import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeAc
 import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.list.NodeGridViewItem
 import mega.privacy.android.core.nodecomponents.list.NodeListViewItem
+import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
@@ -53,7 +53,6 @@ import mega.privacy.android.feature.clouddrive.presentation.offline.model.Offlin
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineSelectionAction
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
@@ -76,8 +75,6 @@ fun OfflineScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val actionUiState by actionViewModel.uiState.collectAsStateWithLifecycle()
-    val megaNavigator = rememberMegaNavigator()
-    val context = LocalContext.current
 
     HandleOfflineNodeAction3(
         uiState = actionUiState,
@@ -100,14 +97,14 @@ fun OfflineScreen(
         onSearch = viewModel::setSearchQuery,
         consumeOpenFolderEvent = viewModel::onOpenFolderInPageEventConsumed,
         consumeOpenFileEvent = viewModel::onOpenOfflineNodeEventConsumed,
-        shareOfflineFiles = {
+        shareOfflineFiles = { files ->
             actionViewModel.handleShareOfflineNodes(
-                nodes = uiState.selectedOfflineNodes,
+                nodes = files,
                 isOnline = uiState.isOnline
             )
         },
-        saveOfflineFilesToDevice = {
-            val nodes = uiState.selectedNodeHandles.map { NodeId(it) }
+        saveOfflineFilesToDevice = { handles ->
+            val nodes = handles.map { NodeId(it) }
             onTransfer(TransferTriggerEvent.CopyOfflineNode(nodes))
         },
         removeOfflineNodes = viewModel::removeOfflineNodes,
@@ -129,8 +126,8 @@ internal fun OfflineScreen(
     onOpenFile: (OfflineFileInformation) -> Unit,
     onDismissOfflineWarning: () -> Unit,
     onSearch: (String) -> Unit,
-    shareOfflineFiles: () -> Unit,
-    saveOfflineFilesToDevice: () -> Unit,
+    shareOfflineFiles: (List<OfflineFileInformation>) -> Unit,
+    saveOfflineFilesToDevice: (List<Long>) -> Unit,
     removeOfflineNodes: (List<Long>) -> Unit,
     openFileInformation: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -139,6 +136,7 @@ internal fun OfflineScreen(
 ) {
     var isSearchMode by rememberSaveable { mutableStateOf(false) }
     var showRemoveDialog by rememberSaveable { mutableStateOf(false) }
+    var selectedHandlesToRemove by rememberSaveable { mutableStateOf<List<Long>>(emptyList()) }
 
     EventEffect(
         event = uiState.openFolderInPageEvent,
@@ -162,21 +160,24 @@ internal fun OfflineScreen(
         modifier = modifier.fillMaxSize(),
         bottomBar = {
             SelectionModeBottomBar(
+                modifier = Modifier
+                    .testTag(OFFLINE_SCREEN_SELECTION_MODE_BOTTOM_BAR_TAG),
                 visible = uiState.selectedNodeHandles.isNotEmpty(),
                 actions = OfflineSelectionAction.bottomBarItems,
                 onActionPressed = {
                     when (it) {
                         is OfflineSelectionAction.Delete -> {
+                            selectedHandlesToRemove = uiState.selectedNodeHandles
                             showRemoveDialog = true
                         }
 
                         is OfflineSelectionAction.Download -> {
-                            saveOfflineFilesToDevice()
+                            saveOfflineFilesToDevice(uiState.selectedNodeHandles)
                             deselectAll()
                         }
 
                         is OfflineSelectionAction.Share -> {
-                            shareOfflineFiles()
+                            shareOfflineFiles(uiState.selectedOfflineNodes)
                             deselectAll()
                         }
                     }
@@ -186,6 +187,8 @@ internal fun OfflineScreen(
         topBar = {
             if (uiState.selectedNodeHandles.isEmpty()) {
                 MegaSearchTopAppBar(
+                    modifier = Modifier
+                        .testTag(OFFLINE_SCREEN_SEARCH_TOP_APP_BAR_TAG),
                     navigationType = AppBarNavigationType.Back(onBack),
                     title = uiState
                         .title
@@ -214,6 +217,8 @@ internal fun OfflineScreen(
                 )
             } else {
                 MegaTopAppBar(
+                    modifier = Modifier
+                        .testTag(OFFLINE_SCREEN_DEFAULT_TOP_APP_BAR_TAG),
                     title = uiState.selectedNodeHandles.size.toString(),
                     navigationType = AppBarNavigationType.Close(deselectAll),
                     actions = OfflineSelectionAction.topBarItems,
@@ -236,7 +241,9 @@ internal fun OfflineScreen(
         ) {
             if (uiState.showOfflineWarning && !uiState.isLoading) {
                 TopWarningBanner(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .testTag(OFFLINE_SCREEN_TOP_WARNING_BANNER_TAG)
+                        .fillMaxWidth(),
                     body = stringResource(R.string.offline_warning),
                     showCancelButton = true,
                     onCancelButtonClick = onDismissOfflineWarning
@@ -246,15 +253,20 @@ internal fun OfflineScreen(
             Box(modifier = Modifier.fillMaxSize()) {
                 when {
                     uiState.isLoading -> {
-                        LargeHUD(
+                        NodesViewSkeleton(
                             modifier = Modifier
-                                .align(Alignment.Center)
+                                .testTag(OFFLINE_SCREEN_LOADING_TAG)
+                                .fillMaxSize(),
+                            contentPadding = PaddingValues(),
+                            isListView = uiState.currentViewType == ViewType.LIST,
                         )
                     }
 
                     uiState.offlineNodes.isEmpty() -> {
                         MegaEmptyView(
-                            modifier = Modifier.align(Alignment.Center),
+                            modifier = Modifier
+                                .testTag(OFFLINE_SCREEN_EMPTY_TAG)
+                                .align(Alignment.Center),
                             text = "No offline files available",
                             imagePainter = painterResource(iconPackR.drawable.ic_arrow_circle_down_glass)
                         )
@@ -280,27 +292,49 @@ internal fun OfflineScreen(
 
         visibleOfflineInformation?.let { file ->
             OfflineOptionsBottomSheet(
+                modifier = Modifier
+                    .testTag(OFFLINE_SCREEN_BOTTOM_SHEET_TAG),
                 offlineFileInformation = file,
-                onShareOfflineFile = { /* TODO */ },
-                onSaveOfflineFileToDevice = { /* TODO */ },
+                onShareOfflineFile = {
+                    shareOfflineFiles(listOf(file))
+                    visibleOfflineInformation = null
+                },
+                onSaveOfflineFileToDevice = {
+                    val safeHandle = file.handle.toLongOrNull() ?: return@OfflineOptionsBottomSheet
+                    saveOfflineFilesToDevice(listOf(safeHandle))
+                    visibleOfflineInformation = null
+                },
                 onOpenOfflineFile = {
                     openFileInformation(file.handle)
                     visibleOfflineInformation = null
                 },
-                onOpenWithFile = { /* TODO */ },
-                onDeleteOfflineFile = { /* TODO */ },
+                onOpenWithFile = {
+                    onOpenFile(file)
+                    visibleOfflineInformation = null
+                },
+                onDeleteOfflineFile = {
+                    val safeHandle = file.handle.toLongOrNull() ?: return@OfflineOptionsBottomSheet
+                    selectedHandlesToRemove = listOf(safeHandle)
+                    showRemoveDialog = true
+                    visibleOfflineInformation = null
+                },
                 onDismiss = { visibleOfflineInformation = null }
             )
         }
 
         if (showRemoveDialog) {
             RemoveFromOfflineDialog(
+                modifier = Modifier
+                    .testTag(OFFLINE_SCREEN_REMOVE_FROM_OFFLINE_TAG),
                 onRemove = {
-                    removeOfflineNodes(uiState.selectedNodeHandles)
+                    removeOfflineNodes(selectedHandlesToRemove)
                     deselectAll()
                     showRemoveDialog = false
                 },
-                onCancel = { showRemoveDialog = false }
+                onCancel = {
+                    selectedHandlesToRemove = emptyList()
+                    showRemoveDialog = false
+                }
             )
         }
     }
@@ -318,7 +352,8 @@ private fun OfflineContent(
     when (uiState.currentViewType) {
         ViewType.LIST -> {
             LazyColumn(
-                modifier = modifier,
+                modifier = modifier
+                    .testTag(OFFLINE_SCREEN_LIST_COLUMN_TAG),
                 contentPadding = contentPadding
             ) {
                 items(
@@ -349,7 +384,9 @@ private fun OfflineContent(
         ViewType.GRID -> {
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(120.dp),
-                modifier = modifier,
+                modifier = modifier
+                    .testTag(OFFLINE_SCREEN_GRID_COLUMN_TAG)
+                    .padding(horizontal = 16.dp),
                 contentPadding = contentPadding,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -387,9 +424,11 @@ private fun OfflineContent(
 @Composable
 private fun RemoveFromOfflineDialog(
     onRemove: () -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     BasicDialog(
+        modifier = modifier,
         description = stringResource(R.string.confirmation_delete_from_save_for_offline),
         positiveButtonText = stringResource(sharedResR.string.general_remove),
         negativeButtonText = stringResource(sharedResR.string.general_dialog_cancel_button),
@@ -397,3 +436,16 @@ private fun RemoveFromOfflineDialog(
         onNegativeButtonClicked = onCancel,
     )
 }
+
+internal const val OFFLINE_SCREEN_SEARCH_TOP_APP_BAR_TAG = "offline_screen:search_top_app_bar"
+internal const val OFFLINE_SCREEN_DEFAULT_TOP_APP_BAR_TAG = "offline_screen:top_app_bar"
+internal const val OFFLINE_SCREEN_GRID_COLUMN_TAG = "offline_screen:grid_column"
+internal const val OFFLINE_SCREEN_LIST_COLUMN_TAG = "offline_screen:list_column"
+internal const val OFFLINE_SCREEN_LOADING_TAG = "offline_screen:loading"
+internal const val OFFLINE_SCREEN_EMPTY_TAG = "offline_screen:empty"
+internal const val OFFLINE_SCREEN_REMOVE_FROM_OFFLINE_TAG =
+    "offline_screen:remove_from_offline_dialog"
+internal const val OFFLINE_SCREEN_BOTTOM_SHEET_TAG = "offline_screen:bottom_sheet"
+internal const val OFFLINE_SCREEN_TOP_WARNING_BANNER_TAG = "offline_screen:top_warning_banner"
+internal const val OFFLINE_SCREEN_SELECTION_MODE_BOTTOM_BAR_TAG =
+    "offline_screen:selection_mode_bottom_bar"

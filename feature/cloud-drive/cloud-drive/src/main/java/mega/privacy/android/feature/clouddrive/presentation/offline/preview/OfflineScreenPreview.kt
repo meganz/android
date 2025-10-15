@@ -63,7 +63,11 @@ private fun PreviewOfflineScreenGrid() {
                     getNodeUiItem(2),
                     getNodeUiItem(3),
                     getNodeUiItem(4),
-                    getNodeUiItem(5)
+                    getNodeUiItem(5),
+                    getNodeUiItem(6),
+                    getNodeUiItem(7),
+                    getNodeUiItem(8),
+                    getNodeUiItem(9),
                 ),
                 selectedNodeHandles = listOf(),
                 nodeId = -1,
