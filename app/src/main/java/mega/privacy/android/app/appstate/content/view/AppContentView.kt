@@ -8,11 +8,15 @@ import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
+import androidx.navigation3.scene.Scene
+import androidx.navigation3.scene.SceneStrategy
+import androidx.navigation3.scene.SceneStrategyScope
 import androidx.navigation3.ui.NavDisplay
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.LocalSnackBarHostState
@@ -59,7 +63,8 @@ internal fun AppContentView(
                 NavDisplay(
                     backStack = backStack,
                     onBack = { backStack.removeLastOrNull() },
-                    sceneStrategy = transparentStrategy.then(dialogStrategy).then(bottomSheetStrategy),
+                    sceneStrategy = transparentStrategy.chain(dialogStrategy)
+                        .chain(bottomSheetStrategy),
                     entryDecorators = listOf(
                         rememberSaveableStateHolderNavEntryDecorator(),
                         rememberViewModelStoreNavEntryDecorator()
@@ -113,3 +118,15 @@ internal fun AppContentView(
         }
     }
 }
+
+infix fun <T : Any> SceneStrategy<T>.chain(sceneStrategy: SceneStrategy<T>): SceneStrategy<T> =
+    object : SceneStrategy<T> {
+        override fun SceneStrategyScope<T>.calculateScene(
+            entries: List<NavEntry<T>>,
+        ): Scene<T>? =
+            this@chain.run { calculateScene(entries) } ?: with(sceneStrategy) {
+                calculateScene(
+                    entries
+                )
+            }
+    }

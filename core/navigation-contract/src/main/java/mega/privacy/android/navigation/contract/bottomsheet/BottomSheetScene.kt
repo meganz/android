@@ -41,6 +41,33 @@ class BottomSheetScene<T : Any>(
         ) {
             sheetEntry.Content()
         }
+    }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as BottomSheetScene<*>
+
+        if (key != other.key) return false
+        if (previousEntries != other.previousEntries) return false
+        if (overlaidEntries != other.overlaidEntries) return false
+        if (sheetEntry != other.sheetEntry) return false
+        if (skipPartiallyExpanded != other.skipPartiallyExpanded) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = key.hashCode()
+        result = 31 * result + previousEntries.hashCode()
+        result = 31 * result + overlaidEntries.hashCode()
+        result = 31 * result + sheetEntry.hashCode()
+        result = 31 * result + skipPartiallyExpanded.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "BottomSheetScene(key=$key, previousEntries=$previousEntries, overlaidEntries=$overlaidEntries, sheetEntry=$sheetEntry, skipPartiallyExpanded=$skipPartiallyExpanded)"
     }
 }

@@ -17,8 +17,34 @@ class TransparentScene<T : Any>(
 
     override val entries = listOf(transparentEntry)
 
-    override val content = @Composable {
+    override val content: @Composable (() -> Unit) = {
         transparentEntry.Content()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as TransparentScene<*>
+
+        if (key != other.key) return false
+        if (transparentEntry != other.transparentEntry) return false
+        if (previousEntries != other.previousEntries) return false
+        if (overlaidEntries != other.overlaidEntries) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = key.hashCode()
+        result = 31 * result + transparentEntry.hashCode()
+        result = 31 * result + previousEntries.hashCode()
+        result = 31 * result + overlaidEntries.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "TransparentScene(key=$key, transparentEntry=$transparentEntry, previousEntries=$previousEntries, overlaidEntries=$overlaidEntries)"
     }
 }
 
