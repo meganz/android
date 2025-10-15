@@ -1,22 +1,27 @@
 package mega.privacy.android.feature.payment
 
+import android.app.Activity
 import com.android.billingclient.api.Purchase
 import com.google.common.truth.Truth
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.MegaSku
+import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.usecase.billing.MonitorBillingEventUseCase
 import mega.privacy.android.domain.usecase.billing.QueryPurchase
 import mega.privacy.android.domain.usecase.billing.QuerySkus
 import mega.privacy.android.feature.payment.domain.LaunchPurchaseFlowUseCase
+import mega.privacy.android.feature.payment.model.mapper.AccountTypeToProductIdMapper
 import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -29,6 +34,7 @@ internal class BillingViewModelTest {
     private val monitorBillingEventUseCase = mock<MonitorBillingEventUseCase> {
         onBlocking { invoke() }.thenReturn(eventFlow)
     }
+    private val accountTypeToProductIdMapper: AccountTypeToProductIdMapper = mock()
 
     @BeforeEach
     fun setUp() {
@@ -41,6 +47,7 @@ internal class BillingViewModelTest {
             queryPurchase = queryPurchase,
             launchPurchaseFlowUseCase = launchPurchaseFlowUseCase,
             monitorBillingEventUseCase = monitorBillingEventUseCase,
+            accountTypeToProductIdMapper = accountTypeToProductIdMapper
         )
     }
 
@@ -111,4 +118,100 @@ internal class BillingViewModelTest {
         val purchase = MegaPurchase(sku = "", state = Purchase.PurchaseState.UNSPECIFIED_STATE)
         Truth.assertThat(underTest.isPurchased(purchase)).isFalse()
     }
+
+    @Test
+    fun `test that accountTypeToProductIdMapper is called with correct parameters for monthly subscription`() =
+        runTest {
+            val activity = mock<Activity>()
+            val accountType = AccountType.PRO_I
+            val isMonthly = true
+            val expectedProductId = Skus.SKU_PRO_I_MONTH
+
+            whenever(accountTypeToProductIdMapper(accountType, isMonthly))
+                .thenReturn(expectedProductId)
+
+            underTest.startPurchase(activity, accountType, isMonthly)
+
+            verify(accountTypeToProductIdMapper).invoke(accountType, isMonthly)
+        }
+
+    @Test
+    fun `test that accountTypeToProductIdMapper is called with correct parameters for yearly subscription`() =
+        runTest {
+            val activity = mock<Activity>()
+            val accountType = AccountType.PRO_II
+            val isMonthly = false
+            val expectedProductId = Skus.SKU_PRO_II_YEAR
+
+            whenever(accountTypeToProductIdMapper(accountType, isMonthly))
+                .thenReturn(expectedProductId)
+
+            underTest.startPurchase(activity, accountType, isMonthly)
+
+            verify(accountTypeToProductIdMapper).invoke(accountType, isMonthly)
+        }
+
+    @Test
+    fun `test that launchPurchaseFlowUseCase is called with correct activity and product id`() =
+        runTest {
+            val activity = mock<Activity>()
+            val accountType = AccountType.PRO_III
+            val isMonthly = true
+            val expectedProductId = Skus.SKU_PRO_III_MONTH
+
+            whenever(accountTypeToProductIdMapper(accountType, isMonthly))
+                .thenReturn(expectedProductId)
+
+            underTest.startPurchase(activity, accountType, isMonthly)
+
+            verify(launchPurchaseFlowUseCase).invoke(activity, expectedProductId)
+        }
+
+    @Test
+    fun `test that startPurchase handles PRO_LITE monthly correctly`() = runTest {
+        val activity = mock<Activity>()
+        val accountType = AccountType.PRO_LITE
+        val isMonthly = true
+        val expectedProductId = Skus.SKU_PRO_LITE_MONTH
+
+        whenever(accountTypeToProductIdMapper(accountType, isMonthly))
+            .thenReturn(expectedProductId)
+
+        underTest.startPurchase(activity, accountType, isMonthly)
+
+        verify(accountTypeToProductIdMapper).invoke(accountType, isMonthly)
+        verify(launchPurchaseFlowUseCase).invoke(activity, expectedProductId)
+    }
+
+    @Test
+    fun `test that startPurchase handles PRO_I yearly correctly`() = runTest {
+        val activity = mock<Activity>()
+        val accountType = AccountType.PRO_I
+        val isMonthly = false
+        val expectedProductId = Skus.SKU_PRO_I_YEAR
+
+        whenever(accountTypeToProductIdMapper(accountType, isMonthly))
+            .thenReturn(expectedProductId)
+
+        underTest.startPurchase(activity, accountType, isMonthly)
+
+        verify(accountTypeToProductIdMapper).invoke(accountType, isMonthly)
+        verify(launchPurchaseFlowUseCase).invoke(activity, expectedProductId)
+    }
+
+    @Test
+    fun `test that startPurchase does not throw exception when mapper returns empty product id`() =
+        runTest {
+            val activity = mock<Activity>()
+            val accountType = AccountType.FREE
+            val isMonthly = true
+
+            whenever(accountTypeToProductIdMapper(accountType, isMonthly))
+                .thenReturn("")
+
+            underTest.startPurchase(activity, accountType, isMonthly)
+
+            verify(accountTypeToProductIdMapper).invoke(accountType, isMonthly)
+            verify(launchPurchaseFlowUseCase).invoke(activity, "")
+        }
 }

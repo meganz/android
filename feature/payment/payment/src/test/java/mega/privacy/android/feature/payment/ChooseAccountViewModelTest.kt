@@ -86,7 +86,6 @@ class ChooseAccountViewModelTest {
             getRecommendedSubscriptionUseCase = getRecommendedSubscriptionUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             savedStateHandle = mock { on { get<Boolean>(any()) }.thenReturn(true) },
-            accountTypeToProductIdMapper = accountTypeToProductIdMapper
         )
     }
 

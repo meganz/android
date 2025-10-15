@@ -45,7 +45,6 @@ class ChooseAccountViewModel @Inject constructor(
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
     private val getRecommendedSubscriptionUseCase: GetRecommendedSubscriptionUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
-    private val accountTypeToProductIdMapper: AccountTypeToProductIdMapper,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -139,10 +138,6 @@ class ChooseAccountViewModel @Inject constructor(
                 it.copy(product = pricing.products)
             }
         }
-    }
-
-    fun getProductId(accountType: AccountType, isMonthly: Boolean): String {
-        return accountTypeToProductIdMapper(accountType = accountType, isMonthly = isMonthly)
     }
 
     companion object {

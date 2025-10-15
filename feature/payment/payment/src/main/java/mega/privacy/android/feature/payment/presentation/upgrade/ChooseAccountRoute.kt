@@ -95,10 +95,8 @@ fun ChooseAccountRoute(
             activity?.let {
                 billingViewModel.startPurchase(
                     activity = activity,
-                    productId = chooseAccountViewModel.getProductId(
-                        isMonthly = isMonthly,
-                        accountType = accountType
-                    ),
+                    isMonthly = isMonthly,
+                    accountType = accountType,
                 )
             }
         },
