@@ -4482,11 +4482,17 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     when (drawerItem) {
                         DrawerItem.RUBBISH_BIN -> {
                             rubbishBinViewModel.resetScrollPosition()
+                            showAdsView()
                             goBackToBottomNavigationItem(bottomNavigationCurrentItem)
                         }
 
-                        DrawerItem.DEVICE_CENTER -> handleDeviceCenterBackNavigation()
+                        DrawerItem.DEVICE_CENTER -> {
+                            showAdsView()
+                            handleDeviceCenterBackNavigation()
+                        }
+
                         DrawerItem.NOTIFICATIONS -> {
+                            showAdsView()
                             handleSuperBackPressed()
                             goBackToBottomNavigationItem(bottomNavigationCurrentItem)
                         }
@@ -4737,8 +4743,10 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         if (drawerItem === DrawerItem.CLOUD_DRIVE) {
             handleCloudDriveBackNavigation(performBackNavigation = true)
         } else if (drawerItem == DrawerItem.DEVICE_CENTER) {
+            showAdsView()
             handleDeviceCenterBackNavigation()
         } else if (drawerItem == DrawerItem.RUBBISH_BIN) {
+            showAdsView()
             rubbishBinComposeFragment = getRubbishBinComposeFragment()
             if (rubbishBinComposeFragment == null || rubbishBinComposeFragment?.onBackPressed() == 0) {
                 goBackToBottomNavigationItem(bottomNavigationCurrentItem)
@@ -4749,6 +4757,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 bottomNavigationCurrentItem
             )
         } else if (drawerItem == DrawerItem.NOTIFICATIONS) {
+            showAdsView()
             handleSuperBackPressed()
             goBackToBottomNavigationItem(bottomNavigationCurrentItem)
         } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
@@ -5645,7 +5654,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             bottomSheetDialogFragment?.dismiss()
         }
         lifecycleScope.launch {
-            bottomSheetDialogFragment = nodeLabelBottomSheetDialogFragmentFactory.newInstance(node.longValue)
+            bottomSheetDialogFragment =
+                nodeLabelBottomSheetDialogFragmentFactory.newInstance(node.longValue)
             bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
         }
     }
@@ -5657,7 +5667,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         }
         val handles = nodeIds.map { it.longValue }
         lifecycleScope.launch {
-            bottomSheetDialogFragment = nodeLabelBottomSheetDialogFragmentFactory.newInstance(handles)
+            bottomSheetDialogFragment =
+                nodeLabelBottomSheetDialogFragmentFactory.newInstance(handles)
             bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
         }
     }
@@ -6647,7 +6658,9 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             if (hide && visibility == View.VISIBLE) {
                 updateMiniAudioPlayerVisibility(false)
                 val bottom =
-                    if (adsContainerViewModel.isAdsLoaded() && adsContainerView.isVisible) resources.getDimensionPixelSize(R.dimen.ads_web_view_container_height) else 0
+                    if (adsContainerViewModel.isAdsLoaded() && adsContainerView.isVisible) resources.getDimensionPixelSize(
+                        R.dimen.ads_web_view_container_height
+                    ) else 0
                 params.setMargins(0, 0, 0, bottom)
                 fragmentLayout.layoutParams = params
                 animate().translationY(height.toFloat())
