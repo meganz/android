@@ -88,7 +88,7 @@ fun NodeListViewItem(
     subtitleColor: TextColor = TextColor.Secondary,
     @DrawableRes accessPermissionIcon: Int? = null,
     titleOverflow: LongTextBehaviour = LongTextBehaviour.MiddleEllipsis,
-    subTitleOverflow: LongTextBehaviour = LongTextBehaviour.Clip(),
+    subTitleOverflow: LongTextBehaviour = LongTextBehaviour.Clip(2),
     highlightText: String = "",
     showOffline: Boolean = false,
     showVersion: Boolean = false,

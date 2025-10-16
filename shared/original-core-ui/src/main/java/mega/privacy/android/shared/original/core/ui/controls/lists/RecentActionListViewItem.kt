@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
@@ -143,6 +144,8 @@ fun RecentActionListViewItem(
                             )
                         ),
                         color = TextColor.Primary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.testTag(SECOND_LINE_TEST_TAG),
                     )
                 }
