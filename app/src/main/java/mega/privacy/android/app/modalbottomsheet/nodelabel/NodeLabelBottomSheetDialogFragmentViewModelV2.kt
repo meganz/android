@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -116,11 +117,13 @@ class NodeLabelBottomSheetDialogFragmentViewModelV2 @Inject constructor(
                 setLoadingState()
 
                 // Load all nodes in parallel for better performance
-                val nodes = nodeHandles.map { handle ->
-                    async {
-                        getNodeByIdUseCase(NodeId(handle))
-                    }
-                }.awaitAll().filterNotNull()
+                val nodes = supervisorScope {
+                    nodeHandles.map { handle ->
+                        async {
+                            getNodeByIdUseCase(NodeId(handle))
+                        }
+                    }.awaitAll().filterNotNull()
+                }
 
                 _uiState.value = _uiState.value.copy(
                     nodes = nodes,
@@ -173,11 +176,13 @@ class NodeLabelBottomSheetDialogFragmentViewModelV2 @Inject constructor(
                 setLoadingState()
 
                 // Process all node label updates in parallel for better performance
-                nodeHandles.map { handle ->
-                    async {
-                        updateNodeLabelUseCase(NodeId(handle), label)
-                    }
-                }.awaitAll()
+                supervisorScope {
+                    nodeHandles.map { handle ->
+                        async {
+                            updateNodeLabelUseCase(NodeId(handle), label)
+                        }
+                    }.awaitAll()
+                }
 
                 setSuccessState()
             } catch (_: Exception) {
