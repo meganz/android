@@ -32,6 +32,11 @@ data class MegaPurchase(
      * Token of the purchase.
      */
     val token: String? = null,
+
+    /**
+     * Time of the purchase, in milliseconds since epoch (Jan 1, 1970).
+     */
+    val time: Long = 0,
 ) {
     /**
      * product level
@@ -43,4 +48,15 @@ data class MegaPurchase(
         Skus.SKU_PRO_III_MONTH, Skus.SKU_PRO_III_YEAR -> 3
         else -> -1
     }
+
+    val isMonthly: Boolean
+        get() = when (sku) {
+            Skus.SKU_PRO_LITE_MONTH,
+            Skus.SKU_PRO_I_MONTH,
+            Skus.SKU_PRO_II_MONTH,
+            Skus.SKU_PRO_III_MONTH,
+                -> true
+
+            else -> false
+        }
 }

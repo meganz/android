@@ -156,9 +156,19 @@ internal class BillingFacade @Inject constructor(
             }
         Timber.d("oldSku is:%s, new sku is:%s", oldSku, skuDetails)
         Timber.d("Obfuscated account id is:%s", obfuscatedAccountId)
-        //if user is upgrading, it take effect immediately otherwise wait until current plan expired
-        val replacementMode =
-            if (MegaPurchase(skuDetails.sku).level > MegaPurchase(oldSku).level) SubscriptionUpdateParams.ReplacementMode.WITH_TIME_PRORATION else SubscriptionUpdateParams.ReplacementMode.DEFERRED
+        // if user upgrade to higher level, it takes effect immediately
+        // if user downgrading to the same level from yearly to monthly, it also takes effect immediately
+        // otherwise, it will take effect after current subscription period
+        val newMegaPurchase = MegaPurchase(skuDetails.sku)
+        val oldLevel = MegaPurchase(oldSku).level
+        val newLevel = newMegaPurchase.level
+        val isDowngradeSameLevel = oldLevel == newLevel && newMegaPurchase.isMonthly
+        Timber.d("old level is: $oldLevel, new level is: $newLevel, isDowngradeSameLevel is: $isDowngradeSameLevel")
+        val replacementMode = if (newLevel > oldLevel || isDowngradeSameLevel) {
+            SubscriptionUpdateParams.ReplacementMode.WITH_TIME_PRORATION
+        } else {
+            SubscriptionUpdateParams.ReplacementMode.DEFERRED
+        }
         val productDetails: ProductDetails =
             productDetailsListCache.get().orEmpty().find { it.productId == productId }
                 ?: throw ProductNotFoundException()
@@ -379,7 +389,8 @@ internal class BillingFacade @Inject constructor(
     }
 
     private fun updateAccountInfo(purchases: List<MegaPurchase>) {
-        val max = purchases.maxByOrNull { it.level }
+        val max =
+            purchases.maxWithOrNull(compareBy<MegaPurchase> { it.level }.thenByDescending { it.time })
         Timber.d("List of purchases: ${purchases.size}")
         Timber.d("Max purchase: $max")
         activeSubscription.set(max)

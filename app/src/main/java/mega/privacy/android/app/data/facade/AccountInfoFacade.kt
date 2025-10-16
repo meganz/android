@@ -112,7 +112,7 @@ class AccountInfoFacade @Inject constructor(
             }
         )
 
-        if (purchase.level > myAccountInfo.levelAccountDetails) {
+        if (purchase.level >= myAccountInfo.levelAccountDetails) {
             Timber.d("megaApi.submitPurchaseReceipt is invoked")
             megaApiGateway.submitPurchaseReceipt(PAYMENT_GATEWAY, json, listener)
         }

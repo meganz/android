@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.AccountScreenEvent
 import mega.privacy.mobile.analytics.event.UpgradeMyAccountEvent
@@ -150,6 +151,7 @@ class MyAccountFragment : Fragment(), MyAccountHomeViewActions {
         Analytics.tracker.trackEvent(UpgradeMyAccountEvent)
         megaNavigator.openUpgradeAccount(
             context = requireContext(),
+            source = UpgradeAccountSource.MY_ACCOUNT_SCREEN
         )
         activityViewModel.setOpenUpgradeFrom()
     }

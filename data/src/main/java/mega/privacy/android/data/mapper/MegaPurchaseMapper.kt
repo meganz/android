@@ -15,5 +15,6 @@ internal fun toMegaPurchase(purchase: Purchase) = MegaPurchase(
         Purchase.PurchaseState.PENDING -> MegaPurchaseState.Pending
         else -> MegaPurchaseState.Unspecified
     },
-    token = purchase.purchaseToken
+    token = purchase.purchaseToken,
+    time = purchase.purchaseTime
 )

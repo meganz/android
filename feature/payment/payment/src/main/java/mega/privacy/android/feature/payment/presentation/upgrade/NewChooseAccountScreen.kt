@@ -116,7 +116,7 @@ fun NewChooseAccountScreen(
         val formattedSize = highestStorageSubscription.formatStorageSize()
         stringResource(id = formattedSize.unit, formattedSize.size)
     } else {
-        "16 TB"
+        "20 TB"
     }
 
     val baseStorageFormatted = remember(accountStorageUiState.baseStorage) {
