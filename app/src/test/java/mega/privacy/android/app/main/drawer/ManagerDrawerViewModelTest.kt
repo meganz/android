@@ -25,7 +25,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.notifications.GetEnabledNotificationsUseCase
-import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
+import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatusUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -59,7 +59,7 @@ internal class ManagerDrawerViewModelTest {
     private val rootNodeExistsUseCase: RootNodeExistsUseCase = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase = mock()
-    private val monitorVerificationStatus: MonitorVerificationStatus = mock()
+    private val monitorVerificationStatusUseCase: MonitorVerificationStatusUseCase = mock()
     private val getEnabledNotificationsUseCase: GetEnabledNotificationsUseCase = mock()
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase = mock()
 
@@ -71,7 +71,7 @@ internal class ManagerDrawerViewModelTest {
             getBackupsNodeUseCase,
             rootNodeExistsUseCase,
             monitorMyAccountUpdateUseCase,
-            monitorVerificationStatus,
+            monitorVerificationStatusUseCase,
             getEnabledNotificationsUseCase,
         )
         monitorMyChatOnlineStatusUseCase.stub {
@@ -103,7 +103,7 @@ internal class ManagerDrawerViewModelTest {
             getBackupsNodeUseCase = getBackupsNodeUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorMyChatOnlineStatusUseCase = monitorMyChatOnlineStatusUseCase,
-            monitorVerificationStatus = monitorVerificationStatus,
+            monitorVerificationStatusUseCase = monitorVerificationStatusUseCase,
             rootNodeExistsUseCase = rootNodeExistsUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             getEnabledNotificationsUseCase = getEnabledNotificationsUseCase,

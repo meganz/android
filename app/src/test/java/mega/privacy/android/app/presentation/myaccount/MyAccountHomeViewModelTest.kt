@@ -40,7 +40,7 @@ import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
 import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCase
-import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
+import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatusUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -80,7 +80,7 @@ class MyAccountHomeViewModelTest {
     private val monitorMyAvatarFile: MonitorMyAvatarFile = mock {
         onBlocking { invoke() }.thenReturn(myAvatarFileFlow)
     }
-    private val monitorVerificationStatus: MonitorVerificationStatus = mock {
+    private val monitorVerificationStatusUseCase: MonitorVerificationStatusUseCase = mock {
         onBlocking { invoke() }.thenReturn(verifiedPhoneNumberFlow)
     }
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock {
@@ -121,7 +121,7 @@ class MyAccountHomeViewModelTest {
             getAccountDetailsUseCase,
             monitorAccountDetailUseCase,
             monitorMyAvatarFile,
-            monitorVerificationStatus,
+            monitorVerificationStatusUseCase,
             monitorConnectivityUseCase,
             monitorUserUpdates,
             getVisibleContactsUseCase,

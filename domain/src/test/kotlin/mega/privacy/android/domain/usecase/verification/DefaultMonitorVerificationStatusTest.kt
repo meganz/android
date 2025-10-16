@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.verification.Verified
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.repository.VerificationRepository
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -23,7 +24,7 @@ import org.mockito.kotlin.stub
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultMonitorVerificationStatusTest {
-    private lateinit var underTest: MonitorVerificationStatus
+    private lateinit var underTest: MonitorVerificationStatusUseCase
     private val monitorVerifiedPhoneNumber = mock<MonitorVerifiedPhoneNumber>()
     private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase> {
         on { invoke() }.thenReturn(
@@ -42,17 +43,21 @@ class DefaultMonitorVerificationStatusTest {
         )
     }
 
+    private val monitorMiscLoadedUseCase = mock<MonitorMiscLoadedUseCase>()
+
     @Before
     fun setUp() {
-        underTest = DefaultMonitorVerificationStatus(
+        underTest = MonitorVerificationStatusUseCase(
             monitorVerifiedPhoneNumber = monitorVerifiedPhoneNumber,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             verificationRepository = verificationRepository,
+            monitorMiscLoadedUseCase = monitorMiscLoadedUseCase,
         )
     }
 
     @Test
     fun `test that verified number is returned if found`() = runTest {
+        stubMiscFlagsLoaded()
         val expectedPhoneNumber = VerifiedPhoneNumber.PhoneNumber("1234")
         monitorVerifiedPhoneNumber.stub {
             on { invoke() }.thenReturn(flow {
@@ -68,6 +73,7 @@ class DefaultMonitorVerificationStatusTest {
 
     @Test
     fun `test that state is unverified if no phone number returned`() = runTest {
+        stubMiscFlagsLoaded()
         val expectedPhoneNumber = VerifiedPhoneNumber.NoVerifiedPhoneNumber
         monitorVerifiedPhoneNumber.stub {
             on { invoke() }.thenReturn(flow {
@@ -84,6 +90,7 @@ class DefaultMonitorVerificationStatusTest {
     @Test
     fun `test that opt in and unblock are false if current storage state is paywall`() =
         runTest {
+            stubMiscFlagsLoaded()
             val expectedPhoneNumber = VerifiedPhoneNumber.PhoneNumber("1234")
             monitorVerifiedPhoneNumber.stub {
                 on { invoke() }.thenReturn(flow {
@@ -110,9 +117,9 @@ class DefaultMonitorVerificationStatusTest {
             }
         }
 
-
     @Test
     fun `test that canRequestUnblockSms is true if unblock permission is returned`() = runTest {
+        stubMiscFlagsLoaded()
         val expectedPhoneNumber = VerifiedPhoneNumber.NoVerifiedPhoneNumber
         monitorVerifiedPhoneNumber.stub {
             on { invoke() }.thenReturn(flow {
@@ -130,9 +137,11 @@ class DefaultMonitorVerificationStatusTest {
         }
     }
 
+
     @Test
     fun `test that canRequestUnblockSms is false if unblock permission is not returned`() =
         runTest {
+            stubMiscFlagsLoaded()
             val expectedPhoneNumber = VerifiedPhoneNumber.NoVerifiedPhoneNumber
             monitorVerifiedPhoneNumber.stub {
                 on { invoke() }.thenReturn(flow {
@@ -153,6 +162,7 @@ class DefaultMonitorVerificationStatusTest {
     @Test
     fun `test that canRequestOptInVerification is true if verify permission is returned`() =
         runTest {
+            stubMiscFlagsLoaded()
             val expectedPhoneNumber = VerifiedPhoneNumber.NoVerifiedPhoneNumber
             monitorVerifiedPhoneNumber.stub {
                 on { invoke() }.thenReturn(flow {
@@ -173,6 +183,7 @@ class DefaultMonitorVerificationStatusTest {
     @Test
     fun `test that canRequestOptInVerification is false if verify permission is not returned`() =
         runTest {
+            stubMiscFlagsLoaded()
             val expectedPhoneNumber = VerifiedPhoneNumber.NoVerifiedPhoneNumber
             monitorVerifiedPhoneNumber.stub {
                 on { invoke() }.thenReturn(flow {
@@ -192,6 +203,7 @@ class DefaultMonitorVerificationStatusTest {
 
     @Test
     fun `test that a new phone number updates the status`() = runTest {
+        stubMiscFlagsLoaded()
         val unVerified = VerifiedPhoneNumber.NoVerifiedPhoneNumber
         val verified = VerifiedPhoneNumber.PhoneNumber("1234")
         val phoneNumberFlow = MutableStateFlow<VerifiedPhoneNumber>(unVerified)
@@ -209,5 +221,14 @@ class DefaultMonitorVerificationStatusTest {
         }
 
 
+    }
+
+    private fun stubMiscFlagsLoaded() {
+        monitorMiscLoadedUseCase.stub {
+            on { invoke() }.thenReturn(flow {
+                emit(true)
+                awaitCancellation()
+            })
+        }
     }
 }

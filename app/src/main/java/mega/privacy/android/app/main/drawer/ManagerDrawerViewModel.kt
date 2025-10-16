@@ -24,7 +24,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.notifications.GetEnabledNotificationsUseCase
-import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
+import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatusUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -36,7 +36,7 @@ internal class ManagerDrawerViewModel @Inject constructor(
     private val getBackupsNodeUseCase: GetBackupsNodeUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorMyChatOnlineStatusUseCase: MonitorMyChatOnlineStatusUseCase,
-    private val monitorVerificationStatus: MonitorVerificationStatus,
+    private val monitorVerificationStatusUseCase: MonitorVerificationStatusUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getEnabledNotificationsUseCase: GetEnabledNotificationsUseCase,
@@ -96,7 +96,7 @@ internal class ManagerDrawerViewModel @Inject constructor(
 
     private fun observerVerificationStatus() {
         viewModelScope.launch {
-            monitorVerificationStatus()
+            monitorVerificationStatusUseCase()
                 .catch { Timber.e(it) }
                 .onEach {
                     Timber.d("Verification status returned: $it")

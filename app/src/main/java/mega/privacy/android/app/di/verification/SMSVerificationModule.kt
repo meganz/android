@@ -11,9 +11,7 @@ import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerifi
 import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerificationTextErrorMapperImpl
 import mega.privacy.android.domain.repository.VerificationRepository
 import mega.privacy.android.domain.usecase.IsSMSVerificationShown
-import mega.privacy.android.domain.usecase.verification.DefaultMonitorVerificationStatus
 import mega.privacy.android.domain.usecase.verification.DefaultMonitorVerifiedPhoneNumber
-import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.verification.MonitorVerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.verification.VerifyPhoneNumber
 
@@ -35,12 +33,6 @@ abstract class SMSVerificationModule {
      */
     @Binds
     abstract fun bindSmsVerificationTextErrorMapper(implementation: SmsVerificationTextErrorMapperImpl): SmsVerificationTextErrorMapper
-
-    /**
-     * bind [DefaultMonitorVerificationStatus]
-     */
-    @Binds
-    abstract fun bindMonitorVerificationStatus(implementation: DefaultMonitorVerificationStatus): MonitorVerificationStatus
 
     /**
      * bind [SMSVerificationTextMapper]

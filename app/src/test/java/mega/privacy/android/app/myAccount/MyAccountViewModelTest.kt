@@ -72,7 +72,7 @@ import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCase
-import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
+import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatusUseCase
 import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumberUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -130,7 +130,7 @@ internal class MyAccountViewModelTest {
     private val changeEmailUseCase: ChangeEmailUseCase = mock()
     private val updateCurrentUserName: UpdateCurrentUserName = mock()
     private val getCurrentUserEmail: GetCurrentUserEmail = mock()
-    private val monitorVerificationStatus: MonitorVerificationStatus = mock()
+    private val monitorVerificationStatusUseCase: MonitorVerificationStatusUseCase = mock()
     private val getExportMasterKeyUseCase: GetExportMasterKeyUseCase = mock()
     private val broadcastRefreshSessionUseCase: BroadcastRefreshSessionUseCase = mock()
     private val monitorBackupFolder: MonitorBackupFolder = mock()
@@ -175,7 +175,7 @@ internal class MyAccountViewModelTest {
         ).thenReturn("name")
         whenever(getCurrentUserEmail()).thenReturn(null)
         whenever(monitorUserUpdates()).thenReturn(userUpdatesFlow)
-        whenever(monitorVerificationStatus()).thenReturn(verificationStatusFlow)
+        whenever(monitorVerificationStatusUseCase()).thenReturn(verificationStatusFlow)
         whenever(monitorBackupFolder()).thenReturn(backupFolderFlow)
         whenever(
             getExtendedAccountDetail(
@@ -221,7 +221,7 @@ internal class MyAccountViewModelTest {
             changeEmailUseCase = changeEmailUseCase,
             updateCurrentUserName = updateCurrentUserName,
             getCurrentUserEmail = getCurrentUserEmail,
-            monitorVerificationStatus = monitorVerificationStatus,
+            monitorVerificationStatusUseCase = monitorVerificationStatusUseCase,
             getExportMasterKeyUseCase = getExportMasterKeyUseCase,
             broadcastRefreshSessionUseCase = broadcastRefreshSessionUseCase,
             monitorBackupFolder = monitorBackupFolder,
@@ -933,7 +933,7 @@ internal class MyAccountViewModelTest {
             changeEmailUseCase,
             updateCurrentUserName,
             getCurrentUserEmail,
-            monitorVerificationStatus,
+            monitorVerificationStatusUseCase,
             getExportMasterKeyUseCase,
             broadcastRefreshSessionUseCase,
             monitorBackupFolder,

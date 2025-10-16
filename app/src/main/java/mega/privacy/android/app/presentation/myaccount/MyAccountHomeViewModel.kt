@@ -43,7 +43,7 @@ import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
 import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCase
-import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
+import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatusUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -56,7 +56,7 @@ class MyAccountHomeViewModel @Inject constructor(
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
-    private val monitorVerificationStatus: MonitorVerificationStatus,
+    private val monitorVerificationStatusUseCase: MonitorVerificationStatusUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorUserUpdates: MonitorUserUpdates,
     private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
@@ -128,7 +128,7 @@ class MyAccountHomeViewModel @Inject constructor(
             }
         ).launchIn(viewModelScope)
         viewModelScope.launch {
-            monitorVerificationStatus()
+            monitorVerificationStatusUseCase()
                 .collectLatest { status ->
                     _uiState.update {
                         it.copy(

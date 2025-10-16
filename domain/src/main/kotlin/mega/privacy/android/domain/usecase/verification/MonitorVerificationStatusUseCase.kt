@@ -1,18 +1,20 @@
 package mega.privacy.android.domain.usecase.verification
 
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.verification.OptInVerification
 import mega.privacy.android.domain.entity.verification.SmsPermission
 import mega.privacy.android.domain.entity.verification.UnVerified
 import mega.privacy.android.domain.entity.verification.Unblock
-import mega.privacy.android.domain.entity.verification.VerificationStatus
 import mega.privacy.android.domain.entity.verification.Verified
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.repository.VerificationRepository
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import javax.inject.Inject
 
 /**
@@ -22,32 +24,36 @@ import javax.inject.Inject
  * @property monitorStorageStateEventUseCase
  * @property verificationRepository
  */
-class DefaultMonitorVerificationStatus @Inject constructor(
+@OptIn(ExperimentalCoroutinesApi::class)
+class MonitorVerificationStatusUseCase @Inject constructor(
     private val monitorVerifiedPhoneNumber: MonitorVerifiedPhoneNumber,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val verificationRepository: VerificationRepository,
-) : MonitorVerificationStatus {
-    override fun invoke(): Flow<VerificationStatus> {
-        return combine(
-            monitorStorageStateEventUseCase()
-                .map { it.storageState == StorageState.PayWall },
-            monitorVerifiedPhoneNumber(),
-        ) { isPaywall, verifiedPhoneNumber ->
-            val permissions = verificationRepository.getSmsPermissions()
-            if (verifiedPhoneNumber is VerifiedPhoneNumber.PhoneNumber) {
-                Verified(
-                    phoneNumber = verifiedPhoneNumber,
-                    canRequestUnblockSms = canUnBlock(isPaywall, permissions),
-                    canRequestOptInVerification = canVerify(isPaywall, permissions),
-                )
-            } else {
-                UnVerified(
-                    canRequestUnblockSms = canUnBlock(isPaywall, permissions),
-                    canRequestOptInVerification = canVerify(isPaywall, permissions),
-                )
+    private val monitorMiscLoadedUseCase: MonitorMiscLoadedUseCase,
+) {
+    operator fun invoke() = monitorMiscLoadedUseCase()
+        .filter { it }
+        .flatMapLatest {
+            combine(
+                monitorStorageStateEventUseCase()
+                    .map { it.storageState == StorageState.PayWall },
+                monitorVerifiedPhoneNumber(),
+            ) { isPaywall, verifiedPhoneNumber ->
+                val permissions = verificationRepository.getSmsPermissions()
+                if (verifiedPhoneNumber is VerifiedPhoneNumber.PhoneNumber) {
+                    Verified(
+                        phoneNumber = verifiedPhoneNumber,
+                        canRequestUnblockSms = canUnBlock(isPaywall, permissions),
+                        canRequestOptInVerification = canVerify(isPaywall, permissions),
+                    )
+                } else {
+                    UnVerified(
+                        canRequestUnblockSms = canUnBlock(isPaywall, permissions),
+                        canRequestOptInVerification = canVerify(isPaywall, permissions),
+                    )
+                }
             }
         }
-    }
 
     private fun canUnBlock(
         isPaywall: Boolean,

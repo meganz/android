@@ -104,7 +104,7 @@ import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCase
-import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
+import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatusUseCase
 import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumberUseCase
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
@@ -146,7 +146,7 @@ import javax.inject.Inject
  * @property changeEmailUseCase
  * @property updateCurrentUserName
  * @property getCurrentUserEmail
- * @property monitorVerificationStatus
+ * @property monitorVerificationStatusUseCase
  * @property snackBarHandler Handler used to display a Snackbar
  * @property getBusinessStatusUseCase
  * @property monitorAccountDetailUseCase
@@ -181,7 +181,7 @@ class MyAccountViewModel @Inject constructor(
     private val changeEmailUseCase: ChangeEmailUseCase,
     private val updateCurrentUserName: UpdateCurrentUserName,
     private val getCurrentUserEmail: GetCurrentUserEmail,
-    private val monitorVerificationStatus: MonitorVerificationStatus,
+    private val monitorVerificationStatusUseCase: MonitorVerificationStatusUseCase,
     private val getExportMasterKeyUseCase: GetExportMasterKeyUseCase,
     private val broadcastRefreshSessionUseCase: BroadcastRefreshSessionUseCase,
     private val monitorBackupFolder: MonitorBackupFolder,
@@ -251,7 +251,7 @@ class MyAccountViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
-            monitorVerificationStatus().collect { status ->
+            monitorVerificationStatusUseCase().collect { status ->
                 _state.update {
                     it.copy(
                         verifiedPhoneNumber = (status.phoneNumber as? VerifiedPhoneNumber.PhoneNumber)

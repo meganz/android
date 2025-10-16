@@ -19,9 +19,11 @@ import mega.privacy.android.domain.repository.BusinessRepository
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
+import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatusUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 
@@ -29,12 +31,16 @@ import org.mockito.kotlin.stub
 class MonitorModalStateUseCaseTest {
     private lateinit var underTest: MonitorModalStateUseCase
 
-    private val monitorVerificationStatus = MutableStateFlow<VerificationStatus>(
+    val verificationFlow = MutableStateFlow<VerificationStatus>(
         UnVerified(
             canRequestUnblockSms = false,
             canRequestOptInVerification = false
         )
     )
+
+    private val monitorVerificationStatusUseCase = mock<MonitorVerificationStatusUseCase> {
+        on { invoke() } doReturn verificationFlow
+    }
 
     private val storageStateEvent = mock<StorageStateEvent> {
         on { storageState }.thenReturn(StorageState.Unknown)
@@ -63,7 +69,7 @@ class MonitorModalStateUseCaseTest {
     @BeforeEach
     fun setUp() {
         underTest = MonitorModalStateUseCase(
-            monitorVerificationStatus = { monitorVerificationStatus },
+            monitorVerificationStatusUseCase = monitorVerificationStatusUseCase,
             monitorStorageStateEventUseCase = monitorStorageState,
             isFirstLaunchUseCase = isFirstLaunchUseCase,
             requireTwoFactorAuthenticationUseCase = requiresTwoFactorAuthentication,
@@ -78,7 +84,7 @@ class MonitorModalStateUseCaseTest {
             requiresTwoFactorAuthentication.stub {
                 onBlocking { invoke(any(), any()) }.thenReturn(false)
             }
-            monitorVerificationStatus.emit(
+            verificationFlow.emit(
                 UnVerified(
                     canRequestUnblockSms = false,
                     canRequestOptInVerification = true
@@ -106,7 +112,7 @@ class MonitorModalStateUseCaseTest {
                 onBlocking { invoke(any(), any()) }.thenReturn(false)
             }
 
-            monitorVerificationStatus.emit(
+            verificationFlow.emit(
                 Verified(
                     phoneNumber = VerifiedPhoneNumber.PhoneNumber("766543"),
                     canRequestUnblockSms = false,
@@ -219,7 +225,7 @@ class MonitorModalStateUseCaseTest {
                 onBlocking { invoke(any(), any()) }.thenReturn(false)
             }
 
-            monitorVerificationStatus.emit(
+            verificationFlow.emit(
                 UnVerified(
                     canRequestOptInVerification = true,
                     canRequestUnblockSms = true
@@ -252,7 +258,7 @@ class MonitorModalStateUseCaseTest {
                 onBlocking { invoke(any(), any()) }.thenReturn(false)
             }
 
-            monitorVerificationStatus.emit(
+            verificationFlow.emit(
                 UnVerified(
                     canRequestOptInVerification = true,
                     canRequestUnblockSms = true
@@ -285,7 +291,7 @@ class MonitorModalStateUseCaseTest {
                 onBlocking { invoke(any(), any()) }.thenReturn(false)
             }
 
-            monitorVerificationStatus.emit(
+            verificationFlow.emit(
                 UnVerified(
                     canRequestOptInVerification = true,
                     canRequestUnblockSms = true
@@ -318,7 +324,7 @@ class MonitorModalStateUseCaseTest {
                 onBlocking { invoke(any(), any()) }.thenReturn(false)
             }
 
-            monitorVerificationStatus.emit(
+            verificationFlow.emit(
                 UnVerified(
                     canRequestOptInVerification = false,
                     canRequestUnblockSms = true
@@ -352,7 +358,7 @@ class MonitorModalStateUseCaseTest {
                 onBlocking { invoke(any(), any()) }.thenReturn(false)
             }
 
-            monitorVerificationStatus.emit(
+            verificationFlow.emit(
                 UnVerified(
                     canRequestOptInVerification = true,
                     canRequestUnblockSms = true
@@ -386,7 +392,7 @@ class MonitorModalStateUseCaseTest {
                 onBlocking { invoke(any(), any()) }.thenReturn(false)
             }
 
-            monitorVerificationStatus.emit(
+            verificationFlow.emit(
                 UnVerified(
                     canRequestOptInVerification = true,
                     canRequestUnblockSms = true
@@ -419,7 +425,7 @@ class MonitorModalStateUseCaseTest {
                 onBlocking { invoke(any(), any()) }.thenReturn(false)
             }
 
-            monitorVerificationStatus.emit(
+            verificationFlow.emit(
                 UnVerified(
                     canRequestOptInVerification = false,
                     canRequestUnblockSms = false

@@ -14,19 +14,19 @@ import mega.privacy.android.domain.repository.BusinessRepository
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
-import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
+import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatusUseCase
 import javax.inject.Inject
 
 /**
  * Monitor modal state use case
  *
- * @property monitorVerificationStatus
+ * @property monitorVerificationStatusUseCase
  * @property monitorStorageStateEventUseCase
  * @property isFirstLaunchUseCase
  * @property requireTwoFactorAuthenticationUseCase
  */
 class MonitorModalStateUseCase @Inject constructor(
-    private val monitorVerificationStatus: MonitorVerificationStatus,
+    private val monitorVerificationStatusUseCase: MonitorVerificationStatusUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val isFirstLaunchUseCase: IsFirstLaunchUseCase,
     private val requireTwoFactorAuthenticationUseCase: RequireTwoFactorAuthenticationUseCase,
@@ -120,7 +120,7 @@ class MonitorModalStateUseCase @Inject constructor(
         askPermissions: Boolean,
         isNewAccount: Boolean,
     ) {
-        val canVerify = monitorVerificationStatus()
+        val canVerify = monitorVerificationStatusUseCase()
             .map { it is UnVerified && it.canRequestOptInVerification }.first()
         if (requiresPhoneVerification(
                 isFreshLogin = freshLogin,
