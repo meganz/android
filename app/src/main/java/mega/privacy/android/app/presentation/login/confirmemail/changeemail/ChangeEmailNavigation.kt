@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.login.Login
 import mega.privacy.android.app.presentation.login.LoginGraph
-import mega.privacy.android.app.presentation.login.LoginGraphContent
+import mega.privacy.android.app.presentation.login.LoginNavigationHandler
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.StartRoute
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailScreen
@@ -39,7 +39,7 @@ fun NavGraphBuilder.changeEmailAddress(
             }
             hiltViewModel<LoginViewModel>(parentEntry)
         }
-        LoginGraphContent(
+        LoginNavigationHandler(
             navigateToLoginScreen = { navController.navigate(Login) },
             navigateToCreateAccountScreen = { navController.navigate(CreateAccountRoute) },
             navigateToTourScreen = {
@@ -71,32 +71,15 @@ data class ChangeEmailAddressScreen(
 
 internal fun EntryProviderScope<NavKey>.changeEmailAddress(
     navigationHandler: NavigationHandler,
-    chatRequestHandler: MegaChatRequestHandler,
-    onFinish: () -> Unit,
-    sharedViewModel: LoginViewModel,
-    stopShowingSplashScreen: () -> Unit,
     onChangeEmailSuccess: (String) -> Unit,
 ) {
     entry<ChangeEmailAddressScreen> { key ->
-        LoginGraphContent(
-            navigateToLoginScreen = { navigationHandler.navigate(Login) },
-            navigateToCreateAccountScreen = { navigationHandler.navigate(CreateAccountRoute) },
-            navigateToTourScreen = {
-                navigationHandler.navigateAndClearBackStack(TourScreen)
-            },
-            navigateToConfirmationEmailScreen = { navigationHandler.navigate(ConfirmationEmailScreen) },
-            viewModel = sharedViewModel,
-            chatRequestHandler = chatRequestHandler,
-            onFinish = onFinish,
-            stopShowingSplashScreen = stopShowingSplashScreen,
-        ) {
-            ChangeEmailAddressRoute(
-                onChangeEmailSuccess = { newEmail ->
-                    onChangeEmailSuccess(newEmail)
-                    navigationHandler.back()
-                }
-            )
-        }
+        ChangeEmailAddressRoute(
+            onChangeEmailSuccess = { newEmail ->
+                onChangeEmailSuccess(newEmail)
+                navigationHandler.back()
+            }
+        )
     }
 }
 

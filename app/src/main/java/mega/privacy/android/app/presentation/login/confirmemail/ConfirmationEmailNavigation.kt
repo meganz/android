@@ -17,7 +17,7 @@ import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.login.Login
 import mega.privacy.android.app.presentation.login.LoginGraph
-import mega.privacy.android.app.presentation.login.LoginGraphContent
+import mega.privacy.android.app.presentation.login.LoginNavigationHandler
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.StartRoute
 import mega.privacy.android.app.presentation.login.confirmemail.changeemail.ChangeEmailAddressScreen
@@ -50,7 +50,7 @@ internal fun NavGraphBuilder.confirmationEmailScreen(
             hiltViewModel<LoginViewModel>(parentEntry)
         }
 
-        LoginGraphContent(
+        LoginNavigationHandler(
             navigateToLoginScreen = { navController.navigate(Login) },
             navigateToCreateAccountScreen = { navController.navigate(CreateAccountRoute) },
             navigateToTourScreen = {
@@ -89,47 +89,32 @@ internal fun NavGraphBuilder.confirmationEmailScreen(
 
 internal fun EntryProviderScope<NavKey>.confirmationEmailScreen(
     navigationHandler: NavigationHandler,
-    chatRequestHandler: MegaChatRequestHandler,
     onFinish: () -> Unit,
     sharedViewModel: LoginViewModel,
-    stopShowingSplashScreen: () -> Unit,
 ) {
     entry<ConfirmationEmailScreen> { key ->
         val context = LocalContext.current
         val result by navigationHandler.monitorResult<String>(ChangeEmailAddressViewModel.EMAIL)
             .collectAsStateWithLifecycle("")
-        LoginGraphContent(
-            navigateToLoginScreen = { navigationHandler.navigate(Login) },
-            navigateToCreateAccountScreen = { navigationHandler.navigate(CreateAccountRoute) },
-            navigateToTourScreen = {
-                navigationHandler.navigateAndClearBackStack(TourScreen)
-            },
-            navigateToConfirmationEmailScreen = { navigationHandler.navigate(ConfirmationEmailScreen) },
-            viewModel = sharedViewModel,
-            chatRequestHandler = chatRequestHandler,
-            onFinish = onFinish,
-            stopShowingSplashScreen = stopShowingSplashScreen,
-        ) {
-            NewConfirmEmailRoute(
-                newEmail = result,
-                onShowPendingFragment = sharedViewModel::setPendingFragmentToShow,
-                onNavigateToChangeEmailAddress = { email, fullName ->
-                    navigationHandler.navigate(
-                        ChangeEmailAddressScreen(
-                            email = email,
-                            fullName = fullName
-                        )
+        NewConfirmEmailRoute(
+            newEmail = result,
+            onShowPendingFragment = sharedViewModel::setPendingFragmentToShow,
+            onNavigateToChangeEmailAddress = { email, fullName ->
+                navigationHandler.navigate(
+                    ChangeEmailAddressScreen(
+                        email = email,
+                        fullName = fullName
                     )
-                },
-                onNavigateToHelpCentre = {
-                    context.launchUrl(HELP_CENTRE_HOME_URL)
-                },
-                onBackPressed = onFinish,
-                checkTemporalCredentials = sharedViewModel::checkTemporalCredentials,
-                cancelCreateAccount = sharedViewModel::cancelCreateAccount,
-                onSetTemporalEmail = sharedViewModel::setTemporalEmail
-            )
-        }
+                )
+            },
+            onNavigateToHelpCentre = {
+                context.launchUrl(HELP_CENTRE_HOME_URL)
+            },
+            onBackPressed = onFinish,
+            checkTemporalCredentials = sharedViewModel::checkTemporalCredentials,
+            cancelCreateAccount = sharedViewModel::cancelCreateAccount,
+            onSetTemporalEmail = sharedViewModel::setTemporalEmail
+        )
     }
 }
 

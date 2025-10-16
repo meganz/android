@@ -29,7 +29,7 @@ import mega.privacy.android.shared.resources.R as sharedResR
  * without creating its own NavHost. This can be used within other navigation graphs.
  */
 @Composable
-fun LoginGraphContent(
+fun LoginNavigationHandler(
     navigateToLoginScreen: () -> Unit,
     navigateToCreateAccountScreen: () -> Unit,
     navigateToTourScreen: () -> Unit,

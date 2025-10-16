@@ -22,17 +22,20 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.appstate.content.navigation.NavigationHandlerImpl
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
+import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailScreen
 import mega.privacy.android.app.presentation.login.confirmemail.changeemail.ChangeEmailAddressViewModel
 import mega.privacy.android.app.presentation.login.confirmemail.changeemail.changeEmailAddress
 import mega.privacy.android.app.presentation.login.confirmemail.confirmationEmailScreen
 import mega.privacy.android.app.presentation.login.confirmemail.openConfirmationEmailScreen
+import mega.privacy.android.app.presentation.login.createaccount.CreateAccountRoute
 import mega.privacy.android.app.presentation.login.createaccount.createAccountScreen
 import mega.privacy.android.app.presentation.login.createaccount.openCreateAccountScreen
 import mega.privacy.android.app.presentation.login.model.LoginScreen
+import mega.privacy.android.app.presentation.login.onboarding.TourScreen
 import mega.privacy.android.app.presentation.login.onboarding.openTourScreen
 import mega.privacy.android.app.presentation.login.onboarding.tourScreen
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
+import mega.privacy.android.navigation.contract.NavigationHandler
 
 @Serializable
 data class LoginGraph(
@@ -152,64 +155,72 @@ fun LoginNavDisplay(
         NavigationHandlerImpl(backStack)
     }
     val sharedViewModel = activityViewModel ?: hiltViewModel<LoginViewModel>()
-    val billingViewModel = hiltViewModel<BillingViewModel>()
-    NavDisplay(
-        backStack = backStack,
-        entryDecorators = listOf(
-            rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator()
-        ),
-        entryProvider = entryProvider {
 
-            loginStartScreen(
-                sharedViewModel = sharedViewModel,
-                navigationHandler = loginNavigationHandler,
-                stopShowingSplashScreen = stopShowingSplashScreen
+    LoginNavigationHandler(
+        navigateToLoginScreen = { loginNavigationHandler.navigate(Login) },
+        navigateToCreateAccountScreen = { loginNavigationHandler.navigate(CreateAccountRoute) },
+        navigateToTourScreen = {
+            loginNavigationHandler.navigateAndClearBackStack(TourScreen)
+        },
+        navigateToConfirmationEmailScreen = {
+            loginNavigationHandler.navigate(
+                ConfirmationEmailScreen
             )
-
-            loginScreen(
+        },
+        viewModel = sharedViewModel,
+        chatRequestHandler = chatRequestHandler,
+        onFinish = onFinish,
+        stopShowingSplashScreen = stopShowingSplashScreen,
+    ) {
+        NavDisplay(
+            backStack = backStack,
+            entryDecorators = listOf(
+                rememberSaveableStateHolderNavEntryDecorator(),
+                rememberViewModelStoreNavEntryDecorator()
+            ),
+            entryProvider = loginEntryProvider(
+                loginViewModel = sharedViewModel,
                 navigationHandler = loginNavigationHandler,
-                chatRequestHandler = chatRequestHandler,
-                onFinish = onFinish,
-                stopShowingSplashScreen = stopShowingSplashScreen,
-                sharedViewModel = sharedViewModel,
-                billingViewModel = billingViewModel
+                onFinish = onFinish
             )
+        )
+    }
 
-            createAccountScreen(
-                navigationHandler = loginNavigationHandler,
-                chatRequestHandler = chatRequestHandler,
-                onFinish = onFinish,
-                stopShowingSplashScreen = stopShowingSplashScreen,
-                sharedViewModel = sharedViewModel
-            )
+}
 
-            tourScreen(
-                navigationHandler = loginNavigationHandler,
-                chatRequestHandler = chatRequestHandler,
-                onFinish = onFinish,
-                stopShowingSplashScreen = stopShowingSplashScreen,
-                sharedViewModel = sharedViewModel,
-                onBackPressed = onFinish
-            )
+fun loginEntryProvider(
+    loginViewModel: LoginViewModel,
+    navigationHandler: NavigationHandler,
+    onFinish: () -> Unit,
+) = entryProvider {
 
-            confirmationEmailScreen(
-                navigationHandler = loginNavigationHandler,
-                chatRequestHandler = chatRequestHandler,
-                onFinish = onFinish,
-                stopShowingSplashScreen = stopShowingSplashScreen,
-                sharedViewModel = sharedViewModel
-            )
+    loginStartScreen()
 
-            changeEmailAddress(
-                navigationHandler = loginNavigationHandler,
-                chatRequestHandler = chatRequestHandler,
-                onFinish = onFinish,
-                stopShowingSplashScreen = stopShowingSplashScreen,
-                sharedViewModel = sharedViewModel,
-                onChangeEmailSuccess = { newEmail ->
-                    loginNavigationHandler.returnResult(ChangeEmailAddressViewModel.EMAIL, newEmail)
-                }
+    loginScreen(
+        sharedViewModel = loginViewModel,
+    )
+
+    createAccountScreen(
+        sharedViewModel = loginViewModel
+    )
+
+    tourScreen(
+        sharedViewModel = loginViewModel,
+        onBackPressed = onFinish
+    )
+
+    confirmationEmailScreen(
+        navigationHandler = navigationHandler,
+        onFinish = onFinish,
+        sharedViewModel = loginViewModel
+    )
+
+    changeEmailAddress(
+        navigationHandler = navigationHandler,
+        onChangeEmailSuccess = { newEmail ->
+            navigationHandler.returnResult(
+                key = ChangeEmailAddressViewModel.EMAIL,
+                value = newEmail
             )
         }
     )
