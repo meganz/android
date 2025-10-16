@@ -33,8 +33,10 @@ import mega.privacy.android.data.mapper.transfer.TransferMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapper
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.RequestEvent
+import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.times
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
@@ -1214,6 +1216,30 @@ class DefaultTransfersRepositoryTest {
             underTest.deleteAllActiveTransfersByType(transferType)
         }
 
+        @ParameterizedTest
+        @EnumSource(TransferType::class)
+        fun `test that updateTransferredBytes is not updated when updateTransferredBytes is called with transfers with less progress`(
+            transferType: TransferType,
+        ) = runTest {
+            testCurrentActiveTransferTotals(
+                transferType = transferType,
+                expectedMap = { transfer ->
+                    mapOf(transfer.uniqueId to transfer.transferredBytes)
+                },
+                callToTest = {
+                    val transferZero = mock<Transfer>()
+                    stubActiveTransfer(
+                        transferZero,
+                        transferType,
+                        transferredBytes = transfer.transferredBytes - 1
+                    )
+
+                    underTest.updateTransferredBytes(listOf(transfer))
+                    underTest.updateTransferredBytes(listOf(transferZero))
+                }
+            )
+        }
+
         /**
          * As getCurrentActiveTransferTotalsByType is based on a state flow, we need to reset this state to make testing stateless
          * This is a convenient function to test changes on this state and then reset it to its initial empty value.
@@ -1251,20 +1277,24 @@ class DefaultTransfersRepositoryTest {
                 anyOrNull()
             )
         }
+    }
 
-        private fun stubActiveTransfer(
-            transfer: Transfer,
-            transferType: TransferType,
-            transferredBytes: Long = 900L,
-        ) {
-            val total = 1024L
-            val tag = 1
+    private fun stubActiveTransfer(
+        transfer: Transfer = mock(),
+        transferType: TransferType = TransferType.DOWNLOAD,
+        transferredBytes: Long = 900L,
+        totalBytes: Long = 1000L,
+        uniqueId: Long = 5L,
+    ): Transfer {
+        val tag = 1
 
-            whenever(transfer.transferType).thenReturn(transferType)
-            whenever(transfer.transferredBytes).thenReturn(transferredBytes)
-            whenever(transfer.totalBytes).thenReturn(total)
-            whenever(transfer.tag).thenReturn(tag)
-        }
+        whenever(transfer.transferType).thenReturn(transferType)
+        whenever(transfer.transferredBytes).thenReturn(transferredBytes)
+        whenever(transfer.totalBytes).thenReturn(totalBytes)
+        whenever(transfer.tag).thenReturn(tag)
+        whenever(transfer.uniqueId).thenReturn(uniqueId)
+        whenever(transfer.progress).thenReturn(Progress(transferredBytes, totalBytes))
+        return transfer
     }
 
     @Nested
@@ -1462,6 +1492,54 @@ class DefaultTransfersRepositoryTest {
                 underTest.updateInProgressTransfers(listOf(transfer2), listOf(uniqueId1))
 
                 assertThat(awaitItem()).containsExactly(uniqueId2, inProgressTransfer2)
+            }
+        }
+
+    @Test
+    fun `test that in progress transfers progress is not updated when updateInProgressTransfer is called with transfers with less progress`() =
+        runTest {
+            val initialProgress = Progress(0.2f)
+            val regressedProgress = Progress(0.1f)
+            val totalBytes = 10_000L
+            val uniqueId = 6L
+            val transfer1 = stubActiveTransfer(
+                uniqueId = uniqueId,
+                transferredBytes = initialProgress * totalBytes,
+                totalBytes = totalBytes,
+            )
+
+            val transfer2 = stubActiveTransfer(
+                uniqueId = uniqueId,
+                transferredBytes = regressedProgress * totalBytes,
+                totalBytes = totalBytes,
+            )
+            whenever(transfer2.copy(transferredBytes = initialProgress * totalBytes)) doReturn transfer1
+
+            val inProgressTransfer1 = mock<InProgressTransfer.Download> {
+                on { it.uniqueId } doReturn uniqueId
+                on { it.progress } doReturn initialProgress
+                on { it.totalBytes } doReturn totalBytes
+            }
+
+            val inProgressTransfer2 = mock<InProgressTransfer.Download> {
+                on { it.uniqueId } doReturn uniqueId
+                on { it.progress } doReturn regressedProgress
+                on { it.totalBytes } doReturn totalBytes
+            }
+
+            whenever(inProgressTransferMapper(transfer1)).thenReturn(inProgressTransfer1)
+            whenever(inProgressTransferMapper(transfer2)).thenReturn(inProgressTransfer2)
+
+            setUp()
+            underTest.monitorInProgressTransfers().test {
+                assertThat(awaitItem()).isEmpty()
+
+                underTest.updateInProgressTransfers(listOf(transfer1))
+                underTest.updateInProgressTransfers(listOf(transfer2))
+                underTest.updateInProgressTransfers(listOf(transfer2), emptyList())
+
+                assertThat(awaitItem().values.single().progress).isEqualTo(initialProgress)
+                this.ensureAllEventsConsumed()
             }
         }
 

@@ -24,3 +24,25 @@ value class Progress(val floatValue: Float) {
      */
     val intValue get() = floatValue.times(100f).roundToInt()
 }
+
+/**
+ * Extension function to multiply a [Long] by a [Progress]
+ */
+operator fun Long.times(progress: Progress) =
+    (this * progress.floatValue.toDouble()).toLong()
+
+/**
+ * Extension function to multiply a [Progress] by a [Long]
+ */
+operator fun Progress.times(long: Long) =
+    (long * this.floatValue.toDouble()).toLong()
+
+/**
+ * Extension function to multiply a [Double] by a [Progress]
+ */
+operator fun Double.times(progress: Progress) = this * progress.floatValue.toDouble()
+
+/**
+ * Extension function to multiply a [Progress] by a [Double]
+ */
+operator fun Progress.times(double: Double) = double * this.floatValue.toDouble()

@@ -50,6 +50,7 @@ import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapp
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.times
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
@@ -79,6 +80,7 @@ import java.io.File
 import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.math.max
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -536,14 +538,49 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override suspend fun updateTransferredBytes(transfers: List<Transfer>) =
         withContext(ioDispatcher) {
-            val grouped = transfers.groupBy { it.transferType }
+            val grouped = transfers
+                .filterNot { it.transferredBytes == 0L }
+                .groupBy { it.transferType }
             grouped.forEach { (transferType, transfersOfThisType) ->
-                val tagToBytes =
-                    transfersOfThisType.mapNotNull { if (it.transferredBytes == 0L) null else it.uniqueId to it.transferredBytes }
                 transferredBytesFlow(transferType).update { map ->
-                    map + tagToBytes
+                    map.updateTransferredBytesKeepingConsistentProgress(transfersOfThisType)
                 }
             }
+        }
+
+    /**
+     * Updates this map with uniqueId keys with new and updated transfers while keeping consistent progress, that is, transfer progress not going backwards
+     * @param updatedTransfers new and updated transfers
+     * @param getMaxValue lambda to get a value with maximum transfer progress given the current value and the updated transfer
+     */
+    private fun <T> Map<Long, T>.updateTransfersKeepingConsistentProgress(
+        updatedTransfers: List<Transfer>,
+        getMaxValue: (T?, Transfer) -> T,
+    ): Map<Long, T> {
+        val updated: List<Pair<Long, T>> = updatedTransfers.map {
+            it.uniqueId to getMaxValue(this[it.uniqueId], it)
+        }
+        return this + updated
+    }
+
+    private fun Map<Long, Long>.updateTransferredBytesKeepingConsistentProgress(updatedTransfers: List<Transfer>) =
+        this.updateTransfersKeepingConsistentProgress(updatedTransfers) { previousBytes, newTransfer ->
+            max(previousBytes ?: 0L, newTransfer.transferredBytes)
+        }
+
+    private fun Map<Long, InProgressTransfer>.updateInProgressTransfersKeepingConsistentProgress(
+        updatedTransfers: List<Transfer>,
+    ) =
+        this.updateTransfersKeepingConsistentProgress(
+            updatedTransfers
+        ) { previousValue, newTransfer ->
+            inProgressTransferMapper(
+                if (previousValue == null || newTransfer.progress.floatValue > previousValue.progress.floatValue) {
+                    newTransfer
+                } else {
+                    newTransfer.copy(transferredBytes = newTransfer.totalBytes * previousValue.progress)
+                }
+            )
         }
 
     override suspend fun deleteAllActiveTransfersByType(transferType: TransferType) =
@@ -698,31 +735,22 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override suspend fun updateInProgressTransfers(transfers: List<Transfer>) {
         transfers
-            .map { inProgressTransferMapper(it) }
-            .associateBy { it.uniqueId }
             .takeIf { it.isNotEmpty() }?.let { newInProgressTransfers ->
                 inProgressTransfersFlow.update { inProgressTransfers ->
-                    inProgressTransfers.toMutableMap().also {
-                        it.putAll(newInProgressTransfers)
-                    }
+                    inProgressTransfers
+                        .updateInProgressTransfersKeepingConsistentProgress(newInProgressTransfers)
                 }
             }
     }
 
     override suspend fun updateInProgressTransfers(
         transfersToUpdate: List<Transfer>,
-        finishedUniqueIds: List<Long>
+        finishedUniqueIds: List<Long>,
     ) {
-        val newInProgressMapped = transfersToUpdate
-            .map { inProgressTransferMapper(it) }
-            .associateBy { it.uniqueId }
-
         inProgressTransfersFlow.update { current ->
-            current.toMutableMap().let { updated ->
+            current.toMutableMap().also { updated ->
                 finishedUniqueIds.forEach { updated.remove(it) }
-                updated.putAll(newInProgressMapped)
-                updated
-            }
+            }.updateInProgressTransfersKeepingConsistentProgress(transfersToUpdate)
         }
     }
 
