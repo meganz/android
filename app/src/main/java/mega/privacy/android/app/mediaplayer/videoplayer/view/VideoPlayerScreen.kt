@@ -202,7 +202,7 @@ internal fun VideoPlayerScreen(
         videoPlayerController?.updateSubtitleButtonUI(uiState.subtitleSelectedStatus)
     }
 
-    LaunchedEffect(uiState.metadata) {
+    LaunchedEffect(uiState.metadata, orientation) {
         videoPlayerController?.displayMetadata(uiState.metadata)
     }
 
@@ -394,9 +394,6 @@ internal fun VideoPlayerScreen(
 
                     root.findViewById<ProgressBar>(R.id.loading_video_player_controller_view).isVisible =
                         playbackState <= STATE_BUFFERING
-
-                    root.findViewById<View>(R.id.track_name).isVisible =
-                        orientation == ORIENTATION_PORTRAIT
                 }
 
                 if (isControllerViewVisible && !uiState.isLocked) {
