@@ -11,10 +11,42 @@ interface MainNavItem {
     val screen: EntryProviderScope<NavKey>.(navigationHandler: NavigationHandler, navigationUiController: NavigationUiController, transferHandler: TransferHandler) -> Unit
     val icon: ImageVector
     val selectedIcon: ImageVector?
-    val badge: Flow<String?>?
+    val badge: Flow<MainNavItemBadge?>?
     val label: Int
     val preferredSlot: PreferredSlot
     val availableOffline: Boolean
     val analyticsEventIdentifier: NavigationEventIdentifier
+}
+
+sealed interface MainNavItemBadge {
+    val count: Int
+    val priority: Int? get() = null
+
+    interface NumberBadge : MainNavItemBadge {
+        val number: Int
+    }
+
+    interface TextBadge : MainNavItemBadge {
+        val text: String
+    }
+
+    interface IconBadge : MainNavItemBadge {
+        val icon: ImageVector
+    }
+}
+
+data class DefaultNumberBadge(override val number: Int) : MainNavItemBadge.NumberBadge {
+    override val count = number
+}
+
+data class DefaultTextBadge(override val text: String) : MainNavItemBadge.TextBadge {
+    override val count = 1
+}
+
+data class DefaultIconBadge(
+    override val icon: ImageVector,
+    override val priority: Int = 1,
+) : MainNavItemBadge.IconBadge {
+    override val count = 1
 }
 

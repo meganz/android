@@ -231,6 +231,8 @@ interface IconPackInterface {
                 val Home: ImageVector
                 val Image01: ImageVector
                 val Link01: ImageVector
+                val Menu01: ImageVector
+                val Phone01: ImageVector
                 val PlayCircle: ImageVector
             }
         }

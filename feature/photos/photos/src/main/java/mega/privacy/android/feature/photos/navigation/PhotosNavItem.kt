@@ -8,6 +8,7 @@ import mega.privacy.android.feature.photos.presentation.home.PhotosNavKey
 import mega.privacy.android.feature.photos.presentation.home.photosScreen
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.navigation.contract.MainNavItemBadge
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.android.navigation.contract.PreferredSlot
@@ -27,7 +28,7 @@ class PhotosNavItem : MainNavItem {
         }
     override val icon: ImageVector = IconPack.Medium.Thin.Outline.Image01
     override val selectedIcon: ImageVector = IconPack.Medium.Thin.Solid.Image01
-    override val badge: Flow<String?>? = null
+    override val badge: Flow<MainNavItemBadge?>? = null
     override val label: Int = sharedR.string.general_section_photos
     override val preferredSlot: PreferredSlot = PreferredSlot.Ordered(2)
     override val availableOffline: Boolean = true

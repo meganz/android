@@ -60,6 +60,7 @@ import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.NotificationsNavKey
 import mega.privacy.android.navigation.destination.TestPasswordNavKey
 import mega.privacy.android.shared.original.core.ui.utils.composeLet
+import mega.privacy.mobile.navigation.snowflake.NavigationBadge
 
 @Composable
 fun MenuHomeScreen(
@@ -253,7 +254,11 @@ private fun AccountItem(
         enableClick = hasActionLabel.not(),
         onClickListener = onNavigate,
         titleTrailingElement = badge?.composeLet { count ->
-            NotificationBadge(count, Modifier.testTag(BADGE))
+            NavigationBadge(
+                navigationBadge = count,
+                small = false,
+                modifier = Modifier.testTag(BADGE)
+            )
         },
     )
 }

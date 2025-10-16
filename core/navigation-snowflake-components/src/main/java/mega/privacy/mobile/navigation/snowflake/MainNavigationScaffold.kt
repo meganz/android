@@ -3,15 +3,19 @@ package mega.privacy.mobile.navigation.snowflake
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuite
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -27,12 +31,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastFirst
 import androidx.navigation3.runtime.NavKey
 import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.toImmutableSet
+import mega.android.core.ui.extensions.composeLet
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.navigation.contract.DefaultIconBadge
+import mega.privacy.android.navigation.contract.DefaultNumberBadge
+import mega.privacy.android.navigation.contract.MainNavItemBadge
 import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.android.navigation.contract.PreferredSlot
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.navigation.snowflake.item.MainNavigationIcon
-import mega.privacy.mobile.navigation.snowflake.item.MainNavigationItemBadge
 import mega.privacy.mobile.navigation.snowflake.model.NavigationAnimationConfig
 import mega.privacy.mobile.navigation.snowflake.model.NavigationItem
 
@@ -44,8 +56,6 @@ val DefaultNavigationAnimationConfig = NavigationAnimationConfig(
     easing = FastOutSlowInEasing,
 )
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainNavigationScaffold(
     modifier: Modifier = Modifier,
@@ -59,9 +69,6 @@ fun MainNavigationScaffold(
             label = label,
             modifier = modifier
         )
-    },
-    mainNavItemBadge: @Composable (String) -> Unit = { text ->
-        MainNavigationItemBadge(text)
     },
     navContent: @Composable (NavigationUiController) -> Unit,
     availableSlots: Int = 5,
@@ -85,7 +92,6 @@ fun MainNavigationScaffold(
                 navSuiteType = navSuiteType,
                 orderedItems = orderedItems,
                 mainNavItemIcon = mainNavItemIcon,
-                mainNavItemBadge = mainNavItemBadge,
                 isSelected = isSelected,
                 onDestinationClick = onDestinationClick,
             )
@@ -104,7 +110,6 @@ private fun MegaNavigationSuite(
     navSuiteType: NavigationSuiteType,
     orderedItems: List<NavigationItem>,
     mainNavItemIcon: @Composable ((ImageVector, String, Modifier) -> Unit),
-    mainNavItemBadge: @Composable ((String) -> Unit),
     isSelected: (NavKey) -> Boolean,
     onDestinationClick: (NavKey) -> Unit,
 ) {
@@ -140,18 +145,25 @@ private fun MegaNavigationSuite(
                     mainNavItemIcon(
                         navItem.getIcon(selected),
                         stringResource(navItem.label),
-                        Modifier.testTag(navItem.testTag),
+                        Modifier
+                            .size(24.dp)
+                            .testTag(navItem.testTag),
                     )
                 },
-                badge = {
-                    navItem.badgeText?.let { text ->
-                        mainNavItemBadge(text)
-                    }
+                badge = navItem.badge?.composeLet { badge ->
+                    NavigationBadge(
+                        navigationBadge = badge,
+                        small = true,
+                        modifier = when (badge) {
+                            is MainNavItemBadge.IconBadge -> Modifier.offset(18.dp, (-6).dp)
+                            else -> Modifier.offset(12.dp)
+                        }.testTag("${navItem.testTag}:badge")
+                    )
                 },
                 label = { Text(text = stringResource(navItem.label)) },
                 selected = selected,
                 onClick = {
-                    Analytics.tracker.trackEvent(navItem.analyticsEventIdentifier)
+                    navItem.analyticsEventIdentifier?.let { Analytics.tracker.trackEvent(it) }
                     onDestinationClick(navItem.destination)
                 },
                 colors = itemColors,
@@ -274,3 +286,51 @@ private const val ContentLayoutIdTag = "content"
 
 internal val WindowAdaptiveInfoDefault
     @Composable get() = currentWindowAdaptiveInfo()
+
+
+@CombinedThemePreviews
+@Composable
+private fun MainNavigationScaffoldPreview(modifier: Modifier = Modifier) {
+    AndroidThemeForPreviews {
+        var selectedIndex by remember { mutableIntStateOf(0) }
+        val lastBadge by remember {
+            derivedStateOf {
+                when (selectedIndex) {
+                    0, 3 -> DefaultIconBadge(IconPack.Medium.Thin.Solid.Phone01)
+                    1 -> DefaultNumberBadge(1)
+                    else -> null
+                }
+            }
+        }
+
+        MainNavigationScaffold(
+            modifier = modifier,
+            mainNavItems = listOf(
+                IconPack.Medium.Thin.Outline.Home to IconPack.Medium.Thin.Solid.Home,
+                IconPack.Medium.Thin.Outline.Folder to IconPack.Medium.Thin.Solid.Folder,
+                IconPack.Medium.Thin.Outline.Image01 to IconPack.Medium.Thin.Solid.Image01,
+                IconPack.Medium.Thin.Outline.Menu01 to IconPack.Medium.Thin.Solid.Menu01,
+            ).mapIndexed { index, icons ->
+                NavigationItem(
+                    destination = NavKeyForPreview(index),
+                    icon = icons.first,
+                    selectedIcon = icons.second,
+                    label = sharedR.string.general_menu,
+                    preferredSlot = PreferredSlot.Ordered(index),
+                    analyticsEventIdentifier = null,
+                    isEnabled = true,
+                    badge = when (index) {
+                        2 -> DefaultNumberBadge(1)
+                        3 -> lastBadge
+                        else -> null
+                    }
+                )
+            }.toImmutableSet(),
+            onDestinationClick = { selectedIndex = (it as? NavKeyForPreview)?.index ?: 1 },
+            isSelected = { selectedIndex == (it as? NavKeyForPreview)?.index },
+            navContent = {}
+        )
+    }
+}
+
+private data class NavKeyForPreview(val index: Int) : NavKey

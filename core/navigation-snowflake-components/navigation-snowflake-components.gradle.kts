@@ -12,6 +12,8 @@ android {
 dependencies {
     implementation(project(":core:navigation-contract"))
     implementation(project(":core:analytics:analytics-tracker"))
+    implementation(project(":icon-pack"))
+    implementation(project(":shared:resources"))
     implementation(platform(androidx.compose.bom))
     implementation(androidx.navigation.compose)
     implementation(androidx.navigation3.runtime)

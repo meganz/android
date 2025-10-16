@@ -32,7 +32,6 @@ import mega.privacy.android.app.presentation.login.view.MEGA_LOGO_TEST_TAG
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
-import mega.privacy.mobile.navigation.snowflake.IndicatorDot
 import mega.privacy.mobile.navigation.snowflake.MainNavigationScaffold
 import timber.log.Timber
 
@@ -92,11 +91,10 @@ fun MainNavigationScaffold(
                     },
                     isSelected = { destination ->
                         currentDestination == destination
-                    },
-                    mainNavItemBadge = { IndicatorDot() },
-                    navContent = { navigationUiController ->
-                        PsaContainer {
-                            NavDisplay(
+                        },
+                        navContent = { navigationUiController ->
+                            PsaContainer {
+                                NavDisplay(
                                 modifier = Modifier.fillMaxSize(),
                                 backStack = backStack,
                                 onBack = { backStack.removeLastOrNull() },

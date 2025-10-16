@@ -30,6 +30,8 @@ import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.Serializable
 import mega.privacy.android.analytics.test.AnalyticsTestRule
+import mega.privacy.android.navigation.contract.DefaultNumberBadge
+import mega.privacy.android.navigation.contract.MainNavItemBadge
 import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 import mega.privacy.mobile.navigation.snowflake.model.NavigationItem
@@ -146,6 +148,12 @@ class MainNavigationScaffoldTest {
         // Verify the item with badge is displayed
         composeTestRule.onNodeWithText(context.getString(android.R.string.cancel))
             .assertIsDisplayed()
+
+        // Verify the badge is displayed
+        navItemsWithBadge.filter { it.badge != null }.forEach { navItem ->
+            composeTestRule.onNodeWithTag("${navItem.testTag}:badge", useUnmergedTree = true)
+                .assertIsDisplayed()
+        }
     }
 
     @Test
@@ -394,7 +402,7 @@ class MainNavigationScaffoldTest {
             label = android.R.string.cancel,
             icon = Icons.Default.Settings,
             preferredSlot = PreferredSlot.Ordered(2),
-            badgeText = "5"
+            badge = DefaultNumberBadge(5)
         ),
         createMockNavItem(
             label = android.R.string.copy,
@@ -409,7 +417,7 @@ class MainNavigationScaffoldTest {
         preferredSlot: PreferredSlot,
         selectedIcon: ImageVector? = null,
         enabled: Boolean = true,
-        badgeText: String? = null,
+        badge: MainNavItemBadge? = null,
         navigationEventIdentifier: NavigationEventIdentifier = mock<NavigationEventIdentifier>(),
     ): NavigationItem {
         return NavigationItem(
@@ -418,7 +426,7 @@ class MainNavigationScaffoldTest {
             selectedIcon = selectedIcon,
             label = label,
             isEnabled = enabled,
-            badgeText = badgeText,
+            badge = badge,
             analyticsEventIdentifier = navigationEventIdentifier,
             preferredSlot = preferredSlot,
         )

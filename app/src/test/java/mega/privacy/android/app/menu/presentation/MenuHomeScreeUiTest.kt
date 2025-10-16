@@ -28,6 +28,8 @@ import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.NOTIF
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.PRIVACY_SUITE_HEADER
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.PRIVACY_SUITE_ITEM
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.TOOLBAR
+import mega.privacy.android.navigation.contract.DefaultNumberBadge
+import mega.privacy.android.navigation.contract.MainNavItemBadge
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import org.junit.Rule
 import org.junit.Test
@@ -46,7 +48,7 @@ class MenuHomeScreeUiTest {
     @Parcelize
     object TestDestination : Parcelable, NavKey
 
-    val badgeFlow = MutableStateFlow<Int?>(null)
+    val badgeFlow = MutableStateFlow<MainNavItemBadge?>(null)
 
     val myAccountItems = mapOf(
         1 to NavDrawerItem.Account(
@@ -276,7 +278,7 @@ class MenuHomeScreeUiTest {
     fun `test that badge is updated when flow is updated`() {
         setupRule()
         composeRule.onNodeWithTag(BADGE, useUnmergedTree = true).assertDoesNotExist()
-        badgeFlow.value = 1
+        badgeFlow.value = DefaultNumberBadge(1)
         composeRule.onNodeWithTag(BADGE, useUnmergedTree = true).assertTextEquals("1")
     }
-} 
+}

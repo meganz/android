@@ -1,10 +1,13 @@
 package mega.privacy.android.app.menu.navigation
 
 import androidx.navigation3.runtime.NavKey
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorOngoingCallUseCase
 import mega.privacy.android.feature.payment.UpgradeAccountNavKey
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.navigation.contract.DefaultIconBadge
+import mega.privacy.android.navigation.contract.DefaultNumberBadge
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import mega.privacy.android.navigation.destination.AchievementNavKey
 import mega.privacy.android.navigation.destination.ChatsNavKey
@@ -49,12 +52,24 @@ object SharedItemsItem : NavDrawerItem.Account(
     title = sharedR.string.video_section_videos_location_option_shared_items
 )
 
-class ChatItem(getNumUnreadChatsUseCase: GetNumUnreadChatsUseCase) : NavDrawerItem.Account(
+class ChatItem(
+    getNumUnreadChatsUseCase: GetNumUnreadChatsUseCase,
+    monitorOngoingCallUseCase: MonitorOngoingCallUseCase,
+) : NavDrawerItem.Account(
     destination = ChatsNavKey,
     icon = IconPack.Medium.Thin.Outline.MessageChatCircle,
     title = sharedR.string.general_chat,
-    badge = getNumUnreadChatsUseCase().map { count ->
-        count.takeIf { it > 0 }
+    badge = combine(
+        monitorOngoingCallUseCase(),
+        getNumUnreadChatsUseCase()
+    ) { ongoingCall, unreadChats ->
+        if (ongoingCall != null) {
+            DefaultIconBadge(IconPack.Medium.Thin.Solid.Phone01)
+        } else if (unreadChats > 0) {
+            DefaultNumberBadge(unreadChats)
+        } else {
+            null
+        }
     }
 )
 

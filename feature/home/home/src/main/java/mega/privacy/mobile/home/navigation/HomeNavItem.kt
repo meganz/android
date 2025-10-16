@@ -6,6 +6,7 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.navigation.contract.MainNavItemBadge
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.android.navigation.contract.PreferredSlot
@@ -27,7 +28,7 @@ class HomeNavItem : MainNavItem {
         }
     override val icon: ImageVector = IconPack.Medium.Thin.Outline.Home
     override val selectedIcon: ImageVector = IconPack.Medium.Thin.Solid.Home
-    override val badge: Flow<String?>? = null
+    override val badge: Flow<MainNavItemBadge?>? = null
     override val label: Int = sharedR.string.general_section_home
     override val preferredSlot: PreferredSlot = PreferredSlot.Ordered(0)
     override val availableOffline: Boolean = true

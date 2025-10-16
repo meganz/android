@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.feature.clouddrive.presentation.drivesync.DriveSync
 import mega.privacy.android.feature.clouddrive.presentation.drivesync.driveSyncScreen
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.navigation.contract.MainNavItemBadge
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.NavigationUiController
@@ -40,7 +41,7 @@ class DriveSyncNavItem : MainNavItem {
 
     override val icon: ImageVector = IconPack.Medium.Thin.Outline.Folder
     override val selectedIcon: ImageVector? = IconPack.Medium.Thin.Solid.Folder
-    override val badge: Flow<String?>? = null
+    override val badge: Flow<MainNavItemBadge?>? = null
 
     @StringRes
     override val label: Int = sharedR.string.general_section_cloud_drive

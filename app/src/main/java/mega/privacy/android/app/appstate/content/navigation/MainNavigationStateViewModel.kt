@@ -25,6 +25,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUse
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.preference.MonitorStartScreenPreferenceDestinationUseCase
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.navigation.contract.MainNavItemBadge
 import mega.privacy.android.navigation.contract.qualifier.DefaultStartScreen
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import mega.privacy.mobile.navigation.snowflake.model.NavigationItem
@@ -78,13 +79,13 @@ class MainNavigationStateViewModel @Inject constructor(
             this.map { mainNavItemsSet ->
                 mainNavItemsSet.map { (it.badge ?: flowOf(null)) to it }
             }
-        ) { connected: Boolean, badgeFlowPair: List<Pair<Flow<String?>, MainNavItem>> ->
+        ) { connected: Boolean, badgeFlowPair: List<Pair<Flow<MainNavItemBadge?>, MainNavItem>> ->
             badgeFlowPair.map { (badgeFlow, mainNavItem) ->
-                badgeFlow.map { badgeText ->
+                badgeFlow.map { badge ->
                     mapToNavigationItem(
                         mainNavItem = mainNavItem,
                         connected = connected,
-                        badgeText = badgeText
+                        badge = badge
                     )
                 }
             }
@@ -96,7 +97,7 @@ class MainNavigationStateViewModel @Inject constructor(
     private fun mapToNavigationItem(
         mainNavItem: MainNavItem,
         connected: Boolean,
-        badgeText: String?,
+        badge: MainNavItemBadge?,
     ): NavigationItem = NavigationItem(
         destination = mainNavItem.destination,
         icon = mainNavItem.icon,
@@ -105,7 +106,7 @@ class MainNavigationStateViewModel @Inject constructor(
         preferredSlot = mainNavItem.preferredSlot,
         analyticsEventIdentifier = mainNavItem.analyticsEventIdentifier,
         isEnabled = connected || mainNavItem.availableOffline,
-        badgeText = badgeText
+        badge = badge
     )
 
     private fun getConnectivityStateOrDefault(): Flow<Boolean> = monitorConnectivityUseCase()
