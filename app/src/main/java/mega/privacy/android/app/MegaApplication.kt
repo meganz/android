@@ -230,9 +230,9 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     private val meetingListener = MeetingListener()
     private val soundsController = CallSoundsController()
 
-    private fun handleUncaughtException(throwable: Throwable?) {
+    private fun handleUncaughtException(throwable: Throwable) {
         Timber.e(throwable, "UNCAUGHT EXCEPTION")
-        crashReporter.report(throwable ?: return)
+        crashReporter.report(throwable)
     }
 
     /**
@@ -254,8 +254,10 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
 
         // Setup handler and RxJava for uncaught exceptions.
         if (!BuildConfig.DEBUG) {
-            Thread.setDefaultUncaughtExceptionHandler { _: Thread?, e: Throwable? ->
-                handleUncaughtException(e)
+            val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
+            Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+                handleUncaughtException(throwable)
+                defaultHandler?.uncaughtException(thread, throwable)
             }
         } else {
             Firebase.crashlytics.setCrashlyticsCollectionEnabled(false)
