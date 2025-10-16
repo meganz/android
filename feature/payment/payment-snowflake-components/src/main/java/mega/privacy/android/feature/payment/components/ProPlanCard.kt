@@ -52,7 +52,7 @@ fun ProPlanCard(
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(horizontal = 16.dp)
-            .clickable(onClick = onSelected)
+            .clickable(enabled = !isCurrentPlan, onClick = onSelected)
             .fillMaxWidth()
             .testTag(TEST_TAG_PRO_PLAN_CARD),
     ) {
@@ -96,14 +96,16 @@ fun ProPlanCard(
                 )
             }
             Spacer(Modifier.weight(1f))
-            MegaRadioButton(
-                selected = isSelected,
-                onOptionSelected = { onSelected() },
-                modifier = Modifier
-                    .size(20.dp)
-                    .testTag(TEST_TAG_PRO_PLAN_CARD_RADIO),
-                identifier = planName
-            )
+            if (!isCurrentPlan) {
+                MegaRadioButton(
+                    selected = isSelected,
+                    onOptionSelected = { onSelected() },
+                    modifier = Modifier
+                        .size(20.dp)
+                        .testTag(TEST_TAG_PRO_PLAN_CARD_RADIO),
+                    identifier = planName
+                )
+            }
         }
         Row(
             modifier = Modifier
