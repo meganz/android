@@ -118,7 +118,12 @@ class IncomingSharesViewModelTest {
             )
         ).thenReturn(nodeUiItems)
         whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
-        whenever(monitorNodeUpdatesByIdUseCase(NodeId(-1L))).thenReturn(flowOf())
+        whenever(
+            monitorNodeUpdatesByIdUseCase(
+                NodeId(-1L),
+                NodeSourceType.INCOMING_SHARES
+            )
+        ).thenReturn(flowOf())
     }
 
     @Test
@@ -143,7 +148,12 @@ class IncomingSharesViewModelTest {
     fun `test that monitorNodeUpdates triggers navigateBack when NodeChanges_Remove is received`() =
         runTest {
             setupTestData(emptyList())
-            whenever(monitorNodeUpdatesByIdUseCase(NodeId(-1L))).thenReturn(flowOf(NodeChanges.Remove))
+            whenever(
+                monitorNodeUpdatesByIdUseCase(
+                    NodeId(-1L),
+                    NodeSourceType.INCOMING_SHARES
+                )
+            ).thenReturn(flowOf(NodeChanges.Remove))
 
             val underTest = createViewModel()
             advanceUntilIdle()
@@ -157,7 +167,12 @@ class IncomingSharesViewModelTest {
     @Test
     fun `test that NavigateBackEventConsumed action consumes the navigate back event`() = runTest {
         setupTestData(emptyList())
-        whenever(monitorNodeUpdatesByIdUseCase(NodeId(-1L))).thenReturn(flowOf(NodeChanges.Remove))
+        whenever(
+            monitorNodeUpdatesByIdUseCase(
+                NodeId(-1L),
+                NodeSourceType.INCOMING_SHARES
+            )
+        ).thenReturn(flowOf(NodeChanges.Remove))
 
         val underTest = createViewModel()
 

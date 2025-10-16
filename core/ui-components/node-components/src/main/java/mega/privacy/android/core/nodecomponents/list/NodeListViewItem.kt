@@ -332,6 +332,7 @@ fun NodeListViewItem(
                     modifier = Modifier
                         .size(24.dp)
                         .testTag(PERMISSION_ICON_TAG),
+                    tint = IconColor.Secondary,
                     painter = painterResource(id = accessPermissionIcon),
                     contentDescription = "Access permission",
                 )

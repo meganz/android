@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
@@ -240,4 +241,178 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             cancelAndConsumeRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that invoke returns NodeChanges_Remove when folder is moved to rubbish bin`() =
+        runTest {
+            val nodeId = NodeId(1L)
+            val folderNode = mock<FolderNode> {
+                on { id } doReturn nodeId
+                on { parentId } doReturn NodeId(0L)
+                on { isInRubbishBin } doReturn true
+            }
+
+            val nodeUpdateFlow = flow {
+                emit(
+                    NodeUpdate(
+                        mapOf(folderNode to listOf(NodeChanges.Attributes))
+                    )
+                )
+            }
+
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+
+            underTest(nodeId).test {
+                assertThat(awaitItem()).isEqualTo(NodeChanges.Remove)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that invoke returns NodeChanges_Remove when folder is removed from incoming shares`() =
+        runTest {
+            val nodeId = NodeId(1L)
+            val folderNode = mock<FolderNode> {
+                on { id } doReturn nodeId
+                on { parentId } doReturn NodeId(0L)
+                on { isInRubbishBin } doReturn false
+                on { isIncomingShare } doReturn false
+            }
+
+            val nodeUpdateFlow = flow {
+                emit(
+                    NodeUpdate(
+                        mapOf(folderNode to listOf(NodeChanges.Attributes))
+                    )
+                )
+            }
+
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+
+            underTest(nodeId, NodeSourceType.INCOMING_SHARES).test {
+                assertThat(awaitItem()).isEqualTo(NodeChanges.Remove)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that invoke returns NodeChanges_Attributes when folder is still in incoming shares`() =
+        runTest {
+            val nodeId = NodeId(1L)
+            val folderNode = mock<FolderNode> {
+                on { id } doReturn nodeId
+                on { parentId } doReturn NodeId(0L)
+                on { isInRubbishBin } doReturn false
+                on { isIncomingShare } doReturn true
+            }
+
+            val nodeUpdateFlow = flow {
+                emit(
+                    NodeUpdate(
+                        mapOf(folderNode to listOf(NodeChanges.Attributes))
+                    )
+                )
+            }
+
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf(Unit))
+
+            underTest(nodeId, NodeSourceType.INCOMING_SHARES).test {
+                assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that invoke returns NodeChanges_Attributes when isIncomingShare is false but source type is not INCOMING_SHARES`() =
+        runTest {
+            val nodeId = NodeId(1L)
+            val folderNode = mock<FolderNode> {
+                on { id } doReturn nodeId
+                on { parentId } doReturn NodeId(0L)
+                on { isInRubbishBin } doReturn false
+                on { isIncomingShare } doReturn false
+            }
+
+            val nodeUpdateFlow = flow {
+                emit(
+                    NodeUpdate(
+                        mapOf(folderNode to listOf(NodeChanges.Attributes))
+                    )
+                )
+            }
+
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf(Unit))
+
+            underTest(nodeId, NodeSourceType.CLOUD_DRIVE).test {
+                assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that invoke returns NodeChanges_Remove when folder in incoming shares is moved to rubbish bin`() =
+        runTest {
+            val nodeId = NodeId(1L)
+            val folderNode = mock<FolderNode> {
+                on { id } doReturn nodeId
+                on { parentId } doReturn NodeId(0L)
+                on { isInRubbishBin } doReturn true
+                on { isIncomingShare } doReturn true
+            }
+
+            val nodeUpdateFlow = flow {
+                emit(
+                    NodeUpdate(
+                        mapOf(folderNode to listOf(NodeChanges.Attributes))
+                    )
+                )
+            }
+
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+
+            underTest(nodeId, NodeSourceType.INCOMING_SHARES).test {
+                assertThat(awaitItem()).isEqualTo(NodeChanges.Remove)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that invoke only triggers removal for folder itself not children`() =
+        runTest {
+            val parentNodeId = NodeId(1L)
+            val childNodeId = NodeId(2L)
+            val childFolderNode = mock<FolderNode> {
+                on { id } doReturn childNodeId
+                on { parentId } doReturn parentNodeId
+                on { isInRubbishBin } doReturn false
+                on { isIncomingShare } doReturn false
+            }
+
+            val nodeUpdateFlow = flow {
+                emit(
+                    NodeUpdate(
+                        mapOf(childFolderNode to listOf(NodeChanges.Attributes))
+                    )
+                )
+            }
+
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf(Unit))
+
+            underTest(parentNodeId, NodeSourceType.INCOMING_SHARES).test {
+                assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
 }

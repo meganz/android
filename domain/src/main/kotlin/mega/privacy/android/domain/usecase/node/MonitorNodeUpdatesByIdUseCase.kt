@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.usecase.node
 
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.emitAll
@@ -13,7 +12,7 @@ import kotlinx.coroutines.flow.merge
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
@@ -33,14 +32,21 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
      * Invoke
      *
      * @param nodeId the id of the node to monitor updates for
+     * @param nodeSourceType the source type of the node
      * @return a flow of NodeChanges
      */
     @OptIn(FlowPreview::class)
-    operator fun invoke(nodeId: NodeId) = flow {
-        val effectiveNodeId = resolveEffectiveNodeId(nodeId)
+    operator fun invoke(
+        nodeId: NodeId,
+        nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
+    ) = flow {
+        val effectiveNodeId = resolveEffectiveNodeId(nodeId, nodeSourceType)
         emitAll(
             merge(
-                monitorOnlineNodeUpdates(effectiveNodeId),
+                monitorOnlineNodeUpdates(
+                    effectiveNodeId = effectiveNodeId,
+                    nodeSourceType = nodeSourceType
+                ),
                 monitorOfflineNodeUpdates(effectiveNodeId),
                 monitorRefreshSessionUpdates()
             ).conflate().debounce(500L)
@@ -48,41 +54,46 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
     }
 
     /**
-     * Use root node if the provided nodeId is -1, otherwise return the provided nodeId.
+     * Fetch cloud drive root node id if the provided node id is -1L and the source type is cloud drive
      */
-    private suspend fun resolveEffectiveNodeId(nodeId: NodeId): NodeId {
-        return if (nodeId.longValue == -1L) {
-            getRootNodeUseCase()?.id ?: nodeId
-        } else {
-            nodeId
+    private suspend fun resolveEffectiveNodeId(
+        nodeId: NodeId,
+        nodeSourceType: NodeSourceType,
+    ) = if (nodeId.longValue == -1L && nodeSourceType == NodeSourceType.CLOUD_DRIVE) {
+        getRootNodeUseCase()?.id ?: nodeId
+    } else {
+        nodeId
+    }
+
+    private fun monitorOnlineNodeUpdates(
+        effectiveNodeId: NodeId,
+        nodeSourceType: NodeSourceType,
+    ) = nodeRepository.monitorNodeUpdates()
+        .filter {
+            it.changes.keys.any { node ->
+                node.parentId == effectiveNodeId || node.id == effectiveNodeId
+            }
         }
-    }
+        .map {
+            val isNodeRemoved = it.changes.keys.any { node ->
+                // Folder moved to rubbish bin or removed from incoming shares
+                node is FolderNode
+                        && node.id == effectiveNodeId
+                        && (node.isInRubbishBin || (nodeSourceType == NodeSourceType.INCOMING_SHARES && !node.isIncomingShare))
+            }
+            if (isNodeRemoved) NodeChanges.Remove else NodeChanges.Attributes
+        }
 
-    private fun monitorOnlineNodeUpdates(effectiveNodeId: NodeId): Flow<NodeChanges> {
-        return nodeRepository.monitorNodeUpdates()
-            .filter {
-                it.changes.keys.any { node ->
-                    node.parentId == effectiveNodeId || node.id == effectiveNodeId
-                }
+    private fun monitorOfflineNodeUpdates(
+        effectiveNodeId: NodeId,
+    ) = monitorOfflineNodeUpdatesUseCase()
+        .mapNotNull { offlineList ->
+            val relevantOfflineNodes = offlineList.filter { offline ->
+                offline.parentId.toLong() == effectiveNodeId.longValue ||
+                        offline.handle.toLong() == effectiveNodeId.longValue
             }
-            .map {
-                val isNodeInRubbishBin = it.changes.keys.any { node ->
-                    node is FolderNode && node.id == effectiveNodeId && node.isInRubbishBin
-                }
-                if (isNodeInRubbishBin) NodeChanges.Remove else NodeChanges.Attributes
-            }
-    }
-
-    private fun monitorOfflineNodeUpdates(effectiveNodeId: NodeId): Flow<NodeChanges> {
-        return monitorOfflineNodeUpdatesUseCase()
-            .mapNotNull { offlineList ->
-                val relevantOfflineNodes = offlineList.filter { offline ->
-                    offline.parentId.toLong() == effectiveNodeId.longValue ||
-                            offline.handle.toLong() == effectiveNodeId.longValue
-                }
-                if (relevantOfflineNodes.isNotEmpty()) NodeChanges.Attributes else null
-            }
-    }
+            if (relevantOfflineNodes.isNotEmpty()) NodeChanges.Attributes else null
+        }
 
     private fun monitorRefreshSessionUpdates() = monitorRefreshSessionUseCase().map {
         NodeChanges.Attributes

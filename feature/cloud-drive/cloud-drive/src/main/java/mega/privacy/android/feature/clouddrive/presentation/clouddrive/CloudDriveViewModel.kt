@@ -238,7 +238,10 @@ class CloudDriveViewModel @AssistedInject constructor(
 
     private fun monitorNodeUpdates() {
         viewModelScope.launch {
-            monitorNodeUpdatesByIdUseCase(NodeId(navKey.nodeHandle)).collectLatest { change ->
+            monitorNodeUpdatesByIdUseCase(
+                nodeId = NodeId(navKey.nodeHandle),
+                nodeSourceType = nodeSourceType
+            ).collectLatest { change ->
                 if (change == NodeChanges.Remove) {
                     // If current folder is moved to rubbish bin, navigate back
                     _uiState.update {

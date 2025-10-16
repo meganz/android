@@ -190,7 +190,12 @@ class CloudDriveViewModelTest {
         whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
-        whenever(monitorNodeUpdatesByIdUseCase(folderNodeId)).thenReturn(flowOf())
+        whenever(
+            monitorNodeUpdatesByIdUseCase(
+                folderNodeId,
+                NodeSourceType.CLOUD_DRIVE
+            )
+        ).thenReturn(flowOf())
         whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
 
         // Setup storage monitoring mocks
@@ -1477,7 +1482,7 @@ class CloudDriveViewModelTest {
         )
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
-        whenever(monitorNodeUpdatesByIdUseCase(any())).thenReturn(flowOf())
+        whenever(monitorNodeUpdatesByIdUseCase(any(), any())).thenReturn(flowOf())
 
         createViewModel(-1L)
         advanceUntilIdle()
@@ -1499,7 +1504,7 @@ class CloudDriveViewModelTest {
         )
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
-        whenever(monitorNodeUpdatesByIdUseCase(any())).thenReturn(flowOf())
+        whenever(monitorNodeUpdatesByIdUseCase(any(), any())).thenReturn(flowOf())
 
         createViewModel(-1L)
         advanceUntilIdle()
@@ -1523,7 +1528,7 @@ class CloudDriveViewModelTest {
         )
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
-        whenever(monitorNodeUpdatesByIdUseCase(any())).thenReturn(flowOf())
+        whenever(monitorNodeUpdatesByIdUseCase(any(), any())).thenReturn(flowOf())
 
         val underTest = createViewModel(-1L)
         advanceUntilIdle()
@@ -1569,7 +1574,7 @@ class CloudDriveViewModelTest {
             )
             whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
             whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
-            whenever(monitorNodeUpdatesByIdUseCase(any())).thenReturn(flowOf())
+            whenever(monitorNodeUpdatesByIdUseCase(any(), any())).thenReturn(flowOf())
 
             val underTest = createViewModel(-1L)
 
