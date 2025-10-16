@@ -5,6 +5,7 @@ import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.TimeUtils.getDateString
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.account.AccountTransferDetail
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -162,8 +163,10 @@ class MyAccountInfo @Inject constructor(
             usedTransferPercentage = 0
 
             if (accountInfo.transferMax != 0L) {
-                usedTransferPercentage =
-                    (100 * accountInfo.transferUsed / accountInfo.transferMax).toInt()
+                usedTransferPercentage = AccountTransferDetail(
+                    totalTransfer = accountInfo.transferMax,
+                    usedTransfer = accountInfo.transferUsed
+                ).usedTransferPercentage
             }
         }
 
