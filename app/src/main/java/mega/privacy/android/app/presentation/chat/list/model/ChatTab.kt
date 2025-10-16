@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.chat.list.model
 
 import androidx.annotation.StringRes
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Chat tab enum representing each view tab
@@ -15,7 +14,7 @@ enum class ChatTab(
     /**
      * Chats
      */
-    CHATS(sharedR.string.general_chat),
+    CHATS(R.string.chats_label),
 
     /**
      * Meetings

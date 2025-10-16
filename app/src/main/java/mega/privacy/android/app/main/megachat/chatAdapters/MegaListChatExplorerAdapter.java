@@ -163,7 +163,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
             if (item.isRecent()) {
                 holder.headerText.setText(R.string.recents_label);
             } else {
-                holder.headerText.setText(mega.privacy.android.shared.resources.R.string.general_chat);
+                holder.headerText.setText(R.string.chats_label);
             }
             return;
         }
