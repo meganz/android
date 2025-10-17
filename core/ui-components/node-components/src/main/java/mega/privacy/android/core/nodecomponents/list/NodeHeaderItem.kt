@@ -24,7 +24,6 @@ import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.icon.pack.IconPack
 
-
 /**
  * Header View item for [NodesView] or [NodeGridView]
  * @param onSortOrderClick callback triggered when sort order is clicked
@@ -60,12 +59,12 @@ fun NodeHeaderItem(
                     .clickable {
                         onSortOrderClick()
                     }
+                    .testTag(SORT_ORDER_TAG)
             ) {
                 MegaText(
                     style = AppTheme.typography.titleSmall,
                     textColor = TextColor.Secondary,
                     text = stringResource(sortConfiguration.sortOption.displayName),
-                    modifier = Modifier.testTag(SORT_ORDER_TAG)
                 )
                 Spacer(modifier = Modifier.size(DSTokens.spacings.s2))
                 MegaIcon(

@@ -159,6 +159,7 @@ fun NodeListViewItem(
     isSensitive: Boolean = false,
     showBlurEffect: Boolean = false,
     isHighlighted: Boolean = false,
+    enableClick: Boolean = true,
     onMoreClicked: (() -> Unit)? = null,
     onInfoClicked: (() -> Unit)? = null,
     onItemClicked: () -> Unit,
@@ -378,7 +379,8 @@ fun NodeListViewItem(
             }
         },
         onClickListener = onItemClicked,
-        onLongClickListener = onLongClicked
+        onLongClickListener = onLongClicked,
+        enableClick = enableClick
     )
 }
 

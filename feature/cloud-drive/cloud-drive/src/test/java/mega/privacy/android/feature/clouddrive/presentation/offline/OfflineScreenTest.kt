@@ -14,6 +14,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import de.palm.composestateevents.triggered
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.core.nodecomponents.list.SORT_ORDER_TAG
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
@@ -21,7 +22,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
-import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_BOTTOM_SHEET_TAG
+import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_SORT_BOTTOM_SHEET_TAG
 import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_DEFAULT_TOP_APP_BAR_TAG
 import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_EMPTY_TAG
 import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_GRID_COLUMN_TAG
@@ -638,7 +639,7 @@ class OfflineScreenTest {
     }
 
     @Test
-    fun `test that bottom sheet tag is not visible by default`() {
+    fun `test that sort bottom sheet tag is not visible by default`() {
         val offlineNodes = listOf(
             createOfflineNodeUiItem("test_file.txt", isFolder = false, handle = "1")
         )
@@ -648,8 +649,8 @@ class OfflineScreenTest {
         )
         setupComposeContent(uiState)
 
-        // The bottom sheet should not be visible by default
-        composeRule.onNodeWithTag(OFFLINE_SCREEN_BOTTOM_SHEET_TAG).assertDoesNotExist()
+        // The sort bottom sheet should not be visible by default
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_SORT_BOTTOM_SHEET_TAG).assertDoesNotExist()
     }
 
     @Test
@@ -681,6 +682,32 @@ class OfflineScreenTest {
         setupComposeContent(uiState)
 
         composeRule.onNodeWithTag(OFFLINE_SCREEN_REMOVE_FROM_OFFLINE_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that on sort click should show sort bottom sheet`() {
+        val mockSortCallback: (NodeSortConfiguration) -> Unit = mock()
+        val offlineNodes = listOf(
+            createOfflineNodeUiItem("test_file.txt", isFolder = false, handle = "1")
+        )
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            offlineNodes = offlineNodes
+        )
+        setupComposeContent(
+            uiState = uiState,
+            onSortNodes = mockSortCallback
+        )
+
+        // Initially, the sort bottom sheet should not be visible
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_SORT_BOTTOM_SHEET_TAG).assertDoesNotExist()
+
+        // Click on the sort button
+        composeRule.onNodeWithTag(SORT_ORDER_TAG).performClick()
+
+        // Wait for and verify that the sort bottom sheet is now displayed
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_SORT_BOTTOM_SHEET_TAG).assertIsDisplayed()
     }
 
     private fun setupComposeContent(

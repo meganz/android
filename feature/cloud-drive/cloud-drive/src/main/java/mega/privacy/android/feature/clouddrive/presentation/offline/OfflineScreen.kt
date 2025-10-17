@@ -358,7 +358,7 @@ internal fun OfflineScreen(
 
         if (showSortBottomSheet) {
             SortBottomSheet(
-                modifier = Modifier,
+                modifier = Modifier.testTag(OFFLINE_SCREEN_SORT_BOTTOM_SHEET_TAG),
                 options = NodeSortOption.getOptionsForSourceType(NodeSourceType.OFFLINE),
                 title = stringResource(sharedResR.string.action_sort_by_header),
                 sheetState = sortBottomSheetState,
@@ -525,3 +525,4 @@ internal const val OFFLINE_SCREEN_BOTTOM_SHEET_TAG = "offline_screen:bottom_shee
 internal const val OFFLINE_SCREEN_TOP_WARNING_BANNER_TAG = "offline_screen:top_warning_banner"
 internal const val OFFLINE_SCREEN_SELECTION_MODE_BOTTOM_BAR_TAG =
     "offline_screen:selection_mode_bottom_bar"
+internal const val OFFLINE_SCREEN_SORT_BOTTOM_SHEET_TAG = "offline_screen:sort_bottom_sheet"
