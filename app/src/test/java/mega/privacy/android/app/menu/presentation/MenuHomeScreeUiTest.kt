@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -24,6 +25,7 @@ import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.ACCOU
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.BADGE
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.LOGOUT_BUTTON
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.MY_ACCOUNT_ITEM
+import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.NOTIFICATION_BADGE
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.NOTIFICATION_ICON
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.PRIVACY_SUITE_HEADER
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.PRIVACY_SUITE_ITEM
@@ -92,12 +94,14 @@ class MenuHomeScreeUiTest {
                 navigateToFeature = navigateToFeature,
                 onLogoutClicked = onLogoutClicked,
                 onResetTestPasswordScreenEvent = onResetTestPasswordScreenEvent,
-                onResetLogoutConfirmationEvent = onResetLogoutConfirmationEvent
+                onResetLogoutConfirmationEvent = onResetLogoutConfirmationEvent,
             )
         }
     }
 
-    private fun createDefaultMenuUiState() = MenuUiState(
+    private fun createDefaultMenuUiState(
+        notificationCount: Int = 0,
+    ) = MenuUiState(
         myAccountItems = myAccountItems,
         privacySuiteItems = privacySuiteItems,
         email = "test@example.com",
@@ -106,7 +110,8 @@ class MenuHomeScreeUiTest {
         avatarColor = Color.Blue,
         isConnectedToNetwork = true,
         showTestPasswordScreenEvent = consumed,
-        showLogoutConfirmationEvent = consumed
+        showLogoutConfirmationEvent = consumed,
+        unreadNotificationsCount = notificationCount,
     )
 
     @Test
@@ -275,10 +280,23 @@ class MenuHomeScreeUiTest {
     }
 
     @Test
-    fun `test that badge is updated when flow is updated`() {
+    fun `test that item badge is updated when flow is updated`() {
         setupRule()
         composeRule.onNodeWithTag(BADGE, useUnmergedTree = true).assertDoesNotExist()
         badgeFlow.value = DefaultNumberBadge(1)
         composeRule.onNodeWithTag(BADGE, useUnmergedTree = true).assertTextEquals("1")
+    }
+
+    @Test
+    fun `test that notification badge is shown when notification count is greater than 0`() {
+        setupRule(createDefaultMenuUiState(1))
+        composeRule.onNodeWithTag(NOTIFICATION_BADGE, useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithTag(NOTIFICATION_BADGE, useUnmergedTree = true).assertTextEquals("1")
+    }
+
+    @Test
+    fun `test that notification badge is not shown when notification count is 0`() {
+        setupRule(createDefaultMenuUiState(0))
+        composeRule.onNodeWithTag(NOTIFICATION_BADGE, useUnmergedTree = true).assertIsNotDisplayed()
     }
 }

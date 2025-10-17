@@ -3,12 +3,14 @@ package mega.privacy.android.app.menu.presentation
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
@@ -28,6 +31,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.NavKey
@@ -42,12 +46,16 @@ import mega.android.core.ui.components.list.SecondaryHeaderListItem
 import mega.android.core.ui.components.profile.MediumProfilePicture
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.preview.BooleanProvider
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.ACCOUNT_ITEM
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.BADGE
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.LOGOUT_BUTTON
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.MY_ACCOUNT_ITEM
+import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.NOTIFICATION_BADGE
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.NOTIFICATION_ICON
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.PRIVACY_SUITE_HEADER
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.PRIVACY_SUITE_ITEM
@@ -113,15 +121,26 @@ fun MenuHomeScreenUi(
                     .testTag(TOOLBAR),
                 title = "",
                 trailingIcons = {
-                    IconButton(
-                        modifier = Modifier.testTag(NOTIFICATION_ICON),
-                        onClick = { navigateToFeature(NotificationsNavKey) }
-                    ) {
-                        MegaIcon(
-                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Bell),
-                            tint = IconColor.Primary,
-                            contentDescription = "Notification Icon"
-                        )
+                    Box(contentAlignment = Alignment.TopEnd) {
+                        IconButton(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .testTag(NOTIFICATION_ICON),
+                            onClick = { navigateToFeature(NotificationsNavKey) }
+                        ) {
+                            MegaIcon(
+                                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Bell),
+                                tint = IconColor.Primary,
+                                contentDescription = "Notification Icon",
+                            )
+                        }
+                        if (uiState.unreadNotificationsCount > 0) {
+                            NotificationBadge(
+                                uiState.unreadNotificationsCount,
+                                modifier = Modifier.padding(end = 8.dp, top = 4.dp)
+                                    .testTag(NOTIFICATION_BADGE),
+                            )
+                        }
                     }
                 },
                 navigationType = AppBarNavigationType.None
@@ -318,6 +337,26 @@ private fun LogoutButton(
     )
 }
 
+@CombinedThemePreviews
+@Composable
+private fun MenuHomeScreenUiPreview(
+    @PreviewParameter(BooleanProvider::class) showBadge: Boolean
+) {
+    AndroidThemeForPreviews {
+        MenuHomeScreenUi(
+            uiState = MenuUiState(
+                name = "John Doe",
+                email = "john.doe@example.com",
+                unreadNotificationsCount = if (showBadge) 2 else 0
+            ),
+            navigateToFeature = {},
+            onLogoutClicked = {},
+            onResetTestPasswordScreenEvent = {},
+            onResetLogoutConfirmationEvent = {},
+        )
+    }
+}
+
 private fun openInSpecificApp(context: Context, link: String, packageName: String) {
     runCatching {
         Intent(Intent.ACTION_VIEW, Uri.parse(link)).apply {
@@ -348,6 +387,7 @@ internal object MenuHomeScreenUiTestTags {
     const val TOOLBAR = "$MENU_HOME_SCREEN:toolbar"
     const val MY_ACCOUNT_ITEM = "$MENU_HOME_SCREEN:my_account_item"
     const val NOTIFICATION_ICON = "$MENU_HOME_SCREEN:notification_icon"
+    const val NOTIFICATION_BADGE = "$MENU_HOME_SCREEN:notification_badge"
     const val ACCOUNT_ITEM = "$MENU_HOME_SCREEN:account_item"
     const val PRIVACY_SUITE_HEADER = "$MENU_HOME_SCREEN:privacy_suite_header"
     const val PRIVACY_SUITE_ITEM = "$MENU_HOME_SCREEN:privacy_suite_item"

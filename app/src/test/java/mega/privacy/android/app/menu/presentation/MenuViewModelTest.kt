@@ -1,5 +1,6 @@
 package mega.privacy.android.app.menu.presentation
 
+import android.R
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
@@ -12,6 +13,7 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -41,6 +43,7 @@ import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.notifications.MonitorUnreadAlertsCountUseCase
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -76,6 +79,7 @@ class MenuViewModelTest {
     private val monitorUserUpdates = mock<MonitorUserUpdates>()
     private val isAchievementsEnabledUseCase = mock<IsAchievementsEnabledUseCase>()
     private val checkPasswordReminderUseCase = mock<CheckPasswordReminderUseCase>()
+    private val monitorUnreadAlertsCountUseCase = mock<MonitorUnreadAlertsCountUseCase>()
     private val ioDispatcher = UnconfinedTestDispatcher()
 
     private object TestDestination : NavKey
@@ -105,7 +109,8 @@ class MenuViewModelTest {
             getCurrentUserEmail,
             monitorUserUpdates,
             isAchievementsEnabledUseCase,
-            checkPasswordReminderUseCase
+            checkPasswordReminderUseCase,
+            monitorUnreadAlertsCountUseCase,
         )
     }
 
@@ -135,7 +140,7 @@ class MenuViewModelTest {
             val accountItem = NavDrawerItem.Account(
                 destination = TestDestination,
                 icon = Icons.Default.Home,
-                title = android.R.string.ok,
+                title = R.string.ok,
                 subTitle = null,
                 actionLabel = null
             )
@@ -143,8 +148,8 @@ class MenuViewModelTest {
             val privacySuiteItem = NavDrawerItem.PrivacySuite(
                 destination = TestDestination,
                 icon = Icons.Default.Settings,
-                title = android.R.string.cancel,
-                subTitle = android.R.string.copy,
+                title = R.string.cancel,
+                subTitle = R.string.copy,
                 link = "https://mega.app",
                 appPackage = null
             )
@@ -159,8 +164,8 @@ class MenuViewModelTest {
             val state = underTest.uiState.value
             assertThat(state.myAccountItems).hasSize(1)
             assertThat(state.privacySuiteItems).hasSize(1)
-            assertThat(state.myAccountItems[1]?.title).isEqualTo(android.R.string.ok)
-            assertThat(state.privacySuiteItems[2]?.title).isEqualTo(android.R.string.cancel)
+            assertThat(state.myAccountItems[1]?.title).isEqualTo(R.string.ok)
+            assertThat(state.privacySuiteItems[2]?.title).isEqualTo(R.string.cancel)
         }
 
     @ParameterizedTest(name = "isConnected: {0}")
@@ -280,7 +285,7 @@ class MenuViewModelTest {
         val mockStorageString = "2 MB"
         val mockTotalStorageString = "4 MB"
         val mockRubbishString = "2 MB"
-        val mockAccountTypeName = android.R.string.ok
+        val mockAccountTypeName = R.string.ok
 
         fileSizeStringMapper.stub {
             on { invoke(2000000L) }.thenReturn(mockStorageString)
@@ -351,7 +356,7 @@ class MenuViewModelTest {
             val mockStorageString = "100B"
             val mockTotalStorageString = "200B"
             val mockRubbishString = "50B"
-            val mockAccountTypeName = android.R.string.copy
+            val mockAccountTypeName = R.string.copy
 
             fileSizeStringMapper.stub {
                 on { invoke(100L) }.thenReturn(mockStorageString)
@@ -411,7 +416,7 @@ class MenuViewModelTest {
 
         val mockZeroSizeString = "0 B"
         val mock1GBString = "1 GB"
-        val mockAccountTypeName = android.R.string.ok
+        val mockAccountTypeName = R.string.ok
 
         fileSizeStringMapper.stub {
             on { invoke(0L) }.thenReturn(mockZeroSizeString)
@@ -463,6 +468,26 @@ class MenuViewModelTest {
         }
     }
 
+    @Test
+    fun `test that unread alerts count is monitored and updates state`() = runTest {
+        val initial = 4
+        val update = 6
+        stubDefaultDependencies()
+        val flow = MutableStateFlow(initial)
+        monitorUnreadAlertsCountUseCase.stub {
+            on { invoke() }.thenReturn(flow)
+        }
+
+        initUnderTest()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().unreadNotificationsCount).isEqualTo(initial)
+            flow.emit(update)
+            assertThat(awaitItem().unreadNotificationsCount).isEqualTo(update)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun createAccountDetail(
         usedStorage: Long = 0L,
         totalStorage: Long = 0L,
@@ -497,6 +522,10 @@ class MenuViewModelTest {
     private suspend fun stubDefaultDependencies() {
         monitorConnectivityUseCase.stub {
             on { invoke() }.thenReturn(flowOf(false))
+        }
+
+        monitorUnreadAlertsCountUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(0))
         }
 
         monitorMyAvatarFile.stub {
@@ -540,6 +569,7 @@ class MenuViewModelTest {
             isAchievementsEnabledUseCase = isAchievementsEnabledUseCase,
             checkPasswordReminderUseCase = checkPasswordReminderUseCase,
             ioDispatcher = ioDispatcher,
+            monitorUnreadAlertsCountUseCase = monitorUnreadAlertsCountUseCase,
         )
     }
 
@@ -852,38 +882,40 @@ class MenuViewModelTest {
         }
 
     @Test
-    fun `test that logout triggers test password screen event when password reminder is required`() = runTest {
-        stubDefaultDependencies()
-        whenever(checkPasswordReminderUseCase(true)).thenReturn(true)
-        initUnderTest()
+    fun `test that logout triggers test password screen event when password reminder is required`() =
+        runTest {
+            stubDefaultDependencies()
+            whenever(checkPasswordReminderUseCase(true)).thenReturn(true)
+            initUnderTest()
 
-        underTest.logout()
+            underTest.logout()
 
-        underTest.uiState.test {
-            val state = awaitItem()
-            assertThat(state.showTestPasswordScreenEvent).isEqualTo(triggered)
-            assertThat(state.showLogoutConfirmationEvent).isEqualTo(consumed)
-            verify(checkPasswordReminderUseCase).invoke(true)
-            cancelAndIgnoreRemainingEvents()
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.showTestPasswordScreenEvent).isEqualTo(triggered)
+                assertThat(state.showLogoutConfirmationEvent).isEqualTo(consumed)
+                verify(checkPasswordReminderUseCase).invoke(true)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `test that logout triggers logout confirmation event when password reminder is not required`() = runTest {
-        stubDefaultDependencies()
-        whenever(checkPasswordReminderUseCase(true)).thenReturn(false)
-        initUnderTest()
+    fun `test that logout triggers logout confirmation event when password reminder is not required`() =
+        runTest {
+            stubDefaultDependencies()
+            whenever(checkPasswordReminderUseCase(true)).thenReturn(false)
+            initUnderTest()
 
-        underTest.logout()
+            underTest.logout()
 
-        underTest.uiState.test {
-            val state = awaitItem()
-            assertThat(state.showTestPasswordScreenEvent).isEqualTo(consumed)
-            assertThat(state.showLogoutConfirmationEvent).isEqualTo(triggered)
-            verify(checkPasswordReminderUseCase).invoke(true)
-            cancelAndIgnoreRemainingEvents()
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.showTestPasswordScreenEvent).isEqualTo(consumed)
+                assertThat(state.showLogoutConfirmationEvent).isEqualTo(triggered)
+                verify(checkPasswordReminderUseCase).invoke(true)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
     fun `test that logout handles password reminder check failure gracefully`() = runTest {

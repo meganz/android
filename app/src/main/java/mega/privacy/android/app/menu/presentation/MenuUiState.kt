@@ -18,4 +18,5 @@ data class MenuUiState(
     val showTestPasswordScreenEvent: StateEvent = consumed,
     val showLogoutConfirmationEvent: StateEvent = consumed,
     val isLoggingOut: Boolean = false,
+    val unreadNotificationsCount: Int = 0,
 )

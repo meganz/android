@@ -37,6 +37,7 @@ import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.notifications.MonitorUnreadAlertsCountUseCase
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import timber.log.Timber
 import javax.inject.Inject
@@ -57,6 +58,7 @@ class MenuViewModel @Inject constructor(
     private val monitorUserUpdates: MonitorUserUpdates,
     private val isAchievementsEnabledUseCase: IsAchievementsEnabledUseCase,
     private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase,
+    private val monitorUnreadAlertsCountUseCase: MonitorUnreadAlertsCountUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     // Flows for items that need dynamic subtitles
@@ -83,6 +85,7 @@ class MenuViewModel @Inject constructor(
         refreshUserName(false)
         refreshCurrentUserEmail()
         monitorUserChanges()
+        monitorUnreadNotificationsCount()
     }
 
     private fun setMyAccountItems() {
@@ -158,6 +161,17 @@ class MenuViewModel @Inject constructor(
         }
     }
 
+    private fun monitorUnreadNotificationsCount() {
+        viewModelScope.launch {
+            monitorUnreadAlertsCountUseCase()
+                .catch { Timber.w("Exception monitoring user updates: $it") }
+                .collect { unreadCount ->
+                    _uiState.update {
+                        it.copy(unreadNotificationsCount = unreadCount)
+                    }
+                }
+        }
+    }
 
     private suspend fun getUserAvatarOrDefault(isForceRefresh: Boolean) {
         val avatarFile = runCatching { getMyAvatarFileUseCase(isForceRefresh) }
