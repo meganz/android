@@ -3,7 +3,6 @@ package mega.privacy.android.core.nodecomponents.dialog.removeshare
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -37,7 +36,9 @@ fun RemoveShareFolderDialogM3(
             viewModel.removeShare(nodes)
             onDismiss()
         },
-        onDismiss = onDismiss
+        // onDismiss is empty here to avoid multiple calls. We don't need this since action must be
+        // taken in order to dismiss the dialog
+        onDismiss = {}
     )
 }
 
