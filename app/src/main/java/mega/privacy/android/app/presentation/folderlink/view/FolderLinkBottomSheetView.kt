@@ -27,6 +27,7 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.extension.folderInfo
+import mega.privacy.android.app.presentation.view.extension.getNodeTitle
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -120,7 +121,7 @@ private fun BottomSheetContent(
             }
             Column(verticalArrangement = Arrangement.Center) {
                 MegaText(
-                    text = nodeUIItem?.name ?: "",
+                    text = nodeUIItem?.node?.getNodeTitle() ?: "",
                     textColor = TextColor.Primary,
                     overflow = LongTextBehaviour.Ellipsis(1)
                 )

@@ -141,7 +141,9 @@ internal fun FolderLinkView(
         }
     }
     val title =
-        if (!state.isNodesFetched) "MEGA" else state.title
+        if (!state.isNodesFetched) "MEGA" else if (state.parentNode?.isNodeKeyDecrypted == true) state.title else stringResource(
+            id = R.string.shared_items_verify_credentials_undecrypted_folder
+        )
 
     BackHandler(enabled = modalSheetState.isVisible) {
         coroutineScope.launch { modalSheetState.hide() }
