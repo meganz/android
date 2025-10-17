@@ -19,18 +19,26 @@ import nz.mega.sdk.MegaNode
 @Composable
 internal fun TypedNode.getNodeItemDescription(showPublicLinkCreationTime: Boolean) = with(this) {
     (this as? ShareFolderNode).getSharedNodeItemDescription() ?: when (this) {
-        is FileNode -> formatFileSize(size, LocalContext.current)
-            .plus(" · ")
-            .plus(
-                formatModifiedDate(
-                    java.util.Locale(
-                        Locale.current.language, Locale.current.region
-                    ),
-                    if (showPublicLinkCreationTime) exportedData?.publicLinkCreationTime
-                        ?: modificationTime
-                    else modificationTime
-                )
-            )
+        is FileNode -> {
+            val timeToFormat = if (showPublicLinkCreationTime) exportedData?.publicLinkCreationTime
+                ?: modificationTime
+            else modificationTime
+
+            if (timeToFormat != 0L) {
+                formatFileSize(size, LocalContext.current)
+                    .plus(" · ")
+                    .plus(
+                        formatModifiedDate(
+                            java.util.Locale(
+                                Locale.current.language, Locale.current.region
+                            ),
+                            timeToFormat
+                        )
+                    )
+            } else {
+                formatFileSize(size, LocalContext.current)
+            }
+        }
 
         is FolderNode -> folderInfo()
         else -> ""
