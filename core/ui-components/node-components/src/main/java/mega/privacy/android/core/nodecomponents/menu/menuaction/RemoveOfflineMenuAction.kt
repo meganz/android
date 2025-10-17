@@ -8,20 +8,18 @@ import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.icon.pack.IconPack
 import javax.inject.Inject
 
-/**
- * Available offline menu action
- */
-class AvailableOfflineMenuAction @Inject constructor() : MenuActionWithIcon {
+class RemoveOfflineMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
     override fun getIconPainter() =
-        rememberVectorPainter(IconPack.Medium.Thin.Outline.CloudDownload)
+        rememberVectorPainter(IconPack.Medium.Thin.Outline.CloudOff)
 
     @Composable
     override fun getDescription() =
-        stringResource(id = R.string.node_menu_action_make_available_offline)
+        stringResource(id = R.string.node_menu_action_remove_offline)
 
     override val orderInCategory: Int
-        get() = 150
+        get() = 151
+
     override val testTag: String
-        get() = "menu_action:available_offline"
+        get() = "menu_action:remove_offline"
 }

@@ -27,6 +27,7 @@ import mega.privacy.android.core.nodecomponents.action.clickhandler.MoveToRubbis
 import mega.privacy.android.core.nodecomponents.action.clickhandler.OpenWithActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveFavouriteActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveLinkActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveOfflineActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveShareActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RenameNodeActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RestoreActionClickHandler
@@ -555,7 +556,7 @@ class NodeActionClickHandlerTest {
     // AvailableOfflineAction Tests
     @Test
     fun `test AvailableOfflineAction canHandle returns true for AvailableOfflineMenuAction`() {
-        val action = AvailableOfflineActionClickHandler(mockRemoveOfflineNodeUseCase)
+        val action = AvailableOfflineActionClickHandler()
         val menuAction = mock<AvailableOfflineMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -564,7 +565,7 @@ class NodeActionClickHandlerTest {
     @Test
     fun `test AvailableOfflineAction single node handle calls downloadNodeForOffline when node is not available offline`() =
         runTest {
-            val action = AvailableOfflineActionClickHandler(mockRemoveOfflineNodeUseCase)
+            val action = AvailableOfflineActionClickHandler()
             val menuAction = mock<AvailableOfflineMenuAction>()
             val nodeNotOffline = mock<TypedFileNode> {
                 on { id } doReturn NodeId(123L)
@@ -577,9 +578,20 @@ class NodeActionClickHandlerTest {
         }
 
     @Test
-    fun `test AvailableOfflineAction single node handle calls removeOfflineNodeUseCase when node is available offline`() =
+    fun `test AvailableOfflineAction multiple nodes handle calls downloadNodeForOffline`() {
+        val action = AvailableOfflineActionClickHandler()
+        val menuAction = mock<AvailableOfflineMenuAction>()
+        val nodes = listOf(mockFileNode, mockFolderNode)
+
+        action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
+
+        verify(mockViewModel).downloadNodeForOffline(withStartMessage = false)
+    }
+
+    @Test
+    fun `test RemoveOfflineAction single node handle calls removeOfflineNodeUseCase when node is available offline`() =
         runTest {
-            val action = AvailableOfflineActionClickHandler(mockRemoveOfflineNodeUseCase)
+            val action = RemoveOfflineActionClickHandler(mockRemoveOfflineNodeUseCase)
             val menuAction = mock<AvailableOfflineMenuAction>()
             val nodeOffline = mock<TypedFileNode> {
                 on { id } doReturn NodeId(123L)
@@ -592,15 +604,24 @@ class NodeActionClickHandlerTest {
         }
 
     @Test
-    fun `test AvailableOfflineAction multiple nodes handle calls downloadNodeForOffline`() {
-        val action = AvailableOfflineActionClickHandler(mockRemoveOfflineNodeUseCase)
-        val menuAction = mock<AvailableOfflineMenuAction>()
-        val nodes = listOf(mockFileNode, mockFolderNode)
+    fun `test RemoveOfflineAction multiple node handle calls removeOfflineNodeUseCase for all the nodes`() =
+        runTest {
+            val action = RemoveOfflineActionClickHandler(mockRemoveOfflineNodeUseCase)
+            val menuAction = mock<AvailableOfflineMenuAction>()
+            val node1 = mock<TypedFileNode> {
+                on { id } doReturn NodeId(123L)
+                on { isAvailableOffline } doReturn false
+            }
+            val node2 = mock<TypedFileNode> {
+                on { id } doReturn NodeId(456L)
+                on { isAvailableOffline } doReturn true
+            }
 
-        action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
+            action.handle(menuAction, listOf(node1, node2), mockMultipleNodesActionProvider)
 
-        verify(mockViewModel).downloadNodeForOffline(withStartMessage = false)
-    }
+            verify(mockRemoveOfflineNodeUseCase).invoke(node1.id)
+            verify(mockRemoveOfflineNodeUseCase).invoke(node2.id)
+        }
 
     // HideAction Tests
     @Test
@@ -1292,21 +1313,22 @@ class NodeActionClickHandlerTest {
 
     // ShareAction Tests (already exists, but adding multiple nodes test)
     @Test
-    fun `test ShareAction multiple nodes handle calls getLocalFilePathUseCase for first node`() = runTest {
-        val action = ShareActionClickHandler(
-            mockGetLocalFilePathUseCase,
-            mockExportNodeUseCase,
-            mockGetFileUriUseCase
-        )
-        val menuAction = mock<ShareMenuAction>()
-        val nodes = listOf(mockFileNode, mockFolderNode)
+    fun `test ShareAction multiple nodes handle calls getLocalFilePathUseCase for first node`() =
+        runTest {
+            val action = ShareActionClickHandler(
+                mockGetLocalFilePathUseCase,
+                mockExportNodeUseCase,
+                mockGetFileUriUseCase
+            )
+            val menuAction = mock<ShareMenuAction>()
+            val nodes = listOf(mockFileNode, mockFolderNode)
 
-        whenever(mockGetLocalFilePathUseCase(any())).thenReturn("/test/path")
+            whenever(mockGetLocalFilePathUseCase(any())).thenReturn("/test/path")
 
-        action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
+            action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
 
-        verify(mockGetLocalFilePathUseCase).invoke(mockFileNode)
-    }
+            verify(mockGetLocalFilePathUseCase).invoke(mockFileNode)
+        }
 
     @Test
     fun `test actions return false for wrong menu action types`() {
@@ -1334,11 +1356,7 @@ class NodeActionClickHandlerTest {
             ).canHandle(wrongAction)
         ).isFalse()
         assertThat(DownloadActionClickHandler().canHandle(wrongAction)).isFalse()
-        assertThat(
-            AvailableOfflineActionClickHandler(mockRemoveOfflineNodeUseCase).canHandle(
-                wrongAction
-            )
-        ).isFalse()
+        assertThat(AvailableOfflineActionClickHandler().canHandle(wrongAction)).isFalse()
         assertThat(HideActionClickHandler(mockIsHiddenNodesOnboardedUseCase).canHandle(wrongAction)).isFalse()
         assertThat(RenameNodeActionClickHandler().canHandle(wrongAction)).isFalse()
         assertThat(

@@ -25,6 +25,7 @@ import mega.privacy.android.core.nodecomponents.action.clickhandler.MultiNodeAct
 import mega.privacy.android.core.nodecomponents.action.clickhandler.OpenWithActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveFavouriteActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveLinkActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveOfflineActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveShareActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RenameNodeActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RestoreActionClickHandler
@@ -62,6 +63,7 @@ object NodeActionHandlerModule {
         openWithAction: OpenWithActionClickHandler,
         downloadAction: DownloadActionClickHandler,
         availableOfflineAction: AvailableOfflineActionClickHandler,
+        removeOfflineAction: RemoveOfflineActionClickHandler,
         hideAction: HideActionClickHandler,
         renameNodeAction: RenameNodeActionClickHandler,
         moveToRubbishBinAction: MoveToRubbishBinActionClickHandler,
@@ -92,6 +94,7 @@ object NodeActionHandlerModule {
             openWithAction,
             downloadAction,
             availableOfflineAction,
+            removeOfflineAction,
             hideAction,
             renameNodeAction,
             moveToRubbishBinAction,
@@ -126,6 +129,7 @@ object NodeActionHandlerModule {
         openWithAction: OpenWithActionClickHandler,
         downloadAction: DownloadActionClickHandler,
         availableOfflineAction: AvailableOfflineActionClickHandler,
+        removeOfflineAction: RemoveOfflineActionClickHandler,
         shareFolderAction: ShareFolderActionClickHandler,
         leaveShareAction: LeaveShareActionClickHandler,
         copyAction: CopyActionClickHandler,
@@ -148,6 +152,7 @@ object NodeActionHandlerModule {
             openWithAction,
             downloadAction,
             availableOfflineAction,
+            removeOfflineAction,
             shareFolderAction,
             leaveShareAction,
             copyAction,

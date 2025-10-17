@@ -12,23 +12,11 @@ import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
-class AvailableOfflineActionClickHandler @Inject constructor(
-    private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
-) : SingleNodeAction, MultiNodeAction {
+class AvailableOfflineActionClickHandler @Inject constructor() : SingleNodeAction, MultiNodeAction {
     override fun canHandle(action: MenuAction): Boolean = action is AvailableOfflineMenuAction
 
     override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
-        if (node.isAvailableOffline) {
-            provider.coroutineScope.launch {
-                withContext(NonCancellable) {
-                    runCatching {
-                        removeOfflineNodeUseCase(nodeId = node.id)
-                    }.onFailure { Timber.e(it) }
-                }
-            }
-        } else {
-            provider.viewModel.downloadNodeForOffline(withStartMessage = false)
-        }
+        provider.viewModel.downloadNodeForOffline(withStartMessage = false)
     }
 
     override fun handle(

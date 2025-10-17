@@ -123,6 +123,7 @@ interface IconPackInterface {
                 val Cloud: ImageVector
                 val CloudOff: ImageVector
                 val CloudUpload: ImageVector
+                val CloudDownload: ImageVector
                 val Copy01: ImageVector
                 val CornerUpRight: ImageVector
                 val Database: ImageVector

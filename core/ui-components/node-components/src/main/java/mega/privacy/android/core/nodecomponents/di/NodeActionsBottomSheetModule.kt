@@ -23,6 +23,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuitem.ManageShareFolderB
 import mega.privacy.android.core.nodecomponents.menu.menuitem.MoveBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.OpenLocationBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.OpenWithBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.RemoveAvailableOfflineBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.RemoveFavouriteBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.RemoveLinkBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.RemoveShareBottomSheetMenuItem
@@ -66,6 +67,7 @@ abstract class NodeActionsBottomSheetModule {
         @Singleton
         fun provideCloudDriveBottomSheetOptions(
             availableOfflineMenuAction: AvailableOfflineBottomSheetMenuItem,
+            removeOfflineMenuAction: RemoveAvailableOfflineBottomSheetMenuItem,
             copyMenuAction: CopyBottomSheetMenuItem,
             deletePermanentlyMenuAction: DeletePermanentlyBottomSheetMenuItem,
             disputeTakeDownMenuAction: DisputeTakeDownBottomSheetMenuItem,
@@ -99,6 +101,7 @@ abstract class NodeActionsBottomSheetModule {
         ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
             return setOf(
                 availableOfflineMenuAction,
+                removeOfflineMenuAction,
                 copyMenuAction,
                 deletePermanentlyMenuAction,
                 disputeTakeDownMenuAction,
@@ -142,6 +145,7 @@ abstract class NodeActionsBottomSheetModule {
         @Singleton
         fun provideOutgoingSharesBottomSheetOptions(
             availableOfflineMenuAction: AvailableOfflineBottomSheetMenuItem,
+            removeOfflineMenuAction: RemoveAvailableOfflineBottomSheetMenuItem,
             copyMenuAction: CopyBottomSheetMenuItem,
             deletePermanentlyMenuAction: DeletePermanentlyBottomSheetMenuItem,
             disputeTakeDownMenuAction: DisputeTakeDownBottomSheetMenuItem,
@@ -172,6 +176,7 @@ abstract class NodeActionsBottomSheetModule {
         ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
             return setOf(
                 availableOfflineMenuAction,
+                removeOfflineMenuAction,
                 copyMenuAction,
                 deletePermanentlyMenuAction,
                 disputeTakeDownMenuAction,
@@ -211,6 +216,7 @@ abstract class NodeActionsBottomSheetModule {
         @Singleton
         fun provideIncomingSharesBottomSheetOptions(
             availableOfflineMenuAction: AvailableOfflineBottomSheetMenuItem,
+            removeOfflineMenuAction: RemoveAvailableOfflineBottomSheetMenuItem,
             copyMenuAction: CopyBottomSheetMenuItem,
             deletePermanentlyMenuAction: DeletePermanentlyBottomSheetMenuItem,
             disputeTakeDownMenuAction: DisputeTakeDownBottomSheetMenuItem,
@@ -242,6 +248,7 @@ abstract class NodeActionsBottomSheetModule {
         ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
             return setOf(
                 availableOfflineMenuAction,
+                removeOfflineMenuAction,
                 copyMenuAction,
                 deletePermanentlyMenuAction,
                 disputeTakeDownMenuAction,
@@ -282,6 +289,7 @@ abstract class NodeActionsBottomSheetModule {
         @Singleton
         fun provideLinkSharesBottomSheetOptions(
             availableOfflineMenuAction: AvailableOfflineBottomSheetMenuItem,
+            removeOfflineMenuAction: RemoveAvailableOfflineBottomSheetMenuItem,
             copyMenuAction: CopyBottomSheetMenuItem,
             deletePermanentlyMenuAction: DeletePermanentlyBottomSheetMenuItem,
             disputeTakeDownMenuAction: DisputeTakeDownBottomSheetMenuItem,
@@ -312,6 +320,7 @@ abstract class NodeActionsBottomSheetModule {
         ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
             return setOf(
                 availableOfflineMenuAction,
+                removeOfflineMenuAction,
                 copyMenuAction,
                 deletePermanentlyMenuAction,
                 disputeTakeDownMenuAction,
@@ -351,6 +360,7 @@ abstract class NodeActionsBottomSheetModule {
         @Singleton
         fun provideRubbishBinsBottomSheetOptions(
             availableOfflineMenuAction: AvailableOfflineBottomSheetMenuItem,
+            removeOfflineMenuAction: RemoveAvailableOfflineBottomSheetMenuItem,
             copyMenuAction: CopyBottomSheetMenuItem,
             deletePermanentlyMenuAction: DeletePermanentlyBottomSheetMenuItem,
             disputeTakeDownMenuAction: DisputeTakeDownBottomSheetMenuItem,
@@ -384,6 +394,7 @@ abstract class NodeActionsBottomSheetModule {
         ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
             return setOf(
                 availableOfflineMenuAction,
+                removeOfflineMenuAction,
                 copyMenuAction,
                 deletePermanentlyMenuAction,
                 disputeTakeDownMenuAction,
@@ -426,6 +437,7 @@ abstract class NodeActionsBottomSheetModule {
         @Singleton
         fun provideBackupsBottomSheetOptions(
             availableOfflineMenuAction: AvailableOfflineBottomSheetMenuItem,
+            removeOfflineMenuAction: RemoveAvailableOfflineBottomSheetMenuItem,
             copyMenuAction: CopyBottomSheetMenuItem,
             deletePermanentlyMenuAction: DeletePermanentlyBottomSheetMenuItem,
             disputeTakeDownMenuAction: DisputeTakeDownBottomSheetMenuItem,
@@ -459,6 +471,7 @@ abstract class NodeActionsBottomSheetModule {
         ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
             return setOf(
                 availableOfflineMenuAction,
+                removeOfflineMenuAction,
                 copyMenuAction,
                 deletePermanentlyMenuAction,
                 disputeTakeDownMenuAction,

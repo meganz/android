@@ -252,4 +252,9 @@
     <string name="context_share">Share using</string>
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">No network connection</string>
+
+    <!-- Menu item to make a node available offline -->
+    <string name="node_menu_action_make_available_offline">Make available offline</string>
+    <!-- Menu item to remove a node from offline -->
+    <string name="node_menu_action_remove_offline">Remove from offline</string>
 </resources>
