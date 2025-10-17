@@ -42,7 +42,8 @@ internal class ResolveStalledIssueUseCase @Inject constructor(
     ) {
         runCatching {
             resolveIssue(stalledIssueResolutionAction, stalledIssue)
-        }.onSuccess {
+        }
+        runCatching {
             saveSolvedIssue(stalledIssue, stalledIssueResolutionAction)
         }
     }
@@ -56,7 +57,7 @@ internal class ResolveStalledIssueUseCase @Inject constructor(
             StalledIssueResolutionActionType.RENAME_ALL_ITEMS -> {
                 if (stalledIssue.nodeIds.size > 1) {
                     renameNodeWithTheSameNameUseCase(
-                        stalledIssue.nodeIds.zip(stalledIssue.nodeNames)
+                        stalledIssue.nodeIds
                     )
                 } else if (stalledIssue.localPaths.size > 1) {
                     renameFilesWithTheSameNameUseCase(stalledIssue.localPaths.map { UriPath(it) })
@@ -168,17 +169,60 @@ internal class ResolveStalledIssueUseCase @Inject constructor(
         mainFolderChildren: List<UnTypedNode>,
     ) {
         val sameNameFileInMainFolder = mainFolderChildren.find {
-            it is FileNode && it.name == secondaryFile.name
+            it is FileNode && it.name.equals(secondaryFile.name, ignoreCase = true)
         }
 
         if (sameNameFileInMainFolder != null) {
-            if (sameNameFileInMainFolder is FileNode && sameNameFileInMainFolder.fingerprint != secondaryFile.fingerprint) {
-                addCounterToNodeName(secondaryFile.name, secondaryFile.id, 1)
+            if (sameNameFileInMainFolder is FileNode) {
+                // Rename if different fingerprint OR different case (case-insensitive filesystem conflict)
+                val needsRename =
+                    sameNameFileInMainFolder.fingerprint != secondaryFile.fingerprint ||
+                            sameNameFileInMainFolder.name != secondaryFile.name
+                if (needsRename) {
+                    // Find unique counter to avoid conflicts with existing files
+                    val uniqueCounter = findUniqueCounter(secondaryFile.name, mainFolderChildren)
+                    addCounterToNodeName(secondaryFile.name, secondaryFile.id, uniqueCounter)
+                }
                 moveNodeUseCase(secondaryFile.id, mainFolder.id)
             }
         } else {
             moveNodeUseCase(secondaryFile.id, mainFolder.id)
         }
+    }
+
+    /**
+     * Finds the first available counter to append to a node name to make it unique.
+     * Example: "file.txt" -> "file (1).txt", "file (3).txt", next available is "file (2).txt"
+     */
+
+    private fun findUniqueCounter(
+        nodeName: String,
+        existingNodes: List<UnTypedNode>,
+    ): Int {
+        val nodeNameWithoutExtension = nodeName.substringBeforeLast(".")
+        val nodeExtension = nodeName.substringAfterLast(".", missingDelimiterValue = "")
+        val fullNodeExtension = if (nodeExtension.isNotEmpty()) {
+            ".$nodeExtension"
+        } else {
+            ""
+        }
+
+        // Get all existing file names for quick lookup (case-insensitive)
+        val existingFileNames = existingNodes
+            .filterIsInstance<FileNode>()
+            .map { it.name.lowercase() }
+            .toSet()
+
+        // Find the first available counter starting from 1
+        for (counter in 1..Int.MAX_VALUE) {
+            val candidateName = "$nodeNameWithoutExtension ($counter)$fullNodeExtension"
+            if (!existingFileNames.contains(candidateName.lowercase())) {
+                return counter
+            }
+        }
+
+        // This should never happen in practice, but return 1 as fallback
+        return 1
     }
 
     private suspend fun addCounterToNodeName(
