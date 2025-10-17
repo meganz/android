@@ -10,9 +10,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
@@ -69,9 +71,11 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
         effectiveNodeId: NodeId,
         nodeSourceType: NodeSourceType,
     ) = nodeRepository.monitorNodeUpdates()
-        .filter {
-            it.changes.keys.any { node ->
-                node.parentId == effectiveNodeId || node.id == effectiveNodeId
+        .filter { update ->
+            update.changes.keys.any { node ->
+                node.parentId == effectiveNodeId
+                        || node.id == effectiveNodeId
+                        || update.isChangesInOutgoingShares(node, nodeSourceType)
             }
         }
         .map {
@@ -83,6 +87,13 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
             }
             if (isNodeRemoved) NodeChanges.Remove else NodeChanges.Attributes
         }
+
+    private fun NodeUpdate.isChangesInOutgoingShares(
+        node: Node,
+        nodeSourceType: NodeSourceType,
+    ) = nodeSourceType == NodeSourceType.OUTGOING_SHARES
+            && ((node as? FolderNode)?.isShared == true
+            || this.changes[node]?.contains(NodeChanges.Outshare) == true)
 
     private fun monitorOfflineNodeUpdates(
         effectiveNodeId: NodeId,

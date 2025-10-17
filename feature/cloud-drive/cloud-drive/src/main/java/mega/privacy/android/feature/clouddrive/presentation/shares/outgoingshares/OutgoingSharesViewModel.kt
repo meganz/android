@@ -91,8 +91,10 @@ class OutgoingSharesViewModel @Inject constructor(
 
     private fun monitorNodeUpdates() {
         viewModelScope.launch {
-            // TODO handle root node of outgoing shares
-            monitorNodeUpdatesByIdUseCase(NodeId(-1L)).collectLatest { change ->
+            monitorNodeUpdatesByIdUseCase(
+                nodeId = NodeId(-1L),
+                nodeSourceType = NodeSourceType.OUTGOING_SHARES
+            ).collectLatest { change ->
                 if (change == NodeChanges.Remove) {
                     // If current folder is moved to rubbish bin, navigate back
                     _uiState.update {

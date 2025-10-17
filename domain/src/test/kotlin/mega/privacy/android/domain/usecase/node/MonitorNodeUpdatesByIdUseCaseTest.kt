@@ -415,4 +415,149 @@ class MonitorNodeUpdatesByIdUseCaseTest {
                 cancelAndConsumeRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that invoke returns NodeChanges_Attributes when folder has isShared true with OUTGOING_SHARES source type`() =
+        runTest {
+            val nodeId = NodeId(1L)
+            val sharedFolderNode = mock<FolderNode> {
+                on { id } doReturn NodeId(999L)
+                on { parentId } doReturn NodeId(888L)
+                on { isShared } doReturn true
+                on { isInRubbishBin } doReturn false
+            }
+
+            val nodeUpdateFlow = flow {
+                emit(
+                    NodeUpdate(
+                        mapOf(sharedFolderNode to listOf(NodeChanges.Attributes))
+                    )
+                )
+            }
+
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+
+            underTest(nodeId, NodeSourceType.OUTGOING_SHARES).test {
+                assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that invoke returns NodeChanges_Attributes when folder has Outshare change with OUTGOING_SHARES source type`() =
+        runTest {
+            val nodeId = NodeId(1L)
+            val folderNode = mock<FolderNode> {
+                on { id } doReturn NodeId(999L)
+                on { parentId } doReturn NodeId(888L)
+                on { isShared } doReturn false
+                on { isInRubbishBin } doReturn false
+            }
+
+            val nodeUpdateFlow = flow {
+                emit(
+                    NodeUpdate(
+                        mapOf(folderNode to listOf(NodeChanges.Outshare))
+                    )
+                )
+            }
+
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+
+            underTest(nodeId, NodeSourceType.OUTGOING_SHARES).test {
+                assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that invoke returns NodeChanges_Attributes when folder matches parent ID with OUTGOING_SHARES source type`() =
+        runTest {
+            val parentNodeId = NodeId(1L)
+            val folderNode = mock<FolderNode> {
+                on { id } doReturn NodeId(2L)
+                on { parentId } doReturn parentNodeId
+                on { isShared } doReturn false
+                on { isInRubbishBin } doReturn false
+            }
+
+            val nodeUpdateFlow = flow {
+                emit(
+                    NodeUpdate(
+                        mapOf(folderNode to listOf(NodeChanges.Attributes))
+                    )
+                )
+            }
+
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+
+            underTest(parentNodeId, NodeSourceType.OUTGOING_SHARES).test {
+                assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that invoke returns NodeChanges_Attributes when folder matches node ID with OUTGOING_SHARES source type`() =
+        runTest {
+            val nodeId = NodeId(1L)
+            val folderNode = mock<FolderNode> {
+                on { id } doReturn nodeId
+                on { parentId } doReturn NodeId(0L)
+                on { isShared } doReturn false
+                on { isInRubbishBin } doReturn false
+            }
+
+            val nodeUpdateFlow = flow {
+                emit(
+                    NodeUpdate(
+                        mapOf(folderNode to listOf(NodeChanges.Attributes))
+                    )
+                )
+            }
+
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+
+            underTest(nodeId, NodeSourceType.OUTGOING_SHARES).test {
+                assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that invoke returns NodeChanges_Attributes when folder is both shared and has Outshare change`() =
+        runTest {
+            val nodeId = NodeId(1L)
+            val folderNode = mock<FolderNode> {
+                on { id } doReturn NodeId(999L)
+                on { parentId } doReturn NodeId(888L)
+                on { isShared } doReturn true
+                on { isInRubbishBin } doReturn false
+            }
+
+            val nodeUpdateFlow = flow {
+                emit(
+                    NodeUpdate(
+                        mapOf(folderNode to listOf(NodeChanges.Outshare, NodeChanges.Attributes))
+                    )
+                )
+            }
+
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+
+            underTest(nodeId, NodeSourceType.OUTGOING_SHARES).test {
+                assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
 }

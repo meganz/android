@@ -248,6 +248,7 @@ class CloudDriveViewModel @AssistedInject constructor(
                         it.copy(navigateBack = triggered)
                     }
                 } else {
+                    updateTitle()
                     // If nodes are currently loading, ignore updates
                     if (uiState.value.nodesLoadingState == NodesLoadingState.FullyLoaded) {
                         refreshNodes()
