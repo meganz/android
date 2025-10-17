@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
+import mega.privacy.android.domain.usecase.GetOfflineSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -26,6 +27,7 @@ class GetSortOrderByNodeSourceTypeUseCaseTest {
     private val getCloudSortOrder: GetCloudSortOrder = mock()
     private val getLinksSortOrder: GetLinksSortOrder = mock()
     private val getOthersSortOrder: GetOthersSortOrder = mock()
+    private val getOfflineSortOrder: GetOfflineSortOrder = mock()
 
     @BeforeEach
     fun setUp() {
@@ -33,17 +35,19 @@ class GetSortOrderByNodeSourceTypeUseCaseTest {
             whenever(getCloudSortOrder()).thenReturn(mockCloudSortOrder)
             whenever(getLinksSortOrder()).thenReturn(mockLinksSortOrder)
             whenever(getOthersSortOrder()).thenReturn(mockOthersSortOrder)
+            whenever(getOfflineSortOrder()).thenReturn(mockOfflineSortOrder)
         }
         underTest = GetSortOrderByNodeSourceTypeUseCase(
             getCloudSortOrder = getCloudSortOrder,
             getLinksSortOrder = getLinksSortOrder,
-            getOthersSortOrder = getOthersSortOrder
+            getOthersSortOrder = getOthersSortOrder,
+            getOfflineSortOrder = getOfflineSortOrder,
         )
     }
 
     @AfterEach
     fun tearDown() {
-        reset(getCloudSortOrder, getLinksSortOrder, getOthersSortOrder)
+        reset(getCloudSortOrder, getLinksSortOrder, getOthersSortOrder, getOfflineSortOrder)
     }
 
     @ParameterizedTest
@@ -67,12 +71,14 @@ class GetSortOrderByNodeSourceTypeUseCaseTest {
         Arguments.of(NodeSourceType.AUDIO, mockCloudSortOrder),
         Arguments.of(NodeSourceType.FAVOURITES, mockCloudSortOrder),
         Arguments.of(NodeSourceType.OUTGOING_SHARES, mockCloudSortOrder),
-        Arguments.of(NodeSourceType.OTHER, mockCloudSortOrder)
+        Arguments.of(NodeSourceType.OTHER, mockCloudSortOrder),
+        Arguments.of(NodeSourceType.OFFLINE, mockOfflineSortOrder),
     )
 
     companion object {
         private val mockCloudSortOrder = SortOrder.ORDER_DEFAULT_ASC
         private val mockLinksSortOrder = SortOrder.ORDER_DEFAULT_DESC
         private val mockOthersSortOrder = SortOrder.ORDER_SIZE_DESC
+        private val mockOfflineSortOrder = SortOrder.ORDER_LABEL_ASC
     }
 }

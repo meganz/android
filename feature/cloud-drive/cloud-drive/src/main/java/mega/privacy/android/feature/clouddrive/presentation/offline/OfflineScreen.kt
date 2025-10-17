@@ -8,12 +8,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,6 +32,8 @@ import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.banner.TopWarningBanner
 import mega.android.core.ui.components.dialogs.BasicDialog
+import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
+import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
@@ -40,10 +42,16 @@ import mega.privacy.android.core.nodecomponents.components.offline.HandleOffline
 import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeActionsViewModel
 import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.list.NodeGridViewItem
+import mega.privacy.android.core.nodecomponents.list.NodeHeaderItem
 import mega.privacy.android.core.nodecomponents.list.NodeListViewItem
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.core.nodecomponents.model.NodeSortOption
+import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
+import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -107,8 +115,10 @@ fun OfflineScreen(
             val nodes = handles.map { NodeId(it) }
             onTransfer(TransferTriggerEvent.CopyOfflineNode(nodes))
         },
+        onChangeViewType = viewModel::updateViewType,
         removeOfflineNodes = viewModel::removeOfflineNodes,
         openFileInformation = openFileInformation,
+        onSortNodes = viewModel::setSortOrder,
         modifier = modifier
     )
 }
@@ -130,6 +140,8 @@ internal fun OfflineScreen(
     saveOfflineFilesToDevice: (List<Long>) -> Unit,
     removeOfflineNodes: (List<Long>) -> Unit,
     openFileInformation: (String) -> Unit,
+    onChangeViewType: () -> Unit,
+    onSortNodes: (NodeSortConfiguration) -> Unit,
     modifier: Modifier = Modifier,
     consumeOpenFolderEvent: () -> Unit = {},
     consumeOpenFileEvent: () -> Unit = {},
@@ -137,6 +149,8 @@ internal fun OfflineScreen(
     var isSearchMode by rememberSaveable { mutableStateOf(false) }
     var showRemoveDialog by rememberSaveable { mutableStateOf(false) }
     var selectedHandlesToRemove by rememberSaveable { mutableStateOf<List<Long>>(emptyList()) }
+    var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
+    val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     EventEffect(
         event = uiState.openFolderInPageEvent,
@@ -283,7 +297,11 @@ internal fun OfflineScreen(
                             },
                             contentPadding = PaddingValues(
                                 bottom = paddingValues.calculateBottomPadding()
-                            )
+                            ),
+                            onChangeViewType = onChangeViewType,
+                            onSortClick = {
+                                showSortBottomSheet = true
+                            }
                         )
                     }
                 }
@@ -337,6 +355,30 @@ internal fun OfflineScreen(
                 }
             )
         }
+
+        if (showSortBottomSheet) {
+            SortBottomSheet(
+                modifier = Modifier,
+                options = NodeSortOption.getOptionsForSourceType(NodeSourceType.OFFLINE),
+                title = stringResource(sharedResR.string.action_sort_by_header),
+                sheetState = sortBottomSheetState,
+                selectedSort = SortBottomSheetResult(
+                    sortOptionItem = uiState.selectedSortConfiguration.sortOption,
+                    sortDirection = uiState.selectedSortConfiguration.sortDirection
+                ),
+                onSortOptionSelected = { result ->
+                    result?.let {
+                        onSortNodes(
+                            NodeSortConfiguration(
+                                sortOption = it.sortOptionItem,
+                                sortDirection = it.sortDirection
+                            )
+                        )
+                        showSortBottomSheet = false
+                    }
+                },
+            )
+        }
     }
 }
 
@@ -346,16 +388,34 @@ private fun OfflineContent(
     onItemClicked: (OfflineNodeUiItem) -> Unit,
     onItemLongClicked: (OfflineNodeUiItem) -> Unit,
     onMoreClicked: (OfflineNodeUiItem) -> Unit,
+    onChangeViewType: () -> Unit,
+    onSortClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     when (uiState.currentViewType) {
         ViewType.LIST -> {
-            LazyColumn(
+            FastScrollLazyColumn(
                 modifier = modifier
                     .testTag(OFFLINE_SCREEN_LIST_COLUMN_TAG),
-                contentPadding = contentPadding
+                contentPadding = contentPadding,
+                totalItems = uiState.offlineNodes.size + 1 // +1 for header
             ) {
+                item(key = "header") {
+                    NodeHeaderItem(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                            .padding(bottom = 8.dp),
+                        onSortOrderClick = onSortClick,
+                        onChangeViewTypeClick = onChangeViewType,
+                        onEnterMediaDiscoveryClick = {},
+                        sortConfiguration = uiState.selectedSortConfiguration,
+                        isListView = true,
+                        showSortOrder = true,
+                        showChangeViewType = true,
+                    )
+                }
+
                 items(
                     items = uiState.offlineNodes,
                     key = { it.offlineFileInformation.handle }
@@ -382,15 +442,31 @@ private fun OfflineContent(
         }
 
         ViewType.GRID -> {
-            LazyVerticalGrid(
+            FastScrollLazyVerticalGrid(
                 columns = GridCells.Adaptive(120.dp),
-                modifier = modifier
+                modifier = Modifier
                     .testTag(OFFLINE_SCREEN_GRID_COLUMN_TAG)
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 8.dp),
                 contentPadding = contentPadding,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                totalItems = uiState.offlineNodes.size + 1 // +1 for header
             ) {
+                item(
+                    key = "header",
+                    span = { GridItemSpan(currentLineSpan = maxLineSpan) }
+                ) {
+                    NodeHeaderItem(
+                        onSortOrderClick = onSortClick,
+                        onChangeViewTypeClick = onChangeViewType,
+                        onEnterMediaDiscoveryClick = {},
+                        sortConfiguration = uiState.selectedSortConfiguration,
+                        isListView = true,
+                        showSortOrder = true,
+                        showChangeViewType = true,
+                    )
+                }
+
                 items(
                     items = uiState.offlineNodes,
                     key = { it.offlineFileInformation.handle }

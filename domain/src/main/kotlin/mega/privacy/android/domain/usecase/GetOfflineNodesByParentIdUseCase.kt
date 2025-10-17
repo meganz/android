@@ -30,18 +30,21 @@ class GetOfflineNodesByParentIdUseCase @Inject constructor(
         searchQuery: String? = null,
     ) = coroutineScope {
         val semaphore = Semaphore(8)
-        if (searchQuery.isNullOrBlank()) {
+        val nodes = if (searchQuery.isNullOrBlank()) {
             nodeRepository.getOfflineNodesByParentId(parentId)
         } else {
             nodeRepository.getOfflineNodesByQuery(searchQuery, parentId)
-        }.let {
-            sortOfflineInfoUseCase(it)
-        }.map {
-            async {
-                semaphore.withPermit {
-                    getOfflineFileInformationUseCase(it, false)
+        }
+
+        nodes
+            .map {
+                async {
+                    semaphore.withPermit {
+                        getOfflineFileInformationUseCase(it, false)
+                    }
                 }
             }
-        }.awaitAll()
+            .awaitAll()
+            .let { sortOfflineInfoUseCase(it) }
     }
 }

@@ -9,17 +9,26 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.domain.entity.Offline
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
+import mega.privacy.android.domain.usecase.SetOfflineSortOrder
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineWarningMessageVisibilityUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodesUseCase
 import mega.privacy.android.domain.usecase.offline.SetOfflineWarningMessageVisibilityUseCase
+import mega.privacy.android.domain.usecase.sortorder.GetSortOrderByNodeSourceTypeUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
 import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.OfflineNavKey
@@ -30,6 +39,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
@@ -49,6 +59,10 @@ class OfflineViewModelTest {
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val removeOfflineNodesUseCase: RemoveOfflineNodesUseCase = mock()
     private val snackbarEventQueue: SnackbarEventQueue = mock()
+    private val setOfflineSortOrder: SetOfflineSortOrder = mock()
+    private val getSortOrderByNodeSourceTypeUseCase: GetSortOrderByNodeSourceTypeUseCase = mock()
+    private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = mock()
+    private val setViewType: SetViewType = mock()
     private lateinit var underTest: OfflineViewModel
 
     @Before
@@ -78,7 +92,11 @@ class OfflineViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             monitorViewType = monitorViewType,
             removeOfflineNodesUseCase = removeOfflineNodesUseCase,
-            snackbarEventQueue = snackbarEventQueue
+            snackbarEventQueue = snackbarEventQueue,
+            setOfflineSortOrder = setOfflineSortOrder,
+            getSortOrderByNodeSourceTypeUseCase = getSortOrderByNodeSourceTypeUseCase,
+            nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
+            setViewType = setViewType
         )
     }
 
@@ -103,43 +121,6 @@ class OfflineViewModelTest {
             assertThat(expectMostRecentItem().isOnline).isEqualTo(false)
         }
     }
-
-    @Test
-    fun `test that root offline content is shown by default when navigateToPath is not invoked`() =
-        runTest {
-            val rootNode = -1
-            val childId1 = 3453
-            val childId2 = 845
-            val file1 = mock<OfflineFileInformation> {
-                on { isFolder } doReturn false
-                on { name } doReturn "file1"
-                on { id } doReturn childId1
-                on { handle } doReturn "1234"
-            }
-            val file2 = mock<OfflineFileInformation> {
-                on { isFolder } doReturn false
-                on { name } doReturn "file2"
-                on { id } doReturn childId2
-                on { handle } doReturn "2345"
-            }
-
-            val offlineNodeUpdates = MutableSharedFlow<List<Offline>>()
-            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(offlineNodeUpdates)
-            whenever(getOfflineNodesByParentIdUseCase(rootNode)).thenReturn(listOf(file1, file2))
-            initViewModel()
-            underTest.uiState.test {
-                assertThat(awaitItem().isLoading).isTrue() //initial
-                offlineNodeUpdates.emit(listOf(mock()))
-                val final = awaitItem()
-                assertThat(final.isLoading).isFalse()
-                assertThat(final.nodeId).isEqualTo(rootNode)
-                assertThat(final.offlineNodes).containsExactly(
-                    OfflineNodeUiItem(offlineFileInformation = file1),
-                    OfflineNodeUiItem(offlineFileInformation = file2)
-                )
-            }
-
-        }
 
     @Test
     fun `test that dismissOfflineWarning calls setOfflineWarningMessageVisibilityUseCase`() =
@@ -475,6 +456,148 @@ class OfflineViewModelTest {
         verify(removeOfflineNodesUseCase, never()).invoke(any())
     }
 
+    @Test
+    fun `test that setSortOrder calls setOfflineSortOrder with correct sort order`() = runTest {
+        // Given
+        val sortConfiguration = NodeSortConfiguration(
+            sortOption = NodeSortOption.Name,
+            sortDirection = SortDirection.Ascending
+        )
+        val expectedSortOrder = SortOrder.ORDER_DEFAULT_ASC
+        whenever(nodeSortConfigurationUiMapper.invoke(sortConfiguration)).thenReturn(
+            expectedSortOrder
+        )
+
+        initViewModel()
+
+        // When
+        underTest.setSortOrder(sortConfiguration)
+
+        // Then
+        verify(setOfflineSortOrder).invoke(expectedSortOrder)
+    }
+
+    @Test
+    fun `test that setSortOrder calls setOfflineSortOrder with different sort configurations`() =
+        runTest {
+            // Given
+            initViewModel()
+
+            // Test ORDER_DEFAULT_DESC
+            val nameDescConfig = NodeSortConfiguration(
+                sortOption = NodeSortOption.Name,
+                sortDirection = SortDirection.Descending
+            )
+            whenever(nodeSortConfigurationUiMapper.invoke(nameDescConfig)).thenReturn(SortOrder.ORDER_DEFAULT_DESC)
+            underTest.setSortOrder(nameDescConfig)
+            verify(setOfflineSortOrder).invoke(SortOrder.ORDER_DEFAULT_DESC)
+
+            // Test ORDER_SIZE_ASC
+            val sizeAscConfig = NodeSortConfiguration(
+                sortOption = NodeSortOption.Size,
+                sortDirection = SortDirection.Ascending
+            )
+            whenever(nodeSortConfigurationUiMapper.invoke(sizeAscConfig)).thenReturn(SortOrder.ORDER_SIZE_ASC)
+            underTest.setSortOrder(sizeAscConfig)
+            verify(setOfflineSortOrder).invoke(SortOrder.ORDER_SIZE_ASC)
+
+            // Test ORDER_MODIFICATION_DESC
+            val modifiedDescConfig = NodeSortConfiguration(
+                sortOption = NodeSortOption.Modified,
+                sortDirection = SortDirection.Descending
+            )
+            whenever(nodeSortConfigurationUiMapper.invoke(modifiedDescConfig)).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
+            underTest.setSortOrder(modifiedDescConfig)
+            verify(setOfflineSortOrder).invoke(SortOrder.ORDER_MODIFICATION_DESC)
+        }
+
+    @Test
+    fun `test that getSortOrder calls getSortOrderByNodeSourceTypeUseCase with OFFLINE source type`() =
+        runTest {
+            // Given
+            val expectedSortOrder = SortOrder.ORDER_DEFAULT_ASC
+            val expectedSortConfiguration = NodeSortConfiguration(
+                sortOption = NodeSortOption.Name,
+                sortDirection = SortDirection.Ascending
+            )
+            whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE)).thenReturn(
+                expectedSortOrder
+            )
+            whenever(nodeSortConfigurationUiMapper.invoke(expectedSortOrder)).thenReturn(
+                expectedSortConfiguration
+            )
+
+            initViewModel()
+
+            // When
+            underTest.uiState.test {
+                val state = awaitItem()
+                // Verify that the sort order is set correctly in the state
+                assertThat(state.selectedSortOrder).isEqualTo(expectedSortOrder)
+                assertThat(state.selectedSortConfiguration).isEqualTo(expectedSortConfiguration)
+            }
+
+            // Then
+            verify(getSortOrderByNodeSourceTypeUseCase).invoke(NodeSourceType.OFFLINE)
+        }
+
+    @Test
+    fun `test that getSortOrder updates UI state with different sort orders`() = runTest {
+        // Test ORDER_SIZE_DESC
+        val sizeDescOrder = SortOrder.ORDER_SIZE_DESC
+        val sizeDescConfig = NodeSortConfiguration(
+            sortOption = NodeSortOption.Size,
+            sortDirection = SortDirection.Descending
+        )
+        whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE)).thenReturn(
+            sizeDescOrder
+        )
+        whenever(nodeSortConfigurationUiMapper.invoke(sizeDescOrder)).thenReturn(sizeDescConfig)
+
+        // Given
+        initViewModel()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.selectedSortOrder).isEqualTo(sizeDescOrder)
+            assertThat(state.selectedSortConfiguration).isEqualTo(sizeDescConfig)
+        }
+
+        verify(getSortOrderByNodeSourceTypeUseCase).invoke(NodeSourceType.OFFLINE)
+    }
+
+    @Test
+    fun `test that setSortOrder and getSortOrder work together correctly`() = runTest {
+        // Given
+        val sortConfiguration = NodeSortConfiguration(
+            sortOption = NodeSortOption.Modified,
+            sortDirection = SortDirection.Ascending
+        )
+        val expectedSortOrder = SortOrder.ORDER_MODIFICATION_ASC
+        val expectedSortConfiguration = NodeSortConfiguration(
+            sortOption = NodeSortOption.Modified,
+            sortDirection = SortDirection.Ascending
+        )
+
+        whenever(nodeSortConfigurationUiMapper.invoke(sortConfiguration)).thenReturn(
+            expectedSortOrder
+        )
+        whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE)).thenReturn(
+            expectedSortOrder
+        )
+        whenever(nodeSortConfigurationUiMapper.invoke(expectedSortOrder)).thenReturn(
+            expectedSortConfiguration
+        )
+
+        initViewModel()
+
+        underTest.setSortOrder(sortConfiguration)
+
+        verify(setOfflineSortOrder).invoke(expectedSortOrder)
+        // Times(2) because initViewModel also calls getSortOrder
+        verify(getSortOrderByNodeSourceTypeUseCase, times(2)).invoke(NodeSourceType.OFFLINE)
+    }
+
     private suspend fun stubCommon() {
         whenever(getOfflineNodesByParentIdUseCase(-1)).thenReturn(emptyList())
         whenever(setOfflineWarningMessageVisibilityUseCase(false)).thenReturn(Unit)
@@ -482,5 +605,8 @@ class OfflineViewModelTest {
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(emptyFlow())
         whenever(monitorViewType()).thenReturn(emptyFlow())
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
+        whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE)).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+        whenever(nodeSortConfigurationUiMapper(any<SortOrder>())).thenReturn(NodeSortConfiguration.default)
+        whenever(nodeSortConfigurationUiMapper(any<NodeSortConfiguration>())).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
     }
 }

@@ -14,6 +14,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import de.palm.composestateevents.triggered
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -697,6 +698,8 @@ class OfflineScreenTest {
         saveOfflineFilesToDevice: (List<Long>) -> Unit = {},
         removeOfflineNodes: (List<Long>) -> Unit = {},
         openFileInformation: (String) -> Unit = {},
+        onSortNodes: (NodeSortConfiguration) -> Unit = {},
+        onChangeViewType: () -> Unit = {},
     ) {
         composeRule.setContent {
             CompositionLocalProvider(LocalContext provides composeRule.activity) {
@@ -716,6 +719,8 @@ class OfflineScreenTest {
                         saveOfflineFilesToDevice = saveOfflineFilesToDevice,
                         removeOfflineNodes = removeOfflineNodes,
                         openFileInformation = openFileInformation,
+                        onSortNodes = onSortNodes,
+                        onChangeViewType = onChangeViewType,
                     )
                 }
             }

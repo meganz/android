@@ -29,6 +29,12 @@ enum class NodeSortOption(
                 Size
             )
 
+            NodeSourceType.OFFLINE -> listOf(
+                Name,
+                Size,
+                Modified
+            )
+
             else -> listOf(
                 Name,
                 Favourite,

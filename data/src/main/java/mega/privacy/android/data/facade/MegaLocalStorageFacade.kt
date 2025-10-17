@@ -7,12 +7,13 @@ import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.settings.ChatSettings
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
-import nz.mega.sdk.MegaApiJava.ORDER_FAV_ASC
-import nz.mega.sdk.MegaApiJava.ORDER_LABEL_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC
 import nz.mega.sdk.MegaApiJava.ORDER_LINK_CREATION_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_LINK_CREATION_DESC
 import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
+import nz.mega.sdk.MegaApiJava.ORDER_SIZE_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_SIZE_DESC
 import javax.inject.Inject
 
 /**
@@ -49,9 +50,15 @@ internal class MegaLocalStorageFacade @Inject constructor(
      */
     override suspend fun getOfflineSortOrder(): Int =
         when (val order = getCloudSortOrder()) {
-            ORDER_LABEL_ASC -> ORDER_DEFAULT_ASC
-            ORDER_FAV_ASC -> ORDER_DEFAULT_ASC
-            else -> order
+            ORDER_DEFAULT_ASC,
+            ORDER_DEFAULT_DESC,
+            ORDER_SIZE_ASC,
+            ORDER_SIZE_DESC,
+            ORDER_MODIFICATION_ASC,
+            ORDER_MODIFICATION_DESC,
+                -> order
+
+            else -> ORDER_DEFAULT_ASC
         }
 
     override suspend fun setOfflineSortOrder(order: Int) {

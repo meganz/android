@@ -59,4 +59,9 @@ enum class NodeSourceType {
      * When node source is other tabs
      */
     OTHER,
+
+    /**
+     * When node source is offline
+     */
+    OFFLINE
 }

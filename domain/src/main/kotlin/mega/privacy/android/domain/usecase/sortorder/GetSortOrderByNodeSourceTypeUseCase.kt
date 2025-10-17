@@ -4,6 +4,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
+import mega.privacy.android.domain.usecase.GetOfflineSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import javax.inject.Inject
 
@@ -14,6 +15,7 @@ class GetSortOrderByNodeSourceTypeUseCase @Inject constructor(
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getLinksSortOrder: GetLinksSortOrder,
     private val getOthersSortOrder: GetOthersSortOrder,
+    private val getOfflineSortOrder: GetOfflineSortOrder,
 ) {
 
     /**
@@ -36,5 +38,7 @@ class GetSortOrderByNodeSourceTypeUseCase @Inject constructor(
             NodeSourceType.OUTGOING_SHARES,
             NodeSourceType.OTHER,
                 -> getCloudSortOrder()
+
+            NodeSourceType.OFFLINE -> getOfflineSortOrder()
         }
 }

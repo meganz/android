@@ -76,4 +76,6 @@
     <string name="offline_screen_selection_menu_remove_from_offline">Remove from Offline</string>
     <!-- Confirmation message before removing something from the Offline section. -->
     <string name="confirmation_delete_from_save_for_offline">Remove from Offline?</string>
+    <!-- Message when file removed from offline. -->
+    <string name="offline_screen_file_removed_message">File removed from Offline</string>
 </resources>

@@ -15,14 +15,21 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
+import mega.privacy.android.domain.usecase.SetOfflineSortOrder
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineWarningMessageVisibilityUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodesUseCase
 import mega.privacy.android.domain.usecase.offline.SetOfflineWarningMessageVisibilityUseCase
+import mega.privacy.android.domain.usecase.sortorder.GetSortOrderByNodeSourceTypeUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
 import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
@@ -41,9 +48,13 @@ class OfflineViewModel @AssistedInject constructor(
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorViewType: MonitorViewType,
+    private val setViewType: SetViewType,
     @Assisted private val navKey: OfflineNavKey,
     private val removeOfflineNodesUseCase: RemoveOfflineNodesUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
+    private val setOfflineSortOrder: SetOfflineSortOrder,
+    private val getSortOrderByNodeSourceTypeUseCase: GetSortOrderByNodeSourceTypeUseCase,
+    private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(
         OfflineUiState(
@@ -68,6 +79,7 @@ class OfflineViewModel @AssistedInject constructor(
         monitorOfflineWarningMessage()
         monitorOfflineNodeUpdates()
         monitorViewTypeUpdate()
+        getSortOrder()
         // Navigate to path if specified
         navigateToPath()
     }
@@ -117,6 +129,22 @@ class OfflineViewModel @AssistedInject constructor(
         }
     }
 
+    fun updateViewType() {
+        viewModelScope.launch {
+            val viewType = if (uiState.value.currentViewType == ViewType.LIST) {
+                ViewType.GRID
+            } else {
+                ViewType.LIST
+            }
+
+            runCatching {
+                setViewType(viewType)
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
     private fun monitorOfflineWarningMessage() {
         viewModelScope.launch {
             monitorOfflineWarningMessageVisibilityUseCase()
@@ -147,15 +175,16 @@ class OfflineViewModel @AssistedInject constructor(
             _uiState.update {
                 it.copy(
                     isLoadingCurrentFolder = false,
-                    offlineNodes = offlineNodeList.map { file ->
-                        OfflineNodeUiItem(
-                            offlineFileInformation = file,
-                            isSelected = uiState.value.selectedNodeHandles.contains(
-                                file.handle.toLongOrNull()
-                            ),
-                            isHighlighted = file.name in uiState.value.highlightedFiles
-                        )
-                    }
+                    offlineNodes = offlineNodeList
+                        .map { file ->
+                            OfflineNodeUiItem(
+                                offlineFileInformation = file,
+                                isSelected = uiState.value.selectedNodeHandles.contains(
+                                    file.handle.toLongOrNull()
+                                ),
+                                isHighlighted = file.name in uiState.value.highlightedFiles
+                            )
+                        }
                 )
             }
         }.onFailure { throwable ->
@@ -321,6 +350,39 @@ class OfflineViewModel @AssistedInject constructor(
             }.onSuccess {
                 // Todo waiting for snackbar message from content team
                 snackbarEventQueue.queueMessage("${handles.size} items removed")
+            }
+        }
+    }
+
+    fun setSortOrder(sortOrder: NodeSortConfiguration) {
+        viewModelScope.launch {
+            runCatching {
+                val sortOrder = nodeSortConfigurationUiMapper(sortOrder)
+                setOfflineSortOrder(sortOrder)
+            }.onFailure {
+                Timber.e(it)
+            }.onSuccess {
+                getSortOrder()
+            }
+        }
+    }
+
+    private fun getSortOrder() {
+        viewModelScope.launch {
+            runCatching {
+                getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE)
+            }.onSuccess { sortOrder ->
+                val sortOrderPair = nodeSortConfigurationUiMapper(sortOrder)
+                _uiState.update {
+                    it.copy(
+                        selectedSortConfiguration = sortOrderPair,
+                        selectedSortOrder = sortOrder
+                    )
+                }
+
+                loadOfflineNodes()
+            }.onFailure {
+                Timber.e(it, "Failed to get offline sort order")
             }
         }
     }

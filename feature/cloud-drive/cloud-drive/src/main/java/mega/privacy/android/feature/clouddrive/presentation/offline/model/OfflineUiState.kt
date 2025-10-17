@@ -2,6 +2,8 @@ package mega.privacy.android.feature.clouddrive.presentation.offline.model
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.preference.ViewType
 
@@ -36,6 +38,8 @@ data class OfflineUiState(
     val searchQuery: String? = null,
     val openFolderInPageEvent: StateEventWithContent<OfflineFileInformation> = consumed(),
     val openOfflineNodeEvent: StateEventWithContent<OfflineFileInformation> = consumed(),
+    val selectedSortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC,
+    val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
 ) {
 
     /**
