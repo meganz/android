@@ -3,6 +3,7 @@ package mega.privacy.android.app.getLink
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.graphics.PorterDuff
+import android.os.Build
 import android.os.Bundle
 import android.text.method.PasswordTransformationMethod
 import android.view.LayoutInflater
@@ -39,14 +40,12 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.SendToChatActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentGetLinkBinding
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_NONE_SENSITIVE
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_WARNING_TYPE_LINKS
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
-import mega.privacy.android.domain.entity.node.chat.SendToChatResult
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.ALPHA_VIEW_DISABLED
 import mega.privacy.android.app.utils.Constants.ALPHA_VIEW_ENABLED
@@ -61,7 +60,9 @@ import mega.privacy.android.app.utils.Util.calculateTimestamp
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.chat.SendToChatResult
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.resources.R as sharedR
@@ -621,7 +622,8 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
      */
     private fun copyToClipboard(copyInfo: Pair<String, String>) {
         TextUtil.copyToClipboard(requireActivity(), copyInfo.first)
-        (requireActivity() as SnackbarShower).showSnackbar(copyInfo.second)
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
+            (requireActivity() as? SnackbarShower)?.showSnackbar(copyInfo.second)
     }
 
     /**
