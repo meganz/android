@@ -1,5 +1,6 @@
 package mega.privacy.android.data.gateway
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.annotation.Keep
 import nz.mega.sdk.MegaApiAndroid
@@ -16,13 +17,19 @@ import javax.inject.Inject
  */
 @Keep
 internal class TimberMegaLogger @Inject constructor() : MegaLoggerInterface {
+    @SuppressLint("LogNotTimber")
     @Synchronized
     override fun log(time: String, logLevel: Int, source: String, message: String) {
-        Timber.tag(TAG)
-        Timber.log(
-            priority = getPriority(logLevel),
-            message = "$message ${getSource(source)}",
-        )
+        try {
+            Timber.tag(TAG)
+            Timber.log(
+                priority = getPriority(logLevel),
+                message = "$message ${getSource(source)}",
+            )
+        } catch (t: Throwable) {
+            // swallow everything to protect native code
+            Log.e(TAG, "Exception in SDK logger, swallowed to prevent SIGABRT", t)
+        }
     }
 
     private fun getPriority(logLevel: Int): Int {
