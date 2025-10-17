@@ -77,7 +77,7 @@ class InsertPendingDownloadsForNodesUseCase @Inject constructor(
             this.plus(File.separator)
         }
 
-    private companion object {
+    internal companion object {
         const val MAX_NAMES_TO_SAVE = 50
     }
 }

@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
+import mega.privacy.android.domain.usecase.transfers.pending.InsertPendingDownloadsForNodesUseCase.Companion.MAX_NAMES_TO_SAVE
 import javax.inject.Inject
 
 /**
@@ -23,7 +24,6 @@ class InsertPendingUploadsForFilesUseCase @Inject constructor(
     /**
      * Invoke
      * @param pathsAndNames the files to be uploaded with its corresponding name if needs to be changed, if null the file name will be kept
-     * @param appData
      * @param parentFolderId the id of the folder in the cloud drive where the files will be updated
      * @param isHighPriority whether this uploads are high priority (take precedence over current transfers) or not
      */
@@ -38,7 +38,9 @@ class InsertPendingUploadsForFilesUseCase @Inject constructor(
                 transferType = TransferType.GENERAL_UPLOAD,
                 destination = nodeRepository.getNodePathById(parentFolderId),
                 startTime = timeSystemRepository.getCurrentTimeInMillis(),
-                pendingTransferNodeId = pendingTransferNodeId
+                pendingTransferNodeId = pendingTransferNodeId,
+                selectedNames = pathsAndNames.mapNotNull { it.value }
+                    .takeIf { it.isNotEmpty() }?.take(MAX_NAMES_TO_SAVE),
             )
         )
         val appData = listOfNotNull(

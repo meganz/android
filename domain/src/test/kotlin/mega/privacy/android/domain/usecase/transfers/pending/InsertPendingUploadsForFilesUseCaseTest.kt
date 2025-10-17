@@ -64,6 +64,7 @@ class InsertPendingUploadsForFilesUseCaseTest {
                     destination = destination,
                     startTime = currentTime,
                     pendingTransferNodeId = pendingTransferNodeIdentifier,
+                    selectedNames = pathsAndNames.mapNotNull { it.value }
                 )
             )
         ) doReturn transferGroupId
