@@ -24,7 +24,7 @@ import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.appstate.content.AppContentStateViewModel
 import mega.privacy.android.app.appstate.content.model.AppContentState
 import mega.privacy.android.app.appstate.content.navigation.NavigationHandlerImpl
-import mega.privacy.android.app.appstate.content.navigation.view.MainNavigationScaffoldDestination
+import mega.privacy.android.app.appstate.content.navigation.view.HomeScreensNavKey
 import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
 import mega.privacy.android.app.appstate.content.transfer.TransferHandlerImpl
 import mega.privacy.android.app.appstate.global.event.AppDialogViewModel
@@ -39,7 +39,7 @@ internal fun AppContentView(
     snackbarHostState: SnackbarHostState,
     navKey: MegaActivity.LoggedInScreens,
 ) {
-    val backStack = rememberNavBackStack(MainNavigationScaffoldDestination)
+    val backStack = rememberNavBackStack(HomeScreensNavKey(null))
     val state by viewModel.state.collectAsStateWithLifecycle()
     val navigationHandler = remember { NavigationHandlerImpl(backStack) }
     val appTransferViewModel = hiltViewModel<AppTransferViewModel>()
@@ -87,11 +87,12 @@ internal fun AppContentView(
                             )
                         }
 
-                        entry<MainNavigationScaffoldDestination> {
+                        entry<HomeScreensNavKey> {
                             MegaApp(
                                 onInteraction = viewModel::signalPresence,
                                 navigationHandler = navigationHandler,
                                 transferHandler = transferHandler,
+                                navigationParameter = it,
                             )
                         }
                     }

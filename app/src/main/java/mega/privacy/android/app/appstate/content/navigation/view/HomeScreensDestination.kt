@@ -33,20 +33,18 @@ import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.mobile.navigation.snowflake.MainNavigationScaffold
-import timber.log.Timber
 
 @Serializable
-data object MainNavigationScaffoldDestination : NavKey
-
-@Serializable
-data object MainGraph : NavKey
-
+data class HomeScreensNavKey(
+    val initialDestination: NavKey?,
+) : NavKey
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainNavigationScaffold(
+fun HomeScreens(
     transferHandler: TransferHandler,
     navigationHandler: NavigationHandler,
+    initialDestination: NavKey?,
     modifier: Modifier = Modifier,
 ) {
     val viewModel = hiltViewModel<MainNavigationStateViewModel>()
@@ -68,7 +66,12 @@ fun MainNavigationScaffold(
         }
 
         is MainNavState.Data -> {
-            val backStack = rememberNavBackStack(currentState.initialDestination)
+            val backStack = rememberNavBackStack(
+                *listOfNotNull(
+                    currentState.initialDestination,
+                    initialDestination
+                ).toTypedArray()
+            )
             val currentDestination = backStack.lastOrNull()
             NewAdsContainer(
                 modifier = modifier.fillMaxSize(),
@@ -80,12 +83,12 @@ fun MainNavigationScaffold(
                     mainNavItems = currentState.mainNavItems,
                     onDestinationClick = { destination ->
                         if (destination != currentDestination) {
-                            if (backStack.size > 1) {
+                            while (backStack.size > 1) {
                                 // keep only the first initial destination and remove others
                                 backStack.removeLastOrNull()
                             }
                             if (destination != backStack.firstOrNull()) {
-                                backStack.add(destination)
+                                backStack.add(1, destination)
                             }
                         }
                     },
@@ -110,8 +113,7 @@ fun MainNavigationScaffold(
                                             transferHandler
                                         )
                                     }
-                                }
-                            )
+                                })
                         }
                     },
                 )
