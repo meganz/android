@@ -146,19 +146,19 @@ fun PhotosScreen(
     LaunchedEffect(
         isScrollingDown,
         isScrolledToEnd,
-        isScrolledToTop
+        isScrolledToTop,
+        timelineLazyGridState.isScrollInProgress
     ) {
-        isBannerShown = (!isScrollingDown && !isScrolledToEnd) || isScrolledToTop
+        val shouldShowBanner = (!isScrollingDown && !isScrolledToEnd) || isScrolledToTop
 
-        if (timelineLazyGridState.isScrollInProgress
-            && (isScrollingDown || isScrolledToEnd)
-            && timelineViewState.isCameraUploadsLimitedAccess
-        ) {
-            timelineViewModel.setCameraUploadsLimitedAccess(false)
+        isBannerShown = shouldShowBanner
+
+        if (timelineLazyGridState.isScrollInProgress) {
+            if ((isScrollingDown || isScrolledToEnd) && timelineViewState.isCameraUploadsLimitedAccess) {
+                timelineViewModel.setCameraUploadsLimitedAccess(false)
+            }
+            isWarningBannerShown = shouldShowBanner
         }
-        isWarningBannerShown = (!isScrollingDown && !isScrolledToEnd)
-                || isScrolledToTop
-                || timelineViewState.isCameraUploadsLimitedAccess
     }
 
     LaunchedEffect(timelineViewState.isCameraUploadsLimitedAccess) {
