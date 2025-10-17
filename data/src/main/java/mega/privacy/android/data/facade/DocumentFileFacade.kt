@@ -17,6 +17,7 @@ import mega.privacy.android.data.facade.DocumentFileFacade.Companion.EXTERNAL_ST
 import mega.privacy.android.data.facade.DocumentFileFacade.Companion.PRIMARY
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.wrapper.DocumentFileWrapper
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -85,18 +86,20 @@ class DocumentFileFacade @Inject constructor(
      * Get the [File] from the given [Uri].
      * Takes into account different Operating Systems and Manufacturers.
      */
-    private fun getFile(uri: Uri) = when {
-        isMIUIGalleryRawUri(uri) -> uri.path?.removePrefix(MIUI_RAW_PREFIX_PATH)
-            ?.let { path -> File(path) }
+    private fun getFile(uri: Uri) = runCatching {
+        when {
+            isMIUIGalleryRawUri(uri) -> uri.path?.removePrefix(MIUI_RAW_PREFIX_PATH)
+                ?.let { path -> File(path) }
 
-        isSamsungDeviceWithAndroidLessThanQ() -> uri.getColumnInfoString(MediaStore.MediaColumns.DATA)
-            ?.let { path -> File(path) }
+            isSamsungDeviceWithAndroidLessThanQ() -> uri.getColumnInfoString(MediaStore.MediaColumns.DATA)
+                ?.let { path -> File(path) }
 
-        uri.scheme == "file" -> uri.path
-            ?.let { path -> File(path) }
+            uri.scheme == "file" -> uri.path
+                ?.let { path -> File(path) }
 
-        else -> null
-    }
+            else -> null
+        }
+    }.onFailure { Timber.e(it, "Error getting File from Uri: $uri") }.getOrNull()
 
     override fun getAbsolutePathFromContentUri(uri: Uri): String? =
         fromUri(uri)?.getAbsolutePath()
