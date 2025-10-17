@@ -512,7 +512,7 @@ internal class FileFacade @Inject constructor(
         }
     }
 
-    private fun getLastModifiedFromContentResolver(uri: Uri) =
+    private fun getLastModifiedFromContentResolver(uri: Uri) = runCatching {
         context.contentResolver.acquireContentProviderClient(uri)
             ?.use { client ->
                 client.query(uri, null, null, null, null)
@@ -543,6 +543,7 @@ internal class FileFacade @Inject constructor(
                         lastModified
                     } ?: 0
             } ?: 0
+    }.onFailure { Timber.e("Error getting last modified from Uri: $uri") }.getOrElse { 0L }
 
     private fun getCurrentTimeWithToleranceMultiplier(toleranceMultiplier: Int) =
         System.currentTimeMillis() * toleranceMultiplier
@@ -811,7 +812,7 @@ internal class FileFacade @Inject constructor(
         }
     }
 
-    private fun getFileNameFromContentResolver(uri: Uri) =
+    private fun getFileNameFromContentResolver(uri: Uri) = runCatching {
         context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
             ?.let { cursor ->
                 cursor.use {
@@ -821,8 +822,9 @@ internal class FileFacade @Inject constructor(
                     } else null
                 }
             }
+    }.onFailure { Timber.e(it, "Error getting file name from Uri $uri") }.getOrNull()
 
-    private fun getFileSizeFromContentResolver(uri: Uri) =
+    private fun getFileSizeFromContentResolver(uri: Uri) = runCatching {
         context.contentResolver.query(uri, arrayOf(OpenableColumns.SIZE), null, null, null)
             ?.let { cursor ->
                 cursor.use {
@@ -832,6 +834,7 @@ internal class FileFacade @Inject constructor(
                     } else null
                 }
             }
+    }.onFailure { Timber.e(it, "Error getting file size from Uri $uri") }.getOrNull()
 
     override fun getDocumentMetadataSync(uri: Uri): DocumentMetadata? =
         getDocumentFileFromUri(uri)?.let { doc ->
