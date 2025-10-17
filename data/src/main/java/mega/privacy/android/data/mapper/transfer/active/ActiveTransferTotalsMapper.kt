@@ -41,7 +41,9 @@ internal class ActiveTransferTotalsMapper @Inject constructor(
                     val startTime = previousGroup?.startTime ?: transferGroup?.startTime ?: 0
                     val pendingTransferNodeIdentifier =
                         previousGroup?.pendingTransferNodeId ?: transferGroup?.pendingTransferNodeId
-                    val names = previousGroup?.selectedNames ?: transferGroup?.selectedNames
+                    val names = previousGroup?.selectedNames
+                        ?: transferGroup?.selectedNames
+                        ?: activeTransfersFiles.map { it.fileName }
                     destination?.let { dest ->
                         ActiveTransferTotals.ActionGroup(
                             groupId = groupId,
@@ -50,7 +52,7 @@ internal class ActiveTransferTotalsMapper @Inject constructor(
                             completedFiles = activeTransfersFiles.count { it.isFinished && transferredBytes[it.uniqueId] == it.totalBytes },
                             alreadyTransferred = activeTransfersFiles.count { it.isAlreadyTransferred },
                             destination = dest,
-                            selectedNames = names ?: emptyList(),
+                            selectedNames = names,
                             singleTransferTag = activeTransfersFiles.singleOrNull()?.tag,
                             startTime = startTime,
                             pausedFiles = activeTransfersFiles.count { it.isPaused },
