@@ -418,7 +418,7 @@ class FileBrowserViewModel @Inject constructor(
         mediaDiscoveryViewSettings: Int,
     ): Boolean =
         mediaDiscoveryViewSettings != MediaDiscoveryViewSettings.DISABLED.ordinal
-                && shouldEnterMediaDiscoveryModeUseCase(folderHandle)
+                && shouldEnterMediaDiscoveryModeUseCase(folderHandle, !showHiddenItems)
 
     /**
      * Refreshes the File Browser Nodes

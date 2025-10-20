@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.photos.mediadiscovery
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.SvgFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -21,18 +22,32 @@ class ShouldEnterMediaDiscoveryModeUseCase @Inject constructor(
     private val getCloudSortOrder: GetCloudSortOrder,
     private val nodeRepository: NodeRepository,
 ) {
-    suspend operator fun invoke(parentHandle: Long): Boolean {
-        val nodeId =
-            (if (parentHandle != nodeRepository.getInvalidHandle()) NodeId(parentHandle) else getRootNodeUseCase()?.id)
-                ?: return false
-        val childNodesFileTypes = nodeRepository.getNodeChildrenFileTypes(
+    suspend operator fun invoke(
+        parentHandle: Long,
+        isCheckSensitive: Boolean = false,
+    ): Boolean {
+        val nodeId = if (parentHandle != nodeRepository.getInvalidHandle()) {
+            NodeId(parentHandle)
+        } else {
+            getRootNodeUseCase()?.id
+        } ?: return false
+
+        val nodes = nodeRepository.getTypedNodesById(
             nodeId = nodeId,
-            order = getCloudSortOrder(),
+            order = getCloudSortOrder()
         )
 
-        if (childNodesFileTypes.isEmpty()) return false
-        return childNodesFileTypes.all { fileType ->
-            fileType !is SvgFileTypeInfo && (fileType is ImageFileTypeInfo || (fileType is VideoFileTypeInfo))
+        if (nodes.isEmpty()) return false
+
+        val isAllImageOrVideo = nodes.all { node ->
+            node is FileNode && node.type !is SvgFileTypeInfo &&
+                    (node.type is ImageFileTypeInfo || node.type is VideoFileTypeInfo)
+        }
+
+        return if (isAllImageOrVideo && isCheckSensitive) {
+            !nodes.filterIsInstance<FileNode>().all { it.isMarkedSensitive }
+        } else {
+            isAllImageOrVideo
         }
     }
 }

@@ -358,7 +358,7 @@ class FileBrowserViewModelTest {
     fun `test that media discovery cannot be entered when shouldEnterMediaDiscoveryModeUseCase is false and setting is in initial state`() =
         runTest {
             val newValue = 123456789L
-            whenever(shouldEnterMediaDiscoveryModeUseCase(newValue)).thenReturn(false)
+            whenever(shouldEnterMediaDiscoveryModeUseCase(newValue, false)).thenReturn(false)
 
             val shouldEnter =
                 underTest.shouldEnterMediaDiscoveryMode(
@@ -372,7 +372,7 @@ class FileBrowserViewModelTest {
     fun `test that media discovery cannot be entered when shouldEnterMediaDiscoveryModeUseCase is false and setting is in enabled state`() =
         runTest {
             val newValue = 123456789L
-            whenever(shouldEnterMediaDiscoveryModeUseCase(newValue)).thenReturn(false)
+            whenever(shouldEnterMediaDiscoveryModeUseCase(newValue, false)).thenReturn(false)
 
             val shouldEnter =
                 underTest.shouldEnterMediaDiscoveryMode(
@@ -386,7 +386,7 @@ class FileBrowserViewModelTest {
     fun `test that media discovery cannot be entered when shouldEnterMediaDiscoveryModeUseCase is false and setting is in disabled state`() =
         runTest {
             val newValue = 123456789L
-            whenever(shouldEnterMediaDiscoveryModeUseCase(newValue)).thenReturn(false)
+            whenever(shouldEnterMediaDiscoveryModeUseCase(newValue, false)).thenReturn(false)
 
             val shouldEnter =
                 underTest.shouldEnterMediaDiscoveryMode(
@@ -400,7 +400,7 @@ class FileBrowserViewModelTest {
     fun `test that media discovery can be entered when shouldEnterMediaDiscoveryModeUseCase is true and setting is in initial state `() =
         runTest {
             val newValue = 123456789L
-            whenever(shouldEnterMediaDiscoveryModeUseCase(newValue)).thenReturn(true)
+            whenever(shouldEnterMediaDiscoveryModeUseCase(newValue, false)).thenReturn(true)
 
             val shouldEnter =
                 underTest.shouldEnterMediaDiscoveryMode(
@@ -414,7 +414,7 @@ class FileBrowserViewModelTest {
     fun `test that media discovery can be entered when shouldEnterMediaDiscoveryModeUseCase is true and setting is in enabled state `() =
         runTest {
             val newValue = 123456789L
-            whenever(shouldEnterMediaDiscoveryModeUseCase(newValue)).thenReturn(true)
+            whenever(shouldEnterMediaDiscoveryModeUseCase(newValue, false)).thenReturn(true)
 
             val shouldEnter =
                 underTest.shouldEnterMediaDiscoveryMode(
@@ -428,7 +428,7 @@ class FileBrowserViewModelTest {
     fun `test that media discovery cannot be entered when shouldEnterMediaDiscoveryModeUseCase is true and setting is in disabled state `() =
         runTest {
             val newValue = 123456789L
-            whenever(shouldEnterMediaDiscoveryModeUseCase(newValue)).thenReturn(true)
+            whenever(shouldEnterMediaDiscoveryModeUseCase(newValue, false)).thenReturn(true)
 
             val shouldEnter =
                 underTest.shouldEnterMediaDiscoveryMode(
@@ -821,7 +821,7 @@ class FileBrowserViewModelTest {
         val folderHandle = 123456789L
 
         // Mock the necessary dependencies
-        whenever(shouldEnterMediaDiscoveryModeUseCase(folderHandle)).thenReturn(false)
+        whenever(shouldEnterMediaDiscoveryModeUseCase(folderHandle, false)).thenReturn(false)
 
         // Call the function
         underTest.openFileBrowserWithSpecificNode(folderHandle, null)
@@ -1894,7 +1894,7 @@ class FileBrowserViewModelTest {
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(showHiddenItemsFlow)
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFakeFlow)
-        whenever(shouldEnterMediaDiscoveryModeUseCase(any())).thenReturn(false)
+        whenever(shouldEnterMediaDiscoveryModeUseCase(any(), any())).thenReturn(false)
         whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
         whenever(monitorStorageStateUseCase()).thenReturn(
             StorageState.Green.asHotFlow()
