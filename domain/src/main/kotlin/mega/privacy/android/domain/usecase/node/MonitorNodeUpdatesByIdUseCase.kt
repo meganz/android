@@ -4,6 +4,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -18,6 +19,7 @@ import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorContactNameUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import javax.inject.Inject
 
@@ -29,6 +31,7 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     private val monitorRefreshSessionUseCase: MonitorRefreshSessionUseCase,
+    private val monitorContactNameUpdatesUseCase: MonitorContactNameUpdatesUseCase,
 ) {
     /**
      * Invoke
@@ -50,7 +53,8 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
                     nodeSourceType = nodeSourceType
                 ),
                 monitorOfflineNodeUpdates(effectiveNodeId),
-                monitorRefreshSessionUpdates()
+                monitorRefreshSessionUpdates(),
+                monitorContactNameUpdates(nodeSourceType)
             ).conflate().debounce(500L)
         )
     }
@@ -88,6 +92,9 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
             if (isNodeRemoved) NodeChanges.Remove else NodeChanges.Attributes
         }
 
+    /**
+     * Check if there are changes in root directory of outgoing shares
+     */
     private fun NodeUpdate.isChangesInOutgoingShares(
         node: Node,
         nodeSourceType: NodeSourceType,
@@ -109,4 +116,14 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
     private fun monitorRefreshSessionUpdates() = monitorRefreshSessionUseCase().map {
         NodeChanges.Attributes
     }
+
+    /**
+     * Monitor contact name updates only for incoming shares and outgoing shares
+     */
+    private fun monitorContactNameUpdates(nodeSourceType: NodeSourceType) =
+        if (nodeSourceType == NodeSourceType.INCOMING_SHARES || nodeSourceType == NodeSourceType.OUTGOING_SHARES) {
+            monitorContactNameUpdatesUseCase().map {
+                NodeChanges.Attributes
+            }
+        } else emptyFlow()
 }

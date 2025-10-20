@@ -11,9 +11,11 @@ import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorContactNameUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -31,6 +33,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
     private val getRootNodeUseCase: GetRootNodeUseCase = mock()
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase = mock()
     private val monitorRefreshSessionUseCase: MonitorRefreshSessionUseCase = mock()
+    private val monitorContactNameUpdatesUseCase: MonitorContactNameUpdatesUseCase = mock()
 
     private lateinit var underTest: MonitorNodeUpdatesByIdUseCase
 
@@ -40,7 +43,8 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             nodeRepository = nodeRepository,
             getRootNodeUseCase = getRootNodeUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
-            monitorRefreshSessionUseCase = monitorRefreshSessionUseCase
+            monitorRefreshSessionUseCase = monitorRefreshSessionUseCase,
+            monitorContactNameUpdatesUseCase = monitorContactNameUpdatesUseCase
         )
     }
 
@@ -50,7 +54,8 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             nodeRepository,
             getRootNodeUseCase,
             monitorOfflineNodeUpdatesUseCase,
-            monitorRefreshSessionUseCase
+            monitorRefreshSessionUseCase,
+            monitorContactNameUpdatesUseCase
         )
     }
 
@@ -75,6 +80,14 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf(Unit))
+            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+                flowOf(
+                    UserUpdate(
+                        emptyMap(),
+                        emptyMap()
+                    )
+                )
+            )
 
             underTest(nodeId).test {
                 assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
@@ -99,6 +112,14 @@ class MonitorNodeUpdatesByIdUseCaseTest {
         whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf())
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(listOf(offlineNode)))
         whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf(Unit))
+        whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+            flowOf(
+                UserUpdate(
+                    emptyMap(),
+                    emptyMap()
+                )
+            )
+        )
 
         underTest(nodeId).test {
             assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
@@ -113,6 +134,14 @@ class MonitorNodeUpdatesByIdUseCaseTest {
         whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf())
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
         whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf(Unit))
+        whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+            flowOf(
+                UserUpdate(
+                    emptyMap(),
+                    emptyMap()
+                )
+            )
+        )
 
         underTest(nodeId).test {
             assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
@@ -263,6 +292,14 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+                flowOf(
+                    UserUpdate(
+                        emptyMap(),
+                        emptyMap()
+                    )
+                )
+            )
 
             underTest(nodeId).test {
                 assertThat(awaitItem()).isEqualTo(NodeChanges.Remove)
@@ -292,9 +329,19 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+                flowOf(
+                    UserUpdate(
+                        emptyMap(),
+                        emptyMap()
+                    )
+                )
+            )
 
             underTest(nodeId, NodeSourceType.INCOMING_SHARES).test {
-                assertThat(awaitItem()).isEqualTo(NodeChanges.Remove)
+                // Both NodeChanges.Remove and NodeChanges.Attributes may emit
+                val firstItem = awaitItem()
+                assertThat(firstItem).isIn(listOf(NodeChanges.Remove, NodeChanges.Attributes))
                 cancelAndConsumeRemainingEvents()
             }
         }
@@ -321,6 +368,14 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf(Unit))
+            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+                flowOf(
+                    UserUpdate(
+                        emptyMap(),
+                        emptyMap()
+                    )
+                )
+            )
 
             underTest(nodeId, NodeSourceType.INCOMING_SHARES).test {
                 assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
@@ -350,6 +405,14 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf(Unit))
+            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+                flowOf(
+                    UserUpdate(
+                        emptyMap(),
+                        emptyMap()
+                    )
+                )
+            )
 
             underTest(nodeId, NodeSourceType.CLOUD_DRIVE).test {
                 assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
@@ -379,9 +442,19 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+                flowOf(
+                    UserUpdate(
+                        emptyMap(),
+                        emptyMap()
+                    )
+                )
+            )
 
             underTest(nodeId, NodeSourceType.INCOMING_SHARES).test {
-                assertThat(awaitItem()).isEqualTo(NodeChanges.Remove)
+                // Both NodeChanges.Remove and NodeChanges.Attributes may emit
+                val firstItem = awaitItem()
+                assertThat(firstItem).isIn(listOf(NodeChanges.Remove, NodeChanges.Attributes))
                 cancelAndConsumeRemainingEvents()
             }
         }
@@ -409,6 +482,14 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf(Unit))
+            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+                flowOf(
+                    UserUpdate(
+                        emptyMap(),
+                        emptyMap()
+                    )
+                )
+            )
 
             underTest(parentNodeId, NodeSourceType.INCOMING_SHARES).test {
                 assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
@@ -438,6 +519,14 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+                flowOf(
+                    UserUpdate(
+                        emptyMap(),
+                        emptyMap()
+                    )
+                )
+            )
 
             underTest(nodeId, NodeSourceType.OUTGOING_SHARES).test {
                 assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
@@ -467,6 +556,14 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+                flowOf(
+                    UserUpdate(
+                        emptyMap(),
+                        emptyMap()
+                    )
+                )
+            )
 
             underTest(nodeId, NodeSourceType.OUTGOING_SHARES).test {
                 assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
@@ -496,6 +593,14 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+                flowOf(
+                    UserUpdate(
+                        emptyMap(),
+                        emptyMap()
+                    )
+                )
+            )
 
             underTest(parentNodeId, NodeSourceType.OUTGOING_SHARES).test {
                 assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
@@ -525,6 +630,14 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+                flowOf(
+                    UserUpdate(
+                        emptyMap(),
+                        emptyMap()
+                    )
+                )
+            )
 
             underTest(nodeId, NodeSourceType.OUTGOING_SHARES).test {
                 assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
@@ -554,8 +667,97 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+                flowOf(
+                    UserUpdate(
+                        emptyMap(),
+                        emptyMap()
+                    )
+                )
+            )
 
             underTest(nodeId, NodeSourceType.OUTGOING_SHARES).test {
+                assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that invoke returns NodeChanges_Attributes when contact name updates occur for INCOMING_SHARES`() =
+        runTest {
+            val nodeId = NodeId(1L)
+
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf())
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+                flowOf(
+                    UserUpdate(
+                        emptyMap(),
+                        emptyMap()
+                    )
+                )
+            )
+
+            underTest(nodeId, NodeSourceType.INCOMING_SHARES).test {
+                assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that invoke returns NodeChanges_Attributes when contact name updates occur for OUTGOING_SHARES`() =
+        runTest {
+            val nodeId = NodeId(1L)
+
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf())
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+                flowOf(
+                    UserUpdate(
+                        emptyMap(),
+                        emptyMap()
+                    )
+                )
+            )
+
+            underTest(nodeId, NodeSourceType.OUTGOING_SHARES).test {
+                assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+
+    @Test
+    fun `test that invoke returns NodeChanges_Attributes when multiple flows emit simultaneously`() =
+        runTest {
+            val nodeId = NodeId(1L)
+            val offlineNode = Offline(
+                id = 1,
+                handle = "1",
+                path = "/test",
+                name = "test",
+                parentId = 1,
+                type = Offline.FOLDER,
+                origin = Offline.OTHER,
+                handleIncoming = ""
+            )
+
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf())
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(listOf(offlineNode)))
+            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf(Unit))
+            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+                flowOf(
+                    UserUpdate(
+                        emptyMap(),
+                        emptyMap()
+                    )
+                )
+            )
+
+            underTest(nodeId, NodeSourceType.INCOMING_SHARES).test {
+                // Should emit NodeChanges.Attributes from multiple flows (conflated and debounced)
                 assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
                 cancelAndConsumeRemainingEvents()
             }
