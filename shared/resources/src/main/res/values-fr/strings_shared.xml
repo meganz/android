@@ -574,8 +574,6 @@
     <string name="document_scanning_confirmation_file_type_pdf">PDF</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Document is uploaded as a JPEG file. This option can only be selected when there is only one scanned document-->
     <string name="document_scanning_confirmation_file_type_jpg">JPG</string>
-    <!-- One of the Options in the Scan Confirmation page where the scanned Documents are saved to Chat -->
-    <string name="document_scanning_confirmation_destination_chat">Dialogue en ligne</string>
     <!-- Label for the button or menu option to add a sync -->
     <string name="device_center_add_sync_button_option">Ajouter une synchronisation</string>
     <!-- Label for the button or menu option to add a backup -->
@@ -1199,9 +1197,9 @@
     <!-- text of how it works for mega pass free trial in achivements section -->
     <string name="text_how_it_works_mega_pass_free_trial">Installez l\’appli MEGA&#160;Pass, connectez-vous avec votre compte MEGA et commencez votre essai gratuit. Votre bonus d\’espace de stockage est ajouté automatiquement après le démarrage de l\’essai gratuit.</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">You’ve received %1$s extra storage space for starting a MEGA&#160;VPN free trial</string>
+    <string name="text_received_mega_vpn_free_trial">Vous avez reçu %1$s d\’espace de stockage supplémentaire pour avoir commencé un essai gratuit de MEGA&#160;VPN.</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">You’ve received %1$s extra storage space for starting a MEGA&#160;Pass free trial</string>
+    <string name="text_received_mega_pass_free_trial">Vous avez reçu %1$s d\’espace de stockage supplémentaire pour avoir commencé un essai gratuit de MEGA&#160;Pass.</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">Certains dossiers ne peuvent pas être synchronisés ou sauvegardés car l\’application MEGA a perdu les autorisations d\’accès aux dossiers locaux. Appuyez sur Reprendre pour rétablir les autorisations pour chaque dossier concerné.</string>
     <!-- Title for the free plan card when the user is an existing account -->
@@ -1497,7 +1495,7 @@
         <item quantity="other"></item>
     </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="context_share_correctly_removed">Access removed</string>
+    <string name="context_share_correctly_removed">Accès supprimé</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Oui</string>
     <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1510,8 +1508,9 @@
     </plurals>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
-        <item quantity="one">This folder is shared with %1$d contact. Stop sharing?</item>
-        <item quantity="other">This folder is shared with %1$d contacts. Stop sharing?</item>
+        <item quantity="one">Ce dossier est partagé avec %1$d contact. Arrêter le partage ?</item>
+        <item quantity="many">Ce dossier est partagé avec %1$d contacts. Arrêter le partage ?</item>
+        <item quantity="other">Ce dossier est partagé avec %1$d contacts. Arrêter le partage ?</item>
     </plurals>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
     <plurals name="alert_remove_several_shares">
@@ -1520,37 +1519,37 @@
         <item quantity="other"></item>
     </plurals>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
-    <string name="figures_storage_referrals_achievements_text">%1$s extra storage for each invitation, valid for %2$d days</string>
+    <string name="figures_storage_referrals_achievements_text">%1$s d\’espace de stockage supplémentaire pour chaque invitation, valable pendant %2$d jours</string>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with permanent valid duration -->
     <string name="figures_storage_referrals_achievements_text_permanent">%1$s de stockage supplémentaire pour chaque invitation, valable de façon permanente</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement with dynamic valid duration -->
-    <string name="figures_storage_achievements_text">%1$s extra storage, valid for %2$d days</string>
+    <string name="figures_storage_achievements_text">%1$s d\’espace de stockage supplémentaire, valable pendant %2$d jours</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement with permanent valid duration -->
     <string name="figures_storage_achievements_text_permanent">%1$s de stockage supplémentaire, valable de façon permanente</string>
     <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with dynamic valid duration -->
-    <string name="figures_storage_achievements_awarded_text">%1$s storage bonus applied, valid for %2$d days</string>
+    <string name="figures_storage_achievements_awarded_text">Bonus de stockage de %1$s appliqué, valable pendant %2$d jours</string>
     <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with permanent valid duration -->
     <string name="figures_storage_achievements_awarded_text_permanent">Bonus de %1$s de stockage appliqué, valable de façon permanente</string>
     <!-- info paragraph about the achievement install megasync with dynamic valid duration -->
-    <string name="paragraph_info_achievement_install_desktop_dynamic_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid for %2$s days. The desktop app is available for Windows, macOS and Linux.</string>
+    <string name="paragraph_info_achievement_install_desktop_dynamic_duration">Installez l\’appli MEGA pour ordinateur et bénéficiez de %1$s d\’espace de stockage supplémentaire gratuit, valable pendant %2$s jours. L\’appli pour ordinateur est disponible pour Windows, macOS et Linux.</string>
     <!-- info paragraph about the achievement install megasync with permanent valid duration -->
     <string name="paragraph_info_achievement_install_desktop_permanent_duration">Installez l\’application MEGA pour ordinateur et bénéficiez de %1$s d\’espace de stockage supplémentaire gratuit, valable à vie. L\’application pour ordinateur est disponible pour Windows, macOS et Linux.</string>
     <!-- info paragraph about the achievement install mobile app with dynamic valid duration -->
-    <string name="paragraph_info_achievement_install_mobile_app_dynamic_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid for %2$s days. The mobile apps are available for iOS and Android.</string>
+    <string name="paragraph_info_achievement_install_mobile_app_dynamic_duration">Installez l\’une des applis mobiles MEGA et bénéficiez de %1$s d\’espace de stockage supplémentaire gratuit, valable pendant %2$s jours. Les applis mobiles sont disponibles pour iOS et Android.</string>
     <!-- info paragraph about the achievement install mobile app with permanent valid duration -->
     <string name="paragraph_info_achievement_install_mobile_app_permanent_duration">Installez l\’une des applis mobiles MEGA et bénéficiez de %1$s d\’espace de stockage supplémentaire gratuit, valable à vie. Les applis mobiles sont disponibles pour iOS et Android.</string>
     <!-- Share multi backup folders, show below warning message -->
-    <string name="backup_multi_share_permission_text">These are backup folders and can only be shared as read-only</string>
+    <string name="backup_multi_share_permission_text">Ce sont des dossiers de sauvegarde qui ne peuvent être partagés qu\’en lecture seule.</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_share_permission_text">This is a backup folder and can only be shared as read-only</string>
+    <string name="backup_share_permission_text">Il s\’agit d\’un dossier de sauvegarde qui ne peut être partagé qu\’en lecture seule.</string>
     <!-- Button to confirm the action of restarting one transfer-->
     <string name="button_permission_info">Fermer</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_share_permission_title">Backup folders are read-only</string>
+    <string name="backup_share_permission_title">Les dossiers de sauvegarde sont en lecture seule</string>
     <!-- dialog option continue in alert dialog -->
     <string name="button_continue">Poursuivre</string>
     <!--Dialog title when the user selected is not on the contact list when sharing a node -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Can’t verify contact</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Impossible de vérifier le contact</string>
     <!--Dialog description when the user selected is not on the contact list when sharing a node -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">Vous ne pouvez pas vérifier %s, car cette personne n’est pas dans votre liste de contacts. Attendez qu’elle accepte d’abord votre invitation.</string>
     <!-- Answer for confirmation dialog. -->
@@ -1588,7 +1587,7 @@
         <item quantity="other">Si vous quittez ces dossiers, vous ne pourrez plus les voir.</item>
     </plurals>
     <!-- Title of the dialog to choose permissions when sharing. -->
-    <string name="dialog_select_permissions">Choose permissions</string>
+    <string name="dialog_select_permissions">Choisir les autorisations</string>
     <!-- Refers to access rights for a file folder. -->
     <string name="file_properties_shared_folder_full_access">Accès total</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
@@ -1596,9 +1595,9 @@
     <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="file_properties_shared_folder_read_write">Lecture et écriture</string>
     <!-- Text shown in the app bar when nodes are being selected in selection mode -->
-    <string name="general_selecting">Selecting</string>
+    <string name="general_selecting">Sélection</string>
     <!-- Snackbar message when retry failed on failed transfers tab. -->
-    <string name="transfers_retry_failed_snackbar_message">Unable to restart transfers</string>
+    <string name="transfers_retry_failed_snackbar_message">Impossible de redémarrer les transferts</string>
     <!-- Action for the Snackbar when retry failed on failed transfers tab. -->
     <string name="transfers_retry_failed_snackbar_action">Réessayer</string>
     <!-- Snackbar message when retry success on failed transfers tab. -->
@@ -1627,13 +1626,15 @@
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item restored but %d item wasn’t restored. Try again later.</item>
-        <item quantity="other">1 item restored but %d items weren’t restored. Try again later.</item>
+        <item quantity="one">1 élément restauré, mais %d élément n\’a pas été restauré. Veuillez réessayer ultérieurement.</item>
+        <item quantity="many">1 élément restauré, mais %d éléments n\’ont pas été restaurés. Veuillez réessayer ultérieurement.</item>
+        <item quantity="other">1 élément restauré, mais %d éléments n\’ont pas été restaurés. Veuillez réessayer ultérieurement.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
-        <item quantity="one">%d item restored but 1 item wasn’t restored. Try again later.</item>
-        <item quantity="other">%d items restored but 1 item wasn’t restored. Try again later.</item>
+        <item quantity="one">%d élément restauré, mais 1 élément n\’a pas été restauré. Veuillez réessayer ultérieurement.</item>
+        <item quantity="many">%d éléments restaurés, mais 1 élément n\’a pas été restauré. Veuillez réessayer ultérieurement.</item>
+        <item quantity="other">%d éléments restaurés, mais 1 élément n\’a pas été restauré. Veuillez réessayer ultérieurement.</item>
     </plurals>
     <!-- category in sort by action to sort by name -->
     <string name="action_sort_by_name">Nom</string>
@@ -1656,35 +1657,35 @@
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <string name="general_links_copied_clipboard">Les liens ont été copiés dans le presse-papiers</string>
     <!-- Snackbar message when retry success on failed transfers tab, singular form. -->
-    <string name="transfers_retry_feedback_snackbar_message_singular">Retrying transfer, see the Active tab for progress</string>
+    <string name="transfers_retry_feedback_snackbar_message_singular">Nouvelle tentative de transfert, consultez l\’onglet Actif pour suivre la progression</string>
     <!-- Snackbar message when retry success on failed transfers tab, plural form. -->
-    <string name="transfers_retry_feedback_snackbar_message_plural">Retrying transfers, see the Active tab for progress</string>
+    <string name="transfers_retry_feedback_snackbar_message_plural">Nouvelle tentative de transferts, consultez l\’onglet Actif pour suivre la progression</string>
     <!--Default file name for scanned documents. Placeholder value is for the current date and time values eg:   Scanned_2025091120323.  -->
-    <string name="document_scanning_default_file_name">Scanned_%1$s</string>
+    <string name="document_scanning_default_file_name">Numerisation_%1$s</string>
     <!-- Benefit: Rewind up to specified days of deleted data -->
-    <string name="pro_plan_benefit_rewind_days">Rewind up to %1$d days of deleted data</string>
+    <string name="pro_plan_benefit_rewind_days">Récupération jusqu\’à %1$d jours de données supprimées</string>
     <!-- Error message when removing 1 or more public links from nodes. -->
-    <string name="public_link_node_removal_error_message">Link removal failed, try again later</string>
+    <string name="public_link_node_removal_error_message">Suppression du lien échouée, veuillez réessayer plus tard.</string>
     <!-- Warning that appears prior to remove links of files-->
-    <string name="remove_links_warning_message">Removing a link means its contents won’t be publicly accessible anymore</string>
+    <string name="remove_links_warning_message">Supprimer un lien signifie que son contenu ne sera plus accessible au public.</string>
     <!-- Success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="stop_sharing_folder_success_message">Folder sharing stopped</string>
+    <string name="stop_sharing_folder_success_message">Partage de dossiers interrompu</string>
     <!-- Positive button text for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="stop_sharing_dialog_positive_button_text">Arrêter le partage</string>
     <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
-    <string name="leave_shared_folder_failed_message">Couldn’t leave one or more shared folders</string>
+    <string name="leave_shared_folder_failed_message">Impossible de quitter un ou plusieurs dossiers partagés</string>
     <!-- Confirmation message before leaving incoming shared folders -->
-    <string name="leave_shared_folder_confirmation_message">Leaving a shared folder means you won’t be able to see it again</string>
+    <string name="leave_shared_folder_confirmation_message">Quitter un dossier partagé signifie que vous ne pourrez plus le consulter.</string>
     <!-- Message when a single public link is removed successfully. -->
     <string name="link_removed_success_message">Le lien a été supprimé</string>
     <!-- Message when a single public link is removed successfully. -->
     <string name="links_removed_success_message">Les liens ont été supprimés</string>
     <!--Alert warning shown to the user when attempting to remove sharing from 1 or more folders-->
-    <string name="stop_sharing_dialog_title">Stop sharing this folder?</string>
+    <string name="stop_sharing_dialog_title">Arrêter le partage de ce dossier ?</string>
     <!--Alert warning shown to the user when attempting to remove sharing from multiple folders-->
-    <string name="stop_sharing_dialog_title_plurals">Stop sharing these folders?</string>
+    <string name="stop_sharing_dialog_title_plurals">Arrêter le partage de ces dossiers ?</string>
     <!-- Title of the dialog to choose permissions when sharing. -->
-    <string name="share_folder_dialog_choose_permission_title">Choose permissions</string>
+    <string name="share_folder_dialog_choose_permission_title">Choisir les autorisations</string>
     <!-- Refers to access rights for a file folder. -->
     <string name="share_folder_dialog_full_access_radio_option">Accès total</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
@@ -1692,7 +1693,7 @@
     <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="share_folder_dialog_read_write_radio_option">Lecture et écriture</string>
     <!-- Text shown in the app bar when nodes are being selected in selection mode -->
-    <string name="app_bar_selection_mode_description">Selecting</string>
+    <string name="app_bar_selection_mode_description">Sélectionner</string>
     <!-- success message when moving a node -->
     <string name="node_moved_success_message">L’élément a été déplacé</string>
     <!-- success message when a node was restore from Rubbish bin to a location -->
@@ -1701,8 +1702,9 @@
     <string name="node_restore_error_message">Une erreur est survenue. L’élément n’a pas été restauré.</string>
     <!-- Snackbar message to show when successfully left shared folder(s) along with one or more failures -->
     <plurals name="leave_shared_folder_partial_success_snackbar_message">
-        <item quantity="one">Left %1$d shared folder, but couldn’t leave one or more folders</item>
-        <item quantity="other">Left %1$d shared folders, but couldn’t leave one or more folders</item>
+        <item quantity="one">%1$d dossier a été quitté, mais un ou plusieurs dossiers n\’ont pas pu être quittés.</item>
+        <item quantity="many">%1$d dossiers ont été quittés, mais un ou plusieurs dossiers n\’ont pas pu être quittés.</item>
+        <item quantity="other">%1$d dossiers ont été quittés, mais un ou plusieurs dossiers n\’ont pas pu être quittés.</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="node_restored_from_rubbish_bin_success_message">
@@ -1719,24 +1721,25 @@
     <!--header for the Camera Uploads transfer in progress items -->
     <string name="camera_uploads_tranfer_header_in_progress">En cours</string>
     <!--header for the Camera Uploads transfer in queue items -->
-    <string name="camera_uploads_tranfer_header_in_queue">Queueing</string>
+    <string name="camera_uploads_tranfer_header_in_queue">En attente</string>
     <!--Title for the Camera Uploads transfer empty view -->
-    <string name="camera_uploads_tranfer_empty_view_title">All caught up</string>
+    <string name="camera_uploads_tranfer_empty_view_title">Tout est bon</string>
     <!--description for the Camera Uploads transfer empty view -->
-    <string name="camera_uploads_tranfer_empty_view_description">New photos and videos will appear here after you take them</string>
+    <string name="camera_uploads_tranfer_empty_view_description">De nouvelles photos et vidéos apparaîtront ici après que vous les aurez prises.</string>
     <!--Title for the Camera Uploads transfer top bar -->
     <string name="camera_uploads_tranfer_top_bar_title">Avancement</string>
     <!--Subtitle for the Camera Uploads transfer top bar -->
     <plurals name="camera_uploads_tranfer_top_bar_subtitle">
-        <item quantity="one">Uploading: %1$d item left</item>
-        <item quantity="other">Uploading: %1$d items left</item>
+        <item quantity="one">Téléversement : %1$d élément restant</item>
+        <item quantity="many">Téléversement : %1$d éléments restants</item>
+        <item quantity="other">Téléversement : %1$d éléments restants</item>
     </plurals>
     <!-- Text of the button to start a video call -->
     <string name="start_video_call_button_text">Vidéos</string>
     <!-- Text of the button for recording a video -->
     <string name="record_video_button_text">Vidéos</string>
     <!-- Label shown the total the used space for business/pro flexi account -->
-    <string name="navigation_drawer_used_space_only">[A]%1$s[/A] used</string>
+    <string name="navigation_drawer_used_space_only">[A]%1$s[/A] utilisé(s)</string>
     <!-- Message informing a transfer was cancelled -->
     <string name="transfers_transfer_cancelled">Le transfert a été annulé</string>
     <!-- Undo label for any undo action -->

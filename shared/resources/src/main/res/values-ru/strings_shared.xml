@@ -585,8 +585,6 @@
     <string name="document_scanning_confirmation_file_type_pdf">PDF</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Document is uploaded as a JPEG file. This option can only be selected when there is only one scanned document-->
     <string name="document_scanning_confirmation_file_type_jpg">JPG</string>
-    <!-- One of the Options in the Scan Confirmation page where the scanned Documents are saved to Chat -->
-    <string name="document_scanning_confirmation_destination_chat">Чат</string>
     <!-- Label for the button or menu option to add a sync -->
     <string name="device_center_add_sync_button_option">Добавить</string>
     <!-- Label for the button or menu option to add a backup -->
@@ -1780,7 +1778,7 @@
     <!-- Text of the button for recording a video -->
     <string name="record_video_button_text">Видео</string>
     <!-- Label shown the total the used space for business/pro flexi account -->
-    <string name="navigation_drawer_used_space_only">[A]%1$s[/A] used</string>
+    <string name="navigation_drawer_used_space_only">Используется [A]%1$s[/A]</string>
     <!-- Message informing a transfer was cancelled -->
     <string name="transfers_transfer_cancelled">Передача отменена</string>
     <!-- Undo label for any undo action -->

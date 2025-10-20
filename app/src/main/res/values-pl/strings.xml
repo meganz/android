@@ -405,8 +405,6 @@
     <string name="invalid_decryption_key">Nieprawidłowy klucz</string>
     <!-- upload to. Then choose an Audio file -->
     <string name="upload_to_audio">Dzwięk</string>
-    <!-- Title of the button in the contact info screen to start a video call -->
-    <string name="upload_to_video">Film</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="one">Przetwarzanie pliku</item>
@@ -1884,8 +1882,6 @@
     <string name="call_button">Połączenie</string>
     <!-- Title of the button in the contact info screen to send a message -->
     <string name="message_button">Wiadomość</string>
-    <!-- Title of the button in the contact info screen to start a video call -->
-    <string name="video_button">Film</string>
     <!-- Title of file explorer to send a link -->
     <string name="title_file_explorer_send_link">Wyślij link do&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
@@ -2353,8 +2349,6 @@
     <string name="create_account_title">Zarejestruj się, aby założyć konto MEGA</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">Niedawne</string>
-    <!-- Label to reference a chats section -->
-    <string name="chats_label">Czaty</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
     <string name="context_empty_recents">[B]Brak plików w [/B][A]Niedawne[/A]</string>
     <!-- Title of a recents bucket -->

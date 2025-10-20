@@ -396,8 +396,6 @@
     <string name="invalid_decryption_key">คีย์ถอดรหัสลับไม่ถูกต้อง</string>
     <!-- upload to. Then choose an Audio file -->
     <string name="upload_to_audio">เสียง</string>
-    <!-- Title of the button in the contact info screen to start a video call -->
-    <string name="upload_to_video">วิดีโอ</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="other">กำลังประมวลผลไฟล์</item>
@@ -1776,8 +1774,6 @@
     <string name="call_button">โทร</string>
     <!-- Title of the button in the contact info screen to send a message -->
     <string name="message_button">ข้อความ</string>
-    <!-- Title of the button in the contact info screen to start a video call -->
-    <string name="video_button">วิดีโอ</string>
     <!-- Title of file explorer to send a link -->
     <string name="title_file_explorer_send_link">ส่งลิงก์ไปยัง&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
@@ -2200,8 +2196,6 @@
     <string name="create_account_title">ลงทะเบียน MEGA</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">ล่าสุด</string>
-    <!-- Label to reference a chats section -->
-    <string name="chats_label">แชท</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
     <string name="context_empty_recents">[B]ไม่มีไฟล์ใน [/B][A]รายการล่าสุด[/A]</string>
     <!-- Title of a recents bucket -->

@@ -103,7 +103,7 @@
     <!-- General label for files -->
     <plurals name="general_num_files">
         <item quantity="one">Dosya</item>
-        <item quantity="other">Dosyalar</item>
+        <item quantity="other">Dosya</item>
     </plurals>
     <!-- Indicates how many contacts a folder is shared with. Plural. e.g. Shared with 7 contacts -->
     <plurals name="general_num_shared_with">
@@ -399,8 +399,6 @@
     <string name="invalid_decryption_key">Geçersiz şifre çözme anahtarı</string>
     <!-- upload to. Then choose an Audio file -->
     <string name="upload_to_audio">Ses</string>
-    <!-- Title of the button in the contact info screen to start a video call -->
-    <string name="upload_to_video">Görüntülü</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="one">Dosya hazırlanıyor</item>
@@ -1812,8 +1810,6 @@
     <string name="call_button">Ara</string>
     <!-- Title of the button in the contact info screen to send a message -->
     <string name="message_button">Mesaj</string>
-    <!-- Title of the button in the contact info screen to start a video call -->
-    <string name="video_button">Görüntülü</string>
     <!-- Title of file explorer to send a link -->
     <string name="title_file_explorer_send_link">Bağlantıyı şuraya gönder&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
@@ -1906,7 +1902,7 @@
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">%s kişisine davet daha önce gönderilmiş ve Gönderilen İstekler sekmesinden görüntülenebilir.</string>
     <!-- General label for files -->
-    <string name="general_files">Dosyalar</string>
+    <string name="general_files">Dosya</string>
     <!-- Item menu option upon right click on one or multiple files -->
     <string name="general_save_to_device">Cihaza kaydet</string>
     <!-- Title of cloud explorer to upload a file -->
@@ -2251,12 +2247,10 @@
     <string name="create_account_title">MEGA hesabı oluşturun</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">Son etkinlikler</string>
-    <!-- Label to reference a chats section -->
-    <string name="chats_label">Sohbetler</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
     <string name="context_empty_recents">[B]Son etkinliklerin içerisinde [/B][A]dosya bulunamadı[/A]</string>
     <!-- Title of a recents bucket -->
-    <string name="title_bucket">%1$s ve %2$d daha</string>
+    <string name="title_bucket">%1$s ve %2$d tane daha</string>
     <!-- Title of a media recents bucket that only contains some images -->
     <plurals name="title_media_bucket_only_images">
         <item quantity="one">%d fotoğraf</item>

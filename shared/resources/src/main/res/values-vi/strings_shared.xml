@@ -552,8 +552,6 @@
     <string name="document_scanning_confirmation_file_type_pdf">PDF</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Document is uploaded as a JPEG file. This option can only be selected when there is only one scanned document-->
     <string name="document_scanning_confirmation_file_type_jpg">JPG</string>
-    <!-- One of the Options in the Scan Confirmation page where the scanned Documents are saved to Chat -->
-    <string name="document_scanning_confirmation_destination_chat">Chat</string>
     <!-- Label for the button or menu option to add a sync -->
     <string name="device_center_add_sync_button_option">Thêm đồng bộ</string>
     <!-- Label for the button or menu option to add a backup -->
@@ -1267,7 +1265,7 @@
     <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
     <string name="node_option_move_to_rubbish_bin">Chuyển vào Thùng Rác</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
-    <string name="file_properties_available_offline">Được lưu ngoại tuyến</string>
+    <string name="file_properties_available_offline">Có lưu về ngoại tuyến</string>
     <!-- Menu item to unselect all the elements of a list -->
     <string name="action_unselect_all">Bỏ lựa chọn</string>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
@@ -1305,7 +1303,7 @@
     <!-- Menu option to restore an item from the Rubbish bin -->
     <string name="context_restore">Khôi phục</string>
     <!-- Menu item to select all the elements of a list -->
-    <string name="action_select_all">Chọn tất cả</string>
+    <string name="action_select_all">Chọn hết</string>
     <!-- send cancel subscriptions dialog -->
     <string name="context_send">Gửi</string>
     <!-- menu option to send a file to a chat -->
@@ -1375,7 +1373,7 @@
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_last_modified_file_explanation">Tệp tin đã cập nhật gần đây nhất sẽ thay thế tệp tin cũ hơn có ở cả hai vị&#160;trí</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict</string>
+    <string name="sync_stalled_issue_general_explanation">Hành&#160;động này sẽ được áp&#160;dụng để giải&#160;quyết xung&#160;đột</string>
     <!-- Dialog choose option -->
     <string name="general_dialog_choose_button">Chọn</string>
     <!-- Text label of Apply to all -->
@@ -1423,17 +1421,16 @@
     <!--Sign Up page text field input last name error message when character limit exceeded-->
     <string name="sign_up_last_name_text_field_char_limit_exceed_error">Họ của tên không được vượt quá 40 ký tự</string>
     <!-- Error message when IP has already sent an issue report and needs to wait -->
-    <string name="report_issue_too_many_times_error">You’ve already sent an issue report within the last 10 minutes. Please wait before trying again, or contact %1$s for assistance.</string>
+    <string name="report_issue_too_many_times_error">Bạn đã có gửi một báo cáo sự cố trong vòng 10 phút qua. Vui lòng đợi trước khi thử lại hoặc liên hệ %1$s để được hỗ trợ.</string>
     <!-- The snackbar message for informing the user about the invitation is trying to sent, is already in the received contact requests because the user already invited them. -->
     <string name="contacts_invite_already_received">Người này đã có gửi lời mời cho bạn từ trước rồi</string>
     <!-- The snackbar message for informing the user about the invitations is trying to sent, are already in the received contact requests because the users already invited them. -->
-    <string name="contacts_invites_already_received">All the people you invited have already sent you an invitation</string>
+    <string name="contacts_invites_already_received">Tất cả những người bạn mời đã có gửi cho bạn lời mời rồi</string>
     <!-- The snackbar message for informing the user about the invitations are correctly sent. -->
-    <string name="contacts_invites_sent">Invitation sent. They’ll appear in Contacts once accepted.</string>
+    <string name="contacts_invites_sent">Thư mời đã gửi. Những người này sẽ xuất hiện trong Sổ liên lạc sau khi chấp nhận.</string>
     <!-- The snackbar message for informing the user about some invitations correctly sent, but not others because they are already in the received contact requests because the users already invited them. -->
     <plurals name="contacts_invites_sent_but_others_already_received">
-        <item quantity="one">%1$d user invited, but one or more users have already invited you</item>
-        <item quantity="other">%1$d users invited, but one or more users have already invited you</item>
+        <item quantity="other">%1$d người đã được mời, nhưng một người hoặc hơn nữa đã có mời bạn rồi</item>
     </plurals>
     <!--  Error shown when the user tries to resend the sign up link multiple times at once. -->
     <string name="resend_signup_link_error">E-mail đã được gửi đi rồi. Xin chờ vài phút trước khi gửi lại cái mới.</string>
@@ -1472,37 +1469,37 @@
         <item quantity="other"></item>
     </plurals>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
-    <string name="figures_storage_referrals_achievements_text">%1$s extra storage for each invitation, valid for %2$d days</string>
+    <string name="figures_storage_referrals_achievements_text">%1$s thêm cho không&#160;gian lưu&#160;trữ với mỗi lần mời, có giá&#160;trị cho %2$d ngày</string>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with permanent valid duration -->
-    <string name="figures_storage_referrals_achievements_text_permanent">%1$s extra storage for each invitation, valid permanently</string>
+    <string name="figures_storage_referrals_achievements_text_permanent">%1$s thêm cho không&#160;gian lưu&#160;trữ với mỗi lần mời, có giá&#160;trị vĩnh&#160;viễn</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement with dynamic valid duration -->
-    <string name="figures_storage_achievements_text">%1$s extra storage, valid for %2$d days</string>
+    <string name="figures_storage_achievements_text">%1$s thêm cho không&#160;gian lưu&#160;trữ, có giá&#160;trị cho %2$d ngày</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement with permanent valid duration -->
-    <string name="figures_storage_achievements_text_permanent">%1$s extra storage, valid permanently</string>
+    <string name="figures_storage_achievements_text_permanent">%1$s thêm cho không&#160;gian lưu&#160;trữ, có giá&#160;trị vĩnh&#160;viễn</string>
     <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with dynamic valid duration -->
-    <string name="figures_storage_achievements_awarded_text">%1$s storage bonus applied, valid for %2$d days</string>
+    <string name="figures_storage_achievements_awarded_text">Đã áp dụng thêm %1$s cho không&#160;gian lưu&#160;trữ, có hiệu&#160;lực cho %2$d ngày</string>
     <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with permanent valid duration -->
-    <string name="figures_storage_achievements_awarded_text_permanent">%1$s storage bonus applied, valid permanently</string>
+    <string name="figures_storage_achievements_awarded_text_permanent">Đã áp dụng thêm %1$s cho không&#160;gian lưu&#160;trữ, có hiệu&#160;lực vĩnh&#160;viễn</string>
     <!-- info paragraph about the achievement install megasync with dynamic valid duration -->
-    <string name="paragraph_info_achievement_install_desktop_dynamic_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid for %2$s days. The desktop app is available for Windows, macOS and Linux.</string>
+    <string name="paragraph_info_achievement_install_desktop_dynamic_duration">Cài đặt ứng&#160;dụng MEGA cho máy&#160;tính và nhận thêm %1$s cho không&#160;gian lưu&#160;trữ miễn&#160;phí, có giá&#160;trị cho %2$s ngày. Ứng&#160;dụng cho máy&#160;tính có sẵn cho Windows, macOS và Linux.</string>
     <!-- info paragraph about the achievement install megasync with permanent valid duration -->
-    <string name="paragraph_info_achievement_install_desktop_permanent_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid permanently. The desktop app is available for Windows, macOS and Linux.</string>
+    <string name="paragraph_info_achievement_install_desktop_permanent_duration">Cài đặt ứng&#160;dụng MEGA cho máy&#160;tính và nhận thêm %1$s cho không&#160;gian lưu&#160;trữ miễn&#160;phí, có giá&#160;trị vĩnh&#160;viễn. Ứng&#160;dụng cho máy&#160;tính có sẵn cho Windows, macOS và Linux.</string>
     <!-- info paragraph about the achievement install mobile app with dynamic valid duration -->
-    <string name="paragraph_info_achievement_install_mobile_app_dynamic_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid for %2$s days. The mobile apps are available for iOS and Android.</string>
+    <string name="paragraph_info_achievement_install_mobile_app_dynamic_duration">Cài đặt ứng&#160;dụng MEGA cho di&#160;động và nhận thêm %1$s cho không&#160;gian lưu&#160;trữ miễn&#160;phí, có giá&#160;trị cho %2$s ngày. Ứng&#160;dụng cho di&#160;động có sẵn cho iOS và Android.</string>
     <!-- info paragraph about the achievement install mobile app with permanent valid duration -->
-    <string name="paragraph_info_achievement_install_mobile_app_permanent_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid permanently. The mobile apps are available for iOS and Android.</string>
+    <string name="paragraph_info_achievement_install_mobile_app_permanent_duration">Cài đặt ứng&#160;dụng MEGA cho di&#160;động và nhận thêm %1$s cho không&#160;gian lưu&#160;trữ miễn&#160;phí, có giá&#160;trị vĩnh&#160;viễn. Ứng&#160;dụng cho di&#160;động có sẵn cho iOS và Android.</string>
     <!-- Share multi backup folders, show below warning message -->
-    <string name="backup_multi_share_permission_text">These are backup folders and can only be shared as read-only</string>
+    <string name="backup_multi_share_permission_text">Đây là những thư mục sao lưu và chỉ có thể được chia sẻ dưới dạng chỉ-được-xem</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_share_permission_text">This is a backup folder and can only be shared as read-only</string>
+    <string name="backup_share_permission_text">Đây là một thư mục sao lưu và chỉ có thể được chia sẻ dưới dạng chỉ-được-xem</string>
     <!-- Button to confirm the action of restarting one transfer-->
     <string name="button_permission_info">OK, đã hiểu</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_share_permission_title">Backup folders are read-only</string>
+    <string name="backup_share_permission_title">Các thư mục sao lưu thuộc dạng chỉ-được-xem</string>
     <!-- dialog option continue in alert dialog -->
     <string name="button_continue">Tiếp tục</string>
     <!--Dialog title when the user selected is not on the contact list when sharing a node -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Can’t verify contact</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Không&#160;thể xác&#160;thực tên liên&#160;lạc</string>
     <!--Dialog description when the user selected is not on the contact list when sharing a node -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">Bạn không&#160;thể xác&#160;thực %s vì họ không&#160;có trong sổ liên&#160;lạc của bạn. Hãy chờ đến khi họ chấp&#160;nhận lời&#160;mời của bạn trước.</string>
     <!-- Answer for confirmation dialog. -->
@@ -1530,7 +1527,7 @@
         <item quantity="other">Nếu bạn quyết định từ bỏ các thư mục này, bạn sẽ không thể truy cập lại được nữa.</item>
     </plurals>
     <!-- Title of the dialog to choose permissions when sharing. -->
-    <string name="dialog_select_permissions">Choose permissions</string>
+    <string name="dialog_select_permissions">Chọn quyền&#160;hạn</string>
     <!-- Refers to access rights for a file folder. -->
     <string name="file_properties_shared_folder_full_access">Toàn quyền</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
@@ -1540,7 +1537,7 @@
     <!-- Text shown in the app bar when nodes are being selected in selection mode -->
     <string name="general_selecting">Chọn mục</string>
     <!-- Snackbar message when retry failed on failed transfers tab. -->
-    <string name="transfers_retry_failed_snackbar_message">Unable to restart transfers</string>
+    <string name="transfers_retry_failed_snackbar_message">Không thể khôi&#160;phục phiên truyền&#160;tải</string>
     <!-- Action for the Snackbar when retry failed on failed transfers tab. -->
     <string name="transfers_retry_failed_snackbar_action">Thử lại</string>
     <!-- Snackbar message when retry success on failed transfers tab. -->
@@ -1563,13 +1560,11 @@
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item restored but %d item wasn’t restored. Try again later.</item>
-        <item quantity="other">1 item restored but %d items weren’t restored. Try again later.</item>
+        <item quantity="other">1 mục đã được khôi&#160;phục và %d mục đã không khôi&#160;phục được. Thử lại sau.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
-        <item quantity="one">%d item restored but 1 item wasn’t restored. Try again later.</item>
-        <item quantity="other">%d items restored but 1 item wasn’t restored. Try again later.</item>
+        <item quantity="other">%d mục đã được khôi&#160;phục và 1 mục đã không khôi&#160;phục được. Thử lại sau.</item>
     </plurals>
     <!-- category in sort by action to sort by name -->
     <string name="action_sort_by_name">Tên</string>
@@ -1592,35 +1587,35 @@
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <string name="general_links_copied_clipboard">Đã sao&#160;chép các đường liên&#160;kết vào bảng&#160;nhớ&#160;tạm</string>
     <!-- Snackbar message when retry success on failed transfers tab, singular form. -->
-    <string name="transfers_retry_feedback_snackbar_message_singular">Retrying transfer, see the Active tab for progress</string>
+    <string name="transfers_retry_feedback_snackbar_message_singular">Đang thử truyền lại, xem thẻ Hoạt động để biết tiến&#160;độ</string>
     <!-- Snackbar message when retry success on failed transfers tab, plural form. -->
-    <string name="transfers_retry_feedback_snackbar_message_plural">Retrying transfers, see the Active tab for progress</string>
+    <string name="transfers_retry_feedback_snackbar_message_plural">Đang thử truyền lại các phiên, xem thẻ Hoạt động để biết tiến&#160;độ</string>
     <!--Default file name for scanned documents. Placeholder value is for the current date and time values eg:   Scanned_2025091120323.  -->
     <string name="document_scanning_default_file_name">Bảnquét_%1$s</string>
     <!-- Benefit: Rewind up to specified days of deleted data -->
     <string name="pro_plan_benefit_rewind_days">Tua lại dữ&#160;liệu bị xóa lên đến %1$d ngày</string>
     <!-- Error message when removing 1 or more public links from nodes. -->
-    <string name="public_link_node_removal_error_message">Link removal failed, try again later</string>
+    <string name="public_link_node_removal_error_message">Xóa bỏ đường liên kết thất bại, thử lại sau</string>
     <!-- Warning that appears prior to remove links of files-->
-    <string name="remove_links_warning_message">Removing a link means its contents won’t be publicly accessible anymore</string>
+    <string name="remove_links_warning_message">Xóa bỏ đường liên kết có nghĩa là nội dung của thư mục sẽ không còn truy cập công khai được nữa</string>
     <!-- Success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="stop_sharing_folder_success_message">Folder sharing stopped</string>
+    <string name="stop_sharing_folder_success_message">Đã dừng chia sẻ thư mục</string>
     <!-- Positive button text for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="stop_sharing_dialog_positive_button_text">Dừng chia&#160;sẻ</string>
     <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
-    <string name="leave_shared_folder_failed_message">Couldn’t leave one or more shared folders</string>
+    <string name="leave_shared_folder_failed_message">Đã không&#160;thể rời khỏi một (hoặc nhiều hơn) thư&#160;mục chia&#160;sẻ</string>
     <!-- Confirmation message before leaving incoming shared folders -->
-    <string name="leave_shared_folder_confirmation_message">Leaving a shared folder means you won’t be able to see it again</string>
+    <string name="leave_shared_folder_confirmation_message">Rời khỏi thư mục chia sẻ có nghĩa là bạn sẽ không thể xem lại thư mục đó được nữa</string>
     <!-- Message when a single public link is removed successfully. -->
     <string name="link_removed_success_message">Đường liên&#160;kết đã loại bỏ</string>
     <!-- Message when a single public link is removed successfully. -->
     <string name="links_removed_success_message">Các đường liên kết đã được xóa</string>
     <!--Alert warning shown to the user when attempting to remove sharing from 1 or more folders-->
-    <string name="stop_sharing_dialog_title">Stop sharing this folder?</string>
+    <string name="stop_sharing_dialog_title">Dừng chia sẻ thư mục này?</string>
     <!--Alert warning shown to the user when attempting to remove sharing from multiple folders-->
-    <string name="stop_sharing_dialog_title_plurals">Stop sharing these folders?</string>
+    <string name="stop_sharing_dialog_title_plurals">Dừng chia sẻ các thư mục này?</string>
     <!-- Title of the dialog to choose permissions when sharing. -->
-    <string name="share_folder_dialog_choose_permission_title">Choose permissions</string>
+    <string name="share_folder_dialog_choose_permission_title">Chọn quyền&#160;hạn</string>
     <!-- Refers to access rights for a file folder. -->
     <string name="share_folder_dialog_full_access_radio_option">Toàn quyền</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
@@ -1637,8 +1632,7 @@
     <string name="node_restore_error_message">Lỗi phát sinh. Mục không thể khôi phục.</string>
     <!-- Snackbar message to show when successfully left shared folder(s) along with one or more failures -->
     <plurals name="leave_shared_folder_partial_success_snackbar_message">
-        <item quantity="one">Left %1$d shared folder, but couldn’t leave one or more folders</item>
-        <item quantity="other">Left %1$d shared folders, but couldn’t leave one or more folders</item>
+        <item quantity="other">Đã rời khỏi %1$d thư mục chia sẻ, nhưng đã không thể rời một thư mục hoặc hơn</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="node_restored_from_rubbish_bin_success_message">
@@ -1655,7 +1649,7 @@
     <!--Title for the Camera Uploads transfer empty view -->
     <string name="camera_uploads_tranfer_empty_view_title">Đã xong hết</string>
     <!--description for the Camera Uploads transfer empty view -->
-    <string name="camera_uploads_tranfer_empty_view_description">New photos and videos will appear here after you take them</string>
+    <string name="camera_uploads_tranfer_empty_view_description">Ảnh và video mới sẽ xuất&#160;hiện ở đây sau khi bạn chụp xong</string>
     <!--Title for the Camera Uploads transfer top bar -->
     <string name="camera_uploads_tranfer_top_bar_title">Tiến trình</string>
     <!--Subtitle for the Camera Uploads transfer top bar -->
@@ -1667,9 +1661,9 @@
     <!-- Text of the button for recording a video -->
     <string name="record_video_button_text">Video</string>
     <!-- Label shown the total the used space for business/pro flexi account -->
-    <string name="navigation_drawer_used_space_only">[A]%1$s[/A] used</string>
+    <string name="navigation_drawer_used_space_only">Đang dùng [A]%1$s[/A]</string>
     <!-- Message informing a transfer was cancelled -->
-    <string name="transfers_transfer_cancelled">Truyền tải đã được hủy</string>
+    <string name="transfers_transfer_cancelled">Truyền tải đã hủy</string>
     <!-- Undo label for any undo action -->
     <string name="general_undo">Hoàn tác</string>
     <!-- Label for chat in the menu section-->

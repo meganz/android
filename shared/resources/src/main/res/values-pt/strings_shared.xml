@@ -115,7 +115,7 @@
     <!-- Location filter title of the video section  -->
     <string name="video_section_videos_location_filter_title">Localização</string>
     <!-- All locations option of the video section location filter  -->
-    <string name="video_section_videos_location_option_all_locations">Todos os locais</string>
+    <string name="video_section_videos_location_option_all_locations">Todas as localizações</string>
     <!-- Cloud drive option of the video section location filter  -->
     <string name="video_section_videos_location_option_cloud_drive">Nuvem de arquivos</string>
     <!-- Camera uploads option of the video section location filter  -->
@@ -574,8 +574,6 @@
     <string name="document_scanning_confirmation_file_type_pdf">PDF</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Document is uploaded as a JPEG file. This option can only be selected when there is only one scanned document-->
     <string name="document_scanning_confirmation_file_type_jpg">JPG</string>
-    <!-- One of the Options in the Scan Confirmation page where the scanned Documents are saved to Chat -->
-    <string name="document_scanning_confirmation_destination_chat">Chat</string>
     <!-- Label for the button or menu option to add a sync -->
     <string name="device_center_add_sync_button_option">Adicionar sincronização</string>
     <!-- Label for the button or menu option to add a backup -->
