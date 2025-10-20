@@ -402,8 +402,6 @@
     <string name="invalid_decryption_key">La clave de descifrado no es válida</string>
     <!-- upload to. Then choose an Audio file -->
     <string name="upload_to_audio">Audio</string>
-    <!-- Title of the button in the contact info screen to start a video call -->
-    <string name="upload_to_video">Vídeo</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="one">Procesando archivo</item>
@@ -1240,15 +1238,15 @@
     <!-- title of the section for unlocked storage quota -->
     <string name="unlocked_storage_title">Almacenamiento</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_referral_bonuses">Invite people to MEGA</string>
+    <string name="title_referral_bonuses">Invita a MEGA</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">Instala nuestra aplicación móvil</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Bono de registro</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Install our desktop app</string>
+    <string name="title_install_desktop">Instala nuestra aplicación de escritorio</string>
     <!-- indicates the number of days left related to a achievement -->
-    <string name="general_num_days_left">%1$d days left</string>
+    <string name="general_num_days_left">%1$d días restantes</string>
     <!-- State to indicate an achievement has expired -->
     <string name="expired_label">Caducado</string>
     <!-- title of the advanced setting to choose the use of https -->
@@ -1266,9 +1264,9 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Correo electrónico no válido</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">You’ve received %1$s extra storage space for installing our desktop app</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Has obtenido %1$s de espacio de almacenamiento extra por instalar nuestra aplicación de escritorio</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">You’ve received %1$s extra storage space for installing our mobile app</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Has obtenido %1$s de espacio de almacenamiento extra por instalar nuestra aplicación móvil</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Has recibido %1$s de espacio de almacenamiento como bono de registro gratuito.</string>
     <!-- menu items -->
@@ -1848,8 +1846,6 @@
     <string name="call_button">Llamar</string>
     <!-- Title of the button in the contact info screen to send a message -->
     <string name="message_button">Mensaje</string>
-    <!-- Title of the button in the contact info screen to start a video call -->
-    <string name="video_button">Vídeo</string>
     <!-- Title of file explorer to send a link -->
     <string name="title_file_explorer_send_link">Enviar enlace a&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
@@ -2302,8 +2298,6 @@
     <string name="create_account_title">Registra una cuenta de MEGA</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">Recientes</string>
-    <!-- Label to reference a chats section -->
-    <string name="chats_label">Chat</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
     <string name="context_empty_recents">[B]No hay archivos [/B] en [A]Recientes[/A]</string>
     <!-- Title of a recents bucket -->

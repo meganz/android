@@ -563,8 +563,6 @@
     <string name="document_scanning_confirmation_file_type_pdf">PDF</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Document is uploaded as a JPEG file. This option can only be selected when there is only one scanned document-->
     <string name="document_scanning_confirmation_file_type_jpg">JPG</string>
-    <!-- One of the Options in the Scan Confirmation page where the scanned Documents are saved to Chat -->
-    <string name="document_scanning_confirmation_destination_chat">Chat</string>
     <!-- Label for the button or menu option to add a sync -->
     <string name="device_center_add_sync_button_option">Synchronisierung hinzufügen</string>
     <!-- Label for the button or menu option to add a backup -->
@@ -1694,15 +1692,15 @@
     <string name="camera_uploads_tranfer_top_bar_title">Fortschritt</string>
     <!--Subtitle for the Camera Uploads transfer top bar -->
     <plurals name="camera_uploads_tranfer_top_bar_subtitle">
-        <item quantity="one">Uploading: %1$d item left</item>
-        <item quantity="other">Uploading: %1$d items left</item>
+        <item quantity="one">Upload im Gange: noch %1$d Element</item>
+        <item quantity="other">Upload im Gange: noch %1$d Elemente</item>
     </plurals>
     <!-- Text of the button to start a video call -->
     <string name="start_video_call_button_text">Video</string>
     <!-- Text of the button for recording a video -->
     <string name="record_video_button_text">Video</string>
     <!-- Label shown the total the used space for business/pro flexi account -->
-    <string name="navigation_drawer_used_space_only">[A]%1$s[/A] used</string>
+    <string name="navigation_drawer_used_space_only">[A]%1$s[/A] belegt</string>
     <!-- Message informing a transfer was cancelled -->
     <string name="transfers_transfer_cancelled">Transfer storniert</string>
     <!-- Undo label for any undo action -->

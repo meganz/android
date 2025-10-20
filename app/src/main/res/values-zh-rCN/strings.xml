@@ -396,8 +396,6 @@
     <string name="invalid_decryption_key">解密密钥无效</string>
     <!-- upload to. Then choose an Audio file -->
     <string name="upload_to_audio">音频</string>
-    <!-- Title of the button in the contact info screen to start a video call -->
-    <string name="upload_to_video">视频</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="other">文件处理中</item>
@@ -1776,8 +1774,6 @@
     <string name="call_button">通话</string>
     <!-- Title of the button in the contact info screen to send a message -->
     <string name="message_button">发消息</string>
-    <!-- Title of the button in the contact info screen to start a video call -->
-    <string name="video_button">视频</string>
     <!-- Title of file explorer to send a link -->
     <string name="title_file_explorer_send_link">发送链接到&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
@@ -2200,8 +2196,6 @@
     <string name="create_account_title">注册一个MEGA帐户</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">近期</string>
-    <!-- Label to reference a chats section -->
-    <string name="chats_label">聊天</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
     <string name="context_empty_recents">[A]最近[/A][B]无文件[/B]</string>
     <!-- Title of a recents bucket -->

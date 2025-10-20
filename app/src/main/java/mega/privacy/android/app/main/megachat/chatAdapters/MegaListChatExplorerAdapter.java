@@ -28,6 +28,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
@@ -45,7 +46,6 @@ import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerFragment
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerListItem;
 import mega.privacy.android.app.main.megachat.chat.explorer.ContactItemUiState;
 import mega.privacy.android.domain.entity.chat.ChatListItem;
-import mega.privacy.android.domain.entity.chat.CombinedChatRoom;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
@@ -163,7 +163,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
             if (item.isRecent()) {
                 holder.headerText.setText(R.string.recents_label);
             } else {
-                holder.headerText.setText(R.string.chats_label);
+                holder.headerText.setText(mega.privacy.android.shared.resources.R.string.general_chats_label);
             }
             return;
         }

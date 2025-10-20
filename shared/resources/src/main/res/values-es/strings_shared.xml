@@ -574,8 +574,6 @@
     <string name="document_scanning_confirmation_file_type_pdf">PDF</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Document is uploaded as a JPEG file. This option can only be selected when there is only one scanned document-->
     <string name="document_scanning_confirmation_file_type_jpg">JPG</string>
-    <!-- One of the Options in the Scan Confirmation page where the scanned Documents are saved to Chat -->
-    <string name="document_scanning_confirmation_destination_chat">Chat</string>
     <!-- Label for the button or menu option to add a sync -->
     <string name="device_center_add_sync_button_option">Añadir sincronización</string>
     <!-- Label for the button or menu option to add a backup -->
@@ -1143,7 +1141,7 @@
     <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->
     <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">Limpieza automática de la papelera entre 7 días y 10 años</string>
     <!-- Benefit: Priority support -->
-    <string name="pro_plan_benefit_priority_support">Asistencia prioritaria</string>
+    <string name="pro_plan_benefit_priority_support">Soporte prioritario</string>
     <!-- Subscription page information section title at the bottom of the page-->
     <string name="choose_account_screen_subscription_information_title">Información sobre la suscripción</string>
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
@@ -1199,9 +1197,9 @@
     <!-- text of how it works for mega pass free trial in achivements section -->
     <string name="text_how_it_works_mega_pass_free_trial">Instala la app MEGA&#160;Pass, inicia sesión con tu cuenta de MEGA y empieza tu prueba gratuita. El almacenamiento adicional se añadirá automáticamente después de iniciar la prueba gratis.</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">You’ve received %1$s extra storage space for starting a MEGA&#160;VPN free trial</string>
+    <string name="text_received_mega_vpn_free_trial">Has obtenido %1$s de espacio de almacenamiento extra por probar gratis MEGA&#160;VPN</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">You’ve received %1$s extra storage space for starting a MEGA&#160;Pass free trial</string>
+    <string name="text_received_mega_pass_free_trial">Has obtenido %1$s de espacio de almacenamiento extra por probar gratis MEGA&#160;Pass</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">No se puede hacer el backup o la sincronización de algunas carpetas porque la app de MEGA ha perdido los permisos para acceder a las carpetas locales. Toca Reanudar para volver a añadir los permisos para cada carpeta afectada.</string>
     <!-- Title for the free plan card when the user is an existing account -->
@@ -1311,7 +1309,7 @@
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
     <string name="title_edit_profile_info">Editar</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
-    <string name="file_properties_favourite">Favorito</string>
+    <string name="file_properties_favourite">Favoritos</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">Información</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
@@ -1597,7 +1595,7 @@
     <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="file_properties_shared_folder_read_write">Lectura y escritura</string>
     <!-- Text shown in the app bar when nodes are being selected in selection mode -->
-    <string name="general_selecting">Selecting</string>
+    <string name="general_selecting">Selección</string>
     <!-- Snackbar message when retry failed on failed transfers tab. -->
     <string name="transfers_retry_failed_snackbar_message">No se pueden reiniciar las transferencias</string>
     <!-- Action for the Snackbar when retry failed on failed transfers tab. -->
@@ -1649,7 +1647,7 @@
     <!-- category in sort by action to sort by node label name -->
     <string name="action_sort_by_label">Etiqueta</string>
     <!-- category in sort by action to sort by favorite -->
-    <string name="action_sort_by_favorite">Favorito</string>
+    <string name="action_sort_by_favorite">Favoritos</string>
     <!-- category in sort by action to sort by link creation date -->
     <string name="action_sort_by_link">Enlace</string>
     <!-- Header of action to sort nodes -->
@@ -1695,7 +1693,7 @@
     <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="share_folder_dialog_read_write_radio_option">Lectura y escritura</string>
     <!-- Text shown in the app bar when nodes are being selected in selection mode -->
-    <string name="app_bar_selection_mode_description">Selecting</string>
+    <string name="app_bar_selection_mode_description">Selección</string>
     <!-- success message when moving a node -->
     <string name="node_moved_success_message">Elemento movido</string>
     <!-- success message when a node was restore from Rubbish bin to a location -->
@@ -1723,24 +1721,25 @@
     <!--header for the Camera Uploads transfer in progress items -->
     <string name="camera_uploads_tranfer_header_in_progress">En curso</string>
     <!--header for the Camera Uploads transfer in queue items -->
-    <string name="camera_uploads_tranfer_header_in_queue">Queueing</string>
+    <string name="camera_uploads_tranfer_header_in_queue">En cola</string>
     <!--Title for the Camera Uploads transfer empty view -->
-    <string name="camera_uploads_tranfer_empty_view_title">All caught up</string>
+    <string name="camera_uploads_tranfer_empty_view_title">Todo al día.</string>
     <!--description for the Camera Uploads transfer empty view -->
-    <string name="camera_uploads_tranfer_empty_view_description">New photos and videos will appear here after you take them</string>
+    <string name="camera_uploads_tranfer_empty_view_description">Las fotos y los videos nuevos aparecerán aquí después de que los hagas.</string>
     <!--Title for the Camera Uploads transfer top bar -->
     <string name="camera_uploads_tranfer_top_bar_title">Progreso</string>
     <!--Subtitle for the Camera Uploads transfer top bar -->
     <plurals name="camera_uploads_tranfer_top_bar_subtitle">
-        <item quantity="one">Uploading: %1$d item left</item>
-        <item quantity="other">Uploading: %1$d items left</item>
+        <item quantity="one">Subiendo: %1$d elemento restante</item>
+        <item quantity="many">Subiendo: %1$d de elementos restantes</item>
+        <item quantity="other">Subiendo: %1$d elementos restantes</item>
     </plurals>
     <!-- Text of the button to start a video call -->
     <string name="start_video_call_button_text">Vídeo</string>
     <!-- Text of the button for recording a video -->
     <string name="record_video_button_text">Vídeo</string>
     <!-- Label shown the total the used space for business/pro flexi account -->
-    <string name="navigation_drawer_used_space_only">[A]%1$s[/A] used</string>
+    <string name="navigation_drawer_used_space_only">[A]%1$s[/A] usados</string>
     <!-- Message informing a transfer was cancelled -->
     <string name="transfers_transfer_cancelled">Transferencia cancelada</string>
     <!-- Undo label for any undo action -->

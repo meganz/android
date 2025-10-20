@@ -563,8 +563,6 @@
     <string name="document_scanning_confirmation_file_type_pdf">PDF</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Document is uploaded as a JPEG file. This option can only be selected when there is only one scanned document-->
     <string name="document_scanning_confirmation_file_type_jpg">JPG</string>
-    <!-- One of the Options in the Scan Confirmation page where the scanned Documents are saved to Chat -->
-    <string name="document_scanning_confirmation_destination_chat">Chat</string>
     <!-- Label for the button or menu option to add a sync -->
     <string name="device_center_add_sync_button_option">Add sync</string>
     <!-- Label for the button or menu option to add a backup -->
@@ -1711,4 +1709,6 @@
     <string name="general_chat">Chat</string>
     <!-- Photos section. -->
     <string name="general_section_photos">Photos</string>
+    <!-- General label to reference a chats section -->
+    <string name="general_chats_label">Chats</string>
 </resources>

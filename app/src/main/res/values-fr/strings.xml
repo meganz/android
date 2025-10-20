@@ -402,8 +402,6 @@
     <string name="invalid_decryption_key">Clé de déchiffrement invalide</string>
     <!-- upload to. Then choose an Audio file -->
     <string name="upload_to_audio">Audio</string>
-    <!-- Title of the button in the contact info screen to start a video call -->
-    <string name="upload_to_video">Vidéo</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="one">Traitement du fichier</item>
@@ -1248,7 +1246,7 @@
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Installez notre appli pour ordinateur</string>
     <!-- indicates the number of days left related to a achievement -->
-    <string name="general_num_days_left">%1$d days left</string>
+    <string name="general_num_days_left">%1$d jours restants</string>
     <!-- State to indicate an achievement has expired -->
     <string name="expired_label">Expiré</string>
     <!-- title of the advanced setting to choose the use of https -->
@@ -1848,8 +1846,6 @@
     <string name="call_button">Appel vocal</string>
     <!-- Title of the button in the contact info screen to send a message -->
     <string name="message_button">Dialoguer</string>
-    <!-- Title of the button in the contact info screen to start a video call -->
-    <string name="video_button">Appel vidéo</string>
     <!-- Title of file explorer to send a link -->
     <string name="title_file_explorer_send_link">Envoyer le lien à&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
@@ -2302,8 +2298,6 @@
     <string name="create_account_title">Inscrivez-vous pour un compte MEGA</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">Récents</string>
-    <!-- Label to reference a chats section -->
-    <string name="chats_label">Conversations</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
     <string name="context_empty_recents">[B]Aucun fichier dans [/B][A]Récents[/A]</string>
     <!-- Title of a recents bucket -->

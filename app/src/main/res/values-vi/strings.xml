@@ -396,8 +396,6 @@
     <string name="invalid_decryption_key">Chìa&#160;khóa giải&#160;mã không hợp&#160;lệ</string>
     <!-- upload to. Then choose an Audio file -->
     <string name="upload_to_audio">Âm Thanh</string>
-    <!-- Title of the button in the contact info screen to start a video call -->
-    <string name="upload_to_video">Video</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="other">Đang xử lý tệp tin</item>
@@ -1776,8 +1774,6 @@
     <string name="call_button">Gọi</string>
     <!-- Title of the button in the contact info screen to send a message -->
     <string name="message_button">Nhắn tin</string>
-    <!-- Title of the button in the contact info screen to start a video call -->
-    <string name="video_button">Video</string>
     <!-- Title of file explorer to send a link -->
     <string name="title_file_explorer_send_link">Gửi liên&#160;kết đến&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
@@ -2200,8 +2196,6 @@
     <string name="create_account_title">Đăng ký tài khoản MEGA</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">Gần&#160;Đây</string>
-    <!-- Label to reference a chats section -->
-    <string name="chats_label">Cuộc chat</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
     <string name="context_empty_recents">[B]Không có tệp&#160;tin nào trong [/B][A]sử&#160;dụng Gần&#160;Đây[/A]</string>
     <!-- Title of a recents bucket -->
@@ -3253,7 +3247,7 @@
     <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_left_to_add_message">Bạn đã thêm tất cả các tên liên lạc đã có vào trong cuộc chát này rồi. Nếu bạn muốn thêm thành viên nữa, trước hết hãy mời thêm người vào sổ liên lạc của bạn.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
-    <string name="media_player_video_snackbar_screenshot_saved">Hình ảnh được lưu vào thiết bị của bạn</string>
+    <string name="media_player_video_snackbar_screenshot_saved">Hình ảnh đã được lưu vào thiết bị của bạn</string>
     <!-- Album creation dialog title -->
     <string name="photos_album_creation_dialog_title">Điền tên album</string>
     <!-- Album creation input name placeholder -->

@@ -411,8 +411,6 @@
     <string name="invalid_decryption_key">مفتاح فك التشفير غير صالح</string>
     <!-- upload to. Then choose an Audio file -->
     <string name="upload_to_audio">صوتي</string>
-    <!-- Title of the button in the contact info screen to start a video call -->
-    <string name="upload_to_video">فيديو</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="zero">لا يوجد أي ملف جاري المعالجة</item>
@@ -1956,8 +1954,6 @@
     <string name="call_button">اتصل</string>
     <!-- Title of the button in the contact info screen to send a message -->
     <string name="message_button">رسالة</string>
-    <!-- Title of the button in the contact info screen to start a video call -->
-    <string name="video_button">فيديو</string>
     <!-- Title of file explorer to send a link -->
     <string name="title_file_explorer_send_link">إرسال الرابط إلى&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
@@ -2455,8 +2451,6 @@
     <string name="create_account_title">قم بالتسجيل للحصول على حساب ميغا MEGA</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">مؤخراً</string>
-    <!-- Label to reference a chats section -->
-    <string name="chats_label">محادثات</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
     <string name="context_empty_recents">[B]لا توجد ملفات في [/B][A]مؤخراً[/A]</string>
     <!-- Title of a recents bucket -->

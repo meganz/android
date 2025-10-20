@@ -396,8 +396,6 @@
     <string name="invalid_decryption_key">잘못된 복호화 키</string>
     <!-- upload to. Then choose an Audio file -->
     <string name="upload_to_audio">오디오</string>
-    <!-- Title of the button in the contact info screen to start a video call -->
-    <string name="upload_to_video">동영상</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="other">파일 처리중</item>
@@ -1776,8 +1774,6 @@
     <string name="call_button">전화</string>
     <!-- Title of the button in the contact info screen to send a message -->
     <string name="message_button">메시지</string>
-    <!-- Title of the button in the contact info screen to start a video call -->
-    <string name="video_button">동영상</string>
     <!-- Title of file explorer to send a link -->
     <string name="title_file_explorer_send_link">다음으로 링크 보내기&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
@@ -2200,8 +2196,6 @@
     <string name="create_account_title">MEGA 계정에 가입</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">최근</string>
-    <!-- Label to reference a chats section -->
-    <string name="chats_label">대화</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
     <string name="context_empty_recents">[A]최근 항목[/A][B]에 파일이 없습니다[/B]</string>
     <!-- Title of a recents bucket -->
