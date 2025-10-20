@@ -4,14 +4,11 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -20,7 +17,6 @@ import mega.privacy.android.app.appstate.content.model.AppContentState
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.navigation.Flagged
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
-import mega.privacy.android.domain.usecase.chat.RetryConnectionsAndSignalPresenceUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.preference.MonitorStartScreenPreferenceDestinationUseCase
@@ -35,16 +31,12 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoMoreInteractions
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AppContentStateViewModelTest {
     private lateinit var underTest: AppContentStateViewModel
     private val getEnabledFlaggedItemsUseCase = mock<GetEnabledFlaggedItemsUseCase>()
-    private val retryConnectionsAndSignalPresenceUseCase =
-        mock<RetryConnectionsAndSignalPresenceUseCase>()
 
     private val monitorStartScreenPreferenceDestinationUseCase =
         mock<MonitorStartScreenPreferenceDestinationUseCase>()
@@ -68,7 +60,6 @@ class AppContentStateViewModelTest {
         reset(
             getEnabledFlaggedItemsUseCase,
             monitorStartScreenPreferenceDestinationUseCase,
-            retryConnectionsAndSignalPresenceUseCase,
             rootNodeExistsUseCase,
         )
     }
@@ -158,84 +149,10 @@ class AppContentStateViewModelTest {
             }
     }
 
-    @Test
-    fun `test that signalPresence triggers retry connections and signal presence use case`() =
-        runTest {
-
-            retryConnectionsAndSignalPresenceUseCase.stub {
-                onBlocking { invoke() }.thenReturn(true)
-            }
-
-            stubMonitoFetchNodes()
-
-            stubAllEnabledFlaggedItems()
-
-            initUnderTest(emptySet())
-
-            // Wait for initial state to be emitted
-            underTest.state
-                .filterIsInstance<AppContentState.Data>()
-                .test {
-                    awaitItem()
-                    cancelAndIgnoreRemainingEvents()
-                }
-
-            // Call signalPresence
-            underTest.signalPresence()
-
-            // Wait for debounce delay
-            delay(600L)
-
-            // Verify the use case was called
-            verify(retryConnectionsAndSignalPresenceUseCase).invoke()
-        }
-
     private fun stubAllEnabledFlaggedItems() {
         getEnabledFlaggedItemsUseCase.stub {
             onBlocking { invoke(any<Set<Any>>()) }.thenAnswer { flow { emit(it.arguments.first()) } }
         }
-    }
-
-    @Test
-    fun `test that signalPresence debounces multiple calls`() = runTest {
-        Dispatchers.setMain(StandardTestDispatcher())
-
-        retryConnectionsAndSignalPresenceUseCase.stub {
-            onBlocking { invoke() }.thenReturn(true)
-        }
-
-        stubMonitoFetchNodes()
-
-        stubAllEnabledFlaggedItems()
-
-        initUnderTest(emptySet())
-
-        // Wait for initial state to be emitted
-        underTest.state
-            .filterIsInstance<AppContentState.Data>()
-            .test {
-                awaitItem()
-                cancelAndIgnoreRemainingEvents()
-            }
-
-        // Call signalPresence multiple times rapidly
-        underTest.signalPresence()
-        underTest.signalPresence()
-        underTest.signalPresence()
-
-        // Advance time by less than debounce delay
-        advanceTimeBy(300L)
-
-        // Verify the use case was NOT called yet
-        verifyNoMoreInteractions(retryConnectionsAndSignalPresenceUseCase)
-
-        // Advance time past debounce delay
-        advanceTimeBy(300L)
-
-        // Verify the use case was called only once due to debouncing
-        verify(retryConnectionsAndSignalPresenceUseCase).invoke()
-
-        Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 
     private fun stubMonitoFetchNodes(
@@ -259,7 +176,6 @@ class AppContentStateViewModelTest {
         underTest = AppContentStateViewModel(
             featureDestinations = featureDestinations,
             getEnabledFlaggedItemsUseCase = getEnabledFlaggedItemsUseCase,
-            retryConnectionsAndSignalPresenceUseCase = retryConnectionsAndSignalPresenceUseCase,
             monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
             rootNodeExistsUseCase = rootNodeExistsUseCase,
             appDialogDestinations = emptySet(),

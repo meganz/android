@@ -5,12 +5,17 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -27,6 +32,7 @@ import mega.privacy.android.app.appstate.global.SnackbarEventsViewModel
 import mega.privacy.android.app.appstate.global.model.GlobalState
 import mega.privacy.android.app.appstate.global.util.show
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
+import mega.privacy.android.app.presence.SignalPresenceViewModel
 import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginNavDisplay
@@ -59,6 +65,7 @@ class MegaActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val viewModel = viewModel<GlobalStateViewModel>()
+            val presenceViewModel = hiltViewModel<SignalPresenceViewModel>()
 
             val state by viewModel.state.collectAsStateWithLifecycle()
             val snackbarEventsViewModel = viewModel<SnackbarEventsViewModel>()
@@ -75,33 +82,45 @@ class MegaActivity : ComponentActivity() {
                     action = { snackbarHostState.show(it) }
                 )
 
-                when (val currentState = state) {
-                    is GlobalState.Loading -> {}
-                    is GlobalState.LoggedIn -> {
-                        AppContainer(
-                            containers = containers,
-                        ) {
-                            val appContentStateViewModel = hiltViewModel<AppContentStateViewModel>()
-                            AppContentView(
-                                viewModel = appContentStateViewModel,
-                                snackbarHostState = snackbarHostState,
-                                navKey = LoggedInScreens(
-                                    isFromLogin = fromLogin,
-                                    session = currentState.session
-                                ),
+                Box(modifier = Modifier.pointerInput(Unit) {
+                    awaitEachGesture {
+                        do {
+                            val event = awaitPointerEvent()
+                            if (event.type == PointerEventType.Press) {
+                                presenceViewModel.signalPresence()
+                            }
+                        } while (event.changes.any { it.pressed })
+                    }
+                }) {
+                    when (val currentState = state) {
+                        is GlobalState.Loading -> {}
+                        is GlobalState.LoggedIn -> {
+                            AppContainer(
+                                containers = containers,
+                            ) {
+                                val appContentStateViewModel =
+                                    hiltViewModel<AppContentStateViewModel>()
+                                AppContentView(
+                                    viewModel = appContentStateViewModel,
+                                    snackbarHostState = snackbarHostState,
+                                    navKey = LoggedInScreens(
+                                        isFromLogin = fromLogin,
+                                        session = currentState.session
+                                    ),
+                                )
+                            }
+                        }
+
+                        is GlobalState.RequireLogin -> {
+                            fromLogin = true
+                            LoginNavDisplay(
+                                chatRequestHandler = chatRequestHandler,
+                                onFinish = ::finish,
+                                stopShowingSplashScreen = {
+                                    keepSplashScreen = false
+                                },
                             )
                         }
-                    }
-
-                    is GlobalState.RequireLogin -> {
-                        fromLogin = true
-                        LoginNavDisplay(
-                            chatRequestHandler = chatRequestHandler,
-                            onFinish = ::finish,
-                            stopShowingSplashScreen = {
-                                keepSplashScreen = false
-                            },
-                        )
                     }
                 }
             }

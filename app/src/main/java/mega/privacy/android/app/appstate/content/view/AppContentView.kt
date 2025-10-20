@@ -24,6 +24,7 @@ import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.appstate.content.AppContentStateViewModel
 import mega.privacy.android.app.appstate.content.model.AppContentState
 import mega.privacy.android.app.appstate.content.navigation.NavigationHandlerImpl
+import mega.privacy.android.app.appstate.content.navigation.view.HomeScreens
 import mega.privacy.android.app.appstate.content.navigation.view.HomeScreensNavKey
 import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
 import mega.privacy.android.app.appstate.content.transfer.TransferHandlerImpl
@@ -88,11 +89,10 @@ internal fun AppContentView(
                         }
 
                         entry<HomeScreensNavKey> {
-                            MegaApp(
-                                onInteraction = viewModel::signalPresence,
-                                navigationHandler = navigationHandler,
+                            HomeScreens(
                                 transferHandler = transferHandler,
-                                navigationParameter = it,
+                                navigationHandler = navigationHandler,
+                                initialDestination = it.initialDestination,
                             )
                         }
                     }
