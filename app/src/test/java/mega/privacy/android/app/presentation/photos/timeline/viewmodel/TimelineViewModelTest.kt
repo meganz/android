@@ -798,7 +798,6 @@ internal class TimelineViewModelTest {
     fun `test that isCameraUploadsTransferScreenEnabled is updated as expected`(
         isEnabled: Boolean,
     ) = runTest {
-        // Set up default feature flags first
         getFeatureFlagValueUseCase.stub {
             onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
             onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
@@ -812,6 +811,27 @@ internal class TimelineViewModelTest {
         underTest.state.test {
             val state = awaitItem()
             assertThat(state.isCameraUploadsTransferScreenEnabled).isEqualTo(isEnabled)
+        }
+    }
+
+    @ParameterizedTest(name = "when isCUPausedWarningBannerEnabled is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isCUPausedWarningBannerEnabled is updated as expected`(
+        isEnabled: Boolean,
+    ) = runTest {
+        getFeatureFlagValueUseCase.stub {
+            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
+            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
+        }
+        whenever(getFeatureFlagValueUseCase(AppFeatures.CameraUploadsPausedWanningBanner))
+            .thenReturn(isEnabled)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isCUPausedWarningBannerEnabled).isEqualTo(isEnabled)
         }
     }
 

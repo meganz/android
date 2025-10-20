@@ -66,6 +66,7 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
  * @property isCameraUploadsTransferScreenEnabled       True if the Camera Uploads Transfer Screen feature is enabled
  * @property cameraUploadsTransfers                     List of in progress Camera Uploads transfers
  * @property popBackFromCameraUploadsTransferScreenEvent An event to signal that we should pop back from the Camera Uploads Transfer Screen
+ * @property isCUPausedWarningBannerEnabled             True if the Camera Uploads Paused Warning Banner feature is enabled
  */
 data class TimelineViewState(
     val photos: List<Photo> = emptyList(),
@@ -118,5 +119,6 @@ data class TimelineViewState(
     val hiddenNodeEnabled: Boolean = false,
     val isCameraUploadsTransferScreenEnabled: Boolean = false,
     val cameraUploadsTransfers: List<InProgressTransfer> = emptyList(),
-    val popBackFromCameraUploadsTransferScreenEvent: StateEvent = consumed
+    val popBackFromCameraUploadsTransferScreenEvent: StateEvent = consumed,
+    val isCUPausedWarningBannerEnabled: Boolean = false,
 )

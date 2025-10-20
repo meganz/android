@@ -197,6 +197,7 @@ class TimelineViewModel @Inject constructor(
             monitorIsHiddenNodesOnboarded()
         }
         checkCameraUploadsTransferScreenEnabled()
+        checkCameraUploadsPausedWarningBannerEnabled()
     }
 
     private suspend fun isUIDrivenPhotoMonitoringEnabled(): Boolean {
@@ -228,6 +229,18 @@ class TimelineViewModel @Inject constructor(
                 getFeatureFlagValueUseCase(AppFeatures.CameraUploadsTransferScreen)
             }.onSuccess { isEnabled ->
                 _state.update { it.copy(isCameraUploadsTransferScreenEnabled = isEnabled) }
+            }.onFailure { error ->
+                Timber.e(error)
+            }
+        }
+    }
+
+    private fun checkCameraUploadsPausedWarningBannerEnabled() {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.CameraUploadsPausedWanningBanner)
+            }.onSuccess { isEnabled ->
+                _state.update { it.copy(isCUPausedWarningBannerEnabled = isEnabled) }
             }.onFailure { error ->
                 Timber.e(error)
             }

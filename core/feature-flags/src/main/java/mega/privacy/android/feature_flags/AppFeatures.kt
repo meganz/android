@@ -16,6 +16,11 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
 
+    CameraUploadsPausedWanningBanner(
+        "Enable Camera Uploads paused warning banner",
+        false
+    ),
+
     CameraUploadsTransferScreen(
         "Enable Camera Uploads transfer screen",
         false
