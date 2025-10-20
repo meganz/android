@@ -1,6 +1,5 @@
 package mega.privacy.android.core.nodecomponents.action.clickhandler
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
@@ -14,6 +13,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.RestoreMenuActio
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -22,6 +22,7 @@ class RestoreActionClickHandler @Inject constructor(
     private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
     private val restoreNodesUseCase: RestoreNodesUseCase,
     private val restoreNodeResultMapper: RestoreNodeResultMapper,
+    private val isNodeDeletedFromBackupsUseCase: IsNodeDeletedFromBackupsUseCase,
 ) : SingleNodeAction, MultiNodeAction {
     override fun canHandle(action: MenuAction): Boolean = action is RestoreMenuAction
 
@@ -43,24 +44,33 @@ class RestoreActionClickHandler @Inject constructor(
     ) {
         provider.coroutineScope.launch {
             withContext(NonCancellable) {
-                val restoreMap = nodes.associate { node ->
-                    node.id.longValue to (node.restoreId?.longValue ?: -1L)
-                }
-                runCatching {
-                    checkNodesNameCollisionUseCase(restoreMap, NodeNameCollisionType.RESTORE)
-                }.onSuccess { result ->
-                    if (result.conflictNodes.isNotEmpty()) {
-                        provider.coroutineScope.ensureActive()
-                        val nodeHandleArray = nodes.map { it.id.longValue }.toLongArray()
-                        provider.restoreLauncher.launch(nodeHandleArray)
+                // backup nodes under syncDebris folder so user only can select one or all backup nodes
+                val isNodeInBackups =
+                    nodes.isNotEmpty() && runCatching { isNodeDeletedFromBackupsUseCase(nodes.first().id) }
+                        .getOrDefault(false)
+                if (isNodeInBackups) {
+                    // treat as move
+                    val nodeHandleArray = nodes.map { it.id.longValue }.toLongArray()
+                    provider.moveLauncher.launch(nodeHandleArray)
+                } else {
+                    val restoreMap = nodes.associate { node ->
+                        node.id.longValue to (node.restoreId?.longValue ?: -1L)
                     }
-                    if (result.noConflictNodes.isNotEmpty()) {
-                        val restoreResult = restoreNodesUseCase(result.noConflictNodes)
-                        val message = restoreNodeResultMapper(restoreResult)
-                        provider.postMessage(message)
+                    runCatching {
+                        checkNodesNameCollisionUseCase(restoreMap, NodeNameCollisionType.RESTORE)
+                    }.onSuccess { result ->
+                        if (result.conflictNodes.isNotEmpty()) {
+                            provider.coroutineScope.ensureActive()
+                            provider.restoreLauncher.launch(ArrayList(result.conflictNodes.values))
+                        }
+                        if (result.noConflictNodes.isNotEmpty()) {
+                            val restoreResult = restoreNodesUseCase(result.noConflictNodes)
+                            val message = restoreNodeResultMapper(restoreResult)
+                            provider.postMessage(message)
+                        }
+                    }.onFailure { throwable ->
+                        Timber.e(throwable)
                     }
-                }.onFailure { throwable ->
-                    Timber.e(throwable)
                 }
             }
         }

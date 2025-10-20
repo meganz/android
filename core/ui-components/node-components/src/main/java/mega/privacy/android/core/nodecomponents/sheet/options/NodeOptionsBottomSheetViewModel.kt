@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -43,6 +44,7 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
+    private val isNodeDeletedFromBackupsUseCase: IsNodeDeletedFromBackupsUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val nodeUiItemMapper: NodeUiItemMapper,
@@ -84,18 +86,26 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
             }
             val node = async { runCatching { getNodeByIdUseCase(NodeId(nodeId)) }.getOrNull() }
             val isNodeInRubbish =
-                async { runCatching { isNodeInRubbishBinUseCase(NodeId(nodeId)) }.getOrDefault(false) }
+                runCatching { isNodeInRubbishBinUseCase(NodeId(nodeId)) }.getOrDefault(false)
             val accessPermission =
                 async { runCatching { getNodeAccessPermission(NodeId(nodeId)) }.getOrNull() }
             val isInBackUps =
-                async { runCatching { isNodeInBackupsUseCase(nodeId) }.getOrDefault(false) }
+                async {
+                    runCatching {
+                        if (isNodeInRubbish) {
+                            isNodeDeletedFromBackupsUseCase(NodeId(nodeId))
+                        } else {
+                            isNodeInBackupsUseCase(nodeId)
+                        }
+                    }.getOrDefault(false)
+                }
             val typedNode = node.await()
             val permission = accessPermission.await()
             typedNode?.let {
                 val bottomSheetItems = nodeBottomSheetActionMapper(
                     toolbarOptions = bottomSheetOptions,
                     selectedNode = typedNode,
-                    isNodeInRubbish = isNodeInRubbish.await(),
+                    isNodeInRubbish = isNodeInRubbish,
                     accessPermission = permission,
                     isInBackUps = isInBackUps.await(),
                     isConnected = uiState.value.isOnline

@@ -3,6 +3,7 @@ package mega.privacy.android.core.nodecomponents.action
 import android.content.Context
 import androidx.activity.result.ActivityResultLauncher
 import kotlinx.coroutines.CoroutineScope
+import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.NavigationHandler
 
@@ -19,7 +20,7 @@ data class SingleNodeActionProvider(
     override val moveLauncher: ActivityResultLauncher<LongArray>,
     override val copyLauncher: ActivityResultLauncher<LongArray>,
     override val shareFolderLauncher: ActivityResultLauncher<LongArray>,
-    override val restoreLauncher: ActivityResultLauncher<LongArray>,
+    override val restoreLauncher: ActivityResultLauncher<ArrayList<NameCollision>>,
     override val sendToChatLauncher: ActivityResultLauncher<LongArray>,
     override val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Boolean>,
     val versionsLauncher: ActivityResultLauncher<Long>,
@@ -51,7 +52,7 @@ data class MultipleNodesActionProvider(
     override val moveLauncher: ActivityResultLauncher<LongArray>,
     override val copyLauncher: ActivityResultLauncher<LongArray>,
     override val shareFolderLauncher: ActivityResultLauncher<LongArray>,
-    override val restoreLauncher: ActivityResultLauncher<LongArray>,
+    override val restoreLauncher: ActivityResultLauncher<ArrayList<NameCollision>>,
     override val sendToChatLauncher: ActivityResultLauncher<LongArray>,
     override val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Boolean>,
 ) : NodeActionProvider(
@@ -79,7 +80,7 @@ open class NodeActionProvider(
     open val moveLauncher: ActivityResultLauncher<LongArray>,
     open val copyLauncher: ActivityResultLauncher<LongArray>,
     open val shareFolderLauncher: ActivityResultLauncher<LongArray>,
-    open val restoreLauncher: ActivityResultLauncher<LongArray>,
+    open val restoreLauncher: ActivityResultLauncher<ArrayList<NameCollision>>,
     open val sendToChatLauncher: ActivityResultLauncher<LongArray>,
     open val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Boolean>
 )

@@ -78,14 +78,10 @@ internal fun rememberSingleNodeActionHandler(
     }
 
     val restoreLauncher = rememberLauncherForActivityResult(
-        contract = megaActivityResultContract.selectFolderToMoveActivityResultContract
-    ) { result ->
-        result?.let { (nodeHandles, targetHandle) ->
-            nodeOptionsActionViewModel.checkNodesNameCollision(
-                nodeHandles.toList(),
-                targetHandle,
-                NodeNameCollisionType.RESTORE
-            )
+        contract = megaActivityResultContract.nameCollisionActivityContract
+    ) { message ->
+        if (!message.isNullOrEmpty()) {
+            nodeOptionsActionViewModel.postMessage(message)
         }
     }
 
@@ -199,14 +195,10 @@ internal fun rememberMultipleNodesActionHandler(
     }
 
     val restoreLauncher = rememberLauncherForActivityResult(
-        contract = megaActivityResultContract.selectFolderToMoveActivityResultContract
-    ) { result ->
-        result?.let { (nodeHandles, targetHandle) ->
-            nodeOptionsActionViewModel.checkNodesNameCollision(
-                nodeHandles.toList(),
-                targetHandle,
-                NodeNameCollisionType.RESTORE
-            )
+        contract = megaActivityResultContract.nameCollisionActivityContract
+    ) { message ->
+        if (!message.isNullOrEmpty()) {
+            nodeOptionsActionViewModel.postMessage(message)
         }
     }
 

@@ -71,6 +71,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.VerifyMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VersionsMenuAction
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.ShareData
+import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
@@ -88,6 +89,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUse
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeShareDataUseCase
@@ -154,9 +156,10 @@ class NodeActionClickHandlerTest {
     private val mockMoveLauncher = mock<ActivityResultLauncher<LongArray>>()
     private val mockCopyLauncher = mock<ActivityResultLauncher<LongArray>>()
     private val mockShareFolderLauncher = mock<ActivityResultLauncher<LongArray>>()
-    private val mockRestoreLauncher = mock<ActivityResultLauncher<LongArray>>()
+    private val mockRestoreLauncher = mock<ActivityResultLauncher<ArrayList<NameCollision>>>()
     private val mockSendToChatLauncher = mock<ActivityResultLauncher<LongArray>>()
     private val mockHiddenNodesOnboardingLauncher = mock<ActivityResultLauncher<Boolean>>()
+    private val isNodeDeletedFromBackupsUseCase = mock<IsNodeDeletedFromBackupsUseCase>()
 
     private val mockSingleNodeActionProvider = SingleNodeActionProvider(
         viewModel = mockViewModel,
@@ -367,7 +370,8 @@ class NodeActionClickHandlerTest {
         val action = RestoreActionClickHandler(
             mockCheckNodesNameCollisionUseCase,
             mockRestoreNodesUseCase,
-            mockRestoreNodeResultMapper
+            mockRestoreNodeResultMapper,
+            isNodeDeletedFromBackupsUseCase
         )
         val menuAction = mock<RestoreMenuAction>()
 
@@ -379,7 +383,8 @@ class NodeActionClickHandlerTest {
         val action = RestoreActionClickHandler(
             mockCheckNodesNameCollisionUseCase,
             mockRestoreNodesUseCase,
-            mockRestoreNodeResultMapper
+            mockRestoreNodeResultMapper,
+            isNodeDeletedFromBackupsUseCase
         )
         val menuAction = mock<RestoreMenuAction>()
 
@@ -397,11 +402,12 @@ class NodeActionClickHandlerTest {
             val action = RestoreActionClickHandler(
                 mockCheckNodesNameCollisionUseCase,
                 mockRestoreNodesUseCase,
-                mockRestoreNodeResultMapper
+                mockRestoreNodeResultMapper,
+                isNodeDeletedFromBackupsUseCase
             )
             val menuAction = mock<RestoreMenuAction>()
             val nodes = listOf(mockFileNode, mockFolderNode)
-
+            whenever(isNodeDeletedFromBackupsUseCase(any())).thenReturn(false)
             action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
 
             verify(mockCheckNodesNameCollisionUseCase).invoke(
@@ -1342,7 +1348,8 @@ class NodeActionClickHandlerTest {
             RestoreActionClickHandler(
                 mockCheckNodesNameCollisionUseCase,
                 mockRestoreNodesUseCase,
-                mockRestoreNodeResultMapper
+                mockRestoreNodeResultMapper,
+                isNodeDeletedFromBackupsUseCase
             ).canHandle(wrongAction)
         ).isFalse()
         assertThat(SendToChatActionClickHandler(mockGetNodeToAttachUseCase).canHandle(wrongAction)).isFalse()

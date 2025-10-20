@@ -8,9 +8,9 @@ import mega.android.core.ui.model.SnackbarAttributes
 import mega.privacy.android.core.nodecomponents.mapper.NodeAccessPermissionIconMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetActionMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
+import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
 import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
-import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -46,6 +47,7 @@ class NodeOptionsBottomSheetViewModelTest {
     private val nodeAccessPermissionIconMapper: NodeAccessPermissionIconMapper = mock()
     private val nodeBottomSheetActionMapper = mock<NodeBottomSheetActionMapper>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
+    private val isNodeDeletedFromBackupsUseCase: IsNodeDeletedFromBackupsUseCase = mock()
 
     private val sampleFileNode = mock<TypedFileNode>().stub {
         on { id } doReturn NodeId(123)
@@ -71,7 +73,8 @@ class NodeOptionsBottomSheetViewModelTest {
             getNodeByIdUseCase = getNodeByIdUseCase,
             nodeUiItemMapper = nodeUiItemMapper,
             snackbarEventQueue = snackbarEventQueue,
-            nodeMenuProviderRegistry = nodeMenuProviderRegistry
+            nodeMenuProviderRegistry = nodeMenuProviderRegistry,
+            isNodeDeletedFromBackupsUseCase = isNodeDeletedFromBackupsUseCase
         )
     }
 
