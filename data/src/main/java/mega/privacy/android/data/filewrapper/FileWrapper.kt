@@ -4,6 +4,7 @@ import androidx.annotation.Keep
 import mega.privacy.android.data.extensions.isFile
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.domain.entity.uri.UriPath
+import timber.log.Timber
 
 /**
  * Class used by SDK via JNI to get access to the native file descriptor (fd) and metadata of a file or folder. It's used to access files and folders from a content uri or path in a platform agnostic way.
@@ -38,15 +39,19 @@ class FileWrapper(
      * @return the file descriptor or null if the operation failed
      */
     @Keep
-    fun getFileDescriptor(write: Boolean) =
+    fun getFileDescriptor(write: Boolean): Int? = runCatching {
         getDetachedFileDescriptorFunction(write)
+    }.onFailure { Timber.e(it) }
+        .getOrNull()
 
     /**
      * Get the children uris of this folder.
      * @return the list of children uris or an empty list if the file is not a folder
      */
     @Keep
-    fun getChildrenUris(): List<String> = getChildrenUrisFunction()
+    fun getChildrenUris(): List<String> = runCatching { getChildrenUrisFunction() }
+        .onFailure { Timber.e(it) }
+        .getOrDefault(emptyList())
 
     /**
      * Check if a child file exists.
@@ -54,7 +59,9 @@ class FileWrapper(
      * @return true if the child file exists, false otherwise
      */
     @Keep
-    fun childFileExists(name: String) = childFileExistsFunction(name)
+    fun childFileExists(name: String): Boolean = runCatching { childFileExistsFunction(name) }
+        .onFailure { Timber.e(it) }
+        .getOrDefault(false)
 
     /**
      * Create a child file or folder.
@@ -63,35 +70,46 @@ class FileWrapper(
      * @return the [FileWrapper] of the newly created file or folder, or null if the operation failed
      */
     @Keep
-    fun createChildFile(name: String, asFolder: Boolean) = createChildFileFunction(name, asFolder)
+    fun createChildFile(name: String, asFolder: Boolean): FileWrapper? = runCatching {
+        createChildFileFunction(name, asFolder)
+    }.onFailure { Timber.e(it) }
+        .getOrNull()
 
     /**
      * Get the parent file or folder.
      * @return the [FileWrapper] of the parent folder or null if the operation failed
      */
     @Keep
-    fun getParentFile(): FileWrapper? = getParentUriFunction()
+    fun getParentFile(): FileWrapper? = runCatching { getParentUriFunction() }
+        .onFailure { Timber.e(it) }
+        .getOrNull()
 
     /**
      * Get the path of the file or folder.
      * @return the path or null if the operation failed
      */
     @Keep
-    fun getPath(): String? = getPathFunction()
+    fun getPath(): String? = runCatching { getPathFunction() }
+        .onFailure { Timber.e(it) }
+        .getOrNull()
 
     /**
      * Delete the file or folder.
      * @return true if the operation was successful, false otherwise
      */
     @Keep
-    fun deleteFile(): Boolean = deleteFileFunction()
+    fun deleteFile(): Boolean = runCatching { deleteFileFunction() }
+        .onFailure { Timber.e(it) }
+        .getOrDefault(false)
 
     /**
      * Delete the folder if it's empty.
      * @return true if the operation was successful, false otherwise
      */
     @Keep
-    fun deleteFolderIfEmpty(): Boolean = deleteFolderIfEmptyFunction()
+    fun deleteFolderIfEmpty(): Boolean = runCatching { deleteFolderIfEmptyFunction() }
+        .onFailure { Timber.e(it) }
+        .getOrDefault(false)
 
     /**
      * Sets the modification time of the file or folder.
@@ -99,7 +117,10 @@ class FileWrapper(
      * @return true if the operation was successful, false otherwise
      */
     @Keep
-    fun setModificationTime(newTime: Long): Boolean = setModificationTimeFunction(newTime)
+    fun setModificationTime(newTime: Long): Boolean = runCatching {
+        setModificationTimeFunction(newTime)
+    }.onFailure { Timber.e(it) }
+        .getOrDefault(false)
 
     /**
      * Rename the file or folder.
@@ -107,7 +128,9 @@ class FileWrapper(
      * @return the [FileWrapper] of the renamed file or folder, or null if the operation failed
      */
     @Keep
-    fun rename(newName: String): FileWrapper? = renameFunction(newName)
+    fun rename(newName: String): FileWrapper? = runCatching { renameFunction(newName) }
+        .onFailure { Timber.e(it) }
+        .getOrNull()
 
 
     /**
@@ -116,19 +139,18 @@ class FileWrapper(
      * @return the URI of the child file or null if the operation failed
      */
     @Keep
-    fun getChildByName(name: String): String? =
-        getChildByNameFunction(name)
+    fun getChildByName(name: String): String? = runCatching { getChildByNameFunction(name) }
+        .onFailure { Timber.e(it) }
+        .getOrNull()
 
     @Keep
     fun createNestedPath(
         children: List<String>,
         createIfMissing: Boolean,
         lastAsFolder: Boolean,
-    ): String? = createNestedPathFunction(
-        children,
-        createIfMissing,
-        lastAsFolder
-    )
+    ): String? = runCatching { createNestedPathFunction(children, createIfMissing, lastAsFolder) }
+        .onFailure { Timber.e(it) }
+        .getOrNull()
 
 
     companion object {

@@ -48,12 +48,22 @@ public class VideoCaptureUtils {
      * @see VideoCaptureUtils#isVideoAllowed
      */
     public static void setIsVideoAllowed(boolean isVideoAllowed) {
-        VideoCaptureUtils.isVideoAllowed = isVideoAllowed;
+        try {
+            VideoCaptureUtils.isVideoAllowed = isVideoAllowed;
+        } catch (Exception e) {
+            Timber.e(e);
+        }
     }
 
     static private VideoCapturer createCameraCapturer(CameraEnumerator enumerator, String deviceName) {
         Timber.d("createCameraCapturer: %s", deviceName);
-        return enumerator.createCapturer(deviceName, null);
+        try {
+            return enumerator.createCapturer(deviceName, null);
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+
+        return null;
     }
 
     /**
@@ -63,8 +73,14 @@ public class VideoCaptureUtils {
      */
     static private String[] deviceList() {
         Timber.d("DeviceList");
-        CameraEnumerator enumerator = new Camera1Enumerator(true);
-        return enumerator.getDeviceNames();
+        try {
+            CameraEnumerator enumerator = new Camera1Enumerator(true);
+            return enumerator.getDeviceNames();
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+
+        return new String[]{};
     }
 
     /**
@@ -73,17 +89,21 @@ public class VideoCaptureUtils {
      * @param listener Camera swap listener.
      */
     public static void swapCamera(ChatChangeVideoStreamListener listener) {
-        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        String currentCamera = megaChatApi.getVideoDeviceSelected();
-        String newCamera;
-        if (isFrontCamera(currentCamera)) {
-            newCamera = getBackCamera();
-        } else {
-            newCamera = getFrontCamera();
-        }
-        if (newCamera != null) {
-            isVideoAllowed = false;
-            megaChatApi.setChatVideoInDevice(newCamera, listener);
+        try {
+            MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+            String currentCamera = megaChatApi.getVideoDeviceSelected();
+            String newCamera;
+            if (isFrontCamera(currentCamera)) {
+                newCamera = getBackCamera();
+            } else {
+                newCamera = getFrontCamera();
+            }
+            if (newCamera != null) {
+                isVideoAllowed = false;
+                megaChatApi.setChatVideoInDevice(newCamera, listener);
+            }
+        } catch (Exception e) {
+            Timber.e(e);
         }
     }
 
@@ -93,7 +113,13 @@ public class VideoCaptureUtils {
      * @return Front camera device.
      */
     static public String getFrontCamera() {
-        return getCameraDevice(true);
+        try {
+            return getCameraDevice(true);
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+
+        return null;
     }
 
     /**
@@ -102,7 +128,13 @@ public class VideoCaptureUtils {
      * @return Back camera device.
      */
     static public String getBackCamera() {
-        return getCameraDevice(false);
+        try {
+            return getCameraDevice(false);
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+
+        return null;
     }
 
     /**
@@ -112,13 +144,18 @@ public class VideoCaptureUtils {
      * @return The camera device (front or back) requested. NULL if the requested device does not exist.
      */
     static private String getCameraDevice(boolean front) {
-        CameraEnumerator enumerator = new Camera1Enumerator(true);
-        String[] deviceList = deviceList();
-        for (String device : deviceList) {
-            if ((front && enumerator.isFrontFacing(device)) || (!front && enumerator.isBackFacing(device))) {
-                return device;
+        try {
+            CameraEnumerator enumerator = new Camera1Enumerator(true);
+            String[] deviceList = deviceList();
+            for (String device : deviceList) {
+                if ((front && enumerator.isFrontFacing(device)) || (!front && enumerator.isBackFacing(device))) {
+                    return device;
+                }
             }
+        } catch (Exception e) {
+            Timber.e(e);
         }
+
         return null;
     }
 
@@ -129,8 +166,14 @@ public class VideoCaptureUtils {
      * @return True if device is front camera or false in other case.
      */
     static public boolean isFrontCamera(String device) {
-        CameraEnumerator enumerator = new Camera1Enumerator(true);
-        return enumerator.isFrontFacing(device);
+        try {
+            CameraEnumerator enumerator = new Camera1Enumerator(true);
+            return enumerator.isFrontFacing(device);
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+
+        return false;
     }
 
     /**
@@ -140,8 +183,14 @@ public class VideoCaptureUtils {
      * @return True if device is back camera or false in other case.
      */
     static public boolean isBackCamera(String device) {
-        CameraEnumerator enumerator = new Camera1Enumerator(true);
-        return enumerator.isBackFacing(device);
+        try {
+            CameraEnumerator enumerator = new Camera1Enumerator(true);
+            return enumerator.isBackFacing(device);
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+
+        return false;
     }
 
     /**
@@ -150,12 +199,18 @@ public class VideoCaptureUtils {
      * @return True if the front camera is in use or false in other case.
      */
     static public boolean isFrontCameraInUse() {
-        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        String deviceName = megaChatApi.getVideoDeviceSelected();
+        try {
+            MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+            String deviceName = megaChatApi.getVideoDeviceSelected();
 
-        if (deviceName == null) return false;
+            if (deviceName == null) return false;
 
-        return isFrontCamera(deviceName);
+            return isFrontCamera(deviceName);
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+
+        return false;
     }
 
     /**
@@ -164,8 +219,14 @@ public class VideoCaptureUtils {
      * @return True if the back camera is in use or false in other case.
      */
     static public boolean isBackCameraInUse() {
-        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        return isBackCamera(megaChatApi.getVideoDeviceSelected());
+        try {
+            MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+            return isBackCamera(megaChatApi.getVideoDeviceSelected());
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+
+        return false;
     }
 
     static public void stopVideoCapture() {
@@ -174,8 +235,8 @@ public class VideoCaptureUtils {
         if (videoCapturer != null) {
             try {
                 videoCapturer.stopCapture();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                Timber.e(e);
             }
             videoCapturer = null;
         }
@@ -185,19 +246,24 @@ public class VideoCaptureUtils {
         Timber.d("startVideoCapture: %s", deviceName);
 
         stopVideoCapture();
-        Context context = MegaApplication.getInstance().getApplicationContext();
 
-        videoCapturer = createCameraCapturer(new Camera1Enumerator(true), deviceName);
+        try {
+            Context context = MegaApplication.getInstance().getApplicationContext();
 
-        if (videoCapturer == null) {
-            Timber.e("Unable to create video capturer");
-            return;
+            videoCapturer = createCameraCapturer(new Camera1Enumerator(true), deviceName);
+
+            if (videoCapturer == null) {
+                Timber.e("Unable to create video capturer");
+                return;
+            }
+
+            videoCapturer.initialize(surfaceTextureHelper, context, nativeAndroidVideoTrackSource);
+
+            // Start the capture!
+            videoCapturer.startCapture(videoWidth, videoHeight, videoFps);
+            Timber.d("Start Capture");
+        } catch (Exception e) {
+            Timber.e(e);
         }
-
-        videoCapturer.initialize(surfaceTextureHelper, context, nativeAndroidVideoTrackSource);
-
-        // Start the capture!
-        videoCapturer.startCapture(videoWidth, videoHeight, videoFps);
-        Timber.d("Start Capture");
     }
 }
