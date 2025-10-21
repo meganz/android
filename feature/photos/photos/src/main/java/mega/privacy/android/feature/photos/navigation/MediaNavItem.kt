@@ -4,8 +4,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.feature.photos.presentation.home.PhotosNavKey
-import mega.privacy.android.feature.photos.presentation.home.photosScreen
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.MainNavItemBadge
@@ -17,7 +15,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 import mega.privacy.mobile.analytics.event.PhotosBottomNavigationItemEvent
 
-class PhotosNavItem : MainNavItem {
+class MediaNavItem : MainNavItem {
     override val destination: NavKey = PhotosNavKey
     override val screen: EntryProviderScope<NavKey>.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
         { navigationHandler, navigationController, transferHandler ->
@@ -29,7 +27,7 @@ class PhotosNavItem : MainNavItem {
     override val icon: ImageVector = IconPack.Medium.Thin.Outline.Image01
     override val selectedIcon: ImageVector = IconPack.Medium.Thin.Solid.Image01
     override val badge: Flow<MainNavItemBadge?>? = null
-    override val label: Int = sharedR.string.general_section_photos
+    override val label: Int = sharedR.string.media_feature_title
     override val preferredSlot: PreferredSlot = PreferredSlot.Ordered(2)
     override val availableOffline: Boolean = true
     override val analyticsEventIdentifier: NavigationEventIdentifier =
