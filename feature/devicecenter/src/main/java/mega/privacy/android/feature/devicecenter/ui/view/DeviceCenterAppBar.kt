@@ -1,14 +1,11 @@
 package mega.privacy.android.feature.devicecenter.ui.view
 
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUiState
@@ -23,9 +20,7 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 internal fun DeviceCenterAppBar(
     uiState: DeviceCenterUiState,
     selectedDevice: DeviceUINode?,
-    modalSheetState: ModalBottomSheetState,
-    coroutineScope: CoroutineScope,
-    onBackPressHandled: () -> Unit,
+    onNavigateUp: () -> Unit,
     onActionPressed: ((MenuAction) -> Unit)?,
     onSearchQueryChanged: (query: String) -> Unit,
     onSearchCloseClicked: () -> Unit,
@@ -38,13 +33,7 @@ internal fun DeviceCenterAppBar(
             title = selectedDevice?.name
                 ?: stringResource(R.string.device_center_top_app_bar_title),
             elevation = 0.dp,
-            onNavigationPressed = {
-                if (modalSheetState.isVisible) {
-                    coroutineScope.launch { modalSheetState.hide() }
-                } else {
-                    onBackPressHandled()
-                }
-            },
+            onNavigationPressed = onNavigateUp,
             onActionPressed = onActionPressed,
             windowInsets = WindowInsets(0.dp),
         )
@@ -56,13 +45,7 @@ internal fun DeviceCenterAppBar(
             onCloseClicked = {
                 onSearchCloseClicked()
             },
-            onBackPressed = {
-                if (modalSheetState.isVisible) {
-                    coroutineScope.launch { modalSheetState.hide() }
-                } else {
-                    onBackPressHandled()
-                }
-            },
+            onBackPressed = onNavigateUp,
             onSearchClicked = { onSearchClicked() },
             elevation = false,
             title = selectedDevice?.name

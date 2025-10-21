@@ -4,6 +4,8 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.BOTTOM_SHEET_CONTAINER
 import mega.privacy.android.feature.devicecenter.ui.lists.loading.DEVICE_CENTER_LOADING_SCREEN
@@ -119,6 +121,7 @@ internal class DeviceCenterScreenTest {
             devices = listOf(ownDeviceUINode),
             isInitialLoadingFinished = true,
             menuClickedDevice = ownDeviceUINode,
+            isNetworkConnected = true
         )
         composeTestRule.setContent {
             DeviceCenterScreen(
@@ -143,6 +146,12 @@ internal class DeviceCenterScreenTest {
                 onSearchClicked = {},
             )
         }
+
+        composeTestRule
+            .onNodeWithTag("node_list_view_item:more_icon")
+            .performScrollTo()
+            .performClick()
+
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_CONTAINER).assertExists()
     }
 
