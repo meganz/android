@@ -34,7 +34,7 @@ interface MegaLocalStorageGateway {
      * Get links sort order
      * @return links sort order
      */
-    suspend fun getLinksSortOrder(): Int
+    suspend fun getLinksSortOrder(isSingleActivityEnabled: Boolean): Int
 
     /**
      * Get offline sort order

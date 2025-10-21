@@ -29,7 +29,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetLinksSortOrderUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.node.publiclink.MonitorPublicLinksUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -39,7 +39,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -56,7 +55,7 @@ class LinksViewModelTest {
     private val setViewTypeUseCase: SetViewType = mock()
     private val monitorViewTypeUseCase: MonitorViewType = mock()
     private val nodeUiItemMapper: NodeUiItemMapper = mock()
-    private val getCloudSortOrder: GetCloudSortOrder = mock()
+    private val getLinksSortOrderUseCase: GetLinksSortOrderUseCase = mock()
     private val setCloudSortOrder: SetCloudSortOrder = mock()
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = mock()
 
@@ -76,7 +75,7 @@ class LinksViewModelTest {
             setViewTypeUseCase,
             monitorViewTypeUseCase,
             nodeUiItemMapper,
-            getCloudSortOrder,
+            getLinksSortOrderUseCase,
             setCloudSortOrder,
             nodeSortConfigurationUiMapper
         )
@@ -87,15 +86,15 @@ class LinksViewModelTest {
         setViewTypeUseCase = setViewTypeUseCase,
         monitorViewTypeUseCase = monitorViewTypeUseCase,
         nodeUiItemMapper = nodeUiItemMapper,
-        getCloudSortOrder = getCloudSortOrder,
+        getLinksSortOrderUseCase = getLinksSortOrderUseCase,
         setCloudSortOrder = setCloudSortOrder,
         nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
     )
 
     private suspend fun setupTestData(items: List<PublicLinkNode>) {
-        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
-        whenever(nodeSortConfigurationUiMapper(any<SortOrder>())).thenReturn(NodeSortConfiguration.default)
-        whenever(monitorPublicLinksUseCase()).thenReturn(flowOf(items))
+        whenever(getLinksSortOrderUseCase(true)).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+        whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(NodeSortConfiguration.default)
+        whenever(monitorPublicLinksUseCase(true)).thenReturn(flowOf(items))
 
         val nodeUiItems = items.map { node ->
             NodeUiItem<TypedNode>(
@@ -565,7 +564,7 @@ class LinksViewModelTest {
         val expectedSortOrder = SortOrder.ORDER_DEFAULT_ASC
         val expectedSortConfiguration = NodeSortConfiguration.default
 
-        whenever(getCloudSortOrder()).thenReturn(expectedSortOrder)
+        whenever(getLinksSortOrderUseCase(true)).thenReturn(expectedSortOrder)
         whenever(nodeSortConfigurationUiMapper(expectedSortOrder)).thenReturn(
             expectedSortConfiguration
         )
@@ -584,11 +583,11 @@ class LinksViewModelTest {
     fun `test that setSortOrder calls use case and refetches sort order`() = runTest {
         setupTestData(emptyList())
         val sortConfiguration =
-            NodeSortConfiguration(NodeSortOption.Size, SortDirection.Ascending)
-        val expectedSortOrder = SortOrder.ORDER_SIZE_ASC
+            NodeSortConfiguration(NodeSortOption.Name, SortDirection.Ascending)
+        val expectedSortOrder = SortOrder.ORDER_DEFAULT_ASC
 
         whenever(nodeSortConfigurationUiMapper(sortConfiguration)).thenReturn(expectedSortOrder)
-        whenever(getCloudSortOrder()).thenReturn(expectedSortOrder)
+        whenever(getLinksSortOrderUseCase(true)).thenReturn(expectedSortOrder)
 
         val underTest = createViewModel()
         advanceUntilIdle()
@@ -599,7 +598,7 @@ class LinksViewModelTest {
         // Verify that getCloudSortOrder was called at least twice:
         // 1. During initialization
         // 2. After setting the sort order (refetch)
-        verify(getCloudSortOrder, times(2)).invoke()
+        verify(getLinksSortOrderUseCase, times(2)).invoke(true)
         verify(setCloudSortOrder).invoke(expectedSortOrder)
     }
 

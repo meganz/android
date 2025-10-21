@@ -6,6 +6,8 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.settings.ChatSettings
+import nz.mega.sdk.MegaApiJava.ORDER_CREATION_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_CREATION_DESC
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC
 import nz.mega.sdk.MegaApiJava.ORDER_LINK_CREATION_ASC
@@ -36,11 +38,19 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun getOthersSortOrder(): Int =
         dbHandler.get().preferences?.preferredSortOthers?.toInt() ?: ORDER_DEFAULT_ASC
 
-    override suspend fun getLinksSortOrder(): Int =
-        when (val order = getCloudSortOrder()) {
-            ORDER_MODIFICATION_ASC -> ORDER_LINK_CREATION_ASC
-            ORDER_MODIFICATION_DESC -> ORDER_LINK_CREATION_DESC
-            else -> order
+    override suspend fun getLinksSortOrder(isSingleActivityEnabled: Boolean): Int =
+        if (isSingleActivityEnabled) {
+            when (val order = getCloudSortOrder()) {
+                ORDER_CREATION_ASC -> ORDER_LINK_CREATION_ASC
+                ORDER_CREATION_DESC -> ORDER_LINK_CREATION_DESC
+                else -> order
+            }
+        } else {
+            when (val order = getCloudSortOrder()) {
+                ORDER_MODIFICATION_ASC -> ORDER_LINK_CREATION_ASC
+                ORDER_MODIFICATION_DESC -> ORDER_LINK_CREATION_DESC
+                else -> order
+            }
         }
 
     /**

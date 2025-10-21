@@ -48,7 +48,7 @@ interface SearchRepository {
     /**
      * get links node list
      */
-    suspend fun getPublicLinks(): List<UnTypedNode>
+    suspend fun getPublicLinks(isSingleActivityEnabled: Boolean): List<UnTypedNode>
 
     /**
      * get root node id

@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.search.SearchViewModel
@@ -39,6 +38,7 @@ import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.entity.search.TypeFilterOption
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -132,7 +132,12 @@ class SearchViewModelTest {
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(emptyFlow())
         whenever(monitorViewType()).thenReturn(emptyFlow())
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
-        whenever(getSortOrderByNodeSourceTypeUseCase(nodeSourceType)).thenReturn(SortOrder.ORDER_SIZE_ASC)
+        whenever(
+            getSortOrderByNodeSourceTypeUseCase(
+                nodeSourceType,
+                false
+            )
+        ).thenReturn(SortOrder.ORDER_SIZE_ASC)
         whenever(stateHandle.get<NodeSourceType>(SearchActivity.SEARCH_TYPE)).thenReturn(
             NodeSourceType.CLOUD_DRIVE
         )
@@ -354,6 +359,7 @@ class SearchViewModelTest {
                     searchParameters = SearchParameters(
                         query = query,
                     ),
+                    isSingleActivityEnabled = false,
                 )
             ).thenReturn(nodeList)
             underTest.updateSearchQuery(query)
@@ -382,9 +388,12 @@ class SearchViewModelTest {
                     searchParameters = SearchParameters(
                         query = query,
                     ),
+                    isSingleActivityEnabled = false,
                 )
             ).thenReturn(nodeList)
-            whenever(getSortOrderByNodeSourceTypeUseCase(nodeSourceType)).thenReturn(SortOrder.ORDER_SIZE_ASC)
+            whenever(getSortOrderByNodeSourceTypeUseCase(nodeSourceType, false)).thenReturn(
+                SortOrder.ORDER_SIZE_ASC
+            )
             underTest.updateSearchQuery("xyz") // Trigger search with a non-empty query first
             underTest.updateSearchQuery(query)
             underTest.state.test {
@@ -392,7 +401,7 @@ class SearchViewModelTest {
                 assertThat(state.searchQuery).isEqualTo(query)
                 assertThat(state.sortOrder).isEqualTo(SortOrder.ORDER_SIZE_ASC)
             }
-            verify(getSortOrderByNodeSourceTypeUseCase, times(1)).invoke(nodeSourceType)
+            verify(getSortOrderByNodeSourceTypeUseCase, times(1)).invoke(nodeSourceType, false)
         }
 
     @Test
@@ -499,6 +508,7 @@ class SearchViewModelTest {
                     searchParameters = SearchParameters(
                         query = query,
                     ),
+                    isSingleActivityEnabled = false,
                 )
             ).thenReturn(listOf(typedFileNode, typedFolderNode))
             underTest.updateSearchQuery(query)
@@ -558,6 +568,7 @@ class SearchViewModelTest {
                 searchParameters = SearchParameters(
                     query = query,
                 ),
+                isSingleActivityEnabled = false,
             )
         ).thenReturn(listOf(typedFileNode, typedFolderNode))
 
@@ -612,7 +623,7 @@ class SearchViewModelTest {
                 nodeSourceType = nodeSourceType,
                 searchParameters = SearchParameters(
                     query = query,
-                ),
+                ), isSingleActivityEnabled = false
             )
         ).thenReturn(listOf(typedFileNode, typedFolderNode))
 

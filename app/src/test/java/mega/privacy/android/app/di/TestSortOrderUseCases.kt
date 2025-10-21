@@ -7,12 +7,12 @@ import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.sortorder.SortOrderUseCases
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetLinksSortOrder
+import mega.privacy.android.domain.usecase.GetLinksSortOrderUseCase
 import mega.privacy.android.domain.usecase.GetOfflineSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
-import mega.privacy.android.domain.usecase.SetOfflineSortOrder
 import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
+import mega.privacy.android.domain.usecase.SetOfflineSortOrder
 import mega.privacy.android.domain.usecase.SetOthersSortOrder
 import org.mockito.kotlin.mock
 
@@ -26,7 +26,7 @@ object TestSortOrderUseCases {
     val getCloudSortOrder = mock<GetCloudSortOrder>()
     val getCameraSortOrder = mock<GetCameraSortOrder>()
     val getOthersSortOrder = mock<GetOthersSortOrder>()
-    val getLinksSortOrder = mock<GetLinksSortOrder>()
+    val getLinksSortOrderUseCase = mock<GetLinksSortOrderUseCase>()
     val getOfflineSortOrder = mock<GetOfflineSortOrder>()
 
     val setOfflineSortOrder = mock<SetOfflineSortOrder>()
@@ -44,7 +44,7 @@ object TestSortOrderUseCases {
     fun provideGetOthersSortOrder() = getOthersSortOrder
 
     @Provides
-    fun provideGetLinksSortOrder() = getLinksSortOrder
+    fun provideGetLinksSortOrder() = getLinksSortOrderUseCase
 
     @Provides
     fun provideGetOfflineSortOrder() = getOfflineSortOrder

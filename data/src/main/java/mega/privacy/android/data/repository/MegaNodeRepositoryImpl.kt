@@ -30,7 +30,7 @@ import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetLinksSortOrder
+import mega.privacy.android.domain.usecase.GetLinksSortOrderUseCase
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
@@ -74,7 +74,7 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
     private val fileGateway: FileGateway,
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
     private val streamingGateway: StreamingGateway,
-    private val getLinksSortOrder: GetLinksSortOrder,
+    private val getLinksSortOrderUseCase: GetLinksSortOrderUseCase,
     private val cancelTokenProvider: CancelTokenProvider,
     private val megaSearchFilterMapper: MegaSearchFilterMapper,
     private val getCloudSortOrder: GetCloudSortOrder,
@@ -286,6 +286,6 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getPublicLinks() = withContext(ioDispatcher) {
-        megaApiGateway.getPublicLinks(sortOrderIntMapper(getLinksSortOrder()))
+        megaApiGateway.getPublicLinks(sortOrderIntMapper(getLinksSortOrderUseCase(false)))
     }
 }

@@ -40,6 +40,7 @@ class SearchUseCase @Inject constructor(
         parentHandle: NodeId,
         nodeSourceType: NodeSourceType,
         searchParameters: SearchParameters,
+        isSingleActivityEnabled: Boolean,
     ): List<TypedNode> {
         val (query, searchTarget, searchCategory, modificationDate, creationDate, description, tag) = searchParameters
         val invalidNodeHandle = searchRepository.getInvalidHandle()
@@ -55,7 +56,7 @@ class SearchUseCase @Inject constructor(
             query.isEmpty() && description.isNullOrEmpty() && tag.isNullOrEmpty() && parentHandle == invalidNodeHandle && searchTarget == SearchTarget.OUTGOING_SHARE -> searchRepository.getOutShares()
 
             // Links Shares Root (No Search applied)
-            query.isEmpty() && description.isNullOrEmpty() && tag.isNullOrEmpty() && parentHandle == invalidNodeHandle && searchTarget == SearchTarget.LINKS_SHARE -> searchRepository.getPublicLinks()
+            query.isEmpty() && description.isNullOrEmpty() && tag.isNullOrEmpty() && parentHandle == invalidNodeHandle && searchTarget == SearchTarget.LINKS_SHARE -> searchRepository.getPublicLinks(isSingleActivityEnabled)
 
             // Outgoing and Links Shares Root (Non Query Search applied)
             query.isEmpty() && (!description.isNullOrEmpty() || !tag.isNullOrEmpty())

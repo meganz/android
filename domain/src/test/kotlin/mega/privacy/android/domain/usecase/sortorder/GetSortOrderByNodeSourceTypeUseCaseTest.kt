@@ -4,7 +4,7 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetLinksSortOrder
+import mega.privacy.android.domain.usecase.GetLinksSortOrderUseCase
 import mega.privacy.android.domain.usecase.GetOfflineSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import org.junit.jupiter.api.AfterEach
@@ -14,6 +14,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -25,7 +26,7 @@ class GetSortOrderByNodeSourceTypeUseCaseTest {
     private lateinit var underTest: GetSortOrderByNodeSourceTypeUseCase
 
     private val getCloudSortOrder: GetCloudSortOrder = mock()
-    private val getLinksSortOrder: GetLinksSortOrder = mock()
+    private val getLinksSortOrderUseCase: GetLinksSortOrderUseCase = mock()
     private val getOthersSortOrder: GetOthersSortOrder = mock()
     private val getOfflineSortOrder: GetOfflineSortOrder = mock()
 
@@ -33,13 +34,13 @@ class GetSortOrderByNodeSourceTypeUseCaseTest {
     fun setUp() {
         runBlocking {
             whenever(getCloudSortOrder()).thenReturn(mockCloudSortOrder)
-            whenever(getLinksSortOrder()).thenReturn(mockLinksSortOrder)
+            whenever(getLinksSortOrderUseCase(any())).thenReturn(mockLinksSortOrder)
             whenever(getOthersSortOrder()).thenReturn(mockOthersSortOrder)
             whenever(getOfflineSortOrder()).thenReturn(mockOfflineSortOrder)
         }
         underTest = GetSortOrderByNodeSourceTypeUseCase(
             getCloudSortOrder = getCloudSortOrder,
-            getLinksSortOrder = getLinksSortOrder,
+            getLinksSortOrderUseCase = getLinksSortOrderUseCase,
             getOthersSortOrder = getOthersSortOrder,
             getOfflineSortOrder = getOfflineSortOrder,
         )
@@ -47,16 +48,26 @@ class GetSortOrderByNodeSourceTypeUseCaseTest {
 
     @AfterEach
     fun tearDown() {
-        reset(getCloudSortOrder, getLinksSortOrder, getOthersSortOrder, getOfflineSortOrder)
+        reset(getCloudSortOrder, getLinksSortOrderUseCase, getOthersSortOrder, getOfflineSortOrder)
     }
 
     @ParameterizedTest
     @MethodSource("provideNodeSourceTypeAndExpectedSortOrder")
-    fun `test sort order by node source type`(
+    fun `test sort order by node source type for legacy implementation`(
         nodeSourceType: NodeSourceType,
         expectedSortOrder: SortOrder,
     ) = runBlocking {
-        val result = underTest(nodeSourceType)
+        val result = underTest(nodeSourceType, false)
+        assertEquals(expectedSortOrder, result)
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideNodeSourceTypeAndExpectedSortOrder")
+    fun `test sort order by node source type for revamp`(
+        nodeSourceType: NodeSourceType,
+        expectedSortOrder: SortOrder,
+    ) = runBlocking {
+        val result = underTest(nodeSourceType, true)
         assertEquals(expectedSortOrder, result)
     }
 

@@ -22,7 +22,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetLinksSortOrderUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.node.publiclink.MonitorPublicLinksUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -38,7 +38,7 @@ class LinksViewModel @Inject constructor(
     private val setViewTypeUseCase: SetViewType,
     private val monitorViewTypeUseCase: MonitorViewType,
     private val nodeUiItemMapper: NodeUiItemMapper,
-    private val getCloudSortOrder: GetCloudSortOrder,
+    private val getLinksSortOrderUseCase: GetLinksSortOrderUseCase,
     private val setCloudSortOrder: SetCloudSortOrder,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
 ) : ViewModel() {
@@ -71,7 +71,7 @@ class LinksViewModel @Inject constructor(
 
     private fun monitorLinks() {
         viewModelScope.launch {
-            monitorPublicLinksUseCase()
+            monitorPublicLinksUseCase(true)
                 .catch { Timber.e(it) }
                 .collectLatest { nodes ->
                     val nodeUiItems = nodeUiItemMapper(
@@ -90,7 +90,7 @@ class LinksViewModel @Inject constructor(
 
     private suspend fun loadLinks() {
         runCatching {
-            val nodes = monitorPublicLinksUseCase().first()
+            val nodes = monitorPublicLinksUseCase(true).first()
             val nodeUiItems = nodeUiItemMapper(
                 nodeList = nodes,
                 existingItems = uiState.value.items,
@@ -238,7 +238,7 @@ class LinksViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             runCatching {
-                getCloudSortOrder()
+                getLinksSortOrderUseCase(true)
             }.onSuccess { sortOrder ->
                 val sortOrderPair = nodeSortConfigurationUiMapper(sortOrder)
                 _uiState.update {

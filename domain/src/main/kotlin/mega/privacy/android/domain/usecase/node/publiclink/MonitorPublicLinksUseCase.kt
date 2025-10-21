@@ -9,7 +9,7 @@ import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.filemanagement.ShareRepository
-import mega.privacy.android.domain.usecase.GetLinksSortOrder
+import mega.privacy.android.domain.usecase.GetLinksSortOrderUseCase
 import javax.inject.Inject
 
 /**
@@ -22,7 +22,7 @@ import javax.inject.Inject
  */
 class MonitorPublicLinksUseCase @Inject constructor(
     private val shareRepository: ShareRepository,
-    private val getLinksSortOrder: GetLinksSortOrder,
+    private val getLinksSortOrderUseCase: GetLinksSortOrderUseCase,
     private val mapNodeToPublicLinkUseCase: MapNodeToPublicLinkUseCase,
     private val nodeRepository: NodeRepository,
 ) {
@@ -33,24 +33,26 @@ class MonitorPublicLinksUseCase @Inject constructor(
      *
      * @return
      */
-    operator fun invoke() = nodeRepository.monitorNodeUpdates()
-        .filter { update ->
-            isPublicLinkUpdate(update) || update.changes.keys.map { it.id }.intersect(
-                nodeIds
-            ).isNotEmpty()
-        }.map {
-            getPublicLinks()
-        }.onStart {
-            emit(getPublicLinks())
-        }
+    operator fun invoke(isSingleActivityEnabled: Boolean) =
+        nodeRepository.monitorNodeUpdates()
+            .filter { update ->
+                isPublicLinkUpdate(update) || update.changes.keys.map { it.id }.intersect(
+                    nodeIds
+                ).isNotEmpty()
+            }.map {
+                getPublicLinks(isSingleActivityEnabled)
+            }.onStart {
+                emit(getPublicLinks(isSingleActivityEnabled))
+            }
 
     private fun isPublicLinkUpdate(update: NodeUpdate) =
         update.changes.values.any {
             it.contains(NodeChanges.Public_link)
         }
 
-    private suspend fun getPublicLinks(): List<PublicLinkNode> {
-        val publicLinks = shareRepository.getPublicLinks(getLinksSortOrder())
+    private suspend fun getPublicLinks(isSingleActivityEnabled: Boolean): List<PublicLinkNode> {
+        val publicLinks =
+            shareRepository.getPublicLinks(getLinksSortOrderUseCase(isSingleActivityEnabled))
         nodeIds = publicLinks.mapTo(mutableSetOf()) { it.id }
         return publicLinks
             .mapNotNull {

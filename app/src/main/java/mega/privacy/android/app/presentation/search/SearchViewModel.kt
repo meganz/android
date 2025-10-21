@@ -211,10 +211,15 @@ class SearchViewModel @Inject constructor(
      */
     private fun executeSearchQuery() = suspend {
         cancelCancelTokenUseCase()
+        val isSingleActivityEnabled =
+            runCatching { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) }.getOrDefault(
+                false
+            )
         searchUseCase(
             parentHandle = NodeId(getCurrentParentHandle()),
             nodeSourceType = nodeSourceType,
-            searchParameters = getSearchParameters()
+            searchParameters = getSearchParameters(),
+            isSingleActivityEnabled = isSingleActivityEnabled,
         )
     }
 
@@ -277,8 +282,12 @@ class SearchViewModel @Inject constructor(
                 )
             }
             val sortOrder = runCatching {
+                val isSingleActivityEnabled =
+                    runCatching { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) }.getOrDefault(
+                        false
+                    )
                 if (state.value.isAtRootWithEmptyQuery) {
-                    getSortOrderByNodeSourceTypeUseCase(nodeSourceType)
+                    getSortOrderByNodeSourceTypeUseCase(nodeSourceType, isSingleActivityEnabled)
                 } else {
                     getCloudSortOrder()
                 }

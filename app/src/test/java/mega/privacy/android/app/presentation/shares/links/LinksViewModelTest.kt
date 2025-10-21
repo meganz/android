@@ -28,7 +28,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetLinksSortOrder
+import mega.privacy.android.domain.usecase.GetLinksSortOrderUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
@@ -59,13 +59,13 @@ internal class LinksViewModelTest {
     private lateinit var monitorLinksChannel: Channel<List<PublicLinkNode>>
     private val monitorPublicLinksUseCase =
         mock<MonitorPublicLinksUseCase> {
-            on { invoke() }.thenAnswer {
+            on { invoke(any()) }.thenAnswer {
                 monitorLinksChannel = Channel()
                 monitorLinksChannel.consumeAsFlow()
             }
         }
     private val getCloudSortOrder: GetCloudSortOrder = mock()
-    private val getLinksSortOrder: GetLinksSortOrder = mock()
+    private val getLinksSortOrderUseCase: GetLinksSortOrderUseCase = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val handleOptionClickMapper: HandleOptionClickMapper = mock()
     private val monitorFolderNodeDeleteUpdatesUseCase: MonitorFolderNodeDeleteUpdatesUseCase =
@@ -88,7 +88,7 @@ internal class LinksViewModelTest {
             monitorPublicLinksUseCase = monitorPublicLinksUseCase,
             monitorFolderNodeDeleteUpdatesUseCase = monitorFolderNodeDeleteUpdatesUseCase,
             getCloudSortOrder = getCloudSortOrder,
-            getLinksSortOrder = getLinksSortOrder,
+            getLinksSortOrderUseCase = getLinksSortOrderUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             handleOptionClickMapper = handleOptionClickMapper,
             isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
@@ -99,7 +99,7 @@ internal class LinksViewModelTest {
     }
 
     private suspend fun stubCommon() {
-        whenever(getLinksSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+        whenever(getLinksSortOrderUseCase(any())).thenReturn(SortOrder.ORDER_NONE)
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
         whenever(monitorFolderNodeDeleteUpdatesUseCase()).thenReturn(emptyFlow())
@@ -112,7 +112,7 @@ internal class LinksViewModelTest {
             monitorPublicLinksUseCase,
             monitorFolderNodeDeleteUpdatesUseCase,
             getCloudSortOrder,
-            getLinksSortOrder,
+            getLinksSortOrderUseCase,
             monitorConnectivityUseCase,
             handleOptionClickMapper,
             isNodeInRubbishBinUseCase,

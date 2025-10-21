@@ -7,17 +7,16 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.SortOrderRepository
 import mega.privacy.android.domain.usecase.DefaultGetCameraSortOrder
 import mega.privacy.android.domain.usecase.DefaultGetCloudSortOrder
-import mega.privacy.android.domain.usecase.DefaultGetLinksSortOrder
 import mega.privacy.android.domain.usecase.DefaultGetOfflineSortOrder
 import mega.privacy.android.domain.usecase.DefaultGetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetLinksSortOrder
+import mega.privacy.android.domain.usecase.GetLinksSortOrderUseCase
 import mega.privacy.android.domain.usecase.GetOfflineSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
-import mega.privacy.android.domain.usecase.SetOfflineSortOrder
 import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
+import mega.privacy.android.domain.usecase.SetOfflineSortOrder
 import mega.privacy.android.domain.usecase.SetOthersSortOrder
 
 /**
@@ -52,8 +51,8 @@ class SortOrderUseCases {
      * Provide the GetLinksSortOrder implementation
      */
     @Provides
-    fun provideGetLinksSortOrder(sortOrderRepository: SortOrderRepository): GetLinksSortOrder =
-        DefaultGetLinksSortOrder(sortOrderRepository)
+    fun provideGetLinksSortOrder(sortOrderRepository: SortOrderRepository): GetLinksSortOrderUseCase =
+        GetLinksSortOrderUseCase(sortOrderRepository)
 
     /**
      * Provide the GetOfflineSortOrder implementation

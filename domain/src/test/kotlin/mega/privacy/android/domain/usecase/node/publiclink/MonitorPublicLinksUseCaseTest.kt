@@ -2,7 +2,6 @@ package mega.privacy.android.domain.usecase.node.publiclink
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -17,14 +16,17 @@ import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.filemanagement.ShareRepository
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import mega.privacy.android.domain.usecase.GetLinksSortOrderUseCase
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class MonitorPublicLinksUseCaseTest {
     private lateinit var underTest: MonitorPublicLinksUseCase
 
@@ -38,33 +40,40 @@ internal class MonitorPublicLinksUseCaseTest {
         on { monitorNodeUpdates() }.thenReturn(flow { awaitCancellation() })
     }
 
-    @BeforeEach
+    private val getLinksSortOrderUseCase = mock<GetLinksSortOrderUseCase>() {
+        onBlocking { invoke(any()) }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+    }
+
+    @BeforeAll
     internal fun setUp() {
         underTest = MonitorPublicLinksUseCase(
             shareRepository = shareRepository,
             mapNodeToPublicLinkUseCase = mapNodeToPublicLinkUseCase,
             nodeRepository = nodeRepository,
-            getLinksSortOrder = { SortOrder.ORDER_DEFAULT_ASC }
+            getLinksSortOrderUseCase = getLinksSortOrderUseCase
         )
     }
 
-    @Test
-    internal fun `test that folder link nodes are returned`() = runTest {
-        val untypedNodes = listOf<FolderNode>(mock(), mock())
-        shareRepository.stub {
-            onBlocking { getPublicLinks(any()) }.thenReturn(
-                untypedNodes
-            )
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    internal fun `test that folder link nodes are returned`(isSingleActivityEnabled: Boolean) =
+        runTest {
+            val untypedNodes = listOf<FolderNode>(mock(), mock())
+            shareRepository.stub {
+                onBlocking { getPublicLinks(any()) }.thenReturn(
+                    untypedNodes
+                )
+            }
+
+            underTest(isSingleActivityEnabled).test {
+                assertThat(awaitItem()).hasSize(untypedNodes.size)
+                cancelAndConsumeRemainingEvents()
+            }
         }
 
-        underTest().test {
-            assertThat(awaitItem()).hasSize(untypedNodes.size)
-            assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
-        }
-    }
-
-    @Test
-    internal fun `test that new items are emitted if a node update of type PublicLink is emitted`() =
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    internal fun `test that new items are emitted if a node update of type PublicLink is emitted`(isSingleActivityEnabled: Boolean) =
         runTest {
             val untypedNodes = listOf<FolderNode>(mock(), mock())
             shareRepository.stub {
@@ -78,7 +87,7 @@ internal class MonitorPublicLinksUseCaseTest {
                 on { monitorNodeUpdates() }.thenReturn(nodeUpdateChannel.consumeAsFlow())
             }
 
-            underTest().test {
+            underTest(isSingleActivityEnabled).test {
                 assertThat(awaitItem()).isEmpty()
                 nodeUpdateChannel.send(NodeUpdate(mapOf(mock<Node>() to listOf(NodeChanges.Public_link))))
                 assertThat(awaitItem()).hasSize(untypedNodes.size)
@@ -87,8 +96,9 @@ internal class MonitorPublicLinksUseCaseTest {
 
         }
 
-    @Test
-    internal fun `test that no new items are emitted if a node update of type not of PublicLink is emitted`() =
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    internal fun `test that no new items are emitted if a node update of type not of PublicLink is emitted`(isSingleActivityEnabled: Boolean) =
         runTest {
             val untypedNodes = listOf<FolderNode>(mock(), mock())
             shareRepository.stub {
@@ -102,7 +112,7 @@ internal class MonitorPublicLinksUseCaseTest {
                 on { monitorNodeUpdates() }.thenReturn(nodeUpdateChannel.consumeAsFlow())
             }
 
-            underTest().test {
+            underTest(false).test {
                 assertThat(awaitItem()).isEmpty()
                 nodeUpdateChannel.send(NodeUpdate(mapOf(mock<Node>() to listOf(NodeChanges.Favourite))))
                 assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
@@ -110,8 +120,9 @@ internal class MonitorPublicLinksUseCaseTest {
 
         }
 
-    @Test
-    internal fun `test that new items are emitted if a non PublicLink update for an existing public node is emitted`() =
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    internal fun `test that new items are emitted if a non PublicLink update for an existing public node is emitted`(isSingleActivityEnabled: Boolean) =
         runTest {
             val nodeId = NodeId(42)
             val untypedNodes = listOf<FolderNode>(mock(), mock { on { id }.thenReturn(nodeId) })
@@ -136,7 +147,7 @@ internal class MonitorPublicLinksUseCaseTest {
                 )
             )
 
-            underTest().test {
+            underTest(isSingleActivityEnabled).test {
                 assertThat(awaitItem()).hasSize(untypedNodes.size)
                 nodeUpdateChannel.send(update)
                 assertThat(awaitItem()).isEmpty()
@@ -144,8 +155,9 @@ internal class MonitorPublicLinksUseCaseTest {
             }
         }
 
-    @Test
-    internal fun `test that only the latest ids are considered when node update is emitted`() =
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    internal fun `test that only the latest ids are considered when node update is emitted`(isSingleActivityEnabled: Boolean) =
         runTest {
             val nodeId = NodeId(42)
             val untypedNodes = listOf<FolderNode>(mock(), mock { on { id }.thenReturn(nodeId) })
@@ -170,7 +182,7 @@ internal class MonitorPublicLinksUseCaseTest {
                 )
             )
 
-            underTest().test {
+            underTest(isSingleActivityEnabled).test {
                 assertThat(awaitItem()).hasSize(untypedNodes.size)
                 nodeUpdateChannel.send(NodeUpdate(mapOf(mock<Node>() to listOf(NodeChanges.Public_link))))
                 assertThat(awaitItem()).isEmpty()

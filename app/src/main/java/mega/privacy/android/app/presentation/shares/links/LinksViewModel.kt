@@ -35,7 +35,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetLinksSortOrder
+import mega.privacy.android.domain.usecase.GetLinksSortOrderUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
@@ -54,7 +54,7 @@ class LinksViewModel @Inject constructor(
     private val monitorPublicLinksUseCase: MonitorPublicLinksUseCase,
     private val monitorFolderNodeDeleteUpdatesUseCase: MonitorFolderNodeDeleteUpdatesUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
-    private val getLinksSortOrder: GetLinksSortOrder,
+    private val getLinksSortOrderUseCase: GetLinksSortOrderUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val handleOptionClickMapper: HandleOptionClickMapper,
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
@@ -101,7 +101,7 @@ class LinksViewModel @Inject constructor(
         }
     }
 
-    private fun publicLinks() = monitorPublicLinksUseCase().map { list ->
+    private fun publicLinks() = monitorPublicLinksUseCase(false).map { list ->
         _state.value.copy(
             nodesList = getNodeUiItems(list),
             sortOrder = getSortOrder(),
@@ -194,7 +194,7 @@ class LinksViewModel @Inject constructor(
     }
 
     private suspend fun getSortOrder() =
-        if (state.value.parentNode == null) getLinksSortOrder() else getCloudSortOrder()
+        if (state.value.parentNode == null) getLinksSortOrderUseCase(false) else getCloudSortOrder()
 
     private fun monitorConnectivity() {
         viewModelScope.launch {

@@ -5,14 +5,12 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeSortOption
-import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -520,7 +518,7 @@ class OfflineViewModelTest {
                 sortOption = NodeSortOption.Name,
                 sortDirection = SortDirection.Ascending
             )
-            whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE)).thenReturn(
+            whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE, true)).thenReturn(
                 expectedSortOrder
             )
             whenever(nodeSortConfigurationUiMapper.invoke(expectedSortOrder)).thenReturn(
@@ -538,7 +536,7 @@ class OfflineViewModelTest {
             }
 
             // Then
-            verify(getSortOrderByNodeSourceTypeUseCase).invoke(NodeSourceType.OFFLINE)
+            verify(getSortOrderByNodeSourceTypeUseCase).invoke(NodeSourceType.OFFLINE, true)
         }
 
     @Test
@@ -549,7 +547,7 @@ class OfflineViewModelTest {
             sortOption = NodeSortOption.Size,
             sortDirection = SortDirection.Descending
         )
-        whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE)).thenReturn(
+        whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE, true)).thenReturn(
             sizeDescOrder
         )
         whenever(nodeSortConfigurationUiMapper.invoke(sizeDescOrder)).thenReturn(sizeDescConfig)
@@ -563,7 +561,7 @@ class OfflineViewModelTest {
             assertThat(state.selectedSortConfiguration).isEqualTo(sizeDescConfig)
         }
 
-        verify(getSortOrderByNodeSourceTypeUseCase).invoke(NodeSourceType.OFFLINE)
+        verify(getSortOrderByNodeSourceTypeUseCase).invoke(NodeSourceType.OFFLINE, true)
     }
 
     @Test
@@ -582,7 +580,7 @@ class OfflineViewModelTest {
         whenever(nodeSortConfigurationUiMapper.invoke(sortConfiguration)).thenReturn(
             expectedSortOrder
         )
-        whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE)).thenReturn(
+        whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE, true)).thenReturn(
             expectedSortOrder
         )
         whenever(nodeSortConfigurationUiMapper.invoke(expectedSortOrder)).thenReturn(
@@ -595,7 +593,7 @@ class OfflineViewModelTest {
 
         verify(setOfflineSortOrder).invoke(expectedSortOrder)
         // Times(2) because initViewModel also calls getSortOrder
-        verify(getSortOrderByNodeSourceTypeUseCase, times(2)).invoke(NodeSourceType.OFFLINE)
+        verify(getSortOrderByNodeSourceTypeUseCase, times(2)).invoke(NodeSourceType.OFFLINE, true)
     }
 
     private suspend fun stubCommon() {
@@ -605,7 +603,7 @@ class OfflineViewModelTest {
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(emptyFlow())
         whenever(monitorViewType()).thenReturn(emptyFlow())
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
-        whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE)).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+        whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE, true)).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(nodeSortConfigurationUiMapper(any<SortOrder>())).thenReturn(NodeSortConfiguration.default)
         whenever(nodeSortConfigurationUiMapper(any<NodeSortConfiguration>())).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
     }

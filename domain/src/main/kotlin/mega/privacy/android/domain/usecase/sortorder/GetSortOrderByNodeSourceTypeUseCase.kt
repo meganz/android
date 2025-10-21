@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.sortorder
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetLinksSortOrder
+import mega.privacy.android.domain.usecase.GetLinksSortOrderUseCase
 import mega.privacy.android.domain.usecase.GetOfflineSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import javax.inject.Inject
@@ -13,7 +13,7 @@ import javax.inject.Inject
  */
 class GetSortOrderByNodeSourceTypeUseCase @Inject constructor(
     private val getCloudSortOrder: GetCloudSortOrder,
-    private val getLinksSortOrder: GetLinksSortOrder,
+    private val getLinksSortOrderUseCase: GetLinksSortOrderUseCase,
     private val getOthersSortOrder: GetOthersSortOrder,
     private val getOfflineSortOrder: GetOfflineSortOrder,
 ) {
@@ -24,9 +24,9 @@ class GetSortOrderByNodeSourceTypeUseCase @Inject constructor(
      * @param nodeSource The source of the node.
      * @return The sort order for the specified node source.
      */
-    suspend operator fun invoke(nodeSource: NodeSourceType): SortOrder =
+    suspend operator fun invoke(nodeSource: NodeSourceType, isSingleActivityEnabled :Boolean): SortOrder =
         when (nodeSource) {
-            NodeSourceType.LINKS -> getLinksSortOrder()
+            NodeSourceType.LINKS -> getLinksSortOrderUseCase(isSingleActivityEnabled)
             NodeSourceType.INCOMING_SHARES -> getOthersSortOrder()
             NodeSourceType.CLOUD_DRIVE,
             NodeSourceType.HOME,

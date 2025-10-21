@@ -17,7 +17,7 @@ import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetLinksSortOrder
+import mega.privacy.android.domain.usecase.GetLinksSortOrderUseCase
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
@@ -26,6 +26,8 @@ import nz.mega.sdk.MegaShare
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -40,7 +42,7 @@ class SearchRepositoryImplTest {
     private val megaApiGateway: MegaApiGateway = mock()
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
     private val cancelTokenProvider: CancelTokenProvider = mock()
-    private val getLinksSortOrder: GetLinksSortOrder = mock()
+    private val getLinksSortOrderUseCase: GetLinksSortOrderUseCase = mock()
     private val sortOrderIntMapper: SortOrderIntMapper = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()
     private val getOthersSortOrder: GetOthersSortOrder = mock()
@@ -62,7 +64,7 @@ class SearchRepositoryImplTest {
             megaApiGateway = megaApiGateway,
             ioDispatcher = ioDispatcher,
             cancelTokenProvider = cancelTokenProvider,
-            getLinksSortOrder = getLinksSortOrder,
+            getLinksSOrtOrderUseCase = getLinksSortOrderUseCase,
             sortOrderIntMapper = sortOrderIntMapper,
             megaSearchFilterMapper = megsSearchFilterMapper,
             megaLocalRoomGateway = megaLocalRoomGateway,
@@ -161,15 +163,17 @@ class SearchRepositoryImplTest {
         assertThat(actual.first().id).isEqualTo(nodeId)
     }
 
-    @Test
-    fun `test that getPublicLinks returns list of untyped nodes`() = runTest {
-        whenever(getLinksSortOrder()).thenReturn(SortOrder.ORDER_NONE)
-        whenever(megaApiGateway.getPublicLinks(sortOrderIntMapper(getLinksSortOrder())))
-            .thenReturn(listOf(megaNode))
-        whenever(nodeMapper(megaNode)).thenReturn(typedNode)
-        val actual = underTest.getPublicLinks()
-        assertThat(actual.first().id).isEqualTo(nodeId)
-    }
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that getPublicLinks returns list of untyped nodes`(isSingleActivityEnabled: Boolean) =
+        runTest {
+            whenever(getLinksSortOrderUseCase(isSingleActivityEnabled)).thenReturn(SortOrder.ORDER_NONE)
+            whenever(megaApiGateway.getPublicLinks(sortOrderIntMapper(SortOrder.ORDER_NONE)))
+                .thenReturn(listOf(megaNode))
+            whenever(nodeMapper(megaNode)).thenReturn(typedNode)
+            val actual = underTest.getPublicLinks(isSingleActivityEnabled)
+            assertThat(actual.first().id).isEqualTo(nodeId)
+        }
 
     @Test
     fun `test that getBackupNodeId returns node id`() = runTest {

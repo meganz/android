@@ -21,7 +21,7 @@ import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetLinksSortOrder
+import mega.privacy.android.domain.usecase.GetLinksSortOrderUseCase
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
@@ -35,7 +35,7 @@ internal class SearchRepositoryImpl @Inject constructor(
     private val nodeMapper: NodeMapper,
     private val sortOrderIntMapper: SortOrderIntMapper,
     private val cancelTokenProvider: CancelTokenProvider,
-    private val getLinksSortOrder: GetLinksSortOrder,
+    private val getLinksSOrtOrderUseCase: GetLinksSortOrderUseCase,
     private val megaApiGateway: MegaApiGateway,
     private val megaSearchFilterMapper: MegaSearchFilterMapper,
     private val getCloudSortOrder: GetCloudSortOrder,
@@ -147,11 +147,19 @@ internal class SearchRepositoryImpl @Inject constructor(
         searchNodes.map { nodeMapper(it) }
     }
 
-    override suspend fun getPublicLinks() = withContext(ioDispatcher) {
-        megaApiGateway.getPublicLinks(sortOrderIntMapper(getLinksSortOrder())).let { list ->
-            list.map { nodeMapper(it) }
+    override suspend fun getPublicLinks(isSingleActivityEnabled: Boolean) =
+        withContext(ioDispatcher) {
+            megaApiGateway.getPublicLinks(
+                sortOrderIntMapper(
+                    getLinksSOrtOrderUseCase(
+                        isSingleActivityEnabled
+                    )
+                )
+            )
+                .let { list ->
+                    list.map { nodeMapper(it) }
+                }
         }
-    }
 
     override suspend fun getBackUpNodeId(): NodeId? = withContext(ioDispatcher) {
         megaApiGateway.getBackupsNode()?.let {
