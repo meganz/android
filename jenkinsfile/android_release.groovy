@@ -411,7 +411,7 @@ pipeline {
 
         stage('Delete old strings') {
             when {
-                expression { triggeredByDeliverAppStore() || triggeredByDeleteOldString() }
+                expression { triggeredByDeleteOldString() }
             }
             steps {
                 script {
