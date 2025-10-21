@@ -6,19 +6,17 @@ import mega.privacy.android.domain.repository.NotificationsRepository
 import javax.inject.Inject
 
 /**
- * Monitor unread user alerts count use-case
+ * Monitor not seen user alerts count use-case
  *
  * @property notificationsRepository
  */
-class MonitorUnreadAlertsCountUseCase @Inject constructor(
+class MonitorNotSeenUserAlertsCountUseCase @Inject constructor(
     private val notificationsRepository: NotificationsRepository,
 ) {
     /**
      * Invoke
      */
-    operator fun invoke() = notificationsRepository.monitorUserAlerts().onStart {
-        emit(notificationsRepository.getUserAlerts())
-    }.map { userAlerts ->
-        userAlerts.count { !it.seen }
-    }
+    operator fun invoke() = notificationsRepository.monitorNotSeenUserAlerts().onStart {
+        emit(notificationsRepository.getNotSeenUserAlerts())
+    }.map { it.size }
 }

@@ -3,6 +3,7 @@ package mega.privacy.android.data.repository
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -1040,4 +1041,56 @@ class DefaultNotificationsRepositoryTest {
         assertThat(alert.destination).isEqualTo(UserAlertDestination.CloudDrive)
     }
 
+    @Test
+    fun `test that getNotSeenUserAlerts only returns not seen alerts`() = runTest {
+        val notSeenId = 1423L
+        val seenId = notSeenId + 1L
+        val notSeenAlert = mock<MegaUserAlert> {
+            on { id }.thenReturn(notSeenId)
+            on { seen }.thenReturn(false)
+            on { type }.thenReturn(MegaUserAlert.TYPE_PAYMENT_SUCCEEDED)
+        }
+        val seenAlert = mock<MegaUserAlert> {
+            on { id }.thenReturn(seenId)
+            on { seen }.thenReturn(true)
+            on { type }.thenReturn(MegaUserAlert.TYPE_NEWSHARE)
+        }
+
+        whenever(megaApiGateway.getUserAlerts()).thenReturn(listOf(notSeenAlert, seenAlert))
+
+        val result = underTest.getNotSeenUserAlerts()
+
+        assertThat(result).hasSize(1)
+        assertThat(result.first().id).isEqualTo(notSeenId)
+        verify(megaApiGateway, never()).getMegaNodeByHandle(seenId)
+    }
+
+
+    @Test
+    fun `test that monitorNotSeenUserAlerts only emits not seen alerts`() = runTest {
+        val notSeenId = 1423L
+        val seenId = notSeenId + 1L
+        val notSeenAlert = mock<MegaUserAlert> {
+            on { id }.thenReturn(notSeenId)
+            on { seen }.thenReturn(false)
+            on { type }.thenReturn(MegaUserAlert.TYPE_PAYMENT_SUCCEEDED)
+        }
+        val seenAlert = mock<MegaUserAlert> {
+            on { id }.thenReturn(seenId)
+            on { seen }.thenReturn(true)
+            on { type }.thenReturn(MegaUserAlert.TYPE_NEWSHARE)
+        }
+        val globalUpdate = GlobalUpdate.OnUserAlertsUpdate(arrayListOf(notSeenAlert, seenAlert))
+
+        val mutableStateFlow = MutableStateFlow(GlobalUpdate.OnUserAlertsUpdate(arrayListOf()))
+        whenever(megaApiGateway.globalUpdates).thenReturn(mutableStateFlow)
+
+        underTest.monitorNotSeenUserAlerts().test {
+            assertThat(awaitItem()).isEmpty()
+            mutableStateFlow.emit(globalUpdate)
+            assertThat(awaitItem().single().id).isEqualTo(notSeenId)
+            cancelAndConsumeRemainingEvents()
+        }
+        verify(megaApiGateway, never()).getMegaNodeByHandle(seenId)
+    }
 }

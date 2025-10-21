@@ -37,7 +37,7 @@ import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.notifications.MonitorUnreadAlertsCountUseCase
+import mega.privacy.android.domain.usecase.notifications.MonitorNotSeenUserAlertsCountUseCase
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import timber.log.Timber
 import javax.inject.Inject
@@ -58,7 +58,7 @@ class MenuViewModel @Inject constructor(
     private val monitorUserUpdates: MonitorUserUpdates,
     private val isAchievementsEnabledUseCase: IsAchievementsEnabledUseCase,
     private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase,
-    private val monitorUnreadAlertsCountUseCase: MonitorUnreadAlertsCountUseCase,
+    private val monitorNotSeenUserAlertsCountUseCase: MonitorNotSeenUserAlertsCountUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     // Flows for items that need dynamic subtitles
@@ -163,7 +163,7 @@ class MenuViewModel @Inject constructor(
 
     private fun monitorUnreadNotificationsCount() {
         viewModelScope.launch {
-            monitorUnreadAlertsCountUseCase()
+            monitorNotSeenUserAlertsCountUseCase()
                 .catch { Timber.w("Exception monitoring user updates: $it") }
                 .collect { unreadCount ->
                     _uiState.update {

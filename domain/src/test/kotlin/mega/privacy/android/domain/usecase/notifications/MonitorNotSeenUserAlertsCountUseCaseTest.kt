@@ -19,14 +19,14 @@ import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class MonitorUnreadAlertsCountUseCaseTest {
-    private lateinit var underTest: MonitorUnreadAlertsCountUseCase
+class MonitorNotSeenUserAlertsCountUseCaseTest {
+    private lateinit var underTest: MonitorNotSeenUserAlertsCountUseCase
 
     private val notificationsRepository = mock<NotificationsRepository>()
 
     @BeforeAll
     fun setUp() {
-        underTest = MonitorUnreadAlertsCountUseCase(notificationsRepository)
+        underTest = MonitorNotSeenUserAlertsCountUseCase(notificationsRepository)
     }
 
     @BeforeEach
@@ -40,9 +40,10 @@ class MonitorUnreadAlertsCountUseCaseTest {
             val current = 3
             val firstUpdate = 4
             val secondUpdate = 0
-            whenever(notificationsRepository.getUserAlerts()) doReturn createUserAlerts(current)
+            whenever(notificationsRepository.getNotSeenUserAlerts()) doReturn
+                    createUserAlerts(current)
             val userAlertsFlow = MutableStateFlow(createUserAlerts(firstUpdate))
-            whenever(notificationsRepository.monitorUserAlerts()) doReturn userAlertsFlow
+            whenever(notificationsRepository.monitorNotSeenUserAlerts()) doReturn userAlertsFlow
             underTest.invoke().test {
                 assertThat(awaitItem()).isEqualTo(current)
                 assertThat(awaitItem()).isEqualTo(firstUpdate)
@@ -51,25 +52,13 @@ class MonitorUnreadAlertsCountUseCaseTest {
             }
         }
 
-    private fun createUserAlerts(notSeenAmount: Int, seenAmount: Int = 10) =
+    private fun createUserAlerts(amount: Int = 10) =
         buildList<UserAlert> {
-            repeat(notSeenAmount) {
+            repeat(amount) {
                 add(
                     NewShareAlert(
                         id = it.toLong(),
                         seen = false,
-                        createdTime = 0L,
-                        isOwnChange = false,
-                        nodeId = null,
-                        contact = mock()
-                    )
-                )
-            }
-            repeat(seenAmount) {
-                add(
-                    NewShareAlert(
-                        id = (notSeenAmount + it).toLong(),
-                        seen = true,
                         createdTime = 0L,
                         isOwnChange = false,
                         nodeId = null,

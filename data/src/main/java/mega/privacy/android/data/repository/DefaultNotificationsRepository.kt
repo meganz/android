@@ -38,6 +38,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaPushNotificationSettings
 import nz.mega.sdk.MegaUser
+import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -74,26 +75,41 @@ internal class DefaultNotificationsRepository @Inject constructor(
         .filterIsInstance<GlobalUpdate.OnUserAlertsUpdate>()
         .mapNotNull { (newUserAlerts) ->
             withContext(dispatcher) {
-                val userAlerts = newUserAlerts?.map { userAlert ->
-                    userAlertsMapper(
-                        megaUserAlert = userAlert,
-                        contactProvider = ::provideContact,
-                        scheduledMeetingProvider = ::provideScheduledMeeting,
-                        scheduledMeetingOccurrProvider = ::provideSchedMeetingOccurrences,
-                        nodeProvider = megaApiGateway::getMegaNodeByHandle,
-                        rootParentNodeProvider = ::provideRootParentNode,
-                        rubbishNodeProvider = megaApiGateway::getRubbishBinNode,
-                        rootNodeProvider = megaApiGateway::getRootNode
-                    )
-                }
-
-                if (!areMeetingInvitationsEnabled()) {
-                    userAlerts?.filter { it !is ScheduledMeetingAlert }
-                } else {
-                    userAlerts
-                }
+                newUserAlerts?.mapAndFilterMeetingIfNeeded()
             }
         }.flowOn(dispatcher)
+
+    override fun monitorNotSeenUserAlerts() =
+        megaApiGateway.globalUpdates
+            .filterIsInstance<GlobalUpdate.OnUserAlertsUpdate>()
+            .mapNotNull { (newUserAlerts) ->
+                withContext(dispatcher) {
+                    newUserAlerts
+                        ?.filter { !it.seen }
+                        ?.mapAndFilterMeetingIfNeeded()
+                }
+            }.flowOn(dispatcher)
+
+    private suspend fun Iterable<MegaUserAlert>.mapAndFilterMeetingIfNeeded(): List<UserAlert> {
+        val userAlerts = this.map { userAlert ->
+            userAlertsMapper(
+                megaUserAlert = userAlert,
+                contactProvider = ::provideContact,
+                scheduledMeetingProvider = ::provideScheduledMeeting,
+                scheduledMeetingOccurrProvider = ::provideSchedMeetingOccurrences,
+                nodeProvider = megaApiGateway::getMegaNodeByHandle,
+                rootParentNodeProvider = ::provideRootParentNode,
+                rubbishNodeProvider = megaApiGateway::getRubbishBinNode,
+                rootNodeProvider = megaApiGateway::getRootNode
+            )
+        }
+
+        return if (!areMeetingInvitationsEnabled()) {
+            userAlerts.filter { it !is ScheduledMeetingAlert }
+        } else {
+            userAlerts
+        }
+    }
 
     override suspend fun enableRequestStatusMonitor() = withContext(dispatcher) {
         megaApiGateway.enableRequestStatusMonitor()
@@ -108,24 +124,14 @@ internal class DefaultNotificationsRepository @Inject constructor(
 
     override suspend fun getUserAlerts(): List<UserAlert> =
         withContext(dispatcher) {
-            val userAlerts = megaApiGateway.getUserAlerts().map { userAlert ->
-                userAlertsMapper(
-                    megaUserAlert = userAlert,
-                    contactProvider = ::provideContact,
-                    scheduledMeetingProvider = ::provideScheduledMeeting,
-                    scheduledMeetingOccurrProvider = ::provideSchedMeetingOccurrences,
-                    nodeProvider = megaApiGateway::getMegaNodeByHandle,
-                    rootParentNodeProvider = ::provideRootParentNode,
-                    rubbishNodeProvider = megaApiGateway::getRubbishBinNode,
-                    rootNodeProvider = megaApiGateway::getRootNode
-                )
-            }
+            megaApiGateway.getUserAlerts().mapAndFilterMeetingIfNeeded()
+        }
 
-            if (!areMeetingInvitationsEnabled()) {
-                userAlerts.filter { it !is ScheduledMeetingAlert }
-            } else {
-                userAlerts
-            }
+    override suspend fun getNotSeenUserAlerts(): List<UserAlert> =
+        withContext(dispatcher) {
+            megaApiGateway.getUserAlerts()
+                .filter { !it.seen }
+                .mapAndFilterMeetingIfNeeded()
         }
 
     private suspend fun provideEmail(userId: Long): String? =
@@ -217,13 +223,14 @@ internal class DefaultNotificationsRepository @Inject constructor(
         _pushNotificationSettings.value.isChatDndEnabled(chatId)
     }
 
-    override suspend fun setChatEnabled(chatId: Long, enabled: Boolean) = withContext(dispatcher) {
-        val updatedSettings = _pushNotificationSettings.value.apply {
-            enableChat(chatId, enabled)
-        }
+    override suspend fun setChatEnabled(chatId: Long, enabled: Boolean) =
+        withContext(dispatcher) {
+            val updatedSettings = _pushNotificationSettings.value.apply {
+                enableChat(chatId, enabled)
+            }
 
-        setPushNotificationSettings(updatedSettings)
-    }
+            setPushNotificationSettings(updatedSettings)
+        }
 
     override suspend fun setChatEnabled(chatIdList: List<Long>, enabled: Boolean) =
         withContext(dispatcher) {

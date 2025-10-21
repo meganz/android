@@ -43,7 +43,7 @@ import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.notifications.MonitorUnreadAlertsCountUseCase
+import mega.privacy.android.domain.usecase.notifications.MonitorNotSeenUserAlertsCountUseCase
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -79,7 +79,7 @@ class MenuViewModelTest {
     private val monitorUserUpdates = mock<MonitorUserUpdates>()
     private val isAchievementsEnabledUseCase = mock<IsAchievementsEnabledUseCase>()
     private val checkPasswordReminderUseCase = mock<CheckPasswordReminderUseCase>()
-    private val monitorUnreadAlertsCountUseCase = mock<MonitorUnreadAlertsCountUseCase>()
+    private val monitorNotSeenUserAlertsCountUseCase = mock<MonitorNotSeenUserAlertsCountUseCase>()
     private val ioDispatcher = UnconfinedTestDispatcher()
 
     private object TestDestination : NavKey
@@ -110,7 +110,7 @@ class MenuViewModelTest {
             monitorUserUpdates,
             isAchievementsEnabledUseCase,
             checkPasswordReminderUseCase,
-            monitorUnreadAlertsCountUseCase,
+            monitorNotSeenUserAlertsCountUseCase,
         )
     }
 
@@ -474,7 +474,7 @@ class MenuViewModelTest {
         val update = 6
         stubDefaultDependencies()
         val flow = MutableStateFlow(initial)
-        monitorUnreadAlertsCountUseCase.stub {
+        monitorNotSeenUserAlertsCountUseCase.stub {
             on { invoke() }.thenReturn(flow)
         }
 
@@ -524,7 +524,7 @@ class MenuViewModelTest {
             on { invoke() }.thenReturn(flowOf(false))
         }
 
-        monitorUnreadAlertsCountUseCase.stub {
+        monitorNotSeenUserAlertsCountUseCase.stub {
             on { invoke() }.thenReturn(flowOf(0))
         }
 
@@ -569,7 +569,7 @@ class MenuViewModelTest {
             isAchievementsEnabledUseCase = isAchievementsEnabledUseCase,
             checkPasswordReminderUseCase = checkPasswordReminderUseCase,
             ioDispatcher = ioDispatcher,
-            monitorUnreadAlertsCountUseCase = monitorUnreadAlertsCountUseCase,
+            monitorNotSeenUserAlertsCountUseCase = monitorNotSeenUserAlertsCountUseCase,
         )
     }
 

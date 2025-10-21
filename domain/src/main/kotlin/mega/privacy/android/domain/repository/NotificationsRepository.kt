@@ -18,6 +18,13 @@ interface NotificationsRepository {
     fun monitorUserAlerts(): Flow<List<UserAlert>>
 
     /**
+     * Monitor not seen user alerts count
+     *
+     * @return a flow of not seen global user alerts
+     */
+    fun monitorNotSeenUserAlerts(): Flow<List<UserAlert>>
+
+    /**
      * Enable request status monitor to receive REQSTAT_PROGRESS events
      */
     suspend fun enableRequestStatusMonitor()
@@ -35,6 +42,13 @@ interface NotificationsRepository {
      * @return list of current user alerts
      */
     suspend fun getUserAlerts(): List<UserAlert>
+
+    /**
+     * Get not seen user alerts count
+     *
+     * @return list of current not seen user alerts
+     */
+    suspend fun getNotSeenUserAlerts(): List<UserAlert>
 
     /**
      * Acknowledge user alerts have been seen
