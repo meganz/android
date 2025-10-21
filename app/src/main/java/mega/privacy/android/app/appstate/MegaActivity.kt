@@ -31,7 +31,6 @@ import mega.privacy.android.app.appstate.global.GlobalStateViewModel
 import mega.privacy.android.app.appstate.global.SnackbarEventsViewModel
 import mega.privacy.android.app.appstate.global.model.GlobalState
 import mega.privacy.android.app.appstate.global.util.show
-import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presence.SignalPresenceViewModel
 import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -45,9 +44,6 @@ class MegaActivity : ComponentActivity() {
 
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
-
-    @Inject
-    lateinit var chatRequestHandler: MegaChatRequestHandler
 
     @Serializable
     data class LoggedInScreens(val isFromLogin: Boolean = false, val session: String) : NavKey
@@ -114,7 +110,6 @@ class MegaActivity : ComponentActivity() {
                         is GlobalState.RequireLogin -> {
                             fromLogin = true
                             LoginNavDisplay(
-                                chatRequestHandler = chatRequestHandler,
                                 onFinish = ::finish,
                                 stopShowingSplashScreen = {
                                     keepSplashScreen = false

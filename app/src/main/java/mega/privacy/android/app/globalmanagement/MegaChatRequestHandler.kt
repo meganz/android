@@ -1,23 +1,10 @@
 package mega.privacy.android.app.globalmanagement
 
 import android.app.Application
-import android.content.Intent
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.appstate.MegaActivity
-import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.presentation.login.LoginActivity
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.qualifier.MainDispatcher
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.login.BroadcastFinishActivityUseCase
-import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatError
@@ -34,7 +21,8 @@ import javax.inject.Singleton
  * @property activityLifecycleHandler
  * @property megaApi
  * @property sharingScope
- * @property chatManagement
+ * @property autoJoinPublicChatHandler
+ * @property chatLogoutHandler
  * @property myAccountInfo
  */
 @Singleton
@@ -45,15 +33,11 @@ class MegaChatRequestHandler @Inject constructor(
     private val megaApi: MegaApiAndroid,
     @ApplicationScope
     private val sharingScope: CoroutineScope,
-    @MainDispatcher
-    private val mainDispatcher: CoroutineDispatcher,
-    private val chatManagement: ChatManagement,
+    private val autoJoinPublicChatHandler: AutoJoinPublicChatHandler,
+    private val chatLogoutHandler: ChatLogoutHandler,
     private val myAccountInfo: MyAccountInfo,
-    private val broadcastFinishActivityUseCase: BroadcastFinishActivityUseCase,
-    private val localLogoutAppUseCase: LocalLogoutAppUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : MegaChatRequestListenerInterface {
-    private var isLoggingRunning = false
+    private var isLoginRunning = false
 
     /**
      * On request start
@@ -86,74 +70,53 @@ class MegaChatRequestHandler @Inject constructor(
         e: MegaChatError,
     ) {
         Timber.d("onRequestFinish (CHAT): %s_%d", request.requestString, e.errorCode)
-        if (request.type == MegaChatRequest.TYPE_SET_BACKGROUND_STATUS) {
-            Timber.d("SET_BACKGROUND_STATUS: %s", request.flag)
-        } else if (request.type == MegaChatRequest.TYPE_LOGOUT) {
-            Timber.d("CHAT_TYPE_LOGOUT: %d__%s", e.errorCode, e.errorString)
-            resetDefaults()
-            MegaApplication.getInstance().disableMegaChatApi()
-            val loggedState: Int = megaApi.isLoggedIn
-            Timber.d("Login status on %s", loggedState)
-            if (loggedState == 0) {
-                sharingScope.launch {
-                    runCatching { localLogoutAppUseCase() }
-                        .onFailure { Timber.d(it) }
-                    //Need to finish ManagerActivity to avoid unexpected behaviours after forced logouts.
-                    broadcastFinishActivityUseCase()
-                    withContext(mainDispatcher) {
-                        if (isLoggingRunning) {
-                            Timber.d("Already in Login Activity, not necessary to launch it again")
-                            return@withContext
-                        }
-                        val isSingleActivityEnable = runCatching {
-                            getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
-                        }.getOrDefault(false)
-                        val loginIntent = if (isSingleActivityEnable) {
-                            Intent(application, MegaActivity::class.java)
-                        } else {
-                            Intent(application, LoginActivity::class.java)
-                        }.apply {
-                            putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                            if (MegaApplication.urlConfirmationLink != null) {
-                                putExtra(
-                                    Constants.EXTRA_CONFIRMATION,
-                                    MegaApplication.urlConfirmationLink
-                                )
-                                if (activityLifecycleHandler.isActivityVisible) {
-                                    flags =
-                                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                                } else {
-                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                                }
-                                action = Constants.ACTION_CONFIRM
-                                MegaApplication.urlConfirmationLink = null
-                            } else {
-                                flags =
-                                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                            }
-                        }
-                        application.startActivity(loginIntent)
-                    }
-                }
-            } else {
-                Timber.d("Disable chat finish logout")
-            }
-        } else if (request.type == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
-            chatManagement.removeJoiningChatId(request.chatHandle)
-            chatManagement.removeJoiningChatId(request.userHandle)
-            chatManagement.broadcastJoinedSuccessfully()
-        } else if (request.type == MegaChatRequest.TYPE_DISCONNECT) {
-            if (e.errorCode == MegaChatError.ERROR_OK) {
-                Timber.d("DISConnected from chat!")
-            } else {
-                Timber.e("ERROR WHEN DISCONNECTING %s", e.errorString)
-            }
-        } else if (request.type == MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE) {
-            if (e.errorCode == MegaChatError.ERROR_OK) {
-                Timber.d("MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE: %s", request.flag)
-            } else {
-                Timber.e("MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE:error: %d", e.errorType)
-            }
+        when (request.type) {
+            MegaChatRequest.TYPE_SET_BACKGROUND_STATUS -> logSetBackgroundStatus(request)
+
+            MegaChatRequest.TYPE_LOGOUT -> onChatLogout(e)
+
+            MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT -> onAutoJoinPublicChat(request)
+
+            MegaChatRequest.TYPE_DISCONNECT -> logDisconnectResponse(e)
+
+            MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE -> logLastGreenResponse(e, request)
+        }
+    }
+
+    private fun logSetBackgroundStatus(request: MegaChatRequest) {
+        Timber.d("SET_BACKGROUND_STATUS: %s", request.flag)
+    }
+
+    private fun onChatLogout(e: MegaChatError) {
+        Timber.d("CHAT_TYPE_LOGOUT: %d__%s", e.errorCode, e.errorString)
+        resetDefaults()
+        MegaApplication.getInstance().disableMegaChatApi()
+        val loggedState: Int = megaApi.isLoggedIn
+        Timber.d("Login status on %s", loggedState)
+        if (loggedState == 0) {
+            chatLogoutHandler.handleChatLogout(isLoginRunning)
+        } else {
+            Timber.d("Disable chat finish logout")
+        }
+    }
+
+    private fun onAutoJoinPublicChat(request: MegaChatRequest) {
+        autoJoinPublicChatHandler.handleResponse(request.chatHandle, request.userHandle)
+    }
+
+    private fun logDisconnectResponse(e: MegaChatError) {
+        if (e.errorCode == MegaChatError.ERROR_OK) {
+            Timber.d("DISConnected from chat!")
+        } else {
+            Timber.e("ERROR WHEN DISCONNECTING %s", e.errorString)
+        }
+    }
+
+    private fun logLastGreenResponse(e: MegaChatError, request: MegaChatRequest) {
+        if (e.errorCode == MegaChatError.ERROR_OK) {
+            Timber.d("MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE: %s", request.flag)
+        } else {
+            Timber.e("MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE:error: %d", e.errorType)
         }
     }
 
@@ -173,12 +136,12 @@ class MegaChatRequestHandler @Inject constructor(
     }
 
     /**
-     * Set is logging running
+     * Set is login running
      *
-     * @param isLoggingRunning
+     * @param isLoginRunning
      */
-    fun setIsLoggingRunning(isLoggingRunning: Boolean) {
-        this.isLoggingRunning = isLoggingRunning
+    fun setIsLoginRunning(isLoginRunning: Boolean) {
+        this.isLoginRunning = isLoginRunning
     }
 
     /**

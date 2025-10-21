@@ -1115,7 +1115,7 @@ class MeetingActivityViewModel @Inject constructor(
      */
     fun logout() = viewModelScope.launch {
         runCatching {
-            megaChatRequestHandler.setIsLoggingRunning(true)
+            megaChatRequestHandler.setIsLoginRunning(true)
         }.onSuccess {
             _state.update { it.copy(shouldLaunchLeftMeetingActivity = true) }
         }.onFailure {

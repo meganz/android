@@ -21,7 +21,6 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.appstate.content.navigation.NavigationHandlerImpl
-import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailScreen
 import mega.privacy.android.app.presentation.login.confirmemail.changeemail.ChangeEmailAddressViewModel
 import mega.privacy.android.app.presentation.login.confirmemail.changeemail.changeEmailAddress
@@ -52,7 +51,6 @@ data object StartRoute : NavKey
  */
 fun NavGraphBuilder.loginNavigationGraph(
     navController: NavController,
-    chatRequestHandler: MegaChatRequestHandler,
     onFinish: () -> Unit,
     activityViewModel: LoginViewModel? = null,
     stopShowingSplashScreen: () -> Unit,
@@ -98,21 +96,18 @@ fun NavGraphBuilder.loginNavigationGraph(
         }
         loginScreen(
             navController = navController,
-            chatRequestHandler = chatRequestHandler,
             onFinish = onFinish,
             stopShowingSplashScreen = stopShowingSplashScreen,
             activityViewModel = activityViewModel
         )
         createAccountScreen(
             navController = navController,
-            chatRequestHandler = chatRequestHandler,
             onFinish = onFinish,
             stopShowingSplashScreen = stopShowingSplashScreen,
             activityViewModel = activityViewModel
         )
         tourScreen(
             navController = navController,
-            chatRequestHandler = chatRequestHandler,
             onFinish = onFinish,
             stopShowingSplashScreen = stopShowingSplashScreen,
             onBackPressed = onFinish,
@@ -120,14 +115,12 @@ fun NavGraphBuilder.loginNavigationGraph(
         )
         confirmationEmailScreen(
             navController = navController,
-            chatRequestHandler = chatRequestHandler,
             onFinish = onFinish,
             stopShowingSplashScreen = stopShowingSplashScreen,
             activityViewModel = activityViewModel,
         )
         changeEmailAddress(
             navController = navController,
-            chatRequestHandler = chatRequestHandler,
             onFinish = onFinish,
             stopShowingSplashScreen = stopShowingSplashScreen,
             onChangeEmailSuccess = { newEmail ->
@@ -143,7 +136,6 @@ fun NavGraphBuilder.loginNavigationGraph(
 
 @Composable
 fun LoginNavDisplay(
-    chatRequestHandler: MegaChatRequestHandler,
     onFinish: () -> Unit,
     activityViewModel: LoginViewModel? = null,
     stopShowingSplashScreen: () -> Unit,
@@ -168,7 +160,6 @@ fun LoginNavDisplay(
             )
         },
         viewModel = sharedViewModel,
-        chatRequestHandler = chatRequestHandler,
         onFinish = onFinish,
         stopShowingSplashScreen = stopShowingSplashScreen,
     ) {

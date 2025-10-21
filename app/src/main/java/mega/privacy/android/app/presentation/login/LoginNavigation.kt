@@ -10,7 +10,6 @@ import androidx.navigation.navOptions
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
-import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailScreen
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountRoute
 import mega.privacy.android.app.presentation.login.onboarding.TourScreen
@@ -21,7 +20,6 @@ data object Login : NavKey
 
 internal fun NavGraphBuilder.loginScreen(
     navController: NavController,
-    chatRequestHandler: MegaChatRequestHandler,
     onFinish: () -> Unit,
     activityViewModel: LoginViewModel? = null,
     stopShowingSplashScreen: () -> Unit,
@@ -44,7 +42,6 @@ internal fun NavGraphBuilder.loginScreen(
             },
             navigateToConfirmationEmailScreen = { navController.navigate(ConfirmationEmailScreen) },
             viewModel = sharedViewModel,
-            chatRequestHandler = chatRequestHandler,
             onFinish = onFinish,
             stopShowingSplashScreen = stopShowingSplashScreen,
         ) {

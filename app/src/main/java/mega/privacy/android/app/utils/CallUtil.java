@@ -212,7 +212,7 @@ public class CallUtil {
     public static void openMeetingGuestMode(Context context, String meetingName, long chatId, String link, MegaChatRequestHandler chatRequestHandler, boolean isWaitingRoom) {
         Timber.d("Open meeting in guest mode. Chat id is %s", chatId);
         MegaApplication.getChatManagement().setOpeningMeetingLink(chatId, true);
-        chatRequestHandler.setIsLoggingRunning(true);
+        chatRequestHandler.setIsLoginRunning(true);
         Intent intent;
         if (isWaitingRoom) {
             intent = new Intent(context, WaitingRoomActivity.class);

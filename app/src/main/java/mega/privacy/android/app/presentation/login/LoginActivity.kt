@@ -5,8 +5,12 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
@@ -99,6 +103,23 @@ class LoginActivity : BaseActivity() {
             val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val navController = rememberNavController()
             AndroidTheme(isDark = themeMode.isDarkMode()) {
+
+                val lifecycleOwner = LocalLifecycleOwner.current
+
+                DisposableEffect(Unit) {
+                    val observer = LifecycleEventObserver { _, event ->
+                        if (event == Lifecycle.Event.ON_CREATE) {
+                            chatRequestHandler.setIsLoginRunning(true)
+                        } else if (event == Lifecycle.Event.ON_DESTROY) {
+                            chatRequestHandler.setIsLoginRunning(false)
+                        }
+                    }
+                    lifecycleOwner.lifecycle.addObserver(observer)
+                    onDispose {
+                        lifecycleOwner.lifecycle.removeObserver(observer)
+                    }
+                }
+
                 NavHost(
                     navController = navController,
                     startDestination = LoginGraph(
@@ -108,7 +129,6 @@ class LoginActivity : BaseActivity() {
                 ) {
                     loginNavigationGraph(
                         navController = navController,
-                        chatRequestHandler = chatRequestHandler,
                         onFinish = ::finish,
                         stopShowingSplashScreen = ::stopShowingSplashScreen,
                         activityViewModel = viewModel

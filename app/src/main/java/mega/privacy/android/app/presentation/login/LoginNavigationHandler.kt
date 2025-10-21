@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.login
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -11,15 +10,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.collectLatest
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.privacy.android.app.R
-import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -34,7 +29,6 @@ fun LoginNavigationHandler(
     navigateToCreateAccountScreen: () -> Unit,
     navigateToTourScreen: () -> Unit,
     navigateToConfirmationEmailScreen: () -> Unit,
-    chatRequestHandler: MegaChatRequestHandler,
     onFinish: () -> Unit,
     stopShowingSplashScreen: () -> Unit,
     viewModel: LoginViewModel,
@@ -43,21 +37,6 @@ fun LoginNavigationHandler(
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
     var showLoggedOutDialog by rememberSaveable { mutableStateOf(false) }
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    DisposableEffect(Unit) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_CREATE) {
-                chatRequestHandler.setIsLoggingRunning(true)
-            } else if (event == Lifecycle.Event.ON_DESTROY) {
-                chatRequestHandler.setIsLoggingRunning(false)
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
 
     LaunchedEffect(Unit) {
         viewModel.monitorLoggedOutFromAnotherLocation.collectLatest { loggedOut ->
