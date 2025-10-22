@@ -1670,4 +1670,24 @@
     <string name="general_chat">チャット</string>
     <!-- Photos section. -->
     <string name="general_section_photos">写真</string>
+    <!-- General label to reference a chats section -->
+    <string name="general_chats_label">チャット</string>
+    <!--Media feature title-->
+    <string name="media_feature_title">メディア</string>
+    <!--Media screen timeline tab title-->
+    <string name="media_timeline_tab_title">タイムライン</string>
+    <!--Media screen albums tab title-->
+    <string name="media_albums_tab_title">アルバム</string>
+    <!--Media screen videos tab title-->
+    <string name="media_videos_tab_title">動画</string>
+    <!--Media screen playlists tab title-->
+    <string name="media_playlists_tab_title">プレイリスト</string>
+    <!--Media screen timeline filter by Years chip text-->
+    <string name="media_timeline_filter_years_chip_text">年</string>
+    <!--Media screen timeline filter by Months chip text-->
+    <string name="media_timeline_filter_months_chip_text">月</string>
+    <!--Media screen timeline filter by Days chip text-->
+    <string name="media_timeline_filter_days_chip_text">日</string>
+    <!--Media screen timeline default chip text to show All timeline media-->
+    <string name="media_timeline_default_chip_text">全部</string>
 </resources>

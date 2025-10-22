@@ -1197,9 +1197,9 @@
     <!-- text of how it works for mega pass free trial in achivements section -->
     <string name="text_how_it_works_mega_pass_free_trial">Installa l\’app di MEGA&#160;Pass, accedi con il tuo account MEGA e inizia la tua prova gratuita. Lo spazio di archiviazione bonus verrà aggiunto automaticamente all\’inizio della prova gratuita.</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">You’ve received %1$s extra storage space for starting a MEGA&#160;VPN free trial</string>
+    <string name="text_received_mega_vpn_free_trial">Hai ricevuto %1$s di spazio di archiviazione aggiuntivo per aver avviato una prova gratuita di MEGA&#160;VPN</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">You’ve received %1$s extra storage space for starting a MEGA&#160;Pass free trial</string>
+    <string name="text_received_mega_pass_free_trial">Hai ricevuto %1$s di spazio di archiviazione aggiuntivo per aver avviato una prova gratuita di MEGA&#160;Pass</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">Alcune cartelle non possono essere sincronizzate o non possono effettuare il backup perché l\’app MEGA ha perso le autorizzazioni per accedere alle cartelle locali. Tocca Riprendi per aggiungere nuovamente le autorizzazioni per ogni cartella interessata.</string>
     <!-- Title for the free plan card when the user is an existing account -->
@@ -1721,24 +1721,25 @@
     <!--header for the Camera Uploads transfer in progress items -->
     <string name="camera_uploads_tranfer_header_in_progress">In corso</string>
     <!--header for the Camera Uploads transfer in queue items -->
-    <string name="camera_uploads_tranfer_header_in_queue">Queueing</string>
+    <string name="camera_uploads_tranfer_header_in_queue">Fare la coda</string>
     <!--Title for the Camera Uploads transfer empty view -->
-    <string name="camera_uploads_tranfer_empty_view_title">All caught up</string>
+    <string name="camera_uploads_tranfer_empty_view_title">Tutto aggiornato</string>
     <!--description for the Camera Uploads transfer empty view -->
-    <string name="camera_uploads_tranfer_empty_view_description">New photos and videos will appear here after you take them</string>
+    <string name="camera_uploads_tranfer_empty_view_description">Le nuove foto e i nuovi video appariranno qui dopo averli scattati</string>
     <!--Title for the Camera Uploads transfer top bar -->
     <string name="camera_uploads_tranfer_top_bar_title">In corso</string>
     <!--Subtitle for the Camera Uploads transfer top bar -->
     <plurals name="camera_uploads_tranfer_top_bar_subtitle">
-        <item quantity="one">Uploading: %1$d item left</item>
-        <item quantity="other">Uploading: %1$d items left</item>
+        <item quantity="one">Caricamento in corso: %1$d oggetto rimasto</item>
+        <item quantity="many">Caricamento in corso: %1$d oggetti rimasti</item>
+        <item quantity="other">Caricamento in corso: %1$d oggetti rimasti</item>
     </plurals>
     <!-- Text of the button to start a video call -->
     <string name="start_video_call_button_text">Video</string>
     <!-- Text of the button for recording a video -->
     <string name="record_video_button_text">Video</string>
     <!-- Label shown the total the used space for business/pro flexi account -->
-    <string name="navigation_drawer_used_space_only">[A]%1$s[/A] used</string>
+    <string name="navigation_drawer_used_space_only">[A]%1$s[/A] usati</string>
     <!-- Message informing a transfer was cancelled -->
     <string name="transfers_transfer_cancelled">Trasferimento cancellato</string>
     <!-- Undo label for any undo action -->
@@ -1747,4 +1748,24 @@
     <string name="general_chat">Chat</string>
     <!-- Photos section. -->
     <string name="general_section_photos">Foto</string>
+    <!-- General label to reference a chats section -->
+    <string name="general_chats_label">Chat</string>
+    <!--Media feature title-->
+    <string name="media_feature_title">Media</string>
+    <!--Media screen timeline tab title-->
+    <string name="media_timeline_tab_title">Cronologia</string>
+    <!--Media screen albums tab title-->
+    <string name="media_albums_tab_title">Album</string>
+    <!--Media screen videos tab title-->
+    <string name="media_videos_tab_title">Video</string>
+    <!--Media screen playlists tab title-->
+    <string name="media_playlists_tab_title">Playlist</string>
+    <!--Media screen timeline filter by Years chip text-->
+    <string name="media_timeline_filter_years_chip_text">Anni</string>
+    <!--Media screen timeline filter by Months chip text-->
+    <string name="media_timeline_filter_months_chip_text">Mesi</string>
+    <!--Media screen timeline filter by Days chip text-->
+    <string name="media_timeline_filter_days_chip_text">Giorni</string>
+    <!--Media screen timeline default chip text to show All timeline media-->
+    <string name="media_timeline_default_chip_text">Tutti</string>
 </resources>

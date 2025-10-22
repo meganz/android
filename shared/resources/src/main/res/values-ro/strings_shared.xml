@@ -1748,4 +1748,24 @@
     <string name="general_chat">Chat</string>
     <!-- Photos section. -->
     <string name="general_section_photos">Fotografii</string>
+    <!-- General label to reference a chats section -->
+    <string name="general_chats_label">Chaturi</string>
+    <!--Media feature title-->
+    <string name="media_feature_title">Mass-media</string>
+    <!--Media screen timeline tab title-->
+    <string name="media_timeline_tab_title">Cronologie</string>
+    <!--Media screen albums tab title-->
+    <string name="media_albums_tab_title">Albume</string>
+    <!--Media screen videos tab title-->
+    <string name="media_videos_tab_title">Videoclipuri</string>
+    <!--Media screen playlists tab title-->
+    <string name="media_playlists_tab_title">Listuri de redare</string>
+    <!--Media screen timeline filter by Years chip text-->
+    <string name="media_timeline_filter_years_chip_text">Ani</string>
+    <!--Media screen timeline filter by Months chip text-->
+    <string name="media_timeline_filter_months_chip_text">Luni</string>
+    <!--Media screen timeline filter by Days chip text-->
+    <string name="media_timeline_filter_days_chip_text">Zile</string>
+    <!--Media screen timeline default chip text to show All timeline media-->
+    <string name="media_timeline_default_chip_text">Toate</string>
 </resources>

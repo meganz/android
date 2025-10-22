@@ -1670,4 +1670,24 @@
     <string name="general_chat">Chat</string>
     <!-- Photos section. -->
     <string name="general_section_photos">Ảnh</string>
+    <!-- General label to reference a chats section -->
+    <string name="general_chats_label">Cuộc chat</string>
+    <!--Media feature title-->
+    <string name="media_feature_title">Đa phương&#160;tiện</string>
+    <!--Media screen timeline tab title-->
+    <string name="media_timeline_tab_title">Dòng thời gian</string>
+    <!--Media screen albums tab title-->
+    <string name="media_albums_tab_title">Albums</string>
+    <!--Media screen videos tab title-->
+    <string name="media_videos_tab_title">Videos</string>
+    <!--Media screen playlists tab title-->
+    <string name="media_playlists_tab_title">Danh sách phát</string>
+    <!--Media screen timeline filter by Years chip text-->
+    <string name="media_timeline_filter_years_chip_text">Năm</string>
+    <!--Media screen timeline filter by Months chip text-->
+    <string name="media_timeline_filter_months_chip_text">Tháng</string>
+    <!--Media screen timeline filter by Days chip text-->
+    <string name="media_timeline_filter_days_chip_text">Ngày</string>
+    <!--Media screen timeline default chip text to show All timeline media-->
+    <string name="media_timeline_default_chip_text">Tất cả</string>
 </resources>

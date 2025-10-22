@@ -865,7 +865,7 @@
     <!-- The name of the Device or Folder Status which signifies that it is inactive -->
     <string name="device_center_list_view_item_status_inactive">Etkin değil</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
-    <string name="device_center_list_view_item_status_attention_needed">İlgi gerekli</string>
+    <string name="device_center_list_view_item_status_attention_needed">Dikkat gerekiyor</string>
     <!--General Unable to log in-->
     <string name="general_unable_to_login">Giriş yapılamıyor</string>
     <!--General check inbox-->
@@ -1709,4 +1709,24 @@
     <string name="general_chat">Sohbet</string>
     <!-- Photos section. -->
     <string name="general_section_photos">Fotoğraflar</string>
+    <!-- General label to reference a chats section -->
+    <string name="general_chats_label">Sohbetler</string>
+    <!--Media feature title-->
+    <string name="media_feature_title">Medya</string>
+    <!--Media screen timeline tab title-->
+    <string name="media_timeline_tab_title">Zaman çizelgesi</string>
+    <!--Media screen albums tab title-->
+    <string name="media_albums_tab_title">Albümler</string>
+    <!--Media screen videos tab title-->
+    <string name="media_videos_tab_title">Videolar</string>
+    <!--Media screen playlists tab title-->
+    <string name="media_playlists_tab_title">Oynatma listeleri</string>
+    <!--Media screen timeline filter by Years chip text-->
+    <string name="media_timeline_filter_years_chip_text">Yıl</string>
+    <!--Media screen timeline filter by Months chip text-->
+    <string name="media_timeline_filter_months_chip_text">Ay</string>
+    <!--Media screen timeline filter by Days chip text-->
+    <string name="media_timeline_filter_days_chip_text">Gün</string>
+    <!--Media screen timeline default chip text to show All timeline media-->
+    <string name="media_timeline_default_chip_text">Tümü</string>
 </resources>
