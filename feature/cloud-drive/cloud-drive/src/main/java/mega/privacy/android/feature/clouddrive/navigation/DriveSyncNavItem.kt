@@ -5,22 +5,22 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.feature.clouddrive.presentation.drivesync.DriveSync
 import mega.privacy.android.feature.clouddrive.presentation.drivesync.driveSyncScreen
 import mega.privacy.android.icon.pack.IconPack
-import mega.privacy.android.navigation.contract.MainNavItemBadge
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.navigation.contract.MainNavItemBadge
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.SearchNodeNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 import mega.privacy.mobile.analytics.event.CloudDriveBottomNavigationItemEvent
 
 class DriveSyncNavItem : MainNavItem {
-    override val destination: NavKey = DriveSync
+    override val destination: NavKey = DriveSyncNavKey()
     override val screen: EntryProviderScope<NavKey>.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
         { navigationHandler, navigationController, transferHandler ->
             driveSyncScreen(
@@ -50,4 +50,3 @@ class DriveSyncNavItem : MainNavItem {
     override val analyticsEventIdentifier: NavigationEventIdentifier =
         CloudDriveBottomNavigationItemEvent
 }
-

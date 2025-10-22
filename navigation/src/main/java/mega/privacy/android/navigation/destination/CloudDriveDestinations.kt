@@ -39,3 +39,8 @@ data class OfflineNavKey(
     val path: String? = null,
     val highlightedFiles: String? = null,
 ) : NavKey
+
+@Serializable
+data class DriveSyncNavKey(
+    val initialTabIndex: Int = 0,
+) : NavKey

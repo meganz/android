@@ -3,6 +3,7 @@ package mega.privacy.android.feature.clouddrive.navigation
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.cloudDriveScreen
+import mega.privacy.android.feature.clouddrive.presentation.drivesync.driveSyncScreen
 import mega.privacy.android.feature.clouddrive.presentation.offline.offlineInfoScreen
 import mega.privacy.android.feature.clouddrive.presentation.offline.offlineScreen
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.rubbishBin
@@ -53,5 +54,20 @@ class CloudDriveFeatureDestination : FeatureDestination {
             )
 
             offlineInfoScreen(navigationHandler::back)
+
+            driveSyncScreen(
+                navigationHandler = navigationHandler,
+                setNavigationVisibility = { /* No-op for FeatureDestination */ },
+                onTransfer = transferHandler::setTransferEvent,
+                openSearch = { isFirstNavigationLevel, parentHandle, nodeSourceType ->
+                    navigationHandler.navigate(
+                        SearchNodeNavKey(
+                            isFirstNavigationLevel = isFirstNavigationLevel,
+                            nodeSourceType = nodeSourceType,
+                            parentHandle = parentHandle
+                        )
+                    )
+                }
+            )
         }
 }

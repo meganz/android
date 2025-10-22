@@ -65,13 +65,14 @@ internal fun DriveSyncScreen(
     openSearch: (Boolean, Long, NodeSourceType) -> Unit,
     cloudDriveViewModel: CloudDriveViewModel,
     viewModel: DriveSyncViewModel = hiltViewModel(),
-    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel()
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
+    initialTabIndex: Int = 0,
 ) {
     val cloudDriveUiState by cloudDriveViewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val megaNavigator = viewModel.megaNavigator
     var showUploadOptionsBottomSheet by remember { mutableStateOf(false) }
-    var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
+    var selectedTabIndex by rememberSaveable { mutableIntStateOf(initialTabIndex) }
     var showSyncSettings by rememberSaveable { mutableStateOf(false) }
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val nodeActionHandler = rememberNodeActionHandler(
@@ -213,7 +214,7 @@ internal fun DriveSyncScreen(
                     )
                 }
             },
-            initialSelectedIndex = 0,
+            initialSelectedIndex = initialTabIndex,
             onTabSelected = {
                 selectedTabIndex = it
                 true

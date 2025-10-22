@@ -340,10 +340,13 @@ private fun SyncListScreenContent(
             }
         }
         if (checkedChip != SYNC_FOLDERS || syncStalledIssuesState.stalledIssues.isNotEmpty() || syncSolvedIssuesState.solvedIssues.isNotEmpty()) {
-            HeaderChips(
-                selectedChip = checkedChip,
-                stalledIssuesCount = stalledIssuesCount,
-                onChipSelected = { checkedChip = it })
+            if (syncFoldersUiState.syncUiItems.isNotEmpty()) {
+                // deferred loading of HeaderChips to avoid showing chips first before sync items are loaded
+                HeaderChips(
+                    selectedChip = checkedChip,
+                    stalledIssuesCount = stalledIssuesCount,
+                    onChipSelected = { checkedChip = it })
+            }
         }
 
         Box(
