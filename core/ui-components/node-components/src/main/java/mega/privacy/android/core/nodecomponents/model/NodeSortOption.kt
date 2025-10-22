@@ -13,8 +13,8 @@ enum class NodeSortOption(
     Name(sharedR.string.action_sort_by_name),
     Favourite(sharedR.string.action_sort_by_favorite),
     Label(sharedR.string.action_sort_by_label),
-    Created(sharedR.string.action_sort_by_created),
-    Modified(sharedR.string.action_sort_by_modified),
+    Created(sharedR.string.search_dropdown_chip_filter_type_date_added),
+    Modified(sharedR.string.search_dropdown_chip_filter_type_last_modified),
     Size(sharedR.string.action_sort_by_size),
     ShareCreated(sharedR.string.action_sort_by_share_created),
     LinkCreated(sharedR.string.action_sort_by_link_created);
