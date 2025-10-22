@@ -206,9 +206,7 @@ internal fun DeviceChargingNotMetPausedBanner(
     }
 
     CameraUploadsBanner(
-        modifier = modifier
-            .clickable { onOpenSettingsClicked() }
-            .testTag(TIMELINE_CAMERA_UPLOADS_DEVICE_CHARGING_NOT_MET_BANNER_TEST_TAG),
+        modifier = modifier.testTag(TIMELINE_CAMERA_UPLOADS_DEVICE_CHARGING_NOT_MET_BANNER_TEST_TAG),
         statusIcon = R.drawable.ic_cu_status_warning,
         title = stringResource(sharedR.string.camera_update_paused_warning_banner_title),
         description = stringResource(sharedR.string.camera_update_device_charging_not_met_banner_description),
@@ -236,6 +234,43 @@ internal fun LowBatteryPausedBanner(
         statusIcon = R.drawable.ic_cu_status_warning,
         title = stringResource(sharedR.string.camera_update_paused_warning_banner_title),
         description = stringResource(sharedR.string.camera_update_low_battery_banner_description),
+    )
+}
+
+@Composable
+internal fun NetworkRequirementNotMetPausedBanner(
+    modifier: Modifier = Modifier,
+    onNavigateMobileDataSetting: () -> Unit = {}
+) {
+    val actionTitle = buildAnnotatedString {
+        withStyle(
+            style = SpanStyle(
+                color = colorResource(R.color.color_link_primary),
+                textDecoration = TextDecoration.Underline,
+                fontWeight = FontWeight.Bold
+            )
+        ) {
+            append(stringResource(sharedR.string.camera_update_network_requirement_not_met_banner_button_text))
+        }
+    }
+
+    CameraUploadsBanner(
+        modifier = modifier
+            .testTag(TIMELINE_CAMERA_UPLOADS_NETWORK_REQUIREMENT_NOT_MET_BANNER_TEST_TAG),
+        statusIcon = R.drawable.ic_cu_status_warning,
+        title = stringResource(sharedR.string.camera_update_paused_warning_banner_title),
+        description = stringResource(sharedR.string.camera_update_network_requirement_not_met_banner_description),
+        action = {
+            MegaText(
+                text = actionTitle,
+                maxLines = Int.MAX_VALUE,
+                modifier = Modifier.clickable {
+                    onNavigateMobileDataSetting()
+                },
+                textColor = TextColor.Secondary,
+                style = MaterialTheme.typography.caption,
+            )
+        }
     )
 }
 
@@ -427,6 +462,12 @@ fun PreviewLowBatteryPausedBanner() {
     LowBatteryPausedBanner()
 }
 
+@Preview
+@Composable
+fun PreviewNetworkRequirementNotMetBanner() {
+    NetworkRequirementNotMetPausedBanner()
+}
+
 /**
  * Test tag for enable camera uploads banner
  */
@@ -462,3 +503,9 @@ const val TIMELINE_CAMERA_UPLOADS_DEVICE_CHARGING_NOT_MET_BANNER_TEST_TAG =
  */
 const val TIMELINE_CAMERA_UPLOADS_LOW_BATTERY_BANNER_TEST_TAG =
     "timeline_camera_uploads_low_battery_test_tag"
+
+/**
+ * Test tag for camera uploads network requirement not met banner
+ */
+const val TIMELINE_CAMERA_UPLOADS_NETWORK_REQUIREMENT_NOT_MET_BANNER_TEST_TAG =
+    "timeline_camera_uploads_network_requirement_not_met_test_tag"

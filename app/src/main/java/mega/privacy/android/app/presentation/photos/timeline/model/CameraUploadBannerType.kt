@@ -38,4 +38,9 @@ enum class CameraUploadsBannerType {
      * Banner to show when Camera Uploads is paused due to the device being on Low Battery
      */
     LowBattery,
+
+    /**
+     * Banner to show when Camera Uploads is paused due to the network requirement not met
+     */
+    NetworkRequirementNotMet
 }

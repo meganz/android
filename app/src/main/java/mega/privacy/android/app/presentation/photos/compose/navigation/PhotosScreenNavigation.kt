@@ -32,6 +32,7 @@ internal fun NavGraphBuilder.photosScreen(
     onNavigateCameraUploadsSettings: () -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
     onNavigateCameraUploadsTransferScreen: () -> Unit,
+    onNavigateMobileDataSetting: () -> Unit
 ) {
     composable<PhotosScreen> {
         PhotosScreen(
@@ -48,7 +49,8 @@ internal fun NavGraphBuilder.photosScreen(
             onNavigateCameraUploadsSettings = onNavigateCameraUploadsSettings,
             onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
             fileTypeIconMapper = fileTypeIconMapper,
-            onNavigateCameraUploadsTransferScreen = onNavigateCameraUploadsTransferScreen
+            onNavigateCameraUploadsTransferScreen = onNavigateCameraUploadsTransferScreen,
+            onNavigateMobileDataSetting = onNavigateMobileDataSetting
         )
     }
 }

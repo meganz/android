@@ -1134,7 +1134,8 @@ class TimelineViewModel @Inject constructor(
         return finishReason?.let { reason ->
             reason in listOf(
                 CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET,
-                CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW
+                CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW,
+                CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
             )
         } ?: false
     }

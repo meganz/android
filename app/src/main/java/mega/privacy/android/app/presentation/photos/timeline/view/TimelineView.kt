@@ -309,6 +309,7 @@ internal fun CameraUploadsBanners(
     onNavigateToCameraUploadsTransferScreen: () -> Unit,
     onNavigateToCameraUploadsSettings: () -> Unit,
     onWarningBannerDismissed: () -> Unit,
+    onNavigateMobileDataSetting: () -> Unit,
 ) {
     val pendingCount = timelineViewState.pending
     val selectPhotoCount = timelineViewState.selectedPhotoCount
@@ -321,13 +322,15 @@ internal fun CameraUploadsBanners(
         CameraUploadsBannerType.NoFullAccess,
         CameraUploadsBannerType.DeviceChargingNotMet,
         CameraUploadsBannerType.LowBattery,
+        CameraUploadsBannerType.NetworkRequirementNotMet,
             -> {
             SlideBanner(visible = isWarningBannerShown) {
                 CameraUploadsWarningBanner(
                     bannerType = bannerType,
                     onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
                     onWarningBannerDismissed = onWarningBannerDismissed,
-                    onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings
+                    onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
+                    onNavigateMobileDataSetting = onNavigateMobileDataSetting
                 )
             }
         }
@@ -358,6 +361,10 @@ internal fun getCameraUploadsBannerType(
             CameraUploadsBannerType.EnableCameraUploads
 
         timelineViewState.isCUPausedWarningBannerEnabled &&
+                timelineViewState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
+            -> CameraUploadsBannerType.NetworkRequirementNotMet
+
+        timelineViewState.isCUPausedWarningBannerEnabled &&
                 timelineViewState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW
             -> CameraUploadsBannerType.LowBattery
 
@@ -383,7 +390,8 @@ private fun CameraUploadsWarningBanner(
     bannerType: CameraUploadsBannerType,
     onChangeCameraUploadsPermissions: () -> Unit,
     onWarningBannerDismissed: () -> Unit,
-    onNavigateToCameraUploadsSettings: () -> Unit
+    onNavigateToCameraUploadsSettings: () -> Unit,
+    onNavigateMobileDataSetting: () -> Unit,
 ) {
     if (bannerType != CameraUploadsBannerType.NONE) {
         LaunchedEffect(Unit) {
@@ -393,6 +401,11 @@ private fun CameraUploadsWarningBanner(
     }
 
     when (bannerType) {
+        CameraUploadsBannerType.NetworkRequirementNotMet ->
+            NetworkRequirementNotMetPausedBanner(
+                onNavigateMobileDataSetting = onNavigateMobileDataSetting,
+            )
+
         CameraUploadsBannerType.NoFullAccess -> {
             CameraUploadsNoFullAccessBanner(
                 onClick = onChangeCameraUploadsPermissions,

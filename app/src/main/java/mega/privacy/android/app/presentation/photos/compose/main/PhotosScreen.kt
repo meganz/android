@@ -76,7 +76,8 @@ fun PhotosScreen(
     onZoomOut: () -> Unit,
     onNavigateCameraUploadsSettings: () -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
-    onNavigateCameraUploadsTransferScreen: () -> Unit
+    onNavigateCameraUploadsTransferScreen: () -> Unit,
+    onNavigateMobileDataSetting: () -> Unit,
 ) {
     val photosViewState by photosViewModel.state.collectAsStateWithLifecycle()
     val timelineViewState by timelineViewModel.state.collectAsStateWithLifecycle()
@@ -236,7 +237,8 @@ fun PhotosScreen(
                                 onWarningBannerDismissed = {
                                     timelineViewModel.updateIsWarningBannerShown(false)
                                     isWarningBannerShown = false
-                                }
+                                },
+                                onNavigateMobileDataSetting = onNavigateMobileDataSetting
                             )
                         },
                     )
@@ -255,7 +257,8 @@ fun PhotosScreen(
                             onWarningBannerDismissed = {
                                 timelineViewModel.updateIsWarningBannerShown(false)
                                 isWarningBannerShown = false
-                            }
+                            },
+                            onNavigateMobileDataSetting = onNavigateMobileDataSetting
                         )
 
                         EmptyState(
@@ -298,7 +301,8 @@ fun PhotosScreen(
                         onWarningBannerDismissed = {
                             timelineViewModel.updateIsWarningBannerShown(false)
                             isWarningBannerShown = false
-                        }
+                        },
+                        onNavigateMobileDataSetting = onNavigateMobileDataSetting
                     )
                 }
             )
@@ -416,6 +420,9 @@ private fun getWarningBannerShown(
     timelineViewState: TimelineViewState,
 ) =
     when (bannerType) {
+        CameraUploadsBannerType.NetworkRequirementNotMet ->
+            timelineViewState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
+
         CameraUploadsBannerType.NoFullAccess -> timelineViewState.isCameraUploadsLimitedAccess
         CameraUploadsBannerType.DeviceChargingNotMet ->
             timelineViewState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET

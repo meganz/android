@@ -1729,6 +1729,10 @@
     <string name="media_timeline_filter_days_chip_text">Days</string>
     <!--Media screen timeline default chip text to show All timeline media-->
     <string name="media_timeline_default_chip_text">All</string>
+    <!-- category in sort by action to sort by link created date -->
+    <string name="action_sort_by_link_created">Link created</string>
+    <!-- category in sort by action to sort by share created date -->
+    <string name="action_sort_by_share_created">Share created</string>
     <!-- The title of camera uploads paused warning banner -->
     <string name="camera_update_paused_warning_banner_title">Camera uploads paused,</string>
     <!-- The description of camera uploads device charging not met paused warning banner -->
@@ -1737,8 +1741,8 @@
     <string name="camera_update_device_charging_not_met_banner_button_text">Update setting</string>
     <!-- The description of camera uploads low battery paused warning banner -->
     <string name="camera_update_low_battery_banner_description">Battery level too low. Charge battery to resume camera uploads.</string>
-    <!-- category in sort by action to sort by link created date -->
-    <string name="action_sort_by_link_created">Link created</string>
-    <!-- category in sort by action to sort by share created date -->
-    <string name="action_sort_by_share_created">Share created</string>
+    <!-- The description of camera uploads network requirement not met paused warning banner -->
+    <string name="camera_update_network_requirement_not_met_banner_description">Camera uploads paused, connect to WIFI or allow mobile data</string>
+    <!-- The button text of camera uploads network requirement not met paused warning banner -->
+    <string name="camera_update_network_requirement_not_met_banner_button_text">Allow mobile data</string>
 </resources>

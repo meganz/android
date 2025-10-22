@@ -31,6 +31,7 @@ class TimelineViewTest {
         onNavigateToCameraUploadsTransferScreen: () -> Unit = {},
         onNavigateToCameraUploadsSettings: () -> Unit = {},
         onWarningBannerDismissed: () -> Unit = {},
+        onNavigateMobileDataSetting: () -> Unit = {},
     ) {
         composeRule.setContent {
             CameraUploadsBanners(
@@ -42,7 +43,8 @@ class TimelineViewTest {
                 onEnableCameraUploads = onEnableCameraUploads,
                 onNavigateToCameraUploadsTransferScreen = onNavigateToCameraUploadsTransferScreen,
                 onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
-                onWarningBannerDismissed = onWarningBannerDismissed
+                onWarningBannerDismissed = onWarningBannerDismissed,
+                onNavigateMobileDataSetting = onNavigateMobileDataSetting,
             )
         }
     }
@@ -261,6 +263,25 @@ class TimelineViewTest {
         )
 
         composeRule.onNodeWithTag(TIMELINE_CAMERA_UPLOADS_LOW_BATTERY_BANNER_TEST_TAG)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test network requirement not met banner is displayed as expected`() {
+        val timelineViewState = createTimelineViewStateForPausedWarningBanners(
+            cameraUploadsFinishedReason = CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
+        )
+        val bannerType = getCameraUploadsBannerType(timelineViewState)
+
+        setComposeContent(
+            timelineViewState = timelineViewState,
+            bannerType = bannerType,
+            isWarningBannerShown = true
+        )
+
+        composeRule.onNodeWithTag(
+            TIMELINE_CAMERA_UPLOADS_NETWORK_REQUIREMENT_NOT_MET_BANNER_TEST_TAG
+        )
             .assertIsDisplayed()
     }
 

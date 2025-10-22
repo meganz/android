@@ -514,7 +514,8 @@ internal class TimelineViewModelTest {
             assertThat(state.showCameraUploadsWarning).isEqualTo(
                 when (cameraUploadsFinishedReason) {
                     CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW,
-                    CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET
+                    CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET,
+                    CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET,
                         -> true
 
                     else -> false
@@ -524,7 +525,8 @@ internal class TimelineViewModelTest {
             assertThat(state.isWarningBannerShown).isEqualTo(
                 when (cameraUploadsFinishedReason) {
                     CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW,
-                    CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET
+                    CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET,
+                    CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET,
                         -> true
 
                     else -> false
@@ -1082,7 +1084,7 @@ internal class TimelineViewModelTest {
         value = CameraUploadsFinishedReason::class,
         mode = EnumSource.Mode.EXCLUDE,
     )
-    fun `test that isWarningMenuVisibility returns true when isCUPausedWarningBannerEnabled is true`(
+    fun `test that shouldShowWarningMenu returns true when isCUPausedWarningBannerEnabled is true`(
         finishReason: CameraUploadsFinishedReason,
     ) = runTest {
         initViewModel()
@@ -1091,8 +1093,12 @@ internal class TimelineViewModelTest {
             isWarningBannerEnabled = true
         )
 
-        if (finishReason == CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW ||
-            finishReason == CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET
+        if (
+            finishReason in listOf(
+                CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET,
+                CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW,
+                CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
+            )
         ) {
             assertThat(isWarningShown).isTrue()
         } else {

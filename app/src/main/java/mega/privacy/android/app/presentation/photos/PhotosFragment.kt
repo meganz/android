@@ -85,6 +85,7 @@ import mega.privacy.android.app.presentation.photos.timeline.viewmodel.zoomIn
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.zoomOut
 import mega.privacy.android.app.presentation.photos.view.showSortByDialog
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SHOW_HOW_TO_UPLOAD_PROMPT
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion
@@ -266,7 +267,17 @@ class PhotosFragment : Fragment() {
                             onZoomOut = ::handleZoomOut,
                             onNavigateCameraUploadsSettings = ::openCameraUploadsSettings,
                             onChangeCameraUploadsPermissions = ::changeCameraUploadsPermissions,
-                            fileTypeIconMapper = fileTypeIconMapper
+                            fileTypeIconMapper = fileTypeIconMapper,
+                            onNavigateMobileDataSetting = {
+                                startActivity(
+                                    Intent(
+                                        requireContext(),
+                                        SettingsCameraUploadsActivity::class.java
+                                    ).apply {
+                                        putExtra(INTENT_EXTRA_KEY_SHOW_HOW_TO_UPLOAD_PROMPT, true)
+                                    }
+                                )
+                            }
                         )
                     }
                 }
