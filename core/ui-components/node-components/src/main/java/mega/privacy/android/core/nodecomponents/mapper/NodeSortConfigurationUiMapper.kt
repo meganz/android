@@ -3,11 +3,15 @@ package mega.privacy.android.core.nodecomponents.mapper
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.SortDirection
 import javax.inject.Inject
 
 class NodeSortConfigurationUiMapper @Inject constructor() {
-    operator fun invoke(order: SortOrder): NodeSortConfiguration =
+    operator fun invoke(
+        order: SortOrder,
+        nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
+    ): NodeSortConfiguration =
         when (order) {
             SortOrder.ORDER_DEFAULT_ASC -> NodeSortConfiguration(
                 NodeSortOption.Name,
@@ -40,12 +44,12 @@ class NodeSortConfigurationUiMapper @Inject constructor() {
             )
 
             SortOrder.ORDER_CREATION_ASC -> NodeSortConfiguration(
-                NodeSortOption.Created,
+                getCreationSortOption(nodeSourceType),
                 SortDirection.Ascending
             )
 
             SortOrder.ORDER_CREATION_DESC -> NodeSortConfiguration(
-                NodeSortOption.Created,
+                getCreationSortOption(nodeSourceType),
                 SortDirection.Descending
             )
 
@@ -69,6 +73,16 @@ class NodeSortConfigurationUiMapper @Inject constructor() {
                 SortDirection.Descending
             )
 
+            SortOrder.ORDER_LINK_CREATION_ASC -> NodeSortConfiguration(
+                NodeSortOption.LinkCreated,
+                SortDirection.Ascending
+            )
+
+            SortOrder.ORDER_LINK_CREATION_DESC -> NodeSortConfiguration(
+                NodeSortOption.LinkCreated,
+                SortDirection.Descending
+            )
+
             else -> NodeSortConfiguration(NodeSortOption.Name, SortDirection.Ascending)
         }
 
@@ -82,6 +96,15 @@ class NodeSortConfigurationUiMapper @Inject constructor() {
             NodeSortOption.Created -> if (isAscending) SortOrder.ORDER_CREATION_ASC else SortOrder.ORDER_CREATION_DESC
             NodeSortOption.Modified -> if (isAscending) SortOrder.ORDER_MODIFICATION_ASC else SortOrder.ORDER_MODIFICATION_DESC
             NodeSortOption.Size -> if (isAscending) SortOrder.ORDER_SIZE_ASC else SortOrder.ORDER_SIZE_DESC
+            NodeSortOption.ShareCreated -> if (isAscending) SortOrder.ORDER_CREATION_ASC else SortOrder.ORDER_CREATION_DESC
+            NodeSortOption.LinkCreated -> if (isAscending) SortOrder.ORDER_CREATION_ASC else SortOrder.ORDER_CREATION_DESC
         }
     }
+
+    private fun getCreationSortOption(sourceType: NodeSourceType): NodeSortOption =
+        when (sourceType) {
+            NodeSourceType.OUTGOING_SHARES -> NodeSortOption.ShareCreated
+            NodeSourceType.LINKS -> NodeSortOption.LinkCreated
+            else -> NodeSortOption.Created
+        }
 }

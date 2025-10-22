@@ -155,7 +155,9 @@ class CloudDriveViewModelTest {
 
     private suspend fun setupTestData(items: List<TypedNode>) {
         whenever(getCloudSortOrderUseCase()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
-        whenever(nodeSortConfigurationUiMapper(any<SortOrder>())).thenReturn(NodeSortConfiguration.default)
+        whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(
+            NodeSortConfiguration.default
+        )
         whenever(getNodeNameByIdUseCase(eq(folderNodeId))).thenReturn("Test folder")
         whenever(getFileBrowserNodeChildrenUseCase(folderNodeHandle)).thenReturn(items)
 
@@ -206,7 +208,7 @@ class CloudDriveViewModelTest {
 
     private suspend fun setupTestDataWithPartialLoad(items: List<TypedNode>) {
         whenever(getCloudSortOrderUseCase()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
-        whenever(nodeSortConfigurationUiMapper(any<SortOrder>())).thenReturn(NodeSortConfiguration.default)
+        whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(NodeSortConfiguration.default)
         whenever(getNodeNameByIdUseCase(eq(folderNodeId))).thenReturn("Test folder")
         whenever(getFileBrowserNodeChildrenUseCase(folderNodeHandle)).thenReturn(items)
 
@@ -1852,8 +1854,8 @@ class CloudDriveViewModelTest {
     fun `test that setCloudSortOrder calls use case and refetches sort order`() = runTest {
         setupTestData(emptyList())
         val sortConfiguration =
-            NodeSortConfiguration(NodeSortOption.Size, SortDirection.Ascending)
-        val expectedSortOrder = SortOrder.ORDER_SIZE_ASC
+            NodeSortConfiguration(NodeSortOption.Name, SortDirection.Ascending)
+        val expectedSortOrder = SortOrder.ORDER_DEFAULT_ASC
 
         whenever(nodeSortConfigurationUiMapper(sortConfiguration)).thenReturn(expectedSortOrder)
         whenever(getCloudSortOrderUseCase()).thenReturn(expectedSortOrder)

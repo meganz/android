@@ -88,7 +88,7 @@ fun LinksContent(
 
             uiState.isEmpty -> {
                 MegaEmptyView(
-                    imagePainter = painterResource(iconPackR.drawable.ic_folder_arrow_up_glass),
+                    imagePainter = painterResource(iconPackR.drawable.ic_link_glass),
                     text = stringResource(R.string.context_empty_links)
                 )
             }

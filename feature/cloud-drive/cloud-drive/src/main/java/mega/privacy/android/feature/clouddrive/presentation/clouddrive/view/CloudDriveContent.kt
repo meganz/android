@@ -518,7 +518,7 @@ internal fun CloudDriveContent(
         if (showSortBottomSheet) {
             SortBottomSheet(
                 title = stringResource(sharedR.string.action_sort_by_header),
-                options = NodeSortOption.entries,
+                options = NodeSortOption.getOptionsForSourceType(NodeSourceType.CLOUD_DRIVE),
                 sheetState = sortBottomSheetState,
                 selectedSort = SortBottomSheetResult(
                     sortOptionItem = uiState.selectedSortConfiguration.sortOption,

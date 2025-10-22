@@ -42,7 +42,7 @@
     <!-- Text of the empty screen when there are not elements in Outgoing -->
     <string name="context_empty_outgoing">[B]No [/B][A]outgoing shared folders[/A]</string>
     <!-- Text of the empty screen when there are not elements in Links -->
-    <string name="context_empty_links">[B]No [/B][A]public links[/A][B][/B]</string>
+    <string name="context_empty_links">[B]No [/B][A]public links[/A]</string>
     <!-- End of shares screen strings -->
 
     <!-- Text that indicates that a folder is currently empty -->

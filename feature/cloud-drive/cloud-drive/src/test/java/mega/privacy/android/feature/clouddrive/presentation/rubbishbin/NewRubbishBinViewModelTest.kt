@@ -219,9 +219,6 @@ class NewRubbishBinViewModelTest {
                     isContactVerificationOn = eq(false),
                 )
             ).thenReturn(nodeUiItems)
-            whenever(nodeSortConfigurationUiMapper.invoke(any<SortOrder>())).thenReturn(
-                NodeSortConfiguration.default
-            )
             underTest.refreshNodes()
             underTest.onItemLongClicked(
                 NodeUiItem(
@@ -263,9 +260,6 @@ class NewRubbishBinViewModelTest {
                     isContactVerificationOn = eq(false),
                 )
             ).thenReturn(nodeUiItems)
-            whenever(nodeSortConfigurationUiMapper.invoke(any<SortOrder>())).thenReturn(
-                NodeSortConfiguration.default
-            )
 
             underTest.refreshNodes()
             underTest.onItemLongClicked(
@@ -314,9 +308,6 @@ class NewRubbishBinViewModelTest {
                     isContactVerificationOn = eq(false),
                 )
             ).thenReturn(nodeUiItems)
-            whenever(nodeSortConfigurationUiMapper.invoke(any<SortOrder>())).thenReturn(
-                NodeSortConfiguration.default
-            )
 
             underTest.refreshNodes()
             underTest.onItemLongClicked(
@@ -372,9 +363,6 @@ class NewRubbishBinViewModelTest {
                     isContactVerificationOn = eq(false),
                 )
             ).thenReturn(nodeUiItems)
-            whenever(nodeSortConfigurationUiMapper.invoke(any<SortOrder>())).thenReturn(
-                NodeSortConfiguration.default
-            )
 
             underTest.refreshNodes()
             underTest.selectAllNodes()
@@ -412,9 +400,6 @@ class NewRubbishBinViewModelTest {
                     isContactVerificationOn = eq(false),
                 )
             ).thenReturn(nodeUiItems)
-            whenever(nodeSortConfigurationUiMapper.invoke(any<SortOrder>())).thenReturn(
-                NodeSortConfiguration.default
-            )
 
             underTest.refreshNodes()
             underTest.clearAllSelectedNodes()
@@ -571,7 +556,7 @@ class NewRubbishBinViewModelTest {
                 isContactVerificationOn = eq(false),
             )
         ).thenReturn(emptyList())
-        whenever(nodeSortConfigurationUiMapper.invoke(any<SortOrder>())).thenReturn(
+        whenever(nodeSortConfigurationUiMapper.invoke(SortOrder.ORDER_NONE)).thenReturn(
             NodeSortConfiguration.default
         )
     }

@@ -41,7 +41,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -101,7 +100,7 @@ class IncomingSharesViewModelTest {
 
     private suspend fun setupTestData(items: List<ShareNode>) {
         whenever(getOthersSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
-        whenever(nodeSortConfigurationUiMapper(any<SortOrder>())).thenReturn(NodeSortConfiguration.default)
+        whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(NodeSortConfiguration.default)
         whenever(getIncomingSharesChildrenNodeUseCase(-1L)).thenReturn(items)
 
         val nodeUiItems = items.map { node ->
@@ -616,8 +615,8 @@ class IncomingSharesViewModelTest {
     fun `test that setSortOrder calls use case and refetches sort order`() = runTest {
         setupTestData(emptyList())
         val sortConfiguration =
-            NodeSortConfiguration(NodeSortOption.Size, SortDirection.Ascending)
-        val expectedSortOrder = SortOrder.ORDER_SIZE_ASC
+            NodeSortConfiguration(NodeSortOption.Name, SortDirection.Ascending)
+        val expectedSortOrder = SortOrder.ORDER_DEFAULT_ASC
 
         whenever(nodeSortConfigurationUiMapper(sortConfiguration)).thenReturn(expectedSortOrder)
         whenever(getOthersSortOrder()).thenReturn(expectedSortOrder)

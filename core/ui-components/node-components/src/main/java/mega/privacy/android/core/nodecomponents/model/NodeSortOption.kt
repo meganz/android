@@ -15,7 +15,9 @@ enum class NodeSortOption(
     Label(sharedR.string.action_sort_by_label),
     Created(sharedR.string.action_sort_by_created),
     Modified(sharedR.string.action_sort_by_modified),
-    Size(sharedR.string.action_sort_by_size);
+    Size(sharedR.string.action_sort_by_size),
+    ShareCreated(sharedR.string.action_sort_by_share_created),
+    LinkCreated(sharedR.string.action_sort_by_link_created);
 
     /**
      * Get available sort options based on the node source type
@@ -29,10 +31,46 @@ enum class NodeSortOption(
                 Size
             )
 
+            NodeSourceType.OUTGOING_SHARES -> listOf(
+                Name,
+                Favourite,
+                Label,
+                ShareCreated,
+                Modified,
+                Size
+            )
+
+            NodeSourceType.LINKS -> listOf(
+                Name,
+                Favourite,
+                Label,
+                LinkCreated,
+                Modified,
+                Size
+            )
+
             NodeSourceType.OFFLINE -> listOf(
                 Name,
                 Size,
                 Modified
+            )
+
+            NodeSourceType.CLOUD_DRIVE -> listOf(
+                Name,
+                Favourite,
+                Label,
+                Created,
+                Modified,
+                Size
+            )
+
+            NodeSourceType.RUBBISH_BIN -> listOf(
+                Name,
+                Favourite,
+                Label,
+                Created,
+                Modified,
+                Size
             )
 
             else -> listOf(

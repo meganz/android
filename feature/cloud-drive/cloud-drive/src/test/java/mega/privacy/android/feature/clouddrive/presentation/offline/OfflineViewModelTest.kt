@@ -604,7 +604,7 @@ class OfflineViewModelTest {
         whenever(monitorViewType()).thenReturn(emptyFlow())
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
         whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE, true)).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
-        whenever(nodeSortConfigurationUiMapper(any<SortOrder>())).thenReturn(NodeSortConfiguration.default)
+        whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(NodeSortConfiguration.default)
         whenever(nodeSortConfigurationUiMapper(any<NodeSortConfiguration>())).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
     }
 }

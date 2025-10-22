@@ -1729,4 +1729,8 @@
     <string name="media_timeline_filter_days_chip_text">Days</string>
     <!--Media screen timeline default chip text to show All timeline media-->
     <string name="media_timeline_default_chip_text">All</string>
+    <!-- category in sort by action to sort by link created date -->
+    <string name="action_sort_by_link_created">Link created</string>
+    <!-- category in sort by action to sort by share created date -->
+    <string name="action_sort_by_share_created">Share created</string>
 </resources>

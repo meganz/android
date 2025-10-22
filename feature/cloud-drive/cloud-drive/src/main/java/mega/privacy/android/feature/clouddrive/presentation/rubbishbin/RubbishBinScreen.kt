@@ -343,7 +343,7 @@ internal fun RubbishBinScreen(
     if (showSortBottomSheet) {
         SortBottomSheet(
             title = stringResource(sharedR.string.action_sort_by_header),
-            options = NodeSortOption.entries,
+            options = NodeSortOption.getOptionsForSourceType(NodeSourceType.RUBBISH_BIN),
             sheetState = sortBottomSheetState,
             selectedSort = SortBottomSheetResult(
                 sortOptionItem = uiState.sortConfiguration.sortOption,
