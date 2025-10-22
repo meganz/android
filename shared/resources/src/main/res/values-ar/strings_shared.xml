@@ -1856,7 +1856,7 @@
     <!-- Text of the button for recording a video -->
     <string name="record_video_button_text">فيديو</string>
     <!-- Label shown the total the used space for business/pro flexi account -->
-    <string name="navigation_drawer_used_space_only">[A]%1$s[/A] used</string>
+    <string name="navigation_drawer_used_space_only">[A]%1$s[/A] مُستخدم</string>
     <!-- Message informing a transfer was cancelled -->
     <string name="transfers_transfer_cancelled">تم إلغاء النقل</string>
     <!-- Undo label for any undo action -->
@@ -1865,4 +1865,24 @@
     <string name="general_chat">المحادثة</string>
     <!-- Photos section. -->
     <string name="general_section_photos">تطبيق الصور</string>
+    <!-- General label to reference a chats section -->
+    <string name="general_chats_label">محادثات</string>
+    <!--Media feature title-->
+    <string name="media_feature_title">وسائط متعددة</string>
+    <!--Media screen timeline tab title-->
+    <string name="media_timeline_tab_title">الجدول الزمني</string>
+    <!--Media screen albums tab title-->
+    <string name="media_albums_tab_title">ألبومات</string>
+    <!--Media screen videos tab title-->
+    <string name="media_videos_tab_title">مقاطع الفيديو</string>
+    <!--Media screen playlists tab title-->
+    <string name="media_playlists_tab_title">قائمة تشغيل</string>
+    <!--Media screen timeline filter by Years chip text-->
+    <string name="media_timeline_filter_years_chip_text">سنين</string>
+    <!--Media screen timeline filter by Months chip text-->
+    <string name="media_timeline_filter_months_chip_text">أشهر</string>
+    <!--Media screen timeline filter by Days chip text-->
+    <string name="media_timeline_filter_days_chip_text">أيام</string>
+    <!--Media screen timeline default chip text to show All timeline media-->
+    <string name="media_timeline_default_chip_text">الكل</string>
 </resources>

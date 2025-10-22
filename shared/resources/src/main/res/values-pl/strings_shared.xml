@@ -1787,4 +1787,24 @@
     <string name="general_chat">Chat</string>
     <!-- Photos section. -->
     <string name="general_section_photos">Zdjęcia</string>
+    <!-- General label to reference a chats section -->
+    <string name="general_chats_label">Czaty</string>
+    <!--Media feature title-->
+    <string name="media_feature_title">Media</string>
+    <!--Media screen timeline tab title-->
+    <string name="media_timeline_tab_title">Oś czasu</string>
+    <!--Media screen albums tab title-->
+    <string name="media_albums_tab_title">Albumy</string>
+    <!--Media screen videos tab title-->
+    <string name="media_videos_tab_title">Filmy</string>
+    <!--Media screen playlists tab title-->
+    <string name="media_playlists_tab_title">Listy odtwarzania</string>
+    <!--Media screen timeline filter by Years chip text-->
+    <string name="media_timeline_filter_years_chip_text">Lata</string>
+    <!--Media screen timeline filter by Months chip text-->
+    <string name="media_timeline_filter_months_chip_text">Miesiące</string>
+    <!--Media screen timeline filter by Days chip text-->
+    <string name="media_timeline_filter_days_chip_text">Dni</string>
+    <!--Media screen timeline default chip text to show All timeline media-->
+    <string name="media_timeline_default_chip_text">Wszystko</string>
 </resources>
