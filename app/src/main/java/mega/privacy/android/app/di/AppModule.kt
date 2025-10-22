@@ -22,6 +22,7 @@ import mega.privacy.android.app.consent.ConsentDialogDestinations
 import mega.privacy.android.app.nav.MegaActivityResultContractImpl
 import mega.privacy.android.app.nav.MegaNavigatorImpl
 import mega.privacy.android.app.presentation.container.MegaAppContainerProvider
+import mega.privacy.android.app.presentation.login.logoutdialog.RemoteLogoutDialogDestinations
 import mega.privacy.android.app.presentation.transfers.navigation.TransfersFeatureDestination
 import mega.privacy.android.app.presentation.transfers.transferoverquota.view.dialog.TransferOverQuotaDialogDestinations
 import mega.privacy.android.app.sslverification.SSLAppDialogDestinations
@@ -148,6 +149,7 @@ internal class AppModule {
             SSLAppDialogDestinations,
             ConsentDialogDestinations,
             TransferOverQuotaDialogDestinations,
+            RemoteLogoutDialogDestinations,
         )
 
     @Provides

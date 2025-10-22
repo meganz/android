@@ -608,7 +608,6 @@ internal class LoginViewModelTest {
                 val item = awaitItem()
                 assertThat(item.fetchNodesUpdate).isNull()
                 assertThat(item.isLoginInProgress).isFalse()
-                assertThat(item.loginException).isInstanceOf(LoginLoggedOutFromOtherLocation::class.java)
             }
         }
 

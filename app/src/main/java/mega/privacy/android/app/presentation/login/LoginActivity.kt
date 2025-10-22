@@ -6,7 +6,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -16,10 +23,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import mega.android.core.ui.components.dialogs.BasicDialog
+import mega.android.core.ui.components.dialogs.BasicDialogButton
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.BaseActivity
+import mega.privacy.android.app.R
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -120,6 +132,18 @@ class LoginActivity : BaseActivity() {
                     }
                 }
 
+
+                var showLoggedOutDialog by rememberSaveable { mutableStateOf(false) }
+
+                LaunchedEffect(Unit) {
+                    viewModel.monitorLoggedOutFromAnotherLocation.collectLatest { loggedOut ->
+                        if (loggedOut) {
+                            showLoggedOutDialog = true
+                            viewModel.setHandledLoggedOutFromAnotherLocation()
+                        }
+                    }
+                }
+
                 NavHost(
                     navController = navController,
                     startDestination = LoginGraph(
@@ -131,7 +155,26 @@ class LoginActivity : BaseActivity() {
                         navController = navController,
                         onFinish = ::finish,
                         stopShowingSplashScreen = ::stopShowingSplashScreen,
-                        activityViewModel = viewModel
+                        activityViewModel = viewModel,
+                    )
+                }
+
+                if (showLoggedOutDialog) {
+                    BasicDialog(
+                        modifier = Modifier.testTag(LOGGED_OUT_DIALOG),
+                        title = stringResource(id = R.string.title_alert_logged_out),
+                        description = stringResource(id = R.string.error_server_expired_session),
+                        buttons = persistentListOf(
+                            BasicDialogButton(
+                                text = stringResource(id = R.string.general_ok),
+                                onClick = {
+                                    showLoggedOutDialog = false
+                                }
+                            ),
+                        ),
+                        onDismissRequest = {
+                            showLoggedOutDialog = false
+                        },
                     )
                 }
             }

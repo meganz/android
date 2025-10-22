@@ -2,6 +2,7 @@ package mega.privacy.android.app.sslverification
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -22,6 +23,7 @@ import javax.inject.Inject
  * @property resetConnectionUseCase
  * @constructor Create empty S s l error view model
  */
+@HiltViewModel
 class SSLErrorViewModel @Inject constructor(
     private val getDomainNameUseCase: GetDomainNameUseCase,
     private val resetConnectionUseCase: ResetConnectionUseCase,

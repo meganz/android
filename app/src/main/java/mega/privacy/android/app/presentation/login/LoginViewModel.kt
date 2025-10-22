@@ -813,7 +813,6 @@ class LoginViewModel @Inject constructor(
                     // in the new design we don't show snackbar for these errors
                     this !is LoginTooManyAttempts
                             && this !is LoginWrongEmailOrPassword
-                            && this !is LoginLoggedOutFromOtherLocation
                 }?.let { triggered(it) }
             loginState.copy(
                 isLoginInProgress = false,
@@ -821,7 +820,7 @@ class LoginViewModel @Inject constructor(
                 is2FAEnabled = is2FARequest,
                 is2FARequired = false,
                 fetchNodesUpdate = null,
-                loginException = this,
+                loginException = this.takeUnless { this is LoginLoggedOutFromOtherLocation },
                 snackbarMessage = snackbarMessage ?: consumed()
             )
         }
