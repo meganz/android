@@ -445,9 +445,14 @@ internal class TimelineViewModelTest {
             }
         }
 
-    @Test
-    fun `test that the paused camera uploads toolbar menu icon is shown when camera uploads finishes because the device is not charged`() =
+    @ParameterizedTest(name = "and isCUPausedWarningBannerEnabled is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that the camera uploads toolbar menu icon is shown as expected when camera uploads finishes because the device is not charged`(
+        isCUPausedWarningBannerEnabled: Boolean,
+    ) =
         runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.CameraUploadsPausedWarningBanner))
+                .thenReturn(isCUPausedWarningBannerEnabled)
             initViewModelWithDefaultFlags()
             advanceUntilIdle() // Wait for init to complete
 
@@ -459,24 +464,10 @@ internal class TimelineViewModelTest {
 
             underTest.state.test {
                 val state = awaitItem()
-                assertThat(state.showCameraUploadsPaused).isTrue()
-            }
-        }
-
-    @Test
-    fun `test that other toolbar menu icons are hidden when camera uploads finishes because the device is not charged`() =
-        runTest {
-            initViewModelWithDefaultFlags()
-            val cameraUploadsStatusInfo =
-                CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET)
-            cameraUploadsStatusInfoFlow.emit(cameraUploadsStatusInfo)
-
-            advanceUntilIdle()
-
-            underTest.state.test {
-                val state = awaitItem()
+                assertThat(state.showCameraUploadsPaused).isEqualTo(!isCUPausedWarningBannerEnabled)
+                assertThat(state.showCameraUploadsWarning).isEqualTo(isCUPausedWarningBannerEnabled)
                 assertThat(state.showCameraUploadsComplete).isFalse()
-                assertThat(state.showCameraUploadsWarning).isFalse()
+                assertThat(state.isWarningBannerShown).isTrue()
             }
         }
 
@@ -505,6 +496,8 @@ internal class TimelineViewModelTest {
     fun `test that no toolbar menu icon is shown and a warning fab icon is shown when camera uploads finishes for any other reason`(
         cameraUploadsFinishedReason: CameraUploadsFinishedReason,
     ) = runTest {
+        whenever(getFeatureFlagValueUseCase(AppFeatures.CameraUploadsPausedWarningBanner))
+            .thenReturn(true)
         initViewModelWithDefaultFlags()
         // Wait for init block to complete (monitoring starts automatically when feature flag is disabled)
         advanceUntilIdle()
@@ -516,10 +509,28 @@ internal class TimelineViewModelTest {
 
         underTest.state.test {
             val state = awaitItem()
-            // Verify that the Toolbar Menu Icons are hidden
             assertThat(state.showCameraUploadsPaused).isFalse()
             assertThat(state.showCameraUploadsComplete).isFalse()
-            assertThat(state.showCameraUploadsWarning).isFalse()
+            assertThat(state.showCameraUploadsWarning).isEqualTo(
+                when (cameraUploadsFinishedReason) {
+                    CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW,
+                    CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET
+                        -> true
+
+                    else -> false
+                }
+            )
+
+            assertThat(state.isWarningBannerShown).isEqualTo(
+                when (cameraUploadsFinishedReason) {
+                    CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW,
+                    CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET
+                        -> true
+
+                    else -> false
+                }
+            )
+
             // Verify that the Warning Fab Icon is shown
             assertThat(state.cameraUploadsStatus).isEqualTo(CameraUploadsStatus.Warning)
             assertThat(state.cameraUploadsProgress).isEqualTo(0.5f)
@@ -823,7 +834,7 @@ internal class TimelineViewModelTest {
             onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
             onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
         }
-        whenever(getFeatureFlagValueUseCase(AppFeatures.CameraUploadsPausedWanningBanner))
+        whenever(getFeatureFlagValueUseCase(AppFeatures.CameraUploadsPausedWarningBanner))
             .thenReturn(isEnabled)
 
         initViewModel()
@@ -1047,6 +1058,45 @@ internal class TimelineViewModelTest {
 
             underTest.updatePopBackFromCameraUploadsTransferScreenEvent(consumed)
             assertThat(awaitItem().popBackFromCameraUploadsTransferScreenEvent).isEqualTo(consumed)
+        }
+    }
+
+    @Test
+    fun `test that isWarningBannerShown is updated correctly`() = runTest {
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().isWarningBannerShown).isFalse()
+
+            underTest.updateIsWarningBannerShown(true)
+            assertThat(awaitItem().isWarningBannerShown).isTrue()
+
+            underTest.updateIsWarningBannerShown(false)
+            assertThat(awaitItem().isWarningBannerShown).isFalse()
+        }
+    }
+
+    @ParameterizedTest(name = "and finishReason is {0}")
+    @EnumSource(
+        value = CameraUploadsFinishedReason::class,
+        mode = EnumSource.Mode.EXCLUDE,
+    )
+    fun `test that isWarningMenuVisibility returns true when isCUPausedWarningBannerEnabled is true`(
+        finishReason: CameraUploadsFinishedReason,
+    ) = runTest {
+        initViewModel()
+        val isWarningShown = underTest.shouldShowWarningMenu(
+            finishReason = finishReason,
+            isWarningBannerEnabled = true
+        )
+
+        if (finishReason == CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW ||
+            finishReason == CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET
+        ) {
+            assertThat(isWarningShown).isTrue()
+        } else {
+            assertThat(isWarningShown).isFalse()
         }
     }
 

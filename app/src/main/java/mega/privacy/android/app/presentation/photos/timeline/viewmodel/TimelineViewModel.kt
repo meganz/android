@@ -238,9 +238,24 @@ class TimelineViewModel @Inject constructor(
     private fun checkCameraUploadsPausedWarningBannerEnabled() {
         viewModelScope.launch {
             runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.CameraUploadsPausedWanningBanner)
+                getFeatureFlagValueUseCase(AppFeatures.CameraUploadsPausedWarningBanner)
             }.onSuccess { isEnabled ->
-                _state.update { it.copy(isCUPausedWarningBannerEnabled = isEnabled) }
+                _state.update { currentState ->
+                    if (isEnabled) {
+                        val showWarning = _state.value.isCameraUploadsLimitedAccess
+                                || shouldShowWarningMenu(isWarningBannerEnabled = true)
+                        currentState.copy(
+                            isCUPausedWarningBannerEnabled = true,
+                            isWarningBannerShown = showWarning,
+                            showCameraUploadsWarning = showWarning,
+                            showCameraUploadsPaused = false,
+                        )
+                    } else {
+                        currentState.copy(
+                            isCUPausedWarningBannerEnabled = false
+                        )
+                    }
+                }
             }.onFailure { error ->
                 Timber.e(error)
             }
@@ -338,6 +353,7 @@ class TimelineViewModel @Inject constructor(
         setCameraUploadsSyncFab(isVisible = true)
         setCameraUploadsPausedMenuIconVisibility(isVisible = false)
         setCameraUploadsCompleteMenu(isVisible = false)
+        setCameraUploadsWarningMenu(false)
     }
 
     private fun handleCameraUploadsProgressStatus(info: CameraUploadsStatusInfo.UploadProgress) {
@@ -378,16 +394,18 @@ class TimelineViewModel @Inject constructor(
             }
 
             CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET -> {
-                // For this Scenario, show the Paused Menu Icon in the Toolbar
-                setCameraUploadsPausedMenuIconVisibility(isVisible = true)
+                setCameraUploadsPausedMenuIconVisibility(isVisible = !_state.value.isCUPausedWarningBannerEnabled)
                 setCameraUploadsCompleteMenu(isVisible = false)
-                setCameraUploadsWarningMenu(isVisible = false)
+                setCameraUploadsWarningMenu(isVisible = _state.value.isCUPausedWarningBannerEnabled)
+                updateIsWarningBannerShown(true)
                 hideCameraUploadsFab()
             }
 
             else -> {
                 setCameraUploadsCompleteMenu(isVisible = false)
                 setCameraUploadsWarningFab(isVisible = true, progress = 0.5f)
+                setCameraUploadsWarningMenu(shouldShowWarningMenu())
+                updateIsWarningBannerShown(shouldShowWarningMenu())
             }
         }
     }
@@ -414,7 +432,7 @@ class TimelineViewModel @Inject constructor(
     }
 
     private suspend fun handlePhotos(photos: List<Photo>) {
-        Timber.v("TimelineViewModel photos flow=>" + photos.size)
+        Timber.v("TimelineViewModel photos flow=> ${photos.size}")
         handleTimelinePhotosUseCase()
 
         val showingPhotos = withContext(defaultDispatcher) { filterMedias(photos) }
@@ -475,7 +493,8 @@ class TimelineViewModel @Inject constructor(
         val hasPermissions = hasMediaPermissionUseCase()
 
         setCameraUploadsLimitedAccess(isLimitedAccess = !hasPermissions)
-        setCameraUploadsWarningMenu(isVisible = !hasPermissions)
+        setCameraUploadsWarningMenu(isVisible = !hasPermissions || shouldShowWarningMenu())
+        updateIsWarningBannerShown(!hasPermissions || shouldShowWarningMenu())
         setTriggerMediaPermissionsDeniedLogicState(shouldTrigger = !hasPermissions)
     }
 
@@ -1100,6 +1119,24 @@ class TimelineViewModel @Inject constructor(
         _state.update {
             it.copy(isHiddenNodesOnboarded = true)
         }
+    }
+
+    internal fun updateIsWarningBannerShown(isShown: Boolean) {
+        _state.update { it.copy(isWarningBannerShown = isShown) }
+    }
+
+    internal fun shouldShowWarningMenu(
+        finishReason: CameraUploadsFinishedReason? = _state.value.cameraUploadsFinishedReason,
+        isWarningBannerEnabled: Boolean = _state.value.isCUPausedWarningBannerEnabled,
+    ): Boolean {
+        if (!isWarningBannerEnabled) return false
+
+        return finishReason?.let { reason ->
+            reason in listOf(
+                CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET,
+                CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW
+            )
+        } ?: false
     }
 
     companion object {

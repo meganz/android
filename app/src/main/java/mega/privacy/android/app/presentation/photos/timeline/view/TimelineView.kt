@@ -305,9 +305,10 @@ internal fun CameraUploadsBanners(
     isWarningBannerShown: Boolean,
     isBannerShown: Boolean,
     onChangeCameraUploadsPermissions: () -> Unit,
-    onUpdateCameraUploadsLimitedAccessState: (Boolean) -> Unit,
     onEnableCameraUploads: () -> Unit,
     onNavigateToCameraUploadsTransferScreen: () -> Unit,
+    onNavigateToCameraUploadsSettings: () -> Unit,
+    onWarningBannerDismissed: () -> Unit,
 ) {
     val pendingCount = timelineViewState.pending
     val selectPhotoCount = timelineViewState.selectedPhotoCount
@@ -317,12 +318,16 @@ internal fun CameraUploadsBanners(
     }
 
     when (bannerType) {
-        CameraUploadsBannerType.NoFullAccess -> {
+        CameraUploadsBannerType.NoFullAccess,
+        CameraUploadsBannerType.DeviceChargingNotMet,
+        CameraUploadsBannerType.LowBattery,
+            -> {
             SlideBanner(visible = isWarningBannerShown) {
                 CameraUploadsWarningBanner(
                     bannerType = bannerType,
                     onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
-                    onUpdateCameraUploadsLimitedAccessState = onUpdateCameraUploadsLimitedAccessState
+                    onWarningBannerDismissed = onWarningBannerDismissed,
+                    onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings
                 )
             }
         }
@@ -352,7 +357,15 @@ internal fun getCameraUploadsBannerType(
         timelineViewState.enableCameraUploadButtonShowing && timelineViewState.selectedPhotoCount == 0 ->
             CameraUploadsBannerType.EnableCameraUploads
 
-        timelineViewState.showCameraUploadsWarning -> CameraUploadsBannerType.NoFullAccess
+        timelineViewState.isCUPausedWarningBannerEnabled &&
+                timelineViewState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW
+            -> CameraUploadsBannerType.LowBattery
+
+        timelineViewState.isCUPausedWarningBannerEnabled &&
+                timelineViewState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET
+            -> CameraUploadsBannerType.DeviceChargingNotMet
+
+        timelineViewState.isCameraUploadsLimitedAccess -> CameraUploadsBannerType.NoFullAccess
 
         timelineViewState.cameraUploadsStatus == CameraUploadsStatus.Sync ->
             CameraUploadsBannerType.CheckingUploads
@@ -369,18 +382,29 @@ internal fun getCameraUploadsBannerType(
 private fun CameraUploadsWarningBanner(
     bannerType: CameraUploadsBannerType,
     onChangeCameraUploadsPermissions: () -> Unit,
-    onUpdateCameraUploadsLimitedAccessState: (Boolean) -> Unit,
+    onWarningBannerDismissed: () -> Unit,
+    onNavigateToCameraUploadsSettings: () -> Unit
 ) {
-    if (bannerType == CameraUploadsBannerType.NoFullAccess) {
+    if (bannerType != CameraUploadsBannerType.NONE) {
         LaunchedEffect(Unit) {
-            delay(5000)
-            onUpdateCameraUploadsLimitedAccessState(false)
+            delay(WARNING_BANNER_AUTO_HIDE_DELAY)
+            onWarningBannerDismissed()
+        }
+    }
+
+    when (bannerType) {
+        CameraUploadsBannerType.NoFullAccess -> {
+            CameraUploadsNoFullAccessBanner(
+                onClick = onChangeCameraUploadsPermissions,
+                onClose = onWarningBannerDismissed,
+            )
         }
 
-        CameraUploadsNoFullAccessBanner(
-            onClick = onChangeCameraUploadsPermissions,
-            onClose = { onUpdateCameraUploadsLimitedAccessState(false) },
-        )
+        CameraUploadsBannerType.DeviceChargingNotMet ->
+            DeviceChargingNotMetPausedBanner(onOpenSettingsClicked = onNavigateToCameraUploadsSettings)
+
+        CameraUploadsBannerType.LowBattery -> LowBatteryPausedBanner()
+        else -> {}
     }
 }
 
@@ -432,3 +456,5 @@ private fun SlideBanner(
         content()
     }
 }
+
+private const val WARNING_BANNER_AUTO_HIDE_DELAY = 5000L

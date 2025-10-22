@@ -307,7 +307,9 @@ class PhotosFragment : Fragment() {
     private fun checkCameraUploadsPermissions(showAction: Boolean = false) {
         val hasPermissions = PermissionUtils.hasPermissions(context, *cameraUploadsPermissions)
         timelineViewModel.setCameraUploadsLimitedAccess(isLimitedAccess = !hasPermissions)
-        timelineViewModel.setCameraUploadsWarningMenu(isVisible = !hasPermissions)
+        val isWarningShown = !hasPermissions || timelineViewModel.shouldShowWarningMenu()
+        timelineViewModel.setCameraUploadsWarningMenu(isVisible = isWarningShown)
+        timelineViewModel.updateIsWarningBannerShown(isShown = isWarningShown)
 
         if (!hasPermissions && showAction) {
             timelineViewModel.showCameraUploadsChangePermissionsMessage(true)
@@ -403,7 +405,7 @@ class PhotosFragment : Fragment() {
                 timelineViewState.showCameraUploadsPaused && !isCuDefaultStatusVisible
             // Conditions for showing the CU Complete Menu Icon
             val isCuCompleteStatusVisible =
-                timelineViewState.showCameraUploadsComplete && !isCuDefaultStatusVisible && !isCuPausedStatusVisible
+                timelineViewState.showCameraUploadsComplete && !isCuDefaultStatusVisible
 
             findItem(R.id.action_cu_status_warning)?.isVisible = isCuWarningStatusVisible
             findItem(R.id.action_cu_status_default)?.isVisible = isCuDefaultStatusVisible
@@ -675,6 +677,9 @@ class PhotosFragment : Fragment() {
                 timelineViewModel.setCameraUploadsMessage(
                     getString(SharedR.string.camera_uploads_phone_not_charging_message),
                 )
+                if (timelineViewModel.state.value.isCUPausedWarningBannerEnabled) {
+                    timelineViewModel.updateIsWarningBannerShown(true)
+                }
                 true
             }
 
@@ -686,7 +691,7 @@ class PhotosFragment : Fragment() {
             }
 
             R.id.action_cu_status_warning -> {
-                timelineViewModel.setCameraUploadsLimitedAccess(true)
+                timelineViewModel.updateIsWarningBannerShown(true)
                 true
             }
 

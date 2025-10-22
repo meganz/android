@@ -20,12 +20,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -187,6 +189,57 @@ fun CameraUploadsNoFullAccessBanner(
 }
 
 @Composable
+internal fun DeviceChargingNotMetPausedBanner(
+    modifier: Modifier = Modifier,
+    onOpenSettingsClicked: () -> Unit = {}
+) {
+    val actionTitle = buildAnnotatedString {
+        withStyle(
+            style = SpanStyle(
+                color = colorResource(R.color.color_link_primary),
+                textDecoration = TextDecoration.Underline,
+                fontWeight = FontWeight.Bold
+            )
+        ) {
+            append(stringResource(sharedR.string.camera_update_device_charging_not_met_banner_button_text))
+        }
+    }
+
+    CameraUploadsBanner(
+        modifier = modifier
+            .clickable { onOpenSettingsClicked() }
+            .testTag(TIMELINE_CAMERA_UPLOADS_DEVICE_CHARGING_NOT_MET_BANNER_TEST_TAG),
+        statusIcon = R.drawable.ic_cu_status_warning,
+        title = stringResource(sharedR.string.camera_update_paused_warning_banner_title),
+        description = stringResource(sharedR.string.camera_update_device_charging_not_met_banner_description),
+        action = {
+            MegaText(
+                text = actionTitle,
+                maxLines = Int.MAX_VALUE,
+                modifier = Modifier.clickable {
+                    onOpenSettingsClicked()
+                },
+                textColor = TextColor.Secondary,
+                style = MaterialTheme.typography.caption,
+            )
+        }
+    )
+}
+
+@Composable
+internal fun LowBatteryPausedBanner(
+    modifier: Modifier = Modifier
+) {
+    CameraUploadsBanner(
+        modifier = modifier
+            .testTag(TIMELINE_CAMERA_UPLOADS_LOW_BATTERY_BANNER_TEST_TAG),
+        statusIcon = R.drawable.ic_cu_status_warning,
+        title = stringResource(sharedR.string.camera_update_paused_warning_banner_title),
+        description = stringResource(sharedR.string.camera_update_low_battery_banner_description),
+    )
+}
+
+@Composable
 fun EnableCameraUploadsBanner(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
@@ -259,6 +312,7 @@ private fun CameraUploadsBanner(
     title: String?,
     description: Any?,
     modifier: Modifier = Modifier,
+    action: @Composable (() -> Unit)? = null,
     endIcon: @Composable (() -> Unit)? = null,
 ) {
     Column(modifier) {
@@ -290,7 +344,7 @@ private fun CameraUploadsBanner(
                     MegaText(
                         modifier = Modifier,
                         textColor = TextColor.Primary,
-                        style = MaterialTheme.typography.subtitle1,
+                        style = MaterialTheme.typography.subtitle2,
                         text = title
                     )
                 }
@@ -301,7 +355,7 @@ private fun CameraUploadsBanner(
                             MegaText(
                                 modifier = Modifier,
                                 textColor = TextColor.Secondary,
-                                style = MaterialTheme.typography.body2,
+                                style = MaterialTheme.typography.caption,
                                 text = it
                             )
                         }
@@ -316,6 +370,10 @@ private fun CameraUploadsBanner(
                             )
                         }
                     }
+                }
+
+                action?.let { actionContent ->
+                    actionContent()
                 }
             }
 
@@ -335,25 +393,38 @@ private fun CameraUploadsBanner(
 @Preview
 @Composable
 fun PreviewCameraUploadsStatusSync() {
-    CameraUploadsStatusSync(onClick = { /*TODO*/ })
+    CameraUploadsStatusSync(onClick = {})
 }
 
 @Preview
 @Composable
 fun PreviewCameraUploadsStatusUploading() {
-    CameraUploadsStatusUploading(progress = 0.6f, onClick = { /*TODO*/ })
+    CameraUploadsStatusUploading(progress = 0.6f, onClick = {})
 }
 
 @Preview
 @Composable
 fun PreviewCameraUploadsStatusCompleted() {
-    CameraUploadsStatusCompleted(onClick = { /*TODO*/ })
+    CameraUploadsStatusCompleted(onClick = {})
 }
 
 @Preview
 @Composable
 fun PreviewCameraUploadsStatusWarning() {
-    CameraUploadsStatusWarning(progress = 0.4f, onClick = { /*TODO*/ })
+    CameraUploadsStatusWarning(progress = 0.4f, onClick = {})
+}
+
+@Preview
+@Composable
+fun PreviewDeviceChargingNotMetPausedBanner() {
+    DeviceChargingNotMetPausedBanner(onOpenSettingsClicked = {})
+}
+
+
+@Preview
+@Composable
+fun PreviewLowBatteryPausedBanner() {
+    LowBatteryPausedBanner()
 }
 
 /**
@@ -379,3 +450,15 @@ const val TIMELINE_CAMERA_UPLOADS_PENDING_COUNT_BANNER_TEST_TAG =
  */
 const val TIMELINE_CAMERA_UPLOADS_NO_FULL_ACCESS_BANNER_TEST_TAG =
     "timeline_camera_uploads_no_full_access_banner_test_tag"
+
+/**
+ * Test tag for camera uploads device charging not met banner
+ */
+const val TIMELINE_CAMERA_UPLOADS_DEVICE_CHARGING_NOT_MET_BANNER_TEST_TAG =
+    "timeline_camera_uploads_device_charging_not_met_test_tag"
+
+/**
+ * Test tag for camera uploads low battery banner
+ */
+const val TIMELINE_CAMERA_UPLOADS_LOW_BATTERY_BANNER_TEST_TAG =
+    "timeline_camera_uploads_low_battery_test_tag"

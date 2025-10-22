@@ -8,6 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsBannerType
 import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsStatus
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.photos.Photo
 import org.junit.Rule
 import org.junit.Test
@@ -26,9 +27,10 @@ class TimelineViewTest {
         isWarningBannerShown: Boolean = false,
         isBannerShown: Boolean = false,
         onChangeCameraUploadsPermissions: () -> Unit = {},
-        onUpdateCameraUploadsLimitedAccessState: (Boolean) -> Unit = {},
         onEnableCameraUploads: () -> Unit = {},
         onNavigateToCameraUploadsTransferScreen: () -> Unit = {},
+        onNavigateToCameraUploadsSettings: () -> Unit = {},
+        onWarningBannerDismissed: () -> Unit = {},
     ) {
         composeRule.setContent {
             CameraUploadsBanners(
@@ -37,9 +39,10 @@ class TimelineViewTest {
                 isWarningBannerShown = isWarningBannerShown,
                 isBannerShown = isBannerShown,
                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
-                onUpdateCameraUploadsLimitedAccessState = onUpdateCameraUploadsLimitedAccessState,
                 onEnableCameraUploads = onEnableCameraUploads,
-                onNavigateToCameraUploadsTransferScreen = onNavigateToCameraUploadsTransferScreen
+                onNavigateToCameraUploadsTransferScreen = onNavigateToCameraUploadsTransferScreen,
+                onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
+                onWarningBannerDismissed = onWarningBannerDismissed
             )
         }
     }
@@ -228,6 +231,40 @@ class TimelineViewTest {
     }
 
     @Test
+    fun `test DeviceChargingNotMetPausedBanner is displayed as expected`() {
+        val timelineViewState = createTimelineViewStateForPausedWarningBanners(
+            cameraUploadsFinishedReason = CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET
+        )
+        val bannerType = getCameraUploadsBannerType(timelineViewState)
+
+        setComposeContent(
+            timelineViewState = timelineViewState,
+            bannerType = bannerType,
+            isWarningBannerShown = true
+        )
+
+        composeRule.onNodeWithTag(TIMELINE_CAMERA_UPLOADS_DEVICE_CHARGING_NOT_MET_BANNER_TEST_TAG)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test LowBatteryPausedBanner is displayed as expected`() {
+        val timelineViewState = createTimelineViewStateForPausedWarningBanners(
+            cameraUploadsFinishedReason = CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW
+        )
+        val bannerType = getCameraUploadsBannerType(timelineViewState)
+
+        setComposeContent(
+            timelineViewState = timelineViewState,
+            bannerType = bannerType,
+            isWarningBannerShown = true
+        )
+
+        composeRule.onNodeWithTag(TIMELINE_CAMERA_UPLOADS_LOW_BATTERY_BANNER_TEST_TAG)
+            .assertIsDisplayed()
+    }
+
+    @Test
     fun `test banner priority order when all conditions are met`() {
         // Test the priority order: Warning > Enable > Sync > Uploading
         val timelineViewState = TimelineViewState(
@@ -341,10 +378,27 @@ class TimelineViewTest {
     private fun createTimelineViewStateForNoFullAccessBanner(
         showCameraUploadsWarning: Boolean = true,
     ) = TimelineViewState(
+        isCameraUploadsLimitedAccess = true,
+        isWarningBannerShown = true,
         enableCameraUploadButtonShowing = false,
         selectedPhotoCount = 0,
         cameraUploadsStatus = CameraUploadsStatus.None,
         showCameraUploadsWarning = showCameraUploadsWarning,
+        currentShowingPhotos = listOf<Photo.Video>(mock(), mock()),
+        loadPhotosDone = true
+    )
+
+    private fun createTimelineViewStateForPausedWarningBanners(
+        cameraUploadsFinishedReason: CameraUploadsFinishedReason,
+    ) = TimelineViewState(
+        isCameraUploadsLimitedAccess = false,
+        isWarningBannerShown = true,
+        enableCameraUploadButtonShowing = false,
+        selectedPhotoCount = 0,
+        cameraUploadsStatus = CameraUploadsStatus.None,
+        isCUPausedWarningBannerEnabled = true,
+        showCameraUploadsWarning = true,
+        cameraUploadsFinishedReason = cameraUploadsFinishedReason,
         currentShowingPhotos = listOf<Photo.Video>(mock(), mock()),
         loadPhotosDone = true
     )

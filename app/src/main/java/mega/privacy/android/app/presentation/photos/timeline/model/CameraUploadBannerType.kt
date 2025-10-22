@@ -27,5 +27,15 @@ enum class CameraUploadsBannerType {
     /**
      * Banner to show the pending uploading count
      */
-    PendingCount
+    PendingCount,
+
+    /**
+     * Banner to show when Camera Uploads is paused due to the device charging requirement not met
+     */
+    DeviceChargingNotMet,
+
+    /**
+     * Banner to show when Camera Uploads is paused due to the device being on Low Battery
+     */
+    LowBattery,
 }

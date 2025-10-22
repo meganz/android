@@ -31,6 +31,7 @@ import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsBannerType
+import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.timeline.view.CameraUploadsBanners
 import mega.privacy.android.app.presentation.photos.timeline.view.EmptyState
 import mega.privacy.android.app.presentation.photos.timeline.view.EnableCameraUploadsScreen
@@ -49,6 +50,7 @@ import mega.privacy.android.app.presentation.photos.view.isScrollingDown
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.CameraUploadsBusinessAccountDialog
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
@@ -117,7 +119,7 @@ fun PhotosScreen(
 
     var isBannerShown by remember { mutableStateOf(false) }
     var isWarningBannerShown by remember { mutableStateOf(false) }
-    var bannerType by remember { mutableStateOf(CameraUploadsBannerType.NONE) }
+    var bannerType by remember { mutableStateOf(getCameraUploadsBannerType(timelineViewState)) }
 
     val isScrollingDown by timelineLazyGridState.isScrollingDown()
     val isScrolledToEnd by timelineLazyGridState.isScrolledToEnd()
@@ -127,7 +129,9 @@ fun PhotosScreen(
         timelineViewState.enableCameraUploadButtonShowing,
         timelineViewState.selectedPhotoCount,
         timelineViewState.showCameraUploadsWarning,
-        timelineViewState.cameraUploadsStatus
+        timelineViewState.cameraUploadsStatus,
+        timelineViewState.cameraUploadsFinishedReason,
+        timelineViewState.isCUPausedWarningBannerEnabled
     ) {
         bannerType = getCameraUploadsBannerType(timelineViewState)
     }
@@ -153,16 +157,24 @@ fun PhotosScreen(
 
         isBannerShown = shouldShowBanner
 
+        if ((isScrollingDown || isScrolledToEnd) && timelineViewState.isWarningBannerShown) {
+            timelineViewModel.updateIsWarningBannerShown(false)
+        }
+
         if (timelineLazyGridState.isScrollInProgress) {
-            if ((isScrollingDown || isScrolledToEnd) && timelineViewState.isCameraUploadsLimitedAccess) {
-                timelineViewModel.setCameraUploadsLimitedAccess(false)
-            }
             isWarningBannerShown = shouldShowBanner
         }
     }
 
-    LaunchedEffect(timelineViewState.isCameraUploadsLimitedAccess) {
-        isWarningBannerShown = timelineViewState.isCameraUploadsLimitedAccess
+    LaunchedEffect(
+        timelineViewState.showCameraUploadsWarning,
+        timelineViewState.isCameraUploadsLimitedAccess,
+        timelineViewState.cameraUploadsFinishedReason,
+        timelineViewState.isWarningBannerShown,
+        timelineViewState.isCUPausedWarningBannerEnabled
+    ) {
+        isWarningBannerShown = timelineViewState.isWarningBannerShown
+                && getWarningBannerShown(bannerType, timelineViewState)
     }
 
     LaunchedEffect(pagerState.currentPage) {
@@ -218,12 +230,13 @@ fun PhotosScreen(
                                 isWarningBannerShown = isWarningBannerShown,
                                 isBannerShown = isBannerShown,
                                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
-                                onUpdateCameraUploadsLimitedAccessState = { isVisible ->
-                                    isWarningBannerShown = isVisible
-                                    timelineViewModel.setCameraUploadsLimitedAccess(isVisible)
-                                },
                                 onEnableCameraUploads = onNavigateCameraUploadsSettings,
                                 onNavigateToCameraUploadsTransferScreen = onNavigateCameraUploadsTransferScreen,
+                                onNavigateToCameraUploadsSettings = onNavigateCameraUploadsSettings,
+                                onWarningBannerDismissed = {
+                                    timelineViewModel.updateIsWarningBannerShown(false)
+                                    isWarningBannerShown = false
+                                }
                             )
                         },
                     )
@@ -233,15 +246,16 @@ fun PhotosScreen(
                         CameraUploadsBanners(
                             timelineViewState = timelineViewState,
                             bannerType = bannerType,
-                            isWarningBannerShown = timelineViewState.isCameraUploadsLimitedAccess,
+                            isWarningBannerShown = isWarningBannerShown,
                             isBannerShown = true,
                             onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
-                            onUpdateCameraUploadsLimitedAccessState = { isVisible ->
-                                isWarningBannerShown = isVisible
-                                timelineViewModel.setCameraUploadsLimitedAccess(isVisible)
-                            },
                             onEnableCameraUploads = onNavigateCameraUploadsSettings,
                             onNavigateToCameraUploadsTransferScreen = onNavigateCameraUploadsTransferScreen,
+                            onNavigateToCameraUploadsSettings = onNavigateCameraUploadsSettings,
+                            onWarningBannerDismissed = {
+                                timelineViewModel.updateIsWarningBannerShown(false)
+                                isWarningBannerShown = false
+                            }
                         )
 
                         EmptyState(
@@ -278,12 +292,13 @@ fun PhotosScreen(
                         isWarningBannerShown = isWarningBannerShown,
                         isBannerShown = isBannerShown,
                         onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
-                        onUpdateCameraUploadsLimitedAccessState = { isVisible ->
-                            isWarningBannerShown = isVisible
-                            timelineViewModel.setCameraUploadsLimitedAccess(isVisible)
-                        },
                         onEnableCameraUploads = onNavigateCameraUploadsSettings,
                         onNavigateToCameraUploadsTransferScreen = onNavigateCameraUploadsTransferScreen,
+                        onNavigateToCameraUploadsSettings = onNavigateCameraUploadsSettings,
+                        onWarningBannerDismissed = {
+                            timelineViewModel.updateIsWarningBannerShown(false)
+                            isWarningBannerShown = false
+                        }
                     )
                 }
             )
@@ -395,3 +410,18 @@ private fun getSelectedAlbumVideoCount(album: UIAlbum): Int? = if (album.id !is 
 } else {
     album.videoCount
 }
+
+private fun getWarningBannerShown(
+    bannerType: CameraUploadsBannerType,
+    timelineViewState: TimelineViewState,
+) =
+    when (bannerType) {
+        CameraUploadsBannerType.NoFullAccess -> timelineViewState.isCameraUploadsLimitedAccess
+        CameraUploadsBannerType.DeviceChargingNotMet ->
+            timelineViewState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET
+
+        CameraUploadsBannerType.LowBattery ->
+            timelineViewState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW
+
+        else -> false
+    }
