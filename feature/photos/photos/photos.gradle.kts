@@ -49,6 +49,7 @@ dependencies {
     implementation(lib.kotlin.serialisation)
     implementation(androidx.navigation3.runtime)
     implementation(google.services.mlkit.document.scanner)
+    implementation(lib.coil.compose)
 
     // test
     testImplementation(project(":core-test"))

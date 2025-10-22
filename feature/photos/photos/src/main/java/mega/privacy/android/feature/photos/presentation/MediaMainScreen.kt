@@ -21,6 +21,7 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.feature.photos.model.MediaAppBarAction
 import mega.privacy.android.feature.photos.model.MediaAppBarAction.CameraUpload.CameraUploadStatus
 import mega.privacy.android.feature.photos.model.MediaScreen
+import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabRoute
 import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
@@ -104,10 +105,7 @@ private fun MediaScreen.MediaContent(
     }
 
     MediaScreen.Albums -> {
-        // Todo: Implement Albums Screen
-        Box(modifier) {
-            MegaText("Albums Screen - To be implemented")
-        }
+        AlbumsTabRoute(modifier = Modifier.fillMaxSize())
     }
 
     // Todo: Implement Videos and Playlists Screens
