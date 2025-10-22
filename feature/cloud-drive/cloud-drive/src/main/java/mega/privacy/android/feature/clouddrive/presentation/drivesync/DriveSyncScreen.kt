@@ -48,6 +48,8 @@ import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetView
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
+import mega.privacy.android.navigation.destination.SyncSelectStopBackupDestinationNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
@@ -185,21 +187,27 @@ internal fun DriveSyncScreen(
                         isInCloudDrive = true,
                         syncPermissionsManager = viewModel.syncPermissionsManager,
                         onSyncFolderClicked = {
-                            megaNavigator.openNewSync(
-                                context,
-                                SyncType.TYPE_TWOWAY,
-                                isFromCloudDrive = true
+                            navigationHandler.navigate(
+                                SyncNewFolderNavKey(
+                                    syncType = SyncType.TYPE_TWOWAY,
+                                    isFromCloudDrive = true
+                                )
                             )
                         },
                         onBackupFolderClicked = {
-                            megaNavigator.openNewSync(
-                                context,
-                                SyncType.TYPE_BACKUP,
-                                isFromCloudDrive = true
+                            navigationHandler.navigate(
+                                SyncNewFolderNavKey(
+                                    syncType = SyncType.TYPE_BACKUP,
+                                    isFromCloudDrive = true
+                                )
                             )
                         },
                         onSelectStopBackupDestinationClicked = {
-                            megaNavigator.openSelectStopBackupDestinationFromSyncsTab(context, it)
+                            navigationHandler.navigate(
+                                SyncSelectStopBackupDestinationNavKey(
+                                    folderName = it
+                                )
+                            )
                         },
                         onOpenUpgradeAccountClicked = {
                             megaNavigator.openUpgradeAccount(context)

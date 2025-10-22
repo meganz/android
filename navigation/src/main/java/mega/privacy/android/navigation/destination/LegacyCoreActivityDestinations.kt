@@ -4,6 +4,7 @@ import androidx.annotation.Keep
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.sync.SyncType
 
 @Serializable
 data object OverDiskQuotaPaywallWarningNavKey : NavKey
@@ -75,3 +76,20 @@ data class TestPasswordNavKey(
 
 @Serializable
 data class OfflineInfoNavKey(val handle: String) : NavKey
+
+@Serializable
+data object SyncListNavKey : NavKey
+
+@Serializable
+data class SyncNewFolderNavKey(
+    val syncType: SyncType = SyncType.TYPE_TWOWAY,
+    val isFromManagerActivity: Boolean = false,
+    val isFromCloudDrive: Boolean = false,
+    val remoteFolderHandle: Long? = null,
+    val remoteFolderName: String? = null,
+) : NavKey
+
+@Serializable
+data class SyncSelectStopBackupDestinationNavKey(
+    val folderName: String? = null,
+) : NavKey

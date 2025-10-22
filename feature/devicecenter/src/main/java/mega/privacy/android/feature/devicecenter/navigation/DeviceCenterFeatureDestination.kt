@@ -9,6 +9,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
+import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.mobile.analytics.event.DeviceCenterItemClicked
 import mega.privacy.mobile.analytics.event.DeviceCenterItemClickedEvent
 
@@ -32,7 +33,7 @@ class DeviceCenterFeatureDestination : FeatureDestination {
                     navigationHandler.navigate(DriveSyncNavKey(initialTabIndex = 1))
                 },
                 onNavigateToNewSync = { syncType: SyncType ->
-                    // TODO: Navigate to new sync screen
+                    navigationHandler.navigate(SyncNewFolderNavKey(syncType = syncType))
                 },
                 onNavigateToCameraUploads = {
                     // TODO: Navigate to camera uploads settings
