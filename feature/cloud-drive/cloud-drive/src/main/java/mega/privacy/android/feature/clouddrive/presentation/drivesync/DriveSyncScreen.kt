@@ -48,6 +48,7 @@ import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetView
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.destination.SyncSelectStopBackupDestinationNavKey
 import mega.privacy.android.shared.resources.R as sharedR
@@ -216,7 +217,7 @@ internal fun DriveSyncScreen(
                             navigationHandler.navigate(CloudDriveNavKey(nodeHandle = handle))
                         },
                         onCameraUploadsSettingsClicked = {
-                            megaNavigator.openSettingsCameraUploads(context)
+                            navigationHandler.navigate(SettingsCameraUploadsNavKey)
                         },
                         onFabExpanded = { isExpanded -> }
                     )

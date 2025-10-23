@@ -457,6 +457,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         context.startActivity(Intent(context, SyncHostActivity::class.java))
     }
 
+
     override fun openNewSync(
         context: Context,
         syncType: SyncType,

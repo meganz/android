@@ -11,3 +11,6 @@ data class LegacySettingsNavKey(
 
 @Serializable
 data object CookieSettingsNavKey : NavKey
+
+@Serializable
+data object SettingsCameraUploadsNavKey : NavKey
