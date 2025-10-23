@@ -33,6 +33,7 @@ import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.shares.GetOutgoingSharesChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -62,6 +63,7 @@ class OutgoingSharesViewModelTest {
     private val getCloudSortOrder: GetCloudSortOrder = mock()
     private val setCloudSortOrder: SetCloudSortOrder = mock()
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = mock()
+    private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase = mock()
     private val folderNodeHandle = 123L
     private val folderNodeId = NodeId(folderNodeHandle)
 
@@ -84,7 +86,8 @@ class OutgoingSharesViewModelTest {
             nodeUiItemMapper,
             getCloudSortOrder,
             setCloudSortOrder,
-            nodeSortConfigurationUiMapper
+            nodeSortConfigurationUiMapper,
+            getContactVerificationWarningUseCase
         )
     }
 
@@ -97,6 +100,7 @@ class OutgoingSharesViewModelTest {
         getCloudSortOrderUseCase = getCloudSortOrder,
         setCloudSortOrderUseCase = setCloudSortOrder,
         nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
+        getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
     )
 
     private suspend fun setupTestData(items: List<ShareNode>, nodeName: String = "Test Folder") {
@@ -124,6 +128,9 @@ class OutgoingSharesViewModelTest {
                 NodeSourceType.OUTGOING_SHARES
             )
         ).thenReturn(flowOf())
+
+        // Setup contact verification mock
+        whenever(getContactVerificationWarningUseCase()).thenReturn(false)
     }
 
     @Test
@@ -722,6 +729,144 @@ class OutgoingSharesViewModelTest {
 
             assertThat(stateAfterSelection.selectedNodeIds).hasSize(1)
             assertThat(stateAfterSelection.selectedNodeIds[0]).isEqualTo(NodeId(1L))
+        }
+    }
+
+    // Contact Verification Tests
+
+    @Test
+    fun `test that contact verification is checked when loading nodes with feature enabled`() =
+        runTest {
+            val node1 = mock<ShareFileNode> {
+                on { id } doReturn NodeId(1L)
+                on { name } doReturn "Test Node 1"
+            }
+
+            whenever(getContactVerificationWarningUseCase()).thenReturn(true)
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+            whenever(
+                nodeSortConfigurationUiMapper(
+                    SortOrder.ORDER_DEFAULT_ASC,
+                )
+            ).thenReturn(
+                NodeSortConfiguration.default
+            )
+            whenever(getOutgoingSharesChildrenNodeUseCase(-1L)).thenReturn(listOf(node1))
+
+            val nodeUiItems = listOf(NodeUiItem<TypedNode>(node = node1, isSelected = false))
+            whenever(
+                nodeUiItemMapper(
+                    nodeList = listOf(node1),
+                    existingItems = emptyList(),
+                    nodeSourceType = NodeSourceType.OUTGOING_SHARES,
+                    isContactVerificationOn = true,
+                )
+            ).thenReturn(nodeUiItems)
+            whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
+            whenever(
+                monitorNodeUpdatesByIdUseCase(
+                    NodeId(-1L),
+                    NodeSourceType.OUTGOING_SHARES
+                )
+            ).thenReturn(flowOf())
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isLoading).isFalse()
+                assertThat(state.items).hasSize(1)
+            }
+        }
+
+    @Test
+    fun `test that contact verification is checked when loading nodes with feature disabled`() =
+        runTest {
+            val node1 = mock<ShareFileNode> {
+                on { id } doReturn NodeId(1L)
+                on { name } doReturn "Test Node 1"
+            }
+
+            whenever(getContactVerificationWarningUseCase()).thenReturn(false)
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+            whenever(
+                nodeSortConfigurationUiMapper(
+                    SortOrder.ORDER_DEFAULT_ASC
+                )
+            ).thenReturn(
+                NodeSortConfiguration.default
+            )
+            whenever(getOutgoingSharesChildrenNodeUseCase(-1L)).thenReturn(listOf(node1))
+
+            val nodeUiItems = listOf(NodeUiItem<TypedNode>(node = node1, isSelected = false))
+            whenever(
+                nodeUiItemMapper(
+                    nodeList = listOf(node1),
+                    existingItems = emptyList(),
+                    nodeSourceType = NodeSourceType.OUTGOING_SHARES,
+                    isContactVerificationOn = false,
+                )
+            ).thenReturn(nodeUiItems)
+            whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
+            whenever(
+                monitorNodeUpdatesByIdUseCase(
+                    NodeId(-1L),
+                    NodeSourceType.OUTGOING_SHARES
+                )
+            ).thenReturn(flowOf())
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isLoading).isFalse()
+                assertThat(state.items).hasSize(1)
+            }
+        }
+
+    @Test
+    fun `test that contact verification exception is handled gracefully`() = runTest {
+        val node1 = mock<ShareFileNode> {
+            on { id } doReturn NodeId(1L)
+            on { name } doReturn "Test Node 1"
+        }
+
+        whenever(getContactVerificationWarningUseCase()).thenThrow(RuntimeException("Test exception"))
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+        whenever(
+            nodeSortConfigurationUiMapper(
+                SortOrder.ORDER_DEFAULT_ASC
+            )
+        ).thenReturn(NodeSortConfiguration.default)
+        whenever(getOutgoingSharesChildrenNodeUseCase(-1L)).thenReturn(listOf(node1))
+
+        val nodeUiItems = listOf(NodeUiItem<TypedNode>(node = node1, isSelected = false))
+        whenever(
+            nodeUiItemMapper(
+                nodeList = listOf(node1),
+                existingItems = emptyList(),
+                nodeSourceType = NodeSourceType.OUTGOING_SHARES,
+                isContactVerificationOn = false,
+            )
+        ).thenReturn(nodeUiItems)
+        whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
+        whenever(
+            monitorNodeUpdatesByIdUseCase(
+                NodeId(-1L),
+                NodeSourceType.OUTGOING_SHARES
+            )
+        ).thenReturn(flowOf())
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            // Should not crash and load items with default verification value (false)
+            assertThat(state.isLoading).isFalse()
+            assertThat(state.items).hasSize(1)
         }
     }
 }

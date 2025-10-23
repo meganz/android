@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.shares.GetOutgoingSharesChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -42,6 +43,7 @@ class OutgoingSharesViewModel @Inject constructor(
     private val getCloudSortOrderUseCase: GetCloudSortOrder,
     private val setCloudSortOrderUseCase: SetCloudSortOrder,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
+    private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OutgoingSharesUiState())
@@ -72,11 +74,15 @@ class OutgoingSharesViewModel @Inject constructor(
     private suspend fun loadNodes() {
         val folderId = uiState.value.currentFolderId
         runCatching {
+            val isContactVerificationOn = runCatching {
+                getContactVerificationWarningUseCase()
+            }.getOrDefault(false)
             val nodes = getOutgoingSharesChildrenNodeUseCase(folderId.longValue)
             val nodeUiItems = nodeUiItemMapper(
                 nodeList = nodes,
                 existingItems = uiState.value.items,
-                nodeSourceType = NodeSourceType.OUTGOING_SHARES
+                nodeSourceType = NodeSourceType.OUTGOING_SHARES,
+                isContactVerificationOn = isContactVerificationOn
             )
             _uiState.update { state ->
                 state.copy(
