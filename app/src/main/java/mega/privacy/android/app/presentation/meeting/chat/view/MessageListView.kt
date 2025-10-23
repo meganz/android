@@ -56,7 +56,8 @@ import timber.log.Timber
 internal fun MessageListView(
     uiState: ChatUiState,
     scrollState: LazyListState,
-    bottomPadding: Dp,
+    topContentPadding: Dp,
+    bottomContentPadding: Dp,
     onMoreReactionsClicked: (Long) -> Unit,
     onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
     onReactionLongClick: (String, List<UIReaction>) -> Unit,
@@ -164,7 +165,7 @@ internal fun MessageListView(
                 lastVisibleIndex.intValue = visibleItems.firstOrNull()?.index ?: -1
             }
     }
-    val actualBottomPadding = bottomPadding.coerceAtLeast(12.dp)
+    val actualBottomPadding = bottomContentPadding.coerceAtLeast(12.dp)
 
     val lastItemAvatarPosition by computeLastItemAvatarPosition(
         pagingItems, scrollState, lastVisibleIndex, actualBottomPadding
@@ -195,7 +196,7 @@ internal fun MessageListView(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             state = scrollState,
-            contentPadding = PaddingValues(bottom = actualBottomPadding),
+            contentPadding = PaddingValues(bottom = actualBottomPadding, top = topContentPadding),
             reverseLayout = true,
         ) {
             items(

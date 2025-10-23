@@ -36,7 +36,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -158,7 +157,6 @@ import mega.privacy.mobile.analytics.event.ChatMessageLongPressedEvent
 @OptIn(
     ExperimentalPermissionsApi::class,
     ExperimentalLayoutApi::class,
-    ExperimentalComposeUiApi::class
 )
 @Composable
 internal fun ChatView(
@@ -174,27 +172,6 @@ internal fun ChatView(
     setPendingAction: (@Composable() (() -> Unit)?) -> Unit,
     setAddingReactionTo: (Long?) -> Unit,
     getApplicableActions: () -> List<MessageAction>,
-    inviteContactsToChat: (Long, List<String>) -> Unit = { _, _ -> },
-    onInfoToShowConsumed: () -> Unit = {},
-    enablePasscodeCheck: () -> Unit = {},
-    archiveChat: () -> Unit = {},
-    unarchiveChat: () -> Unit = {},
-    startCall: (Boolean) -> Unit = {},
-    onCallStarted: () -> Unit = {},
-    onWaitingRoomOpened: () -> Unit = {},
-    onStartOrJoinMeeting: (isStarted: Boolean) -> Unit = {},
-    onAnswerCall: () -> Unit = {},
-    onSendClick: (String) -> Unit = {},
-    onJoinChat: () -> Unit = {},
-    onSetPendingJoinLink: () -> Unit = {},
-    onCloseEditing: () -> Unit = {},
-    onAddReaction: (Long, String) -> Unit = { _, _ -> },
-    onDeleteReaction: (Long, String) -> Unit = { _, _ -> },
-    onForwardMessages: (Set<TypedMessage>, List<Long>?, List<Long>?) -> Unit = { _, _, _ -> },
-    consumeDownloadEvent: () -> Unit = {},
-    onActionToManageEventConsumed: () -> Unit = {},
-    onVoiceClipRecordEvent: (VoiceClipRecordEvent) -> Unit = {},
-    onConsumeShouldUpgradeToProPlan: () -> Unit = {},
     navigateToFreePlanLimitParticipants: () -> Unit,
     showOptionsModal: (Long) -> Unit,
     showEmojiModal: (Long) -> Unit,
@@ -216,6 +193,27 @@ internal fun ChatView(
     navigateToNotSentModal: () -> Unit,
     navigateToConversation: (Long) -> Unit,
     navHostController: androidx.navigation.NavHostController,
+    inviteContactsToChat: (Long, List<String>) -> Unit = { _, _ -> },
+    onInfoToShowConsumed: () -> Unit = {},
+    enablePasscodeCheck: () -> Unit = {},
+    archiveChat: () -> Unit = {},
+    unarchiveChat: () -> Unit = {},
+    startCall: (Boolean) -> Unit = {},
+    onCallStarted: () -> Unit = {},
+    onWaitingRoomOpened: () -> Unit = {},
+    onStartOrJoinMeeting: (isStarted: Boolean) -> Unit = {},
+    onAnswerCall: () -> Unit = {},
+    onSendClick: (String) -> Unit = {},
+    onJoinChat: () -> Unit = {},
+    onSetPendingJoinLink: () -> Unit = {},
+    onCloseEditing: () -> Unit = {},
+    onAddReaction: (Long, String) -> Unit = { _, _ -> },
+    onDeleteReaction: (Long, String) -> Unit = { _, _ -> },
+    onForwardMessages: (Set<TypedMessage>, List<Long>?, List<Long>?) -> Unit = { _, _, _ -> },
+    consumeDownloadEvent: () -> Unit = {},
+    onActionToManageEventConsumed: () -> Unit = {},
+    onVoiceClipRecordEvent: (VoiceClipRecordEvent) -> Unit = {},
+    onConsumeShouldUpgradeToProPlan: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -520,11 +518,12 @@ internal fun ChatView(
                                 }
                             )
                         },
-                        listView = { bottomPadding ->
+                        listView = { topContentPadding, bottomPadding ->
                             MessageListView(
                                 uiState = uiState,
                                 scrollState = scrollState,
-                                bottomPadding = bottomPadding,
+                                topContentPadding = topContentPadding,
+                                bottomContentPadding = bottomPadding,
                                 onMessageLongClick = onMessageLongClick,
                                 onMoreReactionsClicked = onListViewMoreReactionsClicked,
                                 onReactionClicked = onListViewReactionClicked,
@@ -661,7 +660,6 @@ private fun ChatViewPreview() {
             setPendingAction = {},
             setAddingReactionTo = {},
             getApplicableActions = { listOf() },
-            inviteContactsToChat = { _, _ -> },
             navigateToFreePlanLimitParticipants = {},
             showOptionsModal = {},
             showEmojiModal = {},
@@ -683,6 +681,7 @@ private fun ChatViewPreview() {
             navigateToNotSentModal = {},
             navigateToConversation = {},
             navHostController = rememberNavController(),
+            inviteContactsToChat = { _, _ -> },
         )
     }
 }

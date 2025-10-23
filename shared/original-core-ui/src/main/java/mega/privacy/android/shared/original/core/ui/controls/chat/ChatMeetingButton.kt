@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeComponentPreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
@@ -48,7 +48,7 @@ fun ChatMeetingButton(
     )
 }
 
-@CombinedThemePreviews
+@CombinedThemeComponentPreviews
 @Composable
 private fun ChatMeetingButtonPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {

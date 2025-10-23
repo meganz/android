@@ -17,24 +17,29 @@ import androidx.compose.ui.unit.dp
 internal fun ChatContentView(
     modifier: Modifier = Modifier,
     topViews: @Composable () -> Unit = {},
-    listView: @Composable (bottomPadding: Dp) -> Unit = {},
+    listView: @Composable (topContentPadding: Dp, bottomContentPadding: Dp) -> Unit = { _, _ -> },
     bottomViews: @Composable () -> Unit = {},
 ) = Box(
     modifier = modifier
 ) {
+    var topButtonsHeight by remember { mutableStateOf(0.dp) }
     var bottomButtonsHeight by remember { mutableStateOf(12.dp) }
     val density = LocalDensity.current
-    listView(bottomButtonsHeight)
+    listView(topButtonsHeight, bottomButtonsHeight)
     Box(
-        modifier = Modifier.align(Alignment.TopCenter)
-    ) {
+        modifier = Modifier
+            .align(Alignment.TopCenter)
+            .onGloballyPositioned {
+                topButtonsHeight = with(density) { it.size.height.toDp() }
+            }) {
         topViews()
     }
-    Box(modifier = Modifier
-        .align(Alignment.BottomCenter)
-        .onGloballyPositioned {
-            bottomButtonsHeight = with(density) { it.size.height.toDp() }
-        }) {
+    Box(
+        modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .onGloballyPositioned {
+                bottomButtonsHeight = with(density) { it.size.height.toDp() }
+            }) {
         bottomViews()
     }
 

@@ -241,10 +241,9 @@ class ChatViewTest {
             ) {
                 ChatView(
                     bottomSheetNavigator = rememberBottomSheetNavigator(),
+                    uiState = state,
                     onBackPressed = {},
                     onMenuActionPressed = actionPressed,
-                    navHostController = rememberNavController(),
-                    uiState = state,
                     scaffoldState = rememberScaffoldState(),
                     setSelectedMessages = {},
                     setSelectMode = {},
@@ -273,6 +272,7 @@ class ChatViewTest {
                     navigateToReactionInfo = {},
                     navigateToNotSentModal = {},
                     navigateToConversation = {},
+                    navHostController = rememberNavController(),
                 )
             }
         }
