@@ -497,7 +497,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             },
         ).collect { (batteryInfo, chargingRequired) ->
             val isCharging = batteryInfo.isCharging
-            deviceAboveMinimumBatteryLevel = (batteryInfo.level > LOW_BATTERY_LEVEL || isCharging)
+            deviceAboveMinimumBatteryLevel = batteryInfo.level > LOW_BATTERY_LEVEL
             isChargingConstraintSatisfied = if (chargingRequired) isCharging else true
 
             when {
