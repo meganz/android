@@ -54,6 +54,7 @@ import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNa
 import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
 import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
+import mega.privacy.android.core.nodecomponents.list.UnverifiedContactShareBanner
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeSortOption
@@ -223,7 +224,8 @@ internal fun CloudDriveContent(
             when (collisionType) {
                 NodeNameCollisionType.MOVE -> nodeOptionsActionViewModel.moveNodes(nodes)
                 NodeNameCollisionType.COPY -> nodeOptionsActionViewModel.copyNodes(nodes)
-                else -> { /* No-op for other types */ }
+                else -> { /* No-op for other types */
+                }
             }
         },
     )
@@ -300,7 +302,11 @@ internal fun CloudDriveContent(
     ) {
         // Storage Over Quota Banner
         val isOverQuotaBannerShow = uiState.storageCapacity != StorageOverQuotaCapacity.DEFAULT
-        val topPadding = if (isOverQuotaBannerShow || isTabContent) 12.dp else 0.dp
+        val showContactVerificationBanner =
+            !uiState.isLoading && uiState.showContactNotVerifiedBanner && uiState.title.text.isNotEmpty()
+        val topPadding =
+            if (isOverQuotaBannerShow || isTabContent || showContactVerificationBanner) 12.dp else 0.dp
+
         if (isOverQuotaBannerShow) {
             StorageOverQuotaBannerM3(
                 storageCapacity = uiState.storageCapacity,
@@ -308,6 +314,15 @@ internal fun CloudDriveContent(
                 onUpgradeClicked = {
                     megaNavigator.openUpgradeAccount(context)
                 },
+            )
+        }
+
+        if (showContactVerificationBanner) {
+            UnverifiedContactShareBanner(
+                text = stringResource(
+                    id = R.string.contact_incoming_shared_folder_contact_not_approved_alert_text,
+                    uiState.title.text
+                ),
             )
         }
 
@@ -361,6 +376,7 @@ internal fun CloudDriveContent(
                     )
                 },
                 inSelectionMode = uiState.isInSelectionMode,
+                isContactVerificationOn = uiState.isContactVerificationOn
             )
         }
 

@@ -51,6 +51,8 @@ data class CloudDriveUiState(
     val selectedSortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC,
     val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
     val storageCapacity: StorageOverQuotaCapacity = StorageOverQuotaCapacity.DEFAULT,
+    val isContactVerificationOn: Boolean = false,
+    val showContactNotVerifiedBanner: Boolean = false,
 ) {
 
     /**

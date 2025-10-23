@@ -43,12 +43,15 @@ import mega.privacy.android.domain.usecase.MonitorAlmostFullStorageBannerVisibil
 import mega.privacy.android.domain.usecase.SetAlmostFullStorageBannerClosingTimestampUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
+import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.usecase.shares.GetIncomingShareParentUserEmailUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction
@@ -93,6 +96,10 @@ class CloudDriveViewModelTest {
         mock()
     private val setAlmostFullStorageBannerClosingTimestampUseCase: SetAlmostFullStorageBannerClosingTimestampUseCase =
         mock()
+    private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase = mock()
+    private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase = mock()
+    private val getIncomingShareParentUserEmailUseCase: GetIncomingShareParentUserEmailUseCase =
+        mock()
     private val folderNodeHandle = 123L
     private val folderNodeId = NodeId(folderNodeHandle)
 
@@ -126,11 +133,14 @@ class CloudDriveViewModelTest {
             storageCapacityMapper,
             monitorStorageStateUseCase,
             monitorAlmostFullStorageBannerVisibilityUseCase,
-            setAlmostFullStorageBannerClosingTimestampUseCase
+            setAlmostFullStorageBannerClosingTimestampUseCase,
+            getContactVerificationWarningUseCase,
+            areCredentialsVerifiedUseCase,
+            getIncomingShareParentUserEmailUseCase
         )
     }
 
-    private fun createViewModel(nodeHandle: Long = folderNodeHandle) = CloudDriveViewModel(
+    private fun createViewModel(nodeHandle: Long = folderNodeHandle, nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,) = CloudDriveViewModel(
         getNodeNameByIdUseCase = getNodeNameByIdUseCase,
         getFileBrowserNodeChildrenUseCase = getFileBrowserNodeChildrenUseCase,
         setViewTypeUseCase = setViewTypeUseCase,
@@ -150,10 +160,16 @@ class CloudDriveViewModelTest {
         monitorStorageStateUseCase = monitorStorageStateUseCase,
         monitorAlmostFullStorageBannerVisibilityUseCase = monitorAlmostFullStorageBannerVisibilityUseCase,
         setAlmostFullStorageBannerClosingTimestampUseCase = setAlmostFullStorageBannerClosingTimestampUseCase,
-        navKey = CloudDriveNavKey(nodeHandle),
+        getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
+        areCredentialsVerifiedUseCase = areCredentialsVerifiedUseCase,
+        getIncomingShareParentUserEmailUseCase = getIncomingShareParentUserEmailUseCase,
+        navKey = CloudDriveNavKey(nodeHandle, nodeSourceType = nodeSourceType),
     )
 
-    private suspend fun setupTestData(items: List<TypedNode>) {
+    private suspend fun setupTestData(
+        items: List<TypedNode>,
+        nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
+    ) {
         whenever(getCloudSortOrderUseCase()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(
             NodeSortConfiguration.default
@@ -181,7 +197,7 @@ class CloudDriveViewModelTest {
             nodeUiItemMapper(
                 nodeList = items,
                 existingItems = emptyList(),
-                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                nodeSourceType = nodeSourceType,
                 isPublicNodes = false,
                 showPublicLinkCreationTime = false,
                 highlightedNodeId = null,
@@ -195,7 +211,7 @@ class CloudDriveViewModelTest {
         whenever(
             monitorNodeUpdatesByIdUseCase(
                 folderNodeId,
-                NodeSourceType.CLOUD_DRIVE
+                nodeSourceType
             )
         ).thenReturn(flowOf())
         whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
@@ -204,6 +220,11 @@ class CloudDriveViewModelTest {
         whenever(monitorStorageStateUseCase()).thenReturn(flowOf(StorageState.Green))
         whenever(monitorAlmostFullStorageBannerVisibilityUseCase()).thenReturn(flowOf(true))
         whenever(storageCapacityMapper(any(), any())).thenReturn(StorageOverQuotaCapacity.DEFAULT)
+
+        // Setup contact verification mocks
+        whenever(getContactVerificationWarningUseCase()).thenReturn(false)
+        whenever(areCredentialsVerifiedUseCase(any())).thenReturn(false)
+        whenever(getIncomingShareParentUserEmailUseCase(any())).thenReturn(null)
     }
 
     private suspend fun setupTestDataWithPartialLoad(items: List<TypedNode>) {
@@ -250,6 +271,11 @@ class CloudDriveViewModelTest {
         whenever(monitorStorageStateUseCase()).thenReturn(flowOf(StorageState.Green))
         whenever(monitorAlmostFullStorageBannerVisibilityUseCase()).thenReturn(flowOf(true))
         whenever(storageCapacityMapper(any(), any())).thenReturn(StorageOverQuotaCapacity.DEFAULT)
+
+        // Setup contact verification mocks
+        whenever(getContactVerificationWarningUseCase()).thenReturn(false)
+        whenever(areCredentialsVerifiedUseCase(any())).thenReturn(false)
+        whenever(getIncomingShareParentUserEmailUseCase(any())).thenReturn(null)
     }
 
     @Test
@@ -2054,4 +2080,168 @@ class CloudDriveViewModelTest {
         verify(monitorStorageStateUseCase).invoke()
         verify(monitorAlmostFullStorageBannerVisibilityUseCase).invoke()
     }
+
+    // Contact Verification Tests
+
+    @Test
+    fun `test that checkCurrentFolderContactVerification does not run for CLOUD_DRIVE source type`() =
+        runTest {
+            setupTestData(emptyList())
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val initialState = awaitItem()
+                assertThat(initialState.isContactVerificationOn).isFalse()
+                assertThat(initialState.showContactNotVerifiedBanner).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that checkCurrentFolderContactVerification does not run for OUTGOING_SHARES when contact verification is disabled`() =
+        runTest {
+            setupTestData(emptyList(), NodeSourceType.OUTGOING_SHARES)
+            whenever(getContactVerificationWarningUseCase()).thenReturn(false)
+
+            val underTest =
+                createViewModel(nodeHandle = 123L, nodeSourceType = NodeSourceType.OUTGOING_SHARES)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val initialState = awaitItem()
+                assertThat(initialState.isContactVerificationOn).isFalse()
+                assertThat(initialState.showContactNotVerifiedBanner).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that checkCurrentFolderContactVerification enables contact verification for OUTGOING_SHARES when enabled`() =
+        runTest {
+            setupTestData(emptyList(), NodeSourceType.OUTGOING_SHARES)
+            whenever(getContactVerificationWarningUseCase()).thenReturn(true)
+
+            val underTest =
+                createViewModel(nodeHandle = 123L, nodeSourceType = NodeSourceType.OUTGOING_SHARES)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val initialState = awaitItem()
+                assertThat(initialState.isContactVerificationOn).isTrue()
+                assertThat(initialState.showContactNotVerifiedBanner).isFalse() // Should be false for outgoing shares
+            }
+        }
+
+    @Test
+    fun `test that checkCurrentFolderContactVerification enables contact verification for INCOMING_SHARES with verified contact`() =
+        runTest {
+            setupTestData(emptyList(), NodeSourceType.INCOMING_SHARES)
+            whenever(getContactVerificationWarningUseCase()).thenReturn(true)
+            whenever(getIncomingShareParentUserEmailUseCase(folderNodeId)).thenReturn("test@example.com")
+            whenever(areCredentialsVerifiedUseCase("test@example.com")).thenReturn(true)
+
+            val underTest =
+                createViewModel(nodeHandle = 123L, nodeSourceType = NodeSourceType.INCOMING_SHARES)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val initialState = awaitItem()
+                assertThat(initialState.isContactVerificationOn).isTrue()
+                assertThat(initialState.showContactNotVerifiedBanner).isFalse() // Should be false for verified contact
+            }
+        }
+
+    @Test
+    fun `test that checkCurrentFolderContactVerification enables contact verification for INCOMING_SHARES with unverified contact`() =
+        runTest {
+            setupTestData(emptyList(), NodeSourceType.INCOMING_SHARES)
+            whenever(getContactVerificationWarningUseCase()).thenReturn(true)
+            whenever(getIncomingShareParentUserEmailUseCase(folderNodeId)).thenReturn("test@example.com")
+            whenever(areCredentialsVerifiedUseCase("test@example.com")).thenReturn(false)
+
+            val underTest =
+                createViewModel(nodeHandle = 123L, nodeSourceType = NodeSourceType.INCOMING_SHARES)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val initialState = awaitItem()
+                assertThat(initialState.isContactVerificationOn).isTrue()
+                assertThat(initialState.showContactNotVerifiedBanner).isTrue() // Should be true for unverified contact
+            }
+        }
+
+    @Test
+    fun `test that checkCurrentFolderContactVerification handles null email for INCOMING_SHARES`() =
+        runTest {
+            setupTestData(emptyList(), NodeSourceType.INCOMING_SHARES)
+            whenever(getContactVerificationWarningUseCase()).thenReturn(true)
+            whenever(getIncomingShareParentUserEmailUseCase(folderNodeId)).thenReturn(null)
+
+            val underTest =
+                createViewModel(nodeHandle = 123L, nodeSourceType = NodeSourceType.INCOMING_SHARES)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val initialState = awaitItem()
+                assertThat(initialState.isContactVerificationOn).isTrue()
+                assertThat(initialState.showContactNotVerifiedBanner).isFalse() // Should be false when email is null
+            }
+        }
+
+    @Test
+    fun `test that checkCurrentFolderContactVerification handles exception gracefully`() = runTest {
+        setupTestData(emptyList(), NodeSourceType.INCOMING_SHARES)
+        whenever(getContactVerificationWarningUseCase()).thenThrow(RuntimeException("Test exception"))
+
+        val underTest =
+            createViewModel(nodeHandle = 123L, nodeSourceType = NodeSourceType.INCOMING_SHARES)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val initialState = awaitItem()
+            // Should not crash and maintain default values
+            assertThat(initialState.isContactVerificationOn).isFalse()
+            assertThat(initialState.showContactNotVerifiedBanner).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that checkCurrentFolderContactVerification handles exception in getIncomingShareParentUserEmailUseCase`() =
+        runTest {
+            setupTestData(emptyList(), NodeSourceType.INCOMING_SHARES)
+            whenever(getContactVerificationWarningUseCase()).thenReturn(true)
+            whenever(getIncomingShareParentUserEmailUseCase(folderNodeId)).thenThrow(
+                RuntimeException("Test exception")
+            )
+
+            val underTest =
+                createViewModel(nodeHandle = 123L, nodeSourceType = NodeSourceType.INCOMING_SHARES)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val initialState = awaitItem()
+                // Should not crash and maintain default values
+                assertThat(initialState.isContactVerificationOn).isFalse()
+                assertThat(initialState.showContactNotVerifiedBanner).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that checkCurrentFolderContactVerification handles exception in areCredentialsVerifiedUseCase`() =
+        runTest {
+            setupTestData(emptyList(), NodeSourceType.INCOMING_SHARES)
+            whenever(getContactVerificationWarningUseCase()).thenReturn(true)
+            whenever(getIncomingShareParentUserEmailUseCase(folderNodeId)).thenReturn("test@example.com")
+            whenever(areCredentialsVerifiedUseCase("test@example.com")).thenThrow(RuntimeException("Test exception"))
+
+            val underTest =
+                createViewModel(nodeHandle = 123L, nodeSourceType = NodeSourceType.INCOMING_SHARES)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val initialState = awaitItem()
+                // Should not crash and maintain default values
+                assertThat(initialState.isContactVerificationOn).isFalse()
+                assertThat(initialState.showContactNotVerifiedBanner).isFalse()
+            }
+        }
 } 

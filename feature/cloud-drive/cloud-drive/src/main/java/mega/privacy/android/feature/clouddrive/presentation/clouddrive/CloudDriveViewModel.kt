@@ -31,6 +31,7 @@ import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -43,12 +44,15 @@ import mega.privacy.android.domain.usecase.MonitorAlmostFullStorageBannerVisibil
 import mega.privacy.android.domain.usecase.SetAlmostFullStorageBannerClosingTimestampUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
+import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.usecase.shares.GetIncomingShareParentUserEmailUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction
@@ -78,6 +82,9 @@ class CloudDriveViewModel @AssistedInject constructor(
     private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
     private val monitorAlmostFullStorageBannerVisibilityUseCase: MonitorAlmostFullStorageBannerVisibilityUseCase,
     private val setAlmostFullStorageBannerClosingTimestampUseCase: SetAlmostFullStorageBannerClosingTimestampUseCase,
+    private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
+    private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase,
+    private val getIncomingShareParentUserEmailUseCase: GetIncomingShareParentUserEmailUseCase,
     @Assisted private val navKey: CloudDriveNavKey,
 ) : ViewModel() {
 
@@ -152,6 +159,7 @@ class CloudDriveViewModel @AssistedInject constructor(
                     }
                 }
         }
+        checkCurrentFolderContactVerification()
         viewModelScope.launch {
             if (isHiddenNodeFeatureFlagEnabled()) {
                 combine(
@@ -217,6 +225,7 @@ class CloudDriveViewModel @AssistedInject constructor(
     private suspend fun refreshNodes() {
         val folderId = uiState.value.currentFolderId
         runCatching {
+            checkCurrentFolderContactVerification()
             val nodes = getFileBrowserNodeChildrenUseCase(folderId.longValue)
             val nodeUiItems = nodeUiItemMapper(
                 nodeList = nodes,
@@ -511,6 +520,40 @@ class CloudDriveViewModel @AssistedInject constructor(
             }.onFailure { Timber.e(it) }
         }
     }
+
+    /**
+     * Check if the contact verification banner should be shown if the current folder is an incoming share
+     */
+    private fun checkCurrentFolderContactVerification() {
+        if (!isSharedSourceType) return
+        viewModelScope.launch {
+            runCatching {
+                val isContactVerificationOn = getContactVerificationWarningUseCase()
+                if (!isContactVerificationOn) return@runCatching
+
+                val showBanner = if (nodeSourceType == NodeSourceType.INCOMING_SHARES) {
+                    val email =
+                        getIncomingShareParentUserEmailUseCase(uiState.value.currentFolderId)
+                    email?.let { !areCredentialsVerifiedUseCase(it) } ?: false
+                } else {
+                    false
+                }
+
+                _uiState.update {
+                    it.copy(
+                        isContactVerificationOn = true,
+                        showContactNotVerifiedBanner = showBanner
+                    )
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    private val isSharedSourceType: Boolean
+        get() = nodeSourceType == NodeSourceType.INCOMING_SHARES ||
+                nodeSourceType == NodeSourceType.OUTGOING_SHARES
 
     @AssistedFactory
     interface Factory {

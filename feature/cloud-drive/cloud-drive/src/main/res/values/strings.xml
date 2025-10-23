@@ -78,4 +78,9 @@
     <string name="confirmation_delete_from_save_for_offline">Remove from Offline?</string>
     <!-- Message when file removed from offline. -->
     <string name="offline_screen_file_removed_message">File removed from Offline</string>
+
+    <!-- Contact verification -->
+    <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
+    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t verified. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
+
 </resources>

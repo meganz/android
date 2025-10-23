@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
@@ -293,13 +294,13 @@ fun NodeListViewItem(
                     )
                 }
                 if (showIsVerified) {
-                    MegaIcon(
-                        imageVector = IconPack.Medium.Thin.Outline.CheckCircle,
+                    Icon(
+                        imageVector = IconPack.Medium.Thin.Solid.CheckCircle,
                         contentDescription = "Verified",
                         modifier = Modifier
                             .size(16.dp)
                             .testTag(VERIFIED_ICON_TAG),
-                        tint = IconColor.Secondary
+                        tint = DSTokens.colors.indicator.blue
                     )
                 }
             }
