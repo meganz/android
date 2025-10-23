@@ -23,7 +23,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
 
     CameraUploadsTransferScreen(
         "Enable Camera Uploads transfer screen",
-        false
+        true
     ),
 
     /**
