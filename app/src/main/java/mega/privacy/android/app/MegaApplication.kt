@@ -47,6 +47,8 @@ import mega.privacy.android.app.globalmanagement.CallChangesObserver
 import mega.privacy.android.app.globalmanagement.MegaChatNotificationHandler
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
+import mega.privacy.android.app.jni.JniExceptionHandler
+import mega.privacy.android.app.jni.JniExceptionReporter
 import mega.privacy.android.app.listeners.GlobalChatListener
 import mega.privacy.android.app.meeting.CallService
 import mega.privacy.android.app.meeting.CallSoundType
@@ -259,9 +261,35 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
                 handleUncaughtException(throwable)
                 defaultHandler?.uncaughtException(thread, throwable)
             }
+
+            JniExceptionReporter.handler = object : JniExceptionHandler {
+                override fun onJniException(location: String, message: String, stacktrace: String) {
+                    try {
+                        Timber.e("JNI exception at %s: %s\n%s", location, message, stacktrace)
+
+                        Firebase.crashlytics.recordException(
+                            RuntimeException("JNI exception at $location: $message\n$stacktrace")
+                        )
+                    } catch (t: Throwable) {
+                        Log.e("Failed to log JNI exception: ${t.message}", t)
+                    }
+                }
+            }
+
         } else {
             Firebase.crashlytics.setCrashlyticsCollectionEnabled(false)
+            JniExceptionReporter.handler = object : JniExceptionHandler {
+                override fun onJniException(location: String, message: String, stacktrace: String) {
+                    try {
+                        Timber.e("JNI exception at %s: %s\n%s", location, message, stacktrace)
+                    } catch (t: Throwable) {
+                        Log.e("Failed to log JNI exception: ${t.message}", t)
+                    }
+                }
+            }
         }
+
+
 
         registerActivityLifecycleCallbacks(activityLifecycleHandler)
         isVerifySMSShowed = false
