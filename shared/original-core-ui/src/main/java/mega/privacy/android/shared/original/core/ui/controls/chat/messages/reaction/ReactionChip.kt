@@ -7,8 +7,9 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -26,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeComponentPreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 
@@ -55,7 +56,8 @@ fun ReactionChip(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier
-                .size(reactionsChipWidth, reactionsChipHeight)
+                .height(reactionsChipHeight)
+                .sizeIn(minWidth = reactionsChipWidth)
                 .clip(RoundedCornerShape(12.dp))
                 .conditional(interactionEnabled) {
                     combinedClickable(
@@ -69,7 +71,7 @@ fun ReactionChip(
                     shape = RoundedCornerShape(12.dp)
                 )
                 .background(color = DSTokens.colors.background.surface2)
-                .padding(bottom = 2.dp)
+                .padding(horizontal = 8.dp)
                 .testTag(TEST_TAG_CHAT_MESSAGE_REACTION_CHIP),
         ) {
             Text(
@@ -79,7 +81,7 @@ fun ReactionChip(
                 fontSize = 14.sp,
             )
             Text(
-                text = "${reaction.userList.size}",
+                text = reaction.countString(),
                 color = if (reaction.hasMe) DSTokens.colors.border.strongSelected else DSTokens.colors.text.secondary,
                 style = MaterialTheme.typography.subtitle2,
             )
@@ -98,7 +100,7 @@ internal val reactionsChipWidth = 44.dp
  */
 internal val reactionsChipHeight = 24.dp
 
-@CombinedThemePreviews
+@CombinedThemeComponentPreviews
 @Composable
 private fun ReactionChipWithRtlCountPreview(
     @PreviewParameter(BooleanProvider::class) hasMe: Boolean,
@@ -120,7 +122,7 @@ private fun ReactionChipWithRtlCountPreview(
     }
 }
 
-@CombinedThemePreviews
+@CombinedThemeComponentPreviews
 @Composable
 private fun ReactionChipWithCountPreview(
     @PreviewParameter(BooleanProvider::class) hasMe: Boolean,
@@ -129,7 +131,7 @@ private fun ReactionChipWithCountPreview(
         ReactionChip(
             reaction = UIReaction(
                 reaction = "\uD83C\uDF77",
-                count = 1,
+                count = 150,
                 hasMe = hasMe,
                 shortCode = ":wine_glass:"
             ),

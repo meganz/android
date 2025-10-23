@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -94,7 +94,7 @@ fun ReactionsInfoView(
             reactionList.forEachIndexed { index, reaction ->
                 Tab(
                     modifier = Modifier
-                        .width(72.dp)
+                        .sizeIn(minWidth = 72.dp)
                         .fillMaxHeight(),
                     selected = pagerState.currentPage == index,
                     unselectedContentColor = Color.White, // set solid color to avoid the color change on unselected tab
@@ -116,7 +116,7 @@ fun ReactionsInfoView(
                                 modifier = Modifier.padding(end = 4.dp)
                             )
                             MegaText(
-                                text = reaction.userList.size.toString(),
+                                text = reaction.countString(),
                                 textColor = counterColor,
                                 style = MaterialTheme.typography.subtitle2,
                             )

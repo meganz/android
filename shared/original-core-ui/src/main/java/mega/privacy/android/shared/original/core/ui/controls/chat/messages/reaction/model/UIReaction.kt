@@ -1,5 +1,7 @@
 package mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model
 
+import mega.privacy.android.shared.original.core.ui.controls.chip.formatNumberWithMaxDigits
+
 /**
  * Data for a reaction
  *
@@ -15,4 +17,9 @@ data class UIReaction(
     val shortCode: String = "",
     val hasMe: Boolean,
     val userList: List<UIReactionUser> = emptyList(),
-)
+) {
+    /**
+     * Text to represent the total of reactions of this type
+     */
+    fun countString(maxDigits: Int = 2) = count.formatNumberWithMaxDigits(maxDigits)
+}
