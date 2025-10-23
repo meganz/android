@@ -25,9 +25,10 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isOfflineDownload
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
-import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
-import mega.privacy.android.domain.usecase.file.IsContentUriUseCase
+import mega.privacy.android.domain.usecase.GetNodePathByIdUseCase
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
+import mega.privacy.android.domain.usecase.node.DoesNodeExistUseCase
+import mega.privacy.android.domain.usecase.node.GetFullNodePathByIdUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import java.io.File
@@ -39,13 +40,15 @@ import javax.inject.Inject
  */
 class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val isContentUriUseCase: IsContentUriUseCase,
-    private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase,
     private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
     private val fileSizeStringMapper: FileSizeStringMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val actionGroupFinishNotificationActionTextMapper: ActionGroupFinishNotificationActionTextMapper,
     private val actionGroupFinishNotificationTitleMapper: ActionGroupFinishNotificationTitleMapper,
+    private val actionGroupNotificationDestinationMapper: ActionGroupNotificationDestinationMapper,
+    private val doesNodeExistUseCase: DoesNodeExistUseCase,
+    private val getFullNodePathByIdUseCase: GetFullNodePathByIdUseCase,
+    private val getNodePathByIdUseCase: GetNodePathByIdUseCase,
 ) : TransfersActionGroupFinishNotificationBuilder {
     private val resources get() = context.resources
     override suspend fun invoke(
@@ -69,26 +72,36 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
             titleSuffix = titleSuffix,
             actionGroup = actionGroup,
         )
-
+        val uploadLocationExists = if (!isDownload) {
+            actionGroup.pendingTransferNodeId?.nodeId?.let { nodeId ->
+                doesNodeExistUseCase(nodeId)
+            } ?: false
+        } else {
+            true
+        }
         val contentText = contentText(
             isPreviewDownload = isPreviewDownload,
             isOfflineDownload = isOfflineDownload,
+            isDownload = isDownload,
+            uploadLocationExists = uploadLocationExists,
             titleSuffix = titleSuffix,
             actionGroup = actionGroup,
         )
-
-        val actionText = actionGroupFinishNotificationActionTextMapper(
-            isLoggedIn = isLoggedIn,
-            isPreviewDownload = isPreviewDownload,
-            isOfflineDownload = isOfflineDownload,
-            actionGroup = actionGroup,
-        )
-
+        val actionText = when {
+            !isDownload && !uploadLocationExists -> null
+            else -> actionGroupFinishNotificationActionTextMapper(
+                isLoggedIn = isLoggedIn,
+                isPreviewDownload = isPreviewDownload,
+                isOfflineDownload = isOfflineDownload,
+                actionGroup = actionGroup,
+            )
+        }
         val actionIntent = actionIntent(
             isLoggedIn = isLoggedIn,
             isDownload = isDownload,
             isPreviewDownload = isPreviewDownload,
             isOfflineDownload = isOfflineDownload,
+            uploadLocationExists = uploadLocationExists,
             actionGroup = actionGroup,
         )
         val contentIntent =
@@ -162,36 +175,42 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
     private suspend fun contentText(
         isPreviewDownload: Boolean,
         isOfflineDownload: Boolean,
+        isDownload: Boolean,
+        uploadLocationExists: Boolean,
         titleSuffix: String?,
         actionGroup: ActiveTransferTotals.ActionGroup,
-    ): String? {
-        val destinationText = when {
-            isOfflineDownload -> context.getString(R.string.section_saved_for_offline_new)
-            isPreviewDownload -> null
-            else -> runCatching {
-                if (isContentUriUseCase(actionGroup.destination)) {
-                    getPathByDocumentContentUriUseCase(actionGroup.destination)
-                } else {
-                    actionGroup.destination
-                }
-            }.getOrNull() ?: actionGroup.destination
-        }
-        val contentText = destinationText?.let {
-            resources.getString(
-                sharedR.string.transfers_notification_location_content,
-                it,
-            )
-        }?.let {
-            if (titleSuffix == null) {
-                it + "\n" + resources.getString(
-                    R.string.general_total_size,
-                    fileSizeStringMapper(actionGroup.totalBytes)
+    ): String? = when {
+        // The parent node may have changed location or even been deleted
+        !isDownload -> if (uploadLocationExists) {
+            actionGroup.pendingTransferNodeId?.nodeId?.let { nodeId ->
+                getFullNodePathByIdUseCase(nodeId) ?: getNodePathByIdUseCase(nodeId)
+            }?.let { destination ->
+                context.getString(
+                    sharedR.string.transfers_notification_location_content,
+                    destination,
                 )
-            } else {
-                it
             }
+        } else {
+            null
         }
-        return contentText
+
+        else -> {
+            actionGroupNotificationDestinationMapper(
+                isPreviewDownload = isPreviewDownload,
+                isOfflineDownload = isOfflineDownload,
+                isDownload = isDownload,
+                actionGroup = actionGroup,
+            )
+        }
+    }?.let { destination ->
+        if (titleSuffix == null) {
+            destination + "\n" + context.getString(
+                R.string.general_total_size,
+                fileSizeStringMapper(actionGroup.totalBytes)
+            )
+        } else {
+            destination
+        }
     }
 
     private fun actionIntent(
@@ -199,6 +218,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
         isDownload: Boolean,
         isPreviewDownload: Boolean,
         isOfflineDownload: Boolean,
+        uploadLocationExists: Boolean,
         actionGroup: ActiveTransferTotals.ActionGroup,
     ) = if (isPreviewDownload) {
         previewIntent(
@@ -210,6 +230,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
             isLoggedIn = isLoggedIn,
             isDownload = isDownload,
             isOfflineDownload = isOfflineDownload,
+            uploadLocationExists = uploadLocationExists,
             actionGroup = actionGroup
         )
     }
@@ -251,7 +272,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
 
             uri != null && MegaApiUtils.isIntentAvailable(context, previewIntent) -> {
                 previewIntent.setDataAndType(uri, type?.mimeType)
-                val chooserTitle = resources.getString(
+                val chooserTitle = context.getString(
                     sharedR.string.open_with_os_dialog_title,
                     actionGroup.singleFileName
                 )
@@ -259,7 +280,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
             }
 
             else -> {
-                val warningMessage = resources.getString(R.string.intent_not_available)
+                val warningMessage = context.getString(R.string.intent_not_available)
                 Intent(context, ManagerActivity::class.java).apply {
                     action = Constants.ACTION_SHOW_WARNING
                     putExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE, warningMessage)
@@ -272,8 +293,9 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
         isLoggedIn: Boolean,
         isDownload: Boolean,
         isOfflineDownload: Boolean,
+        uploadLocationExists: Boolean,
         actionGroup: ActiveTransferTotals.ActionGroup,
-    ): Intent = when {
+    ): Intent? = when {
         isDownload -> {
             Intent(
                 context,
@@ -292,6 +314,8 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                 )
             }
         }
+
+        !uploadLocationExists -> null
 
         else -> { // is not download
             Intent(context, ManagerActivity::class.java).apply {

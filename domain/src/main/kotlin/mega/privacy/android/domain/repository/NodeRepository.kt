@@ -909,4 +909,13 @@ interface NodeRepository {
      * @return The node name if found else null
      */
     suspend fun getNodeNameById(nodeId: NodeId): String?
+
+    /**
+     * Get full node path by id.
+     * Note that getNodePathById does not takes into account if the node is in Cloud,
+     * Incoming shares or Rubbish Bin, but this method does.
+     *
+     * @return the full path of the node or null if the node is not found.
+     */
+    suspend fun getFullNodePathById(nodeId: NodeId): String?
 }

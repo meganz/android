@@ -27,12 +27,11 @@ import mega.privacy.android.data.mapper.OfflineInformationMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.StringListMapper
-import mega.privacy.android.data.mapper.node.FetchChildrenMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
-import mega.privacy.android.data.mapper.node.FolderNodeMapper
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.node.NodeListMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
+import mega.privacy.android.data.mapper.node.NodePathMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.node.OfflineAvailabilityMapper
 import mega.privacy.android.data.mapper.node.TypedNodeMapper
@@ -132,7 +131,6 @@ internal class NodeRepositoryImplTest {
     private val accessPermissionMapper = mock<AccessPermissionMapper>()
     private val accessPermissionIntMapper: AccessPermissionIntMapper = AccessPermissionIntMapper()
     private val nodeShareKeyResultMapper = mock<NodeShareKeyResultMapper>()
-    private val fetchChildrenMapper = mock<FetchChildrenMapper>()
     private val megaLocalRoomGateway: MegaLocalRoomGateway = mock()
     private val offlineAvailabilityMapper: OfflineAvailabilityMapper = mock()
     private val megaNodeMapper = mock<MegaNodeMapper>()
@@ -143,27 +141,11 @@ internal class NodeRepositoryImplTest {
     private val nodeLabelMapper = mock<NodeLabelMapper>()
     private val typedNodeMapper = mock<TypedNodeMapper>()
 
-    private val fileNodeMapper = FileNodeMapper(
-        cacheGateway = cacheGateway,
-        megaApiGateway = megaApiGateway,
-        fileTypeInfoMapper = fileTypeInfoMapper,
-        offlineAvailabilityMapper = offlineAvailabilityMapper,
-        stringListMapper = stringListMapper,
-        nodeLabelMapper = nodeLabelMapper,
-    )
+    private val fileNodeMapper = mock<FileNodeMapper>()
+    private val nodeMapper = mock<NodeMapper>()
 
-    private val nodeMapper: NodeMapper = NodeMapper(
-        fileNodeMapper = fileNodeMapper,
-        folderNodeMapper = FolderNodeMapper(
-            megaApiGateway = megaApiGateway,
-            megaApiFolderGateway = megaApiFolderGateway,
-            fetChildrenMapper = fetchChildrenMapper,
-            stringListMapper = stringListMapper,
-            nodeLabelMapper = nodeLabelMapper,
-        )
-    )
-
-    private val nodeListMapper = NodeListMapper(nodeMapper = nodeMapper)
+    private val nodeListMapper = mock<NodeListMapper>()
+    private val nodePathMapper = mock<NodePathMapper>()
 
     val offline: Offline = mock()
     private val tag = "tag"
@@ -204,6 +186,7 @@ internal class NodeRepositoryImplTest {
             stringListMapper = stringListMapper,
             nodeLabelMapper = nodeLabelMapper,
             typedNodeMapper = typedNodeMapper,
+            nodePathMapper = nodePathMapper,
         )
     }
 
@@ -234,7 +217,8 @@ internal class NodeRepositoryImplTest {
             accessPermissionMapper,
             megaLocalStorageGateway,
             megaNodeMapper,
-            workManagerGateway
+            workManagerGateway,
+            nodePathMapper
         )
     }
 
@@ -346,13 +330,16 @@ internal class NodeRepositoryImplTest {
             on { email }.thenReturn(testEmail)
         }
         val megaNode = mockMegaNodeForConversion()
-        whenever(offlineAvailabilityMapper(megaNode, offline)).thenReturn(true)
         val nodeList = listOf(megaNode)
+        val typedNode = mock<TypedImageNode>()
+        val expected = listOf(typedNode)
+
+        whenever(offlineAvailabilityMapper(megaNode, offline)).thenReturn(true)
         whenever(megaApiGateway.getContact(testEmail)).thenReturn(user)
         whenever(megaApiGateway.getInShares(user)).thenReturn(nodeList)
-        val actual = underTest.getInShares(testEmail)
-        assertThat(actual.size).isEqualTo(1)
-        assertThat(actual[0].base64Id).isEqualTo("base64Handle")
+        whenever(nodeMapper(megaNode = megaNode, offline = null)) doReturn typedNode
+
+        assertThat(underTest.getInShares(testEmail)).isEqualTo(expected)
     }
 
     @Test
@@ -682,9 +669,13 @@ internal class NodeRepositoryImplTest {
     fun `test that getNodesByHandle invokes correct function`() = runTest {
         val handle = 1L
         val megaNode = mockMegaNodeForConversion()
+        val typedNode = mock<TypedImageNode>()
+
         whenever(offlineAvailabilityMapper(megaNode, offline)).thenReturn(false)
         whenever(megaApiGateway.getMegaNodeByHandle(handle)).thenReturn(megaNode)
-        assertThat(underTest.getNodeByHandle(handle)?.base64Id).isEqualTo("base64Handle")
+        whenever(nodeMapper(megaNode = megaNode, offline = null)) doReturn typedNode
+
+        assertThat(underTest.getNodeByHandle(handle)).isEqualTo(typedNode)
     }
 
     private suspend fun mockFolderInfoResponse() {
@@ -967,12 +958,16 @@ internal class NodeRepositoryImplTest {
         val megaNode = mockMegaNodeForConversion()
         val megaChatMessage = mock<MegaChatMessage>()
         val megaNodeList = mock<MegaNodeList>()
+        val typedNode = mock<TypedImageNode>()
+
         whenever(megaNodeList.get(0)).thenReturn(megaNode)
         whenever(megaChatMessage.megaNodeList).thenReturn(megaNodeList)
         whenever(megaChatApiGateway.getMessage(chatId, messageId)).thenReturn(megaChatMessage)
-        assertThat(
-            underTest.getNodeFromChatMessage(chatId, messageId)?.id?.longValue
-        ).isEqualTo(megaNode.handle)
+        whenever(fileNodeMapper(megaNode, false, null))
+            .thenReturn(typedNode)
+
+        assertThat(underTest.getNodeFromChatMessage(chatId, messageId))
+            .isEqualTo(typedNode)
     }
 
     @Test
@@ -982,14 +977,19 @@ internal class NodeRepositoryImplTest {
         val megaNode = mockMegaNodeForConversion()
         val megaChatMessage = mock<MegaChatMessage>()
         val megaNodeList = mock<MegaNodeList>()
+        val typedNode = mock<TypedImageNode>()
+
         whenever(megaNodeList.get(0)).thenReturn(megaNode)
         whenever(megaChatMessage.megaNodeList).thenReturn(megaNodeList)
         whenever(megaChatApiGateway.getMessage(chatId, messageId)).thenReturn(null)
         whenever(megaChatApiGateway.getMessageFromNodeHistory(chatId, messageId))
             .thenReturn(megaChatMessage)
+        whenever(fileNodeMapper(megaNode, false, null))
+            .thenReturn(typedNode)
+
         assertThat(
-            underTest.getNodeFromChatMessage(chatId, messageId)?.id?.longValue
-        ).isEqualTo(megaNode.handle)
+            underTest.getNodeFromChatMessage(chatId, messageId)
+        ).isEqualTo(typedNode)
     }
 
     @Test
@@ -1002,6 +1002,8 @@ internal class NodeRepositoryImplTest {
         val megaChatMessage = mock<MegaChatMessage>()
         val megaNodeList = mock<MegaNodeList>()
         val chat = mock<MegaChatRoom>()
+        val typedNode = mock<TypedImageNode>()
+
         whenever(megaNodeList.get(0)).thenReturn(megaNode2)
         whenever(megaChatMessage.megaNodeList).thenReturn(megaNodeList)
         whenever(megaChatApiGateway.getMessage(chatId, messageId)).thenReturn(megaChatMessage)
@@ -1010,9 +1012,11 @@ internal class NodeRepositoryImplTest {
         whenever(chat.authorizationToken).thenReturn(authorizationToken)
         whenever(megaApiGateway.authorizeChatNode(megaNode2, chat.authorizationToken))
             .thenReturn(megaNode)
-        assertThat(
-            underTest.getNodeFromChatMessage(chatId, messageId)?.id?.longValue
-        ).isEqualTo(megaNode.handle)
+        whenever(fileNodeMapper(megaNode, false, null))
+            .thenReturn(typedNode)
+
+        underTest.getNodeFromChatMessage(chatId, messageId)
+
         verify(megaApiGateway).authorizeChatNode(megaNode2, chat.authorizationToken)
     }
 
@@ -1023,12 +1027,17 @@ internal class NodeRepositoryImplTest {
         val megaNode = mockMegaNodeForConversion()
         val megaChatMessage = mock<MegaChatMessage>()
         val megaNodeList = mock<MegaNodeList>()
+        val typedNode = mock<TypedImageNode>()
+
         whenever(megaNodeList.get(0)).thenReturn(megaNode)
         whenever(megaNodeList.size()).thenReturn(1)
         whenever(megaChatMessage.megaNodeList).thenReturn(megaNodeList)
         whenever(megaChatApiGateway.getMessage(chatId, messageId)).thenReturn(megaChatMessage)
-        val result = underTest.getNodesFromChatMessage(chatId, messageId)
-        assertThat(result.firstOrNull()?.id?.longValue).isEqualTo(megaNode.handle)
+        whenever(fileNodeMapper(megaNode, false, null))
+            .thenReturn(typedNode)
+
+        assertThat(underTest.getNodesFromChatMessage(chatId, messageId).firstOrNull())
+            .isEqualTo(typedNode)
     }
 
     @Test
@@ -1038,11 +1047,16 @@ internal class NodeRepositoryImplTest {
         val megaNode = mockMegaNodeForConversion()
         val megaChatMessage = mock<MegaChatMessage>()
         val megaNodeList = mock<MegaNodeList>()
+        val typedNode = mock<TypedImageNode>()
+
         whenever(megaNodeList.get(0)).thenReturn(megaNode)
         whenever(megaNodeList.get(1)).thenReturn(null)
         whenever(megaNodeList.size()).thenReturn(2)
         whenever(megaChatMessage.megaNodeList).thenReturn(megaNodeList)
         whenever(megaChatApiGateway.getMessage(chatId, messageId)).thenReturn(megaChatMessage)
+        whenever(fileNodeMapper(megaNode, false, null))
+            .thenReturn(typedNode)
+
         val result = underTest.getNodesFromChatMessage(chatId, messageId)
         assertThat(result.size).isEqualTo(1)
     }
@@ -1054,15 +1068,20 @@ internal class NodeRepositoryImplTest {
         val megaNode = mockMegaNodeForConversion()
         val megaChatMessage = mock<MegaChatMessage>()
         val megaNodeList = mock<MegaNodeList>()
+        val typedNode = mock<TypedImageNode>()
+
         whenever(megaNodeList.get(0)).thenReturn(megaNode)
         whenever(megaNodeList.size()).thenReturn(1)
         whenever(megaChatMessage.megaNodeList).thenReturn(megaNodeList)
         whenever(megaChatApiGateway.getMessage(chatId, messageId)).thenReturn(null)
         whenever(megaChatApiGateway.getMessageFromNodeHistory(chatId, messageId))
             .thenReturn(megaChatMessage)
+        whenever(fileNodeMapper(megaNode, false, null))
+            .thenReturn(typedNode)
+
         assertThat(
-            underTest.getNodesFromChatMessage(chatId, messageId).firstOrNull()?.id?.longValue
-        ).isEqualTo(megaNode.handle)
+            underTest.getNodesFromChatMessage(chatId, messageId).firstOrNull()
+        ).isEqualTo(typedNode)
     }
 
     @Test
@@ -1075,6 +1094,8 @@ internal class NodeRepositoryImplTest {
         val megaChatMessage = mock<MegaChatMessage>()
         val megaNodeList = mock<MegaNodeList>()
         val chat = mock<MegaChatRoom>()
+        val typedNode = mock<TypedImageNode>()
+
         whenever(megaNodeList.get(0)).thenReturn(megaNode2)
         whenever(megaNodeList.size()).thenReturn(1)
         whenever(megaChatMessage.megaNodeList).thenReturn(megaNodeList)
@@ -1084,9 +1105,11 @@ internal class NodeRepositoryImplTest {
         whenever(chat.authorizationToken).thenReturn(authorizationToken)
         whenever(megaApiGateway.authorizeChatNode(megaNode2, chat.authorizationToken))
             .thenReturn(megaNode)
-        assertThat(
-            underTest.getNodesFromChatMessage(chatId, messageId).firstOrNull()?.id?.longValue
-        ).isEqualTo(megaNode.handle)
+        whenever(fileNodeMapper(megaNode, false, null))
+            .thenReturn(typedNode)
+
+        underTest.getNodesFromChatMessage(chatId, messageId)
+
         verify(megaApiGateway).authorizeChatNode(megaNode2, chat.authorizationToken)
     }
 
@@ -1129,11 +1152,18 @@ internal class NodeRepositoryImplTest {
         runTest {
             val serializedData = "serialized Data"
             val megaNode = mockMegaNodeForConversion()
+            val typedNode = mock<TypedImageNode> {
+                on { this.serializedData } doReturn serializedData
+            }
+
             whenever(megaNode.serialize()).thenReturn(serializedData)
             whenever(megaApiGateway.unSerializeNode(serializedData)).thenReturn(megaNode)
             whenever(megaApiGateway.getNumVersions(megaNode)).thenReturn(1)
-            val actual = underTest.getNodeFromSerializedData(serializedData)
-            assertThat(actual?.serializedData).isEqualTo(serializedData)
+            whenever(nodeMapper(megaNode = megaNode, requireSerializedData = true))
+                .thenReturn(typedNode)
+
+            assertThat(underTest.getNodeFromSerializedData(serializedData)?.serializedData)
+                .isEqualTo(serializedData)
         }
 
     @Test
@@ -1674,6 +1704,56 @@ internal class NodeRepositoryImplTest {
         val actual = underTest.getRootNodeId()
 
         assertThat(actual).isNull()
+    }
+
+    @Test
+    fun `test that getRootParentNode returns correct value`() = runTest {
+        val nodeId = NodeId(123)
+        val node = mock<MegaNode>()
+        val parentNode = mock<MegaNode>()
+        val typedNode = mock<TypedImageNode>()
+
+        whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)) doReturn node
+        whenever(megaApiGateway.getParentNode(node)) doReturn parentNode
+        whenever(megaApiGateway.getParentNode(parentNode)) doReturn null
+        whenever(nodeMapper(megaNode = parentNode, offline = null)) doReturn typedNode
+
+        assertThat(underTest.getRootParentNode(nodeId)).isEqualTo(typedNode)
+    }
+
+    @Test
+    fun `test that getRootParentNode returns null`() = runTest {
+        val nodeId = NodeId(123)
+
+        whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)) doReturn null
+
+        assertThat(underTest.getRootParentNode(nodeId)).isNull()
+    }
+
+    @Test
+    fun `test that getFullNodePathById returns correct value`() = runTest {
+        val nodeId = NodeId(123)
+        val node = mock<MegaNode> {
+            on { handle } doReturn nodeId.longValue
+        }
+        val path = "/folder"
+        val parentNode = mock<MegaNode>()
+        val expected = "Cloud drive$path"
+
+        whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)) doReturn node
+        whenever(megaApiGateway.getNodePath(node)) doReturn path
+        whenever(megaApiGateway.getParentNode(node)) doReturn parentNode
+        whenever(
+            nodePathMapper(
+                node = any(),
+                rootParent = any(),
+                getRootNode = any(),
+                getRubbishBinNode = any(),
+                nodePath = any(),
+            )
+        ) doReturn expected
+
+        assertThat(underTest.getFullNodePathById(nodeId)).isEqualTo(expected)
     }
 
     private fun provideNodeId() = Stream.of(

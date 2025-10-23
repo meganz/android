@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.mapper.node.NodePathMapper
 import mega.privacy.android.data.mapper.transfer.completed.API_EOVERQUOTA_FOREIGN
 import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.data.wrapper.StringWrapper
@@ -48,6 +49,7 @@ class CompletedTransferMapperTest {
     private val deviceGateway: DeviceGateway = mock()
     private val fileGateway: FileGateway = mock()
     private val stringWrapper: StringWrapper = mock()
+    private val nodePathMapper = mock<NodePathMapper>()
     private val documentFileWrapper = mock<DocumentFileWrapper>()
     private val displayPathFromUriCache = hashMapOf<String, String>()
 
@@ -59,8 +61,9 @@ class CompletedTransferMapperTest {
             fileGateway = fileGateway,
             documentFileWrapper = documentFileWrapper,
             stringWrapper = stringWrapper,
+            nodePathMapper = nodePathMapper,
             ioDispatcher = UnconfinedTestDispatcher(),
-            displayPathFromUriCache = displayPathFromUriCache
+            displayPathFromUriCache = displayPathFromUriCache,
         )
     }
 
@@ -72,6 +75,7 @@ class CompletedTransferMapperTest {
             fileGateway,
             documentFileWrapper,
             stringWrapper,
+            nodePathMapper,
         )
         displayPathFromUriCache.clear()
     }
@@ -247,46 +251,56 @@ class CompletedTransferMapperTest {
         isInShare: Boolean,
         rootNodeHandle: Long,
         expected: String,
-    ) =
-        runTest {
-            val transfer = mockTransfer(
-                transferType = TransferType.GENERAL_UPLOAD,
-            )
-            val node1 = mock<MegaNode> {
-                on { handle }.thenReturn(4)
-                on { it.isInShare }.thenReturn(isInShare)
-            }
-            val node2 = mock<MegaNode> {
-                on { handle }.thenReturn(2L)
-            }
-            val node3 = mock<MegaNode> {
-                on { handle }.thenReturn(rootNodeHandle)
-            }
-            whenever(stringWrapper.getSizeString(any())).thenReturn("10MB")
-
-            whenever(megaApiGateway.getMegaNodeByHandle(transfer.parentHandle)).thenReturn(node1)
-            whenever(megaApiGateway.getNodePath(node1)).thenReturn(path)
-
-            whenever(megaApiGateway.getParentNode(node1)).thenReturn(node2)
-            whenever(megaApiGateway.getParentNode(node2)).thenReturn(node3)
-            whenever(megaApiGateway.getParentNode(node3)).thenReturn(null)
-            val rootNode = mock<MegaNode> {
-                on { handle }.thenReturn(4L)
-            }
-            whenever(megaApiGateway.getRootNode()).thenReturn(rootNode)
-            val rubbishBinNode = mock<MegaNode> {
-                on { handle }.thenReturn(5L)
-            }
-            whenever(megaApiGateway.getRubbishBinNode()).thenReturn(rubbishBinNode)
-
-            whenever(stringWrapper.getCloudDriveSection()).thenReturn("Cloud drive")
-            whenever(stringWrapper.getRubbishBinSection()).thenReturn("Rubbish bin")
-            whenever(stringWrapper.getTitleIncomingSharesExplorer()).thenReturn("Incoming shares")
-
-            val actual = underTest(transfer, null)
-            assertThat(actual.type).isEqualTo(transfer.transferType)
-            assertThat(actual.path).isEqualTo(expected)
+    ) = runTest {
+        val transfer = mockTransfer(
+            transferType = TransferType.GENERAL_UPLOAD,
+        )
+        val node1 = mock<MegaNode> {
+            on { handle }.thenReturn(4)
+            on { it.isInShare }.thenReturn(isInShare)
         }
+        val node2 = mock<MegaNode> {
+            on { handle }.thenReturn(2L)
+        }
+        val node3 = mock<MegaNode> {
+            on { handle }.thenReturn(rootNodeHandle)
+        }
+        val rootNode = mock<MegaNode> {
+            on { handle }.thenReturn(4L)
+        }
+        val rubbishBinNode = mock<MegaNode> {
+            on { handle }.thenReturn(5L)
+        }
+
+        whenever(stringWrapper.getSizeString(any())).thenReturn("10MB")
+        whenever(
+            nodePathMapper.invoke(
+                node = any(),
+                rootParent = any(),
+                getRootNode = any(),
+                getRubbishBinNode = any(),
+                nodePath = any(),
+            )
+        ).thenReturn(expected)
+        whenever(megaApiGateway.getMegaNodeByHandle(transfer.parentHandle)).thenReturn(node1)
+        whenever(megaApiGateway.getNodePath(node1)).thenReturn(path)
+
+        whenever(megaApiGateway.getParentNode(node1)).thenReturn(node2)
+        whenever(megaApiGateway.getParentNode(node2)).thenReturn(node3)
+        whenever(megaApiGateway.getParentNode(node3)).thenReturn(null)
+
+        whenever(megaApiGateway.getRootNode()).thenReturn(rootNode)
+
+        whenever(megaApiGateway.getRubbishBinNode()).thenReturn(rubbishBinNode)
+
+        whenever(stringWrapper.getCloudDriveSection()).thenReturn("Cloud drive")
+        whenever(stringWrapper.getRubbishBinSection()).thenReturn("Rubbish bin")
+        whenever(stringWrapper.getTitleIncomingSharesExplorer()).thenReturn("Incoming shares")
+
+        val actual = underTest(transfer, null)
+        assertThat(actual.type).isEqualTo(transfer.transferType)
+        assertThat(actual.path).isEqualTo(expected)
+    }
 
     @Test
     fun `test that cache is used to get display path`() = runTest {

@@ -5,6 +5,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.mapper.node.NodePathMapper
 import mega.privacy.android.data.mapper.transfer.completed.API_EOVERQUOTA_FOREIGN
 import mega.privacy.android.data.qualifier.DisplayPathFromUriCache
 import mega.privacy.android.data.wrapper.DocumentFileWrapper
@@ -33,6 +34,7 @@ class CompletedTransferMapper @Inject constructor(
     private val fileGateway: FileGateway,
     private val documentFileWrapper: DocumentFileWrapper,
     private val stringWrapper: StringWrapper,
+    private val nodePathMapper: NodePathMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @DisplayPathFromUriCache private val displayPathFromUriCache: HashMap<String, String>,
 ) {
@@ -155,37 +157,18 @@ class CompletedTransferMapper @Inject constructor(
             val path = getNodePath(parentNode) ?: ""
             val rootParent = findRootParentNode(parentNode)
 
-            return when {
-                rootParent.handle == getRootNode()?.handle ->
-                    stringWrapper.getCloudDriveSection() + path
-
-                rootParent.handle == getRubbishBinNode()?.handle -> {
-                    stringWrapper.getRubbishBinSection() +
-                            path.replace("${File.separator}${File.separator}bin", "")
-                }
-
-                parentNode.isInShare || rootParent.isInShare ->
-                    stringWrapper.getTitleIncomingSharesExplorer() + File.separator +
-                            path.substring(path.indexOf(":") + 1)
-
-                else -> ""
-            }.removeLastFileSeparator()
+            return nodePathMapper(
+                node = parentNode,
+                rootParent = rootParent,
+                getRootNode = { getRootNode() },
+                getRubbishBinNode = { getRubbishBinNode() },
+                nodePath = path
+            )
         }
 
     private suspend fun getParentNodeFromNodeHandle(nodeHandle: Long) = with(megaApiGateway) {
         getMegaNodeByHandle(nodeHandle)?.let { getParentNode(it) }
     }
-
-    /**
-     * Remove the last character of the path if it is a file separator.
-     *
-     * @return The path without the last item if it is a file separator.
-     */
-    private fun String.removeLastFileSeparator() =
-        if (isNotEmpty() && last() == '/')
-            substring(0, length - 1)
-        else
-            this
 
     /**
      * find the root parent Node of a Node

@@ -39,6 +39,7 @@ import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.node.NodeListMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
+import mega.privacy.android.data.mapper.node.NodePathMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.node.TypedNodeMapper
 import mega.privacy.android.data.mapper.node.label.NodeLabelIntMapper
@@ -135,6 +136,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val stringListMapper: StringListMapper,
     private val nodeLabelMapper: NodeLabelMapper,
     private val typedNodeMapper: TypedNodeMapper,
+    private val nodePathMapper: NodePathMapper,
 ) : NodeRepository {
 
     override suspend fun getNodeOutgoingShares(nodeId: NodeId) =
@@ -681,19 +683,25 @@ internal class NodeRepositoryImpl @Inject constructor(
 
     override suspend fun getRootParentNode(nodeId: NodeId): UnTypedNode? =
         withContext(ioDispatcher) {
-            var currentRootParent = megaApiGateway.getMegaNodeByHandle(nodeId.longValue)
-            while (currentRootParent != null) {
-                megaApiGateway.getParentNode(currentRootParent)?.let {
-                    currentRootParent = it
-                } ?: break
-            }
-            currentRootParent?.let {
+            getRootParentNode(nodeId.longValue)?.let {
                 nodeMapper(
                     megaNode = it,
                     offline = getOfflineNode(nodeId.longValue)
                 )
             }
         }
+
+    private suspend fun getRootParentNode(nodeHandle: Long): MegaNode? {
+        var currentRootParent = megaApiGateway.getMegaNodeByHandle(nodeHandle)
+
+        while (currentRootParent != null) {
+            megaApiGateway.getParentNode(currentRootParent)?.let {
+                currentRootParent = it
+            } ?: break
+        }
+
+        return currentRootParent
+    }
 
     override suspend fun getNodesByOriginalFingerprint(
         originalFingerprint: String,
@@ -1350,5 +1358,19 @@ internal class NodeRepositoryImpl @Inject constructor(
         count <= 1000 -> ConcurrencyStrategy.ChunkedParallel(Chunk.Count(20))
         count <= 5000 -> ConcurrencyStrategy.ChunkedParallel(Chunk.Count(30))
         else -> ConcurrencyStrategy.ChunkedParallel(Chunk.Count(40)) // Very large folders, larger chunks
+    }
+
+    override suspend fun getFullNodePathById(nodeId: NodeId) = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let { node ->
+            megaApiGateway.getNodePath(node)?.let { path ->
+                nodePathMapper(
+                    node = node,
+                    rootParent = getRootParentNode(node.parentHandle) ?: node,
+                    getRootNode = { megaApiGateway.getRootNode() },
+                    getRubbishBinNode = { megaApiGateway.getRubbishBinNode() },
+                    nodePath = path,
+                )
+            }
+        }
     }
 }

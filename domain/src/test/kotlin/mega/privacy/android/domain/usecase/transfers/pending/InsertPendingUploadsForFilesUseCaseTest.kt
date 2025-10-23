@@ -13,8 +13,9 @@ import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -47,15 +48,25 @@ class InsertPendingUploadsForFilesUseCaseTest {
         )
     }
 
-    @Test
-    fun `test that pending transfers are inserted with correct parameters`() = runTest {
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that pending transfers are inserted with correct parameters`(
+        hasFullPath: Boolean,
+    ) = runTest {
         val pathsAndNames = (0..10).associate { "content://file$it" to "newName$it" }
         val parentFolderId = NodeId(242L)
         val currentTime = 398457L
-        val destination = "/folder/sub-folder"
+        val path = "/folder/sub-folder"
+        val fullPath = "Cloud drive$path"
+        val destination = if (hasFullPath) fullPath else path
         val pendingTransferNodeIdentifier = PendingTransferNodeIdentifier.CloudDriveNode(parentFolderId)
         whenever(timeSystemRepository.getCurrentTimeInMillis()) doReturn currentTime
-        whenever(nodeRepository.getNodePathById(parentFolderId)) doReturn destination
+        whenever(nodeRepository.getFullNodePathById(parentFolderId)) doReturn if (hasFullPath) {
+            fullPath
+        } else {
+            null
+        }
+        whenever(nodeRepository.getNodePathById(parentFolderId)) doReturn path
         val transferGroupId = 2437865L
         whenever(
             transferRepository.insertActiveTransferGroup(

@@ -23,8 +23,6 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isOfflineDownload
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
-import mega.privacy.android.domain.usecase.file.IsContentUriUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
@@ -36,10 +34,9 @@ import javax.inject.Inject
  */
 class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val isContentUriUseCase: IsContentUriUseCase,
-    private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase,
+    private val actionGroupNotificationDestinationMapper: ActionGroupNotificationDestinationMapper,
 ) : TransfersActionGroupProgressNotificationBuilder {
-    private val resources get() = context.resources
+
     override suspend fun invoke(
         actionGroup: ActiveTransferTotals.ActionGroup,
         transferType: TransferType,
@@ -54,14 +51,14 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
         val isOfflineDownload = isDownload && actionGroup.isOfflineDownload()
         val notificationTitle = when {
             isPreviewPaused -> {
-                resources.getString(
+                context.getString(
                     sharedR.string.transfers_notification_downloading_preview_paused,
                     actionGroup.singleFileName
                 )
             }
 
             isPreviewDownload -> {
-                resources.getString(
+                context.getString(
                     sharedR.string.transfers_notification_downloading_preview,
                     actionGroup.singleFileName
                 )
@@ -91,32 +88,12 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
             actionGroup.transferredBytes,
             actionGroup.totalBytes
         )
-        val destination = runCatching {
-            if (isDownload && isContentUriUseCase(actionGroup.destination)) {
-                getPathByDocumentContentUriUseCase(actionGroup.destination)
-            } else {
-                actionGroup.destination
-            }
-        }.getOrNull() ?: actionGroup.destination
-        val destinationText = when {
-            isOfflineDownload -> {
-                context.getString(R.string.section_saved_for_offline_new)
-            }
-
-            isPreviewDownload -> {
-                null
-            }
-
-            else -> {
-                destination
-            }
-        }
-        val contentText = destinationText?.let {
-            resources.getString(
-                sharedR.string.transfers_notification_location_content,
-                it,
-            )
-        }
+        val contentText = actionGroupNotificationDestinationMapper(
+            isPreviewDownload = isPreviewDownload,
+            isOfflineDownload = isOfflineDownload,
+            isDownload = isDownload,
+            actionGroup = actionGroup,
+        )
         val (contentPendingIntent, actionIntent) = if (!isPreviewDownload) {
             val openTransfersSectionIntent = TransfersActivity.getActiveTabIntent(context)
             PendingIntent.getActivity(
@@ -139,11 +116,11 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
         )
         val actionText = when {
             isPreviewDownload -> {
-                resources.getString(sharedR.string.general_dialog_cancel_button)
+                context.getString(sharedR.string.general_dialog_cancel_button)
             }
 
             else -> {
-                resources.getString(R.string.download_touch_to_show)
+                context.getString(R.string.download_touch_to_show)
             }
         }
 
@@ -176,7 +153,7 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
                     )
                     addAction(
                         iconPackR.drawable.ic_stat_notify,
-                        resources.getString(R.string.option_resume_transfers),
+                        context.getString(R.string.option_resume_transfers),
                         resumeTransfersPendingIntent
                     )
                 }
