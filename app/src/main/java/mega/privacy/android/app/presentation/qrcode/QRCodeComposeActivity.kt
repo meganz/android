@@ -128,7 +128,10 @@ class QRCodeComposeActivity : PasscodeActivity() {
             showLoader = false
             viewModel.scanCode(this)
         }
-        viewModel.createQRCode(showLoader)
+
+        if (!inviteContacts) {
+            viewModel.createQRCode(showLoader)
+        }
     }
 
     private fun onViewContact(email: String) {

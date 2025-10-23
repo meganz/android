@@ -202,234 +202,236 @@ internal fun QRCodeView(
         snackBarHostState = snackBarHostState,
     )
 
-    Scaffold(
-        modifier = Modifier
-            .systemBarsPadding()
-            .fillMaxSize(),
-        scaffoldState = scaffoldState,
-        snackbarHost = {
-            SnackbarHost(hostState = snackBarHostState) { data ->
-                MegaSnackbar(modifier = Modifier.testTag(SNACKBAR_TAG), snackbarData = data)
-            }
-        },
-        topBar = {
-            QRCodeTopBar(
-                context = context,
-                isQRCodeAvailable = viewState.myQRCodeState is MyCodeUIState.QRCodeAvailable,
-                showMoreMenu = showMoreMenu,
-                onShowMoreClicked = { showMoreMenu = !showMoreMenu },
-                onMenuDismissed = { showMoreMenu = false },
-                onSave = {
-                    context.findActivity()?.let { activity ->
-                        qrCodeComposableBounds?.let { viewBounds ->
-                            handleSave(
-                                activity,
-                                view,
-                                viewBounds,
-                                viewState.myQRCodeState,
-                                coroutineScope,
-                                snackBarHostState,
-                            ) {
-                                coroutineScope.launch { modalSheetState.show() }
+    if (!viewState.finishActivityOnScanComplete) {
+        Scaffold(
+            modifier = Modifier
+                .systemBarsPadding()
+                .fillMaxSize(),
+            scaffoldState = scaffoldState,
+            snackbarHost = {
+                SnackbarHost(hostState = snackBarHostState) { data ->
+                    MegaSnackbar(modifier = Modifier.testTag(SNACKBAR_TAG), snackbarData = data)
+                }
+            },
+            topBar = {
+                QRCodeTopBar(
+                    context = context,
+                    isQRCodeAvailable = viewState.myQRCodeState is MyCodeUIState.QRCodeAvailable,
+                    showMoreMenu = showMoreMenu,
+                    onShowMoreClicked = { showMoreMenu = !showMoreMenu },
+                    onMenuDismissed = { showMoreMenu = false },
+                    onSave = {
+                        context.findActivity()?.let { activity ->
+                            qrCodeComposableBounds?.let { viewBounds ->
+                                handleSave(
+                                    activity,
+                                    view,
+                                    viewBounds,
+                                    viewState.myQRCodeState,
+                                    coroutineScope,
+                                    snackBarHostState,
+                                ) {
+                                    coroutineScope.launch { modalSheetState.show() }
+                                }
                             }
                         }
+                    },
+                    onResetQRCode = onResetQRCode,
+                    onDeleteQRCode = onDeleteQRCode,
+                    onBackPressed = onBackPressed,
+                    onShare = {
+                        context.findActivity()?.let { activity ->
+                            qrCodeComposableBounds?.let { viewBounds ->
+                                handleShare(
+                                    activity,
+                                    view,
+                                    viewBounds,
+                                    viewState.myQRCodeState,
+                                    coroutineScope,
+                                    snackBarHostState
+                                )
+                            }
+                        }
+                    },
+                    navigateToQrSettings = navigateToQrSettings
+                )
+            }
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+
+                ShowSnackBar(
+                    qrCodeUIState = viewState.myQRCodeState,
+                    coroutineScope = coroutineScope,
+                    snackbarHostState = snackBarHostState
+                )
+
+                when (viewState.myQRCodeState) {
+                    is MyCodeUIState.CreatingQRCode -> {
+                        if (viewState.myQRCodeState.showLoader)
+                            LoadingDialog(text = stringResource(id = R.string.generatin_qr))
                     }
-                },
-                onResetQRCode = onResetQRCode,
-                onDeleteQRCode = onDeleteQRCode,
-                onBackPressed = onBackPressed,
-                onShare = {
-                    context.findActivity()?.let { activity ->
-                        qrCodeComposableBounds?.let { viewBounds ->
-                            handleShare(
-                                activity,
-                                view,
-                                viewBounds,
-                                viewState.myQRCodeState,
-                                coroutineScope,
-                                snackBarHostState
+
+                    is MyCodeUIState.QRCodeAvailable -> {
+                        val contactLink = viewState.myQRCodeState.contactLink
+                        val avatarContent = viewState.myQRCodeState.avatarContent
+
+                        Box(
+                            modifier = Modifier
+                                .padding(top = 60.dp)
+                                .size(280.dp)
+                                .testTag(QRCODE_TAG)
+                                .onGloballyPositioned {
+                                    qrCodeComposableBounds = it.boundsInWindow()
+                                },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            QRCode(
+                                modifier = Modifier.fillMaxSize(),
+                                text = contactLink,
+                                qrCodeMapper = qrCodeMapper,
+                            )
+
+                            Avatar(
+                                modifier = Modifier.size(64.dp),
+                                content = avatarContent,
+                            )
+                        }
+
+                        OutlinedButton(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
+                                .padding(horizontal = 24.dp)
+                                .testTag(LINK_TAG),
+                            onClick = onCopyLinkClicked,
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
+                            border = BorderStroke(
+                                1.dp,
+                                MaterialTheme.colors.grey_alpha_038_white_alpha_038
+                            )
+                        ) {
+                            Text(
+                                modifier = Modifier.weight(1f),
+                                text = contactLink,
+                                style = MaterialTheme.typography.body2,
+                                color = MaterialTheme.colors.grey_alpha_087_white_alpha_087,
+                                fontWeight = FontWeight.Normal,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.size(ButtonDefaults.IconSize))
+                            Icon(
+                                painter = painterResource(id = R.drawable.copy),
+                                contentDescription = stringResource(id = R.string.context_copy),
+                                tint = MaterialTheme.colors.accent_900_accent_050
                             )
                         }
                     }
-                },
-                navigateToQrSettings = navigateToQrSettings
-            )
-        }
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
 
-            ShowSnackBar(
-                qrCodeUIState = viewState.myQRCodeState,
-                coroutineScope = coroutineScope,
-                snackbarHostState = snackBarHostState
-            )
-
-            when (viewState.myQRCodeState) {
-                is MyCodeUIState.CreatingQRCode -> {
-                    if (viewState.myQRCodeState.showLoader)
-                        LoadingDialog(text = stringResource(id = R.string.generatin_qr))
-                }
-
-                is MyCodeUIState.QRCodeAvailable -> {
-                    val contactLink = viewState.myQRCodeState.contactLink
-                    val avatarContent = viewState.myQRCodeState.avatarContent
-
-                    Box(
-                        modifier = Modifier
-                            .padding(top = 60.dp)
-                            .size(280.dp)
-                            .testTag(QRCODE_TAG)
-                            .onGloballyPositioned {
-                                qrCodeComposableBounds = it.boundsInWindow()
-                            },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        QRCode(
-                            modifier = Modifier.fillMaxSize(),
-                            text = contactLink,
-                            qrCodeMapper = qrCodeMapper,
-                        )
-
-                        Avatar(
-                            modifier = Modifier.size(64.dp),
-                            content = avatarContent,
-                        )
+                    is MyCodeUIState.QRCodeDeleted, is MyCodeUIState.Idle -> {
+                        Box(
+                            modifier = Modifier
+                                .padding(top = 60.dp)
+                                .size(280.dp)
+                                .testTag(CREATE_TAG),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            OutlinedMegaButton(
+                                textId = R.string.button_create_qr,
+                                onClick = onCreateQRCode,
+                                rounded = false,
+                            )
+                        }
                     }
 
-                    OutlinedButton(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp)
-                            .padding(horizontal = 24.dp)
-                            .testTag(LINK_TAG),
-                        onClick = onCopyLinkClicked,
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
-                        border = BorderStroke(
-                            1.dp,
-                            MaterialTheme.colors.grey_alpha_038_white_alpha_038
-                        )
-                    ) {
-                        Text(
-                            modifier = Modifier.weight(1f),
-                            text = contactLink,
-                            style = MaterialTheme.typography.body2,
-                            color = MaterialTheme.colors.grey_alpha_087_white_alpha_087,
-                            fontWeight = FontWeight.Normal,
-                            textAlign = TextAlign.Center
-                        )
-                        Spacer(modifier = Modifier.size(ButtonDefaults.IconSize))
-                        Icon(
-                            painter = painterResource(id = R.drawable.copy),
-                            contentDescription = stringResource(id = R.string.context_copy),
-                            tint = MaterialTheme.colors.accent_900_accent_050
-                        )
-                    }
+                    else -> {}
                 }
 
-                is MyCodeUIState.QRCodeDeleted, is MyCodeUIState.Idle -> {
-                    Box(
-                        modifier = Modifier
-                            .padding(top = 60.dp)
-                            .size(280.dp)
-                            .testTag(CREATE_TAG),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        OutlinedMegaButton(
-                            textId = R.string.button_create_qr,
-                            onClick = onCreateQRCode,
-                            rounded = false,
-                        )
-                    }
-                }
+                Spacer(modifier = Modifier.weight(1f))
 
-                else -> {}
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            RaisedDefaultMegaButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 24.dp, end = 24.dp, bottom = 72.dp)
-                    .testTag(SCAN_TAG),
-                textId = R.string.menu_item_scan_code,
-                onClick = onScanQrCodeClicked
-            )
-
-            showInviteContactResult?.let {
-                val contentText = if (it.printEmail) {
-                    stringResource(
-                        id = it.dialogContent,
-                        viewState.scannedContactEmail ?: ""
-                    )
-                } else {
-                    stringResource(id = it.dialogContent)
-                }
-
-                InviteResultDialog(
-                    title = stringResource(id = it.dialogTitle),
-                    text = contentText,
-                    onInviteResultDialogDismiss = {
-                        onInviteResultDialogDismiss()
-                        showInviteContactResult = null
-                    }
+                RaisedDefaultMegaButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 24.dp, end = 24.dp, bottom = 72.dp)
+                        .testTag(SCAN_TAG),
+                    textId = R.string.menu_item_scan_code,
+                    onClick = onScanQrCodeClicked
                 )
-            }
 
-            showScannedContactLinkResult?.let {
-                when (it.qrCodeQueryResult) {
-                    QRCodeQueryResults.CONTACT_QUERY_OK -> {
-                        InviteContactDialog(
-                            scannedContactLinkResult = it,
-                            onViewContactClicked = onViewContactClicked,
-                            onInviteContactClicked = onInviteContactClicked,
-                            onInviteContactDialogDismiss = {
-                                showScannedContactLinkResult = null
-                                onInviteContactDialogDismiss()
-                            },
-                            avatarContent = viewState.scannedContactAvatarContent,
+                showInviteContactResult?.let {
+                    val contentText = if (it.printEmail) {
+                        stringResource(
+                            id = it.dialogContent,
+                            viewState.scannedContactEmail ?: ""
                         )
+                    } else {
+                        stringResource(id = it.dialogContent)
                     }
 
-                    QRCodeQueryResults.CONTACT_QUERY_EEXIST -> {
-                        InviteResultDialog(
-                            title = stringResource(id = R.string.invite_not_sent),
-                            text = stringResource(
-                                id = R.string.invite_not_sent_text_already_contact,
-                                it.email
-                            ),
-                            onInviteResultDialogDismiss = {
-                                onInviteResultDialogDismiss()
-                                showScannedContactLinkResult = null
-                            }
-                        )
-                    }
+                    InviteResultDialog(
+                        title = stringResource(id = it.dialogTitle),
+                        text = contentText,
+                        onInviteResultDialogDismiss = {
+                            onInviteResultDialogDismiss()
+                            showInviteContactResult = null
+                        }
+                    )
+                }
 
-                    else -> {
-                        InviteResultDialog(
-                            title = stringResource(id = R.string.invite_not_sent),
-                            text = stringResource(id = R.string.invite_not_sent_text),
-                            onInviteResultDialogDismiss = {
-                                onInviteResultDialogDismiss()
-                                showScannedContactLinkResult = null
-                            }
-                        )
+                showScannedContactLinkResult?.let {
+                    when (it.qrCodeQueryResult) {
+                        QRCodeQueryResults.CONTACT_QUERY_OK -> {
+                            InviteContactDialog(
+                                scannedContactLinkResult = it,
+                                onViewContactClicked = onViewContactClicked,
+                                onInviteContactClicked = onInviteContactClicked,
+                                onInviteContactDialogDismiss = {
+                                    showScannedContactLinkResult = null
+                                    onInviteContactDialogDismiss()
+                                },
+                                avatarContent = viewState.scannedContactAvatarContent,
+                            )
+                        }
+
+                        QRCodeQueryResults.CONTACT_QUERY_EEXIST -> {
+                            InviteResultDialog(
+                                title = stringResource(id = R.string.invite_not_sent),
+                                text = stringResource(
+                                    id = R.string.invite_not_sent_text_already_contact,
+                                    it.email
+                                ),
+                                onInviteResultDialogDismiss = {
+                                    onInviteResultDialogDismiss()
+                                    showScannedContactLinkResult = null
+                                }
+                            )
+                        }
+
+                        else -> {
+                            InviteResultDialog(
+                                title = stringResource(id = R.string.invite_not_sent),
+                                text = stringResource(id = R.string.invite_not_sent_text),
+                                onInviteResultDialogDismiss = {
+                                    onInviteResultDialogDismiss()
+                                    showScannedContactLinkResult = null
+                                }
+                            )
+                        }
                     }
                 }
             }
-        }
 
-        QRCodeSaveBottomSheetView(
-            modalSheetState = modalSheetState,
-            coroutineScope = coroutineScope,
-            onCloudDriveClicked = onCloudDriveClicked,
-            onFileSystemClicked = onFileSystemClicked
-        )
+            QRCodeSaveBottomSheetView(
+                modalSheetState = modalSheetState,
+                coroutineScope = coroutineScope,
+                onCloudDriveClicked = onCloudDriveClicked,
+                onFileSystemClicked = onFileSystemClicked
+            )
+        }
     }
 }
 
