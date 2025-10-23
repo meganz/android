@@ -14,8 +14,13 @@ import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.mobile.analytics.event.CloudDriveNewFolderMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.CloudDriveNewTextFileMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.CloudDriveUploadFilesMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.CloudDriveUploadFolderMenuToolbarEvent
 
 /**
  * Material 3 bottom sheet for home FAB options.
@@ -48,6 +53,7 @@ fun UploadOptionsBottomSheet(
         icon = IconPack.Medium.Thin.Outline.FileUpload,
         testTag = TEST_TAG_UPLOAD_FILES_ACTION,
         onClick = {
+            Analytics.tracker.trackEvent(CloudDriveUploadFilesMenuToolbarEvent)
             onUploadFilesClicked()
             onDismissSheet()
         },
@@ -57,6 +63,7 @@ fun UploadOptionsBottomSheet(
         icon = IconPack.Medium.Thin.Outline.FolderArrow,
         testTag = TEST_TAG_UPLOAD_FOLDER_ACTION,
         onClick = {
+            Analytics.tracker.trackEvent(CloudDriveUploadFolderMenuToolbarEvent)
             onUploadFolderClicked()
             onDismissSheet()
         },
@@ -84,6 +91,7 @@ fun UploadOptionsBottomSheet(
         icon = IconPack.Medium.Thin.Outline.FolderPlus01,
         testTag = TEST_TAG_NEW_FOLDER_ACTION,
         onClick = {
+            Analytics.tracker.trackEvent(CloudDriveNewFolderMenuToolbarEvent)
             onNewFolderClicked()
             onDismissSheet()
         },
@@ -93,6 +101,7 @@ fun UploadOptionsBottomSheet(
         icon = IconPack.Medium.Thin.Outline.FilePlus02,
         testTag = TEST_TAG_NEW_TEXT_FILE_ACTION,
         onClick = {
+            Analytics.tracker.trackEvent(CloudDriveNewTextFileMenuToolbarEvent)
             onNewTextFileClicked()
             onDismissSheet()
         },

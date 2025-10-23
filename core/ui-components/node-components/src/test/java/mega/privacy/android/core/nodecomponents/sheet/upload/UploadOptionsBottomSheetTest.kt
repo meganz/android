@@ -12,17 +12,22 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.core.nodecomponents.R
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 class UploadOptionsBottomSheetTest {
+    private val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    private val analyticsRule = AnalyticsTestRule()
+
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
     private val onUploadFilesClicked = mock<() -> Unit>()
     private val onUploadFolderClicked = mock<() -> Unit>()
