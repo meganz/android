@@ -15,6 +15,8 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.presentation.photos.model.CameraUploadsTransferType
+import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsStatus
+import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.transfers.model.image.ActiveTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.model.image.TransferImageUiState
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
@@ -114,7 +116,10 @@ class CameraUploadsTransferScreenTest {
     @Test
     fun `test that CameraUploadsTransferEmptyView is shown when there is no transfer`() {
         composeRule.setContent {
-            CameraUploadsTranferView(emptyList())
+            CameraUploadsTranferView(
+                getTimelineViewState(CameraUploadsStatus.Complete),
+                emptyList()
+            )
         }
 
         with(composeRule) {
@@ -134,7 +139,7 @@ class CameraUploadsTransferScreenTest {
             listOf(CameraUploadsTransferType.InProgress(listOf(mockInProgressTransfer)))
         composeRule.setContent {
             CompositionLocalProvider(LocalViewModelStoreOwner provides viewModelStoreOwner) {
-                CameraUploadsTranferView(mockCameraUploadsTransferType)
+                CameraUploadsTranferView(getTimelineViewState(), mockCameraUploadsTransferType)
             }
         }
 
@@ -157,7 +162,7 @@ class CameraUploadsTransferScreenTest {
             listOf(CameraUploadsTransferType.InQueue(listOf(mockInQueueTransfer)))
         composeRule.setContent {
             CompositionLocalProvider(LocalViewModelStoreOwner provides viewModelStoreOwner) {
-                CameraUploadsTranferView(mockCameraUploadsTransferType)
+                CameraUploadsTranferView(getTimelineViewState(), mockCameraUploadsTransferType)
             }
         }
 
@@ -167,4 +172,36 @@ class CameraUploadsTransferScreenTest {
             onNodeWithTag(TEST_TAG_CAMERA_UPLOADS_TRANSFER_IN_PROGRESS_HEADER).assertIsNotDisplayed()
         }
     }
+
+    @Test
+    fun `test that skeleton loading view is shown correctly when status is Sync`() {
+        composeRule.setContent {
+            CameraUploadsTranferView(getTimelineViewState(CameraUploadsStatus.Sync), emptyList())
+        }
+
+        with(composeRule) {
+            onNodeWithTag(TEST_TAG_CAMERA_UPLOADS_TRANSFER_SKELETON_LOADING_VIEW).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that skeleton loading view is shown correctly when status is Uploading and list is empty`() {
+        composeRule.setContent {
+            CameraUploadsTranferView(
+                getTimelineViewState(CameraUploadsStatus.Uploading),
+                emptyList()
+            )
+        }
+
+        with(composeRule) {
+            onNodeWithTag(TEST_TAG_CAMERA_UPLOADS_TRANSFER_SKELETON_LOADING_VIEW).assertIsDisplayed()
+        }
+    }
+
+    private fun getTimelineViewState(
+        cameraUploadsStatus: CameraUploadsStatus = CameraUploadsStatus.Uploading
+    ) =
+        TimelineViewState(
+            cameraUploadsStatus = cameraUploadsStatus
+        )
 }

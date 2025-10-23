@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -40,9 +41,12 @@ import mega.privacy.android.app.presentation.extensions.transfers.getProgressSiz
 import mega.privacy.android.app.presentation.extensions.transfers.getSpeedString
 import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowMenuAction
 import mega.privacy.android.app.presentation.photos.model.CameraUploadsTransferType
+import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsStatus
+import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.CameraUploadsTransferViewModel
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.app.presentation.transfers.model.image.ActiveTransferImageViewModel
+import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
@@ -95,62 +99,76 @@ fun CameraUploadsTransferScreen(
         }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
-            CameraUploadsTranferView(types = types)
+            CameraUploadsTranferView(uiState = uiState, types = types)
         }
     }
 }
 
 @Composable
-internal fun CameraUploadsTranferView(types: List<CameraUploadsTransferType>) {
-    if (types.isEmpty()) {
-        CameraUploadsTransferEmptyView()
-    } else {
-        val totalItemCount = types.sumOf { section ->
-            when (section) {
-                is CameraUploadsTransferType.InProgress -> section.items.size
-                is CameraUploadsTransferType.InQueue -> section.items.size
+internal fun CameraUploadsTranferView(
+    uiState: TimelineViewState,
+    types: List<CameraUploadsTransferType>,
+) {
+    val isSyncing = uiState.cameraUploadsStatus == CameraUploadsStatus.Sync
+    val isUploading = uiState.cameraUploadsStatus == CameraUploadsStatus.Uploading
+    when {
+        isSyncing || (isUploading && types.isEmpty()) ->
+            NodesViewSkeleton(
+                modifier = Modifier.testTag(
+                    TEST_TAG_CAMERA_UPLOADS_TRANSFER_SKELETON_LOADING_VIEW
+                ), contentPadding = PaddingValues()
+            )
+
+        types.isEmpty() -> CameraUploadsTransferEmptyView()
+
+        else -> {
+            val totalItemCount = types.sumOf { section ->
+                when (section) {
+                    is CameraUploadsTransferType.InProgress -> section.items.size
+                    is CameraUploadsTransferType.InQueue -> section.items.size
+                }
             }
-        }
 
-        FastScrollLazyColumn(
-            state = rememberLazyListState(),
-            totalItems = totalItemCount,
-        ) {
-            types.forEach { type ->
-                when (type) {
-                    is CameraUploadsTransferType.InProgress -> {
-                        item(key = "in progress header") {
-                            MegaText(
-                                modifier = Modifier
-                                    .padding(15.dp)
-                                    .testTag(TEST_TAG_CAMERA_UPLOADS_TRANSFER_IN_PROGRESS_HEADER),
-                                text = stringResource(sharedR.string.camera_uploads_tranfer_header_in_progress),
-                                textColor = TextColor.Primary,
-                                style = MaterialTheme.typography.labelLarge
-                            )
+            FastScrollLazyColumn(
+                state = rememberLazyListState(),
+                totalItems = totalItemCount,
+            ) {
+                types.forEach { type ->
+                    when (type) {
+                        is CameraUploadsTransferType.InProgress -> {
+                            item(key = "in progress header") {
+                                MegaText(
+                                    modifier = Modifier
+                                        .padding(15.dp)
+                                        .testTag(TEST_TAG_CAMERA_UPLOADS_TRANSFER_IN_PROGRESS_HEADER),
+                                    text = stringResource(sharedR.string.camera_uploads_tranfer_header_in_progress),
+                                    textColor = TextColor.Primary,
+                                    style = MaterialTheme.typography.labelLarge
+                                )
+                            }
+
+                            items(count = type.items.size, key = { type.items[it].uniqueId }) {
+                                val item = type.items[it]
+                                CameraUploadsTransferItem(item = item, isInProgress = true)
+                            }
                         }
 
-                        items(count = type.items.size, key = { type.items[it].uniqueId }) {
-                            val item = type.items[it]
-                            CameraUploadsTransferItem(item = item, isInProgress = true)
-                        }
-                    }
+                        is CameraUploadsTransferType.InQueue -> {
+                            item(key = "in queue header") {
+                                MegaText(
+                                    modifier = Modifier
+                                        .padding(15.dp)
+                                        .testTag(TEST_TAG_CAMERA_UPLOADS_TRANSFER_IN_QUEUE_HEADER),
+                                    text = stringResource(sharedR.string.camera_uploads_tranfer_header_in_queue),
+                                    textColor = TextColor.Primary,
+                                    style = MaterialTheme.typography.labelLarge
+                                )
+                            }
 
-                    is CameraUploadsTransferType.InQueue -> {
-                        item(key = "in queue header") {
-                            MegaText(
-                                modifier = Modifier
-                                    .padding(15.dp)
-                                    .testTag(TEST_TAG_CAMERA_UPLOADS_TRANSFER_IN_QUEUE_HEADER),
-                                text = stringResource(sharedR.string.camera_uploads_tranfer_header_in_queue),
-                                textColor = TextColor.Primary,
-                                style = MaterialTheme.typography.labelLarge
-                            )
-                        }
-
-                        items(count = type.items.size, key = { type.items[it].uniqueId }) {
-                            val item = type.items[it]
-                            CameraUploadsTransferItem(item = item, isInProgress = false)
+                            items(count = type.items.size, key = { type.items[it].uniqueId }) {
+                                val item = type.items[it]
+                                CameraUploadsTransferItem(item = item, isInProgress = false)
+                            }
                         }
                     }
                 }
@@ -328,3 +346,9 @@ const val TEST_TAG_CAMERA_UPLOADS_TRANSFER_IN_PROGRESS_HEADER =
  */
 const val TEST_TAG_CAMERA_UPLOADS_TRANSFER_IN_QUEUE_HEADER =
     "camera_uploads_transfers_view:header_in_queue"
+
+/**
+ * Tag for the description of Camera Uploads transfer skeleton loading view.
+ */
+const val TEST_TAG_CAMERA_UPLOADS_TRANSFER_SKELETON_LOADING_VIEW =
+    "camera_uploads_transfers_view:view_skeleton_loading"
