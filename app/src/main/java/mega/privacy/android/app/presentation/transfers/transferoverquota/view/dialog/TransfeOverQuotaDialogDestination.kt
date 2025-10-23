@@ -9,9 +9,9 @@ import androidx.navigation3.scene.DialogSceneStrategy
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.login.Login
 import mega.privacy.android.app.presentation.transfers.transferoverquota.TransferOverQuotaViewModel
-import mega.privacy.android.feature.payment.UpgradeAccountNavKey
 import mega.privacy.android.navigation.contract.AppDialogDestinations
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 
 @Serializable
 data object TransferOverQuotaDialog : NavKey

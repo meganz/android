@@ -5,6 +5,7 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.navigation.payment.UpgradeAccountSource
 
 @Serializable
 data object OverDiskQuotaPaywallWarningNavKey : NavKey
@@ -92,4 +93,9 @@ data class SyncNewFolderNavKey(
 @Serializable
 data class SyncSelectStopBackupDestinationNavKey(
     val folderName: String? = null,
+) : NavKey
+
+@Serializable
+data class UpgradeAccountNavKey(
+    val source: UpgradeAccountSource = UpgradeAccountSource.UNKNOWN,
 ) : NavKey

@@ -51,6 +51,7 @@ import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.destination.SyncSelectStopBackupDestinationNavKey
+import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
@@ -211,7 +212,7 @@ internal fun DriveSyncScreen(
                             )
                         },
                         onOpenUpgradeAccountClicked = {
-                            megaNavigator.openUpgradeAccount(context)
+                            navigationHandler.navigate(UpgradeAccountNavKey())
                         },
                         onOpenMegaFolderClicked = { handle ->
                             navigationHandler.navigate(CloudDriveNavKey(nodeHandle = handle))

@@ -1,10 +1,8 @@
 package mega.privacy.android.app.menu.navigation
 
-import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.combine
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorOngoingCallUseCase
-import mega.privacy.android.feature.payment.UpgradeAccountNavKey
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.DefaultIconBadge
 import mega.privacy.android.navigation.contract.DefaultNumberBadge
@@ -19,6 +17,7 @@ import mega.privacy.android.navigation.destination.OfflineNavKey
 import mega.privacy.android.navigation.destination.RubbishBinNavKey
 import mega.privacy.android.navigation.destination.SharesNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
+import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 
 object CurrentPlanItem : NavDrawerItem.Account(

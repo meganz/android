@@ -4,8 +4,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import mega.privacy.android.feature.payment.UpgradeAccountNavKey
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
+import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.megaNavigator
 
 fun EntryProviderScope<NavKey>.upgradeAccount(removeDestination: () -> Unit) {
@@ -24,4 +24,3 @@ fun EntryProviderScope<NavKey>.upgradeAccount(removeDestination: () -> Unit) {
         }
     }
 }
-
