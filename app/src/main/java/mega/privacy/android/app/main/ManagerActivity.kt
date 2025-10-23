@@ -815,12 +815,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         handleInsets()
         initialiseChatBadgeView()
         setCallBadge()
-        if (mElevationCause > 0) {
-            // A work around: mElevationCause will be changed unexpectedly shortly
-            val elevationCause = mElevationCause
-            // Apply the previous Appbar elevation(e.g. before rotation) after all views have been created
-            handler.postDelayed({ changeAppBarElevation(true, elevationCause) }, 100)
-        }
         setupAudioPlayerController()
         userInfoViewModel.getUserAchievements()
         if (!viewModel.isConnected) {

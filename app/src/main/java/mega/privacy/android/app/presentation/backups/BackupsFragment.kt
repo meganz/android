@@ -168,6 +168,7 @@ class BackupsFragment : RotatableFragment() {
             viewerFrom = Constants.VIEWER_FROM_BACKUPS,
         )
         observeUiState()
+        checkScroll()
     }
 
     /**
