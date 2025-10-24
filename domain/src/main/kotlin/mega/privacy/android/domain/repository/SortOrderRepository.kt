@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.repository
 
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.SortOrder
 
 /**
@@ -12,6 +13,12 @@ interface SortOrderRepository {
      * @return camera sort order
      */
     suspend fun getCameraSortOrder(): SortOrder?
+
+    /**
+     * Monitor cloud sort order
+     * @return Flow of cloud sort order
+     */
+    fun monitorCloudSortOrder(): Flow<SortOrder?>
 
     /**
      * Get cloud sort order

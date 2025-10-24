@@ -14,7 +14,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -28,6 +31,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
@@ -37,7 +41,6 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
-import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeNameByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.MonitorAlmostFullStorageBannerVisibilityUseCase
@@ -51,6 +54,7 @@ import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildre
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
+import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingShareParentUserEmailUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -75,7 +79,6 @@ class CloudDriveViewModel @AssistedInject constructor(
     private val scannerHandler: ScannerHandler,
     private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
     private val getNodesByIdInChunkUseCase: GetNodesByIdInChunkUseCase,
-    private val getCloudSortOrderUseCase: GetCloudSortOrder,
     private val setCloudSortOrderUseCase: SetCloudSortOrder,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
     private val storageCapacityMapper: StorageCapacityMapper,
@@ -85,6 +88,7 @@ class CloudDriveViewModel @AssistedInject constructor(
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase,
     private val getIncomingShareParentUserEmailUseCase: GetIncomingShareParentUserEmailUseCase,
+    private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
     @Assisted private val navKey: CloudDriveNavKey,
 ) : ViewModel() {
 
@@ -106,7 +110,7 @@ class CloudDriveViewModel @AssistedInject constructor(
         viewModelScope.launch { updateTitle() }
         setupNodesLoading()
         monitorNodeUpdates()
-        getCloudSortOrder()
+        monitorCloudSortOrder()
         monitorStorageOverQuotaCapacity()
     }
 
@@ -188,24 +192,24 @@ class CloudDriveViewModel @AssistedInject constructor(
         }
     }
 
-    private fun getCloudSortOrder(refresh: Boolean = false) {
-        viewModelScope.launch {
-            runCatching {
-                getCloudSortOrderUseCase()
-            }.onSuccess { sortOrder ->
-                val sortOrderPair = nodeSortConfigurationUiMapper(sortOrder)
-                _uiState.update {
-                    it.copy(
-                        selectedSortConfiguration = sortOrderPair,
-                        selectedSortOrder = sortOrder
-                    )
-                }
-                if (refresh) {
-                    refreshNodes()
-                }
-            }.onFailure {
-                Timber.e(it, "Failed to get cloud sort order")
+    private fun monitorCloudSortOrder() {
+        monitorSortCloudOrderUseCase()
+            .catch { Timber.e(it) }
+            .filterNotNull()
+            .onEach {
+                updateSortOrder(it)
+                refreshNodes()
             }
+            .launchIn(viewModelScope)
+    }
+
+    private fun updateSortOrder(sortOrder: SortOrder) {
+        val sortOrderPair = nodeSortConfigurationUiMapper(sortOrder)
+        _uiState.update {
+            it.copy(
+                selectedSortConfiguration = sortOrderPair,
+                selectedSortOrder = sortOrder
+            )
         }
     }
 
@@ -216,8 +220,6 @@ class CloudDriveViewModel @AssistedInject constructor(
                 setCloudSortOrderUseCase(order)
             }.onFailure {
                 Timber.e(it, "Failed to set cloud sort order")
-            }.onSuccess {
-                getCloudSortOrder(refresh = true)
             }
         }
     }

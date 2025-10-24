@@ -1,6 +1,11 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
@@ -9,6 +14,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SortOrderRepository
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Default implementation of [SortOrderRepository]
@@ -18,24 +24,37 @@ import javax.inject.Inject
  * @property sortOrderMapper
  * @property sortOrderIntMapper
  */
+@Singleton
 internal class DefaultSortOrderRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
     private val sortOrderMapper: SortOrderMapper,
     private val sortOrderIntMapper: SortOrderIntMapper,
 ) : SortOrderRepository {
+    private val sortOrderFlow = MutableStateFlow<SortOrder?>(null)
 
     override suspend fun getCameraSortOrder(): SortOrder? = withContext(ioDispatcher) {
         sortOrderMapper(megaLocalStorageGateway.getCameraSortOrder())
     }
 
+    override fun monitorCloudSortOrder(): Flow<SortOrder?> =
+        sortOrderFlow
+            .asStateFlow()
+            .onStart {
+                if (sortOrderFlow.value == null) {
+                    getCloudSortOrder()
+                }
+            }
+            .flowOn(ioDispatcher)
+
     override suspend fun getCloudSortOrder(): SortOrder? = withContext(ioDispatcher) {
         sortOrderMapper(megaLocalStorageGateway.getCloudSortOrder())
     }
 
-    override suspend fun getLinksSortOrder(isSingleActivityEnabled: Boolean): SortOrder? = withContext(ioDispatcher) {
-        sortOrderMapper(megaLocalStorageGateway.getLinksSortOrder(isSingleActivityEnabled))
-    }
+    override suspend fun getLinksSortOrder(isSingleActivityEnabled: Boolean): SortOrder? =
+        withContext(ioDispatcher) {
+            sortOrderMapper(megaLocalStorageGateway.getLinksSortOrder(isSingleActivityEnabled))
+        }
 
     override suspend fun getOthersSortOrder(): SortOrder? = withContext(ioDispatcher) {
         sortOrderMapper(megaLocalStorageGateway.getOthersSortOrder())
@@ -55,6 +74,7 @@ internal class DefaultSortOrderRepository @Inject constructor(
 
     override suspend fun setCloudSortOrder(order: SortOrder) = withContext(ioDispatcher) {
         megaLocalStorageGateway.setCloudSortOrder(sortOrderIntMapper(order))
+        sortOrderFlow.emit(order)
     }
 
     override suspend fun setOthersSortOrder(order: SortOrder) = withContext(ioDispatcher) {

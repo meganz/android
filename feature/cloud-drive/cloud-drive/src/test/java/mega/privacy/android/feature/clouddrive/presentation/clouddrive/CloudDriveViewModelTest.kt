@@ -36,7 +36,6 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
-import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeNameByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.MonitorAlmostFullStorageBannerVisibilityUseCase
@@ -50,6 +49,7 @@ import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildre
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
+import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingShareParentUserEmailUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -87,7 +87,6 @@ class CloudDriveViewModelTest {
     private val nodeUiItemMapper: NodeUiItemMapper = mock()
     private val scannerHandler: ScannerHandler = mock()
     private val getRootNodeIdUseCase: GetRootNodeIdUseCase = mock()
-    private val getCloudSortOrderUseCase: GetCloudSortOrder = mock()
     private val setCloudSortOrderUseCase: SetCloudSortOrder = mock()
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = mock()
     private val storageCapacityMapper: StorageCapacityMapper = mock()
@@ -100,6 +99,7 @@ class CloudDriveViewModelTest {
     private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase = mock()
     private val getIncomingShareParentUserEmailUseCase: GetIncomingShareParentUserEmailUseCase =
         mock()
+    private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase = mock()
     private val folderNodeHandle = 123L
     private val folderNodeId = NodeId(folderNodeHandle)
 
@@ -127,7 +127,6 @@ class CloudDriveViewModelTest {
             nodeUiItemMapper,
             scannerHandler,
             getRootNodeIdUseCase,
-            getCloudSortOrderUseCase,
             setCloudSortOrderUseCase,
             nodeSortConfigurationUiMapper,
             storageCapacityMapper,
@@ -136,11 +135,15 @@ class CloudDriveViewModelTest {
             setAlmostFullStorageBannerClosingTimestampUseCase,
             getContactVerificationWarningUseCase,
             areCredentialsVerifiedUseCase,
-            getIncomingShareParentUserEmailUseCase
+            getIncomingShareParentUserEmailUseCase,
+            monitorSortCloudOrderUseCase
         )
     }
 
-    private fun createViewModel(nodeHandle: Long = folderNodeHandle, nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,) = CloudDriveViewModel(
+    private fun createViewModel(
+        nodeHandle: Long = folderNodeHandle,
+        nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
+    ) = CloudDriveViewModel(
         getNodeNameByIdUseCase = getNodeNameByIdUseCase,
         getFileBrowserNodeChildrenUseCase = getFileBrowserNodeChildrenUseCase,
         setViewTypeUseCase = setViewTypeUseCase,
@@ -153,7 +156,6 @@ class CloudDriveViewModelTest {
         scannerHandler = scannerHandler,
         getRootNodeIdUseCase = getRootNodeIdUseCase,
         getNodesByIdInChunkUseCase = getNodesByIdInChunkUseCase,
-        getCloudSortOrderUseCase = getCloudSortOrderUseCase,
         setCloudSortOrderUseCase = setCloudSortOrderUseCase,
         nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
         storageCapacityMapper = storageCapacityMapper,
@@ -163,6 +165,7 @@ class CloudDriveViewModelTest {
         getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
         areCredentialsVerifiedUseCase = areCredentialsVerifiedUseCase,
         getIncomingShareParentUserEmailUseCase = getIncomingShareParentUserEmailUseCase,
+        monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
         navKey = CloudDriveNavKey(nodeHandle, nodeSourceType = nodeSourceType),
     )
 
@@ -170,7 +173,7 @@ class CloudDriveViewModelTest {
         items: List<TypedNode>,
         nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
     ) {
-        whenever(getCloudSortOrderUseCase()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+        whenever(monitorSortCloudOrderUseCase()).thenReturn(flowOf(SortOrder.ORDER_DEFAULT_ASC))
         whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(
             NodeSortConfiguration.default
         )
@@ -228,8 +231,10 @@ class CloudDriveViewModelTest {
     }
 
     private suspend fun setupTestDataWithPartialLoad(items: List<TypedNode>) {
-        whenever(getCloudSortOrderUseCase()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
-        whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(NodeSortConfiguration.default)
+        whenever(monitorSortCloudOrderUseCase()).thenReturn(flowOf(SortOrder.ORDER_DEFAULT_ASC))
+        whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(
+            NodeSortConfiguration.default
+        )
         whenever(getNodeNameByIdUseCase(eq(folderNodeId))).thenReturn("Test folder")
         whenever(getFileBrowserNodeChildrenUseCase(folderNodeHandle)).thenReturn(items)
 
@@ -394,7 +399,8 @@ class CloudDriveViewModelTest {
 
             // Verify that getFileBrowserNodeChildrenUseCase was called for the node update
             // The call should happen when NodeChanges.Attributes is processed
-            verify(getFileBrowserNodeChildrenUseCase).invoke(folderNodeHandle)
+            // called twice after reload
+            verify(getFileBrowserNodeChildrenUseCase, times(2)).invoke(folderNodeHandle)
         }
 
     @Test
@@ -1861,7 +1867,7 @@ class CloudDriveViewModelTest {
         val expectedSortOrder = SortOrder.ORDER_DEFAULT_ASC
         val expectedSortConfiguration = NodeSortConfiguration.default
 
-        whenever(getCloudSortOrderUseCase()).thenReturn(expectedSortOrder)
+        whenever(monitorSortCloudOrderUseCase()).thenReturn(flowOf(expectedSortOrder))
         whenever(nodeSortConfigurationUiMapper(expectedSortOrder)).thenReturn(
             expectedSortConfiguration
         )
@@ -1884,7 +1890,7 @@ class CloudDriveViewModelTest {
         val expectedSortOrder = SortOrder.ORDER_DEFAULT_ASC
 
         whenever(nodeSortConfigurationUiMapper(sortConfiguration)).thenReturn(expectedSortOrder)
-        whenever(getCloudSortOrderUseCase()).thenReturn(expectedSortOrder)
+        whenever(monitorSortCloudOrderUseCase()).thenReturn(flowOf(expectedSortOrder))
 
         val underTest = createViewModel()
         advanceUntilIdle()
@@ -1895,7 +1901,7 @@ class CloudDriveViewModelTest {
         // Verify that getCloudSortOrderUseCase was called at least twice:
         // 1. During initialization
         // 2. After setting the sort order (refetch)
-        verify(getCloudSortOrderUseCase, times(2)).invoke()
+        verify(getFileBrowserNodeChildrenUseCase).invoke(any())
         verify(setCloudSortOrderUseCase).invoke(expectedSortOrder)
     }
 

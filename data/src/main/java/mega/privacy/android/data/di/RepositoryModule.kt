@@ -194,6 +194,7 @@ internal abstract class RepositoryModule {
      * Bind sort order repository
      */
     @Binds
+    @Singleton
     abstract fun bindSortOrderRepository(repository: DefaultSortOrderRepository): SortOrderRepository
 
     @Binds
