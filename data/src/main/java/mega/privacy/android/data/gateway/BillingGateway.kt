@@ -34,5 +34,5 @@ internal interface BillingGateway {
      * Launch a purchase flow.
      */
     @Throws(ProductNotFoundException::class)
-    suspend fun launchPurchaseFlow(activity: Activity, productId: String)
+    suspend fun launchPurchaseFlow(activity: Activity, productId: String, offerId: String?)
 }

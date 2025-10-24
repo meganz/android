@@ -12,5 +12,5 @@ interface AndroidBillingRepository {
     /**
      * Launch a purchase flow.
      */
-    suspend fun launchPurchaseFlow(activity: Activity, productId: String)
+    suspend fun launchPurchaseFlow(activity: Activity, productId: String, offerId: String?)
 }

@@ -111,8 +111,11 @@ internal class DefaultBillingRepository @Inject constructor(
 
     override fun monitorBillingEvent(): Flow<BillingEvent> = billingGateway.monitorBillingEvent()
 
-    override suspend fun launchPurchaseFlow(activity: Activity, productId: String) =
-        billingGateway.launchPurchaseFlow(activity, productId)
+    override suspend fun launchPurchaseFlow(
+        activity: Activity,
+        productId: String,
+        offerId: String?
+    ) = billingGateway.launchPurchaseFlow(activity, productId, offerId)
 
     override suspend fun getCurrentPaymentMethod(): PaymentMethod? =
         PaymentMethod.entries.firstOrNull {

@@ -1238,7 +1238,7 @@
     <!-- The camera uploads notification title to reminder the camera uploads paused-->
     <string name="camera_uploads_notification_title_paused_warning">Camera uploads paused</string>
     <!-- The camera uploads notification content to reminder there is no wifi connection-->
-    <string name="camera_uploads_notification_content_no_wifi_connection">Connect to WIFI or allow mobile data</string>
+    <string name="camera_uploads_notification_content_no_wifi_connection">Connect to Wi-Fi or allow mobile data</string>
     <!-- The camera uploads notification action text to allow mobile data-->
     <string name="camera_uploads_notification_action_allow_mobile_data">Allow mobile data</string>
     <!-- Alert title before download a big file for preview. -->
@@ -1734,15 +1734,33 @@
     <!-- category in sort by action to sort by share created date -->
     <string name="action_sort_by_share_created">Share created</string>
     <!-- The title of camera uploads paused warning banner -->
-    <string name="camera_update_paused_warning_banner_title">Camera uploads paused,</string>
+    <string name="camera_update_paused_warning_banner_title">Camera uploads paused</string>
     <!-- The description of camera uploads device charging not met paused warning banner -->
-    <string name="camera_update_device_charging_not_met_banner_description">Uploads only run while your device is charging. Change this in Settings.</string>
+    <string name="camera_update_device_charging_not_met_banner_description">Uploads only happen while your device is charging. You can change this in Settings.</string>
     <!-- The button text of camera uploads device charging not met paused warning banner -->
-    <string name="camera_update_device_charging_not_met_banner_button_text">Update setting</string>
+    <string name="camera_update_device_charging_not_met_banner_button_text">Settings</string>
     <!-- The description of camera uploads low battery paused warning banner -->
-    <string name="camera_update_low_battery_banner_description">Battery level too low. Charge battery to resume camera uploads.</string>
+    <string name="camera_update_low_battery_banner_description">Uploads are paused due to low battery. Charge your device to continue.</string>
     <!-- The description of camera uploads network requirement not met paused warning banner -->
     <string name="camera_update_network_requirement_not_met_banner_description">Camera uploads paused, connect to WIFI or allow mobile data</string>
     <!-- The button text of camera uploads network requirement not met paused warning banner -->
     <string name="camera_update_network_requirement_not_met_banner_button_text">Allow mobile data</string>
+    <!-- Billing info with discount label -->
+    <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s for %3$s</string>
+    <!-- campaign name for Black Friday deal -->
+    <string name="campaign_name_black_friday">Black Friday deal: XX% off</string>
+    <!-- campaign name for Cyber Monday deal -->
+    <string name="campaign_name_cyber_monday">Cyber Monday deal: XX% off</string>
+    <!-- campaign name for Special offer -->
+    <string name="campaign_name_special_offer">Special offer: XX% off</string>
+    <!-- Label for first time period in days full format -->
+    <plurals name="label_first_time_in_months_full">
+        <item quantity="one">first month</item>
+        <item quantity="other">first %1$d months</item>
+    </plurals>
+    <!-- Label for first time period in years full format -->
+    <plurals name="label_first_time_in_years_full">
+        <item quantity="one">first year</item>
+        <item quantity="other">first %1$d years</item>
+    </plurals>
 </resources>

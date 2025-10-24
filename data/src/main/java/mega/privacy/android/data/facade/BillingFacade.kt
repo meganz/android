@@ -111,9 +111,7 @@ internal class BillingFacade @Inject constructor(
     override fun onStart(owner: LifecycleOwner) {
         applicationScope.launch(exceptionHandler) {
             ensureConnect()
-            if (skusCache.get().isNullOrEmpty()) {
-                querySkus()
-            }
+            querySkus()
             if (accountRepository.isMegaApiLoggedIn()) {
                 queryPurchase()
             }
@@ -144,7 +142,11 @@ internal class BillingFacade @Inject constructor(
     override fun monitorBillingEvent() = billingEvent.asSharedFlow()
 
     @Throws(ProductNotFoundException::class)
-    override suspend fun launchPurchaseFlow(activity: Activity, productId: String) {
+    override suspend fun launchPurchaseFlow(
+        activity: Activity,
+        productId: String,
+        offerId: String?,
+    ) {
         val oldSubscription = activeSubscription.get()
         Timber.d("old subscription is: $oldSubscription")
         val oldSku = oldSubscription?.sku
@@ -173,7 +175,10 @@ internal class BillingFacade @Inject constructor(
             productDetailsListCache.get().orEmpty().find { it.productId == productId }
                 ?: throw ProductNotFoundException()
         productDetails.subscriptionOfferDetails?.let { offerDetailsList ->
-            val offerToken = offerDetailsList.firstOrNull()?.offerToken.orEmpty()
+            // Note: This field is only set for a discounted offer. Returns null for a regular base plan.
+            // https://developer.android.com/reference/com/android/billingclient/api/ProductDetails.SubscriptionOfferDetails#getOfferId()
+            val offerToken = (offerId?.let { offerDetailsList.find { it.offerId == offerId } }
+                ?: offerDetailsList.find { it.offerId.isNullOrEmpty() })?.offerToken.orEmpty()
             val productDetailsParams = listOf(
                 ProductDetailsParams.newBuilder()
                     .setProductDetails(productDetails)

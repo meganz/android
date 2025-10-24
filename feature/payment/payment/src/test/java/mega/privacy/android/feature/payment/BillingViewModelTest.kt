@@ -164,7 +164,7 @@ internal class BillingViewModelTest {
 
             underTest.startPurchase(activity, accountType, isMonthly)
 
-            verify(launchPurchaseFlowUseCase).invoke(activity, expectedProductId)
+            verify(launchPurchaseFlowUseCase).invoke(activity, expectedProductId, null)
         }
 
     @Test
@@ -180,7 +180,7 @@ internal class BillingViewModelTest {
         underTest.startPurchase(activity, accountType, isMonthly)
 
         verify(accountTypeToProductIdMapper).invoke(accountType, isMonthly)
-        verify(launchPurchaseFlowUseCase).invoke(activity, expectedProductId)
+        verify(launchPurchaseFlowUseCase).invoke(activity, expectedProductId, null)
     }
 
     @Test
@@ -189,14 +189,15 @@ internal class BillingViewModelTest {
         val accountType = AccountType.PRO_I
         val isMonthly = false
         val expectedProductId = Skus.SKU_PRO_I_YEAR
+        val offerId = "offerId"
 
         whenever(accountTypeToProductIdMapper(accountType, isMonthly))
             .thenReturn(expectedProductId)
 
-        underTest.startPurchase(activity, accountType, isMonthly)
+        underTest.startPurchase(activity, accountType, isMonthly, offerId)
 
         verify(accountTypeToProductIdMapper).invoke(accountType, isMonthly)
-        verify(launchPurchaseFlowUseCase).invoke(activity, expectedProductId)
+        verify(launchPurchaseFlowUseCase).invoke(activity, expectedProductId, offerId)
     }
 
     @Test
@@ -212,6 +213,6 @@ internal class BillingViewModelTest {
             underTest.startPurchase(activity, accountType, isMonthly)
 
             verify(accountTypeToProductIdMapper).invoke(accountType, isMonthly)
-            verify(launchPurchaseFlowUseCase).invoke(activity, "")
+            verify(launchPurchaseFlowUseCase).invoke(activity, "", null)
         }
 }

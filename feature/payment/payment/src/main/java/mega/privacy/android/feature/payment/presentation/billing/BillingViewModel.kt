@@ -100,11 +100,16 @@ class BillingViewModel @Inject constructor(
      * Start purchase
      *
      */
-    fun startPurchase(activity: Activity, accountType: AccountType, isMonthly: Boolean) {
+    fun startPurchase(
+        activity: Activity,
+        accountType: AccountType,
+        isMonthly: Boolean,
+        offerId: String? = null,
+    ) {
         viewModelScope.launch {
             runCatching {
                 val productId = accountTypeToProductIdMapper(accountType, isMonthly)
-                launchPurchaseFlowUseCase(activity, productId)
+                launchPurchaseFlowUseCase(activity, productId, offerId)
             }.onFailure {
                 Timber.Forest.e(it, "Failed to launch purchase flow")
             }
