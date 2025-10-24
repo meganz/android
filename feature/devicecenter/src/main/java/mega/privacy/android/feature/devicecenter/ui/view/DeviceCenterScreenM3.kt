@@ -114,11 +114,11 @@ internal fun DeviceCenterScreenM3(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     // Handle the Back Press if the Bottom Sheet is visible or User is in Folder View
+    // Note: Info screen has its own BackHandler, so we don't need to handle it here
     BackHandler(enabled = modalSheetState.isVisible || selectedDevice != null) {
-        if (modalSheetState.isVisible) {
-            coroutineScope.launch { modalSheetState.hide() }
-        } else {
-            onBackPressHandled()
+        when {
+            modalSheetState.isVisible -> coroutineScope.launch { modalSheetState.hide() }
+            else -> onBackPressHandled()
         }
     }
 

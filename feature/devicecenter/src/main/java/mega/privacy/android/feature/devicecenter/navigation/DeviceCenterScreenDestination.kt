@@ -1,9 +1,9 @@
 package mega.privacy.android.feature.devicecenter.navigation
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -16,8 +16,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.launch
@@ -50,9 +48,6 @@ fun EntryProviderScope<NavKey>.deviceCenterScreen(
         val lifecycleOwner = LocalLifecycleOwner.current
         val coroutineScope = rememberCoroutineScope()
 
-        BackHandler(enabled = uiState.selectedDevice != null) {
-            viewModel.handleBackPress()
-        }
 
         LifecycleResumeEffect(Unit, lifecycleOwner = lifecycleOwner) {
             val job = coroutineScope.launch {
@@ -67,6 +62,14 @@ fun EntryProviderScope<NavKey>.deviceCenterScreen(
 
         var isSearchMode by rememberSaveable { mutableStateOf(false) }
 
+        // Auto-close search when info screen opens
+        LaunchedEffect(uiState.infoSelectedItem) {
+            if (uiState.infoSelectedItem != null && isSearchMode) {
+                isSearchMode = false
+                viewModel.onSearchCloseClicked()
+            }
+        }
+
         MegaScaffoldWithTopAppBarScrollBehavior(
             modifier = Modifier
                 .fillMaxSize()
@@ -78,7 +81,11 @@ fun EntryProviderScope<NavKey>.deviceCenterScreen(
                     selectedDevice = uiState.selectedDevice,
                     isSearchMode = isSearchMode,
                     onBackPressed = {
-                        navigationHandler.back()
+                        when {
+                            uiState.infoSelectedItem != null -> viewModel.onInfoBackPressHandle()
+                            uiState.selectedDevice != null -> viewModel.handleBackPress()
+                            else -> navigationHandler.back()
+                        }
                     },
                     onActionPressed = { menuAction ->
                         when (menuAction) {
@@ -172,17 +179,12 @@ fun EntryProviderScope<NavKey>.deviceCenterScreen(
                 paddingValues = innerPadding,
             )
             uiState.infoSelectedItem?.let { selectedItem ->
-                val animatedNavController = rememberNavController()
-                NavHost(
-                    navController = animatedNavController,
-                    startDestination = DeviceCenter,
-                ) {
-                    deviceCenterInfoNavGraph(
-                        navController = animatedNavController,
-                        selectedItem = selectedItem,
-                        onBackPressHandled = viewModel::onInfoBackPressHandle
-                    )
-                }
+                DeviceCenterInfoScreenRouteM3(
+                    viewModel = hiltViewModel(),
+                    selectedItem = selectedItem,
+                    onBackPressHandled = viewModel::onInfoBackPressHandle,
+                    paddingValues = innerPadding,
+                )
             }
         }
     }

@@ -141,13 +141,9 @@ internal class DeviceCenterViewModel @Inject constructor(
      */
     fun handleBackPress() {
         _state.update {
-            it.copy(
-                menuClickedDevice = null,
-                searchWidgetState = SearchWidgetState.COLLAPSED,
-                searchQuery = "",
-                filteredUiItems = null
-            )
+            it.copy(menuClickedDevice = null)
         }
+        resetSearchState()
         if (_state.value.deviceToRename != null) {
             // The Rename Device feature is shown. Mark deviceToRename as null to dismiss the feature
             _state.update { it.copy(deviceToRename = null) }
@@ -209,36 +205,22 @@ internal class DeviceCenterViewModel @Inject constructor(
 
     fun onSearchQueryChanged(query: String) {
         _state.update { it.copy(searchQuery = query) }
-        query.takeIf(String::isNotBlank)?.let { searchQuery ->
-            _state.update {
-                it.copy(
-                    filteredUiItems = it.itemsToDisplay.filter { item ->
-                        item.name.contains(
-                            searchQuery,
-                            true
-                        ) || (item is NonBackupDeviceFolderUINode && item.localFolderPath.contains(
-                            searchQuery,
-                            true
+
+        val filteredItems = if (query.isNotBlank()) {
+            _state.value.itemsToDisplay.filter { item ->
+                item.name.contains(query, ignoreCase = true) ||
+                        (item is NonBackupDeviceFolderUINode && item.localFolderPath.contains(
+                            query,
+                            ignoreCase = true
                         ))
-                    }
-                )
             }
-        } ?: run {
-            _state.update {
-                it.copy(
-                    filteredUiItems = null
-                )
-            }
-        }
+        } else null
+
+        _state.update { it.copy(filteredUiItems = filteredItems) }
     }
 
     fun onSearchCloseClicked() {
-        _state.update {
-            it.copy(
-                filteredUiItems = null,
-                searchWidgetState = SearchWidgetState.COLLAPSED
-            )
-        }
+        resetSearchState()
     }
 
     fun onSearchClicked() {
@@ -250,6 +232,19 @@ internal class DeviceCenterViewModel @Inject constructor(
 
     fun onInfoBackPressHandle() =
         _state.update { it.copy(infoSelectedItem = null) }
+
+    /**
+     * Resets the search-related state properties
+     */
+    private fun resetSearchState() {
+        _state.update {
+            it.copy(
+                searchWidgetState = SearchWidgetState.COLLAPSED,
+                searchQuery = "",
+                filteredUiItems = null
+            )
+        }
+    }
 
     companion object {
         /**

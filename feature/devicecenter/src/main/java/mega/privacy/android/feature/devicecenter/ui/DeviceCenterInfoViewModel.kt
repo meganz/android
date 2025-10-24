@@ -8,8 +8,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterInfoUiState
@@ -39,6 +41,7 @@ internal class DeviceCenterInfoViewModel @Inject constructor(
     fun setSelectedItem(selectedItem: DeviceCenterUINode) {
         if (selectedItem != this.selectedItem) {
             this.selectedItem = selectedItem
+            Timber.d("Selected item set: $selectedItem")
             loadInfo()
         }
     }
@@ -50,21 +53,22 @@ internal class DeviceCenterInfoViewModel @Inject constructor(
                     it.copy(
                         name = name,
                         icon = icon.iconRes,
-                        applySecondaryColorIconTint = item is DeviceUINode
+                        applySecondaryColorIconTint = item is DeviceUINode,
+                        // Reset all numeric fields to 0 when loading new item
+                        numberOfFiles = 0,
+                        numberOfFolders = 0,
+                        totalSizeInBytes = 0L,
+                        creationTime = 0L
                     )
                 }
 
                 when (item) {
                     is DeviceUINode -> {
-                        (item as? DeviceUINode)?.let { device ->
-                            loadDeviceInfo(device = device)
-                        }
+                        loadDeviceInfo(device = item)
                     }
 
                     is DeviceFolderUINode -> {
-                        (item as? DeviceFolderUINode)?.let { folder ->
-                            loadFolderInfo(folderHandle = folder.rootHandle)
-                        }
+                        loadFolderInfo(folderHandle = item.rootHandle)
                     }
 
                     else -> {}
@@ -85,23 +89,48 @@ internal class DeviceCenterInfoViewModel @Inject constructor(
      * @param folderHandle Handle of the device folder to load the info
      */
     private fun loadDeviceFolderInfo(folderHandle: Long) {
+        loadFolderTreeInfoForNode(folderHandle)
+    }
+
+    /**
+     * Load folder info
+     *
+     * @param folderHandle Handle of the folder to load the info
+     */
+    private fun loadFolderInfo(folderHandle: Long) {
+        loadFolderTreeInfoForNode(
+            folderHandle = folderHandle,
+            adjustFolderCount = -1,
+            onNodeLoaded = { folder ->
+                _state.update { state ->
+                    state.copy(creationTime = folder.creationTime)
+                }
+            }
+        )
+    }
+
+    /**
+     * Common function to load folder tree info for a given node handle
+     *
+     * @param folderHandle Handle of the folder to load the info
+     * @param adjustFolderCount Adjustment to folder count (default 0)
+     * @param onNodeLoaded Optional callback when node is loaded
+     */
+    private fun loadFolderTreeInfoForNode(
+        folderHandle: Long,
+        adjustFolderCount: Int = 0,
+        onNodeLoaded: ((TypedNode) -> Unit)? = null,
+    ) {
         viewModelScope.launch {
             runCatching {
                 getNodeByIdUseCase(NodeId(folderHandle))
             }.onSuccess { node ->
                 node?.let { folder ->
+                    onNodeLoaded?.invoke(folder)
                     runCatching {
                         getFolderTreeInfo(folder as TypedFolderNode)
                     }.onSuccess { folderTreeInfo ->
-                        with(folderTreeInfo) {
-                            _state.update { state ->
-                                state.copy(
-                                    numberOfFiles = state.numberOfFiles + numberOfFiles,
-                                    numberOfFolders = state.numberOfFolders + numberOfFolders,
-                                    totalSizeInBytes = state.totalSizeInBytes + totalCurrentSizeInBytes,
-                                )
-                            }
-                        }
+                        updateFolderTreeStats(folderTreeInfo, adjustFolderCount)
                     }.onFailure {
                         Timber.e(it)
                     }
@@ -113,37 +142,22 @@ internal class DeviceCenterInfoViewModel @Inject constructor(
     }
 
     /**
-     * Load folder info
+     * Updates folder tree statistics in the state
      *
-     * @param folderHandle Handle of the folder to load the info
+     * @param folderTreeInfo The folder tree information
+     * @param adjustFolderCount Adjustment to folder count (default 0)
      */
-    private fun loadFolderInfo(folderHandle: Long) {
-        viewModelScope.launch {
-            runCatching {
-                getNodeByIdUseCase(NodeId(folderHandle))
-            }.onSuccess { node ->
-                node?.let { folder ->
-                    _state.update { state ->
-                        state.copy(creationTime = folder.creationTime)
-                    }
-                    runCatching {
-                        getFolderTreeInfo(folder as TypedFolderNode)
-                    }.onSuccess { folderTreeInfo ->
-                        with(folderTreeInfo) {
-                            _state.update { state ->
-                                state.copy(
-                                    numberOfFiles = state.numberOfFiles + numberOfFiles,
-                                    numberOfFolders = state.numberOfFolders + numberOfFolders - 1,
-                                    totalSizeInBytes = state.totalSizeInBytes + totalCurrentSizeInBytes,
-                                )
-                            }
-                        }
-                    }.onFailure {
-                        Timber.e(it)
-                    }
-                }
-            }.onFailure {
-                Timber.e(it)
+    private fun updateFolderTreeStats(
+        folderTreeInfo: FolderTreeInfo,
+        adjustFolderCount: Int = 0,
+    ) {
+        with(folderTreeInfo) {
+            _state.update { state ->
+                state.copy(
+                    numberOfFiles = state.numberOfFiles + numberOfFiles,
+                    numberOfFolders = state.numberOfFolders + numberOfFolders + adjustFolderCount,
+                    totalSizeInBytes = state.totalSizeInBytes + totalCurrentSizeInBytes,
+                )
             }
         }
     }

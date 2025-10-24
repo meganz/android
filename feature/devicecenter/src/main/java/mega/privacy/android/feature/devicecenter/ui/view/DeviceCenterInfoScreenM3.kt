@@ -1,25 +1,22 @@
-package mega.privacy.android.feature.devicecenter.ui
+package mega.privacy.android.feature.devicecenter.ui.view
 
 import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -27,80 +24,72 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.components.surface.ThemedSurface
+import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterInfoUiState
 import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
-import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
- * Test tags for the Device Center Info View
+ * Test tag for the Device Center Info View icon in M3
  */
-internal const val DEVICE_CENTER_INFO_VIEW_TOOLBAR = "device_center_info_view:mega_app_bar"
-internal const val DEVICE_CENTER_INFO_VIEW_ICON_TAG = "device_center_info_view:icon_tag"
+internal const val DEVICE_CENTER_INFO_VIEW_ICON_TAG_M3 = "device_center_info_view_m3:icon_tag"
 
 /**
- * A [Composable] that serves as the Info Screen for items (Devices or Folders) in the Device Center
+ * Material 3 version of the Device Center Info Screen
+ *
+ * This version does NOT include its own AppBar - it relies on the parent's DeviceCenterAppBarM3
+ * to display the correct title.
  *
  * @param uiState The UI State
  * @param onBackPressHandled Lambda that performs a specific action when the Composable handles the Back Press
+ * @param paddingValues Padding values from the parent scaffold
  */
 @Composable
-internal fun DeviceCenterInfoScreen(
+internal fun DeviceCenterInfoScreenM3(
     uiState: DeviceCenterInfoUiState,
     onBackPressHandled: () -> Unit,
+    paddingValues: PaddingValues = PaddingValues(),
 ) {
-    val scaffoldState = rememberScaffoldState()
-
     // Handle hardware/gesture back press - this takes precedence over parent BackHandlers
     BackHandler(enabled = true) {
         onBackPressHandled()
     }
 
-    MegaScaffold(
-        scaffoldState = scaffoldState,
-        topBar = {
-            MegaAppBar(
-                modifier = Modifier.testTag(DEVICE_CENTER_INFO_VIEW_TOOLBAR),
-                appBarType = AppBarType.BACK_NAVIGATION,
-                title = String(),
-                elevation = 0.dp,
-                windowInsets = WindowInsets(0.dp),
-                onNavigationPressed = { onBackPressHandled() },
-            )
-        },
-        content = { paddingValues ->
-            DeviceCenterInfoScreenContent(
-                uiState = uiState,
-                modifier = Modifier.padding(paddingValues),
-            )
-        },
-    )
+    ThemedSurface(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+    ) {
+        DeviceCenterInfoScreenContentM3(
+            uiState = uiState,
+            modifier = Modifier.fillMaxSize(),
+        )
+    }
 }
 
 @Composable
-private fun DeviceCenterInfoScreenContent(
+private fun DeviceCenterInfoScreenContentM3(
     uiState: DeviceCenterInfoUiState,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier.fillMaxSize()
     ) {
-        IconAndTitleRow(
+        IconAndTitleRowM3(
             icon = uiState.icon,
             applySecondaryColorIconTint = uiState.applySecondaryColorIconTint,
             name = uiState.name
         )
         if (uiState.creationTime > 0) {
-            InfoRow(
+            InfoRowM3(
                 title = stringResource(id = sharedR.string.info_added),
                 info = formatModifiedDate(
                     locale = java.util.Locale(
@@ -130,13 +119,13 @@ private fun DeviceCenterInfoScreenContent(
                     count = uiState.numberOfFiles, uiState.numberOfFiles,
                 )
             }
-            InfoRow(
+            InfoRowM3(
                 title = stringResource(id = sharedR.string.info_content),
                 info = content,
             )
         }
         if (uiState.totalSizeInBytes > 0) {
-            InfoRow(
+            InfoRowM3(
                 title = stringResource(id = sharedR.string.info_total_size),
                 info = formatFileSize(
                     size = uiState.totalSizeInBytes,
@@ -148,7 +137,7 @@ private fun DeviceCenterInfoScreenContent(
 }
 
 @Composable
-private fun IconAndTitleRow(
+private fun IconAndTitleRowM3(
     @DrawableRes icon: Int,
     applySecondaryColorIconTint: Boolean,
     name: String,
@@ -161,33 +150,27 @@ private fun IconAndTitleRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Image(
+        MegaIcon(
             modifier = Modifier
                 .padding(end = 4.dp)
                 .size(48.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .testTag(DEVICE_CENTER_INFO_VIEW_ICON_TAG),
+                .testTag(DEVICE_CENTER_INFO_VIEW_ICON_TAG_M3),
             painter = painterResource(id = icon),
             contentDescription = "Item icon",
-            colorFilter = if (applySecondaryColorIconTint) {
-                // Temporary fix in order to fix icon color until we change to the new icon set.
-                // Will be removed soon
-                ColorFilter.tint(MaterialTheme.colors.textColorSecondary)
-            } else {
-                null
-            }
+            tint = if (applySecondaryColorIconTint) IconColor.Secondary else IconColor.Primary,
         )
 
         MegaText(
             text = name,
             textColor = TextColor.Primary,
-            style = MaterialTheme.typography.subtitle1
+            style = MaterialTheme.typography.titleMedium
         )
     }
 }
 
 @Composable
-private fun InfoRow(
+private fun InfoRowM3(
     title: String,
     info: String,
     modifier: Modifier = Modifier,
@@ -201,21 +184,21 @@ private fun InfoRow(
             text = title,
             textColor = TextColor.Primary,
             modifier = Modifier.padding(bottom = 2.dp),
-            style = MaterialTheme.typography.subtitle1
+            style = MaterialTheme.typography.bodyLarge
         )
         MegaText(
             text = info,
             textColor = TextColor.Secondary,
-            style = MaterialTheme.typography.subtitle2
+            style = MaterialTheme.typography.bodyMedium
         )
     }
 }
 
 @CombinedThemePreviews
 @Composable
-private fun DeviceCenterInfoScreenDevicePreview() {
+private fun DeviceCenterInfoScreenM3DevicePreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
-        DeviceCenterInfoScreen(
+        DeviceCenterInfoScreenM3(
             uiState = DeviceCenterInfoUiState(
                 icon = IconPackR.drawable.ic_pc_medium_solid,
                 applySecondaryColorIconTint = true,
@@ -231,9 +214,9 @@ private fun DeviceCenterInfoScreenDevicePreview() {
 
 @CombinedThemePreviews
 @Composable
-private fun DeviceCenterInfoScreenFolderPreview() {
+private fun DeviceCenterInfoScreenM3FolderPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
-        DeviceCenterInfoScreen(
+        DeviceCenterInfoScreenM3(
             uiState = DeviceCenterInfoUiState(
                 icon = IconPackR.drawable.ic_folder_medium_solid,
                 name = "Folder name",

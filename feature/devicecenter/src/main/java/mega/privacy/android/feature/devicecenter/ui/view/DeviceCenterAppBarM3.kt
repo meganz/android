@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
+import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUiState
@@ -30,23 +31,34 @@ internal fun DeviceCenterAppBarM3(
     onSearchQueryChanged: (String) -> Unit,
     onSearchModeChanged: (Boolean) -> Unit,
 ) {
-    MegaSearchTopAppBar(
-        navigationType = AppBarNavigationType.Back(
-            onNavigationIconClicked = onBackPressed
-        ),
-        title = selectedDevice?.name
-            ?: stringResource(R.string.device_center_top_app_bar_title),
-        query = uiState.searchQuery,
-        onQueryChanged = onSearchQueryChanged,
-        isSearchingMode = isSearchMode,
-        onSearchingModeChanged = onSearchModeChanged,
-        searchPlaceholder = if (uiState.itemsToDisplay.any { it is DeviceUINode }) {
-            stringResource(R.string.device_center_top_app_bar_search_devices_hint)
-        } else {
-            stringResource(R.string.device_center_top_app_bar_search_syncs_hint)
-        },
-        //actions = buildActionsList(selectedDevice, uiState, onActionPressed), Todo Add Core Ui components for actions without icons
-    )
+    // When info screen is open, use simple AppBar without title or search
+    if (uiState.infoSelectedItem != null) {
+        MegaTopAppBar(
+            navigationType = AppBarNavigationType.Back(
+                onNavigationIconClicked = onBackPressed
+            ),
+            title = "",
+        )
+    } else {
+        // Otherwise, use search-enabled AppBar
+        MegaSearchTopAppBar(
+            navigationType = AppBarNavigationType.Back(
+                onNavigationIconClicked = onBackPressed
+            ),
+            title = selectedDevice?.name
+                ?: stringResource(R.string.device_center_top_app_bar_title),
+            query = uiState.searchQuery,
+            onQueryChanged = onSearchQueryChanged,
+            isSearchingMode = isSearchMode,
+            onSearchingModeChanged = onSearchModeChanged,
+            searchPlaceholder = if (uiState.itemsToDisplay.any { it is DeviceUINode }) {
+                stringResource(R.string.device_center_top_app_bar_search_devices_hint)
+            } else {
+                stringResource(R.string.device_center_top_app_bar_search_syncs_hint)
+            },
+            //actions = buildActionsList(selectedDevice, uiState, onActionPressed), Todo Add Core Ui components for actions without icons
+        )
+    }
 }
 
 // Todo Add Core Ui components for actions without icons

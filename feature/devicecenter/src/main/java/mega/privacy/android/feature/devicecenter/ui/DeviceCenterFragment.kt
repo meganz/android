@@ -20,12 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -33,9 +32,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.feature.devicecenter.navigation.DeviceCenter
-import mega.privacy.android.feature.devicecenter.navigation.deviceCenterInfoNavGraph
-import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
+import mega.privacy.android.feature.devicecenter.navigation.DeviceCenterInfoScreenRoute
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceMenuAction
 import mega.privacy.android.feature.devicecenter.ui.view.DeviceCenterScreen
 import mega.privacy.android.navigation.MegaNavigator
@@ -213,18 +210,12 @@ class DeviceCenterFragment : Fragment() {
                                 .background(MaterialTheme.colors.background)
                         )
                     }
-                    if (uiState.infoSelectedItem != null) {
-                        val animatedNavController = rememberNavController()
-                        NavHost(
-                            navController = animatedNavController,
-                            startDestination = DeviceCenter,
-                        ) {
-                            deviceCenterInfoNavGraph(
-                                navController = animatedNavController,
-                                selectedItem = uiState.infoSelectedItem as DeviceCenterUINode,
-                                onBackPressHandled = viewModel::onInfoBackPressHandle
-                            )
-                        }
+                    uiState.infoSelectedItem?.let { selectedItem ->
+                        DeviceCenterInfoScreenRoute(
+                            viewModel = hiltViewModel(),
+                            selectedItem = selectedItem,
+                            onBackPressHandled = viewModel::onInfoBackPressHandle
+                        )
                     }
                 }
             }

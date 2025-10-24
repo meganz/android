@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.devicecenter.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.feature.devicecenter.ui.DeviceCenterInfoScreen
 import mega.privacy.android.feature.devicecenter.ui.DeviceCenterInfoViewModel
@@ -13,7 +14,9 @@ internal fun DeviceCenterInfoScreenRoute(
     onBackPressHandled: () -> Unit,
 ) {
     val uiState = viewModel.state.collectAsStateWithLifecycle()
-    viewModel.setSelectedItem(selectedItem)
+    LaunchedEffect(selectedItem) {
+        viewModel.setSelectedItem(selectedItem)
+    }
 
     DeviceCenterInfoScreen(uiState = uiState.value, onBackPressHandled = onBackPressHandled)
 }
