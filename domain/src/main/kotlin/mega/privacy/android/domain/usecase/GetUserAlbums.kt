@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.photos.Album
 /**
  * Get user albums use case.
  */
+@Deprecated("Use MonitorMediaAlbumsUseCase instead")
 fun interface GetUserAlbums {
     /**
      * Get user albums.

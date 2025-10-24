@@ -5,6 +5,7 @@ package mega.privacy.android.domain.entity.photos
  *
  * @constructor Create empty Entity album
  */
+@Deprecated("Use MediaAlbum instead")
 sealed interface Album {
     /**
      * Favourite
