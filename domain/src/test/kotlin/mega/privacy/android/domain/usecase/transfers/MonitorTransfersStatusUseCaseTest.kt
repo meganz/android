@@ -184,18 +184,20 @@ internal class MonitorTransfersStatusUseCaseTest {
 
 
     private fun stubActiveTransfersFlows(paused: Boolean = false) =
-        TransferType.entries.filterNot { it == TransferType.NONE }.associateWith { type ->
-            MutableStateFlow(
-                MonitorOngoingActiveTransfersResult(
-                    activeTransferTotals = emptyActiveTransferTotals(type),
-                    paused = paused,
-                    storageOverQuota = false,
-                    transfersOverQuota = false,
-                )
-            ).also { flow ->
-                whenever(monitorOngoingActiveTransfersUseCase(type)) doReturn flow
+        TransferType.entries
+            .filterNot { it == TransferType.NONE || it == TransferType.CU_UPLOAD }
+            .associateWith { type ->
+                MutableStateFlow(
+                    MonitorOngoingActiveTransfersResult(
+                        activeTransferTotals = emptyActiveTransferTotals(type),
+                        paused = paused,
+                        storageOverQuota = false,
+                        transfersOverQuota = false,
+                    )
+                ).also { flow ->
+                    whenever(monitorOngoingActiveTransfersUseCase(type)) doReturn flow
+                }
             }
-        }
 
     private fun emptyActiveTransferTotals(type: TransferType) = ActiveTransferTotals(
         transfersType = type,

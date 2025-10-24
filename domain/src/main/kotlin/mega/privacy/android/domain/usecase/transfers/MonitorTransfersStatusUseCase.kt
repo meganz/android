@@ -23,33 +23,36 @@ class MonitorTransfersStatusUseCase @Inject constructor(
      */
 
     operator fun invoke(): Flow<TransfersStatusInfo> =
-        combine(TransferType.entries.filter { it != TransferType.NONE }.map {
-            monitorOngoingActiveTransfersUseCase(it).map { results ->
-                val totalsWithoutPreviews = results.activeTransferTotals.let { totals ->
-                    totals.actionGroups.filter { group -> group.isPreviewDownload() }
-                        .let { previewGroups ->
-                            totals.copy(
-                                totalFileTransfers = totals.totalFileTransfers
-                                        - previewGroups.sumOf { group -> group.totalFiles },
-                                totalFinishedFileTransfers = totals.totalFinishedTransfers
-                                        - previewGroups.sumOf { group -> group.finishedFiles },
-                                totalCompletedFileTransfers = totals.totalCompletedFileTransfers
-                                        - previewGroups.sumOf { group -> group.completedFiles },
-                                totalBytes = totals.totalBytes
-                                        - previewGroups.sumOf { group -> group.totalBytes },
-                                transferredBytes = totals.transferredBytes
-                                        - previewGroups.sumOf { group -> group.transferredBytes },
-                                totalAlreadyTransferredFiles = totals.totalAlreadyTransferredFiles
-                                        - previewGroups.sumOf { group -> group.alreadyTransferred },
-                                actionGroups = totals.actionGroups
-                                    .filterNot { group -> group.isPreviewDownload() }
-                            )
+        combine(
+            TransferType.entries
+                .filterNot { it == TransferType.NONE || it == TransferType.CU_UPLOAD }
+                .map {
+                    monitorOngoingActiveTransfersUseCase(it).map { results ->
+                        val totalsWithoutPreviews = results.activeTransferTotals.let { totals ->
+                            totals.actionGroups.filter { group -> group.isPreviewDownload() }
+                                .let { previewGroups ->
+                                    totals.copy(
+                                        totalFileTransfers = totals.totalFileTransfers
+                                                - previewGroups.sumOf { group -> group.totalFiles },
+                                        totalFinishedFileTransfers = totals.totalFinishedTransfers
+                                                - previewGroups.sumOf { group -> group.finishedFiles },
+                                        totalCompletedFileTransfers = totals.totalCompletedFileTransfers
+                                                - previewGroups.sumOf { group -> group.completedFiles },
+                                        totalBytes = totals.totalBytes
+                                                - previewGroups.sumOf { group -> group.totalBytes },
+                                        transferredBytes = totals.transferredBytes
+                                                - previewGroups.sumOf { group -> group.transferredBytes },
+                                        totalAlreadyTransferredFiles = totals.totalAlreadyTransferredFiles
+                                                - previewGroups.sumOf { group -> group.alreadyTransferred },
+                                        actionGroups = totals.actionGroups
+                                            .filterNot { group -> group.isPreviewDownload() }
+                                    )
+                                }
                         }
-                }
 
-                results.copy(activeTransferTotals = totalsWithoutPreviews)
-            }
-        }) { monitorOngoingActiveTransfersResults ->
+                        results.copy(activeTransferTotals = totalsWithoutPreviews)
+                    }
+                }) { monitorOngoingActiveTransfersResults ->
             TransfersStatusInfo(
                 totalSizeToTransfer = monitorOngoingActiveTransfersResults.sumOf { it.activeTransferTotals.totalBytes },
                 totalSizeTransferred = monitorOngoingActiveTransfersResults.sumOf { it.activeTransferTotals.transferredBytes },
@@ -64,9 +67,9 @@ class MonitorTransfersStatusUseCase @Inject constructor(
                         it.isNotEmpty() && it.all { it.paused }
                     },
                 transferOverQuota =
-                monitorOngoingActiveTransfersResults.any { it.transfersOverQuota },
+                    monitorOngoingActiveTransfersResults.any { it.transfersOverQuota },
                 storageOverQuota =
-                monitorOngoingActiveTransfersResults.any { it.storageOverQuota },
+                    monitorOngoingActiveTransfersResults.any { it.storageOverQuota },
                 cancelled = monitorOngoingActiveTransfersResults.sumOf { it.activeTransferTotals.totalCancelled }
             )
         }

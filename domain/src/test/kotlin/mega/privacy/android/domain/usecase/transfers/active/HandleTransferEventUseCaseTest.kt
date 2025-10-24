@@ -193,8 +193,17 @@ class HandleTransferEventUseCaseTest {
     fun `test that invoke call updateTransferredBytes with the related transfer when the event is a update or finish event`(
         transferEvent: TransferEvent,
     ) = runTest {
+        val expected: List<Transfer> = transferEvent.transfer
+            .takeIf { it.transferType != TransferType.CU_UPLOAD }
+            ?.let { listOf(it) } ?: emptyList()
+
         underTest.invoke(transferEvent)
-        verify(transferRepository).updateTransferredBytes(listOf(transferEvent.transfer))
+
+        if (expected.isEmpty()) {
+            verify(transferRepository, never()).updateTransferredBytes(expected)
+        } else {
+            verify(transferRepository).updateTransferredBytes(expected)
+        }
     }
 
     @ParameterizedTest
@@ -211,8 +220,17 @@ class HandleTransferEventUseCaseTest {
     fun `test that invoke call addCompletedTransfers when the event is a finish event`(
         transferEvent: TransferEvent.TransferFinishEvent,
     ) = runTest {
+        val expected: List<TransferEvent.TransferFinishEvent> = transferEvent
+            .takeIf { it.transfer.transferType != TransferType.CU_UPLOAD }
+            ?.let { listOf(it) } ?: emptyList()
+
         underTest.invoke(transferEvent)
-        verify(transferRepository).addCompletedTransfers(eq(listOf(transferEvent)))
+
+        if (expected.isEmpty()) {
+            verify(transferRepository, never()).addCompletedTransfers(eq(expected))
+        } else {
+            verify(transferRepository).addCompletedTransfers(eq(expected))
+        }
     }
 
     @Test
@@ -308,9 +326,19 @@ class HandleTransferEventUseCaseTest {
     fun `test that updateInProgressTransfers in repository is invoked when start, pause or update event is received`(
         transferEvent: TransferEvent,
     ) = runTest {
+        val expected: List<Transfer> = transferEvent.transfer
+            .takeIf { it.transferType != TransferType.CU_UPLOAD }
+            ?.let { listOf(it) } ?: emptyList()
+
         underTest(transferEvent)
-        verify(transferRepository)
-            .updateInProgressTransfers(eq(listOf(transferEvent.transfer)), eq(emptyList()))
+
+        if (expected.isEmpty()) {
+            verify(transferRepository, never())
+                .updateInProgressTransfers(eq(expected), eq(emptyList()))
+        } else {
+            verify(transferRepository)
+                .updateInProgressTransfers(eq(expected), eq(emptyList()))
+        }
     }
 
     @ParameterizedTest
@@ -318,9 +346,19 @@ class HandleTransferEventUseCaseTest {
     fun `test that updateInProgressTransfers in repository is invoked when finish event is received`(
         transferEvent: TransferEvent,
     ) = runTest {
+        val expected: List<Long> = transferEvent.transfer
+            .takeIf { it.transferType != TransferType.CU_UPLOAD }
+            ?.let { listOf(it.uniqueId) } ?: emptyList()
+
         underTest(transferEvent)
-        verify(transferRepository)
-            .updateInProgressTransfers(emptyList(), listOf(transferEvent.transfer.uniqueId))
+
+        if (expected.isEmpty()) {
+            verify(transferRepository, never())
+                .updateInProgressTransfers(emptyList(), expected)
+        } else {
+            verify(transferRepository)
+                .updateInProgressTransfers(emptyList(), expected)
+        }
     }
 
     @ParameterizedTest

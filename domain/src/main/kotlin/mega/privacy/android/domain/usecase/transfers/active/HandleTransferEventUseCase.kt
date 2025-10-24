@@ -67,13 +67,15 @@ class HandleTransferEventUseCase @Inject internal constructor(
                         || it.isBackgroundTransfer()
                         || it.isFolderTransfer
                         || it.isPreviewDownload()
+                        || it.transferType == TransferType.CU_UPLOAD
             }.partition { it.isFinished }
 
-            if (transfersToUpdate.isEmpty() && transfersToRemove.isEmpty()) return
+            if (transfersToUpdate.isNotEmpty() || transfersToRemove.isNotEmpty()) {
+                transferRepository.updateInProgressTransfers(
+                    transfersToUpdate = transfersToUpdate,
+                    finishedUniqueIds = transfersToRemove.map { it.uniqueId })
+            }
 
-            val finishedUniqueIds = transfersToRemove.map { it.uniqueId }
-
-            transferRepository.updateInProgressTransfers(transfersToUpdate, finishedUniqueIds)
             updateCameraUploadsInProgressTransfers(transfers)
         }
     }
@@ -100,8 +102,16 @@ class HandleTransferEventUseCase @Inject internal constructor(
         events.filterByType(
             update = true,
             finish = true
-        )?.map { it.transfer }?.let {
-            transferRepository.updateTransferredBytes(it)
+        )?.mapNotNull {
+            if (it.transfer.transferType != TransferType.CU_UPLOAD) {
+                it.transfer
+            } else {
+                null
+            }
+        }?.let { transfers ->
+            if (transfers.isNotEmpty()) {
+                transferRepository.updateTransferredBytes(transfers)
+            }
         }
     }
 
@@ -182,24 +192,27 @@ class HandleTransferEventUseCase @Inject internal constructor(
     }
 
     private suspend fun checkCompletedTransfers(events: List<TransferEvent>) {
-        events
-            .filterNot { it.transfer.isFolderTransfer || it.transfer.isPreviewDownload() }
-            .filterIsInstance<TransferEvent.TransferFinishEvent>()
-            .let { completedEvents ->
-                if (completedEvents.isNotEmpty()) {
-                    val (failed, completed) = completedEvents.partition { it.error != null }
-                    val recentFailed = failed.takeLast(MAX_COMPLETED_TRANSFERS)
-                    val recentCompleted = completed.takeLast(MAX_COMPLETED_TRANSFERS)
-
-                    transferRepository.addCompletedTransfers(recentFailed + recentCompleted)
-                    removeCameraUploadsInProgressTransfers(completedEvents)
-                }
+        val (cameraUploadsEvents, manualTransferEvents) = events
+            .filterNot {
+                it.transfer.transferType == TransferType.CU_UPLOAD
+                        || it.transfer.isFolderTransfer
+                        || it.transfer.isPreviewDownload()
             }
+            .filterIsInstance<TransferEvent.TransferFinishEvent>()
+            .partition { it.transfer.transferType == TransferType.CU_UPLOAD }
+
+        if (manualTransferEvents.isNotEmpty()) {
+            val (failed, completed) = manualTransferEvents.partition { it.error != null }
+            val recentFailed = failed.takeLast(MAX_COMPLETED_TRANSFERS)
+            val recentCompleted = completed.takeLast(MAX_COMPLETED_TRANSFERS)
+
+            transferRepository.addCompletedTransfers(recentFailed + recentCompleted)
+        }
+
+        removeCameraUploadsInProgressTransfers(cameraUploadsEvents)
     }
 
-    private suspend fun removeCameraUploadsInProgressTransfers(events: List<TransferEvent>) {
-        val cameraUploadsEvents =
-            events.filter { it.transfer.transferType == TransferType.CU_UPLOAD }
+    private suspend fun removeCameraUploadsInProgressTransfers(cameraUploadsEvents: List<TransferEvent>) {
         if (cameraUploadsEvents.isNotEmpty()) {
             cameraUploadsRepository.removeCameraUploadsInProgressTransfers(
                 cameraUploadsEvents.map { it.transfer.uniqueId }.toSet()
