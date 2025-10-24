@@ -99,6 +99,7 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.PhotoScreenEvent
@@ -161,6 +162,9 @@ class PhotosFragment : Fragment() {
 
     @Inject
     lateinit var fileTypeIconMapper: FileTypeIconMapper
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val cameraUploadsPermissions: Array<String> by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -277,6 +281,9 @@ class PhotosFragment : Fragment() {
                                         putExtra(INTENT_EXTRA_KEY_SHOW_HOW_TO_UPLOAD_PROMPT, true)
                                     }
                                 )
+                            },
+                            onNavigateUpgradeScreen = {
+                                megaNavigator.openUpgradeAccount(requireContext())
                             }
                         )
                     }
@@ -318,9 +325,10 @@ class PhotosFragment : Fragment() {
     private fun checkCameraUploadsPermissions(showAction: Boolean = false) {
         val hasPermissions = PermissionUtils.hasPermissions(context, *cameraUploadsPermissions)
         timelineViewModel.setCameraUploadsLimitedAccess(isLimitedAccess = !hasPermissions)
-        val isWarningShown = !hasPermissions || timelineViewModel.shouldShowWarningMenu()
-        timelineViewModel.setCameraUploadsWarningMenu(isVisible = isWarningShown)
-        timelineViewModel.updateIsWarningBannerShown(isShown = isWarningShown)
+        val showWarningMenu = !hasPermissions || timelineViewModel.shouldShowWarningMenu()
+        val showWarningBanner = !hasPermissions || timelineViewModel.shouldShowWarningBanner()
+        timelineViewModel.setCameraUploadsWarningMenu(isVisible = showWarningMenu)
+        timelineViewModel.updateIsWarningBannerShown(isShown = showWarningBanner)
 
         if (!hasPermissions && showAction) {
             timelineViewModel.showCameraUploadsChangePermissionsMessage(true)

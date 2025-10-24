@@ -32,6 +32,7 @@ class TimelineViewTest {
         onNavigateToCameraUploadsSettings: () -> Unit = {},
         onWarningBannerDismissed: () -> Unit = {},
         onNavigateMobileDataSetting: () -> Unit = {},
+        onNavigateUpgradeScreen: () -> Unit = {},
     ) {
         composeRule.setContent {
             CameraUploadsBanners(
@@ -45,6 +46,7 @@ class TimelineViewTest {
                 onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
                 onWarningBannerDismissed = onWarningBannerDismissed,
                 onNavigateMobileDataSetting = onNavigateMobileDataSetting,
+                onNavigateUpgradeScreen = onNavigateUpgradeScreen,
             )
         }
     }
@@ -281,8 +283,7 @@ class TimelineViewTest {
 
         composeRule.onNodeWithTag(
             TIMELINE_CAMERA_UPLOADS_NETWORK_REQUIREMENT_NOT_MET_BANNER_TEST_TAG
-        )
-            .assertIsDisplayed()
+        ).assertIsDisplayed()
     }
 
     @Test

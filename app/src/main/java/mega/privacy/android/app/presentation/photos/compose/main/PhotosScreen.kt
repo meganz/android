@@ -78,6 +78,7 @@ fun PhotosScreen(
     onChangeCameraUploadsPermissions: () -> Unit,
     onNavigateCameraUploadsTransferScreen: () -> Unit,
     onNavigateMobileDataSetting: () -> Unit,
+    onNavigateUpgradeScreen: () -> Unit,
 ) {
     val photosViewState by photosViewModel.state.collectAsStateWithLifecycle()
     val timelineViewState by timelineViewModel.state.collectAsStateWithLifecycle()
@@ -152,17 +153,20 @@ fun PhotosScreen(
         isScrollingDown,
         isScrolledToEnd,
         isScrolledToTop,
-        timelineLazyGridState.isScrollInProgress
+        timelineLazyGridState.isScrollInProgress,
+        timelineViewState.cameraUploadsFinishedReason,
     ) {
         val shouldShowBanner = (!isScrollingDown && !isScrolledToEnd) || isScrolledToTop
 
         isBannerShown = shouldShowBanner
 
-        if ((isScrollingDown || isScrolledToEnd) && timelineViewState.isWarningBannerShown) {
-            timelineViewModel.updateIsWarningBannerShown(false)
-        }
+        if (timelineViewState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA)
+            return@LaunchedEffect
 
         if (timelineLazyGridState.isScrollInProgress) {
+            if ((isScrollingDown || isScrolledToEnd) && timelineViewState.isWarningBannerShown) {
+                timelineViewModel.updateIsWarningBannerShown(false)
+            }
             isWarningBannerShown = shouldShowBanner
         }
     }
@@ -238,7 +242,8 @@ fun PhotosScreen(
                                     timelineViewModel.updateIsWarningBannerShown(false)
                                     isWarningBannerShown = false
                                 },
-                                onNavigateMobileDataSetting = onNavigateMobileDataSetting
+                                onNavigateMobileDataSetting = onNavigateMobileDataSetting,
+                                onNavigateUpgradeScreen = onNavigateUpgradeScreen
                             )
                         },
                     )
@@ -258,7 +263,8 @@ fun PhotosScreen(
                                 timelineViewModel.updateIsWarningBannerShown(false)
                                 isWarningBannerShown = false
                             },
-                            onNavigateMobileDataSetting = onNavigateMobileDataSetting
+                            onNavigateMobileDataSetting = onNavigateMobileDataSetting,
+                            onNavigateUpgradeScreen = onNavigateUpgradeScreen
                         )
 
                         EmptyState(
@@ -302,7 +308,8 @@ fun PhotosScreen(
                             timelineViewModel.updateIsWarningBannerShown(false)
                             isWarningBannerShown = false
                         },
-                        onNavigateMobileDataSetting = onNavigateMobileDataSetting
+                        onNavigateMobileDataSetting = onNavigateMobileDataSetting,
+                        onNavigateUpgradeScreen = onNavigateUpgradeScreen
                     )
                 }
             )
@@ -420,10 +427,14 @@ private fun getWarningBannerShown(
     timelineViewState: TimelineViewState,
 ) =
     when (bannerType) {
+        CameraUploadsBannerType.FullStorage ->
+            timelineViewState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA
+
         CameraUploadsBannerType.NetworkRequirementNotMet ->
             timelineViewState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
 
         CameraUploadsBannerType.NoFullAccess -> timelineViewState.isCameraUploadsLimitedAccess
+
         CameraUploadsBannerType.DeviceChargingNotMet ->
             timelineViewState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET
 

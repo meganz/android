@@ -310,6 +310,7 @@ internal fun CameraUploadsBanners(
     onNavigateToCameraUploadsSettings: () -> Unit,
     onWarningBannerDismissed: () -> Unit,
     onNavigateMobileDataSetting: () -> Unit,
+    onNavigateUpgradeScreen: () -> Unit,
 ) {
     val pendingCount = timelineViewState.pending
     val selectPhotoCount = timelineViewState.selectedPhotoCount
@@ -323,6 +324,7 @@ internal fun CameraUploadsBanners(
         CameraUploadsBannerType.DeviceChargingNotMet,
         CameraUploadsBannerType.LowBattery,
         CameraUploadsBannerType.NetworkRequirementNotMet,
+        CameraUploadsBannerType.FullStorage,
             -> {
             SlideBanner(visible = isWarningBannerShown) {
                 CameraUploadsWarningBanner(
@@ -330,7 +332,8 @@ internal fun CameraUploadsBanners(
                     onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
                     onWarningBannerDismissed = onWarningBannerDismissed,
                     onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
-                    onNavigateMobileDataSetting = onNavigateMobileDataSetting
+                    onNavigateMobileDataSetting = onNavigateMobileDataSetting,
+                    onNavigateUpgradeScreen = onNavigateUpgradeScreen
                 )
             }
         }
@@ -359,6 +362,10 @@ internal fun getCameraUploadsBannerType(
     return when {
         timelineViewState.enableCameraUploadButtonShowing && timelineViewState.selectedPhotoCount == 0 ->
             CameraUploadsBannerType.EnableCameraUploads
+
+        timelineViewState.isCUPausedWarningBannerEnabled &&
+                timelineViewState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA
+            -> CameraUploadsBannerType.FullStorage
 
         timelineViewState.isCUPausedWarningBannerEnabled &&
                 timelineViewState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
@@ -392,8 +399,15 @@ private fun CameraUploadsWarningBanner(
     onWarningBannerDismissed: () -> Unit,
     onNavigateToCameraUploadsSettings: () -> Unit,
     onNavigateMobileDataSetting: () -> Unit,
+    onNavigateUpgradeScreen: () -> Unit,
 ) {
-    if (bannerType != CameraUploadsBannerType.NONE) {
+    val shouldAutoCloseable =
+        bannerType !in listOf(
+            CameraUploadsBannerType.NONE,
+            CameraUploadsBannerType.FullStorage
+        )
+
+    if (shouldAutoCloseable) {
         LaunchedEffect(Unit) {
             delay(WARNING_BANNER_AUTO_HIDE_DELAY)
             onWarningBannerDismissed()
@@ -402,9 +416,10 @@ private fun CameraUploadsWarningBanner(
 
     when (bannerType) {
         CameraUploadsBannerType.NetworkRequirementNotMet ->
-            NetworkRequirementNotMetPausedBanner(
-                onNavigateMobileDataSetting = onNavigateMobileDataSetting,
-            )
+            NetworkRequirementNotMetPausedBanner(onNavigateMobileDataSetting = onNavigateMobileDataSetting)
+
+        CameraUploadsBannerType.FullStorage ->
+            FullStorageBanner(onUpgradeClicked = onNavigateUpgradeScreen)
 
         CameraUploadsBannerType.NoFullAccess -> {
             CameraUploadsNoFullAccessBanner(

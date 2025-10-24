@@ -241,13 +241,19 @@ class TimelineViewModel @Inject constructor(
                 getFeatureFlagValueUseCase(AppFeatures.CameraUploadsPausedWarningBanner)
             }.onSuccess { isEnabled ->
                 _state.update { currentState ->
+                    val isLimitedAccess = _state.value.isCameraUploadsLimitedAccess
+                    val showWarningMenu =
+                        isLimitedAccess || shouldShowWarningMenu(isWarningBannerEnabled = true)
+                    val showWarningBanner =
+                        isLimitedAccess || shouldShowWarningBanner(isWarningBannerEnabled = true)
+                    if (isEnabled && showWarningBanner) {
+                        hideCameraUploadsFab()
+                    }
                     if (isEnabled) {
-                        val showWarning = _state.value.isCameraUploadsLimitedAccess
-                                || shouldShowWarningMenu(isWarningBannerEnabled = true)
                         currentState.copy(
                             isCUPausedWarningBannerEnabled = true,
-                            isWarningBannerShown = showWarning,
-                            showCameraUploadsWarning = showWarning,
+                            isWarningBannerShown = showWarningBanner,
+                            showCameraUploadsWarning = showWarningMenu,
                             showCameraUploadsPaused = false,
                         )
                     } else {
@@ -403,9 +409,13 @@ class TimelineViewModel @Inject constructor(
 
             else -> {
                 setCameraUploadsCompleteMenu(isVisible = false)
-                setCameraUploadsWarningFab(isVisible = true, progress = 0.5f)
+                if (shouldShowWarningBanner()) {
+                    hideCameraUploadsFab()
+                } else {
+                    setCameraUploadsWarningFab(isVisible = true, progress = 0.5f)
+                }
                 setCameraUploadsWarningMenu(shouldShowWarningMenu())
-                updateIsWarningBannerShown(shouldShowWarningMenu())
+                updateIsWarningBannerShown(shouldShowWarningBanner())
             }
         }
     }
@@ -1129,13 +1139,30 @@ class TimelineViewModel @Inject constructor(
         finishReason: CameraUploadsFinishedReason? = _state.value.cameraUploadsFinishedReason,
         isWarningBannerEnabled: Boolean = _state.value.isCUPausedWarningBannerEnabled,
     ): Boolean {
-        if (!isWarningBannerEnabled) return false
+        if (!isWarningBannerEnabled || finishReason == CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA)
+            return false
 
         return finishReason?.let { reason ->
-            reason in listOf(
+            reason in setOf(
                 CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET,
                 CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW,
                 CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
+            )
+        } ?: false
+    }
+
+    internal fun shouldShowWarningBanner(
+        finishReason: CameraUploadsFinishedReason? = _state.value.cameraUploadsFinishedReason,
+        isWarningBannerEnabled: Boolean = _state.value.isCUPausedWarningBannerEnabled,
+    ): Boolean {
+        if (!isWarningBannerEnabled) return false
+
+        return finishReason?.let { reason ->
+            reason in setOf(
+                CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET,
+                CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW,
+                CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET,
+                CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA
             )
         } ?: false
     }

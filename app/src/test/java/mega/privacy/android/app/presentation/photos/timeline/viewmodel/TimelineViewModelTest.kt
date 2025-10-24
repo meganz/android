@@ -527,15 +527,27 @@ internal class TimelineViewModelTest {
                     CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW,
                     CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET,
                     CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET,
+                    CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA,
                         -> true
 
                     else -> false
                 }
             )
 
-            // Verify that the Warning Fab Icon is shown
-            assertThat(state.cameraUploadsStatus).isEqualTo(CameraUploadsStatus.Warning)
-            assertThat(state.cameraUploadsProgress).isEqualTo(0.5f)
+            when (cameraUploadsFinishedReason) {
+                CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW,
+                CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET,
+                CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA,
+                    -> {
+                    assertThat(state.cameraUploadsStatus).isEqualTo(CameraUploadsStatus.None)
+                    assertThat(state.cameraUploadsProgress).isEqualTo(0.0f)
+                }
+
+                else -> {
+                    assertThat(state.cameraUploadsStatus).isEqualTo(CameraUploadsStatus.Warning)
+                    assertThat(state.cameraUploadsProgress).isEqualTo(0.5f)
+                }
+            }
         }
     }
 
@@ -1094,10 +1106,38 @@ internal class TimelineViewModelTest {
         )
 
         if (
-            finishReason in listOf(
+            finishReason in setOf(
                 CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET,
                 CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW,
                 CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
+            )
+        ) {
+            assertThat(isWarningShown).isTrue()
+        } else {
+            assertThat(isWarningShown).isFalse()
+        }
+    }
+
+    @ParameterizedTest(name = "and finishReason is {0}")
+    @EnumSource(
+        value = CameraUploadsFinishedReason::class,
+        mode = EnumSource.Mode.EXCLUDE,
+    )
+    fun `test that shouldShowWarningBanner returns true when isCUPausedWarningBannerEnabled is true`(
+        finishReason: CameraUploadsFinishedReason,
+    ) = runTest {
+        initViewModel()
+        val isWarningShown = underTest.shouldShowWarningBanner(
+            finishReason = finishReason,
+            isWarningBannerEnabled = true
+        )
+
+        if (
+            finishReason in setOf(
+                CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET,
+                CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW,
+                CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET,
+                CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA
             )
         ) {
             assertThat(isWarningShown).isTrue()

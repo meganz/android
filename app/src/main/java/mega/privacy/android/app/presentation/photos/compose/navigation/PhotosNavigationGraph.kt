@@ -31,7 +31,8 @@ internal fun NavGraphBuilder.photosNavigationGraph(
     onZoomOut: () -> Unit,
     onNavigateCameraUploadsSettings: () -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
-    onNavigateMobileDataSetting: () -> Unit
+    onNavigateMobileDataSetting: () -> Unit,
+    onNavigateUpgradeScreen: () -> Unit
 ) {
     navigation<PhotosNavigationGraph>(
         startDestination = PhotosScreen
@@ -53,7 +54,8 @@ internal fun NavGraphBuilder.photosNavigationGraph(
             onNavigateCameraUploadsTransferScreen = {
                 navHostController.navigate(CameraUploadsTransferScreen)
             },
-            onNavigateMobileDataSetting = onNavigateMobileDataSetting
+            onNavigateMobileDataSetting = onNavigateMobileDataSetting,
+            onNavigateUpgradeScreen = onNavigateUpgradeScreen
         )
 
         cameraUploadsTransferScreen(
