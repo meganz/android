@@ -294,7 +294,7 @@
     <!-- while copying a file or folder -->
     <string name="context_copying">Copying</string>
     <!-- menu item -->
-    <string name="context_move_to_trash">Move to the Rubbish bin</string>
+    <string name="context_move_to_trash">Move to Rubbish bin</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">Remove from MEGA</string>
     <!-- Input field description in the create folder dialog. -->

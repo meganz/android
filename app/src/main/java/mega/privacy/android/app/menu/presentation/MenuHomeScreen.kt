@@ -3,6 +3,7 @@ package mega.privacy.android.app.menu.presentation
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -15,12 +16,14 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -36,6 +39,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.badge.NotificationBadge
 import mega.android.core.ui.components.button.PrimaryFilledButton
@@ -68,6 +73,7 @@ import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.NotificationsNavKey
 import mega.privacy.android.navigation.destination.TestPasswordNavKey
 import mega.privacy.android.shared.original.core.ui.utils.composeLet
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.navigation.snowflake.NavigationBadge
 
 @Composable
@@ -95,6 +101,8 @@ fun MenuHomeScreenUi(
 ) {
     var isPrivacySuiteExpanded by rememberSaveable { mutableStateOf(true) }
     val context = LocalContext.current
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
 
     EventEffect(
         event = uiState.showTestPasswordScreenEvent,
@@ -137,7 +145,8 @@ fun MenuHomeScreenUi(
                         if (uiState.unreadNotificationsCount > 0) {
                             NotificationBadge(
                                 uiState.unreadNotificationsCount,
-                                modifier = Modifier.padding(end = 8.dp, top = 4.dp)
+                                modifier = Modifier
+                                    .padding(end = 8.dp, top = 4.dp)
                                     .testTag(NOTIFICATION_BADGE),
                             )
                         }
@@ -149,9 +158,11 @@ fun MenuHomeScreenUi(
         }
     ) { paddingValues ->
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
+                .animateContentSize(),
             contentPadding = PaddingValues(top = paddingValues.calculateTopPadding()),
         )
         {
@@ -200,7 +211,19 @@ fun MenuHomeScreenUi(
 
             item {
                 PrivacySuiteHeader(isExpanded = isPrivacySuiteExpanded, onClick = {
-                    isPrivacySuiteExpanded = !isPrivacySuiteExpanded
+                    coroutineScope.launch {
+                        val wasExpanded = isPrivacySuiteExpanded
+                        isPrivacySuiteExpanded = !isPrivacySuiteExpanded
+
+                        // Scroll to bottom only when expanding
+                        if (!wasExpanded) {
+                            delay(100)
+                            val itemCount = listState.layoutInfo.totalItemsCount
+                            if (itemCount > 0) {
+                                listState.animateScrollToItem(itemCount - 1)
+                            }
+                        }
+                    }
                 })
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -286,7 +309,7 @@ private fun AccountItem(
 private fun PrivacySuiteHeader(isExpanded: Boolean, onClick: () -> Unit) {
     SecondaryHeaderListItem(
         modifier = Modifier.testTag(PRIVACY_SUITE_HEADER),
-        text = "MEGA privacy suite",
+        text = stringResource(sharedR.string.general_mega_privacy_suite),
         secondaryRightIconRes = if (isExpanded) IconPackR.drawable.ic_chevron_up_small_regular_outline else IconPackR.drawable.ic_chevron_down_small_regular_outline,
         onClickListener = onClick
     )
@@ -340,7 +363,7 @@ private fun LogoutButton(
 @CombinedThemePreviews
 @Composable
 private fun MenuHomeScreenUiPreview(
-    @PreviewParameter(BooleanProvider::class) showBadge: Boolean
+    @PreviewParameter(BooleanProvider::class) showBadge: Boolean,
 ) {
     AndroidThemeForPreviews {
         MenuHomeScreenUi(
