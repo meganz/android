@@ -29,6 +29,5 @@ class LegacyCoreActivityFeatureGraph : FeatureDestination {
             syncListDestination(navigationHandler::back)
             syncNewFolderDestination(navigationHandler::back)
             syncSelectStopBackupDestinationDestination(navigationHandler::back)
-            upgradeAccount(navigationHandler::back)
         }
 }
