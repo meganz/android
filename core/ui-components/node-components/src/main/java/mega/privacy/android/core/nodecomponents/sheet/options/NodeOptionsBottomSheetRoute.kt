@@ -69,6 +69,8 @@ fun NodeOptionsBottomSheetRoute(
                 contactIds,
                 nodeHandles
             )
+        } ?: run {
+            onDismiss()
         }
     }
 
