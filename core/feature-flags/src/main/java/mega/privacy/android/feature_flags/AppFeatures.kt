@@ -18,7 +18,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
 
     CameraUploadsPausedWarningBanner(
         "Enable Camera Uploads paused warning banner",
-        false
+        true
     ),
 
     CameraUploadsTransferScreen(
