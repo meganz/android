@@ -204,6 +204,17 @@ class TestPasswordViewModel @Inject constructor(
     }
 
     /**
+     * Switch back to password reminder mode layout
+     */
+    fun switchToPasswordReminderLayout() {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(isUITestPasswordMode = false)
+            }
+        }
+    }
+
+    /**
      * Exports the Recovery Key
      */
     suspend fun getRecoveryKey(): String? {

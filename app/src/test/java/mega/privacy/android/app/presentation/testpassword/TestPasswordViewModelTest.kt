@@ -10,7 +10,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity.Companion.KEY_IS_LOGOUT
-import mega.privacy.android.app.presentation.testpassword.TestPasswordViewModel
 import mega.privacy.android.app.presentation.testpassword.model.PasswordState
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.exception.MegaException
@@ -257,6 +256,42 @@ internal class TestPasswordViewModelTest {
         }
 
     @Test
+    fun `test that initial state is password reminder mode by default`() =
+        runTest {
+            underTest.uiState.test {
+                val initialState = awaitItem()
+                assertThat(initialState.isUITestPasswordMode).isEqualTo(false)
+            }
+        }
+
+    @Test
+    fun `test that back navigation works correctly by switching between test password and password reminder modes`() =
+        runTest {
+            // Start in password reminder mode (default)
+            underTest.uiState.test {
+                assertThat(awaitItem().isUITestPasswordMode).isEqualTo(false)
+            }
+
+            // Switch to test password mode
+            underTest.switchToTestPasswordLayout()
+            underTest.uiState.test {
+                assertThat(awaitItem().isUITestPasswordMode).isEqualTo(true)
+            }
+
+            // Switch back to password reminder mode (simulating back button)
+            underTest.switchToPasswordReminderLayout()
+            underTest.uiState.test {
+                assertThat(awaitItem().isUITestPasswordMode).isEqualTo(false)
+            }
+
+            // Switch to test password mode again
+            underTest.switchToTestPasswordLayout()
+            underTest.uiState.test {
+                assertThat(awaitItem().isUITestPasswordMode).isEqualTo(true)
+            }
+        }
+
+    @Test
     fun `test that setMasterKeyExported should NOT trigger when recovery key is empty, and vice versa`() {
         val fakeRecoveryKey = "JALSJLKNDnsnda12738"
 
@@ -326,7 +361,7 @@ internal class TestPasswordViewModelTest {
             // Then
             underTest.uiState.test {
                 val state = awaitItem() // Get the final state after method execution
-                
+
                 // Verify final state
                 assertThat(state.isLoading).isFalse()
                 assertThat(state.isUserLogout).isInstanceOf(StateEventWithContentTriggered::class.java)

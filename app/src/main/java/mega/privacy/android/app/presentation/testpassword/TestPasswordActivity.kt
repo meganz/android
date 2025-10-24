@@ -53,8 +53,13 @@ class TestPasswordActivity : PasscodeActivity() {
     private val logoutViewModel by viewModels<LogoutViewModel>()
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            // Use dismissPasswordReminderAndFinish with timeout protection for back button
-            viewModel.dismissPasswordReminderAndFinish()
+            // Check if we're in test password mode - if so, go back to password reminder screen
+            if (viewModel.uiState.value.isUITestPasswordMode) {
+                viewModel.switchToPasswordReminderLayout()
+            } else {
+                // Use dismissPasswordReminderAndFinish with timeout protection for back button
+                viewModel.dismissPasswordReminderAndFinish()
+            }
         }
     }
     private val downloadFolderActivityResult =
