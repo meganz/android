@@ -55,18 +55,15 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
 
     private fun getLanguage(): String = deviceGateway.getCurrentDeviceLanguage()
 
-    override suspend fun getAppInfo(): AppInfo = withContext(ioDispatcher) {
-        AppInfo(
-            appVersion = context.getString(R.string.app_version),
-            sdkVersion = megaApiGateway.getSdkVersion(),
-        )
-    }
+    override fun getAppInfo(): AppInfo = AppInfo(
+        appVersion = context.getString(R.string.app_version),
+        sdkVersion = megaApiGateway.getSdkVersion(),
+    )
 
-    override suspend fun getDeviceSdkVersionInt() =
-        withContext(ioDispatcher) { deviceGateway.getSdkVersionInt() }
 
-    override suspend fun getDeviceSdkVersionName() =
-        withContext(ioDispatcher) { deviceGateway.getSdkVersionName() }
+    override fun getDeviceSdkVersionInt() = deviceGateway.getSdkVersionInt()
+
+    override fun getDeviceSdkVersionName() = deviceGateway.getSdkVersionName()
 
     override suspend fun getDeviceMemorySizeInBytes() = withContext(ioDispatcher) {
         deviceGateway.getDeviceMemory()

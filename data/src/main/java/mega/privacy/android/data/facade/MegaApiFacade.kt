@@ -173,7 +173,7 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun getRubbishBinNode(): MegaNode? = megaApi.rubbishNode
 
-    override suspend fun getSdkVersion(): String? = megaApi.version
+    override fun getSdkVersion(): String? = megaApi.version
 
     override val globalRequestEvents = callbackFlow {
         val listener = object : MegaRequestListenerInterface {

@@ -35,7 +35,7 @@ interface DeviceGateway {
      * Get sdk version name
      *
      */
-    suspend fun getSdkVersionName(): String
+    fun getSdkVersionName(): String
 
     /**
      * Get current time in millis

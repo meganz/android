@@ -24,19 +24,19 @@ interface EnvironmentRepository {
      *
      * @return app info
      */
-    suspend fun getAppInfo(): AppInfo
+    fun getAppInfo(): AppInfo
 
     /**
      * Get device sdk version Int
      *
      */
-    suspend fun getDeviceSdkVersionInt(): Int
+    fun getDeviceSdkVersionInt(): Int
 
     /**
      * Get device sdk version name
      *
      */
-    suspend fun getDeviceSdkVersionName(): String
+    fun getDeviceSdkVersionName(): String
 
     /**
      * Get device memory size in bytes
