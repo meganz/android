@@ -147,6 +147,7 @@ internal fun TestPasswordComposeView(
     onSaveRecoveryKey: () -> Unit,
     onPrintRecoveryKeyConsumed: () -> Unit,
     onPrintRecoveryKeyCompleted: (File) -> Unit,
+    onResetTimeoutError: () -> Unit,
 ) {
     val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
@@ -173,6 +174,14 @@ internal fun TestPasswordComposeView(
         event = uiState.isUserExhaustedPasswordAttempts,
         onConsumed = onExhaustedPasswordAttempts,
         action = onResetExhaustedPasswordAttempts
+    )
+
+    EventEffect(
+        event = uiState.generalError,
+        onConsumed = onResetTimeoutError,
+        action = {
+            snackBarHostState.showAutoDurationSnackbar(context.resources.getString(sharedResR.string.general_text_error))
+        }
     )
 
     EventEffect(
@@ -896,6 +905,7 @@ private fun TestPasswordComposeViewPreview() {
             onSaveRecoveryKey = {},
             onPrintRecoveryKeyConsumed = {},
             onPrintRecoveryKeyCompleted = {},
+            onResetTimeoutError = {}
         )
     }
 }
@@ -1015,3 +1025,4 @@ internal object Constants {
      */
     const val BOTTOM_SHEET_SAVE = "bottom_sheet_save"
 }
+

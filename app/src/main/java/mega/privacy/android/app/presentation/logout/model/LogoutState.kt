@@ -11,6 +11,16 @@ sealed interface LogoutState {
     object Loading : LogoutState
 
     /**
+     * Encounter some errors
+     */
+    object Error : LogoutState
+
+    /**
+     * Logout completed successfully
+     */
+    object Success : LogoutState
+
+    /**
      * Data
      *
      * @property hasOfflineFiles

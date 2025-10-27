@@ -150,7 +150,8 @@ class TestPasswordViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     isLoading = false,
-                    isUserLogout = triggered(false)
+                    isUserLogout = triggered(false),
+                    generalError = if (passwordReminderCheckResult == null || passwordReminderCheckResult.isFailure) triggered else consumed
                 )
             }
         }
@@ -331,4 +332,13 @@ class TestPasswordViewModel @Inject constructor(
      * Reset and notify printRecoveryKey is consumed
      */
     fun resetPrintRecoveryKey() = _uiState.update { it.copy(printRecoveryKey = consumed()) }
+
+    /**
+     * Reset the general error
+     */
+    fun resetGeneralError() {
+        _uiState.update {
+            it.copy(generalError = consumed)
+        }
+    }
 }

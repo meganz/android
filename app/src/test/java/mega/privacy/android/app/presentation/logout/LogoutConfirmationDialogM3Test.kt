@@ -198,4 +198,62 @@ class LogoutConfirmationDialogM3Test {
         composeRule.onNodeWithText(context.getString(mega.privacy.android.shared.resources.R.string.general_dialog_cancel_button))
             .assertDoesNotExist()
     }
+
+    @Test
+    fun `test that error dialog is displayed when state is error`() {
+        val onLogout = mock<() -> Unit>()
+        val onDismissed = mock<() -> Unit>()
+        val logoutState = LogoutState.Error
+
+        composeRule.setContent {
+            LogoutConfirmationDialogM3(
+                logoutState = logoutState,
+                onLogout = onLogout,
+                onDismissed = onDismissed
+            )
+        }
+
+        // Verify error dialog title is displayed
+        composeRule.onNodeWithText(context.getString(sharedR.string.general_error_word))
+            .assertIsDisplayed()
+
+        // Verify error message is displayed
+        composeRule.onNodeWithText(context.getString(mega.privacy.android.shared.resources.R.string.general_text_error))
+            .assertIsDisplayed()
+
+        // Verify OK button is displayed
+        composeRule.onNodeWithText(context.getString(mega.privacy.android.shared.resources.R.string.general_ok))
+            .assertIsDisplayed()
+
+        // Verify no other dialog elements are displayed
+        composeRule.onNodeWithText(context.getString(sharedR.string.logout_warning_dialog_title))
+            .assertDoesNotExist()
+        composeRule.onNodeWithText(context.getString(sharedR.string.logout_warning_dialog_positive_button))
+            .assertDoesNotExist()
+        composeRule.onNodeWithText(context.getString(mega.privacy.android.shared.resources.R.string.general_dialog_cancel_button))
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that error dialog OK button click triggers onDismissed callback`() {
+        val onLogout = mock<() -> Unit>()
+        val onDismissed = mock<() -> Unit>()
+        val logoutState = LogoutState.Error
+
+        composeRule.setContent {
+            LogoutConfirmationDialogM3(
+                logoutState = logoutState,
+                onLogout = onLogout,
+                onDismissed = onDismissed
+            )
+        }
+
+        // Click OK button
+        composeRule.onNodeWithText(context.getString(mega.privacy.android.shared.resources.R.string.general_ok))
+            .performClick()
+
+        // Verify onDismissed callback is called
+        verify(onDismissed).invoke()
+        verifyNoInteractions(onLogout)
+    }
 }

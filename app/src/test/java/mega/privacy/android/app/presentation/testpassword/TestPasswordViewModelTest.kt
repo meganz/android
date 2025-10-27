@@ -5,8 +5,13 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity.Companion.KEY_IS_LOGOUT
@@ -437,8 +442,8 @@ internal class TestPasswordViewModelTest {
             // Given
             // Mock skipPasswordReminderUseCase to actually suspend longer than timeout (100ms)
             whenever(skipPasswordReminderUseCase()).thenAnswer {
-                kotlinx.coroutines.runBlocking {
-                    kotlinx.coroutines.delay(200) // 200ms > 100ms timeout
+                runBlocking {
+                    delay(200) // 200ms > 100ms timeout
                 }
                 Unit
             }
@@ -480,6 +485,67 @@ internal class TestPasswordViewModelTest {
             verify(skipPasswordReminderUseCase).invoke()
             verify(blockPasswordReminderUseCase).invoke()
         }
+
+    @Test
+    fun `test that dismissPasswordReminderAndFinish triggers generalError when skipPasswordReminderUseCase throws exception`() =
+        runTest {
+            // Given
+            whenever(skipPasswordReminderUseCase()).thenAnswer {
+                throw MegaException(errorCode = 123, errorString = "Network error")
+            }
+
+            // When
+            underTest.dismissPasswordReminderAndFinish()
+
+            // Then
+            underTest.uiState.test {
+                val state = awaitItem() // Get the final state after method execution
+                assertThat(state.generalError).isEqualTo(triggered)
+            }
+
+            verify(skipPasswordReminderUseCase).invoke()
+        }
+
+    @Test
+    fun `test that dismissPasswordReminderAndFinish does not trigger generalError when operation succeeds`() =
+        runTest {
+            // Given
+            whenever(skipPasswordReminderUseCase()).thenAnswer { Unit }
+
+            // When
+            underTest.dismissPasswordReminderAndFinish()
+
+            // Then
+            underTest.uiState.test {
+                val state = awaitItem() // Get the final state after method execution
+                assertThat(state.generalError).isEqualTo(consumed)
+            }
+
+            verify(skipPasswordReminderUseCase).invoke()
+        }
+
+    @Test
+    fun `test that resetGeneralError consumes the generalError state`() = runTest {
+        // Given - Mock the use case to fail so generalError becomes triggered
+        whenever(skipPasswordReminderUseCase()).thenThrow(RuntimeException("Test error"))
+
+        // When - Start the async operation
+        underTest.dismissPasswordReminderAndFinish() // This will trigger generalError
+
+        // Then - Use a single test block to capture both state changes
+        underTest.uiState.test {
+            // Wait for the triggered state
+            val triggeredState = awaitItem()
+            assertThat(triggeredState.generalError).isEqualTo(triggered)
+            assertThat(triggeredState.isLoading).isFalse()
+
+            // Now call resetGeneralError and wait for the consumed state
+            underTest.resetGeneralError()
+
+            val consumedState = awaitItem()
+            assertThat(consumedState.generalError).isEqualTo(consumed)
+        }
+    }
 
     companion object {
         private val dispatcher = UnconfinedTestDispatcher()

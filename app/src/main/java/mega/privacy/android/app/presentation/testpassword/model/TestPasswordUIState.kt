@@ -18,6 +18,7 @@ import java.io.File
  * @param isLogoutMode ui state to check whether screen is in logout mode
  * @param wrongPasswordAttempts ui state to count number of wrong password attempts
  * @param printRecoveryKey Print the given recovery key file
+ * @param generalError ui state to show general error message
  */
 data class TestPasswordUIState(
     val isCurrentPassword: PasswordState = PasswordState.Initial,
@@ -30,7 +31,8 @@ data class TestPasswordUIState(
     val isUITestPasswordMode: Boolean = false,
     val isLogoutMode: Boolean = false,
     val wrongPasswordAttempts: Int = 0,
-    val printRecoveryKey: StateEventWithContent<File?> = consumed()
+    val printRecoveryKey: StateEventWithContent<File?> = consumed(),
+    val generalError: StateEvent = consumed,
 )
 
 /**

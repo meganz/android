@@ -11,20 +11,25 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
 import mega.privacy.android.app.presentation.logout.LogoutViewModel
 import mega.privacy.android.app.presentation.testpassword.view.TestPasswordComposeView
@@ -153,11 +158,12 @@ class TestPasswordActivity : PasscodeActivity() {
                     viewModel.deleteRecoveryKeyFile(it)
                     viewModel.notifyPasswordReminderSucceeded()
                 },
+                onResetTimeoutError = viewModel::resetGeneralError
             )
             if (logoutDialog) {
                 LogoutConfirmationDialog(
                     logoutViewModel = logoutViewModel,
-                    onDismissed = { logoutDialog = false }
+                    onDismissed = { logoutDialog = false },
                 )
             }
         }
@@ -270,3 +276,4 @@ class TestPasswordActivity : PasscodeActivity() {
         const val KEY_TEST_PASSWORD_MODE = "test_password_mode"
     }
 }
+

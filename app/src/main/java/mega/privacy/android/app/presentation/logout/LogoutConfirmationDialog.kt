@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.logout
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -9,9 +8,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.logout.model.LogoutState
+import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.ProgressDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 internal fun LogoutConfirmationDialog(
@@ -43,7 +45,21 @@ private fun ConfirmationDialog(
             ShowDialog(confirmationMessage, logout, onDismissed)
         }
 
-        LogoutState.Loading -> {}
+        LogoutState.Error -> {
+            ShowErrorDialog(onDismissed)
+        }
+
+        LogoutState.Loading -> {
+            LoadingDialog(
+                text = stringResource(R.string.general_loading)
+            )
+        }
+
+        LogoutState.Success -> {
+            // Success state - this might trigger navigation to login screen
+            // or the dialog might be dismissed automatically
+            // The parent component should handle this state
+        }
     }
 }
 
@@ -75,6 +91,20 @@ private fun ShowDialog(
     )
 }
 
+@Composable
+private fun ShowErrorDialog(
+    onDismissed: () -> Unit,
+) {
+    MegaAlertDialog(
+        text = stringResource(id = sharedR.string.general_text_error),
+        confirmButtonText = stringResource(id = sharedR.string.general_ok),
+        cancelButtonText = null,
+        onConfirm = onDismissed,
+        onDismiss = onDismissed,
+        title = stringResource(id = R.string.general_error_word)
+    )
+}
+
 
 @CombinedThemePreviews
 @Composable
@@ -87,3 +117,16 @@ private fun LogoutConfirmationDialogPreview() {
         )
     }
 }
+
+@CombinedThemePreviews
+@Composable
+private fun LogoutConfirmationDialogErrorPreview() {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
+        ConfirmationDialog(
+            logoutState = LogoutState.Error,
+            logout = {},
+            onDismissed = {}
+        )
+    }
+}
+

@@ -52,6 +52,23 @@ internal fun LogoutConfirmationDialogM3(
                 )
             }
         }
+
+        LogoutState.Error -> {
+            BasicDialog(
+                title = stringResource(id = R.string.general_error_word),
+                description = stringResource(id = sharedR.string.general_text_error),
+                positiveButtonText = stringResource(id = sharedR.string.general_ok),
+                onPositiveButtonClicked = onDismissed,
+                negativeButtonText = null,
+                onNegativeButtonClicked = null
+            )
+        }
+
+        LogoutState.Success -> {
+            // Success state - this might trigger navigation to login screen
+            // or the dialog might be dismissed automatically
+            // The parent component should handle this state
+        }
     }
 }
 
@@ -75,6 +92,18 @@ private fun LogoutConfirmationDialogM3Preview() {
     AndroidThemeForPreviews {
         LogoutConfirmationDialogM3(
             logoutState = LogoutState.Data(hasOfflineFiles = true, hasPendingTransfers = true),
+            onLogout = {},
+            onDismissed = {}
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun LogoutConfirmationDialogM3ErrorPreview() {
+    AndroidThemeForPreviews {
+        LogoutConfirmationDialogM3(
+            logoutState = LogoutState.Error,
             onLogout = {},
             onDismissed = {}
         )

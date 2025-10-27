@@ -12,6 +12,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
+import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.testpassword.model.PasswordState
@@ -68,7 +69,8 @@ class TestPasswordComposeViewTest {
                 onCopyRecoveryKey = {},
                 onPrintRecoveryKey = {},
                 onPrintRecoveryKeyConsumed = {},
-                onPrintRecoveryKeyCompleted = {}
+                onPrintRecoveryKeyCompleted = {},
+                onResetTimeoutError = {}
             )
         }
     }
@@ -247,4 +249,21 @@ class TestPasswordComposeViewTest {
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_TITLE).assertIsNotDisplayed()
         composeTestRule.onNodeWithTag(BACKUP_BUTTON_TAG).assertIsDisplayed()
     }
+
+    @Test
+    fun `test that timeout error snackbar is shown when generalError is triggered`() {
+        setComposeContent(TestPasswordUIState(generalError = triggered))
+
+        composeTestRule.onNodeWithTag(SNACKBAR_TAG)
+            .assertIsDisplayed()
+            .assert(hasAnyChild(hasText(fromId(R.string.general_text_error))))
+    }
+
+    @Test
+    fun `test that timeout error snackbar is not shown when generalError is consumed`() {
+        setComposeContent(TestPasswordUIState(generalError = consumed))
+
+        composeTestRule.onNodeWithTag(SNACKBAR_TAG).assertDoesNotExist()
+    }
 }
+
