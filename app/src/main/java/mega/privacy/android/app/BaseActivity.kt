@@ -102,6 +102,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorCookieSettingsSavedUse
 import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.resources.R as sharedResR
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApi
@@ -110,7 +111,6 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
-import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Base activity which includes common behaviors for several activities.
@@ -292,7 +292,8 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                     getSerializable(PURCHASE_TYPE)
                 } as PurchaseType?
 
-                showQueryPurchasesResult(MegaPurchase(sku = getString(ACTIVE_SUBSCRIPTION_SKU)))
+                activeSubscriptionSku = getString(ACTIVE_SUBSCRIPTION_SKU)
+                showQueryPurchasesResult(MegaPurchase(sku = activeSubscriptionSku))
             }
         }
 
@@ -659,7 +660,10 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                     val snackbarTextView =
                         snackbarLayout.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
                     snackbarTextView.maxLines = 5
-                    setAction(sharedResR.string.general_ok, SnackbarNavigateOption(view.context, type))
+                    setAction(
+                        sharedResR.string.general_ok,
+                        SnackbarNavigateOption(view.context, type)
+                    )
                     show()
                 }
 
