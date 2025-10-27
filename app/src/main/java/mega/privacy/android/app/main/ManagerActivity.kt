@@ -1669,7 +1669,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         selectDrawerItemPending = false
                     } else if (intent.action == Constants.ACTION_SHOW_UPGRADE_ACCOUNT) {
                         navigateToUpgradeAccount()
-                        selectDrawerItemPending = false
+                        // If drawerItem is null, then it will default to homepage
+                        selectDrawerItemPending = drawerItem == null
                     } else if (intent.action == Constants.ACTION_OPEN_HANDLE_NODE) {
                         val link = intent.dataString
                         val s =
