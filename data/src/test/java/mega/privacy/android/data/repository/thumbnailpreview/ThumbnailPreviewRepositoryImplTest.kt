@@ -16,6 +16,8 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaError.API_ENOENT
+import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
@@ -23,9 +25,13 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -325,4 +331,137 @@ class ThumbnailPreviewRepositoryImplTest {
         underTest.setPreview(nodeHandle, any())
         verify(megaApi, never()).setPreview(any(), any(), any())
     }
+
+    @Test
+    fun `test that an exception is thrown when fails to download a preview node that doesn't exists`() =
+        runTest {
+            val handle = 123L
+            whenever(megaApi.getMegaNodeByHandle(nodeHandle = handle)) doReturn null
+            whenever(
+                cacheGateway.getOrCreateCacheFolder(
+                    folderName = CacheFolderConstant.PREVIEW_FOLDER
+                )
+            ) doReturn null
+
+            assertThrows<IllegalStateException> {
+                underTest.downloadPreview(handle = handle)
+            }
+        }
+
+    @Test
+    fun `test that an exception is thrown when fails to download a preview node folder path doesn't exists`() =
+        runTest {
+            val handle = 123L
+            val megaNode = mock<MegaNode>()
+            whenever(megaApi.getMegaNodeByHandle(nodeHandle = handle)) doReturn megaNode
+            whenever(
+                cacheGateway.getOrCreateCacheFolder(
+                    folderName = CacheFolderConstant.PREVIEW_FOLDER
+                )
+            ) doReturn null
+
+            assertThrows<IllegalStateException> {
+                underTest.downloadPreview(handle = handle)
+            }
+        }
+
+    @Test
+    fun `test that an exception is thrown when fails to download a preview node that doesn't have preview`() =
+        runTest {
+            val handle = 123L
+            val megaNode = mock<MegaNode> {
+                on { hasPreview() } doReturn false
+            }
+            whenever(megaApi.getMegaNodeByHandle(nodeHandle = handle)) doReturn megaNode
+            val file = mock<File> {
+                on { path } doReturn "path"
+            }
+            whenever(
+                cacheGateway.getOrCreateCacheFolder(
+                    folderName = CacheFolderConstant.PREVIEW_FOLDER
+                )
+            ) doReturn file
+
+            assertThrows<IllegalStateException> {
+                underTest.downloadPreview(handle = handle)
+            }
+        }
+
+    @Test
+    fun `test that an exception is thrown when fails to download preview`() =
+        runTest {
+            val handle = 123L
+            val megaNode = mock<MegaNode> {
+                on { hasPreview() } doReturn true
+            }
+            whenever(megaApi.getMegaNodeByHandle(nodeHandle = handle)) doReturn megaNode
+            val filePath = "path"
+            val file = mock<File> {
+                on { path } doReturn filePath
+            }
+            whenever(
+                cacheGateway.getOrCreateCacheFolder(
+                    folderName = CacheFolderConstant.PREVIEW_FOLDER
+                )
+            ) doReturn file
+            val megaError = mock<MegaError> {
+                on { errorCode } doReturn API_ENOENT
+            }
+            whenever(
+                megaApi.getPreview(
+                    node = eq(megaNode),
+                    previewFilePath = any(),
+                    listener = any()
+                )
+            ) doAnswer {
+                (it.arguments.last() as MegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = mock(),
+                    e = megaError
+                )
+            }
+
+            assertThrows<MegaException> {
+                underTest.downloadPreview(handle = handle)
+            }
+        }
+
+    @Test
+    fun `test that the preview is downloaded successfully`() =
+        runTest {
+            val handle = 123L
+            val megaNode = mock<MegaNode> {
+                on { hasPreview() } doReturn true
+            }
+            whenever(megaApi.getMegaNodeByHandle(nodeHandle = handle)) doReturn megaNode
+            val filePath = "path"
+            val file = mock<File> {
+                on { path } doReturn filePath
+            }
+            whenever(
+                cacheGateway.getOrCreateCacheFolder(
+                    folderName = CacheFolderConstant.PREVIEW_FOLDER
+                )
+            ) doReturn file
+            val megaError = mock<MegaError> {
+                on { errorCode } doReturn API_OK
+            }
+            whenever(
+                megaApi.getPreview(
+                    node = eq(megaNode),
+                    previewFilePath = any(),
+                    listener = any()
+                )
+            ) doAnswer {
+                (it.arguments.last() as MegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = mock(),
+                    e = megaError
+                )
+            }
+
+            assertDoesNotThrow {
+                underTest.downloadPreview(handle = handle)
+            }
+        }
 }

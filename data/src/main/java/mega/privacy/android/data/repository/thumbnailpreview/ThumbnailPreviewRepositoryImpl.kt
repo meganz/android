@@ -147,26 +147,27 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun downloadPreview(
-        handle: Long,
-        callback: (success: Boolean) -> Unit,
-    ) = withContext(ioDispatcher) {
-        val node = megaApi.getMegaNodeByHandle(handle)
-        val previewFolderPath =
-            cacheGateway.getOrCreateCacheFolder(CacheFolderConstant.PREVIEW_FOLDER)?.path
-
-        if (node == null || previewFolderPath == null || !node.hasPreview()) {
-            callback(false)
-        } else {
-            megaApi.getPreview(
-                node,
-                getPreviewPath(previewFolderPath, node),
-                OptionalMegaRequestListenerInterface(
-                    onRequestFinish = { _, error ->
-                        callback(error.errorCode == MegaError.API_OK)
-                    }
-                )
-            )
+    override suspend fun downloadPreview(handle: Long) {
+        withContext(ioDispatcher) {
+            val node = megaApi.getMegaNodeByHandle(handle)
+            val previewFolderPath =
+                cacheGateway.getOrCreateCacheFolder(CacheFolderConstant.PREVIEW_FOLDER)?.path
+            suspendCancellableCoroutine { continuation ->
+                if (node == null || previewFolderPath == null || !node.hasPreview()) {
+                    continuation.resumeWith(
+                        Result.failure(
+                            exception = IllegalStateException("Preview node not found.")
+                        )
+                    )
+                } else {
+                    val listener = continuation.getRequestListener("downloadPreview") {}
+                    megaApi.getPreview(
+                        node,
+                        previewFilePath = getPreviewPath(previewFolderPath, node),
+                        listener = listener
+                    )
+                }
+            }
         }
     }
 

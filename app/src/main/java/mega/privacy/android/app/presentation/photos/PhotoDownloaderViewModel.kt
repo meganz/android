@@ -52,9 +52,9 @@ class PhotoDownloaderViewModel @Inject constructor(
         photoCover: PhotoCover,
     ) {
         if (photoCover.isPreview) {
-            downloadPreviewUseCase(photoCover.photo.id) {
-                photoCover.callback(it)
-            }
+            runCatching { downloadPreviewUseCase(photoCover.photo.id) }
+                .onSuccess { photoCover.callback(true) }
+                .onFailure { photoCover.callback(false) }
         } else {
             downloadThumbnailUseCase(photoCover.photo.id) {
                 photoCover.callback(it)
