@@ -58,7 +58,6 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
-import mega.privacy.android.domain.entity.transfer.TransferAppData.RecursiveTransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -119,7 +118,6 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val inProgressTransferMapper: InProgressTransferMapper,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     private val transfersPreferencesGateway: Lazy<TransfersPreferencesGateway>,
-    private val parentRecursiveAppDataCache: HashMap<Int, List<RecursiveTransferAppData>>,
 ) : TransferRepository {
 
     private val monitorPausedTransfers = MutableStateFlow(false)
@@ -857,21 +855,6 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override fun monitorTransferTagToCancel(): Flow<Int?> =
         appEventGateway.monitorTransferTagToCancel()
-
-
-    override suspend fun getRecursiveTransferAppDataFromParent(
-        parentTransferTag: Int,
-        fetchInMemoryParent: () -> Transfer?,
-    ): List<RecursiveTransferAppData> = withContext(ioDispatcher) {
-        parentRecursiveAppDataCache.getOrPut(parentTransferTag) {
-            (fetchInMemoryParent()?.appData ?: getActiveTransferByTag(parentTransferTag)?.appData)
-                ?.filterIsInstance<RecursiveTransferAppData>() ?: emptyList()
-        }
-    }
-
-    override suspend fun clearRecursiveTransferAppDataFromCache(parentTransferTag: Int) {
-        parentRecursiveAppDataCache.remove(parentTransferTag)
-    }
 
     override fun monitorTransferOverQuotaErrorTimestamp() =
         monitorTransferOverQuotaErrorTimestamp.asStateFlow()

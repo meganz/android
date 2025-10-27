@@ -8,11 +8,6 @@ import mega.privacy.android.domain.entity.uri.UriPath
 sealed interface TransferAppData {
 
     /**
-     * Interface to indicate that this app data should be added to children transfers
-     */
-    sealed interface RecursiveTransferAppData : TransferAppData
-
-    /**
      * Identify a camera upload transfer
      */
     data object CameraUpload : TransferAppData
@@ -69,7 +64,7 @@ sealed interface TransferAppData {
      *
      * @param groupId the group Id related to this transfer
      */
-    data class TransferGroup(val groupId: Long) : RecursiveTransferAppData
+    data class TransferGroup(val groupId: Long) : TransferAppData
 
     /**
      * Identify a transfer that is a download only for preview purposes.
@@ -79,5 +74,5 @@ sealed interface TransferAppData {
     /**
      * Identify a transfer that is a download to make it available offline
      */
-    data object OfflineDownload : RecursiveTransferAppData
+    data object OfflineDownload : TransferAppData
 }

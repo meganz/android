@@ -105,32 +105,8 @@ class HandleTransferEventUseCase @Inject internal constructor(
             start = true,
             pause = true,
             finish = true
-        )?.map { transferEvent ->
-            val appDataToAdd = transferEvent.transfer.folderTransferTag?.let { folderTransferTag ->
-                transferRepository.getRecursiveTransferAppDataFromParent(
-                    folderTransferTag,
-                    fetchInMemoryParent = { events.firstOrNull { it.transfer.tag == folderTransferTag }?.transfer }
-                )
-            }
-
-            if (appDataToAdd.isNullOrEmpty()) {
-                transferEvent.transfer
-            } else {
-                transferEvent.transfer.copy(
-                    appData = transferEvent.transfer.appData.plus(appDataToAdd)
-                )
-            }
-        }?.let {
+        )?.map { transferEvent -> transferEvent.transfer }?.let {
             transferRepository.insertOrUpdateActiveTransfers(it)
-        }
-        clearParentsAppDataCache(events)
-    }
-
-    private suspend fun clearParentsAppDataCache(events: List<TransferEvent>) {
-        events.filterByType(finish = true)?.forEach { transferEvent ->
-            if (transferEvent.transfer.isFolderTransfer) {
-                transferRepository.clearRecursiveTransferAppDataFromCache(transferEvent.transfer.tag)
-            }
         }
     }
 

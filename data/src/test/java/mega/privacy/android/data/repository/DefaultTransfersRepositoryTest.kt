@@ -77,10 +77,8 @@ import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import java.util.concurrent.atomic.AtomicLong
@@ -116,8 +114,6 @@ class DefaultTransfersRepositoryTest {
     private val inProgressTransferMapper = mock<InProgressTransferMapper>()
     private val monitorFetchNodesFinishUseCase = mock<MonitorFetchNodesFinishUseCase>()
     private val transfersPreferencesGateway = mock<TransfersPreferencesGateway>()
-    private val parentRecursiveAppDataCache =
-        HashMap<Int, List<TransferAppData.RecursiveTransferAppData>>()
 
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -153,7 +149,6 @@ class DefaultTransfersRepositoryTest {
             inProgressTransferMapper = inProgressTransferMapper,
             monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
             transfersPreferencesGateway = { transfersPreferencesGateway },
-            parentRecursiveAppDataCache = parentRecursiveAppDataCache,
         )
     }
 
@@ -179,7 +174,6 @@ class DefaultTransfersRepositoryTest {
             monitorFetchNodesFinishUseCase,
             transfersPreferencesGateway,
         )
-        parentRecursiveAppDataCache.clear()
     }
 
     @Nested
@@ -1772,100 +1766,6 @@ class DefaultTransfersRepositoryTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
-
-    @Test
-    fun `test that app data is get from gateway when is not in cache`() = runTest {
-        val parentTransferTag = 7643
-        val appData = listOf(
-            mock<TransferAppData.ChatUpload>(),
-            mock<TransferAppData.OfflineDownload>(),
-            mock<TransferAppData.TransferGroup>(),
-        )
-        val parentActiveTransfer = mock<ActiveTransfer> {
-            on { this.appData } doReturn appData
-        }
-        whenever(megaLocalRoomGateway.getActiveTransferByTag(parentTransferTag)).thenReturn(
-            parentActiveTransfer
-        )
-
-        val actual = underTest.getRecursiveTransferAppDataFromParent(parentTransferTag) { null }
-
-        assertThat(actual).containsExactly(
-            *appData.filterIsInstance<TransferAppData.RecursiveTransferAppData>().toTypedArray()
-        )
-    }
-
-    @Test
-    fun `test that app data is get from cache when it is already added`() = runTest {
-        val parentTransferTag = 24356
-        val appData = listOf(
-            mock<TransferAppData.OfflineDownload>(),
-            mock<TransferAppData.TransferGroup>(),
-        )
-        parentRecursiveAppDataCache[parentTransferTag] = appData
-
-        val actual = underTest.getRecursiveTransferAppDataFromParent(parentTransferTag) { null }
-
-        verify(megaLocalRoomGateway, never()).getActiveTransferByTag(parentTransferTag)
-        assertThat(actual).containsExactly(*appData.toTypedArray())
-    }
-
-    @Test
-    fun `test that app data is added to cache when fetched`() = runTest {
-        val parentTransferTag = 753455
-        val appData = listOf(
-            mock<TransferAppData.ChatUpload>(),
-            mock<TransferAppData.OfflineDownload>(),
-            mock<TransferAppData.TransferGroup>(),
-        )
-        val parentActiveTransfer = mock<ActiveTransfer> {
-            on { this.appData } doReturn appData
-        }
-        whenever(megaLocalRoomGateway.getActiveTransferByTag(parentTransferTag)).thenReturn(
-            parentActiveTransfer
-        )
-
-        underTest.getRecursiveTransferAppDataFromParent(parentTransferTag) { null }
-
-        assertThat(parentRecursiveAppDataCache[parentTransferTag]).containsExactly(
-            *appData.filterIsInstance<TransferAppData.RecursiveTransferAppData>().toTypedArray()
-        )
-    }
-
-    @Test
-    fun `test that app data is added from parent`() = runTest {
-        val parentTransferTag = 753455
-        val appData = listOf(
-            mock<TransferAppData.ChatUpload>(),
-            mock<TransferAppData.OfflineDownload>(),
-            mock<TransferAppData.TransferGroup>(),
-        )
-        val parentTransfer = mock<Transfer> {
-            on { this.appData } doReturn appData
-        }
-
-        underTest.getRecursiveTransferAppDataFromParent(parentTransferTag) { parentTransfer }
-
-        assertThat(parentRecursiveAppDataCache[parentTransferTag]).containsExactly(
-            *appData.filterIsInstance<TransferAppData.RecursiveTransferAppData>().toTypedArray()
-        )
-
-        verifyNoInteractions(megaLocalRoomGateway)
-    }
-
-    @Test
-    fun `test that app data cache is cleared`() = runTest {
-        val parentTransferTag = 24356
-        val appData = listOf(
-            mock<TransferAppData.OfflineDownload>(),
-            mock<TransferAppData.TransferGroup>(),
-        )
-        parentRecursiveAppDataCache[parentTransferTag] = appData
-
-        underTest.clearRecursiveTransferAppDataFromCache(parentTransferTag)
-
-        assertThat(parentRecursiveAppDataCache).isEmpty()
-    }
 
     @Test
     fun `test that monitorTransferOverQuotaErrorTimestamp emits value when setTransferOverQuotaErrorTimestamp is invoked`() =

@@ -20,7 +20,6 @@ import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.psa.Psa
-import mega.privacy.android.domain.entity.transfer.TransferAppData.RecursiveTransferAppData
 import mega.privacy.android.domain.entity.uri.UriPath
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
@@ -85,10 +84,6 @@ internal object LocalCacheModule {
     @Provides
     @Singleton
     fun provideBannersCache(): Cache<List<Banner>> = PermanentCache()
-
-    @Provides
-    @Singleton
-    fun provideParentsAppDataCache(): HashMap<Int, List<RecursiveTransferAppData>> = hashMapOf()
 
     @Provides
     @Singleton
