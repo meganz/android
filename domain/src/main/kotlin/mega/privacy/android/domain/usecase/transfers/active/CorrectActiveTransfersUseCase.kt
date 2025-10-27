@@ -114,7 +114,7 @@ class CorrectActiveTransfersUseCase @Inject constructor(
                 PendingTransferState.ErrorStarting
             )
             notInProgressPendingTransfersWaitingSdkScanning
-                .filterNot { it.transferType == TransferType.CU_UPLOAD || it.isPreviewDownload() }
+                .filterNot { it.isPreviewDownload() }
                 .takeIf { it.isNotEmpty() }
                 ?.let {
                     transferRepository.addCompletedTransferFromFailedPendingTransfers(

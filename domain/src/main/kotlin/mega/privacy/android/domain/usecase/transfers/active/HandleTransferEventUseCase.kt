@@ -5,7 +5,6 @@ import kotlinx.coroutines.coroutineScope
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
 import mega.privacy.android.domain.monitoring.CrashReporter
@@ -60,11 +59,7 @@ class HandleTransferEventUseCase @Inject internal constructor(
             pause = true,
         )?.map { it.transfer }?.let { transfers ->
             val (transfersToRemove, transfersToUpdate) = transfers.filterNot {
-                it.isStreamingTransfer
-                        || it.isBackgroundTransfer()
-                        || it.isFolderTransfer
-                        || it.isPreviewDownload()
-                        || it.transferType == TransferType.CU_UPLOAD
+                it.isFolderTransfer || it.isPreviewDownload()
             }.partition { it.isFinished }
 
             if (transfersToUpdate.isNotEmpty() || transfersToRemove.isNotEmpty()) {
@@ -87,13 +82,7 @@ class HandleTransferEventUseCase @Inject internal constructor(
         events.filterByType(
             update = true,
             finish = true
-        )?.mapNotNull {
-            if (it.transfer.transferType != TransferType.CU_UPLOAD) {
-                it.transfer
-            } else {
-                null
-            }
-        }?.let { transfers ->
+        )?.map { it.transfer }?.let { transfers ->
             if (transfers.isNotEmpty()) {
                 transferRepository.updateTransferredBytes(transfers)
             }
@@ -155,7 +144,6 @@ class HandleTransferEventUseCase @Inject internal constructor(
     private suspend fun checkCompletedTransfers(events: List<TransferEvent>) {
         events.mapNotNull {
             if (it is TransferEvent.TransferFinishEvent
-                && it.transfer.transferType != TransferType.CU_UPLOAD
                 && !it.transfer.isFolderTransfer
                 && !it.transfer.isPreviewDownload()
             ) {

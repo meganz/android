@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.transfers.active
+package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -11,12 +11,12 @@ import javax.inject.Inject
  */
 class HandleCUTransferEventsUseCase @Inject constructor(
     private val cameraUploadsRepository: CameraUploadsRepository,
-) : IHandleTransferEventUseCase {
+) {
 
     /**
      * Invoke
      */
-    override suspend operator fun invoke(vararg events: TransferEvent) {
+    suspend operator fun invoke(vararg events: TransferEvent) {
         val cameraUploadEvents = events
             .filter { it.transfer.transferType == TransferType.CU_UPLOAD }
 

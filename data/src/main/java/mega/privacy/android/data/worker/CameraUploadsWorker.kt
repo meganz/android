@@ -102,6 +102,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUse
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadFileSizeDifferenceUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
+import mega.privacy.android.domain.usecase.camerauploads.HandleCUTransferEventsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HandleLocalIpChangeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredUseCase
@@ -128,9 +129,6 @@ import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
-import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
-import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
@@ -199,9 +197,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val timeSystemRepository: TimeSystemRepository,
     private val crashReporter: CrashReporter,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
-    private val handleTransferEventUseCase: HandleTransferEventUseCase,
-    private val clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
-    private val correctActiveTransfersUseCase: CorrectActiveTransfersUseCase,
+    private val handleCUTransferEventsUseCase: HandleCUTransferEventsUseCase,
     private val checkEnableCameraUploadsStatusUseCase: CheckEnableCameraUploadsStatusUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @LoginMutex private val loginMutex: Mutex,
@@ -420,7 +416,6 @@ class CameraUploadsWorker @AssistedInject constructor(
     ): Result =
         when (finishedReason) {
             CameraUploadsFinishedReason.COMPLETED -> {
-                clearActiveTransfersIfFinished()
                 sendTransfersUpToDateInfoToBackupCenter()
                 scheduleCameraUploads()
                 Result.success()
@@ -428,7 +423,6 @@ class CameraUploadsWorker @AssistedInject constructor(
 
             else -> {
                 cancelAllTransfers()
-                clearActiveTransfersIfFinished()
                 sendTransfersInterruptedInfoToBackupCenter()
                 when (restartMode) {
                     CameraUploadsRestartMode.RestartImmediately -> {
@@ -542,8 +536,6 @@ class CameraUploadsWorker @AssistedInject constructor(
      * Monitors and processes only the Camera Uploads Transfers
      */
     private fun CoroutineScope.monitorCameraUploadsTransfers() = launch {
-        runCatching { correctActiveTransfersUseCase(TransferType.CU_UPLOAD) }
-            .onFailure { Timber.e(it) }
         monitorTransferEventsUseCase()
             .filter { it.transfer.transferType == TransferType.CU_UPLOAD }
             .collectChunked(
@@ -563,7 +555,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun handleCameraUploadsTransferEvents(transferEvents: List<TransferEvent>) {
         withContext(NonCancellable) {
             launch {
-                handleTransferEventUseCase(events = transferEvents.toTypedArray())
+                handleCUTransferEventsUseCase(events = transferEvents.toTypedArray())
             }
         }
     }
@@ -606,14 +598,6 @@ class CameraUploadsWorker @AssistedInject constructor(
                 }
             }
         }.onFailure { Timber.e(it) }
-    }
-
-    /**
-     * Reset totals uploads
-     */
-    private suspend fun clearActiveTransfersIfFinished() {
-        runCatching { clearActiveTransfersIfFinishedUseCase() }
-            .onFailure { Timber.e(it) }
     }
 
     /**

@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.transfers.active
+package mega.privacy.android.domain.usecase.camerauploads
 
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.transfer.Transfer
@@ -19,7 +19,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
-
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class HandleCUTransferEventsUseCaseTest {
