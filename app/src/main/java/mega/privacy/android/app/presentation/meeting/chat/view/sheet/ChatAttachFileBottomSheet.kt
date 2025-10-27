@@ -27,6 +27,7 @@ import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import timber.log.Timber
 
 /**
  * Bottom sheet to select where to get the file to attach (cloud drive or upload from device) and return the selection.
@@ -66,6 +67,18 @@ fun ChatAttachFileBottomSheet(
                             }
                         }
                     } ?: listOfNotNull(result.data?.data).takeIf { it.isNotEmpty() }
+
+                attachedFiles?.forEach { uri ->
+                    runCatching {
+                        context.contentResolver.takePersistableUriPermission(
+                            uri,
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        )
+                    }.onFailure { e ->
+                        Timber.e(e, "Failed to take persistable URI permission")
+                    }
+                }
+
                 attachedFiles?.map { UriPath(it.toString()) }?.let(onAttachFiles)
 
             }
@@ -111,8 +124,10 @@ private fun openFilePicker(
     localLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>,
 ) {
     Intent().also {
-        it.action = Intent.ACTION_GET_CONTENT
+        it.action = Intent.ACTION_OPEN_DOCUMENT
         it.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        it.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        it.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
         it.type = "*/*"
         localLauncher.launch(it)
     }
