@@ -29,6 +29,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -50,6 +51,7 @@ class CompletedTransferActionsBottomSheetTest {
     private val onShareLink = mock<(Long) -> Unit>()
     private val onClearTransfer = mock<(CompletedTransfer) -> Unit>()
     private val onDismissSheet = mock<() -> Unit>()
+    private val onViewInFolder = mock<(CompletedTransfer) -> Unit>()
     private val fileName = "2023-03-24 00.13.20_1.pdf"
     private val completedDownload = CompletedTransfer(
         id = 0,
@@ -160,7 +162,7 @@ class CompletedTransferActionsBottomSheetTest {
             onNodeWithTag(TEST_TAG_VIEW_IN_FOLDER_ACTION)
                 .performSemanticsAction(SemanticsActions.OnClick)
 
-            verify(onDismissSheet).invoke()
+            verify(onViewInFolder).invoke(any())
         }
     }
 
@@ -311,6 +313,9 @@ class CompletedTransferActionsBottomSheetTest {
                 onConsumeOpenWithEvent = {},
                 onConsumeShareLinkEvent = {},
                 onDismissSheet = onDismissSheet,
+                onViewInFolder = onViewInFolder,
+                onConsumeViewInFolder = {},
+                navigationHandler = null,
             )
         }
     }

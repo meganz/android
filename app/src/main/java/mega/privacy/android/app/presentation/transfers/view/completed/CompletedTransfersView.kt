@@ -29,6 +29,7 @@ import mega.privacy.android.app.presentation.transfers.view.sheet.CompletedTrans
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.feature.transfers.components.CompletedTransferItem
+import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CompletedTransfersItemTapAndHoldSelectedEvent
 import mega.privacy.mobile.analytics.event.CompletedTransfersSwipeToClearEvent
@@ -41,6 +42,7 @@ internal fun CompletedTransfersView(
     enableSwipeToDismiss: Boolean,
     onCompletedTransferSelected: (CompletedTransfer) -> Unit,
     onClearCompletedTransfer: (Int) -> Unit,
+    navigationHandler: NavigationHandler?,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
 ) {
@@ -100,6 +102,7 @@ internal fun CompletedTransfersView(
 
             CompletedTransferActionsBottomSheet(
                 completedTransfer = completedTransfer,
+                navigationHandler = navigationHandler,
                 fileTypeResId = fileTypeResId,
                 previewUri = previewUri,
                 onDismissSheet = { completedItemSelected = null },

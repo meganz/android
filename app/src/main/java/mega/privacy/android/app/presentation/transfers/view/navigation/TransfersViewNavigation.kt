@@ -11,6 +11,7 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.transfers.model.TransfersViewModel
 import mega.privacy.android.app.presentation.transfers.view.TransfersView
+import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.TransfersNavKey
 
 internal fun NavGraphBuilder.transfersScreen(
@@ -22,7 +23,8 @@ internal fun NavGraphBuilder.transfersScreen(
         TransferRoute(
             args = args,
             onBackPress = onBackPress,
-            onNavigateToUpgradeAccount = onNavigateToUpgradeAccount
+            onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
+            navigationHandler = null,
         )
     }
 }
@@ -31,6 +33,7 @@ internal fun NavGraphBuilder.transfersScreen(
 private fun TransferRoute(
     args: TransfersNavKey,
     onBackPress: () -> Unit,
+    navigationHandler: NavigationHandler?,
     onNavigateToUpgradeAccount: () -> Unit,
 ) {
     val viewModel = hiltViewModel<TransfersViewModel, TransfersViewModel.Factory>(
@@ -75,14 +78,16 @@ private fun TransferRoute(
         onClearCompletedTransfer = viewModel::clearCompletedTransfer,
         onSetActiveTransferToCancel = viewModel::setActiveTransferToCancel,
         onUndoCancelActiveTransfer = viewModel::undoCancelActiveTransfer,
+        navigationHandler = navigationHandler,
     )
 }
 
 internal fun EntryProviderScope<NavKey>.transfersScreen3(
     onBackPress: () -> Unit,
     onNavigateToUpgradeAccount: () -> Unit,
+    navigationHandler: NavigationHandler?,
 ) {
     entry<TransfersNavKey> {
-        TransferRoute(it, onBackPress, onNavigateToUpgradeAccount)
+        TransferRoute(it, onBackPress, navigationHandler, onNavigateToUpgradeAccount)
     }
 }

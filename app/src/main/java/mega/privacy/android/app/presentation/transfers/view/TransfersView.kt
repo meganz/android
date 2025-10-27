@@ -56,6 +56,7 @@ import mega.privacy.android.app.presentation.transfers.view.sheet.FailedTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ActiveTransferDragAndDropToChangePriorityEvent
 import mega.privacy.mobile.analytics.event.ActiveTransfersCancelSelectedMenuItemEvent
@@ -79,6 +80,7 @@ import mega.privacy.mobile.analytics.event.TransfersSectionScreenEvent
 internal fun TransfersView(
     onBackPress: () -> Unit,
     onNavigateToUpgradeAccount: () -> Unit,
+    navigationHandler: NavigationHandler?,
     uiState: TransfersUiState,
     onTabSelected: (Int) -> Unit,
     onPlayPauseTransfer: (Int) -> Unit,
@@ -319,6 +321,7 @@ internal fun TransfersView(
                             enableSwipeToDismiss = !isInSelectTransfersMode,
                             onCompletedTransferSelected = onCompletedTransferSelected,
                             onClearCompletedTransfer = onClearCompletedTransfer,
+                            navigationHandler = navigationHandler,
                             modifier = modifier,
                         )
                     }
@@ -494,6 +497,7 @@ private fun TransfersViewPreview() {
             onClearCompletedTransfer = {},
             onSetActiveTransferToCancel = {},
             onUndoCancelActiveTransfer = {},
+            navigationHandler = null,
         )
     }
 }

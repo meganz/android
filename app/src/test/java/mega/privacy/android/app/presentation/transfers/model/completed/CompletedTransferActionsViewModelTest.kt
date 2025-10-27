@@ -3,6 +3,8 @@ package mega.privacy.android.app.presentation.transfers.model.completed
 import android.net.Uri
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -20,18 +22,22 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.GetDownloadDocumentFileUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.GetDownloadParentDocumentFileUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.io.TempDir
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -54,6 +60,7 @@ class CompletedTransferActionsViewModelTest {
     private val deleteCompletedTransferUseCase = mock<DeleteCompletedTransferUseCase>()
     private val getNodeByHandleUseCase = mock<GetNodeByHandleUseCase>()
     private val fileTypeInfoMapper = mock<FileTypeInfoMapper>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     @TempDir
     lateinit var temporaryFolder: File
@@ -62,6 +69,42 @@ class CompletedTransferActionsViewModelTest {
         id = 0,
         fileName = "fileName.txt",
         type = TransferType.DOWNLOAD,
+        state = TransferState.STATE_COMPLETED,
+        size = "3.57 MB",
+        handle = 27169983390750L,
+        path = "content://com.android.externalstorage.documents/tree/primary%Download//2023-03-24 00.13.20_1.pdf",
+        displayPath = "storage/emulated/0/Download",
+        isOffline = false,
+        timestamp = 1684228012974L,
+        error = "No error",
+        errorCode = 0,
+        originalPath = "content://com.android.externalstorage.documents/tree/primary%Download//2023-03-24 00.13.20_1.pdf",
+        parentHandle = 11622336899311L,
+        appData = emptyList(),
+    )
+
+    private val completedOffline = CompletedTransfer(
+        id = 0,
+        fileName = "fileName.txt",
+        type = TransferType.DOWNLOAD,
+        state = TransferState.STATE_COMPLETED,
+        size = "3.57 MB",
+        handle = 27169983390750L,
+        path = "content://com.android.externalstorage.documents/tree/primary%Download//2023-03-24 00.13.20_1.pdf",
+        displayPath = "storage/emulated/0/Download",
+        isOffline = true,
+        timestamp = 1684228012974L,
+        error = "No error",
+        errorCode = 0,
+        originalPath = "content://com.android.externalstorage.documents/tree/primary%Download//2023-03-24 00.13.20_1.pdf",
+        parentHandle = 11622336899311L,
+        appData = emptyList(),
+    )
+
+    private val completedUpload = CompletedTransfer(
+        id = 0,
+        fileName = "fileName.txt",
+        type = TransferType.GENERAL_UPLOAD,
         state = TransferState.STATE_COMPLETED,
         size = "3.57 MB",
         handle = 27169983390750L,
@@ -89,7 +132,8 @@ class CompletedTransferActionsViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             deleteCompletedTransferUseCase = deleteCompletedTransferUseCase,
             getNodeByHandleUseCase = getNodeByHandleUseCase,
-            fileTypeInfoMapper = fileTypeInfoMapper
+            fileTypeInfoMapper = fileTypeInfoMapper,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
         )
     }
 
@@ -102,10 +146,12 @@ class CompletedTransferActionsViewModelTest {
             monitorConnectivityUseCase,
             deleteCompletedTransferUseCase,
             getNodeByHandleUseCase,
-            fileTypeInfoMapper
+            fileTypeInfoMapper,
+            getFeatureFlagValueUseCase,
         )
 
         wheneverBlocking { monitorConnectivityUseCase() } doReturn flowOf(true)
+        wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) } doReturn false
     }
 
     @Test
@@ -326,6 +372,65 @@ class CompletedTransferActionsViewModelTest {
         underTest.clearTransfer(completedDownload)
 
         verify(deleteCompletedTransferUseCase).invoke(completedDownload, false)
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that onViewInFolder emits new download event when is invoked with a download completed transfer`(
+        singleActivity: Boolean,
+    ) = runTest {
+        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn singleActivity
+
+        underTest.onViewInFolder(completedDownload)
+
+        assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content).isInstanceOf(
+            ViewInFolderEvent.Download::class.java
+        )
+        assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content?.singleActivity).isEqualTo(
+            singleActivity
+        )
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that onViewInFolder emits new download to offline event when is invoked with a download to offline completed transfer`(
+        singleActivity: Boolean,
+    ) = runTest {
+        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn singleActivity
+
+        underTest.onViewInFolder(completedOffline)
+
+        assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content).isInstanceOf(
+            ViewInFolderEvent.DownloadToOffline::class.java
+        )
+        assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content?.singleActivity).isEqualTo(
+            singleActivity
+        )
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that onViewInFolder emits new upload event when is invoked with an upload completed transfer`(
+        singleActivity: Boolean,
+    ) = runTest {
+        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn singleActivity
+
+        underTest.onViewInFolder(completedUpload)
+
+        assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content).isInstanceOf(
+            ViewInFolderEvent.Upload::class.java
+        )
+        assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content?.singleActivity).isEqualTo(
+            singleActivity
+        )
+    }
+
+    @Test
+    fun `test that onConsumeViewInFolder consumes the event correctly`() = runTest {
+        underTest.onViewInFolder(completedDownload)
+        underTest.onConsumeViewInFolder()
+
+        assertThat(underTest.uiState.value.viewInFolderEvent).isEqualTo(consumed())
     }
 
     companion object {

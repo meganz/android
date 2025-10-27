@@ -44,6 +44,7 @@ class CompletedTransfersViewTest {
                 onCompletedTransferSelected = mock(),
                 onClearCompletedTransfer = mock(),
                 modifier = mock(),
+                navigationHandler = null,
             )
         }
     }

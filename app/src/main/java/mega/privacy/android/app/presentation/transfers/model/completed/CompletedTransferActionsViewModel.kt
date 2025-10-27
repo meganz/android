@@ -17,12 +17,14 @@ import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.GetDownloadDocumentFileUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.GetDownloadParentDocumentFileUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -41,6 +43,7 @@ class CompletedTransferActionsViewModel @Inject constructor(
     private val deleteCompletedTransferUseCase: DeleteCompletedTransferUseCase,
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CompletedTransferActionsUiState())
@@ -159,6 +162,40 @@ class CompletedTransferActionsViewModel @Inject constructor(
     }
 
     /**
+     * View in folder action
+     */
+    fun onViewInFolder(completedTransfer: CompletedTransfer) {
+        viewModelScope.launch {
+            val singleActivity = getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
+            val viewInFolderEvent = if (completedTransfer.type.isDownloadType()) {
+                val path = _uiState.value.parentUri?.toString()?.takeUnless { it.isBlank() }
+                    ?: "file://${completedTransfer.path}"
+                if (completedTransfer.isOffline == true) {
+                    ViewInFolderEvent.DownloadToOffline(
+                        singleActivity,
+                        completedTransfer.fileName,
+                    )
+                } else {
+                    ViewInFolderEvent.Download(
+                        singleActivity,
+                        completedTransfer.fileName,
+                        path
+                    )
+                }
+            } else {
+                ViewInFolderEvent.Upload(
+                    singleActivity,
+                    completedTransfer.fileName,
+                    NodeId(completedTransfer.parentHandle)
+                )
+            }
+            _uiState.update { state ->
+                state.copy(viewInFolderEvent = triggered(viewInFolderEvent))
+            }
+        }
+    }
+
+    /**
      * Share link action for completed transfer.
      */
     fun shareLink(handle: Long) {
@@ -182,6 +219,13 @@ class CompletedTransferActionsViewModel @Inject constructor(
      */
     fun onConsumeShareLinkEvent() {
         _uiState.update { state -> state.copy(shareLinkEvent = consumed()) }
+    }
+
+    /**
+     * Consume the view in folder event.
+     */
+    fun onConsumeViewInFolder() {
+        _uiState.update { state -> state.copy(viewInFolderEvent = consumed()) }
     }
 
     /**

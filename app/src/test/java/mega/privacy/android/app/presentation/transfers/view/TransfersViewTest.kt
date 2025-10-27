@@ -624,6 +624,7 @@ class TransfersViewTest {
                     onClearCompletedTransfer = {},
                     onSetActiveTransferToCancel = {},
                     onUndoCancelActiveTransfer = {},
+                    navigationHandler = null,
                 )
             }
         }

@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.transfers.model.completed
 import android.net.Uri
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import java.io.File
@@ -20,6 +21,7 @@ import java.io.File
  * @property isOnline Indicates if the device is currently online.
  * @property openWithEvent Event to handle opening the completed transfer with another app.
  * @property shareLinkEvent Event to handle sharing a link to the completed transfer.
+ * @property viewInFolderEvent Event to handle viewing the completed transfer in its folder.
  */
 data class CompletedTransferActionsUiState(
     val completedTransfer: CompletedTransfer? = null,
@@ -29,6 +31,7 @@ data class CompletedTransferActionsUiState(
     val isOnline: Boolean = true,
     val openWithEvent: StateEventWithContent<OpenWithEvent> = consumed(),
     val shareLinkEvent: StateEventWithContent<ShareLinkEvent> = consumed(),
+    val viewInFolderEvent: StateEventWithContent<ViewInFolderEvent> = consumed(),
 ) {
     val canViewInFolder
         get() = completedTransfer != null &&
@@ -77,4 +80,47 @@ data class ShareLinkEvent(
 
     val isTakenDown: Boolean
         get() = node?.isTakenDown == true
+}
+
+/**
+ * View in folder event
+ */
+sealed interface ViewInFolderEvent {
+    /**
+     * The action should be performed with single activity navigation
+     */
+    val singleActivity: Boolean
+
+    /**
+     * The file name to be displayed in the folder
+     */
+    val fileName: String
+
+    /**
+     * The transfer to view in folder is a download to the local storage transfer, so it should be shown in file explorer
+     * @property path the path of the transfer
+     */
+    data class Download(
+        override val singleActivity: Boolean,
+        override val fileName: String,
+        val path: String,
+    ) : ViewInFolderEvent
+
+    /**
+     * The transfer to view in folder is a download to offline transfer, so it should be shown in offline section
+     */
+    data class DownloadToOffline(
+        override val singleActivity: Boolean,
+        override val fileName: String,
+    ) : ViewInFolderEvent
+
+    /**
+     * The transfer to view in folder is an upload, so it should be shown in cloud drive
+     * @property parentNodeId
+     */
+    data class Upload(
+        override val singleActivity: Boolean,
+        override val fileName: String,
+        val parentNodeId: NodeId,
+    ) : ViewInFolderEvent
 }
