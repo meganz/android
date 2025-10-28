@@ -2,6 +2,8 @@ package mega.privacy.android.app.presentation.photos
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -41,5 +43,19 @@ class PhotosViewModel @Inject constructor() : ViewModel() {
         _state.update {
             it.copy(isMenuShowing = isShow)
         }
+    }
+
+    /**
+     * Trigger cameraUploadsProgressViewEvent.
+     */
+    fun triggerCameraUploadsProgressViewEvent() {
+        _state.update { state -> state.copy(cameraUploadsProgressViewEvent = triggered) }
+    }
+
+    /**
+     * Consume cameraUploadsProgressViewEvent.
+     */
+    fun onConsumeCameraUploadsProgressViewEvent() {
+        _state.update { state -> state.copy(cameraUploadsProgressViewEvent = consumed) }
     }
 }

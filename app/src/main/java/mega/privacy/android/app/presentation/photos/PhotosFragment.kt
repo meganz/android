@@ -1045,6 +1045,13 @@ class PhotosFragment : Fragment() {
         Util.showSnackbar(requireActivity(), message)
     }
 
+    /**
+     * Trigger CU Progress view event.
+     */
+    fun triggerCUProgressViewEvent() {
+        photosViewModel.triggerCameraUploadsProgressViewEvent()
+    }
+
     internal fun isCameraUploadsTransferScreen() = isCameraUploadsTransferScreen
 
     internal fun triggerPopBackFromCameraUploadsTransferScreenEvent() {
@@ -1075,5 +1082,6 @@ class PhotosFragment : Fragment() {
         }
 
         private const val FIRST_LOGIN_KEY = "PHOTOS_FRAGMENT_FIRST_LOGIN_ARGUMENT"
+        const val ACTION_SHOW_CU_PROGRESS_VIEW = "ACTION_SHOW_CU_PROGRESS_VIEW"
     }
 }

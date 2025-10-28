@@ -197,6 +197,7 @@ import mega.privacy.android.app.presentation.notification.model.NotificationNavi
 import mega.privacy.android.app.presentation.offline.offlinecompose.OfflineComposeFragment
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment
 import mega.privacy.android.app.presentation.photos.PhotosFragment
+import mega.privacy.android.app.presentation.photos.PhotosFragment.Companion.ACTION_SHOW_CU_PROGRESS_VIEW
 import mega.privacy.android.app.presentation.photos.albums.albumcontent.AlbumContentFragment
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
@@ -1512,6 +1513,12 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                             Timber.d("Link to change mail: %s", it)
                             showMyAccount(Constants.ACTION_CHANGE_MAIL, it)
                         }
+                    } else if (intent.action == ACTION_SHOW_CU_PROGRESS_VIEW) {
+                        drawerItem = DrawerItem.PHOTOS
+                        selectDrawerItem(drawerItem)
+                        photosFragment?.triggerCUProgressViewEvent()
+                        selectDrawerItemPending = false
+                        intent = null
                     } else if (intent.action == Constants.ACTION_OPEN_FOLDER) {
                         Timber.d("Open after LauncherFileExplorerActivity ")
                         val locationFileInfo: Boolean = intent.getBooleanExtra(
@@ -2788,6 +2795,12 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     Timber.d("ACTION_OPEN_CONTACTS_SECTION")
                     markNotificationsSeen(true)
                     openContactLink(intent.getLongExtra(Constants.CONTACT_HANDLE, -1))
+                }
+
+                ACTION_SHOW_CU_PROGRESS_VIEW -> {
+                    drawerItem = DrawerItem.PHOTOS
+                    selectDrawerItem(drawerItem)
+                    photosFragment?.triggerCUProgressViewEvent()
                 }
 
                 Constants.ACTION_OPEN_FOLDER -> {

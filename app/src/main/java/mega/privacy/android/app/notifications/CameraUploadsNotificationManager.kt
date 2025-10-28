@@ -13,6 +13,7 @@ import androidx.work.ForegroundInfo
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.photos.PhotosFragment.Companion.ACTION_SHOW_CU_PROGRESS_VIEW
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.INITIAL_PREFERENCE
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.NAVIGATE_TO_INITIAL_PREFERENCE
@@ -20,7 +21,6 @@ import mega.privacy.android.app.presentation.settings.camerauploads.INTENT_EXTRA
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
 import mega.privacy.android.app.presentation.settings.compose.SettingsHomeActivity
 import mega.privacy.android.app.presentation.settings.model.cameraUploadsTargetPreference
-import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SHOW_HOW_TO_UPLOAD_PROMPT
 import mega.privacy.android.data.wrapper.StringWrapper
@@ -183,7 +183,9 @@ class CameraUploadsNotificationManager @Inject constructor(
     private fun getDefaultPendingIntent() = PendingIntent.getActivity(
         context,
         0,
-        TransfersActivity.getActiveTabIntent(context),
+        Intent(context, ManagerActivity::class.java).apply {
+            action = ACTION_SHOW_CU_PROGRESS_VIEW
+        },
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
 

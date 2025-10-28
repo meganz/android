@@ -2,12 +2,14 @@ package mega.privacy.android.app.presentation.photos
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.photos.PhotosViewModel
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
@@ -44,6 +46,26 @@ internal class PhotosViewModelTest {
                 assertThat(awaitItem()).isEqualTo(isMenuShowing)
             }
     }
+
+    @Test
+    fun `test that triggerCameraUploadsProgressViewEvent updates state with triggered`() = runTest {
+        underTest.triggerCameraUploadsProgressViewEvent()
+
+        underTest.state.map { it.cameraUploadsProgressViewEvent }.test {
+            assertThat(awaitItem()).isEqualTo(triggered)
+        }
+    }
+
+    @Test
+    fun `test that onConsumeCameraUploadsProgressViewEvent updates state with consumed`() =
+        runTest {
+            underTest.triggerCameraUploadsProgressViewEvent()
+            underTest.onConsumeCameraUploadsProgressViewEvent()
+
+            underTest.state.map { it.cameraUploadsProgressViewEvent }.test {
+                assertThat(awaitItem()).isEqualTo(consumed)
+            }
+        }
 
     private fun initializeViewModel() {
         underTest = PhotosViewModel()

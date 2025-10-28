@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -189,6 +190,13 @@ fun PhotosScreen(
             pagerState.scrollToPage(photosTab.ordinal)
             Analytics.tracker.trackEvent(photosTab.analyticsInfo)
         }
+    }
+
+    EventEffect(
+        event = photosViewState.cameraUploadsProgressViewEvent,
+        onConsumed = photosViewModel::onConsumeCameraUploadsProgressViewEvent
+    ) {
+        onNavigateCameraUploadsTransferScreen()
     }
 
     PhotosBodyView(
