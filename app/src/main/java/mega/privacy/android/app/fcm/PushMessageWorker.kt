@@ -1,6 +1,5 @@
 package mega.privacy.android.app.fcm
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Notification
@@ -37,6 +36,7 @@ import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.data.mapper.pushmessage.PushMessageMapper
 import mega.privacy.android.domain.entity.CallsMeetingReminders
+import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.FakeIncomingCallState
@@ -49,18 +49,21 @@ import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
+import mega.privacy.android.domain.usecase.GetUrlRegexPatternTypeUseCase
 import mega.privacy.android.domain.usecase.RetryPendingConnectionsUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.call.IsChatStatusConnectedForCallUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotifiableUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
+import mega.privacy.android.domain.usecase.link.DecodeLinkUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.SetFakeIncomingCallStateUseCase
 import mega.privacy.android.domain.usecase.notifications.GetChatMessageNotificationDataUseCase
 import mega.privacy.android.domain.usecase.notifications.PushReceivedUseCase
+import mega.privacy.android.icon.pack.R as iconPackR
 import timber.log.Timber
 
 /**
@@ -107,6 +110,8 @@ class PushMessageWorker @AssistedInject constructor(
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
     private val getChatCallUseCase: GetChatCallUseCase,
+    private val getUrlRegexPatternTypeUseCase: GetUrlRegexPatternTypeUseCase,
+    private val decodeLinkUseCase: DecodeLinkUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @LoginMutex private val loginMutex: Mutex,
 ) : CoroutineWorker(context, workerParams) {
@@ -117,12 +122,15 @@ class PushMessageWorker @AssistedInject constructor(
     override suspend fun doWork(): Result = withContext(ioDispatcher) {
         Timber.d("Push message worker - do work")
         // legacy support, other places need to know logging in happen
-        if (loginMutex.isLocked) {
+        val pushMessage = getPushMessageFromWorkerData(inputData)
+        val isRequiredLogin = isRequiredLogin(pushMessage)
+        Timber.d("Is required login: $isRequiredLogin")
+        if (loginMutex.isLocked && isRequiredLogin) {
             Timber.w("Logging already running.")
             return@withContext Result.failure()
         }
 
-        getPushMessageFromWorkerData(inputData)?.let {
+        pushMessage?.let {
             if (it is CallPushMessage) {
                 runCatching {
                     Timber.d("CallPushMessage received, show fake notification")
@@ -131,35 +139,37 @@ class PushMessageWorker @AssistedInject constructor(
                         type = FakeIncomingCallState.Notification
                     )
                 }.onFailure { exception ->
-                    Timber.e(exception.message)
+                    Timber.e(exception)
                 }
             }
         }
 
-        val loginResult = runCatching {
-            backgroundFastLoginUseCase()
-        }
-        Timber.d("Login result $loginResult")
-        if (loginResult.isSuccess) {
-            Timber.d("Fast login success.")
-            runCatching { retryPendingConnectionsUseCase(disconnect = false) }
-                .recoverCatching { error ->
-                    if (error is ChatNotInitializedErrorStatus) {
-                        Timber.d("chat engine not ready. try to initialise MEGAChat")
-                        initialiseMegaChatUseCase(loginResult.getOrDefault(""))
-                    } else {
-                        Timber.w(error)
+        if (isRequiredLogin) {
+            val loginResult = runCatching {
+                backgroundFastLoginUseCase()
+            }
+            Timber.d("Login result $loginResult")
+            if (loginResult.isSuccess) {
+                Timber.d("Fast login success.")
+                runCatching { retryPendingConnectionsUseCase(disconnect = false) }
+                    .recoverCatching { error ->
+                        if (error is ChatNotInitializedErrorStatus) {
+                            Timber.d("chat engine not ready. try to initialise MEGAChat")
+                            initialiseMegaChatUseCase(loginResult.getOrDefault(""))
+                        } else {
+                            Timber.w(error)
+                        }
+                    }.onFailure { error ->
+                        Timber.e("Initialise MEGAChat failed: $error")
+                        return@withContext Result.failure()
                     }
-                }.onFailure { error ->
-                    Timber.e("Initialise MEGAChat failed: $error")
-                    return@withContext Result.failure()
-                }
-        } else {
-            Timber.e("Fast login error: ${loginResult.exceptionOrNull()}")
-            return@withContext Result.failure()
-        }
+            } else {
+                Timber.e("Fast login error: ${loginResult.exceptionOrNull()}")
+                return@withContext Result.failure()
+            }
 
-        when (val pushMessage = getPushMessageFromWorkerData(inputData)) {
+        }
+        when (pushMessage) {
             is CallPushMessage -> {
                 Timber.d("Call push message with chatId ${pushMessage.chatId} ")
                 if (isChatStatusConnectedForCallUseCase(pushMessage.chatId)) {
@@ -280,6 +290,14 @@ class PushMessageWorker @AssistedInject constructor(
         }
 
         return@withContext Result.success()
+    }
+
+    private fun isRequiredLogin(pushMessage: PushMessage?): Boolean {
+        return (pushMessage as? PromoPushMessage)?.let {
+            val decodedUrl = decodeLinkUseCase(it.redirectLink)
+            val type = getUrlRegexPatternTypeUseCase(decodedUrl)
+            type != RegexPatternType.UPGRADE_LINK && type != RegexPatternType.UPGRADE_PAGE_LINK
+        } != false
     }
 
     /**

@@ -518,13 +518,8 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
             getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.UPGRADE_PAGE_LINK
                     || getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.UPGRADE_LINK -> {
                 lifecycleScope.launch {
-                    if (isLoggedIn) {
-                        navigateToUpgradeAccount()
-                        finish()
-                    } else {
-                        Timber.w("Not logged in")
-                        setError(getString(R.string.alert_not_logged_in))
-                    }
+                    navigateToUpgradeAccount()
+                    finish()
                 }
             }
             //Enable camera uploads link

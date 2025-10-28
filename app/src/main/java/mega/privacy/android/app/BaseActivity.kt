@@ -893,7 +893,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     open fun navigateToUpgradeAccount() {
         val intent = Intent(this, ManagerActivity::class.java)
         intent.action = ACTION_SHOW_UPGRADE_ACCOUNT
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
     }
 

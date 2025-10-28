@@ -27,17 +27,20 @@ import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.data.mapper.pushmessage.PushMessageMapper
 import mega.privacy.android.domain.entity.CallsMeetingReminders
+import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.pushes.PushMessage
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.exception.EmptyFolderException
 import mega.privacy.android.domain.exception.SessionNotRetrievedException
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
+import mega.privacy.android.domain.usecase.GetUrlRegexPatternTypeUseCase
 import mega.privacy.android.domain.usecase.RetryPendingConnectionsUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.call.IsChatStatusConnectedForCallUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotifiableUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
+import mega.privacy.android.domain.usecase.link.DecodeLinkUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
@@ -92,7 +95,8 @@ class PushMessageWorkerTest {
     private val getMyUserHandleUseCase = mock<GetMyUserHandleUseCase>()
     private val getChatCallUseCase = mock<GetChatCallUseCase>()
     private val ioDispatcher = UnconfinedTestDispatcher()
-
+    private val getUrlRegexPatternTypeUseCase: GetUrlRegexPatternTypeUseCase = mock()
+    private val decodeLinkUseCase: DecodeLinkUseCase = mock()
 
     @Before
     fun setUp() {
@@ -142,6 +146,8 @@ class PushMessageWorkerTest {
             getMyUserHandleUseCase = getMyUserHandleUseCase,
             getChatCallUseCase = getChatCallUseCase,
             ioDispatcher = ioDispatcher,
+            getUrlRegexPatternTypeUseCase = getUrlRegexPatternTypeUseCase,
+            decodeLinkUseCase = decodeLinkUseCase,
             loginMutex = mock()
         )
 
@@ -269,4 +275,180 @@ class PushMessageWorkerTest {
             assertThat(result).isEqualTo(ListenableWorker.Result.success())
         }
     }
+
+    @Test
+    fun `test that PromoPushMessage with UPGRADE_LINK redirect does not require login and skips fast login`() =
+        runTest {
+            val pushMessage = PushMessage.PromoPushMessage(
+                id = 1,
+                title = "Upgrade",
+                subtitle = null,
+                description = "Upgrade description",
+                redirectLink = "https://upgrade.mega.io",
+                imagePath = null,
+                sound = null,
+            )
+            whenever(pushMessageMapper(any())).thenReturn(pushMessage)
+            whenever(decodeLinkUseCase(pushMessage.redirectLink)).thenReturn(pushMessage.redirectLink)
+            whenever(getUrlRegexPatternTypeUseCase(pushMessage.redirectLink)).thenReturn(
+                RegexPatternType.UPGRADE_LINK
+            )
+            whenever(notificationManager.areNotificationsEnabled()).thenReturn(true)
+
+            val result = underTest.doWork()
+
+            verifyNoInteractions(backgroundFastLoginUseCase)
+            verify(promoPushNotificationManager).show(context, pushMessage)
+            assertThat(result).isEqualTo(ListenableWorker.Result.success())
+        }
+
+    @Test
+    fun `test that PromoPushMessage with UPGRADE_PAGE_LINK redirect does not require login and skips fast login`() =
+        runTest {
+            val pushMessage = PushMessage.PromoPushMessage(
+                id = 1,
+                title = "Upgrade Page",
+                subtitle = null,
+                description = "Upgrade page description",
+                redirectLink = "https://upgrade-page.mega.io",
+                imagePath = null,
+                sound = null,
+            )
+            whenever(pushMessageMapper(any())).thenReturn(pushMessage)
+            whenever(decodeLinkUseCase(pushMessage.redirectLink)).thenReturn(pushMessage.redirectLink)
+            whenever(getUrlRegexPatternTypeUseCase(pushMessage.redirectLink)).thenReturn(
+                RegexPatternType.UPGRADE_PAGE_LINK
+            )
+            whenever(notificationManager.areNotificationsEnabled()).thenReturn(true)
+
+            val result = underTest.doWork()
+
+            verifyNoInteractions(backgroundFastLoginUseCase)
+            verify(promoPushNotificationManager).show(context, pushMessage)
+            assertThat(result).isEqualTo(ListenableWorker.Result.success())
+        }
+
+    @Test
+    fun `test that PromoPushMessage with non-upgrade redirect requires login and performs fast login`() =
+        runTest {
+            val pushMessage = PushMessage.PromoPushMessage(
+                id = 1,
+                title = "Promo",
+                subtitle = null,
+                description = "Promo description",
+                redirectLink = "https://mega.io",
+                imagePath = null,
+                sound = null,
+            )
+            whenever(pushMessageMapper(any())).thenReturn(pushMessage)
+            whenever(decodeLinkUseCase(pushMessage.redirectLink)).thenReturn(pushMessage.redirectLink)
+            whenever(getUrlRegexPatternTypeUseCase(pushMessage.redirectLink)).thenReturn(
+                RegexPatternType.WHITELISTED_URL
+            )
+            whenever(backgroundFastLoginUseCase()).thenReturn("session_id")
+            whenever(notificationManager.areNotificationsEnabled()).thenReturn(true)
+            whenever(retryPendingConnectionsUseCase(any())).thenReturn(Unit)
+
+            val result = underTest.doWork()
+
+            verify(backgroundFastLoginUseCase).invoke()
+            verify(retryPendingConnectionsUseCase).invoke(false)
+            verify(promoPushNotificationManager).show(context, pushMessage)
+            assertThat(result).isEqualTo(ListenableWorker.Result.success())
+        }
+
+    @Test
+    fun `test that PromoPushMessage with non-upgrade redirect fails when login already running`() =
+        runTest {
+            val pushMessage = PushMessage.PromoPushMessage(
+                id = 1,
+                title = "Promo",
+                subtitle = null,
+                description = "Promo description",
+                redirectLink = "https://mega.io",
+                imagePath = null,
+                sound = null,
+            )
+            whenever(pushMessageMapper(any())).thenReturn(pushMessage)
+            whenever(decodeLinkUseCase(pushMessage.redirectLink)).thenReturn(pushMessage.redirectLink)
+            whenever(getUrlRegexPatternTypeUseCase(pushMessage.redirectLink)).thenReturn(
+                RegexPatternType.WHITELISTED_URL
+            )
+
+            // Simulate login already running
+            val loginMutex = kotlinx.coroutines.sync.Mutex()
+            loginMutex.lock()
+
+            val underTestWithLockedMutex = PushMessageWorker(
+                context = context,
+                workerParams = WorkerParameters(
+                    UUID.randomUUID(),
+                    workDataOf(),
+                    emptyList(),
+                    WorkerParameters.RuntimeExtras(),
+                    1,
+                    1,
+                    executor,
+                    Dispatchers.Unconfined,
+                    workExecutor,
+                    DefaultWorkerFactory,
+                    WorkProgressUpdater(workDatabase, workExecutor),
+                    WorkForegroundUpdater(workDatabase, { _, _ -> }, workExecutor)
+                ),
+                backgroundFastLoginUseCase = backgroundFastLoginUseCase,
+                pushReceivedUseCase = pushReceivedUseCase,
+                retryPendingConnectionsUseCase = retryPendingConnectionsUseCase,
+                pushMessageMapper = pushMessageMapper,
+                initialiseMegaChatUseCase = initialiseMegaChatUseCase,
+                scheduledMeetingPushMessageNotificationManager = scheduledMeetingPushMessageNotificationManager,
+                callsPreferencesGateway = callsPreferencesGateway,
+                notificationManager = notificationManager,
+                isChatNotifiableUseCase = isChatNotifiableUseCase,
+                getChatRoomUseCase = getChatRoomUseCase,
+                fileDurationMapper = fileDurationMapper,
+                promoPushNotificationManager = promoPushNotificationManager,
+                getChatMessageNotificationDataUseCase = getChatMessageNotificationDataUseCase,
+                chatMessageNotificationManager = chatMessageNotificationManager,
+                setFakeIncomingCallStateUseCase = setFakeIncomingCallStateUseCase,
+                isChatStatusConnectedForCallUseCase = isChatStatusConnectedForCallUseCase,
+                monitorChatConnectionStateUseCase = monitorChatConnectionStateUseCase,
+                monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase,
+                getMyUserHandleUseCase = getMyUserHandleUseCase,
+                getChatCallUseCase = getChatCallUseCase,
+                ioDispatcher = ioDispatcher,
+                getUrlRegexPatternTypeUseCase = getUrlRegexPatternTypeUseCase,
+                decodeLinkUseCase = decodeLinkUseCase,
+                loginMutex = loginMutex,
+            )
+
+            val result = underTestWithLockedMutex.doWork()
+
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+            verifyNoInteractions(backgroundFastLoginUseCase)
+            loginMutex.unlock()
+        }
+
+    @Test
+    fun `test that PromoPushMessage with non-upgrade redirect fails when fast login fails`() =
+        runTest {
+            val pushMessage = PushMessage.PromoPushMessage(
+                id = 1,
+                title = "Promo",
+                subtitle = null,
+                description = "Promo description",
+                redirectLink = "https://mega.io",
+                imagePath = null,
+                sound = null,
+            )
+            whenever(pushMessageMapper(any())).thenReturn(pushMessage)
+            whenever(decodeLinkUseCase(pushMessage.redirectLink)).thenReturn(pushMessage.redirectLink)
+            whenever(getUrlRegexPatternTypeUseCase(pushMessage.redirectLink)).thenReturn(
+                RegexPatternType.WHITELISTED_URL
+            )
+            whenever(backgroundFastLoginUseCase()).thenThrow(SessionNotRetrievedException())
+
+            val result = underTest.doWork()
+
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+        }
 }
