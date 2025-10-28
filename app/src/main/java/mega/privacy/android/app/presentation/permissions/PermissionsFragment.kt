@@ -7,7 +7,6 @@ import android.Manifest.permission.READ_MEDIA_VIDEO
 import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings.canDrawOverlays
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -185,27 +184,6 @@ class PermissionsFragment : Fragment() {
 
             add(
                 Pair(
-                    Permission.DisplayOverOtherApps,
-                    canDrawOverlays(requireContext())
-                )
-            )
-
-            add(
-                Pair(
-                    Permission.Read,
-                    hasPermissions(requireActivity(), *readPermissions)
-                )
-            )
-
-            add(
-                Pair(
-                    Permission.Write,
-                    hasPermissions(requireActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                )
-            )
-
-            add(
-                Pair(
                     Permission.CameraBackup,
                     hasPermissions(
                         requireActivity(),
@@ -213,29 +191,6 @@ class PermissionsFragment : Fragment() {
                     )
                 )
             )
-
-            add(
-                Pair(
-                    Permission.Camera,
-                    hasPermissions(requireActivity(), Manifest.permission.CAMERA)
-                )
-            )
-
-            add(
-                Pair(
-                    Permission.Microphone,
-                    hasPermissions(requireActivity(), Manifest.permission.RECORD_AUDIO)
-                )
-            )
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                add(
-                    Pair(
-                        Permission.Bluetooth,
-                        hasPermissions(requireActivity(), Manifest.permission.BLUETOOTH_CONNECT)
-                    )
-                )
-            }
         }
         viewModel.updateFirstTimeLoginStatus()
         viewModel.setData(missingPermission)

@@ -141,12 +141,14 @@ class PermissionsViewModelTest {
             underTest.setData(
                 permissions = listOf(
                     Permission.CameraBackup to false,
-                    Permission.Bluetooth to false
+                    Permission.Notifications to false
                 )
             )
 
             underTest.uiState.test {
                 assertThat(awaitItem().visiblePermission).isEqualTo(NewPermissionScreen.CameraBackup)
+                underTest.nextPermission()
+                assertThat(awaitItem().visiblePermission).isEqualTo(NewPermissionScreen.Notification)
                 underTest.nextPermission()
                 assertThat(awaitItem().finishEvent).isEqualTo(triggered)
             }

@@ -72,9 +72,6 @@ class PermissionsViewModel @Inject constructor(
         viewModelScope.launch {
             missingPermissions = permissions.filterAllowedPermissions()
             missingPermissions
-                // Filter out permissions that are not needed for the onboarding revamp. On the new
-                // onboarding flow, we only need Media (Read and Write) and Notifications permissions.
-                .filter { it == Permission.CameraBackup || it == Permission.Notifications }
                 .apply { permissionScreens = toPermissionScreen() }
                 .also { updateCurrentPermissionRevamp() }
         }
