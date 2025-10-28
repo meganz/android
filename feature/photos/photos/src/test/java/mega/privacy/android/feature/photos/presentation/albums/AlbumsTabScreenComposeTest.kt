@@ -6,7 +6,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.photos.AlbumId
 import org.junit.Rule
 import org.junit.Test
@@ -41,9 +41,9 @@ class AlbumsTabScreenComposeTest {
         setComposeContent(uiState)
 
         // Verify all album grid items are displayed
-        albums.forEach { album ->
+        albums.forEachIndexed { index, album ->
             composeTestRule
-                .onNodeWithTag("$ALBUMS_SCREEN_ALBUM_GRID_ITEM:${album.id}")
+                .onNodeWithTag("$ALBUMS_SCREEN_ALBUM_GRID_ITEM:$index")
                 .assertIsDisplayed()
 
             composeTestRule
@@ -52,8 +52,8 @@ class AlbumsTabScreenComposeTest {
         }
     }
 
-    private fun createMockAlbum(id: Long, title: String): Album.UserAlbum {
-        return Album.UserAlbum(
+    private fun createMockAlbum(id: Long, title: String): MediaAlbum.User {
+        return MediaAlbum.User(
             id = AlbumId(id),
             title = title,
             cover = null,

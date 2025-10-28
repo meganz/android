@@ -13,6 +13,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.components.AlbumGridItem
 
@@ -46,16 +47,29 @@ fun AlbumsTabScreen(
     ) {
         items(
             count = uiState.albums.size,
-            key = { uiState.albums[it].id.id },
-        ) { album ->
-            val album = uiState.albums[album]
+            key = { index ->
+                val album = uiState.albums[index]
+                when (album) {
+                    is MediaAlbum.User -> album.id.id
+                    is MediaAlbum.System -> album.id.albumName.hashCode()
+                }
+            },
+            contentType = { index ->
+                uiState.albums[index]::class
+            }
+        ) { index ->
+            val album = uiState.albums[index]
+            val title = when (album) {
+                is MediaAlbum.User -> album.title
+                is MediaAlbum.System -> album.id.albumName
+            }
 
             // Todo add downloader `PhotoDownloaderViewModel`
             AlbumGridItem(
                 modifier = Modifier
-                    .testTag("$ALBUMS_SCREEN_ALBUM_GRID_ITEM:${album.id}"),
+                    .testTag("$ALBUMS_SCREEN_ALBUM_GRID_ITEM:${index}"),
                 coverImage = album.cover?.thumbnailFilePath,
-                title = album.title,
+                title = title,
                 placeholder = placeholder,
                 errorPlaceholder = placeholder
             )

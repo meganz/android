@@ -5,10 +5,9 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.photos.AlbumId
-import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.domain.usecase.GetUserAlbums
+import mega.privacy.android.feature.photos.provider.AlbumsDataProvider
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -25,22 +24,23 @@ import org.mockito.kotlin.whenever
 internal class AlbumsTabViewModelTest {
     private lateinit var underTest: AlbumsTabViewModel
 
-    private val getUserAlbums: GetUserAlbums = mock()
+    private val mockAlbumsDataProvider: AlbumsDataProvider = mock()
 
     @BeforeEach
     fun setUp() {
-        reset(getUserAlbums)
+        reset(mockAlbumsDataProvider)
     }
 
     private fun initViewModel() {
         underTest = AlbumsTabViewModel(
-            getUserAlbums = getUserAlbums
+            albumsProvider = setOf(mockAlbumsDataProvider)
         )
     }
 
     @Test
     fun `test that initial state is correct`() = runTest {
-        whenever(getUserAlbums()).thenReturn(flowOf(emptyList()))
+        whenever(mockAlbumsDataProvider.order).thenReturn(1)
+        whenever(mockAlbumsDataProvider.monitorAlbums()).thenReturn(flowOf(emptyList()))
         initViewModel()
 
         underTest.uiState.test {
@@ -52,37 +52,63 @@ internal class AlbumsTabViewModelTest {
     @Test
     fun `test that albums are loaded successfully`() = runTest {
         val mockAlbums = createMockAlbums()
-        whenever(getUserAlbums()).thenReturn(flowOf(mockAlbums))
+        whenever(mockAlbumsDataProvider.order).thenReturn(1)
+        whenever(mockAlbumsDataProvider.monitorAlbums()).thenReturn(flowOf(mockAlbums))
         initViewModel()
 
         underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.albums).hasSize(2)
-            assertThat(state.albums[0].id).isEqualTo(AlbumId(1L))
-            assertThat(state.albums[0].title).isEqualTo("Album 1")
-            assertThat(state.albums[1].id).isEqualTo(AlbumId(2L))
-            assertThat(state.albums[1].title).isEqualTo("Album 2")
+            assertThat(state.albums[0]).isInstanceOf(MediaAlbum.User::class.java)
+            assertThat((state.albums[0] as MediaAlbum.User).id).isEqualTo(AlbumId(1L))
+            assertThat((state.albums[0] as MediaAlbum.User).title).isEqualTo("Album 1")
+            assertThat(state.albums[1]).isInstanceOf(MediaAlbum.User::class.java)
+            assertThat((state.albums[1] as MediaAlbum.User).id).isEqualTo(AlbumId(2L))
+            assertThat((state.albums[1] as MediaAlbum.User).title).isEqualTo("Album 2")
         }
     }
 
-    private fun createMockAlbums(): List<Album.UserAlbum> {
+    @Test
+    fun `test that multiple providers are combined correctly`() = runTest {
+        val mockProvider1: AlbumsDataProvider = mock()
+        val mockProvider2: AlbumsDataProvider = mock()
+
+        val albums1 = listOf(createMockUserAlbum(1L, "Album 1"))
+        val albums2 = listOf(createMockUserAlbum(2L, "Album 2"))
+
+        whenever(mockProvider1.order).thenReturn(1)
+        whenever(mockProvider1.monitorAlbums()).thenReturn(flowOf(albums1))
+        whenever(mockProvider2.order).thenReturn(2)
+        whenever(mockProvider2.monitorAlbums()).thenReturn(flowOf(albums2))
+
+        underTest = AlbumsTabViewModel(
+            albumsProvider = setOf(mockProvider1, mockProvider2)
+        )
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.albums).hasSize(2)
+            // Albums should be sorted by order (provider1 first, then provider2)
+            assertThat((state.albums[0] as MediaAlbum.User).title).isEqualTo("Album 1")
+            assertThat((state.albums[1] as MediaAlbum.User).title).isEqualTo("Album 2")
+        }
+    }
+
+    private fun createMockAlbums(): List<MediaAlbum> {
         return listOf(
-            Album.UserAlbum(
-                id = AlbumId(1L),
-                title = "Album 1",
-                cover = null,
-                creationTime = 0,
-                modificationTime = 0,
-                isExported = false
-            ),
-            Album.UserAlbum(
-                id = AlbumId(2L),
-                title = "Album 2",
-                cover = null,
-                creationTime = 0,
-                modificationTime = 0,
-                isExported = false
-            )
+            createMockUserAlbum(1L, "Album 1"),
+            createMockUserAlbum(2L, "Album 2")
+        )
+    }
+
+    private fun createMockUserAlbum(id: Long, title: String): MediaAlbum.User {
+        return MediaAlbum.User(
+            id = AlbumId(id),
+            title = title,
+            cover = null,
+            creationTime = 0,
+            modificationTime = 0,
+            isExported = false
         )
     }
 }
