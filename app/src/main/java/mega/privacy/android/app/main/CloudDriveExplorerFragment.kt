@@ -764,11 +764,12 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
      * @param sourceData original nodes
      */
     suspend fun updateNodesByAdapter(sourceData: List<MegaNode?>) {
+        val safeSourceData = sourceData.toList()
         val data = if (fileExplorerViewModel.showHiddenItems) {
-            sourceData
+            safeSourceData
         } else {
             withContext(ioDispatcher) {
-                sourceData.filter {
+                safeSourceData.filter {
                     it != null && !it.isMarkedSensitive && !megaApi.isSensitiveInherited(it)
                 }
             }
