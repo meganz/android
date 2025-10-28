@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.call
 
 import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.logging.Log
 import mega.privacy.android.domain.repository.CallRepository
 import javax.inject.Inject
 
@@ -19,12 +20,10 @@ class HangChatCallByChatIdUseCase @Inject constructor(
      * @return [ChatCall]
      */
     suspend operator fun invoke(chatId: Long): ChatCall? =
-        when (chatId) {
-            -1L -> error("Invalid Chat Id")
-            else -> {
-                callRepository.getChatCall(chatId)?.apply {
-                    callRepository.hangChatCall(callId)
-                }
-            }
+        if (chatId != -1L) {
+            callRepository.getChatCall(chatId)?.apply { callRepository.hangChatCall(callId) }
+        } else {
+            Log.e("HangChatCallByChatIdUseCase", IllegalStateException("Invalid Chat Id"))
+            null
         }
 }
