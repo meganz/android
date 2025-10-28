@@ -692,11 +692,11 @@
     <!-- Message shown to user when app is connected to the MEGA server -->
     <string name="login_connected_to_server">Sunucuya bağlanıldı</string>
     <!-- User Alert notification for scheduled recurring meeting changes -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_scheduled_changes">[A]%s[/A], [B]tekrarlayan toplantı ayrıntılarını güncelledi[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_scheduled_changes">[A]%s[/A], [B]yinelenen toplantı ayrıntılarını güncelledi[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting hour change -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_hour_changed">[A]%s[/A], [B]tekrarlayan toplantı saatini güncelledi[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_hour_changed">[A]%s[/A], [B]yinelenen toplantı saatini güncelledi[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting date of the week change -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_date_of_the_week_changed">[A]%s[/A], [B]tekrarlayan toplantı tarihini güncelledi[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_date_of_the_week_changed">[A]%s[/A], [B]yinelenen toplantı tarihini güncelledi[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting multiple fields change -->
     <string name="meetings_notification_subtitle_scheduled_recurring_meeting_multiple_fields_changed">[A]%s[/A], [B]toplantıyı güncelledi[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
@@ -1129,7 +1129,7 @@
     <!-- Subscription page information section title at the bottom of the page-->
     <string name="choose_account_screen_subscription_information_title">Abonelik ayrıntıları</string>
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
-    <string name="choose_account_screen_subscription_information_description">Abonelikler, seçilen ilk dönemle aynı süredeki ardışık abonelik dönemleri için otomatik olarak yinelenir.\n\nPlan aboneliğinizi istediğiniz zaman, ancak bir sonraki abonelik ödemenizin vadesinden en geç 24 saat önce iptal edebilirsiniz. [A]Ayarlarınızdan aboneliğinizi nasıl yöneteceğinizi öğrenin[/A].</string>
+    <string name="choose_account_screen_subscription_information_description">Abonelikler, seçilen ilk dönemle aynı süredeki ardışık abonelik dönemleri için otomatik olarak yenilenir.\n\nPlan aboneliğinizi istediğiniz zaman, ancak bir sonraki abonelik ödemenizin vadesinden en geç 24 saat önce iptal edebilirsiniz. [A]Ayarlarınızdan aboneliğinizi nasıl yöneteceğinizi öğrenin[/A].</string>
     <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
     <string name="choose_account_screen_terms_and_policies_link_text">[A]Hizmet Şartları[/A] ve [B]Gizlilik Politikası[/B]</string>
     <!-- Get more with Pro plan title in choose account screen-->
@@ -1729,4 +1729,40 @@
     <string name="media_timeline_filter_days_chip_text">Gün</string>
     <!--Media screen timeline default chip text to show All timeline media-->
     <string name="media_timeline_default_chip_text">Tümü</string>
+    <!-- category in sort by action to sort by link created date -->
+    <string name="action_sort_by_link_created">Bağlantı oluşturuldu</string>
+    <!-- category in sort by action to sort by share created date -->
+    <string name="action_sort_by_share_created">Paylaşım oluşturuldu</string>
+    <!-- The title of camera uploads paused warning banner -->
+    <string name="camera_update_paused_warning_banner_title">Kamera yüklemeleri duraklatıldı</string>
+    <!-- The description of camera uploads device charging not met paused warning banner -->
+    <string name="camera_update_device_charging_not_met_banner_description">Yüklemeler yalnızca cihazınız şarj olurken gerçekleşir. Bunu Ayarlar’dan değiştirebilirsiniz.</string>
+    <!-- The button text of camera uploads device charging not met paused warning banner -->
+    <string name="camera_update_device_charging_not_met_banner_button_text">Ayarlar</string>
+    <!-- The description of camera uploads low battery paused warning banner -->
+    <string name="camera_update_low_battery_banner_description">Düşük şarj seviyesi nedeniyle yüklemeler duraklatıldı. Devam etmek için cihazınızı şarj edin.</string>
+    <!-- The description of camera uploads network requirement not met paused warning banner -->
+    <string name="camera_update_network_requirement_not_met_banner_description">Camera uploads paused, connect to WIFI or allow mobile data</string>
+    <!-- The button text of camera uploads network requirement not met paused warning banner -->
+    <string name="camera_update_network_requirement_not_met_banner_button_text">Mobil veriye izin ver</string>
+    <!-- Billing info with discount label -->
+    <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s for %3$s</string>
+    <!-- campaign name for Black Friday deal -->
+    <string name="campaign_name_black_friday">Black Friday deal: %1$d%% off</string>
+    <!-- campaign name for Cyber Monday deal -->
+    <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
+    <!-- campaign name for Special offer -->
+    <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
+    <!-- Label for first time period in days full format -->
+    <plurals name="label_first_time_in_months_full">
+        <item quantity="one"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Label for first time period in years full format -->
+    <plurals name="label_first_time_in_years_full">
+        <item quantity="one"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Header for MEGA privacy suite section in Menu screen -->
+    <string name="general_mega_privacy_suite">MEGA gizlilik paketi</string>
 </resources>

@@ -1700,4 +1700,40 @@
     <string name="media_timeline_filter_days_chip_text">일</string>
     <!--Media screen timeline default chip text to show All timeline media-->
     <string name="media_timeline_default_chip_text">모두</string>
+    <!-- category in sort by action to sort by link created date -->
+    <string name="action_sort_by_link_created">링크 생성일</string>
+    <!-- category in sort by action to sort by share created date -->
+    <string name="action_sort_by_share_created">공유 생성일</string>
+    <!-- The title of camera uploads paused warning banner -->
+    <string name="camera_update_paused_warning_banner_title">카메라 업로드 일시정지됨</string>
+    <!-- The description of camera uploads device charging not met paused warning banner -->
+    <string name="camera_update_device_charging_not_met_banner_description">업로드는 장치가 충전 중일 때만 진행됩니다. 이것을 설정에서 바꿀 수 있습니다.</string>
+    <!-- The button text of camera uploads device charging not met paused warning banner -->
+    <string name="camera_update_device_charging_not_met_banner_button_text">설정</string>
+    <!-- The description of camera uploads low battery paused warning banner -->
+    <string name="camera_update_low_battery_banner_description">배터리가 부족하여 업로드가 일시정지 되었습니다. 계속하려면 장치를 충전하세요.</string>
+    <!-- The description of camera uploads network requirement not met paused warning banner -->
+    <string name="camera_update_network_requirement_not_met_banner_description">Camera uploads paused, connect to WIFI or allow mobile data</string>
+    <!-- The button text of camera uploads network requirement not met paused warning banner -->
+    <string name="camera_update_network_requirement_not_met_banner_button_text">Allow mobile data</string>
+    <!-- Billing info with discount label -->
+    <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s for %3$s</string>
+    <!-- campaign name for Black Friday deal -->
+    <string name="campaign_name_black_friday">Black Friday deal: %1$d%% off</string>
+    <!-- campaign name for Cyber Monday deal -->
+    <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
+    <!-- campaign name for Special offer -->
+    <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
+    <!-- Label for first time period in days full format -->
+    <plurals name="label_first_time_in_months_full">
+        <item quantity="one">first month</item>
+        <item quantity="other">first %1$d months</item>
+    </plurals>
+    <!-- Label for first time period in years full format -->
+    <plurals name="label_first_time_in_years_full">
+        <item quantity="one">first year</item>
+        <item quantity="other">first %1$d years</item>
+    </plurals>
+    <!-- Header for MEGA privacy suite section in Menu screen -->
+    <string name="general_mega_privacy_suite">MEGA 프라이버시 스위트</string>
 </resources>

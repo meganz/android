@@ -1748,11 +1748,11 @@
     <!-- Billing info with discount label -->
     <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s for %3$s</string>
     <!-- campaign name for Black Friday deal -->
-    <string name="campaign_name_black_friday">Black Friday deal: %1$d off</string>
+    <string name="campaign_name_black_friday">Black Friday deal: %1$d%% off</string>
     <!-- campaign name for Cyber Monday deal -->
-    <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d off</string>
+    <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
     <!-- campaign name for Special offer -->
-    <string name="campaign_name_special_offer">Special offer: %1$d off</string>
+    <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
         <item quantity="one">first month</item>

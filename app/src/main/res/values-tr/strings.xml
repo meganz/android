@@ -2363,7 +2363,7 @@
     <!-- Text shown when the creation of a version as a new file was successful -->
     <string name="version_as_new_file_created">Sürüm yeni bir dosya olarak oluşturuldu</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
-    <string name="general_date_label">%1$s tarihinde</string>
+    <string name="general_date_label">%1$s</string>
     <!-- Download location label -->
     <string name="download_location">İndirme konumu</string>
     <!-- Action to show any file in its location -->
@@ -4659,7 +4659,7 @@
     <!-- Bottom sheet button to unhide a node/file -->
     <string name="general_unhide_node">Göster</string>
     <!-- Promo label for promo notification section -->
-    <string name="notifications_screen_notification_label_promo">Promosyon</string>
+    <string name="notifications_screen_notification_label_promo">İndirim</string>
     <!-- Promo notification section title for promo notification section -->
     <string name="notifications_screen_notification_section_title">Sınırlı süreli teklif</string>
     <!-- The title of the Dialog shown to Change the SFU Server Id  -->

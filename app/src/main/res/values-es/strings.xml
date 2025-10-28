@@ -2745,7 +2745,7 @@
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Realiza un backup automático de tus fotos y vídeos en tu Nube.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
-    <string name="all_view_button">Todas</string>
+    <string name="all_view_button">Todo</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
     <string name="days_view_button">Días</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by months-->
