@@ -86,18 +86,24 @@ class DocumentFileFacade @Inject constructor(
      * Get the [File] from the given [Uri].
      * Takes into account different Operating Systems and Manufacturers.
      */
-    private fun getFile(uri: Uri) = runCatching {
-        when {
-            isMIUIGalleryRawUri(uri) -> uri.path?.removePrefix(MIUI_RAW_PREFIX_PATH)
-                ?.let { path -> File(path) }
+    private fun getFile(uri: Uri) =
+        getFileFromUri(uri) ?: runCatching {
+            when {
+                isMIUIGalleryRawUri(uri) -> uri.path?.removePrefix(MIUI_RAW_PREFIX_PATH)
+                    ?.let { path -> File(path) }
 
-            isSamsungDeviceWithAndroidLessThanQ() -> uri.getColumnInfoString(MediaStore.MediaColumns.DATA)
-                ?.let { path -> File(path) }
+                isSamsungDeviceWithAndroidLessThanQ() -> uri.getColumnInfoString(MediaStore.MediaColumns.DATA)
+                    ?.let { path -> File(path) }
 
-            uri.scheme == "file" -> uri.path
-                ?.let { path -> File(path) }
+                else -> null
+            }
+        }.onFailure { Timber.e(it, "Error getting File from Uri: $uri") }.getOrNull()
 
-            else -> null
+    private fun getFileFromUri(uri: Uri) = runCatching {
+        if (uri.scheme == "file") {
+            uri.path?.let { path -> File(path) }
+        } else {
+            null
         }
     }.onFailure { Timber.e(it, "Error getting File from Uri: $uri") }.getOrNull()
 
