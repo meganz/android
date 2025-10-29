@@ -122,14 +122,14 @@ sealed interface ViewInFolderEvent {
      * The transfer to view in folder is a download to offline transfer, so it should be shown in offline section
      * @property parentNodeOfflineId
      * @property title
-     * @property uriPath the path of the transfer
+     * @property path the relative path of the file in offline files
      */
     data class DownloadToOffline(
         override val singleActivity: Boolean,
         override val fileName: String,
         val parentNodeOfflineId: Int,
         val title: String?,
-        val uriPath: UriPath,
+        val path: String,
     ) : Found
 
     /**

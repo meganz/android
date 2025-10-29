@@ -335,7 +335,7 @@ private fun onViewInFolder(
             ).apply {
                 action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
                 putExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, true)
-                putExtra(FileStorageActivity.EXTRA_PATH, viewInFolderEvent.uriPath.value)
+                putExtra(FileStorageActivity.EXTRA_PATH, viewInFolderEvent.path)
                 putStringArrayListExtra(
                     FileStorageActivity.EXTRA_FILE_NAMES,
                     arrayListOf(viewInFolderEvent.fileName)

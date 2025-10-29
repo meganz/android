@@ -171,9 +171,6 @@ class CompletedTransferActionsViewModel @Inject constructor(
         viewModelScope.launch {
             val singleActivity = getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
             val viewInFolderEvent = if (completedTransfer.type.isDownloadType()) {
-                val path =
-                    _uiState.value.parentUri?.takeUnless { it.toString().isBlank() }?.toUriPath()
-                        ?: completedTransfer.path.toUriPath()
                 if (completedTransfer.isOffline == true) {
                     getOfflineNodeInformationByNodeIdUseCase(NodeId(completedTransfer.parentHandle))?.let { offlineInfo ->
                         ViewInFolderEvent.DownloadToOffline(
@@ -181,14 +178,17 @@ class CompletedTransferActionsViewModel @Inject constructor(
                             fileName = completedTransfer.fileName,
                             parentNodeOfflineId = offlineInfo.id,
                             title = offlineInfo.name,
-                            uriPath = path
+                            path = completedTransfer.path
                         )
                     }
                 } else {
                     ViewInFolderEvent.Download(
                         singleActivity = singleActivity,
                         fileName = completedTransfer.fileName,
-                        uriPath = path
+                        uriPath = _uiState.value.parentUri
+                            ?.takeUnless { it.toString().isBlank() }
+                            ?.toUriPath()
+                            ?: completedTransfer.path.toUriPath()
                     )
                 }
             } else {

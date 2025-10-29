@@ -12,7 +12,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.data.extensions.toUriPath
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
@@ -426,7 +425,7 @@ class CompletedTransferActionsViewModelTest {
                 fileName = completedOffline.fileName,
                 parentNodeOfflineId = offlineInfo.id,
                 title = offlineInfo.name,
-                uriPath = completedOffline.path.toUriPath()
+                path = completedOffline.path
             )
             whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn singleActivity
             whenever(getOfflineNodeInformationByNodeIdUseCase(NodeId(completedOffline.parentHandle))) doReturn offlineInfo
