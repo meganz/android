@@ -20,9 +20,7 @@ class AdaptiveLayoutMemoryManager @Inject constructor() {
      *
      * @return true if adaptive layout is enabled, false if disabled, null if not initialized
      */
-    fun getAdaptiveLayoutEnabled(): Boolean? {
-        return adaptiveLayoutEnabled.get()
-    }
+    fun getAdaptiveLayoutEnabled(): Boolean? = adaptiveLayoutEnabled.get()
 
     /**
      * Sets the adaptive layout state.

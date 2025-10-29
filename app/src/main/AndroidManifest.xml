@@ -211,8 +211,7 @@
         <activity
             android:name=".presentation.openlink.OpenLinkActivity"
             android:exported="true"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait">
+            android:launchMode="singleTask">
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
 

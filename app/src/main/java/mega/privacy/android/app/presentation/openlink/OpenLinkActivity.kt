@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -31,6 +32,9 @@ import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
+import mega.privacy.android.app.di.isAdaptiveLayoutEnabled
+import mega.privacy.android.app.usecase.orientation.GetCachedAdaptiveLayoutUseCase
+import mega.privacy.android.app.usecase.orientation.enableAdaptiveLayout
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.CallUtil.participatingInACall
 import mega.privacy.android.app.utils.CallUtil.showConfirmationInACall
@@ -151,6 +155,18 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdgeAndConsumeInsets()
+
+        // Set orientation before super.onCreate() to ensure it takes effect
+        if (isAdaptiveLayoutEnabled) {
+            // Adaptive layout is enabled, let the system handle orientation
+            enableAdaptiveLayout { old, new ->
+                Timber.d("On size change in OpenLinkActivity from $old to $new")
+            }
+        } else {
+            // Force portrait orientation when adaptive layout is disabled
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
+
         super.onCreate(savedInstanceState)
         url = intent.dataString
         Timber.d("Original url: $url")
