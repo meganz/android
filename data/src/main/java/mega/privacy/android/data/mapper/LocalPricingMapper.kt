@@ -18,5 +18,6 @@ internal fun toLocalPricing(megaSku: MegaSku) =
     LocalPricing(
         amount = CurrencyPoint.LocalCurrencyPoint(megaSku.priceAmountMicros),
         currency = Currency(megaSku.priceCurrencyCode),
-        sku = megaSku.sku
+        sku = megaSku.sku,
+        offers = megaSku.offers
     )

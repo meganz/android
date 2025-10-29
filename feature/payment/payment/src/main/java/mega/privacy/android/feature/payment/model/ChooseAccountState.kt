@@ -20,4 +20,18 @@ data class ChooseAccountState(
     val cheapestSubscriptionAvailable: LocalisedSubscription? = null,
     val currentSubscriptionPlan: AccountType? = null,
     val subscriptionCycle: AccountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
-)
+) {
+    // checking if there is any discount available it's different from current plan
+    fun hasDiscount() = localisedSubscriptionsList.any {
+        when (subscriptionCycle) {
+            AccountSubscriptionCycle.MONTHLY ->
+                it.yearlySubscription.discountedAmountMonthly != null && it.accountType != currentSubscriptionPlan
+
+            AccountSubscriptionCycle.YEARLY ->
+                it.monthlySubscription.discountedAmountMonthly != null && it.accountType != currentSubscriptionPlan
+
+            else -> (it.monthlySubscription.discountedAmountMonthly != null || it.yearlySubscription.discountedAmountMonthly != null)
+                    && it.accountType != currentSubscriptionPlan
+        }
+    }
+}

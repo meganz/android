@@ -17,5 +17,9 @@ data class MegaSku(
     /**
      * Currency code, used to format price.
      */
-    val priceCurrencyCode: String
+    val priceCurrencyCode: String,
+    /**
+     * List of all available offers for this product.
+     */
+    val offers: List<OfferDetail> = emptyList()
 )

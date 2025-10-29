@@ -10,9 +10,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
-import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
+import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import org.junit.Rule
 import org.junit.Test
@@ -26,17 +26,33 @@ class AdsFreeIntroViewTest {
     @get:Rule
     var composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val subscriptionProLite = LocalisedSubscription(
+    private val subscriptionProLiteMonthly = Subscription(
         accountType = AccountType.PRO_LITE,
+        handle = -4226692769210777158,
         storage = 400,
-        monthlyTransfer = 1024,
-        yearlyTransfer = 12288,
-        monthlyAmount = CurrencyAmount(4.99F, Currency("EUR")),
-        yearlyAmount = CurrencyAmount(
-            49.99F,
-            Currency("EUR")
-        ),
-        localisedPrice = LocalisedPriceStringMapper(),
+        transfer = 1024,
+        amount = CurrencyAmount(4.99F, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
+    )
+
+    private val subscriptionProLiteYearly = Subscription(
+        accountType = AccountType.PRO_LITE,
+        handle = -5517769810977460898,
+        storage = 400,
+        transfer = 12288,
+        amount = CurrencyAmount(49.99F, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
+    )
+
+    private val subscriptionProLite = LocalisedSubscription(
+        monthlySubscription = subscriptionProLiteMonthly,
+        yearlySubscription = subscriptionProLiteYearly,
         localisedPriceCurrencyCode = LocalisedPriceCurrencyCodeStringMapper(),
         formattedSize = FormattedSizeMapper(),
     )

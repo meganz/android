@@ -85,7 +85,7 @@ fun ChooseAccountRoute(
             )
             activity?.let { onFreeClick(it, megaNavigator) }
         },
-        onBuyPlanClick = { accountType, isMonthly ->
+        onBuyPlanClick = { accountType, isMonthly, offerId ->
             sendAccountTypeAnalytics(
                 isUpgradeAccount = isUpgradeAccount,
                 openFromSource = openFromSource,
@@ -97,6 +97,7 @@ fun ChooseAccountRoute(
                     activity = activity,
                     isMonthly = isMonthly,
                     accountType = accountType,
+                    offerId = offerId
                 )
             }
         },

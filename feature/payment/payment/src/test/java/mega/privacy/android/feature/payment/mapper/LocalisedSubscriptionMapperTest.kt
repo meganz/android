@@ -8,16 +8,13 @@ import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
-import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
 import org.junit.Test
 
 class LocalisedSubscriptionMapperTest {
-    private val localisedPriceStringMapper = LocalisedPriceStringMapper()
     private val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
     private val formattedSizeMapper = FormattedSizeMapper()
     private val underTest = LocalisedSubscriptionMapper(
-        localisedPriceStringMapper,
         localisedPriceCurrencyCodeStringMapper,
         formattedSizeMapper,
     )
@@ -29,7 +26,11 @@ class LocalisedSubscriptionMapperTest {
             handle = 1560943707714440503,
             storage = 2048,
             transfer = 2048,
-            amount = CurrencyAmount(9.99.toFloat(), Currency("EUR"))
+            amount = CurrencyAmount(9.99.toFloat(), Currency("EUR")),
+            offerId = null,
+            discountedAmountMonthly = null,
+            discountedPercentage = null,
+            offerPeriod = null
         )
 
         val subscriptionProIYearly = Subscription(
@@ -37,20 +38,16 @@ class LocalisedSubscriptionMapperTest {
             handle = 7472683699866478542,
             storage = 2048,
             transfer = 24576,
-            amount = CurrencyAmount(99.99.toFloat(), Currency("EUR"))
+            amount = CurrencyAmount(99.99.toFloat(), Currency("EUR")),
+            offerId = null,
+            discountedAmountMonthly = null,
+            discountedPercentage = null,
+            offerPeriod = null
         )
 
         val localisedSubscription = LocalisedSubscription(
-            accountType = AccountType.PRO_I,
-            storage = 2048,
-            monthlyTransfer = 2048,
-            yearlyTransfer = 24576,
-            monthlyAmount = CurrencyAmount(9.99.toFloat(), Currency("EUR")),
-            yearlyAmount = CurrencyAmount(
-                99.99.toFloat(),
-                Currency("EUR")
-            ),
-            localisedPrice = localisedPriceStringMapper,
+            monthlySubscription = subscriptionProIMonthly,
+            yearlySubscription = subscriptionProIYearly,
             localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
             formattedSize = formattedSizeMapper,
         )

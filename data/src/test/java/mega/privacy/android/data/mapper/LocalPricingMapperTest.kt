@@ -15,11 +15,11 @@ class LocalPricingMapperTest {
     private val amount = CurrencyPoint.LocalCurrencyPoint(9.99.toLong())
 
     private val megaSku =
-        MegaSku(sku = SKU_PRO_I_MONTH, priceAmountMicros = 9.99.toLong(), priceCurrencyCode = "EUR")
+        MegaSku(sku = SKU_PRO_I_MONTH, priceAmountMicros = 9.99.toLong(), priceCurrencyCode = "EUR", offers = emptyList())
 
     @Test
     fun `test that local pricing is mapped correctly`() {
-        val expectedResult = LocalPricing(amount, currency, sku)
+        val expectedResult = LocalPricing(amount, currency, sku, emptyList())
 
         assertEquals(expectedResult, toLocalPricing(megaSku))
     }

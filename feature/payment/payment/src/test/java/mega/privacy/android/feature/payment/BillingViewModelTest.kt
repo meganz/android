@@ -67,7 +67,7 @@ internal class BillingViewModelTest {
 
     @Test
     fun `test that skus not empty when loadSkus return not empty`() = runTest {
-        val list = listOf(MegaSku("", 1L, "USD"))
+        val list = listOf(MegaSku("", 1L, "USD", emptyList()))
         whenever(querySkus()).thenReturn(list)
         underTest.loadSkus()
         Truth.assertThat(underTest.skus.value).isNotEmpty()
