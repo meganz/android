@@ -35,7 +35,7 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.model.LocalizedText
-import mega.android.core.ui.model.menu.MenuActionIconWithClick
+import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
@@ -200,7 +200,7 @@ internal fun RubbishBinScreen(
                     },
                     maxActionsToShow = if (isRootDirectory) 1 else 2,
                     actions = buildList {
-                        add(MenuActionIconWithClick(RubbishBinAppBarAction.Search) {
+                        add(MenuActionWithClick(RubbishBinAppBarAction.Search) {
                             openSearch(
                                 isRootDirectory,
                                 uiState.currentFolderId.longValue,
@@ -208,13 +208,13 @@ internal fun RubbishBinScreen(
                         })
                         if (isRootDirectory) {
                             add(
-                                MenuActionIconWithClick(RubbishBinAppBarAction.Empty) {
+                                MenuActionWithClick(RubbishBinAppBarAction.Empty) {
                                     showClearRubbishBinDialog = true
                                 },
                             )
                         } else {
                             add(
-                                MenuActionIconWithClick(RubbishBinAppBarAction.More) {
+                                MenuActionWithClick(RubbishBinAppBarAction.More) {
                                     visibleNodeOptionId = uiState.currentFolderId
                                 },
                             )

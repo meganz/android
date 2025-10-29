@@ -29,7 +29,7 @@ import mega.android.core.ui.components.tabs.MegaScrollableTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.TabItems
-import mega.android.core.ui.model.menu.MenuActionIconWithClick
+import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
@@ -117,7 +117,7 @@ internal fun DriveSyncScreen(
                     actions = buildList {
                         when {
                             selectedTabIndex == 0 && cloudDriveUiState.items.isNotEmpty() -> add(
-                                MenuActionIconWithClick(CloudDriveAppBarAction.Search) {
+                                MenuActionWithClick(CloudDriveAppBarAction.Search) {
                                     openSearch(
                                         true,
                                         cloudDriveUiState.currentFolderId.longValue,
@@ -126,7 +126,7 @@ internal fun DriveSyncScreen(
                                 })
 
                             selectedTabIndex == 1 -> add(
-                                MenuActionIconWithClick(
+                                MenuActionWithClick(
                                     CloudDriveAppBarAction.More
                                 ) {
                                     showSyncSettings = true

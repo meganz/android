@@ -37,7 +37,7 @@ import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVertic
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.android.core.ui.model.menu.MenuActionIconWithClick
+import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.core.nodecomponents.components.offline.HandleOfflineNodeAction3
 import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeActionsViewModel
 import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
@@ -222,7 +222,7 @@ internal fun OfflineScreen(
                     actions = buildList {
                         if (uiState.nodeId != -1) {
                             add(
-                                MenuActionIconWithClick(CloudDriveAppBarAction.More) {
+                                MenuActionWithClick(CloudDriveAppBarAction.More) {
                                     // Todo implement NodeOptionsBottomSheet
                                 }
                             )

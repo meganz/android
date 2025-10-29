@@ -1,14 +1,18 @@
 package mega.privacy.android.feature.devicecenter.ui.view
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuAction
+import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUiState
+import mega.privacy.android.feature.devicecenter.ui.model.DeviceMenuAction
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
+import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 
 /**
  * Material 3 App Bar for Device Center
@@ -56,42 +60,54 @@ internal fun DeviceCenterAppBarM3(
             } else {
                 stringResource(R.string.device_center_top_app_bar_search_syncs_hint)
             },
-            //actions = buildActionsList(selectedDevice, uiState, onActionPressed), Todo Add Core Ui components for actions without icons
+            actions = remember(selectedDevice, uiState.isCameraUploadsEnabled, onActionPressed) {
+                buildActionsList(
+                    selectedDevice,
+                    uiState.isCameraUploadsEnabled,
+                    onActionPressed
+                ) ?: emptyList()
+            },
         )
     }
 }
 
-// Todo Add Core Ui components for actions without icons
+/**
+ * Builds the list of action menu items based on the selected device type
+ *
+ * @param selectedDevice The currently selected device
+ * @param isCameraUploadsEnabled Whether camera uploads are enabled
+ * @param onActionPressed Lambda for action menu item clicks
+ * @return List of menu actions or null if no device is selected
+ */
+private fun buildActionsList(
+    selectedDevice: DeviceUINode?,
+    isCameraUploadsEnabled: Boolean,
+    onActionPressed: (MenuAction) -> Unit,
+): List<MenuActionWithClick>? {
+    return selectedDevice?.let {
+        buildList {
+            add(
+                MenuActionWithClick(
+                    DeviceMenuAction.Rename
+                ) { onActionPressed(DeviceMenuAction.Rename) }
+            )
 
-///**
-// * Builds the list of action menu items based on the selected device type
-// *
-// * @param selectedDevice The currently selected device
-// * @param uiState The UI State
-// * @param onActionPressed Lambda for action menu item clicks
-// * @return List of menu actions or null if no device is selected
-// */
-//private fun buildActionsList(
-//    selectedDevice: DeviceUINode?,
-//    uiState: DeviceCenterUiState,
-//    onActionPressed: (MenuAction) -> Unit,
-//): List<MenuActionIconWithClick>? {
-//    return selectedDevice?.let {
-//        val list = mutableListOf<MenuAction>(DeviceMenuAction.Rename)
-//
-//        when (selectedDevice) {
-//            is OwnDeviceUINode -> {
-//                if (uiState.isCameraUploadsEnabled) {
-//                    list.add(DeviceMenuAction.Info)
-//                }
-//                list.add(DeviceMenuAction.CameraUploads)
-//            }
-//
-//            else -> list.add(DeviceMenuAction.Info)
-//        }
-//
-//        list.map { action ->
-//            MenuActionIconWithClick(action) { onActionPressed(action) }
-//        }
-//    }
-//}
+            when (selectedDevice) {
+                is OwnDeviceUINode -> {
+                    if (isCameraUploadsEnabled) {
+                        add(MenuActionWithClick(DeviceMenuAction.Info) {
+                            onActionPressed(DeviceMenuAction.Info)
+                        })
+                    }
+                    add(MenuActionWithClick(DeviceMenuAction.CameraUploads) {
+                        onActionPressed(DeviceMenuAction.CameraUploads)
+                    })
+                }
+
+                else -> add(MenuActionWithClick(DeviceMenuAction.Info) {
+                    onActionPressed(DeviceMenuAction.Info)
+                })
+            }
+        }
+    }
+}

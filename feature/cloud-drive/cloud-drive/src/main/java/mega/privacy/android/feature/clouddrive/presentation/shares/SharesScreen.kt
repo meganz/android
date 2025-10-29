@@ -38,7 +38,7 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.model.TabItems
-import mega.android.core.ui.model.menu.MenuActionIconWithClick
+import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
@@ -200,7 +200,7 @@ internal fun SharesScreen(
                     },
                     actions = buildList {
                         add(
-                            MenuActionIconWithClick(CloudDriveAppBarAction.Search) {
+                            MenuActionWithClick(CloudDriveAppBarAction.Search) {
                                 navigationHandler.navigate(
                                     SearchNodeNavKey(
                                         isFirstNavigationLevel = false,

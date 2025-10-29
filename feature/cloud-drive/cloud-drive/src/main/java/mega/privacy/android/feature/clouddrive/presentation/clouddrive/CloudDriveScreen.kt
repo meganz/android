@@ -12,7 +12,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.android.core.ui.model.menu.MenuActionIconWithClick
+import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
@@ -79,7 +79,7 @@ fun CloudDriveScreen(
                     actions = buildList {
                         if (uiState.items.isNotEmpty()) {
                             add(
-                                MenuActionIconWithClick(CloudDriveAppBarAction.Search) {
+                                MenuActionWithClick(CloudDriveAppBarAction.Search) {
                                     openSearch(
                                         false,
                                         uiState.currentFolderId.longValue,
@@ -91,7 +91,7 @@ fun CloudDriveScreen(
 
                         if (!uiState.isCloudDriveRoot) {
                             add(
-                                MenuActionIconWithClick(
+                                MenuActionWithClick(
                                     CloudDriveAppBarAction.More
                                 ) {
                                     visibleNodeOptionId = uiState.currentFolderId

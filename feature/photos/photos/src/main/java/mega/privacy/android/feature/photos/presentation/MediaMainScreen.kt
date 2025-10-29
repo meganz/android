@@ -15,7 +15,7 @@ import mega.android.core.ui.components.tabs.MegaScrollableTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.TabItems
-import mega.android.core.ui.model.menu.MenuActionIconWithClick
+import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.feature.photos.model.MediaAppBarAction
@@ -41,7 +41,7 @@ fun MediaMainScreen(
                 title = stringResource(sharedResR.string.media_feature_title),
                 actions = buildList {
                     add(
-                        MenuActionIconWithClick(
+                        MenuActionWithClick(
                             menuAction = MediaAppBarAction.CameraUpload(CameraUploadStatus.Default)
                         ) {
                             // Todo: Handle Camera Upload action click
@@ -49,13 +49,13 @@ fun MediaMainScreen(
                     )
 
                     add(
-                        MenuActionIconWithClick(menuAction = MediaAppBarAction.Search) {
+                        MenuActionWithClick(menuAction = MediaAppBarAction.Search) {
                             // Todo: Handle Search action click
                         }
                     )
 
                     add(
-                        MenuActionIconWithClick(menuAction = MediaAppBarAction.More) {
+                        MenuActionWithClick(menuAction = MediaAppBarAction.More) {
                             // Todo: Handle More action click
                         }
                     )
