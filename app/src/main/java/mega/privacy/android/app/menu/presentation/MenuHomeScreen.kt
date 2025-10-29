@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -66,6 +65,7 @@ import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.PRIVA
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.PRIVACY_SUITE_ITEM
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.TOOLBAR
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialogM3NavKey
+import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.contract.NavDrawerItem
@@ -154,7 +154,6 @@ fun MenuHomeScreenUi(
                 },
                 navigationType = AppBarNavigationType.None
             )
-
         }
     ) { paddingValues ->
         LazyColumn(
@@ -163,7 +162,7 @@ fun MenuHomeScreenUi(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
                 .animateContentSize(),
-            contentPadding = PaddingValues(top = paddingValues.calculateTopPadding()),
+            contentPadding = paddingValues.excludingBottomPadding(),
         )
         {
             item(key = "${uiState.name} ${uiState.email} ${uiState.lastModifiedTime}") {

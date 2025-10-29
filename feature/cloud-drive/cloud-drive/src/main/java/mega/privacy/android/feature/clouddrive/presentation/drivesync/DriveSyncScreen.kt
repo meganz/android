@@ -3,9 +3,11 @@ package mega.privacy.android.feature.clouddrive.presentation.drivesync
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,6 +35,7 @@ import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
+import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.sync.SyncType
@@ -93,7 +96,9 @@ internal fun DriveSyncScreen(
         modifier = Modifier
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true },
-        contentWindowInsets = WindowInsets.statusBars,
+        contentWindowInsets = WindowInsets.systemBars.only(
+            WindowInsetsSides.Top + WindowInsetsSides.Horizontal
+        ),
         topBar = {
             if (cloudDriveUiState.isInSelectionMode) {
                 NodeSelectionModeAppBar(
@@ -153,7 +158,7 @@ internal fun DriveSyncScreen(
         MegaScrollableTabRow(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding()),
+                .padding(paddingValues.excludingBottomPadding()),
             beyondViewportPageCount = 1,
             hideTabs = cloudDriveUiState.isInSelectionMode,
             pagerScrollEnabled = !cloudDriveUiState.isInSelectionMode,

@@ -2,11 +2,14 @@ package mega.privacy.android.feature.clouddrive.presentation.shares
 
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -48,6 +51,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetRoute
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
+import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -170,7 +174,9 @@ internal fun SharesScreen(
         modifier = Modifier
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true },
-        contentWindowInsets = WindowInsets.statusBars,
+        contentWindowInsets = WindowInsets.systemBars.only(
+            WindowInsetsSides.Top + WindowInsetsSides.Horizontal
+        ),
         topBar = {
             if (isInSelectionMode) {
                 NodeSelectionModeAppBar(
@@ -222,7 +228,7 @@ internal fun SharesScreen(
         MegaScrollableTabRow(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding()),
+                .padding(paddingValues.excludingBottomPadding()),
             beyondViewportPageCount = 1,
             hideTabs = isInSelectionMode,
             pagerScrollEnabled = !isInSelectionMode,
@@ -236,7 +242,10 @@ internal fun SharesScreen(
                         navigationHandler = navigationHandler,
                         onAction = incomingSharesViewModel::processAction,
                         onShowNodeOptions = { visibleNodeOptionId = it },
-                        onSortOrderClick = { showSortBottomSheet = true }
+                        onSortOrderClick = { showSortBottomSheet = true },
+                        contentPadding = PaddingValues(
+                            bottom = paddingValues.calculateBottomPadding()
+                        ),
                     )
                 }
                 addTextTabWithScrollableContent(
@@ -248,7 +257,10 @@ internal fun SharesScreen(
                         navigationHandler = navigationHandler,
                         onAction = outgoingSharesViewModel::processAction,
                         onShowNodeOptions = { visibleNodeOptionId = it },
-                        onSortOrderClick = { showSortBottomSheet = true }
+                        onSortOrderClick = { showSortBottomSheet = true },
+                        contentPadding = PaddingValues(
+                            bottom = paddingValues.calculateBottomPadding()
+                        ),
                     )
                 }
                 addTextTabWithScrollableContent(
@@ -261,7 +273,10 @@ internal fun SharesScreen(
                         onAction = linksViewModel::processAction,
                         onShowNodeOptions = { visibleNodeOptionId = it },
                         onSortOrderClick = { showSortBottomSheet = true },
-                        onTransfer = onTransfer
+                        onTransfer = onTransfer,
+                        contentPadding = PaddingValues(
+                            bottom = paddingValues.calculateBottomPadding()
+                        ),
                     )
                 }
             },

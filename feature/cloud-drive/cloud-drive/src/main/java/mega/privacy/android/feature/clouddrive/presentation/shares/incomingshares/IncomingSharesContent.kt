@@ -25,6 +25,7 @@ import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
+import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -64,7 +65,7 @@ fun IncomingSharesContent(
 
     Column(
         modifier = modifier
-            .padding(top = contentPadding.calculateTopPadding()),
+            .padding(contentPadding.excludingBottomPadding()),
     ) {
         when {
             uiState.isLoading -> {
@@ -90,7 +91,7 @@ fun IncomingSharesContent(
                     .weight(1f),
                 listContentPadding = PaddingValues(
                     top = 12.dp,
-                    bottom = contentPadding.calculateBottomPadding() + 100.dp
+                    bottom = contentPadding.calculateBottomPadding() + 100.dp,
                 ),
                 listState = listState,
                 gridState = gridState,

@@ -62,6 +62,7 @@ import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomS
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
+import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -298,7 +299,7 @@ internal fun CloudDriveContent(
 
     Column(
         modifier = modifier
-            .padding(top = contentPadding.calculateTopPadding()),
+            .padding(contentPadding.excludingBottomPadding())
     ) {
         // Storage Over Quota Banner
         val isOverQuotaBannerShow = uiState.storageCapacity != StorageOverQuotaCapacity.DEFAULT
@@ -349,7 +350,7 @@ internal fun CloudDriveContent(
                     .weight(1f),
                 listContentPadding = PaddingValues(
                     top = topPadding,
-                    bottom = contentPadding.calculateBottomPadding() + 100.dp
+                    bottom = contentPadding.calculateBottomPadding() + 100.dp,
                 ),
                 listState = listState,
                 gridState = gridState,
