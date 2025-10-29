@@ -7,7 +7,10 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -32,18 +35,30 @@ class PhotoDownloaderViewModel @Inject constructor(
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
+    private val downloadSemaphore = Semaphore(permits = 100)
+
     init {
         viewModelScope.launch(ioDispatcher) {
             handleChannel()
         }
     }
 
+    // This is temporary, after revamp we will use the new viewmodel to better handle
+    // the download process. Otherwise, we will only process 1 download at a time because
+    // we have removed the callback-based approach in both downloadPreviewUseCase and
+    // downloadThumbnailUseCase.
     private suspend fun handleChannel() {
-        for (photoCover in channel) {
-            if (photoCover.isPublicNode) {
-                downloadPhotoCover(photoCover)
-            } else {
-                downloadPublicNodePhotoCover(photoCover)
+        channel.consumeEach { photoCover ->
+            // For each item that arrives, launch a NEW coroutine to process it.
+            // This allows all downloads to start and run concurrently.
+            viewModelScope.launch(ioDispatcher) {
+                downloadSemaphore.withPermit {
+                    if (photoCover.isPublicNode) {
+                        downloadPhotoCover(photoCover)
+                    } else {
+                        downloadPublicNodePhotoCover(photoCover)
+                    }
+                }
             }
         }
     }
@@ -56,9 +71,9 @@ class PhotoDownloaderViewModel @Inject constructor(
                 .onSuccess { photoCover.callback(true) }
                 .onFailure { photoCover.callback(false) }
         } else {
-            downloadThumbnailUseCase(photoCover.photo.id) {
-                photoCover.callback(it)
-            }
+            runCatching { downloadThumbnailUseCase(photoCover.photo.id) }
+                .onSuccess { photoCover.callback(true) }
+                .onFailure { photoCover.callback(false) }
         }
     }
 

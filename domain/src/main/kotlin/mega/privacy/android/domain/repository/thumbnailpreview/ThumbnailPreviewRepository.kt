@@ -58,9 +58,8 @@ interface ThumbnailPreviewRepository {
      * Download thumbnail
      *
      * @param handle
-     * @param callback is download success
      */
-    suspend fun downloadThumbnail(handle: Long, callback: (success: Boolean) -> Unit)
+    suspend fun downloadThumbnail(handle: Long)
 
     /**
      * Download preview

@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
 import mega.privacy.android.app.presentation.photos.model.MediaListItem
 import mega.privacy.android.app.presentation.photos.model.MediaListItem.PhotoItem
@@ -29,6 +28,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -190,7 +190,11 @@ class AlbumCoverSelectionViewModel @Inject constructor(
         val thumbnailFilePath = photo.thumbnailFilePath ?: return@withContext
 
         if (File(thumbnailFilePath).exists()) callback(true)
-        else downloadThumbnailUseCase(nodeId = photo.id, callback)
+        else {
+            runCatching { downloadThumbnailUseCase(photo.id) }
+                .onSuccess { callback(true) }
+                .onFailure { callback(false) }
+        }
     }
 
     fun selectPhoto(photo: Photo) {

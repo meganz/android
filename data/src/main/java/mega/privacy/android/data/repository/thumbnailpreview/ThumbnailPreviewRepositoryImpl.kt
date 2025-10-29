@@ -11,14 +11,12 @@ import mega.privacy.android.data.extensions.getThumbnailFileName
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
-import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
@@ -124,26 +122,23 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
             }.getOrNull()
         }
 
-    override suspend fun downloadThumbnail(
-        handle: Long,
-        callback: (success: Boolean) -> Unit,
-    ) = withContext(ioDispatcher) {
-        val node = megaApi.getMegaNodeByHandle(handle)
-        val thumbnailFolderPath =
-            cacheGateway.getOrCreateCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER)?.path
+    override suspend fun downloadThumbnail(handle: Long) {
+        withContext(ioDispatcher) {
+            val node = megaApi.getMegaNodeByHandle(handle)
+            val thumbnailFolderPath =
+                cacheGateway.getOrCreateCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER)?.path
+            if (node == null || thumbnailFolderPath == null || !node.hasThumbnail()) {
+                throw IllegalStateException("Thumbnail node not found.")
+            }
 
-        if (node == null || thumbnailFolderPath == null || !node.hasThumbnail()) {
-            callback(false)
-        } else {
-            megaApi.getThumbnail(
-                node,
-                getThumbnailPath(thumbnailFolderPath, node),
-                OptionalMegaRequestListenerInterface(
-                    onRequestFinish = { _, error ->
-                        callback(error.errorCode == MegaError.API_OK)
-                    }
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("downloadThumbnail") {}
+                megaApi.getThumbnail(
+                    node = node,
+                    thumbnailFilePath = getThumbnailPath(thumbnailFolderPath, node),
+                    listener = listener
                 )
-            )
+            }
         }
     }
 

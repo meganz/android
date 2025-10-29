@@ -145,7 +145,11 @@ class AlbumGetMultipleLinksViewModel @Inject constructor(
         val thumbnailFilePath = photo.thumbnailFilePath ?: return@launch
 
         if (File(thumbnailFilePath).exists()) callback(true)
-        else downloadThumbnailUseCase(nodeId = photo.id, callback)
+        else {
+            runCatching { downloadThumbnailUseCase(photo.id) }
+                .onSuccess { callback(true) }
+                .onFailure { callback(false) }
+        }
     }
 
     fun hideCopyright() {

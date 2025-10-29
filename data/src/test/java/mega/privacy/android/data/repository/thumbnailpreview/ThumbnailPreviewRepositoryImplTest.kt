@@ -464,4 +464,140 @@ class ThumbnailPreviewRepositoryImplTest {
                 underTest.downloadPreview(handle = handle)
             }
         }
+
+    @Test
+    fun `test that an exception is thrown when fails to download a thumbnail node that doesn't exists`() =
+        runTest {
+            val handle = 123L
+            whenever(megaApi.getMegaNodeByHandle(nodeHandle = handle)) doReturn null
+            whenever(
+                cacheGateway.getOrCreateCacheFolder(
+                    folderName = CacheFolderConstant.THUMBNAIL_FOLDER
+                )
+            ) doReturn null
+
+            assertThrows<IllegalStateException> {
+                underTest.downloadThumbnail(handle = handle)
+            }
+            verify(megaApi, never()).getThumbnail(any(), any(), any())
+        }
+
+    @Test
+    fun `test that an exception is thrown when fails to download a thumbnail node folder path doesn't exists`() =
+        runTest {
+            val handle = 123L
+            val megaNode = mock<MegaNode>()
+            whenever(megaApi.getMegaNodeByHandle(nodeHandle = handle)) doReturn megaNode
+            whenever(
+                cacheGateway.getOrCreateCacheFolder(
+                    folderName = CacheFolderConstant.THUMBNAIL_FOLDER
+                )
+            ) doReturn null
+
+            assertThrows<IllegalStateException> {
+                underTest.downloadThumbnail(handle = handle)
+            }
+            verify(megaApi, never()).getThumbnail(any(), any(), any())
+        }
+
+    @Test
+    fun `test that an exception is thrown when fails to download a thumbnail node that doesn't have preview`() =
+        runTest {
+            val handle = 123L
+            val megaNode = mock<MegaNode> {
+                on { hasThumbnail() } doReturn false
+            }
+            whenever(megaApi.getMegaNodeByHandle(nodeHandle = handle)) doReturn megaNode
+            val file = mock<File> {
+                on { path } doReturn "path"
+            }
+            whenever(
+                cacheGateway.getOrCreateCacheFolder(
+                    folderName = CacheFolderConstant.THUMBNAIL_FOLDER
+                )
+            ) doReturn file
+
+            assertThrows<IllegalStateException> {
+                underTest.downloadThumbnail(handle = handle)
+            }
+            verify(megaApi, never()).getThumbnail(any(), any(), any())
+        }
+
+    @Test
+    fun `test that an exception is thrown when fails to download thumbnail`() =
+        runTest {
+            val handle = 123L
+            val megaNode = mock<MegaNode> {
+                on { hasThumbnail() } doReturn true
+            }
+            whenever(megaApi.getMegaNodeByHandle(nodeHandle = handle)) doReturn megaNode
+            val filePath = "path"
+            val file = mock<File> {
+                on { path } doReturn filePath
+            }
+            whenever(
+                cacheGateway.getOrCreateCacheFolder(
+                    folderName = CacheFolderConstant.THUMBNAIL_FOLDER
+                )
+            ) doReturn file
+            val megaError = mock<MegaError> {
+                on { errorCode } doReturn API_ENOENT
+            }
+            whenever(
+                megaApi.getThumbnail(
+                    node = eq(megaNode),
+                    thumbnailFilePath = any(),
+                    listener = any()
+                )
+            ) doAnswer {
+                (it.arguments.last() as MegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = mock(),
+                    e = megaError
+                )
+            }
+
+            assertThrows<MegaException> {
+                underTest.downloadThumbnail(handle = handle)
+            }
+        }
+
+    @Test
+    fun `test that the thumbnail is downloaded successfully`() =
+        runTest {
+            val handle = 123L
+            val megaNode = mock<MegaNode> {
+                on { hasThumbnail() } doReturn true
+            }
+            whenever(megaApi.getMegaNodeByHandle(nodeHandle = handle)) doReturn megaNode
+            val filePath = "path"
+            val file = mock<File> {
+                on { path } doReturn filePath
+            }
+            whenever(
+                cacheGateway.getOrCreateCacheFolder(
+                    folderName = CacheFolderConstant.THUMBNAIL_FOLDER
+                )
+            ) doReturn file
+            val megaError = mock<MegaError> {
+                on { errorCode } doReturn API_OK
+            }
+            whenever(
+                megaApi.getThumbnail(
+                    node = eq(megaNode),
+                    thumbnailFilePath = any(),
+                    listener = any()
+                )
+            ) doAnswer {
+                (it.arguments.last() as MegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = mock(),
+                    e = megaError
+                )
+            }
+
+            assertDoesNotThrow {
+                underTest.downloadThumbnail(handle = handle)
+            }
+        }
 }
