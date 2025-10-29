@@ -30,6 +30,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -43,6 +44,7 @@ import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
+import mega.privacy.android.core.nodecomponents.R as nodeComponentsR
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
@@ -62,6 +64,7 @@ import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomS
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
+import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -79,6 +82,7 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import mega.privacy.android.feature.clouddrive.presentation.upload.UploadingFiles
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.camera.CameraArg
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -339,8 +343,14 @@ internal fun CloudDriveContent(
             }
 
             uiState.isEmpty -> {
-                CloudDriveEmptyView(
-                    isRootCloudDrive = uiState.isCloudDriveRoot
+                val (imageDrawable, textId) = if (uiState.isCloudDriveRoot) {
+                    iconPackR.drawable.ic_empty_cloud_glass to nodeComponentsR.string.context_empty_cloud_drive
+                } else {
+                    iconPackR.drawable.ic_empty_folder_glass to nodeComponentsR.string.file_browser_empty_folder_new
+                }
+                MegaEmptyView(
+                    imagePainter = painterResource(id = imageDrawable),
+                    text = stringResource(id = textId)
                 )
             }
 
