@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.extensions.matchOrderWithNewAtEnd
 import mega.privacy.android.app.extensions.moveElement
 import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
+import mega.privacy.android.app.presentation.transfers.view.COMPLETED_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.FAILED_TAB_INDEX
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
@@ -90,12 +91,16 @@ class TransfersViewModel @AssistedInject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
-        val initialTabIndex = navKey.tabIndex
-            ?: if (isTransferInErrorStatusUseCase()) {
+        val initialTabIndex = when (navKey.tab) {
+            TransfersNavKey.Tab.Active -> ACTIVE_TAB_INDEX
+            TransfersNavKey.Tab.Completed -> COMPLETED_TAB_INDEX
+            TransfersNavKey.Tab.Failed -> FAILED_TAB_INDEX
+            null -> if (isTransferInErrorStatusUseCase()) {
                 FAILED_TAB_INDEX
             } else {
                 ACTIVE_TAB_INDEX
             }
+        }
         updateSelectedTab(initialTabIndex)
         monitorActiveTransfers()
         monitorStorageOverQuota()

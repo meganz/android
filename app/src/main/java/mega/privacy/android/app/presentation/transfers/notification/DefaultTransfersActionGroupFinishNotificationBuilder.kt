@@ -26,10 +26,13 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isOfflineDownload
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.usecase.GetNodePathByIdUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.node.DoesNodeExistUseCase
 import mega.privacy.android.domain.usecase.node.GetFullNodePathByIdUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import java.io.File
 import java.util.zip.ZipFile
@@ -49,6 +52,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
     private val doesNodeExistUseCase: DoesNodeExistUseCase,
     private val getFullNodePathByIdUseCase: GetFullNodePathByIdUseCase,
     private val getNodePathByIdUseCase: GetNodePathByIdUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : TransfersActionGroupFinishNotificationBuilder {
     private val resources get() = context.resources
     override suspend fun invoke(
@@ -104,25 +108,21 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
             uploadLocationExists = uploadLocationExists,
             actionGroup = actionGroup,
         )
-        val contentIntent =
+        val pendingIntent =
             if (isPreviewDownload || actionGroup.groupId < 0) { //not a real transfer, will not appear on transfer section -> content intent same as action intent
-                actionIntent
+                createPendingIntent(actionIntent)
             } else {
-                TransfersActivity.getCompletedTabIntent(context)
+                TransfersActivity.getPendingIntentForTransfersSection(
+                    getFeatureFlagValueUseCase(AppFeatures.SingleActivity),
+                    context,
+                    TransfersNavKey.Tab.Completed
+                )
             }
-        val pendingIntent = PendingIntent.getActivity(
-            context,
-            0,
-            contentIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
 
-        val actionPendingIntent = PendingIntent.getActivity(
-            context,
+        val actionPendingIntent = createPendingIntent(
+            actionIntent,
             System.currentTimeMillis()
                 .toInt(), // Unique request code to make sure old intents are not reused
-            actionIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         return NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID)
@@ -171,6 +171,14 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
         }
         return titleSuffix
     }
+
+    private fun createPendingIntent(intent: Intent?, requestCode: Int = 0) =
+        PendingIntent.getActivity(
+            context,
+            requestCode,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
 
     private suspend fun contentText(
         isPreviewDownload: Boolean,

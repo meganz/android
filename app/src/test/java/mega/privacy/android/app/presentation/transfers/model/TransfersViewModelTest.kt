@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.transfers.model
 
-import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.triggered
@@ -15,7 +14,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.extensions.moveElement
-import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
 import mega.privacy.android.app.presentation.transfers.model.TransfersViewModel.Companion.MAX_COMPLETED_TRANSFER_FOR_STATE
 import mega.privacy.android.app.presentation.transfers.view.FAILED_TAB_INDEX
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -213,7 +211,7 @@ class TransfersViewModelTest {
             clearTransferErrorStatusUseCase = clearTransferErrorStatusUseCase,
             getTransferByUniqueIdUseCase = getTransferByUniqueIdUseCase,
             isTransferInErrorStatusUseCase = isTransferInErrorStatusUseCase,
-            navKey = TransfersNavKey(0),
+            navKey = TransfersNavKey(TransfersNavKey.Tab.Active),
         )
     }
 

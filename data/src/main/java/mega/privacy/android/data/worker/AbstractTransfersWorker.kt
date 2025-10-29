@@ -308,12 +308,12 @@ abstract class AbstractTransfersWorker(
     private suspend fun showSingleNotification() = !showGroupedNotifications()
 
     /**
-     * Groups finish notifications by type.
+     * Summary notification for grouped finish notifications by type.
      */
     open suspend fun createFinishSummaryNotification(): Notification? = null
 
     /**
-     * Groups progress notifications by type.
+     * Summary notification for grouped progress notifications by type.
      */
     open suspend fun createProgressSummaryNotification(): Notification? = null
 

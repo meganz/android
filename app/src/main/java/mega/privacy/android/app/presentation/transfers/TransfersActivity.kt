@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.transfers
 
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -19,8 +20,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
-import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
-import mega.privacy.android.app.presentation.transfers.view.COMPLETED_TAB_INDEX
+import mega.privacy.android.app.presentation.transfers.navigation.TransferDeepLinkHandler
 import mega.privacy.android.app.presentation.transfers.view.navigation.transfersScreen
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -28,11 +28,6 @@ import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
-
-/**
- * Extra for the tab to show in the transfers screen.
- */
-const val EXTRA_TAB = "TAB"
 
 /**
  * Activity to show transfers.
@@ -74,12 +69,12 @@ class TransfersActivity : AppCompatActivity() {
                             passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                             content = {
                                 PsaContainer {
-                                    val tabIndex =
-                                        intent?.getIntExtra(EXTRA_TAB, -1)?.takeIf { it >= 0 }
+                                    val tab = intent?.getStringExtra(EXTRA_TAB)
+                                        ?.let { TransfersNavKey.Tab.valueOf(it) }
 
                                     NavHost(
                                         navController = rememberNavController(),
-                                        startDestination = TransfersNavKey(tabIndex = tabIndex),
+                                        startDestination = TransfersNavKey(tab = tab),
                                         modifier = Modifier.navigationBarsPadding()
                                     ) {
                                         transfersScreen(
@@ -101,12 +96,17 @@ class TransfersActivity : AppCompatActivity() {
     companion object {
 
         /**
+         * Extra for the tab to show in the transfers screen.
+         */
+        private const val EXTRA_TAB = "TAB"
+
+        /**
          * Get the Intent to open the [TransfersActivity] in the active tab
          */
         @JvmStatic
         fun getActiveTabIntent(context: Context): Intent =
             Intent(context, TransfersActivity::class.java).apply {
-                putExtra(EXTRA_TAB, ACTIVE_TAB_INDEX)
+                putExtra(EXTRA_TAB, TransfersNavKey.Tab.Active.name)
             }
 
         /**
@@ -115,7 +115,7 @@ class TransfersActivity : AppCompatActivity() {
         @JvmStatic
         fun getCompletedTabIntent(context: Context): Intent =
             Intent(context, TransfersActivity::class.java).apply {
-                putExtra(EXTRA_TAB, COMPLETED_TAB_INDEX)
+                putExtra(EXTRA_TAB, TransfersNavKey.Tab.Completed.name)
             }
 
         /**
@@ -124,5 +124,34 @@ class TransfersActivity : AppCompatActivity() {
         @JvmStatic
         fun getIntent(context: Context): Intent =
             Intent(context, TransfersActivity::class.java)
+
+        /**
+         * Helper method to create a pending intent for transfers section with optional selected tab
+         * that works with both values of single activity feature flag
+         * Once the [SingleActivity] feature flag is removed this activity will be removed as well and
+         * we can replace calls to this method with calls to similar method:
+         * [TransferDeepLinkHandler.getPendingIntentForTransfersSection]
+         */
+        fun getPendingIntentForTransfersSection(
+            singleActivity: Boolean,
+            context: Context,
+            tab: TransfersNavKey.Tab? = null,
+            requestCode: Int = 0,
+        ): PendingIntent = if (singleActivity) {
+            TransferDeepLinkHandler.getPendingIntentForTransfersSection(
+                context, tab, requestCode
+            )
+        } else {
+            PendingIntent.getActivity(
+                context,
+                requestCode,
+                when (tab) {
+                    TransfersNavKey.Tab.Active -> getActiveTabIntent(context)
+                    TransfersNavKey.Tab.Completed -> getCompletedTabIntent(context)
+                    else -> getIntent(context)
+                },
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        }
     }
 }
