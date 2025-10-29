@@ -3,47 +3,32 @@ package mega.privacy.android.feature.payment.model
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.core.formatter.model.FormattedSize
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
-import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceStringMapper
 import java.util.Locale
 
 /**
  * Localised Subscription
  *
- * @property accountType                        Account type (PRO I, PRO II, PRO III, PRO LITE, etc.)
- * @property storage                            Amount of storage of the subscription option
- * @property monthlyTransfer                    Amount of monthly transfer quota of the subscription option
- * @property yearlyTransfer                     Amount of yearly transfer quota of the subscription option
- * @property monthlyAmount                      Currency amount object, containing monthly price amount for subscription option and local currency
- * @property yearlyAmount                       Currency amount object, containing yearly price amount for subscription option and local currency
- * @property localisedPrice                     Mapper to get localised price
+ * @property monthlySubscription                Subscription option for monthly plan
+ * @property yearlySubscription                 Subscription option for yearly plan
  * @property localisedPriceCurrencyCode         Mapper to get localised price and currency code (e.g. "EUR")
  * @property formattedSize                      Mapper to get correctly formatted size for storage and transfer
  */
 data class LocalisedSubscription(
-    val accountType: AccountType,
-    val storage: Int,
-    val monthlyTransfer: Int,
-    val yearlyTransfer: Int,
-    val monthlyAmount: CurrencyAmount,
-    val yearlyAmount: CurrencyAmount,
-    val localisedPrice: LocalisedPriceStringMapper,
+    val monthlySubscription: Subscription,
+    val yearlySubscription: Subscription,
     val localisedPriceCurrencyCode: LocalisedPriceCurrencyCodeStringMapper,
     val formattedSize: FormattedSizeMapper,
 ) {
-    private val yearlyAmountPerMonth = CurrencyAmount(
-        yearlyAmount.value / 12,
-        yearlyAmount.currency,
-    )
+    val accountType: AccountType = monthlySubscription.accountType
+    val storage: Int = monthlySubscription.storage
 
-    /**
-     * method to call LocalisedPriceStringMapper to return string containing localised price and currency sign
-     *
-     * @param locale [Locale]
-     * @return String
-     */
-    fun localisePrice(locale: Locale): String = localisedPrice(monthlyAmount, locale)
+    private val yearlyAmountPerMonth = CurrencyAmount(
+        yearlySubscription.amount.value / 12,
+        yearlySubscription.amount.currency,
+    )
 
     /**
      * method to call LocalisedPriceCurrencyCodeStringMapper to return pair of strings containing localised price, currency sign and currency code
@@ -54,8 +39,48 @@ data class LocalisedSubscription(
      */
     fun localisePriceCurrencyCode(locale: Locale, isMonthly: Boolean): LocalisedProductPrice =
         when (isMonthly) {
-            true -> localisedPriceCurrencyCode(monthlyAmount, locale)
-            false -> localisedPriceCurrencyCode(yearlyAmount, locale)
+            true -> localisedPriceCurrencyCode(monthlySubscription.amount, locale)
+            false -> localisedPriceCurrencyCode(yearlySubscription.amount, locale)
+        }
+
+    /**
+     * method to call LocalisedPriceCurrencyCodeStringMapper to return pair of strings containing localised discounted price, currency sign and currency code
+     *
+     * @param locale [Locale]
+     * @param isMonthly [Boolean]
+     */
+    fun localiseDiscountedPriceMonthlyCurrencyCode(
+        locale: Locale,
+        isMonthly: Boolean,
+    ): LocalisedProductPrice? =
+        if (isMonthly) {
+            monthlySubscription.discountedAmountMonthly?.let {
+                localisedPriceCurrencyCode(it, locale)
+            }
+        } else {
+            yearlySubscription.discountedAmountMonthly?.let {
+                localisedPriceCurrencyCode(it, locale)
+            }
+        }
+
+    /**
+     * method to call LocalisedPriceCurrencyCodeStringMapper to return pair of strings containing localised discounted price, currency sign and currency code
+     *
+     * @param locale [Locale]
+     * @param isMonthly [Boolean]
+     */
+    fun localiseDiscountedPriceYearlyCurrencyCode(
+        locale: Locale,
+        isMonthly: Boolean,
+    ): LocalisedProductPrice? =
+        if (isMonthly) {
+            monthlySubscription.discountedAmountMonthly?.let {
+                localisedPriceCurrencyCode(CurrencyAmount(it.value * 12, it.currency), locale)
+            }
+        } else {
+            yearlySubscription.discountedAmountMonthly?.let {
+                localisedPriceCurrencyCode(CurrencyAmount(it.value * 12, it.currency), locale)
+            }
         }
 
     /**
@@ -80,7 +105,10 @@ data class LocalisedSubscription(
      */
     fun formatTransferSize(isMonthly: Boolean): FormattedSize =
         when (isMonthly) {
-            true -> formattedSize(size = monthlyTransfer)
-            false -> formattedSize(size = yearlyTransfer)
+            true -> formattedSize(size = monthlySubscription.transfer)
+            false -> formattedSize(size = yearlySubscription.transfer)
         }
+
+    val hasDiscount: Boolean
+        get() = monthlySubscription.discountedAmountMonthly != null || yearlySubscription.discountedAmountMonthly != null
 }

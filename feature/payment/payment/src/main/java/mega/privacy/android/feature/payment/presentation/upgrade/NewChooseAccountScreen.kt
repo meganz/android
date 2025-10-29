@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.payment.presentation.upgrade
 
+import android.content.Context
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -18,6 +19,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,11 +33,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaText
@@ -46,11 +48,9 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.formatFileSize
-import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.Currency
-import mega.privacy.android.domain.entity.account.CurrencyAmount
+import mega.privacy.android.domain.entity.account.OfferPeriod
 import mega.privacy.android.feature.payment.R
 import mega.privacy.android.feature.payment.components.AdditionalBenefitProPlanView
 import mega.privacy.android.feature.payment.components.BuyPlanBottomBar
@@ -58,21 +58,21 @@ import mega.privacy.android.feature.payment.components.ChooseAccountScreenTopBar
 import mega.privacy.android.feature.payment.components.FreePlanCard
 import mega.privacy.android.feature.payment.components.NewFeatureRow
 import mega.privacy.android.feature.payment.components.ProPlanCard
+import mega.privacy.android.feature.payment.components.TEST_TAG_FREE_PLAN_CARD
+import mega.privacy.android.feature.payment.components.TEST_TAG_PRO_PLAN_CARD
 import mega.privacy.android.feature.payment.model.AccountStorageUIState
 import mega.privacy.android.feature.payment.model.ChooseAccountState
-import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.ProFeature
 import mega.privacy.android.feature.payment.model.extensions.toUIAccountType
-import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
-import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import java.util.Locale
 
+
 @Composable
 fun NewChooseAccountScreen(
-    onBuyPlanClick: (AccountType, Boolean) -> Unit,
+    onBuyPlanClick: (AccountType, Boolean, String?) -> Unit,
     maybeLaterClicked: () -> Unit,
     onFreePlanClicked: () -> Unit,
     uiState: ChooseAccountState = ChooseAccountState(),
@@ -82,8 +82,10 @@ fun NewChooseAccountScreen(
     onBack: () -> Unit,
 ) {
     var chosenPlan by rememberSaveable { mutableStateOf<AccountType?>(null) }
-    var isMonthly by remember { mutableStateOf(false) }
+    var offerId by rememberSaveable { mutableStateOf<String?>(null) }
+    var isMonthly by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
+    val locale = Locale.getDefault()
 
     val lazyListState = rememberLazyListState()
     val topBarHeightPx =
@@ -108,6 +110,21 @@ fun NewChooseAccountScreen(
         accountStorageUiState.baseStorage?.let {
             formatFileSize(it, context)
         }.orEmpty()
+    }
+
+    val hasDiscount = remember(uiState) { uiState.hasDiscount() }
+
+    LaunchedEffect(uiState.localisedSubscriptionsList, uiState.currentSubscriptionPlan) {
+        if (chosenPlan == null) {
+            uiState.localisedSubscriptionsList.find { it.hasDiscount }?.let {
+                chosenPlan = it.accountType
+                offerId = if (isMonthly) {
+                    it.monthlySubscription.offerId
+                } else {
+                    it.yearlySubscription.offerId
+                }
+            }
+        }
     }
 
     val proFeatures = remember(highestStorageString) {
@@ -153,11 +170,18 @@ fun NewChooseAccountScreen(
             )
         },
         bottomBar = {
-            chosenPlan?.let {
+            chosenPlan?.takeIf {
+                !isCurrentPlan(
+                    uiState = uiState,
+                    subscriptionAccountType = it,
+                    isMonthly = isMonthly,
+                    isUpgradeAccount = isUpgradeAccount
+                )
+            }?.let {
                 BuyPlanBottomBar(
                     modifier = Modifier,
                     text = stringResource(it.toUIAccountType().textBuyButtonValue),
-                    onClick = { onBuyPlanClick(it, isMonthly) },
+                    onClick = { onBuyPlanClick(it, isMonthly, offerId) },
                 )
             }
         }
@@ -223,7 +247,10 @@ fun NewChooseAccountScreen(
                         onClick = {
                             isMonthly = true
                         },
-                        text = stringResource(id = R.string.subscription_type_monthly),
+                        content = stringResource(id = R.string.subscription_type_monthly),
+                        leadingPainter = if (isMonthly) {
+                            rememberVectorPainter(IconPack.Medium.Thin.Outline.Check)
+                        } else null
                     )
 
                     MegaChip(
@@ -232,7 +259,10 @@ fun NewChooseAccountScreen(
                         onClick = {
                             isMonthly = false
                         },
-                        text = stringResource(id = R.string.subscription_type_yearly),
+                        content = stringResource(id = R.string.subscription_type_yearly),
+                        leadingPainter = if (!isMonthly) {
+                            rememberVectorPainter(IconPack.Medium.Thin.Outline.Check)
+                        } else null
                     )
                 }
             }
@@ -252,49 +282,62 @@ fun NewChooseAccountScreen(
             }
 
             itemsIndexed(uiState.localisedSubscriptionsList) { index, subscription ->
-                val isRecommended =
-                    uiState.cheapestSubscriptionAvailable?.accountType == subscription.accountType
-
+                val isRecommended = !hasDiscount
+                        && uiState.cheapestSubscriptionAvailable?.accountType == subscription.accountType
                 val storageFormattedSize = subscription.formatStorageSize()
-                val storageValueString =
-                    stringResource(id = storageFormattedSize.unit, storageFormattedSize.size)
-
                 val transferFormattedSize = subscription.formatTransferSize(isMonthly)
-                val transferValueString =
-                    stringResource(id = transferFormattedSize.unit, transferFormattedSize.size)
 
                 val uiAccountType = subscription.accountType.toUIAccountType()
 
                 val storageString = stringResource(
                     id = sharedR.string.choose_account_screen_storage_label,
-                    storageValueString
+                    stringResource(id = storageFormattedSize.unit, storageFormattedSize.size)
                 )
                 val transferString = stringResource(
                     id = sharedR.string.choose_account_screen_transfer_quota_label,
-                    transferValueString
+                    stringResource(id = transferFormattedSize.unit, transferFormattedSize.size)
                 )
                 val totalPrice =
-                    subscription.localisePriceCurrencyCode(Locale.getDefault(), isMonthly)
+                    subscription.localisePriceCurrencyCode(locale, isMonthly)
 
                 val yearlyPricePerMonth = if (!isMonthly) {
-                    subscription.localisePriceOfYearlyAmountPerMonth(
-                        Locale.getDefault()
-                    )
+                    subscription.localisePriceOfYearlyAmountPerMonth(locale)
                 } else null
 
-                val billingInfo = if (!isMonthly) {
-                    stringResource(
-                        sharedR.string.choose_account_screen_billed_yearly,
-                        totalPrice.price
-                    )
-                } else null
+                val currentSubscription =
+                    if (isMonthly) subscription.monthlySubscription else subscription.yearlySubscription
+                val discountPercentage = currentSubscription.discountedPercentage
+                val offerPeriod = currentSubscription.offerPeriod
+                val discountedPriceMonthly =
+                    subscription.localiseDiscountedPriceMonthlyCurrencyCode(locale, isMonthly)
+                val discountedPriceYearly =
+                    subscription.localiseDiscountedPriceYearlyCurrencyCode(locale, isMonthly)
 
                 // in case subscriptionCycle is UNKNOWN and currentSubscriptionPlan is PRO level, we show it as current plan for both monthly and yearly
-                val isCurrentPlan = uiState.currentSubscriptionPlan == subscription.accountType
-                        && isUpgradeAccount
-                        && (uiState.subscriptionCycle == AccountSubscriptionCycle.UNKNOWN
-                        || (isMonthly && uiState.subscriptionCycle == AccountSubscriptionCycle.MONTHLY)
-                        || (!isMonthly && uiState.subscriptionCycle == AccountSubscriptionCycle.YEARLY))
+                val isCurrentPlan = isCurrentPlan(
+                    uiState = uiState,
+                    subscriptionAccountType = subscription.accountType,
+                    isMonthly = isMonthly,
+                    isUpgradeAccount = isUpgradeAccount
+                )
+
+                val billingInfo = if (!isMonthly) {
+                    if (!isCurrentPlan && discountedPriceYearly != null
+                        && discountPercentage != null && offerPeriod != null
+                    ) {
+                        stringResource(
+                            sharedR.string.billing_info_with_discount_label,
+                            totalPrice.price,
+                            discountedPriceYearly.price,
+                            getOfferPeriodLabel(offerPeriod)
+                        )
+                    } else {
+                        stringResource(
+                            sharedR.string.choose_account_screen_billed_yearly,
+                            totalPrice.price
+                        )
+                    }
+                } else null
 
                 ProPlanCard(
                     modifier = Modifier
@@ -302,13 +345,24 @@ fun NewChooseAccountScreen(
                         .testTag("$TEST_TAG_PRO_PLAN_CARD$index"),
                     planName = stringResource(id = uiAccountType.textValue),
                     isRecommended = isRecommended,
-                    isSelected = chosenPlan == subscription.accountType,
+                    isSelected = chosenPlan == subscription.accountType && !isCurrentPlan,
                     storage = storageString,
                     transfer = transferString,
                     price = yearlyPricePerMonth?.price ?: totalPrice.price,
                     billingInfo = billingInfo,
+                    offerName = discountPercentage?.takeIf { !isCurrentPlan }?.let {
+                        getCampaignName(
+                            context = context,
+                            offerId = currentSubscription.offerId,
+                            discountPercentage = discountPercentage
+                        )
+                    },
+                    discountedPrice = discountedPriceMonthly?.price?.takeIf { !isCurrentPlan },
                     isCurrentPlan = isCurrentPlan,
-                    onSelected = { chosenPlan = subscription.accountType },
+                    onSelected = {
+                        chosenPlan = subscription.accountType
+                        offerId = currentSubscription.offerId
+                    },
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -350,6 +404,47 @@ fun NewChooseAccountScreen(
     }
 }
 
+fun isCurrentPlan(
+    uiState: ChooseAccountState,
+    subscriptionAccountType: AccountType,
+    isMonthly: Boolean,
+    isUpgradeAccount: Boolean,
+): Boolean = uiState.currentSubscriptionPlan == subscriptionAccountType
+        && isUpgradeAccount
+        && (uiState.subscriptionCycle == AccountSubscriptionCycle.UNKNOWN
+        || (isMonthly && uiState.subscriptionCycle == AccountSubscriptionCycle.MONTHLY)
+        || (!isMonthly && uiState.subscriptionCycle == AccountSubscriptionCycle.YEARLY))
+
+@Composable
+fun getOfferPeriodLabel(period: OfferPeriod) = when (period) {
+    is OfferPeriod.Month -> pluralStringResource(
+        id = sharedR.plurals.label_first_time_in_months_full,
+        period.value,
+        period.value
+    )
+
+    is OfferPeriod.Year -> pluralStringResource(
+        id = sharedR.plurals.label_first_time_in_years_full,
+        period.value,
+        period.value
+    )
+}
+
+fun getCampaignName(context: Context, offerId: String?, discountPercentage: Int): String =
+    when (offerId) {
+        CAMPAIGN_BLACK_FRIDAY -> context.getString(
+            sharedR.string.campaign_name_black_friday,
+            discountPercentage
+        )
+
+        CAMPAIGN_CYBER_MONDAY -> context.getString(
+            sharedR.string.campaign_name_cyber_monday,
+            discountPercentage
+        )
+
+        else -> context.getString(sharedR.string.campaign_name_special_offer, discountPercentage)
+    }
+
 @CombinedThemePreviews
 @Composable
 internal fun NewChooseAccountScreenPreview(
@@ -364,7 +459,7 @@ internal fun NewChooseAccountScreenPreview(
             ),
             isNewCreationAccount = false,
             isUpgradeAccount = false,
-            onBuyPlanClick = { _, _ -> },
+            onBuyPlanClick = { _, _, _ -> },
             onFreePlanClicked = {},
             maybeLaterClicked = {},
             onBack = {}
@@ -372,88 +467,8 @@ internal fun NewChooseAccountScreenPreview(
     }
 }
 
-internal class ChooseAccountPreviewProvider :
-    PreviewParameterProvider<ChooseAccountState> {
-    override val values: Sequence<ChooseAccountState>
-        get() = sequenceOf(
-            ChooseAccountState(
-                localisedSubscriptionsList = localisedSubscriptionsList
-            )
-        )
-
-    companion object {
-        val localisedPriceStringMapper = LocalisedPriceStringMapper()
-        val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
-        val formattedSizeMapper = FormattedSizeMapper()
-
-        val subscriptionProI = LocalisedSubscription(
-            accountType = AccountType.PRO_I,
-            storage = 2048,
-            monthlyTransfer = 2048,
-            yearlyTransfer = 24576,
-            monthlyAmount = CurrencyAmount(9.99F, Currency("EUR")),
-            yearlyAmount = CurrencyAmount(
-                99.99F,
-                Currency("EUR")
-            ),
-            localisedPrice = localisedPriceStringMapper,
-            localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
-            formattedSize = formattedSizeMapper,
-        )
-
-        val subscriptionProII = LocalisedSubscription(
-            accountType = AccountType.PRO_II,
-            storage = 8192,
-            monthlyTransfer = 8192,
-            yearlyTransfer = 98304,
-            monthlyAmount = CurrencyAmount(19.99F, Currency("EUR")),
-            yearlyAmount = CurrencyAmount(
-                199.99F,
-                Currency("EUR")
-            ),
-            localisedPrice = localisedPriceStringMapper,
-            localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
-            formattedSize = formattedSizeMapper,
-        )
-
-        val subscriptionProIII = LocalisedSubscription(
-            accountType = AccountType.PRO_III,
-            storage = 16384,
-            monthlyTransfer = 16384,
-            yearlyTransfer = 196608,
-            monthlyAmount = CurrencyAmount(29.99F, Currency("EUR")),
-            yearlyAmount = CurrencyAmount(
-                299.99F,
-                Currency("EUR")
-            ),
-            localisedPrice = localisedPriceStringMapper,
-            localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
-            formattedSize = formattedSizeMapper,
-        )
-
-        val subscriptionProLite = LocalisedSubscription(
-            accountType = AccountType.PRO_LITE,
-            storage = 400,
-            monthlyTransfer = 1024,
-            yearlyTransfer = 12288,
-            monthlyAmount = CurrencyAmount(4.99F, Currency("EUR")),
-            yearlyAmount = CurrencyAmount(
-                49.99F,
-                Currency("EUR")
-            ),
-            localisedPrice = localisedPriceStringMapper,
-            localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
-            formattedSize = formattedSizeMapper,
-        )
-
-        val localisedSubscriptionsList: List<LocalisedSubscription> = listOf(
-            subscriptionProLite,
-            subscriptionProI,
-            subscriptionProII,
-            subscriptionProIII
-        )
-    }
-}
+private const val CAMPAIGN_BLACK_FRIDAY = "black-friday"
+private const val CAMPAIGN_CYBER_MONDAY = "cyber-monday"
 
 /**
  * Test tag for the yearly chip selector
@@ -491,19 +506,9 @@ internal const val TEST_TAG_FEATURE_ROW = "choose_account_screen:feature_row_"
 internal const val TEST_TAG_SAVE_UP_TO_BADGE = "choose_account_screen:save_up_to_badge"
 
 /**
- * Test tag prefix for each Pro plan card (append index)
- */
-internal const val TEST_TAG_PRO_PLAN_CARD = "choose_account_screen:pro_plan_card_"
-
-/**
  * Test tag for the additional benefits section
  */
 internal const val TEST_TAG_ADDITIONAL_BENEFITS = "choose_account_screen:additional_benefits"
-
-/**
- * Test tag for the Free plan card
- */
-internal const val TEST_TAG_FREE_PLAN_CARD = "choose_account_screen:free_plan_card"
 
 /**
  * Test tag for the subscription info title

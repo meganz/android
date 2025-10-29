@@ -11,13 +11,13 @@ import javax.inject.Inject
  *
  * @property accountRepository                  [AccountRepository]
  * @property getLocalPricingUseCase             [GetLocalPricingUseCase]
- * @property calculateCurrencyAmountUseCase     [CalculateCurrencyAmountUseCase]
+ * @property subscriptionMapper                 [SubscriptionMapper]
  */
 class GetYearlySubscriptionsUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
-    private val calculateCurrencyAmountUseCase: CalculateCurrencyAmountUseCase,
     private val getLocalPricingUseCase: GetLocalPricingUseCase,
     private val getAppSubscriptionOptionsUseCase: GetAppSubscriptionOptionsUseCase,
+    private val subscriptionMapper: SubscriptionMapper,
 ) {
     /**
      * Invoke
@@ -28,20 +28,7 @@ class GetYearlySubscriptionsUseCase @Inject constructor(
         return getAppSubscriptionOptionsUseCase(12).map { plan ->
             val sku = getSku(plan.accountType)
             val localPricing = sku?.let { getLocalPricingUseCase(it) }
-
-            Subscription(
-                accountType = plan.accountType,
-                handle = plan.handle,
-                storage = plan.storage,
-                transfer = plan.transfer,
-                amount = localPricing?.let {
-                    calculateCurrencyAmountUseCase(
-                        it.amount,
-                        it.currency
-                    )
-                }
-                    ?: calculateCurrencyAmountUseCase(plan.amount, plan.currency),
-            )
+            subscriptionMapper(plan, localPricing)
         }
     }
 

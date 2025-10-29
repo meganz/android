@@ -22,18 +22,18 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GetRecommendedSubscriptionUseCaseTest {
     private lateinit var underTest: GetRecommendedSubscriptionUseCase
-    private val calculateCurrencyAmountUseCase = mock<CalculateCurrencyAmountUseCase>()
     private val getLocalPricingUseCase = mock<GetLocalPricingUseCase>()
     private val getAppSubscriptionOptionsUseCase = mock<GetAppSubscriptionOptionsUseCase>()
     private val getCurrentSubscriptionPlanUseCase = mock<GetCurrentSubscriptionPlanUseCase>()
+    private val subscriptionMapper = mock<SubscriptionMapper>()
 
     @BeforeAll
     fun setUp() {
         underTest = GetRecommendedSubscriptionUseCase(
-            calculateCurrencyAmountUseCase = calculateCurrencyAmountUseCase,
             getLocalPricingUseCase = getLocalPricingUseCase,
             getAppSubscriptionOptionsUseCase = getAppSubscriptionOptionsUseCase,
             getCurrentSubscriptionPlanUseCase = getCurrentSubscriptionPlanUseCase,
+            subscriptionMapper = subscriptionMapper,
         )
     }
 
@@ -49,12 +49,7 @@ class GetRecommendedSubscriptionUseCaseTest {
         )
 
         whenever(getLocalPricingUseCase(Skus.SKU_PRO_I_MONTH)).thenReturn(localPricingProI)
-        whenever(
-            calculateCurrencyAmountUseCase(
-                CurrencyPoint.LocalCurrencyPoint(999L),
-                Currency("EUR")
-            )
-        ).thenReturn(currencyAmountProI)
+        whenever(subscriptionMapper(subscriptionOptionI, localPricingProI)).thenReturn(subscriptionProI)
 
         val actual = underTest.invoke()
         assertThat(actual).isEqualTo(subscriptionProI)
@@ -87,12 +82,7 @@ class GetRecommendedSubscriptionUseCaseTest {
         )
 
         whenever(getLocalPricingUseCase(Skus.SKU_PRO_LITE_MONTH)).thenReturn(localPricingLite)
-        whenever(
-            calculateCurrencyAmountUseCase(
-                CurrencyPoint.LocalCurrencyPoint(499L),
-                Currency("EUR")
-            )
-        ).thenReturn(currencyAmountLite)
+        whenever(subscriptionMapper(subscriptionOptionLite, localPricingLite)).thenReturn(subscriptionLite)
 
         val actual = underTest.invoke()
         assertThat(actual).isEqualTo(subscriptionLite)
@@ -131,13 +121,15 @@ class GetRecommendedSubscriptionUseCaseTest {
     private val localPricingLite = LocalPricing(
         CurrencyPoint.LocalCurrencyPoint(499L),
         Currency("EUR"),
-        Skus.SKU_PRO_LITE_MONTH
+        Skus.SKU_PRO_LITE_MONTH,
+        emptyList()
     )
 
     private val localPricingProI = LocalPricing(
         CurrencyPoint.LocalCurrencyPoint(999L),
         Currency("EUR"),
-        Skus.SKU_PRO_I_MONTH
+        Skus.SKU_PRO_I_MONTH,
+        emptyList()
     )
 
     private val subscriptionLite = Subscription(
@@ -145,7 +137,11 @@ class GetRecommendedSubscriptionUseCaseTest {
         handle = 1560943707714440503,
         storage = 450,
         transfer = 450,
-        amount = CurrencyAmount(499L.toFloat(), Currency("EUR"))
+        amount = CurrencyAmount(499L.toFloat(), Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
     )
 
     private val subscriptionProI = Subscription(
@@ -153,9 +149,10 @@ class GetRecommendedSubscriptionUseCaseTest {
         handle = 1560943707714440503,
         storage = 2048,
         transfer = 2048,
-        amount = CurrencyAmount(999L.toFloat(), Currency("EUR"))
+        amount = CurrencyAmount(999L.toFloat(), Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
     )
-
-    private val currencyAmountLite = CurrencyAmount(499L.toFloat(), Currency("EUR"))
-    private val currencyAmountProI = CurrencyAmount(999L.toFloat(), Currency("EUR"))
 }

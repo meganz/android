@@ -19,9 +19,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.SpannedText
 import mega.android.core.ui.components.button.MegaRadioButton
+import mega.android.core.ui.model.MegaSpanStyle
+import mega.android.core.ui.model.SpanIndicator
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
 import mega.android.core.ui.theme.values.TextColor
@@ -41,6 +45,8 @@ fun ProPlanCard(
     transfer: String,
     price: String,
     billingInfo: String?,
+    offerName: String? = null,
+    discountedPrice: String? = null,
     isCurrentPlan: Boolean = false,
     onSelected: () -> Unit = {},
 ) {
@@ -80,6 +86,20 @@ fun ProPlanCard(
                     style = MaterialTheme.typography.bodySmall,
                     textColor = TextColor.Warning
                 )
+            } else if (!offerName.isNullOrEmpty()) {
+                MegaText(
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .background(
+                            color = DSTokens.colors.brand.default,
+                            shape = RoundedCornerShape(4.dp)
+                        )
+                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                        .testTag(TEST_TAG_PRO_PLAN_CARD_OFFER),
+                    text = offerName,
+                    style = MaterialTheme.typography.bodySmall,
+                    textColor = TextColor.OnColor
+                )
             } else if (isRecommended) {
                 MegaText(
                     modifier = Modifier
@@ -111,7 +131,6 @@ fun ProPlanCard(
             modifier = Modifier
                 .padding(vertical = 16.dp)
                 .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
@@ -135,9 +154,22 @@ fun ProPlanCard(
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
-                Row(verticalAlignment = Alignment.Bottom) {
+                // Show original price with strikethrough if there's a discount
+                val actualPrice = discountedPrice ?: price
+                if (discountedPrice != null) {
                     MegaText(
                         text = price,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.Normal,
+                            textDecoration = TextDecoration.LineThrough
+                        ),
+                        textColor = TextColor.Secondary,
+                        modifier = Modifier.testTag(TEST_TAG_PRO_PLAN_CARD_ORIGINAL_PRICE)
+                    )
+                }
+                Row(verticalAlignment = Alignment.Bottom) {
+                    MegaText(
+                        text = actualPrice,
                         style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                         textColor = TextColor.Primary,
                         modifier = Modifier.testTag(TEST_TAG_PRO_PLAN_CARD_PRICE)
@@ -152,10 +184,17 @@ fun ProPlanCard(
                     )
                 }
                 if (!billingInfo.isNullOrEmpty()) {
-                    MegaText(
-                        text = billingInfo,
-                        style = MaterialTheme.typography.bodySmall,
-                        textColor = TextColor.Secondary,
+                    SpannedText(
+                        value = billingInfo,
+                        baseTextColor = TextColor.Secondary,
+                        baseStyle = MaterialTheme.typography.bodySmall,
+                        spanStyles = mapOf(
+                            SpanIndicator('A') to MegaSpanStyle.DefaultColorStyle(
+                                androidx.compose.ui.text.SpanStyle(
+                                    textDecoration = TextDecoration.LineThrough
+                                )
+                            )
+                        ),
                         modifier = Modifier
                             .padding(top = 2.dp)
                             .testTag(TEST_TAG_PRO_PLAN_CARD_BILLING_INFO)
@@ -171,11 +210,27 @@ fun ProPlanCard(
 private fun ProPlanCardPreview() {
     AndroidTheme(isSystemInDarkTheme()) {
         Column {
+            // Card with discount
+            ProPlanCard(
+                modifier = Modifier.padding(16.dp),
+                planName = "Pro I",
+                isRecommended = false,
+                isSelected = true,
+                storage = "2 TB storage",
+                transfer = "24 TB transfer",
+                price = "€9.99",
+                billingInfo = "€99.99 $49.99 for first year",
+                offerName = "Black Friday offer",
+                discountedPrice = "€4.99",
+                isCurrentPlan = false
+            )
+
+            // Card without discount
             ProPlanCard(
                 modifier = Modifier.padding(16.dp),
                 planName = "Pro II",
                 isRecommended = true,
-                isSelected = true,
+                isSelected = false,
                 storage = "8 TB storage",
                 transfer = "96 TB transfer",
                 price = "€16.67",
@@ -183,6 +238,7 @@ private fun ProPlanCardPreview() {
                 isCurrentPlan = false
             )
 
+            // Current plan
             ProPlanCard(
                 modifier = Modifier.padding(16.dp),
                 planName = "Pro II",
@@ -206,44 +262,54 @@ const val TEST_TAG_PRO_PLAN_CARD = "pro_plan_card"
 /**
  * Tag for the ProPlanCard title text
  */
-const val TEST_TAG_PRO_PLAN_CARD_TITLE = "pro_plan_card:title"
+const val TEST_TAG_PRO_PLAN_CARD_TITLE = "${TEST_TAG_PRO_PLAN_CARD}:title"
 
 /**
  * Tag for the ProPlanCard recommended label
  */
-const val TEST_TAG_PRO_PLAN_CARD_RECOMMENDED = "pro_plan_card:recommended"
+const val TEST_TAG_PRO_PLAN_CARD_RECOMMENDED = "${TEST_TAG_PRO_PLAN_CARD}:recommended"
 
 /**
  * Tag for the ProPlanCard radio button
  */
-const val TEST_TAG_PRO_PLAN_CARD_RADIO = "pro_plan_card:radio"
+const val TEST_TAG_PRO_PLAN_CARD_RADIO = "${TEST_TAG_PRO_PLAN_CARD}:radio"
 
 /**
  * Tag for the ProPlanCard storage text
  */
-const val TEST_TAG_PRO_PLAN_CARD_STORAGE = "pro_plan_card:storage"
+const val TEST_TAG_PRO_PLAN_CARD_STORAGE = "${TEST_TAG_PRO_PLAN_CARD}:storage"
 
 /**
  * Tag for the ProPlanCard transfer text
  */
-const val TEST_TAG_PRO_PLAN_CARD_TRANSFER = "pro_plan_card:transfer"
+const val TEST_TAG_PRO_PLAN_CARD_TRANSFER = "${TEST_TAG_PRO_PLAN_CARD}:transfer"
 
 /**
  * Tag for the ProPlanCard price text
  */
-const val TEST_TAG_PRO_PLAN_CARD_PRICE = "pro_plan_card:price"
+const val TEST_TAG_PRO_PLAN_CARD_PRICE = "${TEST_TAG_PRO_PLAN_CARD}:price"
 
 /**
  * Tag for the ProPlanCard price unit text
  */
-const val TEST_TAG_PRO_PLAN_CARD_PRICE_UNIT = "pro_plan_card:price_unit"
+const val TEST_TAG_PRO_PLAN_CARD_PRICE_UNIT = "${TEST_TAG_PRO_PLAN_CARD}:price_unit"
 
 /**
  * Tag for the ProPlanCard billing info text
  */
-const val TEST_TAG_PRO_PLAN_CARD_BILLING_INFO = "pro_plan_card:billing_info"
+const val TEST_TAG_PRO_PLAN_CARD_BILLING_INFO = "${TEST_TAG_PRO_PLAN_CARD}:billing_info"
 
 /**
  * Tag for the ProPlanCard current plan label
  */
-const val TEST_TAG_PRO_PLAN_CARD_CURRENT_PLAN = "pro_plan_card:current_plan"
+const val TEST_TAG_PRO_PLAN_CARD_CURRENT_PLAN = "${TEST_TAG_PRO_PLAN_CARD}:current_plan"
+
+/**
+ * Tag for the ProPlanCard offer label
+ */
+const val TEST_TAG_PRO_PLAN_CARD_OFFER = "${TEST_TAG_PRO_PLAN_CARD}:offer"
+
+/**
+ * Tag for the ProPlanCard original price text
+ */
+const val TEST_TAG_PRO_PLAN_CARD_ORIGINAL_PRICE = "${TEST_TAG_PRO_PLAN_CARD}:original_price"

@@ -11,17 +11,17 @@ import androidx.test.platform.app.InstrumentationRegistry
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
+import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.CurrencyAmount
+import mega.privacy.android.feature.payment.components.TEST_TAG_FREE_PLAN_CARD
+import mega.privacy.android.feature.payment.components.TEST_TAG_PRO_PLAN_CARD
 import mega.privacy.android.feature.payment.model.ChooseAccountState
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
-import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.feature.payment.presentation.upgrade.NewChooseAccountScreen
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_ADDITIONAL_BENEFITS
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_FEATURE_ROW
-import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_FREE_PLAN_CARD
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_LAZY_COLUMN
-import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_PRO_PLAN_CARD
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_SUBSCRIPTION_INFO_DESC
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_SUBSCRIPTION_INFO_TITLE
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_TERMS_AND_POLICIES
@@ -32,40 +32,96 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class NewChooseAccountScreenTest {
-    private val localisedPriceStringMapper = LocalisedPriceStringMapper()
     private val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
     private val formattedSizeMapper = FormattedSizeMapper()
 
-    private val subscriptionProI = LocalisedSubscription(
+    private val subscriptionProIMonthly = Subscription(
         accountType = AccountType.PRO_I,
+        handle = 1560943707714440503,
         storage = 2048,
-        monthlyTransfer = 2048,
-        yearlyTransfer = 24576,
-        monthlyAmount = CurrencyAmount(8.33F, Currency("EUR")),
-        yearlyAmount = CurrencyAmount(99.96F, Currency("EUR")),
-        localisedPrice = localisedPriceStringMapper,
+        transfer = 2048,
+        amount = CurrencyAmount(8.33F, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
+    )
+
+    private val subscriptionProIYearly = Subscription(
+        accountType = AccountType.PRO_I,
+        handle = 7472683699866478542,
+        storage = 2048,
+        transfer = 24576,
+        amount = CurrencyAmount(99.96F, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
+    )
+
+    private val subscriptionProIIMonthly = Subscription(
+        accountType = AccountType.PRO_II,
+        handle = 7974113413762509455,
+        storage = 8192,
+        transfer = 8192,
+        amount = CurrencyAmount(16.67F, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
+    )
+
+    private val subscriptionProIIYearly = Subscription(
+        accountType = AccountType.PRO_II,
+        handle = 370834413380951543,
+        storage = 8192,
+        transfer = 98304,
+        amount = CurrencyAmount(199.99F, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
+    )
+
+    private val subscriptionProIIIMonthly = Subscription(
+        accountType = AccountType.PRO_III,
+        handle = -2499193043825823892,
+        storage = 16384,
+        transfer = 16384,
+        amount = CurrencyAmount(25.00F, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
+    )
+
+    private val subscriptionProIIIYearly = Subscription(
+        accountType = AccountType.PRO_III,
+        handle = 7225413476571973499,
+        storage = 16384,
+        transfer = 196608,
+        amount = CurrencyAmount(299.99F, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
+    )
+
+    private val subscriptionProI = LocalisedSubscription(
+        monthlySubscription = subscriptionProIMonthly,
+        yearlySubscription = subscriptionProIYearly,
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
     )
     private val subscriptionProII = LocalisedSubscription(
-        accountType = AccountType.PRO_II,
-        storage = 8192,
-        monthlyTransfer = 8192,
-        yearlyTransfer = 98304,
-        monthlyAmount = CurrencyAmount(16.67F, Currency("EUR")),
-        yearlyAmount = CurrencyAmount(199.99F, Currency("EUR")),
-        localisedPrice = localisedPriceStringMapper,
+        monthlySubscription = subscriptionProIIMonthly,
+        yearlySubscription = subscriptionProIIYearly,
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
     )
     private val subscriptionProIII = LocalisedSubscription(
-        accountType = AccountType.PRO_III,
-        storage = 16384,
-        monthlyTransfer = 16384,
-        yearlyTransfer = 196608,
-        monthlyAmount = CurrencyAmount(25.00F, Currency("EUR")),
-        yearlyAmount = CurrencyAmount(299.99F, Currency("EUR")),
-        localisedPrice = localisedPriceStringMapper,
+        monthlySubscription = subscriptionProIIIMonthly,
+        yearlySubscription = subscriptionProIIIYearly,
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
     )
@@ -151,7 +207,7 @@ class NewChooseAccountScreenTest {
 
     private fun setContent(
         isUpgradeAccount: Boolean = false,
-        onBuyPlanClick: (AccountType, Boolean) -> Unit = { _, _ -> },
+        onBuyPlanClick: (AccountType, Boolean, String?) -> Unit = { _, _, _ -> },
         onFreePlanClick: () -> Unit = {},
         maybeLaterClicked: () -> Unit = {},
     ) = composeRule.setContent {

@@ -24,7 +24,6 @@ import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCas
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
-import mega.privacy.android.feature.payment.model.mapper.AccountTypeToProductIdMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
@@ -54,14 +53,12 @@ class ChooseAccountViewModelTest {
     private val formattedSizeMapper = mock<FormattedSizeMapper>()
     private val localisedSubscriptionMapper =
         LocalisedSubscriptionMapper(
-            localisedPriceStringMapper,
             localisedPriceCurrencyCodeStringMapper,
             formattedSizeMapper,
         )
     private val getRecommendedSubscriptionUseCase =
         mock<GetRecommendedSubscriptionUseCase>()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
-    private val accountTypeToProductIdMapper: AccountTypeToProductIdMapper = mock()
 
     @BeforeEach
     fun setUp() {
@@ -115,16 +112,8 @@ class ChooseAccountViewModelTest {
     @Test
     fun `test that initial state has cheapest Pro plan`() = runTest {
         val expectedResult = LocalisedSubscription(
-            accountType = AccountType.PRO_LITE,
-            storage = PRO_LITE_STORAGE,
-            monthlyTransfer = PRO_LITE_TRANSFER_MONTHLY,
-            yearlyTransfer = PRO_LITE_TRANSFER_MONTHLY,
-            monthlyAmount = CurrencyAmount(PRO_LITE_PRICE_MONTHLY, Currency("EUR")),
-            yearlyAmount = CurrencyAmount(
-                PRO_LITE_PRICE_MONTHLY,
-                Currency("EUR")
-            ),
-            localisedPrice = localisedPriceStringMapper,
+            monthlySubscription = subscriptionProLiteMonthly,
+            yearlySubscription = subscriptionProLiteMonthly, // ViewModel uses the same subscription for both
             localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
             formattedSize = formattedSizeMapper,
         )
@@ -168,7 +157,11 @@ class ChooseAccountViewModelTest {
         handle = 1560943707714440503,
         storage = PRO_I_STORAGE_TRANSFER,
         transfer = PRO_I_STORAGE_TRANSFER,
-        amount = CurrencyAmount(PRO_I_PRICE_MONTHLY, Currency("EUR"))
+        amount = CurrencyAmount(PRO_I_PRICE_MONTHLY, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
     )
 
     private val subscriptionProIIMonthly = Subscription(
@@ -176,7 +169,11 @@ class ChooseAccountViewModelTest {
         handle = 7974113413762509455,
         storage = PRO_II_STORAGE_TRANSFER,
         transfer = PRO_II_STORAGE_TRANSFER,
-        amount = CurrencyAmount(PRO_II_PRICE_MONTHLY, Currency("EUR"))
+        amount = CurrencyAmount(PRO_II_PRICE_MONTHLY, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
     )
 
     private val subscriptionProIIIMonthly = Subscription(
@@ -184,7 +181,11 @@ class ChooseAccountViewModelTest {
         handle = -2499193043825823892,
         storage = PRO_III_STORAGE_TRANSFER,
         transfer = PRO_III_STORAGE_TRANSFER,
-        amount = CurrencyAmount(PRO_III_PRICE_MONTHLY, Currency("EUR"))
+        amount = CurrencyAmount(PRO_III_PRICE_MONTHLY, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
     )
 
     private val subscriptionProLiteMonthly = Subscription(
@@ -192,7 +193,11 @@ class ChooseAccountViewModelTest {
         handle = -4226692769210777158,
         storage = PRO_LITE_STORAGE,
         transfer = PRO_LITE_TRANSFER_MONTHLY,
-        amount = CurrencyAmount(PRO_LITE_PRICE_MONTHLY, Currency("EUR"))
+        amount = CurrencyAmount(PRO_LITE_PRICE_MONTHLY, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
     )
 
     private val expectedMonthlySubscriptionsList = listOf(
@@ -207,7 +212,11 @@ class ChooseAccountViewModelTest {
         handle = 7472683699866478542,
         storage = PRO_I_STORAGE_TRANSFER,
         transfer = PRO_I_TRANSFER_YEARLY,
-        amount = CurrencyAmount(PRO_I_PRICE_YEARLY, Currency("EUR"))
+        amount = CurrencyAmount(PRO_I_PRICE_YEARLY, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
     )
 
     private val subscriptionProIIYearly = Subscription(
@@ -215,7 +224,11 @@ class ChooseAccountViewModelTest {
         handle = 370834413380951543,
         storage = PRO_II_STORAGE_TRANSFER,
         transfer = PRO_II_TRANSFER_YEARLY,
-        amount = CurrencyAmount(PRO_II_PRICE_YEARLY, Currency("EUR"))
+        amount = CurrencyAmount(PRO_II_PRICE_YEARLY, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
     )
 
     private val subscriptionProIIIYearly = Subscription(
@@ -223,7 +236,11 @@ class ChooseAccountViewModelTest {
         handle = 7225413476571973499,
         storage = PRO_III_STORAGE_TRANSFER,
         transfer = PRO_III_TRANSFER_YEARLY,
-        amount = CurrencyAmount(PRO_III_PRICE_YEARLY, Currency("EUR"))
+        amount = CurrencyAmount(PRO_III_PRICE_YEARLY, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
     )
 
     private val subscriptionProLiteYearly = Subscription(
@@ -231,7 +248,11 @@ class ChooseAccountViewModelTest {
         handle = -5517769810977460898,
         storage = PRO_LITE_STORAGE,
         transfer = PRO_LITE_TRANSFER_YEARLY,
-        amount = CurrencyAmount(PRO_LITE_PRICE_YEARLY, Currency("EUR"))
+        amount = CurrencyAmount(PRO_LITE_PRICE_YEARLY, Currency("EUR")),
+        offerId = null,
+        discountedAmountMonthly = null,
+        discountedPercentage = null,
+        offerPeriod = null
     )
 
     private val expectedYearlySubscriptionsList = listOf(
@@ -242,61 +263,29 @@ class ChooseAccountViewModelTest {
     )
 
     private val localisedSubscriptionProI = LocalisedSubscription(
-        accountType = AccountType.PRO_I,
-        storage = PRO_I_STORAGE_TRANSFER,
-        monthlyTransfer = PRO_I_STORAGE_TRANSFER,
-        yearlyTransfer = PRO_I_TRANSFER_YEARLY,
-        monthlyAmount = CurrencyAmount(PRO_I_PRICE_MONTHLY, Currency("EUR")),
-        yearlyAmount = CurrencyAmount(
-            PRO_I_PRICE_YEARLY,
-            Currency("EUR")
-        ),
-        localisedPrice = localisedPriceStringMapper,
+        monthlySubscription = subscriptionProIMonthly,
+        yearlySubscription = subscriptionProIYearly,
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
     )
 
     private val localisedSubscriptionProII = LocalisedSubscription(
-        accountType = AccountType.PRO_II,
-        storage = PRO_II_STORAGE_TRANSFER,
-        monthlyTransfer = PRO_II_STORAGE_TRANSFER,
-        yearlyTransfer = PRO_II_TRANSFER_YEARLY,
-        monthlyAmount = CurrencyAmount(PRO_II_PRICE_MONTHLY, Currency("EUR")),
-        yearlyAmount = CurrencyAmount(
-            PRO_II_PRICE_YEARLY,
-            Currency("EUR")
-        ),
-        localisedPrice = localisedPriceStringMapper,
+        monthlySubscription = subscriptionProIIMonthly,
+        yearlySubscription = subscriptionProIIYearly,
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
     )
 
     private val localisedSubscriptionProIII = LocalisedSubscription(
-        accountType = AccountType.PRO_III,
-        storage = PRO_III_STORAGE_TRANSFER,
-        monthlyTransfer = PRO_III_STORAGE_TRANSFER,
-        yearlyTransfer = PRO_III_TRANSFER_YEARLY,
-        monthlyAmount = CurrencyAmount(PRO_III_PRICE_MONTHLY, Currency("EUR")),
-        yearlyAmount = CurrencyAmount(
-            PRO_III_PRICE_YEARLY,
-            Currency("EUR")
-        ),
-        localisedPrice = localisedPriceStringMapper,
+        monthlySubscription = subscriptionProIIIMonthly,
+        yearlySubscription = subscriptionProIIIYearly,
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
     )
 
     private val localisedSubscriptionProLite = LocalisedSubscription(
-        accountType = AccountType.PRO_LITE,
-        storage = PRO_LITE_STORAGE,
-        monthlyTransfer = PRO_LITE_TRANSFER_MONTHLY,
-        yearlyTransfer = PRO_LITE_TRANSFER_YEARLY,
-        monthlyAmount = CurrencyAmount(PRO_LITE_PRICE_MONTHLY, Currency("EUR")),
-        yearlyAmount = CurrencyAmount(
-            PRO_LITE_PRICE_YEARLY,
-            Currency("EUR")
-        ),
-        localisedPrice = localisedPriceStringMapper,
+        monthlySubscription = subscriptionProLiteMonthly,
+        yearlySubscription = subscriptionProLiteYearly,
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
     )

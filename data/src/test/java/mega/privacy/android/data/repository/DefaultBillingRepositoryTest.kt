@@ -51,12 +51,12 @@ class DefaultBillingRepositoryTest {
     private val numberOfSubscriptionCache = mock<Cache<Long>>()
     private val skusCache = mock<Cache<List<MegaSku>>>()
     private val activeSubscriptionCache = mock<Cache<MegaPurchase>>()
-    private val megaSkuObject1 = MegaSku(Skus.SKU_PRO_I_MONTH, 9990000, "EUR")
-    private val megaSkuObject2 = MegaSku(Skus.SKU_PRO_II_MONTH, 9990000, "EUR")
+    private val megaSkuObject1 = MegaSku(Skus.SKU_PRO_I_MONTH, 9990000, "EUR", emptyList())
+    private val megaSkuObject2 = MegaSku(Skus.SKU_PRO_II_MONTH, 9990000, "EUR", emptyList())
     private val skuString = Skus.SKU_PRO_I_MONTH
     private val megaSkuList = listOf(megaSkuObject2, megaSkuObject1)
     private val localPricing =
-        LocalPricing(CurrencyPoint.LocalCurrencyPoint(9990000), Currency("EUR"), skuString)
+        LocalPricing(CurrencyPoint.LocalCurrencyPoint(9990000), Currency("EUR"), skuString, emptyList())
     private val localPricingMapper = mock<LocalPricingMapper>()
     private val pricingMapper = mock<PricingMapper>()
     private val billingGateway = mock<BillingGateway>()

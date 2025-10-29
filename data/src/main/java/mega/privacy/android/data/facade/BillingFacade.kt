@@ -177,8 +177,10 @@ internal class BillingFacade @Inject constructor(
         productDetails.subscriptionOfferDetails?.let { offerDetailsList ->
             // Note: This field is only set for a discounted offer. Returns null for a regular base plan.
             // https://developer.android.com/reference/com/android/billingclient/api/ProductDetails.SubscriptionOfferDetails#getOfferId()
-            val offerToken = (offerId?.let { offerDetailsList.find { it.offerId == offerId } }
-                ?: offerDetailsList.find { it.offerId.isNullOrEmpty() })?.offerToken.orEmpty()
+            val offerToken =
+                (offerDetailsList.find { it.offerId == offerId } // try finding specific offer
+                    ?: offerDetailsList.find { it.offerId.isNullOrEmpty() }) // fallback to base plan
+                    ?.offerToken.orEmpty()
             val productDetailsParams = listOf(
                 ProductDetailsParams.newBuilder()
                     .setProductDetails(productDetails)
@@ -257,6 +259,7 @@ internal class BillingFacade @Inject constructor(
         productDetailsListCache.set(productsDetails)
         val megaSkus = productsDetails
             .mapNotNull {
+                Timber.d("Found product detail: %s", it)
                 megaSkuMapper(it)
             }
         skusCache.set(megaSkus)

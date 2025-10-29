@@ -59,7 +59,6 @@ import mega.privacy.android.data.mapper.toLocalPricing
 import mega.privacy.android.data.mapper.toMediaStoreFileTypeUri
 import mega.privacy.android.data.mapper.toMegaAchievement
 import mega.privacy.android.data.mapper.toMegaPurchase
-import mega.privacy.android.data.mapper.toMegaSku
 import mega.privacy.android.data.mapper.toPaymentMethodType
 import mega.privacy.android.data.mapper.toPricing
 import mega.privacy.android.data.mapper.toUserSet
@@ -219,7 +218,7 @@ internal abstract class MapperModule {
         fun providePricingMapper(): PricingMapper = ::toPricing
 
         @Provides
-        fun provideMegaSkuMapper(): MegaSkuMapper = ::toMegaSku
+        fun provideMegaSkuMapper(): MegaSkuMapper = MegaSkuMapper()
 
         @Provides
         fun provideMegaPurchaseMapper(): MegaPurchaseMapper = ::toMegaPurchase

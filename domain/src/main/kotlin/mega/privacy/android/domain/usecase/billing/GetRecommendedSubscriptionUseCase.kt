@@ -15,16 +15,16 @@ import javax.inject.Inject
  * 2. If the current plan doesn't exist in available plans:
  *    - Returns the first (cheapest) plan from the sorted list as there is no current plan to compare with
  *
- * @property calculateCurrencyAmountUseCase     [CalculateCurrencyAmountUseCase]
  * @property getLocalPricingUseCase             [GetLocalPricingUseCase]
  * @property getAppSubscriptionOptionsUseCase   [GetAppSubscriptionOptionsUseCase]
  * @property getCurrentSubscriptionPlanUseCase  [GetCurrentSubscriptionPlanUseCase]
+ * @property subscriptionMapper                 [SubscriptionMapper]
  */
 class GetRecommendedSubscriptionUseCase @Inject constructor(
-    private val calculateCurrencyAmountUseCase: CalculateCurrencyAmountUseCase,
     private val getLocalPricingUseCase: GetLocalPricingUseCase,
     private val getAppSubscriptionOptionsUseCase: GetAppSubscriptionOptionsUseCase,
     private val getCurrentSubscriptionPlanUseCase: GetCurrentSubscriptionPlanUseCase,
+    private val subscriptionMapper: SubscriptionMapper,
 ) {
     /**
      * Invoke
@@ -43,19 +43,7 @@ class GetRecommendedSubscriptionUseCase @Inject constructor(
 
         val sku = getSku(cheapestPlan.accountType)
         val localPricing = sku?.let { getLocalPricingUseCase(it) }
-
-        return Subscription(
-            accountType = cheapestPlan.accountType,
-            handle = cheapestPlan.handle,
-            storage = cheapestPlan.storage,
-            transfer = cheapestPlan.transfer,
-            amount = localPricing?.let {
-                calculateCurrencyAmountUseCase(
-                    it.amount,
-                    it.currency
-                )
-            } ?: calculateCurrencyAmountUseCase(cheapestPlan.amount, cheapestPlan.currency),
-        )
+        return subscriptionMapper(cheapestPlan, localPricing)
     }
 
     private fun getSku(accountType: AccountType) = when (accountType) {
