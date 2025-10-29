@@ -22,6 +22,7 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
+@Deprecated("Please use DownloadPhotoViewModel instead")
 @HiltViewModel
 class PhotoDownloaderViewModel @Inject constructor(
     private val downloadThumbnailUseCase: DownloadThumbnailUseCase,
