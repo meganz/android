@@ -12,7 +12,10 @@ import mega.privacy.android.data.mapper.transfer.ChatUploadNotificationMapper
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.ChatCompressionProgress
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.destination.TransfersNavKey
 import javax.inject.Inject
 
 /**
@@ -20,6 +23,7 @@ import javax.inject.Inject
  */
 class DefaultChatUploadNotificationMapper @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ChatUploadNotificationMapper {
 
     override suspend fun invoke(
@@ -27,11 +31,10 @@ class DefaultChatUploadNotificationMapper @Inject constructor(
         chatCompressionProgress: ChatCompressionProgress?,
         paused: Boolean,
     ): Notification {
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(
+        val pendingIntent: PendingIntent = TransfersActivity.getPendingIntentForTransfersSection(
+            getFeatureFlagValueUseCase(AppFeatures.SingleActivity),
             context,
-            0,
-            TransfersActivity.getActiveTabIntent(context),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            TransfersNavKey.Tab.Active,
         )
         val content = context.getString(R.string.chat_upload_title_notification)
         val progress: Progress?

@@ -103,8 +103,7 @@ class TransfersActivity : AppCompatActivity() {
         /**
          * Get the Intent to open the [TransfersActivity] in the active tab
          */
-        @JvmStatic
-        fun getActiveTabIntent(context: Context): Intent =
+        private fun getActiveTabIntent(context: Context): Intent =
             Intent(context, TransfersActivity::class.java).apply {
                 putExtra(EXTRA_TAB, TransfersNavKey.Tab.Active.name)
             }
@@ -112,8 +111,7 @@ class TransfersActivity : AppCompatActivity() {
         /**
          * Get the Intent to open the [TransfersActivity] in the completed tab
          */
-        @JvmStatic
-        fun getCompletedTabIntent(context: Context): Intent =
+        private fun getCompletedTabIntent(context: Context): Intent =
             Intent(context, TransfersActivity::class.java).apply {
                 putExtra(EXTRA_TAB, TransfersNavKey.Tab.Completed.name)
             }
@@ -121,7 +119,6 @@ class TransfersActivity : AppCompatActivity() {
         /**
          * Get the Intent to open the [TransfersActivity] in the default tab (failed tab if the transfer are in error status, active tab otherwise)
          */
-        @JvmStatic
         fun getIntent(context: Context): Intent =
             Intent(context, TransfersActivity::class.java)
 

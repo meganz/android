@@ -23,8 +23,11 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isOfflineDownload
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
@@ -35,6 +38,7 @@ import javax.inject.Inject
 class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor(
     @ApplicationContext private val context: Context,
     private val actionGroupNotificationDestinationMapper: ActionGroupNotificationDestinationMapper,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : TransfersActionGroupProgressNotificationBuilder {
 
     override suspend fun invoke(
@@ -94,26 +98,24 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
             isDownload = isDownload,
             actionGroup = actionGroup,
         )
-        val (contentPendingIntent, actionIntent) = if (!isPreviewDownload) {
-            val openTransfersSectionIntent = TransfersActivity.getActiveTabIntent(context)
+        val actionPendingIntent = if (!isPreviewDownload) {
+            TransfersActivity.getPendingIntentForTransfersSection(
+                getFeatureFlagValueUseCase(AppFeatures.SingleActivity),
+                context,
+                TransfersNavKey.Tab.Active,
+                System.currentTimeMillis().toInt(),
+            )
+        } else {
             PendingIntent.getActivity(
                 context,
-                0,
-                openTransfersSectionIntent,
+                System.currentTimeMillis().toInt(),
+                Intent(context, LoadingPreviewActivity::class.java).apply {
+                    putExtra(EXTRA_TRANSFER_TAG, actionGroup.singleTransferTag)
+                },
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            ) to openTransfersSectionIntent
-        } else {
-            null to Intent(context, LoadingPreviewActivity::class.java).apply {
-                putExtra(EXTRA_TRANSFER_TAG, actionGroup.singleTransferTag)
-            }
+            )
         }
-        val actionPendingIntent = PendingIntent.getActivity(
-            context,
-            System.currentTimeMillis()
-                .toInt(), // Unique request code to make sure old intents are not reused
-            actionIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val contentPendingIntent = if (!isPreviewDownload) actionPendingIntent else null
         val actionText = when {
             isPreviewDownload -> {
                 context.getString(sharedR.string.general_dialog_cancel_button)

@@ -17,10 +17,13 @@ import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.GetBandwidthOverQuotaDelayUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaAccountDetails
 import javax.inject.Inject
@@ -34,6 +37,7 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
     private val accountInfoFacade: AccountInfoFacade,
     private val getBandwidthOverQuotaDelayUseCase: GetBandwidthOverQuotaDelayUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : OverQuotaNotificationBuilder {
 
     override suspend operator fun invoke(storageOverQuota: Boolean) = if (storageOverQuota) {
@@ -63,11 +67,10 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
             intent,
             PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val clickPendingIntent = PendingIntent.getActivity(
+        val clickPendingIntent = TransfersActivity.getPendingIntentForTransfersSection(
+            getFeatureFlagValueUseCase(AppFeatures.SingleActivity),
             context,
-            0,
-            TransfersActivity.getActiveTabIntent(context),
-            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            TransfersNavKey.Tab.Active,
         )
         val upgradeButtonText =
             context.getString(if (!isLoggedIn) sharedR.string.login_text else if (isFreeAccount) sharedR.string.general_upgrade_button else R.string.plans_depleted_transfer_overquota)
