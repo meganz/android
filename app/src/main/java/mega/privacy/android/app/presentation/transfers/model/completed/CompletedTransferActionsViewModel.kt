@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.data.extensions.toUri
+import mega.privacy.android.data.extensions.toUriPath
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -20,6 +21,7 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByNodeIdUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.GetDownloadDocumentFileUseCase
@@ -44,6 +46,7 @@ class CompletedTransferActionsViewModel @Inject constructor(
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getOfflineNodeInformationByNodeIdUseCase: GetOfflineNodeInformationByNodeIdUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CompletedTransferActionsUiState())
@@ -168,18 +171,24 @@ class CompletedTransferActionsViewModel @Inject constructor(
         viewModelScope.launch {
             val singleActivity = getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
             val viewInFolderEvent = if (completedTransfer.type.isDownloadType()) {
-                val path = _uiState.value.parentUri?.toString()?.takeUnless { it.isBlank() }
-                    ?: "file://${completedTransfer.path}"
+                val path =
+                    _uiState.value.parentUri?.takeUnless { it.toString().isBlank() }?.toUriPath()
+                        ?: completedTransfer.path.toUriPath()
                 if (completedTransfer.isOffline == true) {
-                    ViewInFolderEvent.DownloadToOffline(
-                        singleActivity,
-                        completedTransfer.fileName,
-                    )
+                    getOfflineNodeInformationByNodeIdUseCase(NodeId(completedTransfer.parentHandle))?.let { offlineInfo ->
+                        ViewInFolderEvent.DownloadToOffline(
+                            singleActivity = singleActivity,
+                            fileName = completedTransfer.fileName,
+                            parentNodeOfflineId = offlineInfo.id,
+                            title = offlineInfo.name,
+                            uriPath = path
+                        )
+                    }
                 } else {
                     ViewInFolderEvent.Download(
-                        singleActivity,
-                        completedTransfer.fileName,
-                        path
+                        singleActivity = singleActivity,
+                        fileName = completedTransfer.fileName,
+                        uriPath = path
                     )
                 }
             } else {
@@ -190,7 +199,11 @@ class CompletedTransferActionsViewModel @Inject constructor(
                 )
             }
             _uiState.update { state ->
-                state.copy(viewInFolderEvent = triggered(viewInFolderEvent))
+                state.copy(
+                    viewInFolderEvent = triggered(
+                        viewInFolderEvent ?: ViewInFolderEvent.NotFound
+                    )
+                )
             }
         }
     }

@@ -6,6 +6,7 @@ import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.uri.UriPath
 import java.io.File
 
 /**
@@ -87,32 +88,49 @@ data class ShareLinkEvent(
  */
 sealed interface ViewInFolderEvent {
     /**
-     * The action should be performed with single activity navigation
+     * File for view in folder event not found
      */
-    val singleActivity: Boolean
+    data object NotFound : ViewInFolderEvent
 
     /**
-     * The file name to be displayed in the folder
+     * File for view in folder event found
      */
-    val fileName: String
+    sealed interface Found : ViewInFolderEvent {
+
+        /**
+         * The action should be performed with single activity navigation
+         */
+        val singleActivity: Boolean
+
+        /**
+         * The file name to be displayed in the folder
+         */
+        val fileName: String
+    }
 
     /**
      * The transfer to view in folder is a download to the local storage transfer, so it should be shown in file explorer
-     * @property path the path of the transfer
+     * @property uriPath the path of the transfer
      */
     data class Download(
         override val singleActivity: Boolean,
         override val fileName: String,
-        val path: String,
-    ) : ViewInFolderEvent
+        val uriPath: UriPath,
+    ) : Found
 
     /**
      * The transfer to view in folder is a download to offline transfer, so it should be shown in offline section
+     * @property parentNodeOfflineId
+     * @property title
+     * @property uriPath the path of the transfer
      */
     data class DownloadToOffline(
         override val singleActivity: Boolean,
         override val fileName: String,
-    ) : ViewInFolderEvent
+        val parentNodeOfflineId: Int,
+        val title: String?,
+        val uriPath: UriPath,
+    ) : Found
 
     /**
      * The transfer to view in folder is an upload, so it should be shown in cloud drive
@@ -122,5 +140,7 @@ sealed interface ViewInFolderEvent {
         override val singleActivity: Boolean,
         override val fileName: String,
         val parentNodeId: NodeId,
-    ) : ViewInFolderEvent
+    ) : Found
+
+
 }

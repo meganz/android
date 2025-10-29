@@ -12,11 +12,13 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.data.extensions.toUriPath
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
@@ -25,6 +27,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByNodeIdUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.GetDownloadDocumentFileUseCase
@@ -39,6 +42,7 @@ import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito.mockStatic
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -61,6 +65,8 @@ class CompletedTransferActionsViewModelTest {
     private val getNodeByHandleUseCase = mock<GetNodeByHandleUseCase>()
     private val fileTypeInfoMapper = mock<FileTypeInfoMapper>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val getOfflineNodeInformationByNodeIdUseCase =
+        mock<GetOfflineNodeInformationByNodeIdUseCase>()
 
     @TempDir
     lateinit var temporaryFolder: File
@@ -119,6 +125,14 @@ class CompletedTransferActionsViewModelTest {
         appData = emptyList(),
     )
 
+    private fun mockCompletedTransferUriPath(completedTransfer: CompletedTransfer) {
+        val uri = mock<Uri> {
+            on { this.scheme } doReturn "content"
+            on { this.toString() } doReturn completedTransfer.path
+        }
+        whenever(Uri.parse(completedTransfer.path)) doReturn uri
+    }
+
     @BeforeAll
     fun initTest() {
         initializeTest()
@@ -133,7 +147,8 @@ class CompletedTransferActionsViewModelTest {
             deleteCompletedTransferUseCase = deleteCompletedTransferUseCase,
             getNodeByHandleUseCase = getNodeByHandleUseCase,
             fileTypeInfoMapper = fileTypeInfoMapper,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getOfflineNodeInformationByNodeIdUseCase = getOfflineNodeInformationByNodeIdUseCase,
         )
     }
 
@@ -148,6 +163,7 @@ class CompletedTransferActionsViewModelTest {
             getNodeByHandleUseCase,
             fileTypeInfoMapper,
             getFeatureFlagValueUseCase,
+            getOfflineNodeInformationByNodeIdUseCase,
         )
 
         wheneverBlocking { monitorConnectivityUseCase() } doReturn flowOf(true)
@@ -379,16 +395,19 @@ class CompletedTransferActionsViewModelTest {
     fun `test that onViewInFolder emits new download event when is invoked with a download completed transfer`(
         singleActivity: Boolean,
     ) = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn singleActivity
+        mockStatic(Uri::class.java).use {
+            mockCompletedTransferUriPath(completedOffline)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn singleActivity
 
-        underTest.onViewInFolder(completedDownload)
+            underTest.onViewInFolder(completedDownload)
 
-        assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content).isInstanceOf(
-            ViewInFolderEvent.Download::class.java
-        )
-        assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content?.singleActivity).isEqualTo(
-            singleActivity
-        )
+            assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content).isInstanceOf(
+                ViewInFolderEvent.Download::class.java
+            )
+            assertThat(((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content as? ViewInFolderEvent.Found)?.singleActivity).isEqualTo(
+                singleActivity
+            )
+        }
     }
 
     @ParameterizedTest
@@ -396,16 +415,26 @@ class CompletedTransferActionsViewModelTest {
     fun `test that onViewInFolder emits new download to offline event when is invoked with a download to offline completed transfer`(
         singleActivity: Boolean,
     ) = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn singleActivity
+        mockStatic(Uri::class.java).use {
+            mockCompletedTransferUriPath(completedOffline)
+            val offlineInfo = mock<OfflineFileInformation> {
+                on { this.id } doReturn 425
+                on { this.name } doReturn "parent"
+            }
+            val expected = ViewInFolderEvent.DownloadToOffline(
+                singleActivity = singleActivity,
+                fileName = completedOffline.fileName,
+                parentNodeOfflineId = offlineInfo.id,
+                title = offlineInfo.name,
+                uriPath = completedOffline.path.toUriPath()
+            )
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn singleActivity
+            whenever(getOfflineNodeInformationByNodeIdUseCase(NodeId(completedOffline.parentHandle))) doReturn offlineInfo
+            underTest.onViewInFolder(completedOffline)
 
-        underTest.onViewInFolder(completedOffline)
-
-        assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content).isInstanceOf(
-            ViewInFolderEvent.DownloadToOffline::class.java
-        )
-        assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content?.singleActivity).isEqualTo(
-            singleActivity
-        )
+            assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content)
+                .isEqualTo(expected)
+        }
     }
 
     @ParameterizedTest
@@ -420,17 +449,35 @@ class CompletedTransferActionsViewModelTest {
         assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content).isInstanceOf(
             ViewInFolderEvent.Upload::class.java
         )
-        assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content?.singleActivity).isEqualTo(
+        assertThat(((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content as? ViewInFolderEvent.Found)?.singleActivity).isEqualTo(
             singleActivity
         )
     }
 
     @Test
-    fun `test that onConsumeViewInFolder consumes the event correctly`() = runTest {
-        underTest.onViewInFolder(completedDownload)
-        underTest.onConsumeViewInFolder()
+    fun `test that onViewInFolder emits not found event when is invoked with a completed transfer that does not exist anymore`() =
+        runTest {
+            mockStatic(Uri::class.java).use {
+                mockCompletedTransferUriPath(completedOffline)
+                whenever(getOfflineNodeInformationByNodeIdUseCase(any())) doReturn null
 
-        assertThat(underTest.uiState.value.viewInFolderEvent).isEqualTo(consumed())
+                underTest.onViewInFolder(completedOffline)
+
+                assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content)
+                    .isEqualTo(ViewInFolderEvent.NotFound)
+            }
+        }
+
+    @Test
+    fun `test that onConsumeViewInFolder consumes the event correctly`() = runTest {
+        mockStatic(Uri::class.java).use {
+            mockCompletedTransferUriPath(completedOffline)
+
+            underTest.onViewInFolder(completedDownload)
+            underTest.onConsumeViewInFolder()
+
+            assertThat(underTest.uiState.value.viewInFolderEvent).isEqualTo(consumed())
+        }
     }
 
     companion object {

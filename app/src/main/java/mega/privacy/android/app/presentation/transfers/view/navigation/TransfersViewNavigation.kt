@@ -85,7 +85,7 @@ private fun TransferRoute(
 internal fun EntryProviderScope<NavKey>.transfersScreen3(
     onBackPress: () -> Unit,
     onNavigateToUpgradeAccount: () -> Unit,
-    navigationHandler: NavigationHandler?,
+    navigationHandler: NavigationHandler,
 ) {
     entry<TransfersNavKey> {
         TransferRoute(it, onBackPress, navigationHandler, onNavigateToUpgradeAccount)

@@ -54,6 +54,7 @@ import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.OfflineNavKey
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -231,7 +232,9 @@ fun CompletedTransferActionsBottomSheet(
         event = uiState.viewInFolderEvent,
         onConsumed = onConsumeViewInFolder,
     ) { viewInFolderEvent ->
-        if (viewInFolderEvent.singleActivity) {
+        if (viewInFolderEvent !is ViewInFolderEvent.Found) {
+            snackbarHostState?.showSnackbar(context.getString(R.string.corrupt_video_dialog_text))
+        } else if (viewInFolderEvent.singleActivity) {
             onViewInFolderSingleActivity(viewInFolderEvent, navigationHandler)
         } else {
             activity?.let { activity ->
@@ -307,7 +310,7 @@ private fun onOpenWith(
 }
 
 private fun onViewInFolder(
-    viewInFolderEvent: ViewInFolderEvent,
+    viewInFolderEvent: ViewInFolderEvent.Found,
     activity: Activity,
 ) {
     when (viewInFolderEvent) {
@@ -317,7 +320,7 @@ private fun onViewInFolder(
                 FileStorageActivity::class.java
             ).apply {
                 action = FileStorageActivity.Mode.BROWSE_FILES.action
-                putExtra(FileStorageActivity.EXTRA_PATH, viewInFolderEvent.path)
+                putExtra(FileStorageActivity.EXTRA_PATH, viewInFolderEvent.uriPath.value)
                 putStringArrayListExtra(
                     FileStorageActivity.EXTRA_FILE_NAMES,
                     arrayListOf(viewInFolderEvent.fileName)
@@ -332,6 +335,7 @@ private fun onViewInFolder(
             ).apply {
                 action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
                 putExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, true)
+                putExtra(FileStorageActivity.EXTRA_PATH, viewInFolderEvent.uriPath.value)
                 putStringArrayListExtra(
                     FileStorageActivity.EXTRA_FILE_NAMES,
                     arrayListOf(viewInFolderEvent.fileName)
@@ -357,7 +361,7 @@ private fun onViewInFolder(
 }
 
 private fun onViewInFolderSingleActivity(
-    viewInFolderEvent: ViewInFolderEvent,
+    viewInFolderEvent: ViewInFolderEvent.Found,
     navigationHandler: NavigationHandler?,
 ) {
     when (viewInFolderEvent) {
@@ -366,14 +370,20 @@ private fun onViewInFolderSingleActivity(
         }
 
         is ViewInFolderEvent.DownloadToOffline -> {
-            // will be implemented in TRAN-1039
+            navigationHandler?.navigate(
+                OfflineNavKey(
+                    nodeId = viewInFolderEvent.parentNodeOfflineId,
+                    highlightedFiles = viewInFolderEvent.fileName,
+                    title = viewInFolderEvent.title,
+                )
+            )
         }
 
         is ViewInFolderEvent.Upload -> {
             navigationHandler?.navigate(
                 CloudDriveNavKey(
                     nodeHandle = viewInFolderEvent.parentNodeId.longValue,
-                    highlightedNodeNames = listOf(viewInFolderEvent.fileName)
+                    highlightedNodeNames = listOf(viewInFolderEvent.fileName),
                 )
             )
         }
