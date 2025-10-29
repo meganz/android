@@ -369,13 +369,13 @@ class TransfersViewModel @AssistedInject constructor(
                         }.onFailure {
                             //No chat uploads retried, try general upload only.
                             return TransferTriggerEvent.StartUpload.Files(
-                                mapOf(path to null),
+                                mapOf(path to failedTransfer.fileName),
                                 NodeId(parentHandle)
                             )
                         }
                     } else {
                         return TransferTriggerEvent.StartUpload.Files(
-                            mapOf(path to null),
+                            mapOf(path to failedTransfer.fileName),
                             NodeId(parentHandle)
                         )
                     }

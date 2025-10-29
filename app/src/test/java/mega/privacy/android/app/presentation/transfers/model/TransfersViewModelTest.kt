@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.transfers.model
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -103,6 +104,7 @@ class TransfersViewModelTest {
     private val isTransferInErrorStatusUseCase = mock<IsTransferInErrorStatusUseCase>()
 
     private val originalPath = "originalPath"
+    private val fileName = "File name"
     private val chatAppData = listOf<TransferAppData>(TransferAppData.ChatUpload(1))
     private val originalUriPathAppData =
         listOf<TransferAppData>(TransferAppData.OriginalUriPath(UriPath(originalPath)))
@@ -129,6 +131,7 @@ class TransfersViewModelTest {
         on { type } doReturn TransferType.GENERAL_UPLOAD
         on { this.appData } doReturn chatAppData
         on { this.originalPath } doReturn originalPath
+        on { this.fileName } doReturn fileName
     }
     private val failedUpload = mock<CompletedTransfer> {
         on { id } doReturn 4
@@ -764,7 +767,7 @@ class TransfersViewModelTest {
         runTest {
             val chatData = chatAppData.mapNotNull { it as? TransferAppData.ChatUpload }
             val uploadStartEvent = TransferTriggerEvent.StartUpload.Files(
-                mapOf(originalPath to null),
+                mapOf(originalPath to fileName),
                 NodeId(cancelledChatUpload.parentHandle)
             )
             val id = cancelledChatUpload.id ?: return@runTest
@@ -779,7 +782,17 @@ class TransfersViewModelTest {
                 retryFailedTransfer(cancelledChatUpload)
                 advanceUntilIdle()
                 uiState.map { it.startEvent }.test {
-                    assertThat(awaitItem()).isEqualTo(expectedStartEvent)
+                    val actual = awaitItem()
+                    val content =
+                        (actual as StateEventWithContentTriggered).content as TransferTriggerEvent.RetryTransfers
+                    val pathsAndNames =
+                        (content.idsAndEvents[id] as? TransferTriggerEvent.StartUpload.Files)?.pathsAndNames
+                    val contentFilePath = pathsAndNames?.keys?.first()
+                    val contentFileName = pathsAndNames?.get(contentFilePath)
+
+                    assertThat(actual).isEqualTo(expectedStartEvent)
+                    assertThat(contentFilePath).isEqualTo(originalPath)
+                    assertThat(contentFileName).isEqualTo(fileName)
                 }
             }
 
