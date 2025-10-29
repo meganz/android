@@ -8,6 +8,7 @@ import javax.inject.Inject
 /**
  * Use Case to create an album
  */
+@Deprecated("Use CreateUserAlbumUseCase instead")
 class CreateAlbumUseCase @Inject constructor(
     private val albumRepository: AlbumRepository,
 ) {

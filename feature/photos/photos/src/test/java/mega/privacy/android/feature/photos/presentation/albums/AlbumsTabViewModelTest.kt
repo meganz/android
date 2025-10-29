@@ -7,6 +7,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.usecase.media.CreateUserAlbumUseCase
 import mega.privacy.android.feature.photos.provider.AlbumsDataProvider
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -14,26 +15,30 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 /**
  * Test class for [AlbumsTabViewModel]
  */
 @ExtendWith(CoroutineMainDispatcherExtension::class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 internal class AlbumsTabViewModelTest {
     private lateinit var underTest: AlbumsTabViewModel
 
     private val mockAlbumsDataProvider: AlbumsDataProvider = mock()
+    private val mockCreateUserAlbumUseCase: CreateUserAlbumUseCase = mock()
+
 
     @BeforeEach
     fun setUp() {
-        reset(mockAlbumsDataProvider)
+        reset(mockAlbumsDataProvider, mockCreateUserAlbumUseCase)
     }
 
     private fun initViewModel() {
         underTest = AlbumsTabViewModel(
-            albumsProvider = setOf(mockAlbumsDataProvider)
+            albumsProvider = setOf(mockAlbumsDataProvider),
+            createUserAlbumUseCase = mockCreateUserAlbumUseCase
         )
     }
 
@@ -82,7 +87,8 @@ internal class AlbumsTabViewModelTest {
         whenever(mockProvider2.monitorAlbums()).thenReturn(flowOf(albums2))
 
         underTest = AlbumsTabViewModel(
-            albumsProvider = setOf(mockProvider1, mockProvider2)
+            albumsProvider = setOf(mockProvider1, mockProvider2),
+            createUserAlbumUseCase = mockCreateUserAlbumUseCase
         )
 
         underTest.uiState.test {
@@ -92,6 +98,17 @@ internal class AlbumsTabViewModelTest {
             assertThat((state.albums[0] as MediaAlbum.User).title).isEqualTo("Album 1")
             assertThat((state.albums[1] as MediaAlbum.User).title).isEqualTo("Album 2")
         }
+    }
+
+    @Test
+    fun `test that add new albums calls the use case`() = runTest {
+        val expectedName = "New Album"
+
+        initViewModel()
+
+        underTest.addNewAlbum(expectedName)
+
+        verify(mockCreateUserAlbumUseCase).invoke(expectedName)
     }
 
     private fun createMockAlbums(): List<MediaAlbum> {

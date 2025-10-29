@@ -7,8 +7,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.tabs.MegaScrollableTabRow
@@ -18,6 +24,7 @@ import mega.android.core.ui.model.TabItems
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.feature.photos.model.MediaAppBarAction
 import mega.privacy.android.feature.photos.model.MediaAppBarAction.CameraUpload.CameraUploadStatus
 import mega.privacy.android.feature.photos.model.MediaScreen
@@ -32,9 +39,18 @@ fun MediaMainRoute() {
 @Composable
 fun MediaMainScreen(
     modifier: Modifier = Modifier,
+    viewModel: MediaMainViewModel = hiltViewModel(),
 ) {
+    var currentTabIndex by rememberSaveable { mutableIntStateOf(0) }
+
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier.fillMaxSize(),
+        floatingActionButton = {
+            AddContentFab(
+                visible = currentTabIndex == MediaScreen.Albums.ordinal,
+                onClick = viewModel::showNewAlbumDialog
+            )
+        },
         topBar = {
             MegaTopAppBar(
                 navigationType = AppBarNavigationType.None,
@@ -70,18 +86,27 @@ fun MediaMainScreen(
             beyondViewportPageCount = 1,
             hideTabs = false,
             pagerScrollEnabled = true,
-        ) {
-            MediaScreen.entries.forEach { tab ->
-                with(tab) {
-                    addTextTabWithScrollableContent(
-                        tabItem = getTabItem(),
-                        content = { _, modifier ->
-                            MediaContent(modifier = Modifier.fillMaxSize())
-                        }
-                    )
+            initialSelectedIndex = currentTabIndex,
+            onTabSelected = { index ->
+                currentTabIndex = index
+                true
+            },
+            cells = {
+                MediaScreen.entries.forEach { tab ->
+                    with(tab) {
+                        addTextTabWithScrollableContent(
+                            tabItem = getTabItem(),
+                            content = { _, modifier ->
+                                MediaContent(
+                                    mainViewModel = viewModel,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            }
+                        )
+                    }
                 }
             }
-        }
+        )
     }
 }
 
@@ -95,23 +120,32 @@ private fun MediaScreen.getTabItem() = when (this) {
 
 @Composable
 private fun MediaScreen.MediaContent(
+    mainViewModel: MediaMainViewModel,
     modifier: Modifier = Modifier,
-) = when (this) {
-    MediaScreen.Timeline -> {
-        // Todo: Implement Timeline Screen
-        Box(modifier) {
-            MegaText("Timeline Screen - To be implemented")
+) {
+    val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
+
+    when (this) {
+        MediaScreen.Timeline -> {
+            // Todo: Implement Timeline Screen
+            Box(modifier) {
+                MegaText("Timeline Screen - To be implemented")
+            }
         }
-    }
 
-    MediaScreen.Albums -> {
-        AlbumsTabRoute(modifier = Modifier.fillMaxSize())
-    }
+        MediaScreen.Albums -> {
+            AlbumsTabRoute(
+                modifier = Modifier.fillMaxSize(),
+                showNewAlbumDialogEvent = uiState.newAlbumDialogEvent,
+                resetNewAlbumDialogEvent = mainViewModel::resetNewAlbumDialog
+            )
+        }
 
-    // Todo: Implement Videos and Playlists Screens
-    else -> {
-        Box(modifier) {
-            MegaText("Video / Playlists Screen - To be implemented")
+        // Todo: Implement Videos and Playlists Screens
+        else -> {
+            Box(modifier) {
+                MegaText("Video / Playlists Screen - To be implemented")
+            }
         }
     }
 }

@@ -40,7 +40,7 @@ class MonitorMediaAlbumsUseCase @Inject constructor(
     operator fun invoke(): Flow<List<MediaAlbum>> =
         albumRepository
             .monitorUserSetsUpdate()
-            .mapLatest { getUserAlbums(it) }
+            .mapLatest { getUserAlbums(albumRepository.getAllUserSets()) }
             .onStart {
                 val userAlbums = applicationScope.async {
                     getUserAlbums(albumRepository.getAllUserSets())
@@ -50,27 +50,29 @@ class MonitorMediaAlbumsUseCase @Inject constructor(
 
     private suspend fun getUserAlbums(users: List<UserSet>): List<MediaAlbum.User> =
         withContext(defaultDispatcher) {
-            users.map { set ->
-                val cover = set.cover?.let { eid ->
-                    albumRepository
-                        .getAlbumElementIDs(albumId = AlbumId(set.id))
-                        .find { it.id == eid }
-                        ?.run {
-                            photosRepository.getPhotoFromNodeID(
-                                nodeId = nodeId,
-                                albumPhotoId = this,
-                                refresh = users.any { it.id == set.id },
-                            )
-                        }
+            users
+                .map { set ->
+                    val cover = set.cover?.let { eid ->
+                        albumRepository
+                            .getAlbumElementIDs(albumId = AlbumId(set.id))
+                            .find { it.id == eid }
+                            ?.run {
+                                photosRepository.getPhotoFromNodeID(
+                                    nodeId = nodeId,
+                                    albumPhotoId = this,
+                                    refresh = users.any { it.id == set.id },
+                                )
+                            }
+                    }
+                    MediaAlbum.User(
+                        id = AlbumId(set.id),
+                        title = set.name,
+                        cover = cover,
+                        creationTime = set.creationTime,
+                        modificationTime = set.modificationTime,
+                        isExported = set.isExported,
+                    )
                 }
-                MediaAlbum.User(
-                    id = AlbumId(set.id),
-                    title = set.name,
-                    cover = cover,
-                    creationTime = set.creationTime,
-                    modificationTime = set.modificationTime,
-                    isExported = set.isExported,
-                )
-            }
+                .sortedByDescending { it.modificationTime }
         }
 }

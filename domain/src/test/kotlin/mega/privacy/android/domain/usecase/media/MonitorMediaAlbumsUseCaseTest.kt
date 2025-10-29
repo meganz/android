@@ -53,25 +53,27 @@ internal class MonitorMediaAlbumsUseCaseTest {
 
     @Test
     fun `test that albums are updated when user sets change`() = runTest {
-        val initialUserSets = createMockUserSets()
-        val updatedUserSets = createMockUserSets().drop(1) // Remove one album
+        val allUserSets = createMockUserSets()
+        val updatedUserSets = allUserSets.dropLast(1)
 
-        whenever(albumRepository.getAllUserSets()).thenReturn(initialUserSets)
+        whenever(albumRepository.getAllUserSets())
+            .thenReturn(allUserSets)
+            .thenReturn(updatedUserSets)
         whenever(albumRepository.monitorUserSetsUpdate()).thenReturn(flowOf(updatedUserSets))
 
         initUseCase()
 
-        setupAlbumRepositoryMocks(initialUserSets)
+        setupAlbumRepositoryMocks(allUserSets)
         setupAlbumRepositoryMocks(updatedUserSets)
 
         underTest().test {
             // Initial emission
             val initialResult = awaitItem()
-            assertThat(initialResult).hasSize(3) // 3 user albums
+            assertThat(initialResult).hasSize(allUserSets.size)
 
             // Updated emission
             val updatedResult = awaitItem()
-            assertThat(updatedResult).hasSize(2) // 2 user albums
+            assertThat(updatedResult).hasSize(updatedUserSets.size)
 
             awaitComplete()
         }
