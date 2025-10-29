@@ -82,7 +82,6 @@ fun NewChooseAccountScreen(
     onBack: () -> Unit,
 ) {
     var chosenPlan by rememberSaveable { mutableStateOf<AccountType?>(null) }
-    var offerId by rememberSaveable { mutableStateOf<String?>(null) }
     var isMonthly by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
     val locale = Locale.getDefault()
@@ -118,11 +117,6 @@ fun NewChooseAccountScreen(
         if (chosenPlan == null) {
             uiState.localisedSubscriptionsList.find { it.hasDiscount }?.let {
                 chosenPlan = it.accountType
-                offerId = if (isMonthly) {
-                    it.monthlySubscription.offerId
-                } else {
-                    it.yearlySubscription.offerId
-                }
             }
         }
     }
@@ -181,7 +175,13 @@ fun NewChooseAccountScreen(
                 BuyPlanBottomBar(
                     modifier = Modifier,
                     text = stringResource(it.toUIAccountType().textBuyButtonValue),
-                    onClick = { onBuyPlanClick(it, isMonthly, offerId) },
+                    onClick = {
+                        val offerId =
+                            uiState.localisedSubscriptionsList
+                                .find { sub -> sub.accountType == chosenPlan }
+                                ?.getOfferId(isMonthly)
+                        onBuyPlanClick(it, isMonthly, offerId)
+                    },
                 )
             }
         }
@@ -267,10 +267,20 @@ fun NewChooseAccountScreen(
                 }
             }
 
-            item("save_up_to_badge") {
+            item("save_up_to_badge_${hasDiscount}") {
+                val label = if (hasDiscount) {
+                    stringResource(sharedR.string.account_upgrade_account_label_save_at_least)
+                } else {
+                    stringResource(sharedR.string.account_upgrade_account_label_save_up_to)
+                }
+                val badgeType = if (hasDiscount) {
+                    BadgeType.MegaSecondary
+                } else {
+                    BadgeType.Mega
+                }
                 Badge(
-                    badgeType = BadgeType.Mega,
-                    text = stringResource(id = sharedR.string.account_upgrade_account_label_save_up_to),
+                    badgeType = badgeType,
+                    text = label,
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                         .testTag(TEST_TAG_SAVE_UP_TO_BADGE)
@@ -361,7 +371,6 @@ fun NewChooseAccountScreen(
                     isCurrentPlan = isCurrentPlan,
                     onSelected = {
                         chosenPlan = subscription.accountType
-                        offerId = currentSubscription.offerId
                     },
                 )
 

@@ -104,11 +104,21 @@ data class LocalisedSubscription(
      * @return Pair<Int, String>
      */
     fun formatTransferSize(isMonthly: Boolean): FormattedSize =
-        when (isMonthly) {
-            true -> formattedSize(size = monthlySubscription.transfer)
-            false -> formattedSize(size = yearlySubscription.transfer)
+        if (isMonthly) {
+            formattedSize(size = monthlySubscription.transfer)
+        } else {
+            formattedSize(size = yearlySubscription.transfer)
         }
 
     val hasDiscount: Boolean
         get() = monthlySubscription.discountedAmountMonthly != null || yearlySubscription.discountedAmountMonthly != null
+
+    /**
+     * Get offer id based on subscription period
+     */
+    fun getOfferId(isMonthly: Boolean): String? = if (isMonthly) {
+        monthlySubscription.offerId
+    } else {
+        yearlySubscription.offerId
+    }
 }

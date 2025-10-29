@@ -1765,4 +1765,6 @@
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGA privacy suite</string>
+    <!-- Message about savings on yearly plan in case it has discount -->
+    <string name="account_upgrade_account_label_save_at_least">Save at least 16% on a yearly plan</string>
 </resources>
