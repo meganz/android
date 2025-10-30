@@ -926,7 +926,7 @@ class OutgoingSharesComposeViewModelTest {
     private suspend fun stubCommon() {
         whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)
         whenever(monitorViewType()).thenReturn(emptyFlow())
-        whenever(getOutgoingSharesChildrenNodeUseCase(any())).thenReturn(emptyList())
+        whenever(getOutgoingSharesChildrenNodeUseCase(any(), any())).thenReturn(emptyList())
         whenever(getParentNodeUseCase(NodeId(any()))).thenReturn(null)
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
         whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())

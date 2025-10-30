@@ -162,11 +162,12 @@ internal class NodeRepositoryImpl @Inject constructor(
 
     override suspend fun getAllOutgoingShares(
         order: SortOrder,
+        isSingleActivity: Boolean
     ) = withContext(ioDispatcher) {
         megaApiGateway.getOutgoingSharesNode(
             sortOrderIntMapper(
                 sortOrder = order,
-                source = SortOrderSource.OutgoingShares
+                source = if (isSingleActivity) SortOrderSource.OutgoingSharesSingleActivity else SortOrderSource.OutgoingShares
             )
         )
             .filter { it.user != null }

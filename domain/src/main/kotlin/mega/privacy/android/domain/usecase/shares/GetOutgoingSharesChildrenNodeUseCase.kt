@@ -26,10 +26,18 @@ class GetOutgoingSharesChildrenNodeUseCase @Inject constructor(
 
     /**
      * Get children nodes of the outgoing shares parent handle or root list of outgoing shares node
+     * @param parentHandle
+     * @param isSingleActivity
      */
-    suspend operator fun invoke(parentHandle: Long): List<ShareNode> {
+    suspend operator fun invoke(
+        parentHandle: Long,
+        isSingleActivity: Boolean = false,
+    ): List<ShareNode> {
         return if (parentHandle == -1L) {
-            nodeRepository.getAllOutgoingShares(getCloudSortOrder()).mapNotNull { shareData ->
+            nodeRepository.getAllOutgoingShares(
+                order = getCloudSortOrder(),
+                isSingleActivity = isSingleActivity
+            ).mapNotNull { shareData ->
                 getNodeByHandle(NodeId(shareData.nodeHandle))?.let { node ->
                     runCatching {
                         mapNodeToShareUseCase(node, shareData)

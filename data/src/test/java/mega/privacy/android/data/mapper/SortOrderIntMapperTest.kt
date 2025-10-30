@@ -50,4 +50,22 @@ class SortOrderIntMapperTest {
         assertThat(underTest(SortOrder.ORDER_MODIFICATION_DESC, SortOrderSource.OutgoingShares))
             .isEqualTo(MegaApiJava.ORDER_SHARE_CREATION_DESC)
     }
+
+    @Test
+    fun `test that sort order is mapped correctly for OutgoingSharesSingleActivity source`() {
+        assertThat(
+            underTest(
+                SortOrder.ORDER_CREATION_ASC,
+                SortOrderSource.OutgoingSharesSingleActivity
+            )
+        )
+            .isEqualTo(MegaApiJava.ORDER_SHARE_CREATION_ASC)
+        assertThat(
+            underTest(
+                SortOrder.ORDER_CREATION_DESC,
+                SortOrderSource.OutgoingSharesSingleActivity
+            )
+        )
+            .isEqualTo(MegaApiJava.ORDER_SHARE_CREATION_DESC)
+    }
 }

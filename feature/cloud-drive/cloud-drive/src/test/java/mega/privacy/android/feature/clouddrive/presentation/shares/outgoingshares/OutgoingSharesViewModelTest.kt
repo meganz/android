@@ -2,7 +2,6 @@ package mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshar
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -105,8 +104,13 @@ class OutgoingSharesViewModelTest {
 
     private suspend fun setupTestData(items: List<ShareNode>, nodeName: String = "Test Folder") {
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
-        whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(NodeSortConfiguration.Companion.default)
-        whenever(getOutgoingSharesChildrenNodeUseCase(-1L)).thenReturn(items)
+        whenever(
+            nodeSortConfigurationUiMapper(
+                SortOrder.ORDER_DEFAULT_ASC,
+                NodeSourceType.OUTGOING_SHARES
+            )
+        ).thenReturn(NodeSortConfiguration.Companion.default)
+        whenever(getOutgoingSharesChildrenNodeUseCase(-1L, true)).thenReturn(items)
 
         val nodeUiItems = items.map { node ->
             NodeUiItem<TypedNode>(
@@ -140,14 +144,14 @@ class OutgoingSharesViewModelTest {
 
         underTest.uiState.test {
             val initialState = awaitItem()
-            Truth.assertThat(initialState.currentFolderId).isEqualTo(NodeId(-1L))
-            Truth.assertThat(initialState.isLoading).isTrue()
-            Truth.assertThat(initialState.items).isEmpty()
-            Truth.assertThat(initialState.isInSelectionMode).isFalse()
-            Truth.assertThat(initialState.navigateToFolderEvent).isEqualTo(consumed())
-            Truth.assertThat(initialState.navigateBack).isEqualTo(consumed)
-            Truth.assertThat(initialState.currentViewType).isEqualTo(ViewType.LIST)
-            Truth.assertThat(initialState.isSelecting).isFalse()
+            assertThat(initialState.currentFolderId).isEqualTo(NodeId(-1L))
+            assertThat(initialState.isLoading).isTrue()
+            assertThat(initialState.items).isEmpty()
+            assertThat(initialState.isInSelectionMode).isFalse()
+            assertThat(initialState.navigateToFolderEvent).isEqualTo(consumed())
+            assertThat(initialState.navigateBack).isEqualTo(consumed)
+            assertThat(initialState.currentViewType).isEqualTo(ViewType.LIST)
+            assertThat(initialState.isSelecting).isFalse()
         }
     }
 
@@ -167,7 +171,7 @@ class OutgoingSharesViewModelTest {
 
             underTest.uiState.test {
                 val updatedState = awaitItem()
-                Truth.assertThat(updatedState.navigateBack).isEqualTo(triggered)
+                assertThat(updatedState.navigateBack).isEqualTo(triggered)
             }
         }
 
@@ -187,7 +191,7 @@ class OutgoingSharesViewModelTest {
             awaitItem()
             awaitItem()
             val stateAfterRemove = awaitItem()
-            Truth.assertThat(stateAfterRemove.navigateBack).isEqualTo(triggered)
+            assertThat(stateAfterRemove.navigateBack).isEqualTo(triggered)
 
             underTest.processAction(OutgoingSharesAction.NavigateBackEventConsumed)
             val stateAfterConsume = awaitItem()
@@ -747,11 +751,12 @@ class OutgoingSharesViewModelTest {
             whenever(
                 nodeSortConfigurationUiMapper(
                     SortOrder.ORDER_DEFAULT_ASC,
+                    NodeSourceType.OUTGOING_SHARES
                 )
             ).thenReturn(
                 NodeSortConfiguration.default
             )
-            whenever(getOutgoingSharesChildrenNodeUseCase(-1L)).thenReturn(listOf(node1))
+            whenever(getOutgoingSharesChildrenNodeUseCase(-1L, true)).thenReturn(listOf(node1))
 
             val nodeUiItems = listOf(NodeUiItem<TypedNode>(node = node1, isSelected = false))
             whenever(
@@ -792,12 +797,13 @@ class OutgoingSharesViewModelTest {
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
             whenever(
                 nodeSortConfigurationUiMapper(
-                    SortOrder.ORDER_DEFAULT_ASC
+                    SortOrder.ORDER_DEFAULT_ASC,
+                    NodeSourceType.OUTGOING_SHARES
                 )
             ).thenReturn(
                 NodeSortConfiguration.default
             )
-            whenever(getOutgoingSharesChildrenNodeUseCase(-1L)).thenReturn(listOf(node1))
+            whenever(getOutgoingSharesChildrenNodeUseCase(-1L, true)).thenReturn(listOf(node1))
 
             val nodeUiItems = listOf(NodeUiItem<TypedNode>(node = node1, isSelected = false))
             whenever(
@@ -837,10 +843,11 @@ class OutgoingSharesViewModelTest {
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(
             nodeSortConfigurationUiMapper(
-                SortOrder.ORDER_DEFAULT_ASC
+                SortOrder.ORDER_DEFAULT_ASC,
+                NodeSourceType.OUTGOING_SHARES
             )
         ).thenReturn(NodeSortConfiguration.default)
-        whenever(getOutgoingSharesChildrenNodeUseCase(-1L)).thenReturn(listOf(node1))
+        whenever(getOutgoingSharesChildrenNodeUseCase(-1L, true)).thenReturn(listOf(node1))
 
         val nodeUiItems = listOf(NodeUiItem<TypedNode>(node = node1, isSelected = false))
         whenever(

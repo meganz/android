@@ -52,9 +52,11 @@ interface NodeRepository {
     /**
      * Provides all outgoing shares from SDK with proper sorting and filtering
      *
+     * @param order
+     * @param isSingleActivity
      * @return List of [ShareData]
      */
-    suspend fun getAllOutgoingShares(order: SortOrder): List<ShareData>
+    suspend fun getAllOutgoingShares(order: SortOrder, isSingleActivity: Boolean): List<ShareData>
 
     /**
      * Provides both unverified and verified incoming shares from SDK with proper sorting and filtering

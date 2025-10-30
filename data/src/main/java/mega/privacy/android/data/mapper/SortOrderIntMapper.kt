@@ -26,8 +26,8 @@ class SortOrderIntMapper @Inject constructor() {
         SortOrder.ORDER_DEFAULT_DESC -> MegaApiJava.ORDER_DEFAULT_DESC
         SortOrder.ORDER_SIZE_ASC -> MegaApiJava.ORDER_SIZE_ASC
         SortOrder.ORDER_SIZE_DESC -> MegaApiJava.ORDER_SIZE_DESC
-        SortOrder.ORDER_CREATION_ASC -> MegaApiJava.ORDER_CREATION_ASC
-        SortOrder.ORDER_CREATION_DESC -> MegaApiJava.ORDER_CREATION_DESC
+        SortOrder.ORDER_CREATION_ASC -> if (source == SortOrderSource.OutgoingSharesSingleActivity) MegaApiJava.ORDER_SHARE_CREATION_ASC else MegaApiJava.ORDER_CREATION_ASC
+        SortOrder.ORDER_CREATION_DESC -> if (source == SortOrderSource.OutgoingSharesSingleActivity) MegaApiJava.ORDER_SHARE_CREATION_DESC else MegaApiJava.ORDER_CREATION_DESC
         SortOrder.ORDER_MODIFICATION_ASC -> if (source == SortOrderSource.OutgoingShares) MegaApiJava.ORDER_SHARE_CREATION_ASC else MegaApiJava.ORDER_MODIFICATION_ASC
         SortOrder.ORDER_MODIFICATION_DESC -> if (source == SortOrderSource.OutgoingShares) MegaApiJava.ORDER_SHARE_CREATION_DESC else MegaApiJava.ORDER_MODIFICATION_DESC
         SortOrder.ORDER_LINK_CREATION_ASC -> MegaApiJava.ORDER_LINK_CREATION_ASC

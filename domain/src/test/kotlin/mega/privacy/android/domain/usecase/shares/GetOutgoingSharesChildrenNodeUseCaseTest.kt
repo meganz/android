@@ -44,7 +44,7 @@ class GetOutgoingSharesChildrenNodeUseCaseTest {
             val shareFileNode = mock<ShareFileNode>()
             whenever(getCloudSortOrder.invoke()).thenReturn(SortOrder.ORDER_NONE)
             whenever(mapNodeToShareUseCase.invoke(node, shareData)).thenReturn(shareFileNode)
-            whenever(nodeRepository.getAllOutgoingShares(SortOrder.ORDER_NONE)).thenReturn(
+            whenever(nodeRepository.getAllOutgoingShares(SortOrder.ORDER_NONE, false)).thenReturn(
                 listOf(shareData)
             )
             whenever(getNodeByHandle.invoke(NodeId(shareData.nodeHandle))).thenReturn(node)

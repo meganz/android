@@ -77,7 +77,10 @@ class OutgoingSharesViewModel @Inject constructor(
             val isContactVerificationOn = runCatching {
                 getContactVerificationWarningUseCase()
             }.getOrDefault(false)
-            val nodes = getOutgoingSharesChildrenNodeUseCase(folderId.longValue)
+            val nodes = getOutgoingSharesChildrenNodeUseCase(
+                parentHandle = folderId.longValue,
+                isSingleActivity = true
+            )
             val nodeUiItems = nodeUiItemMapper(
                 nodeList = nodes,
                 existingItems = uiState.value.items,
@@ -228,7 +231,10 @@ class OutgoingSharesViewModel @Inject constructor(
             runCatching {
                 getCloudSortOrderUseCase()
             }.onSuccess { sortOrder ->
-                val sortOrderPair = nodeSortConfigurationUiMapper(sortOrder)
+                val sortOrderPair = nodeSortConfigurationUiMapper(
+                    order = sortOrder,
+                    nodeSourceType = NodeSourceType.OUTGOING_SHARES
+                )
                 _uiState.update {
                     it.copy(
                         selectedSortConfiguration = sortOrderPair,

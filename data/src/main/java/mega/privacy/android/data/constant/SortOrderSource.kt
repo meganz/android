@@ -5,5 +5,8 @@ package mega.privacy.android.data.constant
  */
 sealed interface SortOrderSource {
     object Default : SortOrderSource
+
+    @Deprecated("Part of old legacy screen")
     object OutgoingShares : SortOrderSource
+    object OutgoingSharesSingleActivity : SortOrderSource
 }
