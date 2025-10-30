@@ -1826,11 +1826,11 @@
     <!-- Billing info with discount label -->
     <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s for %3$s</string>
     <!-- campaign name for Black Friday deal -->
-    <string name="campaign_name_black_friday">Black Friday deal: %1$d%% off</string>
+    <string name="campaign_name_black_friday">Oferta na Black Friday: %1$d%% zniżki</string>
     <!-- campaign name for Cyber Monday deal -->
-    <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
+    <string name="campaign_name_cyber_monday">Oferta na Cyber Monday: %1$d%% zniżki</string>
     <!-- campaign name for Special offer -->
-    <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
+    <string name="campaign_name_special_offer">Specjalna oferta: %1$d%% zniżki</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
         <item quantity="one"></item>
@@ -1847,4 +1847,10 @@
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGA pakiet prywatności</string>
+    <!-- Message about savings on yearly plan in case it has discount -->
+    <string name="account_upgrade_account_label_save_at_least">Oszczędź co najmniej 16% na rocznym planie</string>
+    <!-- Add new album on Media screen dialog title -->
+    <string name="media_add_new_album_dialog_title">Wprowadź nazwę albumu</string>
+    <!-- Add new album on Media screen dialog positive button text -->
+    <string name="media_add_new_album_dialog_positive_button">Utwórz</string>
 </resources>
