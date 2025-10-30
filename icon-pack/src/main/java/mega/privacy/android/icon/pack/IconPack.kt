@@ -140,6 +140,7 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinSolidPhone01ImageV
 import mega.privacy.android.icon.pack.vectors.createMediumThinSolidPlayCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineArrowDownImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineArrowUpImageVector
+import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineCheckImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineChevronDownImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineGrid4ImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineImage01ImageVector
@@ -541,6 +542,8 @@ public object IconPack : IconPackInterface {
 
                 override val ArrowUp: ImageVector by lazy {
                         createSmallThinOutlineArrowUpImageVector() }
+
+                override val Check: ImageVector by lazy { createSmallThinOutlineCheckImageVector() }
 
                 override val ChevronDown: ImageVector by lazy {
                         createSmallThinOutlineChevronDownImageVector() }

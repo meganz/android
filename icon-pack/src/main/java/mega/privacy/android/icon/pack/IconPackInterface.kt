@@ -61,6 +61,7 @@ interface IconPackInterface {
                 val Squares4: ImageVector
                 val ChevronDown: ImageVector
                 val Image04: ImageVector
+                val Check: ImageVector
             }
 
             /**
