@@ -63,7 +63,6 @@ data class FileContactInfoNavKey(
 
 @Serializable
 data class SearchNodeNavKey(
-    val isFirstNavigationLevel: Boolean,
     val nodeSourceType: NodeSourceType,
     val parentHandle: Long,
 ) : NavKey

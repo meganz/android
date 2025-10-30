@@ -774,14 +774,12 @@ internal class MegaNavigatorImpl @Inject constructor(
         context: Context,
         nodeSourceType: NodeSourceType,
         parentHandle: Long,
-        isFirstNavigationLevel: Boolean,
     ) {
         context.startActivity(
             SearchActivity.getIntent(
                 context = context,
                 nodeSourceType = nodeSourceType,
                 parentHandle = parentHandle,
-                isFirstNavigationLevel = isFirstNavigationLevel
             )
         )
     }

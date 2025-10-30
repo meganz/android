@@ -27,10 +27,9 @@ class DriveSyncNavItem : MainNavItem {
                 navigationHandler = navigationHandler,
                 setNavigationVisibility = navigationController::showNavigation,
                 onTransfer = transferHandler::setTransferEvent,
-                openSearch = { isFirstNavigationLevel, parentHandle, nodeSourceType ->
+                openSearch = { parentHandle, nodeSourceType ->
                     navigationHandler.navigate(
                         SearchNodeNavKey(
-                            isFirstNavigationLevel = isFirstNavigationLevel,
                             nodeSourceType = nodeSourceType,
                             parentHandle = parentHandle
                         )

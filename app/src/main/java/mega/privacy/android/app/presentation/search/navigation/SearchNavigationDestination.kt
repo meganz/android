@@ -20,7 +20,6 @@ fun EntryProviderScope<NavKey>.searchLegacyDestination(
                 context = context,
                 nodeSourceType = key.nodeSourceType,
                 parentHandle = key.parentHandle,
-                isFirstNavigationLevel = key.isFirstNavigationLevel
             )
             removeDestination()
         }

@@ -203,7 +203,6 @@ internal fun SharesScreen(
                             MenuActionWithClick(CloudDriveAppBarAction.Search) {
                                 navigationHandler.navigate(
                                     SearchNodeNavKey(
-                                        isFirstNavigationLevel = false,
                                         nodeSourceType = selectedTab.toNodeSourceType(),
                                         parentHandle = -1L
                                     )

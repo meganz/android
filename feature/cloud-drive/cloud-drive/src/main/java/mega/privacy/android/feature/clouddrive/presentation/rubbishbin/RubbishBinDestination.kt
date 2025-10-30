@@ -27,10 +27,9 @@ fun EntryProviderScope<NavKey>.rubbishBin(
             onFolderClick = {
                 navigationHandler.navigate(RubbishBinNavKey(it.longValue))
             },
-            openSearch = { isFirstNavigationLevel, parentHandle ->
+            openSearch = { parentHandle ->
                 navigationHandler.navigate(
                     SearchNodeNavKey(
-                        isFirstNavigationLevel = isFirstNavigationLevel,
                         nodeSourceType = NodeSourceType.RUBBISH_BIN,
                         parentHandle = parentHandle
                     )

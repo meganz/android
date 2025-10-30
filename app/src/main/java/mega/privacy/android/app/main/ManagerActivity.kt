@@ -3951,7 +3951,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
         val searchActivityIntent = SearchActivity.getIntent(
             context = this,
-            isFirstNavigationLevel = isFirstNavigationLevel,
             nodeSourceType = nodeSourceType,
             parentHandle = parentHandle
         )

@@ -80,7 +80,7 @@ internal fun RubbishBinScreen(
     navigationHandler: NavigationHandler,
     onTransfer: (TransferTriggerEvent) -> Unit,
     onFolderClick: (NodeId) -> Unit,
-    openSearch: (Boolean, Long) -> Unit,
+    openSearch: (Long) -> Unit,
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -202,7 +202,6 @@ internal fun RubbishBinScreen(
                     actions = buildList {
                         add(MenuActionWithClick(RubbishBinAppBarAction.Search) {
                             openSearch(
-                                isRootDirectory,
                                 uiState.currentFolderId.longValue,
                             )
                         })

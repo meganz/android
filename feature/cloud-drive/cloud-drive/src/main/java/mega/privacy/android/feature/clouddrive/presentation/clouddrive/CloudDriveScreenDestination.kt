@@ -21,7 +21,7 @@ fun EntryProviderScope<NavKey>.cloudDriveScreen(
     navigationHandler: NavigationHandler,
     onBack: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
-    openSearch: (Boolean, Long, NodeSourceType) -> Unit,
+    openSearch: (Long, NodeSourceType) -> Unit,
 ) {
     entry<CloudDriveNavKey> { key ->
         val viewModel = hiltViewModel<CloudDriveViewModel, CloudDriveViewModel.Factory>(

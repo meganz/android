@@ -42,7 +42,7 @@ fun CloudDriveScreen(
     navigationHandler: NavigationHandler,
     onBack: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
-    openSearch: (Boolean, Long, NodeSourceType) -> Unit,
+    openSearch: (Long, NodeSourceType) -> Unit,
     viewModel: CloudDriveViewModel = hiltViewModel(),
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel()
 ) {
@@ -81,7 +81,6 @@ fun CloudDriveScreen(
                             add(
                                 MenuActionWithClick(CloudDriveAppBarAction.Search) {
                                     openSearch(
-                                        false,
                                         uiState.currentFolderId.longValue,
                                         viewModel.nodeSourceType
                                     )

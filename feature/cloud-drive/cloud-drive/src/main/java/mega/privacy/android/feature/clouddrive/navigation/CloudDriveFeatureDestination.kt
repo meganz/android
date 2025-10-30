@@ -22,10 +22,9 @@ class CloudDriveFeatureDestination : FeatureDestination {
                 navigationHandler = navigationHandler,
                 onBack = navigationHandler::back,
                 onTransfer = transferHandler::setTransferEvent,
-                openSearch = { isFirstNavigationLevel, parentHandle, nodeSourceType ->
+                openSearch = { parentHandle, nodeSourceType ->
                     navigationHandler.navigate(
                         SearchNodeNavKey(
-                            isFirstNavigationLevel = isFirstNavigationLevel,
                             nodeSourceType = nodeSourceType,
                             parentHandle = parentHandle
                         )
@@ -59,10 +58,9 @@ class CloudDriveFeatureDestination : FeatureDestination {
                 navigationHandler = navigationHandler,
                 setNavigationVisibility = { /* No-op for FeatureDestination */ },
                 onTransfer = transferHandler::setTransferEvent,
-                openSearch = { isFirstNavigationLevel, parentHandle, nodeSourceType ->
+                openSearch = { parentHandle, nodeSourceType ->
                     navigationHandler.navigate(
                         SearchNodeNavKey(
-                            isFirstNavigationLevel = isFirstNavigationLevel,
                             nodeSourceType = nodeSourceType,
                             parentHandle = parentHandle
                         )

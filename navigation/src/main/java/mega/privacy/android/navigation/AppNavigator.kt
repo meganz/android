@@ -506,13 +506,11 @@ interface AppNavigator {
      * @param context The context
      * @param nodeSourceType The source type of the node
      * @param parentHandle The parent handle of the node
-     * @param isFirstNavigationLevel Indicates if this is the first navigation level
      */
     fun openSearchActivity(
         context: Context,
         nodeSourceType: NodeSourceType,
         parentHandle: Long,
-        isFirstNavigationLevel: Boolean = false,
     )
 
     /**

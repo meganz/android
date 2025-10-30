@@ -15,7 +15,7 @@ fun EntryProviderScope<NavKey>.driveSyncScreen(
     navigationHandler: NavigationHandler,
     setNavigationVisibility: (Boolean) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
-    openSearch: (Boolean, Long, NodeSourceType) -> Unit,
+    openSearch: (Long, NodeSourceType) -> Unit,
 ) {
     entry<DriveSyncNavKey> { key ->
         val viewModel = hiltViewModel<DriveSyncViewModel>()

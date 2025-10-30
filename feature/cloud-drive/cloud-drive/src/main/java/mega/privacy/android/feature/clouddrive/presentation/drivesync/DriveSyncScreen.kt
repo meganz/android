@@ -69,7 +69,7 @@ internal fun DriveSyncScreen(
     navigationHandler: NavigationHandler,
     setNavigationItemVisibility: (Boolean) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
-    openSearch: (Boolean, Long, NodeSourceType) -> Unit,
+    openSearch: (Long, NodeSourceType) -> Unit,
     cloudDriveViewModel: CloudDriveViewModel,
     viewModel: DriveSyncViewModel = hiltViewModel(),
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
@@ -119,7 +119,6 @@ internal fun DriveSyncScreen(
                             selectedTabIndex == 0 && cloudDriveUiState.items.isNotEmpty() -> add(
                                 MenuActionWithClick(CloudDriveAppBarAction.Search) {
                                     openSearch(
-                                        true,
                                         cloudDriveUiState.currentFolderId.longValue,
                                         cloudDriveViewModel.nodeSourceType
                                     )

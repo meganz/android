@@ -152,10 +152,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
     private val snackbarHostState = SnackbarHostState()
 
     companion object {
-        /**
-         * Checks if first navigation level
-         */
-        const val IS_FIRST_LEVEL = "isFirstLevel"
 
         /**
          * Parent search handle
@@ -179,9 +175,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
             context: Context,
             nodeSourceType: NodeSourceType,
             parentHandle: Long,
-            isFirstNavigationLevel: Boolean = false,
         ): Intent = Intent(context, SearchActivity::class.java).apply {
-            putExtra(IS_FIRST_LEVEL, isFirstNavigationLevel)
             putExtra(SEARCH_TYPE, nodeSourceType)
             putExtra(PARENT_HANDLE, parentHandle)
         }
