@@ -109,7 +109,10 @@ internal fun ChatBottomBar(
             onSendClick(it)
             viewModel.onExitTypingContext()
         },
-        onAttachmentClick = onAttachmentClick,
+        onAttachmentClick = {
+            showEmojiPicker = false
+            onAttachmentClick()
+        },
         onEmojiClick = onEmojiClick,
         interactionSourceTextInput = interactionSourceTextInput,
         onTextChange = {
