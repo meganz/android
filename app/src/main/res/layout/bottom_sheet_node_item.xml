@@ -264,15 +264,6 @@
                     android:layout_weight="1"
                     android:text="@string/sync"
                     app:drawableStartCompat="@drawable/ic_sync_01_medium_thin_outline" />
-
-                <mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
-                    android:id="@+id/option_sync_tag"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    app:mega_chip_selected="true"
-                    app:mega_chip_style="TagChipStyle"
-                    app:mega_chip_text="@string/notifications_notification_item_new_tag" />
             </LinearLayout>
 
             <LinearLayout
