@@ -156,6 +156,38 @@ class PermissionRepositoryTest {
         }
     }
 
+    @Test
+    fun `test hasNotificationPermission returns true when permission is granted on TIRAMISU+`() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            whenever(
+                permissionGateway.hasPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
+            ).thenReturn(true)
+
+            val result = permissionRepository.hasNotificationPermission()
+            assertThat(result).isTrue()
+        }
+    }
+
+    @Test
+    fun `test hasNotificationPermission returns false when permission is not granted on TIRAMISU+`() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            whenever(
+                permissionGateway.hasPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
+            ).thenReturn(false)
+
+            val result = permissionRepository.hasNotificationPermission()
+            assertThat(result).isFalse()
+        }
+    }
+
+    @Test
+    fun `test hasNotificationPermission returns true on pre-TIRAMISU devices`() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            val result = permissionRepository.hasNotificationPermission()
+            assertThat(result).isTrue()
+        }
+    }
+
     companion object {
         @JvmStatic
         private fun provideLocationPermissions(): Stream<Arguments> {

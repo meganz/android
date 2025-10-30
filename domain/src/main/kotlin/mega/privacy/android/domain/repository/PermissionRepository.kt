@@ -28,6 +28,11 @@ interface PermissionRepository {
     fun isLocationPermissionGranted(): Boolean
 
     /**
+     * Has notification permission
+     */
+    fun hasNotificationPermission(): Boolean
+
+    /**
      * Set notification permission shown and save its timestamp
      *
      * @param timestamp The timestamp when the notification permission was shown

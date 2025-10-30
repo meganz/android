@@ -1,5 +1,6 @@
 package mega.privacy.android.data.repository
 
+import android.Manifest
 import android.os.Build
 import android.os.Environment
 import kotlinx.coroutines.CoroutineDispatcher
@@ -50,6 +51,10 @@ internal class PermissionRepositoryImpl @Inject constructor(
         return permissionGateway.hasPermissions(android.Manifest.permission.ACCESS_FINE_LOCATION)
                 || permissionGateway.hasPermissions(android.Manifest.permission.ACCESS_COARSE_LOCATION)
     }
+
+    override fun hasNotificationPermission() =
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+                permissionGateway.hasPermissions(Manifest.permission.POST_NOTIFICATIONS)
 
     override suspend fun setNotificationPermissionShownTimestamp(timestamp: Long) =
         withContext(ioDispatcher) {
