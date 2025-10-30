@@ -242,6 +242,46 @@ class GetUrlRegexPatternTypeUseCaseTest {
             "https://mega.app/settings/camera",
             RegexPatternType.ENABLE_CAMERA_UPLOADS_LINK
         ),
+        Arguments.of(
+            "Login Link",
+            "https://mega.nz/login",
+            RegexPatternType.LOGIN_LINK
+        ),
+        Arguments.of(
+            "Login Link",
+            "https://mega.nz/login?miojid=32015f7bf6012800",
+            RegexPatternType.LOGIN_LINK
+        ),
+        Arguments.of(
+            "Login Link",
+            "https://mega.app/login",
+            RegexPatternType.LOGIN_LINK
+        ),
+        Arguments.of(
+            "Login Link",
+            "https://mega.app/login?miojid=32015f7bf6012800",
+            RegexPatternType.LOGIN_LINK
+        ),
+        Arguments.of(
+            "Registration Link",
+            "https://mega.nz/register",
+            RegexPatternType.REGISTRATION_LINK
+        ),
+        Arguments.of(
+            "Registration Link",
+            "https://mega.nz/register?miojid=32015f7bf6012800",
+            RegexPatternType.REGISTRATION_LINK
+        ),
+        Arguments.of(
+            "Registration Link",
+            "https://mega.app/register",
+            RegexPatternType.REGISTRATION_LINK
+        ),
+        Arguments.of(
+            "Registration Link",
+            "https://mega.app/register?miojid=32015f7bf6012800",
+            RegexPatternType.REGISTRATION_LINK
+        ),
     )
 
     private fun invalidRegexType(): Stream<Arguments> = Stream.of(
@@ -521,5 +561,31 @@ class GetUrlRegexPatternTypeUseCaseTest {
         Arguments.of("Completely invalid URL", "not-a-url"),
         Arguments.of("Completely invalid URL", "mega.nz"),
         Arguments.of("Completely invalid URL", "https://"),
+        // Invalid login links
+        Arguments.of(
+            "Invalid Login Link - Wrong Domain",
+            "https://mega.co.nz/login"
+        ),
+        Arguments.of(
+            "Invalid Login Link - Extra characters after domain",
+            "https://mega.nz/alogin"
+        ),
+        Arguments.of(
+            "Invalid Login Link - Extra characters after domain",
+            "https://mega.app/alogin/asfsa"
+        ),
+        // Invalid registration links
+        Arguments.of(
+            "Invalid Login Link - Wrong Domain",
+            "https://mega.co.nz/register"
+        ),
+        Arguments.of(
+            "Invalid Login Link - Extra characters after domain",
+            "https://mega.nz/aregister/asfsa"
+        ),
+        Arguments.of(
+            "Invalid Login Link - Extra characters after domain",
+            "https://mega.app/aregister/asfsa"
+        ),
     )
 }

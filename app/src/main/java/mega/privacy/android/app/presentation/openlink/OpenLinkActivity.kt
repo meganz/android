@@ -21,6 +21,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityOpenLinkBinding
+import mega.privacy.android.app.di.isAdaptiveLayoutEnabled
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
@@ -32,8 +33,6 @@ import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
-import mega.privacy.android.app.di.isAdaptiveLayoutEnabled
-import mega.privacy.android.app.usecase.orientation.GetCachedAdaptiveLayoutUseCase
 import mega.privacy.android.app.usecase.orientation.enableAdaptiveLayout
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.CallUtil.participatingInACall
@@ -562,6 +561,64 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                 } else {
                     Timber.w("Not logged in")
                     setError(getString(R.string.alert_not_logged_in))
+                }
+            }
+
+            // Open Login screen link
+            getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.LOGIN_LINK -> {
+                if (isLoggedIn) {
+                    Timber.d("Already logged in, open app")
+                    startActivity(
+                        Intent(this, ManagerActivity::class.java)
+                            .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
+                    )
+                    finish()
+                } else {
+                    Timber.d("Open login screen")
+                    lifecycleScope.launch {
+                        getFeatureFlagValueUseCase(AppFeatures.SingleActivity).let { isSingleActivityEnabled ->
+                            Timber.d("SingleActivity feature flag is enabled: $isSingleActivityEnabled")
+                            val targetActivity = if (isSingleActivityEnabled) {
+                                MegaActivity::class.java
+                            } else {
+                                LoginActivity::class.java
+                            }
+                            startActivity(
+                                Intent(this@OpenLinkActivity, targetActivity)
+                                    .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
+                            )
+                            finish()
+                        }
+                    }
+                }
+            }
+
+            // Open Registration screen link
+            getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.REGISTRATION_LINK -> {
+                if (isLoggedIn) {
+                    Timber.d("Already logged in, open app")
+                    startActivity(
+                        Intent(this, ManagerActivity::class.java)
+                            .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
+                    )
+                    finish()
+                } else {
+                    Timber.d("Open registration screen")
+                    lifecycleScope.launch {
+                        getFeatureFlagValueUseCase(AppFeatures.SingleActivity).let { isSingleActivityEnabled ->
+                            Timber.d("SingleActivity feature flag is enabled: $isSingleActivityEnabled")
+                            val targetActivity = if (isSingleActivityEnabled) {
+                                MegaActivity::class.java
+                            } else {
+                                LoginActivity::class.java
+                            }
+                            startActivity(
+                                Intent(this@OpenLinkActivity, targetActivity)
+                                    .putExtra(VISIBLE_FRAGMENT, CREATE_ACCOUNT_FRAGMENT)
+                            )
+                            finish()
+                        }
+                    }
                 }
             }
 

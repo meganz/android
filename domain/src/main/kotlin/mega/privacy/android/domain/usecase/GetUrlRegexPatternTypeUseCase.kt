@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.RegexPatternType.FILE_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.FOLDER_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.HANDLE_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.INSTALLER_DOWNLOAD_LINK
+import mega.privacy.android.domain.entity.RegexPatternType.LOGIN_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.MEGA_BLOG_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.MEGA_DROP_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.MEGA_FILE_REQUEST_LINK
@@ -24,6 +25,7 @@ import mega.privacy.android.domain.entity.RegexPatternType.OPEN_SYNC_MEGA_FOLDER
 import mega.privacy.android.domain.entity.RegexPatternType.PASSWORD_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.PENDING_CONTACTS_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.PURCHASE_LINK
+import mega.privacy.android.domain.entity.RegexPatternType.REGISTRATION_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.RESET_PASSWORD_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.RESTRICTED
 import mega.privacy.android.domain.entity.RegexPatternType.REVERT_CHANGE_PASSWORD_LINK
@@ -86,6 +88,8 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
                 -> ENABLE_CAMERA_UPLOADS_LINK
 
             isUrlMatchesRegexUseCase(url, OPEN_DEVICE_CENTER_LINK_REGEX) -> OPEN_DEVICE_CENTER_LINK
+            isUrlMatchesRegexUseCase(url, OPEN_LOGIN_LINK_REGEX) -> LOGIN_LINK
+            isUrlMatchesRegexUseCase(url, OPEN_REGISTRATION_LINK_REGEX) -> REGISTRATION_LINK
             else -> RESTRICTED
         }
 
@@ -420,6 +424,22 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
         private val OPEN_SYNC_MEGA_FOLDER_LINK_REGEX = arrayOf(
             "^https://mega\\.nz/opensync#.+$",
             "^https://mega\\.app/opensync#.+$"
+        )
+
+        /**
+         * Regex pattern to open Login screen
+         */
+        private val OPEN_LOGIN_LINK_REGEX = arrayOf(
+            "^https://mega\\.nz/login.*$",
+            "^https://mega\\.app/login.*$"
+        )
+
+        /**
+         * Regex pattern to open Registration screen
+         */
+        private val OPEN_REGISTRATION_LINK_REGEX = arrayOf(
+            "^https://mega\\.nz/register.*$",
+            "^https://mega\\.app/register.*$"
         )
     }
 }
