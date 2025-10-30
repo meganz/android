@@ -7,11 +7,13 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.domain.entity.photos.DownloadPhotoRequest
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.photos.DownloadPhotoUseCase
-import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 /**
@@ -24,7 +26,13 @@ class DownloadPhotoViewModel @Inject constructor(
     private val downloadPhotoUseCase: DownloadPhotoUseCase,
 ) : ViewModel() {
 
-    private val downloadResultMap = ConcurrentHashMap<Long, StateFlow<DownloadPhotoResult>>()
+    private val downloadResultMap =
+        object : LinkedHashMap<Long, StateFlow<DownloadPhotoResult>>(MAX_DOWNLOAD_CACHE_SIZE) {
+            override fun removeEldestEntry(
+                eldest: MutableMap.MutableEntry<Long, StateFlow<DownloadPhotoResult>>?,
+            ): Boolean = size > MAX_DOWNLOAD_CACHE_SIZE
+        }
+    private val cacheMutex = Mutex()
 
     /**
      * Get [DownloadPhotoResult] as a [StateFlow].
@@ -38,26 +46,41 @@ class DownloadPhotoViewModel @Inject constructor(
      * is returned for each photo ID. If a StateFlow for a photo ID already exists, the previously
      * created instance will be returned.
      */
-    fun getDownloadPhotoResult(
+    suspend fun getDownloadPhotoResult(
         photo: Photo,
         isPreview: Boolean,
         isPublicNode: Boolean = false,
-    ): StateFlow<DownloadPhotoResult> = downloadResultMap.getOrPut(photo.id) {
-        flow {
-            val result = runCatching {
-                downloadPhotoUseCase(
-                    request = DownloadPhotoRequest(
-                        isPreview = isPreview,
-                        photo = photo,
-                        isPublicNode = isPublicNode
+    ): StateFlow<DownloadPhotoResult> = cacheMutex.withLock {
+        downloadResultMap.getOrPut(photo.id) {
+            flow {
+                val result = runCatching {
+                    downloadPhotoUseCase(
+                        request = DownloadPhotoRequest(
+                            isPreview = isPreview,
+                            photo = photo,
+                            isPublicNode = isPublicNode
+                        )
                     )
-                )
-            }.getOrDefault(defaultValue = DownloadPhotoResult.Error)
-            emit(result)
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Lazily,
-            initialValue = DownloadPhotoResult.Idle
-        )
+                }.getOrDefault(defaultValue = DownloadPhotoResult.Error)
+                emit(result)
+            }.stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Lazily,
+                initialValue = DownloadPhotoResult.Idle
+            )
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelScope.launch {
+            cacheMutex.withLock {
+                downloadResultMap.clear()
+            }
+        }
+    }
+
+    companion object {
+        private const val MAX_DOWNLOAD_CACHE_SIZE = 300
     }
 }
