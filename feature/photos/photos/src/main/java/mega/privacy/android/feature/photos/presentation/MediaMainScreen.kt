@@ -29,6 +29,7 @@ import mega.privacy.android.feature.photos.model.MediaAppBarAction
 import mega.privacy.android.feature.photos.model.MediaAppBarAction.CameraUpload.CameraUploadStatus
 import mega.privacy.android.feature.photos.model.MediaScreen
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabRoute
+import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabRoute
 import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
@@ -127,10 +128,7 @@ private fun MediaScreen.MediaContent(
 
     when (this) {
         MediaScreen.Timeline -> {
-            // Todo: Implement Timeline Screen
-            Box(modifier) {
-                MegaText("Timeline Screen - To be implemented")
-            }
+            TimelineTabRoute(modifier = Modifier.fillMaxSize())
         }
 
         MediaScreen.Albums -> {
