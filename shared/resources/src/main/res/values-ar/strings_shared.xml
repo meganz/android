@@ -1929,4 +1929,10 @@
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">مجموعة الخصوصية من ميغا MEGA</string>
+    <!-- Message about savings on yearly plan in case it has discount -->
+    <string name="account_upgrade_account_label_save_at_least">Save at least 16% on a yearly plan</string>
+    <!-- Add new album on Media screen dialog title -->
+    <string name="media_add_new_album_dialog_title">أدخل اسم الألبوم</string>
+    <!-- Add new album on Media screen dialog positive button text -->
+    <string name="media_add_new_album_dialog_positive_button">إنشاء</string>
 </resources>
