@@ -21,7 +21,7 @@ internal const val NEW_PERMISSIONS_SCREEN_CAMERA_BACKUP_PERMISSION =
 internal const val NEW_PERMISSIONS_SCREEN_LOADING = "new_permissions_screen_loading"
 
 @Composable
-fun NewPermissionsComposableScreen(
+fun NewPermissionsContent(
     uiState: PermissionsUIState,
     askNotificationPermission: () -> Unit = {},
     askCameraBackupPermission: () -> Unit = {},

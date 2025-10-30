@@ -3,6 +3,7 @@ package mega.privacy.android.app.appstate.content.view
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -26,6 +27,7 @@ import mega.privacy.android.app.appstate.content.model.AppContentState
 import mega.privacy.android.app.appstate.content.navigation.NavigationHandlerImpl
 import mega.privacy.android.app.appstate.content.navigation.view.HomeScreens
 import mega.privacy.android.app.appstate.content.navigation.view.HomeScreensNavKey
+import mega.privacy.android.app.appstate.content.navigation.view.PermissionScreensNavKey
 import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
 import mega.privacy.android.app.appstate.content.transfer.TransferHandlerImpl
 import mega.privacy.android.app.appstate.global.event.AppDialogViewModel
@@ -42,6 +44,22 @@ internal fun AppContentView(
 ) {
     val backStack = rememberNavBackStack(HomeScreensNavKey(null))
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(state) {
+        when (val appState = state) {
+            is AppContentState.Data -> {
+                if (appState.onboardingPermissionsCheckResult?.requestPermissionsOnFirstLaunch == true) {
+                    val permissionScreensNavKey = PermissionScreensNavKey(
+                        onlyShowNotificationPermission = appState.onboardingPermissionsCheckResult.onlyShowNotificationPermission
+                    )
+                    backStack.add(permissionScreensNavKey)
+                }
+            }
+
+            else -> {
+            }
+        }
+    }
     val navigationHandler = remember { NavigationHandlerImpl(backStack) }
     val appTransferViewModel = hiltViewModel<AppTransferViewModel>()
     val transferHandler = remember { TransferHandlerImpl(appTransferViewModel) }

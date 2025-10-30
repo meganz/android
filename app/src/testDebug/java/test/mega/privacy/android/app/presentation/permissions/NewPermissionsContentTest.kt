@@ -11,7 +11,7 @@ import mega.privacy.android.app.presentation.permissions.NEW_PERMISSIONS_SCREEN_
 import mega.privacy.android.app.presentation.permissions.NEW_PERMISSIONS_SCREEN_LOADING
 import mega.privacy.android.app.presentation.permissions.NEW_PERMISSIONS_SCREEN_NOTIFICATION_PERMISSION
 import mega.privacy.android.app.presentation.permissions.NewPermissionScreen
-import mega.privacy.android.app.presentation.permissions.NewPermissionsComposableScreen
+import mega.privacy.android.app.presentation.permissions.NewPermissionsContent
 import mega.privacy.android.app.presentation.permissions.PermissionsUIState
 import mega.privacy.android.shared.resources.R
 import org.junit.Rule
@@ -21,14 +21,14 @@ import org.mockito.Mockito.mock
 import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
-class NewPermissionsComposableScreenViewTest {
+class NewPermissionsContentTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
     @Test
     fun `test that notification permission screen should be displayed when type is notification`() {
         composeTestRule.setContent {
-            NewPermissionsComposableScreen(
+            NewPermissionsContent(
                 uiState = PermissionsUIState(
                     visiblePermission = NewPermissionScreen.Notification
                 )
@@ -44,7 +44,7 @@ class NewPermissionsComposableScreenViewTest {
         val mockCallback = mock<() -> Unit>()
 
         composeTestRule.setContent {
-            NewPermissionsComposableScreen(
+            NewPermissionsContent(
                 uiState = PermissionsUIState(
                     visiblePermission = NewPermissionScreen.Notification
                 ),
@@ -63,7 +63,7 @@ class NewPermissionsComposableScreenViewTest {
         val mockCallback = mock<() -> Unit>()
 
         composeTestRule.setContent {
-            NewPermissionsComposableScreen(
+            NewPermissionsContent(
                 uiState = PermissionsUIState(
                     visiblePermission = NewPermissionScreen.Notification
                 ),
@@ -80,7 +80,7 @@ class NewPermissionsComposableScreenViewTest {
     @Test
     fun `test that camera backup permission screen should be displayed when type is camera backup`() {
         composeTestRule.setContent {
-            NewPermissionsComposableScreen(
+            NewPermissionsContent(
                 uiState = PermissionsUIState(
                     visiblePermission = NewPermissionScreen.CameraBackup
                 )
@@ -96,7 +96,7 @@ class NewPermissionsComposableScreenViewTest {
         val mockCallback = mock<() -> Unit>()
 
         composeTestRule.setContent {
-            NewPermissionsComposableScreen(
+            NewPermissionsContent(
                 uiState = PermissionsUIState(
                     visiblePermission = NewPermissionScreen.CameraBackup
                 ),
@@ -115,7 +115,7 @@ class NewPermissionsComposableScreenViewTest {
         val mockCallback = mock<() -> Unit>()
 
         composeTestRule.setContent {
-            NewPermissionsComposableScreen(
+            NewPermissionsContent(
                 uiState = PermissionsUIState(
                     visiblePermission = NewPermissionScreen.CameraBackup
                 ),
@@ -132,7 +132,7 @@ class NewPermissionsComposableScreenViewTest {
     @Test
     fun `test that loading screen should be displayed when type is loading`() {
         composeTestRule.setContent {
-            NewPermissionsComposableScreen(
+            NewPermissionsContent(
                 uiState = PermissionsUIState(
                     visiblePermission = NewPermissionScreen.Loading
                 )
@@ -148,7 +148,7 @@ class NewPermissionsComposableScreenViewTest {
         val mockCallback = mock<() -> Unit>()
 
         composeTestRule.setContent {
-            NewPermissionsComposableScreen(
+            NewPermissionsContent(
                 uiState = PermissionsUIState(
                     finishEvent = triggered,
                 ),
@@ -164,7 +164,7 @@ class NewPermissionsComposableScreenViewTest {
         val mockCallback = mock<() -> Unit>()
 
         composeTestRule.setContent {
-            NewPermissionsComposableScreen(
+            NewPermissionsContent(
                 uiState = PermissionsUIState(),
                 onPermissionPageShown = mockCallback
             )

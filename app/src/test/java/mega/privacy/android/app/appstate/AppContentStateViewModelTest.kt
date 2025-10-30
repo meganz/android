@@ -16,17 +16,17 @@ import mega.privacy.android.app.appstate.content.AppContentStateViewModel
 import mega.privacy.android.app.appstate.content.model.AppContentState
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.navigation.Flagged
+import mega.privacy.android.domain.entity.permission.OnboardingPermissionsCheckResult
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
-import mega.privacy.android.domain.usecase.preference.MonitorStartScreenPreferenceDestinationUseCase
+import mega.privacy.android.domain.usecase.permisison.CheckOnboardingPermissionsUseCase
 import mega.privacy.android.navigation.contract.FeatureDestination
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -37,13 +37,9 @@ import org.mockito.kotlin.stub
 class AppContentStateViewModelTest {
     private lateinit var underTest: AppContentStateViewModel
     private val getEnabledFlaggedItemsUseCase = mock<GetEnabledFlaggedItemsUseCase>()
-
-    private val monitorStartScreenPreferenceDestinationUseCase =
-        mock<MonitorStartScreenPreferenceDestinationUseCase>()
-
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase = mock()
-
     private val rootNodeExistsUseCase: RootNodeExistsUseCase = mock()
+    private val checkOnboardingPermissionsUseCase: CheckOnboardingPermissionsUseCase = mock()
 
     @BeforeAll
     fun initialisation() {
@@ -59,8 +55,9 @@ class AppContentStateViewModelTest {
     fun setUp() {
         reset(
             getEnabledFlaggedItemsUseCase,
-            monitorStartScreenPreferenceDestinationUseCase,
+            monitorFetchNodesFinishUseCase,
             rootNodeExistsUseCase,
+            checkOnboardingPermissionsUseCase,
         )
     }
 
@@ -80,7 +77,7 @@ class AppContentStateViewModelTest {
             onBlocking { invoke(expected) }.thenReturn(flow { emit(expected) })
         }
 
-        stubMonitoFetchNodes()
+        stubCommon()
 
         initUnderTest(expected)
 
@@ -107,7 +104,7 @@ class AppContentStateViewModelTest {
                 onBlocking { invoke(featureDestinations) }.thenReturn(flow { emit(setOf(expected)) })
             }
 
-            stubMonitoFetchNodes()
+            stubCommon()
 
             initUnderTest(featureDestinations)
 
@@ -139,7 +136,7 @@ class AppContentStateViewModelTest {
                 )
             })
         }
-        stubMonitoFetchNodes()
+        stubCommon()
         initUnderTest(featureDestinations)
         underTest.state
             .filterIsInstance<AppContentState.Data>()
@@ -149,13 +146,38 @@ class AppContentStateViewModelTest {
             }
     }
 
-    private fun stubAllEnabledFlaggedItems() {
-        getEnabledFlaggedItemsUseCase.stub {
-            onBlocking { invoke(any<Set<Any>>()) }.thenAnswer { flow { emit(it.arguments.first()) } }
-        }
-    }
+    @Test
+    fun `test that onboardingPermissionsCheckResult is included in state when permissions needed`() =
+        runTest {
+            val expectedFeatureDestinations = setOf(mock<FeatureDestination>())
+            val expectedPermissionsResult = OnboardingPermissionsCheckResult(
+                requestPermissionsOnFirstLaunch = true,
+                onlyShowNotificationPermission = false
+            )
 
-    private fun stubMonitoFetchNodes(
+            getEnabledFlaggedItemsUseCase.stub {
+                onBlocking { invoke(expectedFeatureDestinations) }
+                    .thenReturn(flow { emit(expectedFeatureDestinations) })
+            }
+
+            stubCommon()
+
+            checkOnboardingPermissionsUseCase.stub {
+                onBlocking { invoke() }.thenReturn(expectedPermissionsResult)
+            }
+
+            initUnderTest(expectedFeatureDestinations)
+
+            underTest.state
+                .filterIsInstance<AppContentState.Data>()
+                .test {
+                    val state = awaitItem()
+                    assertThat(state.onboardingPermissionsCheckResult).isEqualTo(expectedPermissionsResult)
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    private fun stubCommon(
         flow: Flow<Boolean> = emptyFlow(),
         initialValue: Boolean = true,
     ) {
@@ -167,8 +189,16 @@ class AppContentStateViewModelTest {
         rootNodeExistsUseCase.stub {
             onBlocking { invoke() } doReturn initialValue
         }
-    }
 
+        checkOnboardingPermissionsUseCase.stub {
+            onBlocking { invoke() }.thenReturn(
+                OnboardingPermissionsCheckResult(
+                    requestPermissionsOnFirstLaunch = false,
+                    onlyShowNotificationPermission = false
+                )
+            )
+        }
+    }
 
     private fun initUnderTest(
         featureDestinations: Set<FeatureDestination>,
@@ -179,6 +209,7 @@ class AppContentStateViewModelTest {
             monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
             rootNodeExistsUseCase = rootNodeExistsUseCase,
             appDialogDestinations = emptySet(),
+            checkOnboardingPermissionsUseCase = checkOnboardingPermissionsUseCase,
         )
     }
 }

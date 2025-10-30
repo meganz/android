@@ -130,7 +130,7 @@ class PermissionsFragment : Fragment() {
         }
 
         AndroidTheme(isDarkTheme) {
-            NewPermissionsComposableScreen(
+            NewPermissionsContent(
                 uiState = uiState,
                 askNotificationPermission = {
                     Analytics.tracker.trackEvent(EnableNotificationsCTAButtonPressedEvent)
