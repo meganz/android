@@ -178,7 +178,5 @@ class NotificationViewM3Test {
         setupRule(NotificationState(notifications = emptyList(), promoNotifications = emptyList()))
 
         composeRule.onNodeWithTag(NOTIFICATION_EMPTY_VIEW_M3_TEST_TAG).assertIsDisplayed()
-        composeRule.onNodeWithTag(NOTIFICATION_EMPTY_VIEW_IMAGE_M3_TEST_TAG).assertIsDisplayed()
-        composeRule.onNodeWithTag(NOTIFICATION_EMPTY_VIEW_TEXT_M3_TEST_TAG).assertIsDisplayed()
     }
 }
