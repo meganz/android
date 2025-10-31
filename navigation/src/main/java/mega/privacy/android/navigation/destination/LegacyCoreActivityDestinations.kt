@@ -5,6 +5,7 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 
 @Serializable
@@ -97,4 +98,10 @@ data class SyncSelectStopBackupDestinationNavKey(
 @Serializable
 data class UpgradeAccountNavKey(
     val source: UpgradeAccountSource = UpgradeAccountSource.UNKNOWN,
+) : NavKey
+
+@Serializable
+data class LegacyFileExplorerNavKey(
+    val uriPath: UriPath,
+    val highlightedFiles: List<String> = emptyList(),
 ) : NavKey

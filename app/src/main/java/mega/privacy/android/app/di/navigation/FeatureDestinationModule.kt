@@ -8,6 +8,7 @@ import dagger.multibindings.IntoSet
 import mega.privacy.android.app.activities.destinations.LegacyCoreActivityFeatureGraph
 import mega.privacy.android.app.appstate.content.navigation.PermissionFeatureDestination
 import mega.privacy.android.app.presentation.filecontact.navigation.FileContactFeatureDestination
+import mega.privacy.android.app.presentation.filestorage.FileStorageFeatureDestination
 import mega.privacy.android.app.presentation.logout.LogoutFeatureDestination
 import mega.privacy.android.app.presentation.notification.navigation.NotificationsFeatureDestination
 import mega.privacy.android.navigation.contract.FeatureDestination
@@ -40,4 +41,8 @@ class FeatureDestinationModule {
     @IntoSet
     fun providePermissionFeatureDestination(): FeatureDestination =
         PermissionFeatureDestination()
+
+    @Provides
+    @IntoSet
+    fun provideFileStorageFeatureDestination(): FeatureDestination = FileStorageFeatureDestination()
 }

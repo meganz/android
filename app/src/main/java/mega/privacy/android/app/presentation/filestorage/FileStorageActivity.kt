@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.filestorage
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
@@ -698,5 +699,34 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
         const val EXTRA_FILE_NAMES: String = "filename"
         const val EXTRA_IS_FOLDER_IN_SD_CARD: String = "is_folder_in_sd_card"
         const val EXTRA_PROMPT: String = "prompt"
+
+        /**
+         * Get an intent to open the file storage activity
+         */
+        fun getBrowseFilesIntent(
+            context: Context,
+            uriPath: UriPath,
+            selectedFileName: String,
+        ) = getBrowseFilesIntent(context, uriPath, listOf(selectedFileName))
+
+        /**
+         * Get an intent to open the file storage activity
+         */
+        fun getBrowseFilesIntent(
+            context: Context,
+            uriPath: UriPath,
+            selectedFileNames: List<String>,
+        ): Intent =
+            Intent(
+                context,
+                FileStorageActivity::class.java
+            ).apply {
+                action = FileStorageActivity.Mode.BROWSE_FILES.action
+                putExtra(EXTRA_PATH, uriPath.value)
+                putStringArrayListExtra(
+                    EXTRA_FILE_NAMES,
+                    selectedFileNames.toCollection(ArrayList())
+                )
+            }
     }
 }

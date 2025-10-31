@@ -54,6 +54,7 @@ import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.LegacyFileExplorerNavKey
 import mega.privacy.android.navigation.destination.OfflineNavKey
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -315,17 +316,11 @@ private fun onViewInFolder(
 ) {
     when (viewInFolderEvent) {
         is ViewInFolderEvent.Download -> {
-            Intent(
+            FileStorageActivity.getBrowseFilesIntent(
                 activity,
-                FileStorageActivity::class.java
-            ).apply {
-                action = FileStorageActivity.Mode.BROWSE_FILES.action
-                putExtra(FileStorageActivity.EXTRA_PATH, viewInFolderEvent.uriPath.value)
-                putStringArrayListExtra(
-                    FileStorageActivity.EXTRA_FILE_NAMES,
-                    arrayListOf(viewInFolderEvent.fileName)
-                )
-            }
+                viewInFolderEvent.uriPath,
+                viewInFolderEvent.fileName
+            )
         }
 
         is ViewInFolderEvent.DownloadToOffline -> {
@@ -366,7 +361,12 @@ private fun onViewInFolderSingleActivity(
 ) {
     when (viewInFolderEvent) {
         is ViewInFolderEvent.Download -> {
-            // will be implemented in TRAN-1038
+            navigationHandler?.navigate(
+                LegacyFileExplorerNavKey(
+                    uriPath = viewInFolderEvent.uriPath,
+                    highlightedFiles = listOf(viewInFolderEvent.fileName),
+                )
+            )
         }
 
         is ViewInFolderEvent.DownloadToOffline -> {
