@@ -6,6 +6,7 @@ import android.app.SearchManager
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -54,6 +55,7 @@ import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomViewPager
 import mega.privacy.android.app.components.EditTextPIN
+import mega.privacy.android.app.di.isAdaptiveLayoutEnabled
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.main.providers.CloudDriveProviderFragment
@@ -63,6 +65,7 @@ import mega.privacy.android.app.presentation.container.AppContainerWrapper
 import mega.privacy.android.app.presentation.provider.FileProviderViewModel
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
+import mega.privacy.android.app.usecase.orientation.enableAdaptiveLayout
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.ChatUtil
@@ -281,6 +284,17 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
         Timber.d("onCreate first")
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         enableEdgeToEdge()
+
+        if (isAdaptiveLayoutEnabled) {
+            // Adaptive layout is enabled, let the system handle orientation
+            enableAdaptiveLayout { old, new ->
+                Timber.d("On size change in FileProviderActivity from $old to $new")
+            }
+        } else {
+            // Force locked orientation when adaptive layout is disabled
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED
+        }
+
         super.onCreate(savedInstanceState)
         appContainerWrapper.setPasscodeCheck(passcodeCheck)
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)

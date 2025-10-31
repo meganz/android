@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.res.Configuration
 import android.os.Parcelable
 import android.view.ViewTreeObserver
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -89,7 +90,7 @@ fun Activity.calculateWindowSizeClass(): WindowSizeClass {
  *
  * @param onSizeChanged Callback triggered when window size changes
  */
-fun BaseActivity.enableAdaptiveLayout(
+fun AppCompatActivity.enableAdaptiveLayout(
     onSizeChanged: ((old: WindowSizeClass?, new: WindowSizeClass) -> Unit)? = null,
 ) {
     Timber.d("enableAdaptiveLayout called for ${this::class.java.simpleName}")
