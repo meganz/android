@@ -1755,13 +1755,13 @@
     <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="one">first month</item>
-        <item quantity="other">first %1$d months</item>
+        <item quantity="one">%1$s for the first month</item>
+        <item quantity="other">%1$s for the first %2$d months</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one">first year</item>
-        <item quantity="other">first %1$d years</item>
+        <item quantity="one">%1$s for the first year</item>
+        <item quantity="other">%1$s for the first %2$d years</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGA privacy suite</string>
