@@ -183,7 +183,8 @@ internal fun NodeOptionsBottomSheetContent(
             icon = uiState.node.iconRes,
             thumbnailData = uiState.node.thumbnailData,
             accessPermissionIcon = uiState.node.accessPermissionIcon,
-            onItemClicked = {}
+            onItemClicked = {},
+            enableClick = false
         )
     }
 

@@ -55,10 +55,10 @@ fun NodeHeaderItem(
         if (showSortOrder) {
             Row(
                 modifier = Modifier
-                    .padding(DSTokens.spacings.s3)
                     .clickable {
                         onSortOrderClick()
                     }
+                    .padding(DSTokens.spacings.s3)
                     .testTag(SORT_ORDER_TAG)
             ) {
                 MegaText(
@@ -88,10 +88,10 @@ fun NodeHeaderItem(
                 tint = IconColor.Secondary,
                 contentDescription = "Enter media discovery",
                 modifier = Modifier
-                    .padding(DSTokens.spacings.s3)
                     .align(CenterVertically)
-                    .size(16.dp)
                     .clickable { onEnterMediaDiscoveryClick() }
+                    .padding(DSTokens.spacings.s3)
+                    .size(16.dp)
                     .testTag(MEDIA_DISCOVERY_TAG)
             )
         }
@@ -103,11 +103,9 @@ fun NodeHeaderItem(
                     contentDescription = "Switch to grid view",
                     modifier = Modifier
                         .align(CenterVertically)
+                        .clickable { onChangeViewTypeClick() }
                         .padding(DSTokens.spacings.s3)
                         .size(16.dp)
-                        .clickable {
-                            onChangeViewTypeClick()
-                        }
                         .testTag(GRID_VIEW_TOGGLE_TAG)
                 )
             } else {
@@ -117,11 +115,9 @@ fun NodeHeaderItem(
                     contentDescription = "Switch to list view",
                     modifier = Modifier
                         .align(CenterVertically)
+                        .clickable { onChangeViewTypeClick() }
                         .padding(DSTokens.spacings.s3)
                         .size(16.dp)
-                        .clickable {
-                            onChangeViewTypeClick()
-                        }
                         .testTag(LIST_VIEW_TOGGLE_TAG)
                 )
             }
