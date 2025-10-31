@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -132,7 +131,7 @@ internal class SyncRepositoryImpl @Inject constructor(
         runCatching {
             syncGateway.getSyncStalledIssues()?.let { stalledIssues ->
                 stalledIssuesMapper(
-                    syncs = monitorFolderPairChanges().first(),
+                    syncs = getFolderPairs(),
                     stalledIssues = stalledIssues
                 )
             }.orEmpty()

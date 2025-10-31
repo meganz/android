@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.domain.sync
 
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncError
@@ -8,7 +7,7 @@ import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
-import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
@@ -31,7 +30,7 @@ internal class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
 
     private val pauseSyncUseCase = mock<PauseSyncUseCase>()
     private val resumeSyncUseCase = mock<ResumeSyncUseCase>()
-    private val monitorSyncsUseCase = mock<MonitorSyncsUseCase>()
+    private val getFolderPairsUseCase = mock<GetFolderPairsUseCase>()
     private val isSyncPausedByTheUserUseCase = mock<IsSyncPausedByTheUserUseCase>()
 
     private val firstSyncId = 1L
@@ -60,7 +59,7 @@ internal class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
         underTest = PauseResumeSyncsBasedOnBatteryAndWiFiUseCase(
             pauseSyncUseCase,
             resumeSyncUseCase,
-            monitorSyncsUseCase,
+            getFolderPairsUseCase,
             isSyncPausedByTheUserUseCase
         )
     }
@@ -70,7 +69,7 @@ internal class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
         reset(
             pauseSyncUseCase,
             resumeSyncUseCase,
-            monitorSyncsUseCase,
+            getFolderPairsUseCase,
             isSyncPausedByTheUserUseCase
         )
     }
@@ -82,7 +81,7 @@ internal class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
                 syncStatus = if (index == 0) SyncStatus.SYNCING else SyncStatus.SYNCED,
             )
         }
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf(newPairs))
+        whenever(getFolderPairsUseCase()).thenReturn(newPairs)
 
 
         underTest(false)
@@ -98,7 +97,7 @@ internal class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
                 syncStatus = SyncStatus.PAUSED,
             )
         }
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf(newPairs))
+        whenever(getFolderPairsUseCase()).thenReturn(newPairs)
         whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
         whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(true)
 
@@ -119,7 +118,7 @@ internal class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
                     syncError = if (index == 0) SyncError.NO_SYNC_ERROR else SyncError.UNKNOWN_ERROR,
                 )
             }
-            whenever(monitorSyncsUseCase()).thenReturn(flowOf(newPairs))
+            whenever(getFolderPairsUseCase()).thenReturn(newPairs)
             whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
             whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(false)
 
@@ -139,7 +138,7 @@ internal class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
                     syncError = if (index == 0) SyncError.NO_SYNC_ERROR else SyncError.UNKNOWN_ERROR,
                 )
             }
-            whenever(monitorSyncsUseCase()).thenReturn(flowOf(newPairs))
+            whenever(getFolderPairsUseCase()).thenReturn(newPairs)
             whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
             whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(false)
 

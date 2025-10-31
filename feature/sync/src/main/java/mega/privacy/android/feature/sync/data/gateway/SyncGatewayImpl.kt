@@ -25,6 +25,7 @@ import nz.mega.sdk.MegaSyncList
 import nz.mega.sdk.MegaSyncStall
 import nz.mega.sdk.MegaSyncStats
 import nz.mega.sdk.StalledIssuesReceiver
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.resume
 
@@ -118,6 +119,7 @@ internal class SyncGatewayImpl @Inject constructor(
     }
 
     override fun pauseSync(folderPairId: Long) {
+        Timber.d("Pausing sync for folderPairId: $folderPairId")
         megaApi.pauseSync(folderPairId)
     }
 

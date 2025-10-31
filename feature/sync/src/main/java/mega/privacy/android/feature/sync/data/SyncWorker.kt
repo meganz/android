@@ -105,9 +105,8 @@ internal class SyncWorker @AssistedInject constructor(
         Timber.d("monitorNotificationsJob cancelled")
     }
 
-    private fun isSyncingCompleted(syncs: List<FolderPair>): Boolean {
-        return syncs.isNotEmpty() && syncs.all { it.syncStatus == SyncStatus.SYNCED || it.syncStatus == SyncStatus.PAUSED }
-    }
+    private fun isSyncingCompleted(syncs: List<FolderPair>): Boolean =
+        syncs.isNotEmpty() && syncs.all { it.syncStatus == SyncStatus.SYNCED || it.syncStatus == SyncStatus.PAUSED }
 
     /**
      * When the user is not logged in, perform a Complete Fast Login procedure
