@@ -8,6 +8,8 @@ import mega.privacy.android.domain.entity.photos.DownloadPhotoRequest
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.photos.DownloadPhotoUseCase
+import mega.privacy.android.feature.photos.mapper.PhotoMapper
+import mega.privacy.android.feature.photos.model.PhotoUiState
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -26,24 +28,31 @@ class DownloadPhotoViewModelTest {
     private lateinit var underTest: DownloadPhotoViewModel
 
     private val downloadPhotoUseCase: DownloadPhotoUseCase = mock()
+    private val photoMapper: PhotoMapper = mock()
 
     @BeforeEach
     fun setup() {
         underTest = DownloadPhotoViewModel(
-            downloadPhotoUseCase = downloadPhotoUseCase
+            downloadPhotoUseCase = downloadPhotoUseCase,
+            photoMapper = photoMapper
         )
     }
 
     @AfterEach
     fun tearDown() {
-        reset(downloadPhotoUseCase)
+        reset(
+            downloadPhotoUseCase,
+            photoMapper
+        )
     }
 
     @Test
     fun `test that the existing flow is returned if exists`() = runTest {
+        val photoUiState = mock<PhotoUiState.Image>()
         val photo = mock<Photo.Image>()
         val isPreview = false
         val isPublicNode = false
+        whenever(photoMapper(photoUiState = photoUiState)) doReturn photo
         whenever(
             downloadPhotoUseCase(
                 request = DownloadPhotoRequest(
@@ -58,12 +67,12 @@ class DownloadPhotoViewModelTest {
         )
 
         val expected = underTest.getDownloadPhotoResult(
-            photo = photo,
+            photoUiState = photoUiState,
             isPreview = isPreview,
             isPublicNode = isPublicNode
         )
         val actual = underTest.getDownloadPhotoResult(
-            photo = photo,
+            photoUiState = photoUiState,
             isPreview = isPreview,
             isPublicNode = isPublicNode
         )
@@ -74,6 +83,7 @@ class DownloadPhotoViewModelTest {
     @Test
     fun `test that the correct success result is returned when the download is successful`() =
         runTest {
+            val photoUiState = mock<PhotoUiState.Image>()
             val photo = mock<Photo.Image>()
             val isPreview = false
             val isPublicNode = false
@@ -81,6 +91,7 @@ class DownloadPhotoViewModelTest {
                 previewFilePath = "preview",
                 thumbnailFilePath = "thumbail"
             )
+            whenever(photoMapper(photoUiState = photoUiState)) doReturn photo
             whenever(
                 downloadPhotoUseCase(
                     request = DownloadPhotoRequest(
@@ -92,7 +103,7 @@ class DownloadPhotoViewModelTest {
             ) doReturn result
 
             underTest.getDownloadPhotoResult(
-                photo = photo,
+                photoUiState = photoUiState,
                 isPreview = isPreview,
                 isPublicNode = isPublicNode
             ).test {
@@ -103,9 +114,11 @@ class DownloadPhotoViewModelTest {
     @Test
     fun `test that the error result is returned when the download fails`() =
         runTest {
+            val photoUiState = mock<PhotoUiState.Image>()
             val photo = mock<Photo.Image>()
             val isPreview = false
             val isPublicNode = false
+            whenever(photoMapper(photoUiState = photoUiState)) doReturn photo
             whenever(
                 downloadPhotoUseCase(
                     request = DownloadPhotoRequest(
@@ -117,7 +130,7 @@ class DownloadPhotoViewModelTest {
             ) doThrow RuntimeException()
 
             underTest.getDownloadPhotoResult(
-                photo = photo,
+                photoUiState = photoUiState,
                 isPreview = isPreview,
                 isPublicNode = isPublicNode
             ).test {

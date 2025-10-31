@@ -14,6 +14,8 @@ import mega.privacy.android.domain.entity.photos.DownloadPhotoRequest
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.photos.DownloadPhotoUseCase
+import mega.privacy.android.feature.photos.mapper.PhotoMapper
+import mega.privacy.android.feature.photos.model.PhotoUiState
 import javax.inject.Inject
 
 /**
@@ -24,6 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DownloadPhotoViewModel @Inject constructor(
     private val downloadPhotoUseCase: DownloadPhotoUseCase,
+    private val photoMapper: PhotoMapper,
 ) : ViewModel() {
 
     private val downloadResultMap =
@@ -37,7 +40,7 @@ class DownloadPhotoViewModel @Inject constructor(
     /**
      * Get [DownloadPhotoResult] as a [StateFlow].
      *
-     * @param photo [Photo].
+     * @param photoUiState [Photo].
      * @param isPreview whether the download is for preview. The value is true if the photo
      * screen is in portrait mode and zoomed in so that only 1 photo item is displayed per row.
      * @param isPublicNode whether the download request is from the MediaDiscoveryScreen
@@ -47,17 +50,17 @@ class DownloadPhotoViewModel @Inject constructor(
      * created instance will be returned.
      */
     suspend fun getDownloadPhotoResult(
-        photo: Photo,
+        photoUiState: PhotoUiState,
         isPreview: Boolean,
         isPublicNode: Boolean = false,
     ): StateFlow<DownloadPhotoResult> = cacheMutex.withLock {
-        downloadResultMap.getOrPut(photo.id) {
+        downloadResultMap.getOrPut(photoUiState.id) {
             flow {
                 val result = runCatching {
                     downloadPhotoUseCase(
                         request = DownloadPhotoRequest(
                             isPreview = isPreview,
-                            photo = photo,
+                            photo = photoMapper(photoUiState = photoUiState),
                             isPublicNode = isPublicNode
                         )
                     )
