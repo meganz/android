@@ -796,6 +796,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         if (handleDuplicateLaunches()) return
         if (savedInstanceState != null) {
             //Do after view instantiation
+            adsContainerViewModel.resetAdsLoaded()
             restoreFromSavedInstanceState(savedInstanceState)
         } else {
             Timber.d("Bundle is NULL")
@@ -884,8 +885,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             findViewById<LinearLayout>(R.id.bottom_navigation_container).minimumHeight =
                 insets.bottom
             // Adjust the ads container height to add system bar insets bottom padding
-            adsContainerView.updatePadding(bottom = if (adsContainerViewModel.isAdsLoaded()) insets.bottom else 0)
-            bottomNavigationView.updatePadding(bottom = if (adsContainerViewModel.isAdsLoaded()) 0 else insets.bottom)
+            adsContainerView.updatePadding(bottom = if (isAdsVisible()) insets.bottom else 0)
+            bottomNavigationView.updatePadding(bottom = if (isAdsVisible()) 0 else insets.bottom)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             window.isNavigationBarContrastEnforced = false
@@ -4028,7 +4029,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
         )
         val height =
-            if (adsContainerViewModel.isAdsLoaded()) resources.getDimensionPixelSize(R.dimen.ads_web_view_and_bottom_navigation_view_height)
+            if (isAdsVisible()) resources.getDimensionPixelSize(R.dimen.ads_web_view_and_bottom_navigation_view_height)
             else resources.getDimensionPixelSize(R.dimen.bottom_navigation_view_height)
         params.setMargins(0, 0, 0, height)
         fragmentLayout.layoutParams = params
@@ -6657,7 +6658,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
-            val height = if (adsContainerViewModel.isAdsLoaded())
+            val height = if (isAdsVisible())
                 resources.getDimensionPixelSize(R.dimen.ads_web_view_and_bottom_navigation_view_height)
             else
                 resources.getDimensionPixelSize(R.dimen.bottom_navigation_view_height)
@@ -6665,7 +6666,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             if (hide && visibility == View.VISIBLE) {
                 updateMiniAudioPlayerVisibility(false)
                 val bottom =
-                    if (adsContainerViewModel.isAdsLoaded() && adsContainerView.isVisible) resources.getDimensionPixelSize(
+                    if (isAdsVisible()) resources.getDimensionPixelSize(
                         R.dimen.ads_web_view_container_height
                     ) else 0
                 params.setMargins(0, 0, 0, bottom)
@@ -7235,6 +7236,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     private fun setAppBarColor(@ColorInt color: Int) {
         appBarLayout.setBackgroundColor(color)
     }
+
+    private fun isAdsVisible() = adsContainerViewModel.isAdsLoaded() && adsContainerView.isVisible
 
     companion object {
         private const val BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE =

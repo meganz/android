@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.advertisements.SetAdsClosingTimestampUseCase
 import timber.log.Timber
@@ -31,6 +32,10 @@ class AdsContainerViewModel @Inject constructor(
                 Timber.e(it, "Error setting ads closing timestamp")
             }
         }
+    }
+
+    fun resetAdsLoaded() {
+        _isAdsLoaded.update { null }
     }
 
     fun setAdsLoaded(isLoaded: Boolean) {
