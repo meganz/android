@@ -293,6 +293,10 @@ class PhotosFragment : Fragment() {
     }
 
     private fun updateActivityActionBarShown(isShowActivityActionBar: Boolean) {
+        if (managerActivity.drawerItem != DrawerItem.PHOTOS) {
+            // Don't manipulate appbar if current drawer is not Photos
+            return
+        }
         if (isShowActivityActionBar) {
             (activity as? AppCompatActivity)?.supportActionBar?.show()
             managerActivity.handleShowingAds()
