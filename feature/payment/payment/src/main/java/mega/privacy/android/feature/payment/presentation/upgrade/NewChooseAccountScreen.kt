@@ -335,12 +335,12 @@ fun NewChooseAccountScreen(
                     if (!isCurrentPlan && discountedPriceYearly != null
                         && discountPercentage != null && offerPeriod != null
                     ) {
-                        stringResource(
-                            sharedR.string.billing_info_with_discount_label,
-                            totalPrice.price,
-                            discountedPriceYearly.price,
-                            getOfferPeriodLabel(offerPeriod)
-                        )
+                        "[A]${totalPrice.price}[/A] ${
+                            getOfferPeriodLabel(
+                                discountedPriceYearly.price,
+                                offerPeriod
+                            )
+                        }"
                     } else {
                         stringResource(
                             sharedR.string.choose_account_screen_billed_yearly,
@@ -425,16 +425,18 @@ fun isCurrentPlan(
         || (!isMonthly && uiState.subscriptionCycle == AccountSubscriptionCycle.YEARLY))
 
 @Composable
-fun getOfferPeriodLabel(period: OfferPeriod) = when (period) {
+fun getOfferPeriodLabel(discountedPrice: String, period: OfferPeriod) = when (period) {
     is OfferPeriod.Month -> pluralStringResource(
         id = sharedR.plurals.label_first_time_in_months_full,
         period.value,
+        discountedPrice,
         period.value
     )
 
     is OfferPeriod.Year -> pluralStringResource(
         id = sharedR.plurals.label_first_time_in_years_full,
         period.value,
+        discountedPrice,
         period.value
     )
 }
