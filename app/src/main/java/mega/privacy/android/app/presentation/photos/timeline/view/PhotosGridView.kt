@@ -30,7 +30,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
-import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsBannerType
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
@@ -38,6 +37,7 @@ import mega.privacy.android.app.presentation.photos.view.isDownloadPreview
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.feature.photos.model.ZoomLevel
 import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyVerticalGrid
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime

@@ -52,10 +52,10 @@ import mega.android.core.ui.theme.spacing.LocalSpacing
 import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
-import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.feature.photos.model.ZoomLevel
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_050_grey_700

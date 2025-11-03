@@ -3,8 +3,8 @@ package mega.privacy.android.app.presentation.photos.timeline.viewmodel
 import kotlinx.coroutines.flow.update
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
-import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
+import mega.privacy.android.feature.photos.model.ZoomLevel
 
 fun TimelineViewModel.zoomIn() {
     if (_state.value.currentZoomLevel == ZoomLevel.values()[ZoomLevel.values().first().ordinal]) {

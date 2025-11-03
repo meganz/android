@@ -63,6 +63,7 @@ import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import mega.privacy.android.feature.photos.model.ZoomLevel
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -659,7 +660,7 @@ class MediaDiscoveryViewModelTest {
         underTest.showSortByDialog(true)
         underTest.showFilterDialog(true)
         underTest.showSlidersPopup(true)
-        underTest.updateZoomLevel(mega.privacy.android.app.presentation.photos.model.ZoomLevel.Grid_1)
+        underTest.updateZoomLevel(ZoomLevel.Grid_1)
         underTest.setCurrentSort(mega.privacy.android.app.presentation.photos.model.Sort.OLDEST)
         underTest.setCurrentMediaType(mega.privacy.android.app.presentation.photos.model.FilterMediaType.IMAGES)
 
@@ -671,7 +672,7 @@ class MediaDiscoveryViewModelTest {
         assertThat(currentState.currentFolderId).isNull()
         assertThat(currentState.sourcePhotos).isEmpty()
         assertThat(currentState.mediaListItemList).isEmpty()
-        assertThat(currentState.currentZoomLevel).isEqualTo(mega.privacy.android.app.presentation.photos.model.ZoomLevel.Grid_3)
+        assertThat(currentState.currentZoomLevel).isEqualTo(ZoomLevel.Grid_3)
         assertThat(currentState.selectedPhotoIds).isEmpty()
         assertThat(currentState.currentSort).isEqualTo(mega.privacy.android.app.presentation.photos.model.Sort.NEWEST)
         assertThat(currentState.currentMediaType).isEqualTo(mega.privacy.android.app.presentation.photos.model.FilterMediaType.ALL_MEDIA)

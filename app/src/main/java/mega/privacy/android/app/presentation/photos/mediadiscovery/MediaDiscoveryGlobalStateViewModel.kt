@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
-import mega.privacy.android.app.presentation.photos.model.ZoomLevel
+import mega.privacy.android.feature.photos.model.ZoomLevel
 import javax.inject.Inject
 
 @HiltViewModel

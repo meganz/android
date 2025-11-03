@@ -4,8 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryGlobalStateViewModel
-import mega.privacy.android.app.presentation.photos.model.ZoomLevel
+import mega.privacy.android.feature.photos.model.ZoomLevel
 import org.junit.Before
 import org.junit.Test
 

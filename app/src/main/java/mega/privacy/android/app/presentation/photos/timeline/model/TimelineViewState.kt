@@ -6,11 +6,11 @@ import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
-import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
+import mega.privacy.android.feature.photos.model.ZoomLevel
 
 /**
  * View States for the Timeline View

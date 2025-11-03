@@ -10,13 +10,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.photos.model.ZoomLevel
+import mega.privacy.android.feature.photos.model.ZoomLevel
 
 internal fun Modifier.isSelected(isSelected: Boolean): Modifier = composed {
     if (isSelected) Modifier
-        .border(BorderStroke(
-            width = 2.dp,
-            color = colorResource(id = R.color.accent_900)),
+        .border(
+            BorderStroke(
+                width = 2.dp,
+                color = colorResource(id = R.color.accent_900)
+            ),
             shape = RoundedCornerShape(4.dp)
         )
         .clip(RoundedCornerShape(4.dp)) else Modifier

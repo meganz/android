@@ -27,7 +27,6 @@ import mega.privacy.android.app.presentation.photos.model.RememberPreferences
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.model.TimelineFilterPreferences
-import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsStatus
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
@@ -77,6 +76,7 @@ import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUs
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
+import mega.privacy.android.feature.photos.model.ZoomLevel
 import mega.privacy.android.feature_flags.AppFeatures
 import nz.mega.sdk.MegaNode
 import timber.log.Timber

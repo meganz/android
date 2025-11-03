@@ -56,7 +56,6 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionViewModel.Companion.MAX_SELECTION_NUM
 import mega.privacy.android.app.presentation.photos.model.MediaListItem
-import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.ALL_PHOTOS
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CAMERA_UPLOAD
@@ -66,6 +65,7 @@ import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.feature.photos.model.ZoomLevel
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
@@ -73,6 +73,7 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.AddItemsToExistingAlbumFABEvent
 import mega.privacy.mobile.analytics.event.AddItemsToNewAlbumFABEvent
 import mega.privacy.mobile.analytics.event.AlbumPhotosSelectionAllLocationsButtonEvent
@@ -80,7 +81,6 @@ import mega.privacy.mobile.analytics.event.AlbumPhotosSelectionCameraUploadsButt
 import mega.privacy.mobile.analytics.event.AlbumPhotosSelectionCloudDriveButtonEvent
 import mega.privacy.mobile.analytics.event.AlbumPhotosSelectionFilterMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.AlbumPhotosSelectionScreenEvent
-import mega.privacy.android.shared.resources.R as sharedResR
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable

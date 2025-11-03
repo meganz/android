@@ -34,7 +34,6 @@ import mega.privacy.android.app.presentation.photos.model.MediaListItem.PhotoIte
 import mega.privacy.android.app.presentation.photos.model.MediaListMedia
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
-import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.util.createDaysCardList
 import mega.privacy.android.app.presentation.photos.util.createMonthsCardList
 import mega.privacy.android.app.presentation.photos.util.createYearsCardList
@@ -82,6 +81,7 @@ import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import mega.privacy.android.feature.photos.model.ZoomLevel
 import mega.privacy.android.navigation.ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
 import nz.mega.sdk.MegaNode
 import timber.log.Timber

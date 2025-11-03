@@ -34,10 +34,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.MediaListItem
-import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.feature.photos.model.ZoomLevel
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.accent_050
 import mega.privacy.android.shared.original.core.ui.theme.accent_900
