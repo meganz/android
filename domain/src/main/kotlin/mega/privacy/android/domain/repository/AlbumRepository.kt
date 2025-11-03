@@ -271,4 +271,11 @@ interface AlbumRepository {
      * Clear all albums cache
      */
     fun clearCache()
+
+    /**
+     * Monitor albums content update
+     *
+     * @return a flow of all the Albums where its content has been updated
+     */
+    fun monitorUserSetsContentUpdate(): Flow<List<UserSet>>
 }

@@ -16,9 +16,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import mega.privacy.android.domain.entity.media.MediaAlbum
+import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.components.AlbumGridItem
+import mega.privacy.android.feature.photos.extensions.downloadAsStateWithLifecycle
 import mega.privacy.android.feature.photos.presentation.albums.dialog.AddNewAlbumDialog
 
 @Composable
@@ -62,29 +63,22 @@ fun AlbumsTabScreen(
     ) {
         items(
             count = uiState.albums.size,
-            key = { index ->
-                val album = uiState.albums[index]
-                when (album) {
-                    is MediaAlbum.User -> album.id.id
-                    is MediaAlbum.System -> album.id.albumName.hashCode()
-                }
-            },
+            key = { uiState.albums[it].id },
             contentType = { index ->
                 uiState.albums[index]::class
             }
         ) { index ->
             val album = uiState.albums[index]
-            val title = when (album) {
-                is MediaAlbum.User -> album.title
-                is MediaAlbum.System -> album.id.albumName
-            }
+            val downloadResult = album.cover?.downloadAsStateWithLifecycle(isPreview = false)
 
-            // Todo add downloader `PhotoDownloaderViewModel`
             AlbumGridItem(
                 modifier = Modifier
                     .testTag("$ALBUMS_SCREEN_ALBUM_GRID_ITEM:${index}"),
-                coverImage = album.cover?.thumbnailFilePath,
-                title = title,
+                coverImage = when (val result = downloadResult?.value) {
+                    is DownloadPhotoResult.Success -> result.thumbnailFilePath
+                    else -> null
+                },
+                title = album.title,
                 placeholder = placeholder,
                 errorPlaceholder = placeholder
             )

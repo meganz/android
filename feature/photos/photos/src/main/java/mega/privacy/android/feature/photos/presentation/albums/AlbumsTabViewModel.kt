@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.media.CreateUserAlbumUseCase
+import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
 import mega.privacy.android.feature.photos.provider.AlbumsDataProvider
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
@@ -18,6 +19,7 @@ import javax.inject.Inject
 class AlbumsTabViewModel @Inject constructor(
     private val albumsProvider: Set<@JvmSuppressWildcards AlbumsDataProvider>,
     private val createUserAlbumUseCase: CreateUserAlbumUseCase,
+    private val albumUiStateMapper: AlbumUiStateMapper,
 ) : ViewModel() {
     internal val uiState: StateFlow<AlbumsTabUiState> by lazy {
         combine(
@@ -28,7 +30,11 @@ class AlbumsTabViewModel @Inject constructor(
                 albums.toList().flatten()
             }
         )
-            .map { AlbumsTabUiState(albums = it) }
+            .map { albums ->
+                val albumsUiState = albums.map { albumUiStateMapper(it) }
+                Timber.d("AlbumsTabViewModel: ${albumsUiState.map { it.title }}")
+                AlbumsTabUiState(albums = albumsUiState)
+            }
             .catch { Timber.e(it) }
             .asUiStateFlow(
                 viewModelScope,

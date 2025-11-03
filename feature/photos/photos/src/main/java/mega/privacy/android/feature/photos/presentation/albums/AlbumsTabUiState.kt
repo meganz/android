@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.photos.presentation.albums
 
-import mega.privacy.android.domain.entity.media.MediaAlbum
+import mega.privacy.android.feature.photos.model.AlbumUiState
 
 data class AlbumsTabUiState(
-    val albums: List<MediaAlbum> = emptyList()
+    val albums: List<AlbumUiState> = emptyList()
 )

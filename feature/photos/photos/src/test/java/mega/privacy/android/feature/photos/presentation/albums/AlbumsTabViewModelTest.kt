@@ -8,6 +8,8 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.usecase.media.CreateUserAlbumUseCase
+import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
+import mega.privacy.android.feature.photos.model.AlbumUiState
 import mega.privacy.android.feature.photos.provider.AlbumsDataProvider
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -28,17 +30,19 @@ internal class AlbumsTabViewModelTest {
 
     private val mockAlbumsDataProvider: AlbumsDataProvider = mock()
     private val mockCreateUserAlbumUseCase: CreateUserAlbumUseCase = mock()
+    private val mockAlbumUiStateMapper: AlbumUiStateMapper = mock()
 
 
     @BeforeEach
     fun setUp() {
-        reset(mockAlbumsDataProvider, mockCreateUserAlbumUseCase)
+        reset(mockAlbumsDataProvider, mockCreateUserAlbumUseCase, mockAlbumUiStateMapper)
     }
 
     private fun initViewModel() {
         underTest = AlbumsTabViewModel(
             albumsProvider = setOf(mockAlbumsDataProvider),
-            createUserAlbumUseCase = mockCreateUserAlbumUseCase
+            createUserAlbumUseCase = mockCreateUserAlbumUseCase,
+            albumUiStateMapper = mockAlbumUiStateMapper
         )
     }
 
@@ -57,19 +61,22 @@ internal class AlbumsTabViewModelTest {
     @Test
     fun `test that albums are loaded successfully`() = runTest {
         val mockAlbums = createMockAlbums()
+        val expectedAlbumUiState1 = AlbumUiState(id = 1L, title = "Album 1")
+        val expectedAlbumUiState2 = AlbumUiState(id = 2L, title = "Album 2")
+
         whenever(mockAlbumsDataProvider.order).thenReturn(1)
         whenever(mockAlbumsDataProvider.monitorAlbums()).thenReturn(flowOf(mockAlbums))
+        whenever(mockAlbumUiStateMapper(mockAlbums[0])).thenReturn(expectedAlbumUiState1)
+        whenever(mockAlbumUiStateMapper(mockAlbums[1])).thenReturn(expectedAlbumUiState2)
         initViewModel()
 
         underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.albums).hasSize(2)
-            assertThat(state.albums[0]).isInstanceOf(MediaAlbum.User::class.java)
-            assertThat((state.albums[0] as MediaAlbum.User).id).isEqualTo(AlbumId(1L))
-            assertThat((state.albums[0] as MediaAlbum.User).title).isEqualTo("Album 1")
-            assertThat(state.albums[1]).isInstanceOf(MediaAlbum.User::class.java)
-            assertThat((state.albums[1] as MediaAlbum.User).id).isEqualTo(AlbumId(2L))
-            assertThat((state.albums[1] as MediaAlbum.User).title).isEqualTo("Album 2")
+            assertThat(state.albums[0]).isEqualTo(expectedAlbumUiState1)
+            assertThat(state.albums[1]).isEqualTo(expectedAlbumUiState2)
+            verify(mockAlbumUiStateMapper).invoke(mockAlbums[0])
+            verify(mockAlbumUiStateMapper).invoke(mockAlbums[1])
         }
     }
 
@@ -80,23 +87,30 @@ internal class AlbumsTabViewModelTest {
 
         val albums1 = listOf(createMockUserAlbum(1L, "Album 1"))
         val albums2 = listOf(createMockUserAlbum(2L, "Album 2"))
+        val expectedAlbumUiState1 = AlbumUiState(id = 1L, title = "Album 1")
+        val expectedAlbumUiState2 = AlbumUiState(id = 2L, title = "Album 2")
 
         whenever(mockProvider1.order).thenReturn(1)
         whenever(mockProvider1.monitorAlbums()).thenReturn(flowOf(albums1))
         whenever(mockProvider2.order).thenReturn(2)
         whenever(mockProvider2.monitorAlbums()).thenReturn(flowOf(albums2))
+        whenever(mockAlbumUiStateMapper(albums1[0])).thenReturn(expectedAlbumUiState1)
+        whenever(mockAlbumUiStateMapper(albums2[0])).thenReturn(expectedAlbumUiState2)
 
         underTest = AlbumsTabViewModel(
             albumsProvider = setOf(mockProvider1, mockProvider2),
-            createUserAlbumUseCase = mockCreateUserAlbumUseCase
+            createUserAlbumUseCase = mockCreateUserAlbumUseCase,
+            albumUiStateMapper = mockAlbumUiStateMapper
         )
 
         underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.albums).hasSize(2)
             // Albums should be sorted by order (provider1 first, then provider2)
-            assertThat((state.albums[0] as MediaAlbum.User).title).isEqualTo("Album 1")
-            assertThat((state.albums[1] as MediaAlbum.User).title).isEqualTo("Album 2")
+            assertThat(state.albums[0]).isEqualTo(expectedAlbumUiState1)
+            assertThat(state.albums[1]).isEqualTo(expectedAlbumUiState2)
+            verify(mockAlbumUiStateMapper).invoke(albums1[0])
+            verify(mockAlbumUiStateMapper).invoke(albums2[0])
         }
     }
 

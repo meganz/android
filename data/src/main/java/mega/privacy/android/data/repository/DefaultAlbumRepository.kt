@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -740,6 +741,21 @@ internal class DefaultAlbumRepository @Inject constructor(
         userSetsFlow.tryEmit(listOf())
         userSetsElementsFlow.tryEmit(listOf())
     }
+
+    override fun monitorUserSetsContentUpdate(): Flow<List<UserSet>> =
+        megaApiGateway
+            .globalUpdates
+            .filterIsInstance<GlobalUpdate.OnSetElementsUpdate>()
+            .mapNotNull { sets ->
+                val updatedSets = sets
+                    .elements
+                    ?.distinctBy { it.id() }
+                    ?.mapNotNull { element ->
+                        getUserSet(AlbumId(element.setId()))
+                    }
+                updatedSets
+            }
+            .flowOn(ioDispatcher)
 
     private fun getAlbumPhotosAddingProgressFlow(albumId: AlbumId): MutableStateFlow<AlbumPhotosAddingProgress?> =
         albumPhotosAddingProgressPool.getOrPut(albumId) { MutableStateFlow(null) }

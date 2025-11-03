@@ -578,6 +578,135 @@ class DefaultAlbumRepositoryTest {
         }
     }
 
+    @Test
+    fun `test that monitorUserSetsContentUpdate emits correct result when set elements are updated`() =
+        runTest {
+            val albumId1 = AlbumId(1L)
+            val albumId2 = AlbumId(2L)
+            val expectedUserSet1 = createUserSet(
+                id = albumId1.id,
+                name = "Album 1",
+                type = MegaSet.SET_TYPE_ALBUM,
+                cover = null,
+                creationTime = 1000L,
+                modificationTime = 2000L,
+                isExported = false,
+            )
+            val expectedUserSet2 = createUserSet(
+                id = albumId2.id,
+                name = "Album 2",
+                type = MegaSet.SET_TYPE_ALBUM,
+                cover = null,
+                creationTime = 1001L,
+                modificationTime = 2001L,
+                isExported = false,
+            )
+
+            val megaSetElement1 = mock<MegaSetElement> {
+                on { setId() }.thenReturn(albumId1.id)
+                on { id() }.thenReturn(10L)
+            }
+            val megaSetElement2 = mock<MegaSetElement> {
+                on { setId() }.thenReturn(albumId2.id)
+                on { id() }.thenReturn(20L)
+            }
+
+            val megaSet1 = mock<MegaSet> {
+                on { id() }.thenReturn(albumId1.id)
+                on { name() }.thenReturn(expectedUserSet1.name)
+                on { cover() }.thenReturn(-1L)
+                on { ts() }.thenReturn(expectedUserSet1.modificationTime)
+            }
+            val megaSet2 = mock<MegaSet> {
+                on { id() }.thenReturn(albumId2.id)
+                on { name() }.thenReturn(expectedUserSet2.name)
+                on { cover() }.thenReturn(-1L)
+                on { ts() }.thenReturn(expectedUserSet2.modificationTime)
+            }
+
+            whenever(megaApiGateway.globalUpdates)
+                .thenReturn(
+                    flowOf(
+                        OnSetElementsUpdate(
+                            ArrayList(
+                                listOf(
+                                    megaSetElement1,
+                                    megaSetElement2
+                                )
+                            )
+                        )
+                    )
+                )
+
+            whenever(megaApiGateway.getSet(albumId1.id)).thenReturn(megaSet1)
+            whenever(megaApiGateway.getSet(albumId2.id)).thenReturn(megaSet2)
+
+            underTest = createUnderTest(this)
+            underTest.monitorUserSetsContentUpdate().test {
+                val userSets = awaitItem()
+                assertThat(userSets).hasSize(2)
+                assertThat(userSets[0].id).isEqualTo(expectedUserSet1.id)
+                assertThat(userSets[1].id).isEqualTo(expectedUserSet2.id)
+                awaitComplete()
+            }
+        }
+
+    @Test
+    fun `test that monitorUserSetsContentUpdate filters out duplicate elements`() = runTest {
+        val albumId = AlbumId(1L)
+        val expectedUserSet = createUserSet(
+            id = albumId.id,
+            name = "Album 1",
+            type = MegaSet.SET_TYPE_ALBUM,
+            cover = null,
+            creationTime = 1000L,
+            modificationTime = 2000L,
+            isExported = false,
+        )
+
+        // Two elements with the same id() - should be deduplicated
+        val megaSetElement1 = mock<MegaSetElement> {
+            on { setId() }.thenReturn(albumId.id)
+            on { id() }.thenReturn(10L)
+        }
+        val megaSetElement2 = mock<MegaSetElement> {
+            on { setId() }.thenReturn(albumId.id)
+            on { id() }.thenReturn(10L) // Same id
+        }
+
+        val megaSet = mock<MegaSet> {
+            on { id() }.thenReturn(albumId.id)
+            on { name() }.thenReturn(expectedUserSet.name)
+            on { cover() }.thenReturn(-1L)
+            on { ts() }.thenReturn(expectedUserSet.modificationTime)
+        }
+
+        whenever(megaApiGateway.globalUpdates)
+            .thenReturn(
+                flowOf(
+                    OnSetElementsUpdate(
+                        ArrayList(
+                            listOf(
+                                megaSetElement1,
+                                megaSetElement2
+                            )
+                        )
+                    )
+                )
+            )
+
+        whenever(megaApiGateway.getSet(albumId.id)).thenReturn(megaSet)
+
+        underTest = createUnderTest(this)
+        underTest.monitorUserSetsContentUpdate().test {
+            val userSets = awaitItem()
+            // Should only have one UserSet even though there are two elements (duplicate filtered)
+            assertThat(userSets).hasSize(1)
+            assertThat(userSets[0].id).isEqualTo(expectedUserSet.id)
+            awaitComplete()
+        }
+    }
+
     private fun createUnderTest(coroutineScope: CoroutineScope) = DefaultAlbumRepository(
         nodeRepository = nodeRepository,
         megaApiGateway = megaApiGateway,

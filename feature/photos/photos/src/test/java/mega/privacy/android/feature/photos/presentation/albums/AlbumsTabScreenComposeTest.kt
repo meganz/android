@@ -11,8 +11,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import mega.privacy.android.domain.entity.media.MediaAlbum
-import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.feature.photos.model.AlbumUiState
 import mega.privacy.android.shared.resources.R as sharedResR
 import org.junit.Rule
 import org.junit.Test
@@ -106,14 +105,11 @@ class AlbumsTabScreenComposeTest {
         verify(mockCallback).invoke(any())
     }
 
-    private fun createMockAlbum(id: Long, title: String): MediaAlbum.User {
-        return MediaAlbum.User(
-            id = AlbumId(id),
+    private fun createMockAlbum(id: Long, title: String): AlbumUiState {
+        return AlbumUiState(
+            id = id,
             title = title,
-            cover = null,
-            creationTime = 0,
-            modificationTime = 0,
-            isExported = false
+            cover = null
         )
     }
 }
