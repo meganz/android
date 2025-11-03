@@ -161,4 +161,5 @@
     <dimen name="image_mini_avatar_text_size">12sp</dimen>
     <dimen name="image_link_avatar_size">44dp</dimen>
     <dimen name="image_link_avatar_text_size">22sp</dimen>
+    <dimen name="image_artwork_thumbnail_padding">20dp</dimen>
 </resources>

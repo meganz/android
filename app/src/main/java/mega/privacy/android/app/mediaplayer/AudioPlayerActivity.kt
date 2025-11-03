@@ -3,6 +3,7 @@ package mega.privacy.android.app.mediaplayer
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.os.Bundle
@@ -38,6 +39,7 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.ActivityAudioPlayerBinding
+import mega.privacy.android.app.di.isAdaptiveLayoutEnabled
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.showSnackbar
@@ -50,6 +52,7 @@ import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragmentArgs
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
+import mega.privacy.android.app.usecase.orientation.enableAdaptiveLayout
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.CallUtil
@@ -200,6 +203,18 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     @androidx.annotation.OptIn(UnstableApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdgeAndConsumeInsets()
+
+        // Set orientation before super.onCreate() to ensure it takes effect
+        if (isAdaptiveLayoutEnabled) {
+            // Adaptive layout is enabled, let the system handle orientation
+            enableAdaptiveLayout { old, new ->
+                Timber.d("On size change in AudioPlayerActivity from $old to $new")
+            }
+        } else {
+            // Force portrait orientation when adaptive layout is disabled
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
+
         super.onCreate(savedInstanceState)
 
         // Setup the Back Press dispatcher to receive Back Press events

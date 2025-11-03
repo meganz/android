@@ -1,23 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- the artwork's size & position will be adjusted in code -->
+    <!-- Left-aligned artwork in landscape; code still sets final size -->
     <FrameLayout
         android:id="@+id/artwork_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:visibility="invisible"
+        android:layout_gravity="start|center_vertical"
         android:layout_margin="@dimen/standard_margin_double"
         android:padding="@dimen/image_artwork_thumbnail_padding"
-        tools:visibility="visible">
+        android:visibility="invisible">
 
-        <!-- ExoPlayer will set exo_artwork invisible until it get metadata -->
         <ImageView
-            android:layout_marginTop="@dimen/standard_margin_double"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:adjustViewBounds="true"
@@ -25,12 +21,12 @@
             android:src="@drawable/ic_default_audio_cover" />
 
         <ImageView
-            android:layout_marginTop="@dimen/standard_margin_double"
             android:id="@id/exo_artwork"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:adjustViewBounds="true"
             android:scaleType="fitCenter" />
+
     </FrameLayout>
 
     <View

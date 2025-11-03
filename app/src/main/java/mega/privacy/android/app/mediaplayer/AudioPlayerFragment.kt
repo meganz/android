@@ -10,6 +10,7 @@ import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.getValue
@@ -32,6 +33,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
+import mega.privacy.android.app.di.isAdaptiveLayoutEnabled
 import mega.privacy.android.app.di.mediaplayer.AudioPlayer
 import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
@@ -94,6 +96,9 @@ class AudioPlayerFragment : Fragment() {
 
     private var retryFailedDialog: AlertDialog? = null
 
+    // top-level inside class
+    private var playerGlobalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
+
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
             serviceGateway = null
@@ -130,7 +135,6 @@ class AudioPlayerFragment : Fragment() {
             playerViewHolder = AudioPlayerViewHolder(this)
         }.root
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -143,6 +147,16 @@ class AudioPlayerFragment : Fragment() {
             BIND_AUTO_CREATE
         )
 
+        if (context?.isAdaptiveLayoutEnabled == true) {
+            // Re-apply artwork layout after any layout pass (e.g., rotation/size change)
+            playerGlobalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
+                playerViewHolder?.layoutArtwork()
+            }
+            playerViewHolder?.binding?.playerView?.viewTreeObserver?.addOnGlobalLayoutListener(
+                playerGlobalLayoutListener
+            )
+        }
+
         observeFlow()
         delayHideToolbar()
     }
@@ -153,7 +167,6 @@ class AudioPlayerFragment : Fragment() {
         if (serviceGateway != null && serviceViewModelGateway != null) {
             setupPlayer()
         }
-
         if (!toolbarVisible) {
             showToolbar()
             delayHideToolbar()
@@ -162,6 +175,11 @@ class AudioPlayerFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        if (context?.isAdaptiveLayoutEnabled == true) {
+            playerViewHolder?.binding?.playerView?.viewTreeObserver?.let { vto ->
+                playerGlobalLayoutListener?.let { vto.removeOnGlobalLayoutListener(it) }
+            }
+        }
         playlistObserved = false
         // Close the dialog after fragment is destroyed to avoid adding dialog view repeatedly after screen is rotated.
         playbackPositionDialog?.run {

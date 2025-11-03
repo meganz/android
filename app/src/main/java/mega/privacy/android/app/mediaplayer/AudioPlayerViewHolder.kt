@@ -14,6 +14,7 @@ import androidx.media3.common.Player
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
+import mega.privacy.android.app.di.isAdaptiveLayoutEnabled
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
@@ -46,21 +47,29 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
      */
     fun layoutArtwork() {
         post {
-            val resources = binding.root.resources
-
-            val artworkWidth = resources.displayMetrics.widthPixels / 3 * 2
-            val controllerHeight =
-                resources.getDimensionPixelSize(R.dimen.audio_player_main_controller_height)
-
-            val layoutParams = artworkContainer.layoutParams as FrameLayout.LayoutParams
-            layoutParams.width = artworkWidth
-            layoutParams.height = artworkWidth
-            layoutParams.topMargin =
-                (binding.playerView.measuredHeight - artworkWidth - controllerHeight) / 2
-            artworkContainer.layoutParams = layoutParams
-
-            artworkContainer.isVisible = true
+            if (binding.root.context.isAdaptiveLayoutEnabled) {
+                artworkContainer.isVisible = true
+            } else {
+                legacyLayout()
+            }
         }
+    }
+
+    private fun legacyLayout() {
+        val resources = binding.root.resources
+
+        val artworkWidth = resources.displayMetrics.widthPixels / 3 * 2
+        val controllerHeight =
+            resources.getDimensionPixelSize(R.dimen.audio_player_main_controller_height)
+
+        val layoutParams = artworkContainer.layoutParams as FrameLayout.LayoutParams
+        layoutParams.width = artworkWidth
+        layoutParams.height = artworkWidth
+        layoutParams.topMargin =
+            (binding.playerView.measuredHeight - artworkWidth - controllerHeight) / 2
+        artworkContainer.layoutParams = layoutParams
+
+        artworkContainer.isVisible = true
     }
 
     /**
