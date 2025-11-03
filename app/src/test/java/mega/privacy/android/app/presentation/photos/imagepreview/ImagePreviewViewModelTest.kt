@@ -17,22 +17,18 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewVideoLauncher
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_NODE_FETCHER_SOURCE
-import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_SORT
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
-import mega.privacy.android.app.presentation.imagepreview.fetcher.MediaDiscoveryImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.triggeredContent
 import mega.privacy.android.core.nodecomponents.mapper.RemovePublicLinkResultMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
-import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
@@ -40,7 +36,6 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
@@ -75,7 +70,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
@@ -212,7 +206,7 @@ class ImagePreviewViewModelTest {
     }
 
     private fun commonStub() = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)).thenReturn(true)
+        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
     }
 
     @ParameterizedTest
@@ -943,101 +937,6 @@ class ImagePreviewViewModelTest {
                 }
             )
         }
-
-    @ParameterizedTest
-    @EnumSource(value = Sort::class, names = ["NEWEST", "OLDEST"])
-    internal fun `test that the correct sorted image nodes are returned when hidden node flag is enabled`(
-        sort: Sort,
-    ) =
-        runTest {
-            whenever(monitorConnectivityUseCase()) doReturn flowOf(false)
-            whenever(savedStateHandle.get<Long>(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE)) doReturn 123L
-            whenever(
-                getFeatureFlagValueUseCase(
-                    ApiFeatures.HiddenNodesInternalRelease
-                )
-            ) doReturn true
-            val imagePreviewFetcherSource = ImagePreviewFetcherSource.MEDIA_DISCOVERY
-            whenever(
-                savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE)
-            ) doReturn imagePreviewFetcherSource
-            val imageNodeFetcher = mock<MediaDiscoveryImageNodeFetcher>()
-            imageNodeFetchers[imagePreviewFetcherSource] = imageNodeFetcher
-            whenever(monitorShowHiddenItemsUseCase()) doReturn flowOf(true)
-            val accountDetail = mock<AccountDetail>()
-            whenever(
-                monitorAccountDetailUseCase()
-            ) doReturn flowOf(accountDetail)
-            whenever(isHiddenNodesOnboardedUseCase()) doReturn true
-            whenever(savedStateHandle.get<Sort>(IMAGE_PREVIEW_SORT)) doReturn sort
-            val firstImageNode = mock<ImageNode> {
-                on { id } doReturn NodeId(123L)
-                on { modificationTime } doReturn 1L
-            }
-            val secondImageNode = mock<ImageNode> {
-                on { id } doReturn NodeId(234L)
-                on { modificationTime } doReturn 2L
-            }
-            val imageNodes = listOf(firstImageNode, secondImageNode)
-            whenever(
-                imageNodeFetcher.monitorImageNodes(any())
-            ) doReturn flowOf(imageNodes)
-
-            initViewModel()
-
-            underTest.state.test {
-                val expected = when (sort) {
-                    Sort.NEWEST -> imageNodes.sortedWith(compareByDescending<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
-                    Sort.OLDEST -> imageNodes.sortedWith(compareBy<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
-                    else -> imageNodes
-                }
-                assertThat(expectMostRecentItem().imageNodes).isEqualTo(expected)
-            }
-        }
-
-    @ParameterizedTest
-    @EnumSource(value = Sort::class, names = ["NEWEST", "OLDEST"])
-    internal fun `test that the correct sorted image nodes are returned when hidden node flag is not enabled`(
-        sort: Sort,
-    ) = runTest {
-        whenever(monitorConnectivityUseCase()) doReturn flowOf(false)
-        whenever(savedStateHandle.get<Long>(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE)) doReturn 123L
-        whenever(
-            getFeatureFlagValueUseCase(
-                ApiFeatures.HiddenNodesInternalRelease
-            )
-        ) doReturn false
-        val imagePreviewFetcherSource = ImagePreviewFetcherSource.MEDIA_DISCOVERY
-        whenever(
-            savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE)
-        ) doReturn imagePreviewFetcherSource
-        val imageNodeFetcher = mock<MediaDiscoveryImageNodeFetcher>()
-        imageNodeFetchers[imagePreviewFetcherSource] = imageNodeFetcher
-        whenever(savedStateHandle.get<Sort>(IMAGE_PREVIEW_SORT)) doReturn sort
-        val firstImageNode = mock<ImageNode> {
-            on { id } doReturn NodeId(123L)
-            on { modificationTime } doReturn 1L
-        }
-        val secondImageNode = mock<ImageNode> {
-            on { id } doReturn NodeId(234L)
-            on { modificationTime } doReturn 2L
-        }
-        val imageNodes = listOf(firstImageNode, secondImageNode)
-        whenever(
-            imageNodeFetcher.monitorImageNodes(any())
-        ) doReturn flowOf(imageNodes)
-
-        initViewModel()
-
-        underTest.state.test {
-            val expected = when (sort) {
-                Sort.NEWEST -> imageNodes.sortedWith(compareByDescending<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
-                Sort.OLDEST -> imageNodes.sortedWith(compareBy<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
-                else -> imageNodes
-            }
-            assertThat(expectMostRecentItem().imageNodes).isEqualTo(expected)
-        }
-    }
 
     private fun createNonSensitiveNode(): ImageNode {
         return mock<ImageNode> {

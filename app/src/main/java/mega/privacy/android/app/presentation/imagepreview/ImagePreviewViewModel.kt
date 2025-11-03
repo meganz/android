@@ -32,7 +32,6 @@ import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewState
-import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.core.nodecomponents.mapper.RemovePublicLinkResultMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -190,7 +189,7 @@ class ImagePreviewViewModel @Inject constructor(
             val isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
 
             val filteredImageNodes = filterNonSensitiveNodes(
-                imageNodes = imageNodes.sort(),
+                imageNodes = imageNodes,
                 showHiddenItems = showHiddenItems,
                 isPaid = accountType?.isPaid,
                 isBusinessAccountExpired = isBusinessAccountExpired,
@@ -245,9 +244,8 @@ class ImagePreviewViewModel @Inject constructor(
         imageFetcher.monitorImageNodes(params)
             .catch { Timber.e(it) }
             .mapLatest { imageNodes ->
-                val sortedImageNodes = imageNodes.sort()
                 val (currentImageNodeIndex, currentImageNode) = findCurrentImageNode(
-                    sortedImageNodes
+                    imageNodes
                 )
                 val isCurrentImageNodeAvailableOffline =
                     currentImageNode?.isAvailableOffline ?: false
@@ -257,7 +255,7 @@ class ImagePreviewViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         isInitialized = true,
-                        imageNodes = sortedImageNodes,
+                        imageNodes = imageNodes,
                         currentImageNodeIndex = currentImageNodeIndex,
                         currentImageNode = currentImageNode,
                         isCurrentImageNodeAvailableOffline = isCurrentImageNodeAvailableOffline
@@ -309,14 +307,6 @@ class ImagePreviewViewModel @Inject constructor(
             imageNodes
         } else {
             imageNodes.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }
-        }
-    }
-
-    private fun List<ImageNode>.sort(): List<ImageNode> {
-        return when (getSort()) {
-            Sort.NEWEST -> sortedWith(compareByDescending<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
-            Sort.OLDEST -> sortedWith(compareBy<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
-            else -> this
         }
     }
 
@@ -980,10 +970,6 @@ class ImagePreviewViewModel @Inject constructor(
         }
     }
 
-    private fun getSort(): Sort {
-        return savedStateHandle[IMAGE_PREVIEW_SORT] ?: Sort.DEFAULT
-    }
-
     companion object {
         const val IMAGE_NODE_FETCHER_SOURCE = "image_node_fetcher_source"
         const val IMAGE_PREVIEW_MENU_OPTIONS = "image_preview_menu_options"
@@ -991,6 +977,5 @@ class ImagePreviewViewModel @Inject constructor(
         const val PARAMS_CURRENT_IMAGE_NODE_ID_VALUE = "currentImageNodeIdValue"
         const val IMAGE_PREVIEW_IS_FOREIGN = "image_preview_is_foreign"
         const val IMAGE_PREVIEW_ADD_TO_ALBUM = "image_preview_add_to_album"
-        const val IMAGE_PREVIEW_SORT = "image_preview_sort"
     }
 }
