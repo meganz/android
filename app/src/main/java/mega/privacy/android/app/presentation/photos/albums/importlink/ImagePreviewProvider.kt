@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.MediaDiscoveryImageNodeFetcher.Companion.IMAGE_PREVIEW_SORT
 import mega.privacy.android.app.presentation.imagepreview.fetcher.MediaDiscoveryImageNodeFetcher.Companion.IS_RECURSIVE
 import mega.privacy.android.app.presentation.imagepreview.fetcher.MediaDiscoveryImageNodeFetcher.Companion.PARENT_ID
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -110,9 +111,12 @@ class ImagePreviewProvider @Inject constructor(
                     imageSource = ImagePreviewFetcherSource.MEDIA_DISCOVERY,
                     menuOptionsSource = ImagePreviewMenuSource.MEDIA_DISCOVERY,
                     anchorImageNodeId = NodeId(photo.id),
-                    params = mapOf(PARENT_ID to parentID, IS_RECURSIVE to recursive),
+                    params = mapOf(
+                        PARENT_ID to parentID,
+                        IS_RECURSIVE to recursive,
+                        IMAGE_PREVIEW_SORT to currentSort
+                    ),
                     enableAddToAlbum = true,
-                    sort = currentSort
                 ).run {
                     activity.startActivity(this)
                 }
