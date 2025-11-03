@@ -74,7 +74,7 @@ fun CameraUploadsTransferScreen(
     }
 
     LaunchedEffect(uiState) {
-        subtitle = if (types.isNotEmpty() && uiState.pending > 0) {
+        subtitle = if (uiState.pending > 0) {
             resources.getQuantityString(
                 sharedR.plurals.camera_uploads_tranfer_top_bar_subtitle,
                 uiState.pending,
