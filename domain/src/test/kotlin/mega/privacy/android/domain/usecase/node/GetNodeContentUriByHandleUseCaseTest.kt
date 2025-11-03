@@ -12,6 +12,8 @@ import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -31,6 +33,9 @@ class GetNodeContentUriByHandleUseCaseTest {
 
     private val megaApiHttpServerStartUseCase = mock<MegaApiHttpServerStartUseCase>()
     private val megaApiHttpServerIsRunningUseCase = mock<MegaApiHttpServerIsRunningUseCase>()
+    private val megaApiFolderHttpServerStartUseCase = mock<MegaApiFolderHttpServerStartUseCase>()
+    private val megaApiFolderHttpServerIsRunningUseCase =
+        mock<MegaApiFolderHttpServerIsRunningUseCase>()
     private val getFileUrlByNodeHandleUseCase = mock<GetFileUrlByNodeHandleUseCase>()
     private val hasCredentialsUseCase = mock<HasCredentialsUseCase>()
     private val getLocalFolderLinkFromMegaApiUseCase = mock<GetLocalFolderLinkFromMegaApiUseCase>()
@@ -49,6 +54,8 @@ class GetNodeContentUriByHandleUseCaseTest {
         underTest = GetNodeContentUriByHandleUseCase(
             megaApiHttpServerStartUseCase = megaApiHttpServerStartUseCase,
             megaApiHttpServerIsRunningUseCase = megaApiHttpServerIsRunningUseCase,
+            megaApiFolderHttpServerIsRunningUseCase = megaApiFolderHttpServerIsRunningUseCase,
+            megaApiFolderHttpServerStartUseCase = megaApiFolderHttpServerStartUseCase,
             getFileUrlByNodeHandleUseCase = getFileUrlByNodeHandleUseCase,
             hasCredentialsUseCase = hasCredentialsUseCase,
             getLocalFolderLinkFromMegaApiUseCase = getLocalFolderLinkFromMegaApiUseCase,
@@ -65,6 +72,8 @@ class GetNodeContentUriByHandleUseCaseTest {
         reset(
             megaApiHttpServerStartUseCase,
             megaApiHttpServerIsRunningUseCase,
+            megaApiFolderHttpServerStartUseCase,
+            megaApiFolderHttpServerIsRunningUseCase,
             getFileUrlByNodeHandleUseCase,
             hasCredentialsUseCase,
             getLocalFolderLinkFromMegaApiUseCase,
@@ -81,10 +90,12 @@ class GetNodeContentUriByHandleUseCaseTest {
         runTest {
             val expectedUrl = "url"
             val contentUri = NodeContentUri.RemoteContentUri(expectedUrl, true)
+            whenever(hasCredentialsUseCase()).thenReturn(true)
             whenever(megaApiHttpServerIsRunningUseCase()).thenReturn(0)
             whenever(getFileUrlByNodeHandleUseCase(paramHandle)).thenReturn(expectedUrl)
             val actual = underTest(paramHandle)
             assertThat(actual).isEqualTo(contentUri)
+            verify(megaApiHttpServerStartUseCase).invoke()
         }
 
     @Test
@@ -92,6 +103,7 @@ class GetNodeContentUriByHandleUseCaseTest {
         runTest {
             val expectedUrl = "url"
             val contentUri = NodeContentUri.RemoteContentUri(expectedUrl, false)
+            whenever(hasCredentialsUseCase()).thenReturn(true)
             whenever(megaApiHttpServerIsRunningUseCase()).thenReturn(1)
             whenever(getFileUrlByNodeHandleUseCase(paramHandle)).thenReturn(expectedUrl)
             val actual = underTest(paramHandle)
@@ -103,11 +115,13 @@ class GetNodeContentUriByHandleUseCaseTest {
         runTest {
             val expectedUrl = "url"
             val contentUri = NodeContentUri.RemoteContentUri(expectedUrl, true)
-            whenever(megaApiHttpServerIsRunningUseCase()).thenReturn(0)
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            whenever(megaApiFolderHttpServerIsRunningUseCase()).thenReturn(0)
             whenever(getFileUrlByNodeHandleUseCase(paramHandle)).thenReturn(null)
             whenever(getAlbumPhotoFileUrlByNodeIdUseCase(paramNodeId)).thenReturn(expectedUrl)
             val actual = underTest(paramHandle)
             assertThat(actual).isEqualTo(contentUri)
+            verify(megaApiFolderHttpServerStartUseCase).invoke()
         }
 
     @Test
@@ -115,6 +129,7 @@ class GetNodeContentUriByHandleUseCaseTest {
         runTest {
             val expectedUrl = "url"
             val contentUri = NodeContentUri.RemoteContentUri(expectedUrl, false)
+            whenever(hasCredentialsUseCase()).thenReturn(true)
             whenever(megaApiHttpServerIsRunningUseCase()).thenReturn(1)
             whenever(getFileUrlByNodeHandleUseCase(paramHandle)).thenReturn(null)
             whenever(getAlbumPhotoFileUrlByNodeIdUseCase(paramNodeId)).thenReturn(expectedUrl)
@@ -157,7 +172,7 @@ class GetNodeContentUriByHandleUseCaseTest {
         runTest {
             val expectedUrl = "url"
             val contentUri = NodeContentUri.RemoteContentUri(expectedUrl, true)
-            whenever(megaApiHttpServerIsRunningUseCase()).thenReturn(0)
+            whenever(megaApiFolderHttpServerIsRunningUseCase()).thenReturn(0)
             whenever(getFileUrlByNodeHandleUseCase(paramHandle)).thenReturn(null)
             whenever(getAlbumPhotoFileUrlByNodeIdUseCase(paramNodeId)).thenReturn(null)
             whenever(hasCredentialsUseCase()).thenReturn(false)
@@ -172,7 +187,7 @@ class GetNodeContentUriByHandleUseCaseTest {
         runTest {
             val expectedUrl = "url"
             val contentUri = NodeContentUri.RemoteContentUri(expectedUrl, false)
-            whenever(megaApiHttpServerIsRunningUseCase()).thenReturn(1)
+            whenever(megaApiFolderHttpServerIsRunningUseCase()).thenReturn(1)
             whenever(getFileUrlByNodeHandleUseCase(paramHandle)).thenReturn(null)
             whenever(getAlbumPhotoFileUrlByNodeIdUseCase(paramNodeId)).thenReturn(null)
             whenever(hasCredentialsUseCase()).thenReturn(false)
@@ -207,12 +222,12 @@ class GetNodeContentUriByHandleUseCaseTest {
             val expectedUrl = "url"
             val expectedNode = mock<TypedFileNode>()
             val contentUri = NodeContentUri.RemoteContentUri(expectedUrl, true)
-            whenever(megaApiHttpServerIsRunningUseCase()).thenReturn(0)
+            whenever(megaApiFolderHttpServerIsRunningUseCase()).thenReturn(0)
             whenever(getFileUrlByNodeHandleUseCase(paramHandle)).thenReturn(null)
             whenever(getAlbumPhotoFileUrlByNodeIdUseCase(paramNodeId)).thenReturn(null)
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(getLocalFolderLinkFromMegaApiFolderUseCase(paramHandle)).thenReturn(null)
-            whenever(getNodeByHandleUseCase(paramHandle)).thenReturn(expectedNode)
+            whenever(getNodeByHandleUseCase(paramHandle, true)).thenReturn(expectedNode)
             whenever(addNodeType(any())).thenReturn(expectedNode)
             whenever(getNodeContentUriUseCase(expectedNode)).thenReturn(contentUri)
             val actual = underTest(paramHandle)
@@ -238,7 +253,7 @@ class GetNodeContentUriByHandleUseCaseTest {
     fun `test that the IllegalStateException is thrown when getNodeByHandleUseCase returns a folder`() =
         runTest {
             val expectedNode = mock<TypedFolderNode>()
-            whenever(megaApiHttpServerIsRunningUseCase()).thenReturn(0)
+            whenever(megaApiFolderHttpServerIsRunningUseCase()).thenReturn(0)
             whenever(getFileUrlByNodeHandleUseCase(paramHandle)).thenReturn(null)
             whenever(getAlbumPhotoFileUrlByNodeIdUseCase(paramNodeId)).thenReturn(null)
             whenever(hasCredentialsUseCase()).thenReturn(false)
