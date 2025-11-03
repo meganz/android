@@ -9,6 +9,8 @@ import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import javax.inject.Inject
@@ -19,6 +21,8 @@ import javax.inject.Inject
 class GetNodeContentUriByHandleUseCase @Inject constructor(
     private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
     private val megaApiHttpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
+    private val megaApiFolderHttpServerStartUseCase: MegaApiFolderHttpServerStartUseCase,
+    private val megaApiFolderHttpServerIsRunningUseCase: MegaApiFolderHttpServerIsRunningUseCase,
     private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
     private val hasCredentialsUseCase: HasCredentialsUseCase,
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
@@ -33,24 +37,34 @@ class GetNodeContentUriByHandleUseCase @Inject constructor(
      * Invoke
      */
     suspend operator fun invoke(handle: Long): NodeContentUri {
-        val shouldStopHttpSever = if (megaApiHttpServerIsRunningUseCase() == 0) {
-            megaApiHttpServerStartUseCase()
-            true
-        } else false
+        val hasCredentials = hasCredentialsUseCase()
+        val shouldStopHttpSever = when {
+            hasCredentials && megaApiHttpServerIsRunningUseCase() == 0 -> {
+                megaApiHttpServerStartUseCase()
+                true
+            }
+
+            !hasCredentials && megaApiFolderHttpServerIsRunningUseCase() == 0 -> {
+                megaApiFolderHttpServerStartUseCase()
+                true
+            }
+
+            else -> false
+        }
         return getFileUrlByNodeHandleUseCase(handle)?.let { url ->
             NodeContentUri.RemoteContentUri(url, shouldStopHttpSever)
         } ?: run {
             getAlbumPhotoFileUrlByNodeIdUseCase(NodeId(handle))?.let { url ->
                 NodeContentUri.RemoteContentUri(url, shouldStopHttpSever)
             } ?: run {
-                if (hasCredentialsUseCase()) {
+                if (hasCredentials) {
                     getLocalFolderLinkFromMegaApiUseCase(handle)
                 } else {
                     getLocalFolderLinkFromMegaApiFolderUseCase(handle)
                 }?.let { url ->
                     NodeContentUri.RemoteContentUri(url, shouldStopHttpSever)
                 } ?: run {
-                    getNodeByHandleUseCase(handle)?.let { node ->
+                    getNodeByHandleUseCase(handle, !hasCredentials)?.let { node ->
                         val typedNode = addNodeType(node)
                         if (typedNode is TypedFileNode) {
                             getNodeContentUriUseCase(typedNode)
