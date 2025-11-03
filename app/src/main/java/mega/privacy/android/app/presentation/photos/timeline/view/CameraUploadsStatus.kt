@@ -261,7 +261,7 @@ internal fun NetworkRequirementNotMetPausedBanner(
             .testTag(TIMELINE_CAMERA_UPLOADS_NETWORK_REQUIREMENT_NOT_MET_BANNER_TEST_TAG),
         statusIcon = R.drawable.ic_cu_status_warning,
         title = stringResource(sharedR.string.camera_update_paused_warning_banner_title),
-        description = stringResource(sharedR.string.camera_update_network_requirement_not_met_banner_description),
+        description = stringResource(sharedR.string.camera_uploads_notification_content_no_wifi_connection),
         action = {
             MegaText(
                 text = actionTitle,
