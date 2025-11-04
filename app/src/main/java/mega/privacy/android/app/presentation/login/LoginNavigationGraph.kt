@@ -12,7 +12,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
@@ -21,29 +20,30 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.appstate.content.navigation.NavigationHandlerImpl
-import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailScreen
+import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailNavKey
 import mega.privacy.android.app.presentation.login.confirmemail.changeemail.ChangeEmailAddressViewModel
 import mega.privacy.android.app.presentation.login.confirmemail.changeemail.changeEmailAddress
 import mega.privacy.android.app.presentation.login.confirmemail.confirmationEmailScreen
 import mega.privacy.android.app.presentation.login.confirmemail.openConfirmationEmailScreen
-import mega.privacy.android.app.presentation.login.createaccount.CreateAccountRoute
+import mega.privacy.android.app.presentation.login.createaccount.CreateAccountNavKey
 import mega.privacy.android.app.presentation.login.createaccount.createAccountScreen
 import mega.privacy.android.app.presentation.login.createaccount.openCreateAccountScreen
 import mega.privacy.android.app.presentation.login.model.LoginScreen
-import mega.privacy.android.app.presentation.login.onboarding.TourScreen
+import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
 import mega.privacy.android.app.presentation.login.onboarding.openTourScreen
 import mega.privacy.android.app.presentation.login.onboarding.tourScreen
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 
 @Serializable
 data class LoginGraph(
     @SerialName(Constants.VISIBLE_FRAGMENT)
     val startScreen: Int? = null,
-) : NavKey
+) : NoSessionNavKey.Mandatory
 
 @Serializable
-data object StartRoute : NavKey
+data object StartRoute : NoSessionNavKey.Mandatory
 
 /**
  * Login navigation graph that can be integrated into other navigation graphs
@@ -149,14 +149,14 @@ fun LoginNavDisplay(
     val sharedViewModel = activityViewModel ?: hiltViewModel<LoginViewModel>()
 
     LoginNavigationHandler(
-        navigateToLoginScreen = { loginNavigationHandler.navigate(Login) },
-        navigateToCreateAccountScreen = { loginNavigationHandler.navigate(CreateAccountRoute) },
+        navigateToLoginScreen = { loginNavigationHandler.navigate(LoginNavKey) },
+        navigateToCreateAccountScreen = { loginNavigationHandler.navigate(CreateAccountNavKey) },
         navigateToTourScreen = {
-            loginNavigationHandler.navigateAndClearBackStack(TourScreen)
+            loginNavigationHandler.navigateAndClearBackStack(TourNavKey)
         },
         navigateToConfirmationEmailScreen = {
             loginNavigationHandler.navigate(
-                ConfirmationEmailScreen
+                ConfirmationEmailNavKey
             )
         },
         viewModel = sharedViewModel,

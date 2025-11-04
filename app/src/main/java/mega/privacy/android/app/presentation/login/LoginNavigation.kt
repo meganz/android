@@ -10,13 +10,14 @@ import androidx.navigation.navOptions
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
-import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailScreen
-import mega.privacy.android.app.presentation.login.createaccount.CreateAccountRoute
-import mega.privacy.android.app.presentation.login.onboarding.TourScreen
+import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailNavKey
+import mega.privacy.android.app.presentation.login.createaccount.CreateAccountNavKey
+import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
 import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
+import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 
 @Serializable
-data object Login : NavKey
+data object LoginNavKey : NoSessionNavKey.Mandatory
 
 internal fun NavGraphBuilder.loginScreen(
     navController: NavController,
@@ -24,23 +25,23 @@ internal fun NavGraphBuilder.loginScreen(
     activityViewModel: LoginViewModel? = null,
     stopShowingSplashScreen: () -> Unit,
 ) {
-    composable<Login> { backStackEntry ->
+    composable<LoginNavKey> { backStackEntry ->
         val parentEntry = remember(backStackEntry) {
             navController.getBackStackEntry<LoginGraph>()
         }
         val sharedViewModel = activityViewModel ?: hiltViewModel<LoginViewModel>(parentEntry)
         val billingViewModel = hiltViewModel<BillingViewModel>(parentEntry)
         LoginNavigationHandler(
-            navigateToLoginScreen = { navController.navigate(Login) },
-            navigateToCreateAccountScreen = { navController.navigate(CreateAccountRoute) },
+            navigateToLoginScreen = { navController.navigate(LoginNavKey) },
+            navigateToCreateAccountScreen = { navController.navigate(CreateAccountNavKey) },
             navigateToTourScreen = {
-                navController.navigate(TourScreen, navOptions {
+                navController.navigate(TourNavKey, navOptions {
                     popUpTo<StartRoute> {
                         inclusive = false
                     }
                 })
             },
-            navigateToConfirmationEmailScreen = { navController.navigate(ConfirmationEmailScreen) },
+            navigateToConfirmationEmailScreen = { navController.navigate(ConfirmationEmailNavKey) },
             viewModel = sharedViewModel,
             onFinish = onFinish,
             stopShowingSplashScreen = stopShowingSplashScreen,
@@ -56,7 +57,7 @@ internal fun NavGraphBuilder.loginScreen(
 internal fun EntryProviderScope<NavKey>.loginScreen(
     sharedViewModel: LoginViewModel,
 ) {
-    entry<Login> { key ->
+    entry<LoginNavKey> { key ->
         val billingViewModel = hiltViewModel<BillingViewModel>()
         LoginScreen(
             viewModel = sharedViewModel,
@@ -78,5 +79,5 @@ internal fun NavController.openLoginScreen(
         }
     },
 ) {
-    navigate(Login, options)
+    navigate(LoginNavKey, options)
 }

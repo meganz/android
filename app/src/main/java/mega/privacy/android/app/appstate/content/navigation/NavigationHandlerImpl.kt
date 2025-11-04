@@ -24,6 +24,10 @@ class NavigationHandlerImpl(
         backStack.add(destination)
     }
 
+    override fun navigate(destinations: List<NavKey>) {
+        backStack.addAll(destinations)
+    }
+
     override fun backTo(destination: NavKey, inclusive: Boolean) {
         removeFromBackStackTo(destination, inclusive)
     }

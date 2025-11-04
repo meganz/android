@@ -10,15 +10,16 @@ import androidx.navigation.navOptions
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
-import mega.privacy.android.app.presentation.login.Login
 import mega.privacy.android.app.presentation.login.LoginGraph
+import mega.privacy.android.app.presentation.login.LoginNavKey
 import mega.privacy.android.app.presentation.login.LoginNavigationHandler
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.StartRoute
-import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailScreen
-import mega.privacy.android.app.presentation.login.createaccount.CreateAccountRoute
-import mega.privacy.android.app.presentation.login.onboarding.TourScreen
+import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailNavKey
+import mega.privacy.android.app.presentation.login.createaccount.CreateAccountNavKey
+import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 
 /**
  * function to build the ChangeEmailAddress screen.
@@ -38,16 +39,16 @@ fun NavGraphBuilder.changeEmailAddress(
             hiltViewModel<LoginViewModel>(parentEntry)
         }
         LoginNavigationHandler(
-            navigateToLoginScreen = { navController.navigate(Login) },
-            navigateToCreateAccountScreen = { navController.navigate(CreateAccountRoute) },
+            navigateToLoginScreen = { navController.navigate(LoginNavKey) },
+            navigateToCreateAccountScreen = { navController.navigate(CreateAccountNavKey) },
             navigateToTourScreen = {
-                navController.navigate(TourScreen, navOptions {
+                navController.navigate(TourNavKey, navOptions {
                     popUpTo<StartRoute> {
                         inclusive = false
                     }
                 })
             },
-            navigateToConfirmationEmailScreen = { navController.navigate(ConfirmationEmailScreen) },
+            navigateToConfirmationEmailScreen = { navController.navigate(ConfirmationEmailNavKey) },
             viewModel = sharedViewModel,
             onFinish = onFinish,
             stopShowingSplashScreen = stopShowingSplashScreen,
@@ -63,7 +64,7 @@ fun NavGraphBuilder.changeEmailAddress(
 data class ChangeEmailAddressScreen(
     val email: String?,
     val fullName: String?,
-) : NavKey
+) : NoSessionNavKey.Optional
 
 
 internal fun EntryProviderScope<NavKey>.changeEmailAddress(

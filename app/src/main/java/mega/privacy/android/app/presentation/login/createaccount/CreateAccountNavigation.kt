@@ -12,17 +12,18 @@ import androidx.navigation.navOptions
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
-import mega.privacy.android.app.presentation.login.Login
 import mega.privacy.android.app.presentation.login.LoginGraph
+import mega.privacy.android.app.presentation.login.LoginNavKey
 import mega.privacy.android.app.presentation.login.LoginNavigationHandler
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.StartRoute
-import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailScreen
+import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailNavKey
 import mega.privacy.android.app.presentation.login.createaccount.view.NewCreateAccountRoute
-import mega.privacy.android.app.presentation.login.onboarding.TourScreen
+import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
+import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 
 @Serializable
-data object CreateAccountRoute: NavKey
+data object CreateAccountNavKey : NoSessionNavKey.Mandatory
 
 internal fun NavGraphBuilder.createAccountScreen(
     navController: NavController,
@@ -30,7 +31,7 @@ internal fun NavGraphBuilder.createAccountScreen(
     activityViewModel: LoginViewModel? = null,
     stopShowingSplashScreen: () -> Unit,
 ) {
-    composable<CreateAccountRoute> { backStackEntry ->
+    composable<CreateAccountNavKey> { backStackEntry ->
         val sharedViewModel = activityViewModel ?: run {
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry<LoginGraph>()
@@ -38,16 +39,16 @@ internal fun NavGraphBuilder.createAccountScreen(
             hiltViewModel<LoginViewModel>(parentEntry)
         }
         LoginNavigationHandler(
-            navigateToLoginScreen = { navController.navigate(Login) },
-            navigateToCreateAccountScreen = { navController.navigate(CreateAccountRoute) },
+            navigateToLoginScreen = { navController.navigate(LoginNavKey) },
+            navigateToCreateAccountScreen = { navController.navigate(CreateAccountNavKey) },
             navigateToTourScreen = {
-                navController.navigate(TourScreen, navOptions {
+                navController.navigate(TourNavKey, navOptions {
                     popUpTo<StartRoute> {
                         inclusive = false
                     }
                 })
             },
-            navigateToConfirmationEmailScreen = { navController.navigate(ConfirmationEmailScreen) },
+            navigateToConfirmationEmailScreen = { navController.navigate(ConfirmationEmailNavKey) },
             viewModel = sharedViewModel,
             onFinish = onFinish,
             stopShowingSplashScreen = stopShowingSplashScreen,
@@ -63,7 +64,7 @@ internal fun NavGraphBuilder.createAccountScreen(
 internal fun EntryProviderScope<NavKey>.createAccountScreen(
     sharedViewModel: LoginViewModel,
 ) {
-    entry<CreateAccountRoute> { key ->
+    entry<CreateAccountNavKey> { key ->
         NewCreateAccountRoute(
             activityViewModel = sharedViewModel,
             modifier = Modifier.fillMaxSize(),
@@ -72,5 +73,5 @@ internal fun EntryProviderScope<NavKey>.createAccountScreen(
 }
 
 internal fun NavController.openCreateAccountScreen(navOptions: NavOptions? = null) {
-    navigate(CreateAccountRoute, navOptions)
+    navigate(CreateAccountNavKey, navOptions)
 }

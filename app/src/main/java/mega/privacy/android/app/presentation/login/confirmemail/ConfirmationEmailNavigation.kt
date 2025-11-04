@@ -14,8 +14,8 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.extensions.launchUrl
-import mega.privacy.android.app.presentation.login.Login
 import mega.privacy.android.app.presentation.login.LoginGraph
+import mega.privacy.android.app.presentation.login.LoginNavKey
 import mega.privacy.android.app.presentation.login.LoginNavigationHandler
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.StartRoute
@@ -23,13 +23,14 @@ import mega.privacy.android.app.presentation.login.confirmemail.changeemail.Chan
 import mega.privacy.android.app.presentation.login.confirmemail.changeemail.ChangeEmailAddressViewModel
 import mega.privacy.android.app.presentation.login.confirmemail.changeemail.navigateToChangeEmailAddress
 import mega.privacy.android.app.presentation.login.confirmemail.view.NewConfirmEmailRoute
-import mega.privacy.android.app.presentation.login.createaccount.CreateAccountRoute
-import mega.privacy.android.app.presentation.login.onboarding.TourScreen
+import mega.privacy.android.app.presentation.login.createaccount.CreateAccountNavKey
+import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
 import mega.privacy.android.app.utils.Constants.HELP_CENTRE_HOME_URL
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 
 @Serializable
-data object ConfirmationEmailScreen : NavKey
+data object ConfirmationEmailNavKey : NoSessionNavKey.Mandatory
 
 internal fun NavGraphBuilder.confirmationEmailScreen(
     navController: NavController,
@@ -37,7 +38,7 @@ internal fun NavGraphBuilder.confirmationEmailScreen(
     stopShowingSplashScreen: () -> Unit,
     activityViewModel: LoginViewModel? = null,
 ) {
-    composable<ConfirmationEmailScreen> { backStackEntry ->
+    composable<ConfirmationEmailNavKey> { backStackEntry ->
         val newEmail =
             backStackEntry.savedStateHandle.get<String>(ChangeEmailAddressViewModel.EMAIL)
         val context = LocalContext.current
@@ -49,16 +50,16 @@ internal fun NavGraphBuilder.confirmationEmailScreen(
         }
 
         LoginNavigationHandler(
-            navigateToLoginScreen = { navController.navigate(Login) },
-            navigateToCreateAccountScreen = { navController.navigate(CreateAccountRoute) },
+            navigateToLoginScreen = { navController.navigate(LoginNavKey) },
+            navigateToCreateAccountScreen = { navController.navigate(CreateAccountNavKey) },
             navigateToTourScreen = {
-                navController.navigate(TourScreen, navOptions {
+                navController.navigate(TourNavKey, navOptions {
                     popUpTo<StartRoute> {
                         inclusive = false
                     }
                 })
             },
-            navigateToConfirmationEmailScreen = { navController.navigate(ConfirmationEmailScreen) },
+            navigateToConfirmationEmailScreen = { navController.navigate(ConfirmationEmailNavKey) },
             viewModel = sharedViewModel,
             onFinish = onFinish,
             stopShowingSplashScreen = stopShowingSplashScreen,
@@ -89,7 +90,7 @@ internal fun EntryProviderScope<NavKey>.confirmationEmailScreen(
     onFinish: () -> Unit,
     sharedViewModel: LoginViewModel,
 ) {
-    entry<ConfirmationEmailScreen> { key ->
+    entry<ConfirmationEmailNavKey> { key ->
         val context = LocalContext.current
         val result by navigationHandler.monitorResult<String>(ChangeEmailAddressViewModel.EMAIL)
             .collectAsStateWithLifecycle("")
@@ -116,5 +117,5 @@ internal fun EntryProviderScope<NavKey>.confirmationEmailScreen(
 }
 
 internal fun NavController.openConfirmationEmailScreen(navOptions: NavOptions? = null) {
-    navigate(ConfirmationEmailScreen, navOptions)
+    navigate(ConfirmationEmailNavKey, navOptions)
 }

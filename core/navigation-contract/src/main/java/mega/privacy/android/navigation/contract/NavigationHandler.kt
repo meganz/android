@@ -21,6 +21,13 @@ interface NavigationHandler {
     fun navigate(destination: NavKey)
 
     /**
+     * Navigate to a specific destination within a hierarchy
+     *
+     * @param destinations
+     */
+    fun navigate(destinations: List<NavKey>)
+
+    /**
      * Pop back stack to a specific destination.
      *
      * @param destination The destination to pop back to

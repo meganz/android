@@ -2,6 +2,7 @@ package mega.privacy.android.core.nodecomponents.action
 
 import android.content.Context
 import androidx.activity.result.ActivityResultLauncher
+import androidx.navigation3.runtime.NavKey
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -823,7 +824,7 @@ class NodeActionClickHandlerTest {
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockNavigationHandler).navigate(any())
+        verify(mockNavigationHandler).navigate(any<NavKey>())
     }
 
     // ManageShareFolderAction Tests
@@ -957,7 +958,7 @@ class NodeActionClickHandlerTest {
 
             action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-            verify(mockNavigationHandler).navigate(any())
+            verify(mockNavigationHandler).navigate(any<NavKey>())
         }
 
     @Test
@@ -994,7 +995,7 @@ class NodeActionClickHandlerTest {
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
         verify(mockGetNodeShareDataUseCase).invoke(mockFileNode)
-        verify(mockNavigationHandler, never()).navigate(any())
+        verify(mockNavigationHandler, never()).navigate(any<NavKey>())
         verify(mockMegaNavigator, never()).openAuthenticityCredentialsActivity(any(), any(), any())
     }
 
