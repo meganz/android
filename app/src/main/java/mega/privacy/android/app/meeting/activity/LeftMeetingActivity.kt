@@ -1,6 +1,7 @@
 package mega.privacy.android.app.meeting.activity
 
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -14,14 +15,17 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityGuestLeaveMeetingBinding
+import mega.privacy.android.app.di.isAdaptiveLayoutEnabled
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.meeting.LeftMeetingViewModel
 import mega.privacy.android.app.presentation.meeting.view.dialog.FreePlanLimitParticipantsDialog
+import mega.privacy.android.app.usecase.orientation.enableAdaptiveLayout
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
+import timber.log.Timber
 
 class LeftMeetingActivity : BaseActivity() {
     private lateinit var binding: ActivityGuestLeaveMeetingBinding
@@ -29,6 +33,18 @@ class LeftMeetingActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdgeAndConsumeInsets()
+
+        // Set orientation before super.onCreate() to ensure it takes effect
+        if (isAdaptiveLayoutEnabled) {
+            // Adaptive layout is enabled, let the system handle orientation
+            enableAdaptiveLayout { old, new ->
+                Timber.d("On size change in LeftMeetingActivity from $old to $new")
+            }
+        } else {
+            // Force portrait orientation when adaptive layout is disabled
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
+
         super.onCreate(savedInstanceState)
 
         binding = ActivityGuestLeaveMeetingBinding.inflate(layoutInflater)
