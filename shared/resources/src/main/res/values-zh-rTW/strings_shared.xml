@@ -989,15 +989,15 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">隱藏重要的檔案和資料夾</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy in one easy step.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">只需一個簡單步驟，即可隱藏敏感檔案和資料夾來保護隱私。</string>
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">隱藏</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
+    <string name="hidden_nodes_description_control_visibility">只有您可以顯示隱藏檔案，既可以個別顯示，也可以透過設定來暫時顯示隱藏的項目。</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Blur for privacy</string>
+    <string name="hidden_nodes_title_visible_shared_files">模糊處理保護隱私</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
+    <string name="hidden_nodes_description_visible_shared_files">以模糊縮圖的方式顯示隱藏項目，以便您可以在不顯示其內容的情況下識別它們。</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">始終確保照片的安全</string>
     <!--Camera backup permission screen description-->
@@ -1730,4 +1730,16 @@
     <string name="media_add_new_album_dialog_title">輸入相簿名稱</string>
     <!-- Add new album on Media screen dialog positive button text -->
     <string name="media_add_new_album_dialog_positive_button">建立</string>
+    <!-- Title of favourite album. -->
+    <string name="system_album_favourites_title">收藏</string>
+    <!-- Title of gif album. -->
+    <string name="system_album_gif_title">GIF</string>
+    <!-- Title of raw album. -->
+    <string name="system_album_raw_title">RAW</string>
+    <!-- General error message to show when an invalid string is detected -->
+    <string name="general_invalid_string">不正確</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="album_invalid_name_error_message">不允許使用此相簿名稱。請輸入不同的名稱。</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="album_name_exists_error_message">已存在相同名稱的相簿。請輸入不同的名稱。</string>
 </resources>

@@ -1005,15 +1005,15 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">Önemli dosyaları ve klasörleri gizle</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy in one easy step.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">Tek bir kolay adımla hassas dosyaları ve klasörleri gizlilik için saklayabilirsiniz.</string>
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">Gözden uzak</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
+    <string name="hidden_nodes_description_control_visibility">Gizli dosyaları yalnızca siz; ister tek tek, ister Ayarlar’dan gizli öğeleri geçici olarak göstererek ortaya çıkarabilirsiniz.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Blur for privacy</string>
+    <string name="hidden_nodes_title_visible_shared_files">Gizlilik için bulanıklaştırma</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
+    <string name="hidden_nodes_description_visible_shared_files">Gizli öğeleri, içeriklerini açığa çıkarmadan tanımlayabilmeniz için küçük resimleri bulanıklaştırılmış şekilde gösterin.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Fotoğraflarınızı her zaman güvende tutun</string>
     <!--Camera backup permission screen description-->
@@ -1771,4 +1771,16 @@
     <string name="media_add_new_album_dialog_title">Albüm adını girin</string>
     <!-- Add new album on Media screen dialog positive button text -->
     <string name="media_add_new_album_dialog_positive_button">Oluştur</string>
+    <!-- Title of favourite album. -->
+    <string name="system_album_favourites_title">Favoriler</string>
+    <!-- Title of gif album. -->
+    <string name="system_album_gif_title">GIF’ler</string>
+    <!-- Title of raw album. -->
+    <string name="system_album_raw_title">RAW</string>
+    <!-- General error message to show when an invalid string is detected -->
+    <string name="general_invalid_string">Geçersiz</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="album_invalid_name_error_message">Bu albüm adına izin verilmiyor. Farklı bir ad girin.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="album_name_exists_error_message">Bu adda bir albüm zaten var. Farklı bir ad girin.</string>
 </resources>

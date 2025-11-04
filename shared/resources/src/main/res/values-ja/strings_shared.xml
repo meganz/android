@@ -989,15 +989,15 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">重要なファイルやフォルダを隠す</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy in one easy step.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">簡単な1つの手順で、機密ファイルやフォルダを非表示にしてプライバシーを保護することができます。</string>
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">非表示の解除</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
+    <string name="hidden_nodes_description_control_visibility">隠しファイルを表示するのは、個別に、または設定から​​隠し項目を一時的に表示することによってのみ可能です。</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Blur for privacy</string>
+    <string name="hidden_nodes_title_visible_shared_files">プライバシーのためにぼかす</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
+    <string name="hidden_nodes_description_visible_shared_files">非表示の項目をサムネイルでぼかして表示するため、内容を公開せずに識別できます。</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">写真を常に安全に</string>
     <!--Camera backup permission screen description-->
@@ -1730,4 +1730,16 @@
     <string name="media_add_new_album_dialog_title">アルバム名を入力</string>
     <!-- Add new album on Media screen dialog positive button text -->
     <string name="media_add_new_album_dialog_positive_button">作成</string>
+    <!-- Title of favourite album. -->
+    <string name="system_album_favourites_title">お気に入り</string>
+    <!-- Title of gif album. -->
+    <string name="system_album_gif_title">GIF</string>
+    <!-- Title of raw album. -->
+    <string name="system_album_raw_title">RAW</string>
+    <!-- General error message to show when an invalid string is detected -->
+    <string name="general_invalid_string">エラー</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="album_invalid_name_error_message">このアルバム名は使用できません。別の名前を入力してください。</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="album_name_exists_error_message">この名前のアルバムはすでに存在します。別の名前を入力してください。</string>
 </resources>

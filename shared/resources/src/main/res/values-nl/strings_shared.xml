@@ -1005,15 +1005,15 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">Belangrijke bestanden en mappen verbergen</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy in one easy step.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">U kunt gevoelige bestanden en mappen verbergen voor privacy in één eenvoudige stap.</string>
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">Uit het zicht</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
+    <string name="hidden_nodes_description_control_visibility">Alleen u kunt verborgen bestanden onthullen, afzonderlijk of door tijdelijk verborgen items in de instellingen weer te geven.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Blur for privacy</string>
+    <string name="hidden_nodes_title_visible_shared_files">Vervaging voor privacy</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
+    <string name="hidden_nodes_description_visible_shared_files">Verborgen items met wazige miniaturen weergeven, zodat u ze kunt identificeren zonder dat de inhoud zichtbaar wordt.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Bewaar uw foto\’s altijd veilig</string>
     <!--Camera backup permission screen description-->
@@ -1771,4 +1771,16 @@
     <string name="media_add_new_album_dialog_title">Voer album naam in</string>
     <!-- Add new album on Media screen dialog positive button text -->
     <string name="media_add_new_album_dialog_positive_button">Creëren</string>
+    <!-- Title of favourite album. -->
+    <string name="system_album_favourites_title">Favorieten</string>
+    <!-- Title of gif album. -->
+    <string name="system_album_gif_title">GIF</string>
+    <!-- Title of raw album. -->
+    <string name="system_album_raw_title">RAW</string>
+    <!-- General error message to show when an invalid string is detected -->
+    <string name="general_invalid_string">Onjuist</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="album_invalid_name_error_message">Deze album naam is niet toegestaan. Voer een andere naam in.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="album_name_exists_error_message">Een album met deze naam bestaat al. Voer een andere naam in.</string>
 </resources>
