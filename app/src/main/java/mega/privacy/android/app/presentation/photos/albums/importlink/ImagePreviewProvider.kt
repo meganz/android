@@ -15,7 +15,7 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.MediaDiscovery
 import mega.privacy.android.app.presentation.imagepreview.fetcher.MediaDiscoveryImageNodeFetcher.Companion.PARENT_ID
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.app.presentation.photos.model.Sort
+import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
 import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
 import mega.privacy.android.app.utils.FileUtil

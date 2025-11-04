@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.photos
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
-import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
+import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import mega.privacy.android.domain.entity.photos.Photo
 
 internal object PhotosCache {

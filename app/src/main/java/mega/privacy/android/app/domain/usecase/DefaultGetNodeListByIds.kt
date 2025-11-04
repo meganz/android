@@ -3,6 +3,7 @@ package mega.privacy.android.app.domain.usecase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 

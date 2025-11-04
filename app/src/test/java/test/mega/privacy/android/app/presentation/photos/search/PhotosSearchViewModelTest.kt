@@ -11,8 +11,8 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.photos.albums.AlbumTitleStringMapper
-import mega.privacy.android.app.presentation.photos.albums.model.AlbumTitle
-import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
+import mega.privacy.android.feature.photos.presentation.albums.model.AlbumTitle
+import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.search.PhotosSearchViewModel
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.photos.Album

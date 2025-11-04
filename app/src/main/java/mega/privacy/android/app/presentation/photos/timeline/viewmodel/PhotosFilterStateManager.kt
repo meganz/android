@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMediaType
-import mega.privacy.android.app.presentation.photos.model.FilterMediaType
+import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 
 fun TimelineViewModel.updateFilterMediaType(mediaType: FilterMediaType) {

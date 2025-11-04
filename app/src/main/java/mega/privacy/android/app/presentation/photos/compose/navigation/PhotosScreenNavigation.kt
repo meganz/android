@@ -8,7 +8,7 @@ import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.PhotosViewComposeCoordinator
 import mega.privacy.android.app.presentation.photos.PhotosViewModel
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
-import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
+import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.compose.main.PhotosScreen
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper

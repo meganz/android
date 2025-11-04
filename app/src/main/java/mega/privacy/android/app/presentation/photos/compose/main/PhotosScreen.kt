@@ -28,7 +28,6 @@ import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.PhotosViewComposeCoordinator
 import mega.privacy.android.app.presentation.photos.PhotosViewModel
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
-import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsBannerType
@@ -56,6 +55,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import mega.privacy.mobile.analytics.event.AlbumSelected
 import mega.privacy.mobile.analytics.event.AlbumSelectedEvent
 
@@ -345,27 +345,25 @@ fun PhotosScreen(
                 allPhotos = timelineViewState.photos,
                 clearAlbumDeletedMessage = { albumsViewModel.updateAlbumDeletedMessage(message = "") },
                 onAlbumSelection = { album ->
-                    if (album.id is Album.UserAlbum) {
-                        val userAlbum = album.id
-                        if (userAlbum.id in albumsViewState.selectedAlbumIds) {
-                            Analytics.tracker.trackEvent(
-                                AlbumSelectedEvent(
-                                    selectionType = AlbumSelected.SelectionType.MultiRemove,
-                                    imageCount = null,
-                                    videoCount = null,
-                                )
+                    val userAlbum = (album.id as? Album.UserAlbum) ?: return@AlbumsView
+                    if (userAlbum.id in albumsViewState.selectedAlbumIds) {
+                        Analytics.tracker.trackEvent(
+                            AlbumSelectedEvent(
+                                selectionType = AlbumSelected.SelectionType.MultiRemove,
+                                imageCount = null,
+                                videoCount = null,
                             )
-                            albumsViewModel.unselectAlbum(userAlbum)
-                        } else {
-                            Analytics.tracker.trackEvent(
-                                AlbumSelectedEvent(
-                                    selectionType = AlbumSelected.SelectionType.MultiAdd,
-                                    imageCount = getSelectedAlbumImageCount(album),
-                                    videoCount = getSelectedAlbumVideoCount(album),
-                                )
+                        )
+                        albumsViewModel.unselectAlbum(userAlbum)
+                    } else {
+                        Analytics.tracker.trackEvent(
+                            AlbumSelectedEvent(
+                                selectionType = AlbumSelected.SelectionType.MultiAdd,
+                                imageCount = getSelectedAlbumImageCount(album),
+                                videoCount = getSelectedAlbumVideoCount(album),
                             )
-                            albumsViewModel.selectAlbum(album.id)
-                        }
+                        )
+                        albumsViewModel.selectAlbum(userAlbum)
                     }
                 },
                 closeDeleteAlbumsConfirmation = {
@@ -380,7 +378,7 @@ fun PhotosScreen(
                         context.resources.getString(
                             R.string.photos_album_deleted_message_singular,
                             albums.find {
-                                it.id is Album.UserAlbum && it.id.id == albumIds.firstOrNull()
+                                (it.id as? Album.UserAlbum)?.id == albumIds.firstOrNull()
                             }?.title?.getTitleString(context),
                         )
                     } else {
@@ -388,7 +386,7 @@ fun PhotosScreen(
                             R.plurals.photos_album_deleted_message,
                             albumIds.size,
                             albumIds.size.takeIf { it > 1 } ?: albums.find {
-                                it.id is Album.UserAlbum && it.id.id == albumIds.firstOrNull()
+                                (it.id as? Album.UserAlbum)?.id == albumIds.firstOrNull()
                             }?.title?.getTitleString(context),
                         )
                     }

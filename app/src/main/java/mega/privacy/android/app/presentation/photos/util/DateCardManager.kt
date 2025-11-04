@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.photos.util
 
 import mega.privacy.android.app.presentation.photos.model.DateCard
-import mega.privacy.android.app.presentation.photos.model.Sort
+import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.domain.entity.photos.Photo
 import java.text.SimpleDateFormat
 import java.time.LocalDate

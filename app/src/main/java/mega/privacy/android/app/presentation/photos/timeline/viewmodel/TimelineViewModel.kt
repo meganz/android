@@ -17,14 +17,14 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.domain.usecase.GetNodeListByIds
+import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.presentation.mapper.TimelinePreferencesMapper
 import mega.privacy.android.app.presentation.photos.PhotosCache.updatePhotos
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.LocationPreference
 import mega.privacy.android.app.presentation.photos.model.MediaTypePreference
 import mega.privacy.android.app.presentation.photos.model.RememberPreferences
-import mega.privacy.android.app.presentation.photos.model.Sort
+import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.model.TimelineFilterPreferences
 import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsStatus

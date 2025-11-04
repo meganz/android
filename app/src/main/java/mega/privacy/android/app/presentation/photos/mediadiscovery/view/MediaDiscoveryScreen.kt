@@ -37,10 +37,10 @@ import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryGlobalStateViewModel
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryViewModel
 import mega.privacy.android.app.presentation.photos.model.DateCard
-import mega.privacy.android.app.presentation.photos.model.FilterMediaType
+import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.MediaListItem
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
-import mega.privacy.android.app.presentation.photos.model.Sort
+import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.view.PhotosSkeletonView
 import mega.privacy.android.app.presentation.photos.view.CardListView

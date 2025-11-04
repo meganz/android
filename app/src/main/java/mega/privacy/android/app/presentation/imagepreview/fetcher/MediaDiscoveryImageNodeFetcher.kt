@@ -6,7 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
-import mega.privacy.android.app.presentation.photos.model.Sort
+import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.core.sharedcomponents.serializable
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId

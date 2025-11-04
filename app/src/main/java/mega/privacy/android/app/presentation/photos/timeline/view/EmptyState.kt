@@ -27,7 +27,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.photos.model.FilterMediaType
+import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CLOUD_DRIVE
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 

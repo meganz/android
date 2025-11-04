@@ -6,9 +6,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import mega.privacy.android.domain.entity.media.SystemAlbum
-import mega.privacy.android.feature.photos.model.FavouriteSystemAlbum
-import mega.privacy.android.feature.photos.model.GifSystemAlbum
-import mega.privacy.android.feature.photos.model.RawSystemAlbum
+import mega.privacy.android.feature.photos.presentation.albums.model.FavouriteSystemAlbum
+import mega.privacy.android.feature.photos.presentation.albums.model.GifSystemAlbum
+import mega.privacy.android.feature.photos.presentation.albums.model.RawSystemAlbum
 import javax.inject.Singleton
 
 @Module

@@ -20,10 +20,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.PhotosCache.updateAlbums
-import mega.privacy.android.app.presentation.photos.albums.model.AlbumTitle
+import mega.privacy.android.feature.photos.presentation.albums.model.AlbumTitle
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
-import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
-import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
+import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
+import mega.privacy.android.feature.photos.mapper.UIAlbumMapper
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
@@ -406,13 +406,15 @@ class AlbumsViewModel @Inject constructor(
                     photos.filter { !it.isSensitive && !it.isSensitiveInherited }
                 }
 
-                val cover = userAlbum.cover?.let { photo ->
-                    if (showHiddenItems || !isPaid) {
-                        photo
-                    } else {
-                        photo.takeIf { !it.isSensitive && !it.isSensitiveInherited }
+                val cover = (userAlbum as? Album.UserAlbum)
+                    ?.cover
+                    ?.let { photo ->
+                        if (showHiddenItems || !isPaid) {
+                            photo
+                        } else {
+                            photo.takeIf { !it.isSensitive && !it.isSensitiveInherited }
+                        }
                     }
-                }
                 val defaultCover = filteredPhotos.firstOrNull()
                 val (imageCount, videoCount) = getImageAndVideoCount(filteredPhotos)
 

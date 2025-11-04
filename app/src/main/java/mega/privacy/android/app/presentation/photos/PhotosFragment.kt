@@ -60,13 +60,13 @@ import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumsActi
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.photos.albums.albumcontent.AlbumContentFragment
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
-import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
+import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.compose.navigation.CameraUploadsTransferScreen
 import mega.privacy.android.app.presentation.photos.compose.navigation.PhotosNavigationGraph
 import mega.privacy.android.app.presentation.photos.compose.navigation.photosNavigationGraph
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
-import mega.privacy.android.app.presentation.photos.model.Sort
+import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.search.PhotosSearchActivity
 import mega.privacy.android.app.presentation.photos.timeline.actionMode.TimelineActionModeCallback
@@ -928,7 +928,8 @@ class PhotosFragment : Fragment() {
         val allAlbums = albumsViewModel.state.value.albums
 
         val allExportedSelectedAlbums = allAlbums.filter {
-            it.id is Album.UserAlbum && it.id.id in selectedAlbumIds && it.id.isExported
+            val album = (it.id as? Album.UserAlbum) ?: return@filter false
+            album.id in selectedAlbumIds && album.isExported
         }
 
         return allExportedSelectedAlbums.size == selectedAlbumIds.size

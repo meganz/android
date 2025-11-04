@@ -22,6 +22,7 @@ dependencies {
     lintChecks(project(":lint"))
     lintChecks(lib.slack.compose.lints)
 
+    implementation(project(":core:feature-flags"))
     implementation(project(":core:ui-components:shared-components"))
     implementation(project(":core:ui-components:node-components"))
     implementation(project(":core:analytics:analytics-tracker"))

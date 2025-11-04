@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.photos.mapper
 
 import mega.privacy.android.domain.entity.media.MediaAlbum
-import mega.privacy.android.feature.photos.model.AlbumUiState
+import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import javax.inject.Inject
 
 class AlbumUiStateMapper @Inject constructor(

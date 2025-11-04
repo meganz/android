@@ -1,10 +1,10 @@
-package mega.privacy.android.app.presentation.photos.albums.albumcontent
+package mega.privacy.android.feature.photos.presentation.albums.content
 
-import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
-import mega.privacy.android.app.presentation.photos.model.FilterMediaType
-import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.feature.photos.model.FilterMediaType
+import mega.privacy.android.feature.photos.model.Sort
+import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 
 /**
  * State of the Album Content screen.

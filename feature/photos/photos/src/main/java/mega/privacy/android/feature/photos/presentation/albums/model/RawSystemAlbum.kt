@@ -1,12 +1,12 @@
-package mega.privacy.android.feature.photos.model
+package mega.privacy.android.feature.photos.presentation.albums.model
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.domain.entity.media.SystemAlbum
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.photos.FilterRAWUseCase
+import mega.privacy.android.shared.resources.R as sharedResR
 import javax.inject.Inject
-import mega.privacy.android.feature.photos.R
 
 /**
  * System album type for RAW photos
@@ -16,7 +16,7 @@ class RawSystemAlbum @Inject constructor(
     private val filterRAWUseCase: FilterRAWUseCase,
 ) : SystemAlbum {
 
-    override val albumName: String = context.getString(R.string.photos_album_title_raw)
+    override val albumName: String = context.getString(sharedResR.string.system_album_raw_title)
 
     override suspend fun filter(photo: Photo): Boolean = filterRAWUseCase()(photo)
 }

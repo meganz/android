@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.photos.albums.AlbumTitleStringMapper
-import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
+import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.photos.Photo

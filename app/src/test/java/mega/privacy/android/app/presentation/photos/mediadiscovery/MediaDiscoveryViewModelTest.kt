@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.GetNodeListByIds
+import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
@@ -63,6 +63,8 @@ import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import mega.privacy.android.feature.photos.model.FilterMediaType
+import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.feature.photos.model.ZoomLevel
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeAll
@@ -661,8 +663,8 @@ class MediaDiscoveryViewModelTest {
         underTest.showFilterDialog(true)
         underTest.showSlidersPopup(true)
         underTest.updateZoomLevel(ZoomLevel.Grid_1)
-        underTest.setCurrentSort(mega.privacy.android.app.presentation.photos.model.Sort.OLDEST)
-        underTest.setCurrentMediaType(mega.privacy.android.app.presentation.photos.model.FilterMediaType.IMAGES)
+        underTest.setCurrentSort(Sort.OLDEST)
+        underTest.setCurrentMediaType(FilterMediaType.IMAGES)
 
         // When: clearState is called
         underTest.clearState()
@@ -674,8 +676,8 @@ class MediaDiscoveryViewModelTest {
         assertThat(currentState.mediaListItemList).isEmpty()
         assertThat(currentState.currentZoomLevel).isEqualTo(ZoomLevel.Grid_3)
         assertThat(currentState.selectedPhotoIds).isEmpty()
-        assertThat(currentState.currentSort).isEqualTo(mega.privacy.android.app.presentation.photos.model.Sort.NEWEST)
-        assertThat(currentState.currentMediaType).isEqualTo(mega.privacy.android.app.presentation.photos.model.FilterMediaType.ALL_MEDIA)
+        assertThat(currentState.currentSort).isEqualTo(Sort.NEWEST)
+        assertThat(currentState.currentMediaType).isEqualTo(FilterMediaType.ALL_MEDIA)
         assertThat(currentState.selectedTimeBarTab).isEqualTo(mega.privacy.android.app.presentation.photos.model.TimeBarTab.All)
         assertThat(currentState.yearsCardList).isEmpty()
         assertThat(currentState.monthsCardList).isEmpty()

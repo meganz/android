@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.photos.albums.albumcontent
+package mega.privacy.android.feature.photos.presentation.albums.content
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -15,11 +15,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.R
-import mega.privacy.android.app.domain.usecase.GetNodeListByIds
-import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
-import mega.privacy.android.app.presentation.photos.model.FilterMediaType
-import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
@@ -52,7 +47,12 @@ import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumNameUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
+import mega.privacy.android.feature.photos.mapper.UIAlbumMapper
+import mega.privacy.android.feature.photos.model.FilterMediaType
+import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.PhotoItemSelected
 import mega.privacy.mobile.analytics.event.PhotoItemSelectedEvent
 import nz.mega.sdk.MegaNode
@@ -60,7 +60,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-internal class AlbumContentViewModel @Inject constructor(
+class AlbumContentViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getDefaultAlbumPhotos: GetDefaultAlbumPhotos,
     private val getDefaultAlbumsMapUseCase: GetDefaultAlbumsMapUseCase,
@@ -523,16 +523,16 @@ internal class AlbumContentViewModel @Inject constructor(
 
         if (title.isEmpty()) {
             isTitleValid = false
-            errorMessage = R.string.invalid_string
+            errorMessage = sharedResR.string.general_invalid_string
         } else if (title.isEmpty() || proscribedAlbumNames.any { it.equals(title, true) }) {
             isTitleValid = false
-            errorMessage = R.string.photos_create_album_error_message_systems_album
+            errorMessage = sharedResR.string.general_invalid_characters_defined
         } else if (title in albumNames) {
             isTitleValid = false
-            errorMessage = R.string.photos_create_album_error_message_duplicate
+            errorMessage = sharedResR.string.album_invalid_name_error_message
         } else if ("[\\\\*/:<>?\"|]".toRegex().containsMatchIn(title)) {
             isTitleValid = false
-            errorMessage = R.string.invalid_characters_defined
+            errorMessage = sharedResR.string.album_name_exists_error_message
         }
 
         _state.update {

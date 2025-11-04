@@ -10,7 +10,7 @@ import mega.privacy.android.app.di.MegaUtilModule
 import mega.privacy.android.app.di.homepage.favourites.OpenFileModule
 import mega.privacy.android.app.di.photos.PhotosUseCases
 import mega.privacy.android.app.di.sortorder.SortOrderUseCases
-import mega.privacy.android.app.domain.usecase.GetNodeListByIds
+import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.OpenFileWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper

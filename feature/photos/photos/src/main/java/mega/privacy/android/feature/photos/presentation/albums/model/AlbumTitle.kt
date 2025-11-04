@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.photos.albums.model
+package mega.privacy.android.feature.photos.presentation.albums.model
 
 import android.content.Context
 import androidx.annotation.StringRes
@@ -7,6 +7,7 @@ import androidx.annotation.StringRes
  * Album title
  *
  */
+@Deprecated("Legacy implementation. Use LocalizedText instead")
 sealed interface AlbumTitle {
     /**
      * Get title string

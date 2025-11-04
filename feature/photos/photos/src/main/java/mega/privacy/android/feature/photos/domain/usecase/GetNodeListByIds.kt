@@ -1,10 +1,11 @@
-package mega.privacy.android.app.domain.usecase
+package mega.privacy.android.feature.photos.domain.usecase
 
 import nz.mega.sdk.MegaNode
 
 /**
  * Interface to get nodeList by ids
  */
+@Deprecated("Should create a new use case that returns List<TypedNode> instead")
 interface GetNodeListByIds {
     /**
      * Get nodeList by ids

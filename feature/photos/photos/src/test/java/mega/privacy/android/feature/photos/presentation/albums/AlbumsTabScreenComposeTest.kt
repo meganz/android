@@ -11,7 +11,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import mega.privacy.android.feature.photos.model.AlbumUiState
+import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.shared.resources.R as sharedResR
 import org.junit.Rule
 import org.junit.Test

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.photos.albums.model
+package mega.privacy.android.feature.photos.presentation.albums.model
 
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property coverPhoto     The selected photos used as the cover
  * @property defaultCover   The fallback cover if main cover is null
  */
+@Deprecated("Legacy implementation. Use AlbumUiState instead")
 data class UIAlbum(
     val id: Album,
     val title: AlbumTitle,

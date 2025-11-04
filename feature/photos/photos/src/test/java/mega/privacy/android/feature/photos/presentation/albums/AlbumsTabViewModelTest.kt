@@ -9,7 +9,7 @@ import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.usecase.media.CreateUserAlbumUseCase
 import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
-import mega.privacy.android.feature.photos.model.AlbumUiState
+import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.feature.photos.provider.AlbumsDataProvider
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

@@ -3,8 +3,8 @@ package mega.privacy.android.app.presentation.photos.timeline.model
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.photos.model.DateCard
-import mega.privacy.android.app.presentation.photos.model.FilterMediaType
-import mega.privacy.android.app.presentation.photos.model.Sort
+import mega.privacy.android.feature.photos.model.FilterMediaType
+import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason

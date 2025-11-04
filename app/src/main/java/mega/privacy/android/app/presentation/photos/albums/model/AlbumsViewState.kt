@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.photos.albums.model
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 
 /**
  * @property albums

@@ -52,7 +52,7 @@ import kotlinx.coroutines.delay
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
-import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
+import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.transfers.widget.TransfersWidget
 import mega.privacy.android.core.R as coreR

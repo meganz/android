@@ -1,15 +1,16 @@
-package mega.privacy.android.app.presentation.photos.albums.model.mapper
+package mega.privacy.android.feature.photos.mapper
 
-import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.photos.albums.model.AlbumTitle
-import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.feature.photos.presentation.albums.model.AlbumTitle
+import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * UIAlbumMapper
  */
+@Deprecated("Will be migrated to AlbumUiStateMapper")
 class UIAlbumMapper @Inject constructor() {
     operator fun invoke(
         count: Int,
@@ -20,9 +21,9 @@ class UIAlbumMapper @Inject constructor() {
         album: Album,
     ): UIAlbum {
         val title = when (album) {
-            Album.FavouriteAlbum -> AlbumTitle.ResourceTitle(R.string.title_favourites_album)
-            Album.GifAlbum -> AlbumTitle.ResourceTitle(R.string.photos_album_title_gif)
-            Album.RawAlbum -> AlbumTitle.ResourceTitle(R.string.photos_album_title_raw)
+            Album.FavouriteAlbum -> AlbumTitle.ResourceTitle(sharedResR.string.system_album_favourites_title)
+            Album.GifAlbum -> AlbumTitle.ResourceTitle(sharedResR.string.system_album_gif_title)
+            Album.RawAlbum -> AlbumTitle.ResourceTitle(sharedResR.string.system_album_raw_title)
             is Album.UserAlbum -> AlbumTitle.StringTitle(album.title)
         }
 
