@@ -1812,4 +1812,16 @@
     <string name="media_add_new_album_dialog_title">Introducir el nombre del álbum</string>
     <!-- Add new album on Media screen dialog positive button text -->
     <string name="media_add_new_album_dialog_positive_button">Crear</string>
+    <!-- Title of favourite album. -->
+    <string name="system_album_favourites_title">Favoritos</string>
+    <!-- Title of gif album. -->
+    <string name="system_album_gif_title">GIF</string>
+    <!-- Title of raw album. -->
+    <string name="system_album_raw_title">RAW</string>
+    <!-- General error message to show when an invalid string is detected -->
+    <string name="general_invalid_string">Incorrecto</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="album_invalid_name_error_message">Este nombre no está permitido. Introducir un nombre diferente.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="album_name_exists_error_message">Ya existe un álbum con este nombre. Introducir un nombre diferente.</string>
 </resources>

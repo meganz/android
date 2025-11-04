@@ -1021,15 +1021,15 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">Cacher les fichiers et dossiers importants</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy in one easy step.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">Vous pouvez masquer les fichiers et dossiers sensibles pour préserver votre confidentialité en une seule étape simple.</string>
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">À l’abri des regards</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
+    <string name="hidden_nodes_description_control_visibility">Vous seul pouvez afficher les fichiers cachés, soit individuellement, soit en affichant temporairement les éléments cachés à partir des paramètres.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Blur for privacy</string>
+    <string name="hidden_nodes_title_visible_shared_files">Floutage pour la confidentialité</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
+    <string name="hidden_nodes_description_visible_shared_files">Affiche les éléments masqués avec leurs vignettes floues, afin que vous puissiez les identifier sans exposer leur contenu.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Gardez vos photos en sécurité, en permanence</string>
     <!--Camera backup permission screen description-->
@@ -1775,11 +1775,11 @@
     <!-- The title of camera uploads paused warning banner -->
     <string name="camera_update_paused_warning_banner_title">Téléversements de l\’appareil photo mis en pause</string>
     <!-- The description of camera uploads device charging not met paused warning banner -->
-    <string name="camera_update_device_charging_not_met_banner_description">Uploads only happen while your device is charging. You can change this in Settings.</string>
+    <string name="camera_update_device_charging_not_met_banner_description">Les téléversements ne se font que lorsque votre appareil est en charge. Vous pouvez modifier cela dans les Paramètres.</string>
     <!-- The button text of camera uploads device charging not met paused warning banner -->
     <string name="camera_update_device_charging_not_met_banner_button_text">Paramètres</string>
     <!-- The description of camera uploads low battery paused warning banner -->
-    <string name="camera_update_low_battery_banner_description">Uploads are paused due to low battery. Charge your device to continue.</string>
+    <string name="camera_update_low_battery_banner_description">Les téléversements sont suspendus en raison d\’un niveau de batterie insuffisant. Rechargez votre appareil pour continuer.</string>
     <!-- The description of camera uploads network requirement not met paused warning banner -->
     <string name="camera_update_network_requirement_not_met_banner_description">Camera uploads paused, connect to WIFI or allow mobile data</string>
     <!-- The button text of camera uploads network requirement not met paused warning banner -->
@@ -1787,11 +1787,11 @@
     <!-- Billing info with discount label -->
     <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s for %3$s</string>
     <!-- campaign name for Black Friday deal -->
-    <string name="campaign_name_black_friday">Black Friday deal: %1$d%% off</string>
+    <string name="campaign_name_black_friday">Offre Black Friday : %1$d%% de réduction</string>
     <!-- campaign name for Cyber Monday deal -->
-    <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
+    <string name="campaign_name_cyber_monday">Offre Cyber Monday : %1$d%% de réduction</string>
     <!-- campaign name for Special offer -->
-    <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
+    <string name="campaign_name_special_offer">Offre spéciale : %1$d%% de réduction</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
         <item quantity="one"></item>
@@ -1807,9 +1807,21 @@
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">Solutions de confidentialité de MEGA</string>
     <!-- Message about savings on yearly plan in case it has discount -->
-    <string name="account_upgrade_account_label_save_at_least">Save at least 16% on a yearly plan</string>
+    <string name="account_upgrade_account_label_save_at_least">Économisez au moins 16&#160;% sur un abonnement annuel</string>
     <!-- Add new album on Media screen dialog title -->
     <string name="media_add_new_album_dialog_title">Saisir le nom de l’album</string>
     <!-- Add new album on Media screen dialog positive button text -->
     <string name="media_add_new_album_dialog_positive_button">Créer</string>
+    <!-- Title of favourite album. -->
+    <string name="system_album_favourites_title">Favoris</string>
+    <!-- Title of gif album. -->
+    <string name="system_album_gif_title">GIF</string>
+    <!-- Title of raw album. -->
+    <string name="system_album_raw_title">RAW</string>
+    <!-- General error message to show when an invalid string is detected -->
+    <string name="general_invalid_string">Erroné</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="album_invalid_name_error_message">Ce nom d’album n’est pas permis. Saisissez un nom différent.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="album_name_exists_error_message">Un album du même nom existe déjà. Saisissez un nom différent.</string>
 </resources>
