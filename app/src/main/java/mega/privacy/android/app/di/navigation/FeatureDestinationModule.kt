@@ -11,6 +11,7 @@ import mega.privacy.android.app.presentation.filecontact.navigation.FileContactF
 import mega.privacy.android.app.presentation.filestorage.FileStorageFeatureDestination
 import mega.privacy.android.app.presentation.logout.LogoutFeatureDestination
 import mega.privacy.android.app.presentation.notification.navigation.NotificationsFeatureDestination
+import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserFeatureDestination
 import mega.privacy.android.navigation.contract.FeatureDestination
 
 @Module
@@ -45,4 +46,8 @@ class FeatureDestinationModule {
     @Provides
     @IntoSet
     fun provideFileStorageFeatureDestination(): FeatureDestination = FileStorageFeatureDestination()
+
+    @Provides
+    @IntoSet
+    fun provideZipBrowserFeatureDestination(): FeatureDestination = ZipBrowserFeatureDestination()
 }

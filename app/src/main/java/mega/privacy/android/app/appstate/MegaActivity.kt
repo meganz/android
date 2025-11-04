@@ -1,6 +1,9 @@
 package mega.privacy.android.app.appstate
 
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -130,4 +133,31 @@ class MegaActivity : ComponentActivity() {
             )
         },
     )
+
+    companion object {
+        /**
+         * Get a pending intent to open this activity with the specified Uri as data, this should be used by notification actions
+         */
+        fun getPendingIntent(
+            context: Context,
+            uri: Uri,
+            requestCode: Int = System.currentTimeMillis().toInt(),
+        ): PendingIntent {
+            val intent = Intent(
+                Intent.ACTION_VIEW,
+                uri,
+                context,
+                MegaActivity::class.java
+            ).apply {
+                flags =
+                    Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+            return PendingIntent.getActivity(
+                context,
+                requestCode,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        }
+    }
 }

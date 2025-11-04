@@ -3,9 +3,8 @@ package mega.privacy.android.app.presentation.transfers.navigation
 import android.net.Uri
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.presentation.transfers.navigation.TransferDeepLinkHandler.Companion.TAB_QUERY_PARAM
-import mega.privacy.android.app.presentation.transfers.navigation.TransferDeepLinkHandler.Companion.TRANSFER_ROUTE
-import mega.privacy.android.app.presentation.transfers.navigation.TransferDeepLinkHandler.Companion.TRANSFER_SCHEME
 import mega.privacy.android.app.presentation.transfers.navigation.TransferDeepLinkHandler.Companion.getUriForTransfersSection
+import mega.privacy.android.navigation.contract.PendingIntentHandler
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -73,8 +72,8 @@ class TransferDeepLinkHandlerTest {
 
     private fun stubUriAndUriBuilder(
         tabParam: String? = null,
-        scheme: String = TRANSFER_SCHEME,
-        authority: String = TRANSFER_ROUTE,
+        scheme: String = PendingIntentHandler.DEFAULT_SCHEME_FOR_PENDING_INTENTS,
+        authority: String = TransferDeepLinkHandler.authority,
     ): Uri = mock<Uri> {
         on { this.scheme } doReturn scheme
         on { this.authority } doReturn authority

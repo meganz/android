@@ -714,7 +714,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
          */
         fun getBrowseFilesIntent(
             context: Context,
-            uriPath: UriPath,
+            uriPath: UriPath?,
             selectedFileNames: List<String>,
         ): Intent =
             Intent(
@@ -722,7 +722,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
                 FileStorageActivity::class.java
             ).apply {
                 action = FileStorageActivity.Mode.BROWSE_FILES.action
-                putExtra(EXTRA_PATH, uriPath.value)
+                putExtra(EXTRA_PATH, uriPath?.value)
                 putStringArrayListExtra(
                     EXTRA_FILE_NAMES,
                     selectedFileNames.toCollection(ArrayList())

@@ -10,10 +10,13 @@ import androidx.core.content.FileProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.clouddrive.CloudDriveDeepLinkHandler
 import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
+import mega.privacy.android.app.presentation.filestorage.FileStorageDeepLinkHandler
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
+import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserDeepLinkHandler
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
 import mega.privacy.android.app.utils.MegaApiUtils
@@ -100,30 +103,26 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                 actionGroup = actionGroup,
             )
         }
-        val actionIntent = actionIntent(
+        val singleActivity = getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
+        val actionPendingIntent = actionPendingIntent(
             isLoggedIn = isLoggedIn,
             isDownload = isDownload,
             isPreviewDownload = isPreviewDownload,
             isOfflineDownload = isOfflineDownload,
             uploadLocationExists = uploadLocationExists,
             actionGroup = actionGroup,
+            singleActivity = singleActivity,
         )
         val pendingIntent =
             if (isPreviewDownload || actionGroup.groupId < 0) { //not a real transfer, will not appear on transfer section -> content intent same as action intent
-                createPendingIntent(actionIntent)
+                actionPendingIntent
             } else {
                 TransfersActivity.getPendingIntentForTransfersSection(
-                    getFeatureFlagValueUseCase(AppFeatures.SingleActivity),
+                    singleActivity,
                     context,
                     TransfersNavKey.Tab.Completed
                 )
             }
-
-        val actionPendingIntent = createPendingIntent(
-            actionIntent,
-            System.currentTimeMillis()
-                .toInt(), // Unique request code to make sure old intents are not reused
-        )
 
         return NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID)
             .setSmallIcon(iconPackR.drawable.ic_stat_notify)
@@ -172,7 +171,10 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
         return titleSuffix
     }
 
-    private fun createPendingIntent(intent: Intent?, requestCode: Int = 0) =
+    private fun createPendingIntent(
+        intent: Intent?,
+        requestCode: Int = System.currentTimeMillis().toInt(),
+    ) =
         PendingIntent.getActivity(
             context,
             requestCode,
@@ -221,32 +223,36 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
         }
     }
 
-    private fun actionIntent(
+    private fun actionPendingIntent(
         isLoggedIn: Boolean,
         isDownload: Boolean,
         isPreviewDownload: Boolean,
         isOfflineDownload: Boolean,
         uploadLocationExists: Boolean,
         actionGroup: ActiveTransferTotals.ActionGroup,
+        singleActivity: Boolean,
     ) = if (isPreviewDownload) {
-        previewIntent(
+        previewPendingIntent(
             isLoggedIn = isLoggedIn,
             actionGroup = actionGroup,
+            singleActivity = singleActivity,
         )
     } else {
-        actionIntent(
+        actionPendingIntent(
             isLoggedIn = isLoggedIn,
             isDownload = isDownload,
             isOfflineDownload = isOfflineDownload,
             uploadLocationExists = uploadLocationExists,
-            actionGroup = actionGroup
+            actionGroup = actionGroup,
+            singleActivity = singleActivity,
         )
     }
 
-    private fun previewIntent(
+    private fun previewPendingIntent(
         isLoggedIn: Boolean,
         actionGroup: ActiveTransferTotals.ActionGroup,
-    ): Intent {
+        singleActivity: Boolean,
+    ): PendingIntent {
         val previewFile = actionGroup.singleFileName?.let {
             File(actionGroup.destination + actionGroup.singleFileName)
         }
@@ -266,15 +272,24 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
         } else null
         return when {
             previewFile?.exists() == true && isZipFile -> {
-                if (isLoggedIn) {
-                    Intent(context, ManagerActivity::class.java).apply {
-                        action = Constants.ACTION_EXPLORE_ZIP
-                        putExtra(EXTRA_PATH_ZIP, previewFile.absolutePath)
-                    }
+                if (singleActivity) {
+                    ZipBrowserDeepLinkHandler.getPendingIntentForZipBrowserSection(
+                        context,
+                        previewFile.absolutePath,
+                    )
                 } else {
-                    Intent(context, ZipBrowserComposeActivity::class.java).apply {
-                        putExtra(EXTRA_PATH_ZIP, previewFile.absolutePath)
-                    }
+                    createPendingIntent(
+                        if (isLoggedIn) {
+                            Intent(context, ManagerActivity::class.java).apply {
+                                action = Constants.ACTION_EXPLORE_ZIP
+                                putExtra(EXTRA_PATH_ZIP, previewFile.absolutePath)
+                            }
+                        } else {
+                            Intent(context, ZipBrowserComposeActivity::class.java).apply {
+                                putExtra(EXTRA_PATH_ZIP, previewFile.absolutePath)
+                            }
+                        }
+                    )
                 }
             }
 
@@ -284,57 +299,84 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                     sharedR.string.open_with_os_dialog_title,
                     actionGroup.singleFileName
                 )
-                Intent.createChooser(previewIntent, chooserTitle)
+                createPendingIntent(
+                    Intent.createChooser(previewIntent, chooserTitle)
+                )
             }
 
             else -> {
                 val warningMessage = context.getString(R.string.intent_not_available)
-                Intent(context, ManagerActivity::class.java).apply {
-                    action = Constants.ACTION_SHOW_WARNING
-                    putExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE, warningMessage)
-                }
+                //if (singleActivity) { // TRAN-1042
+                createPendingIntent(
+                    Intent(context, ManagerActivity::class.java).apply {
+                        action = Constants.ACTION_SHOW_WARNING
+                        putExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE, warningMessage)
+                    }
+                )
             }
         }
     }
 
-    private fun actionIntent(
+    private fun actionPendingIntent(
         isLoggedIn: Boolean,
         isDownload: Boolean,
         isOfflineDownload: Boolean,
         uploadLocationExists: Boolean,
         actionGroup: ActiveTransferTotals.ActionGroup,
-    ): Intent? = when {
+        singleActivity: Boolean,
+    ): PendingIntent? = when {
         isDownload -> {
-            Intent(
-                context,
-                if (isLoggedIn) ManagerActivity::class.java else FileStorageActivity::class.java
-            ).apply {
-                if (isLoggedIn) {
-                    action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
-                    putExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, isOfflineDownload)
-                } else {
-                    action = FileStorageActivity.Mode.BROWSE_FILES.action
-                }
-                putExtra(FileStorageActivity.EXTRA_PATH, actionGroup.destination)
-                putStringArrayListExtra(
-                    FileStorageActivity.EXTRA_FILE_NAMES,
-                    ArrayList(actionGroup.selectedNames)
+            if (singleActivity) {
+                FileStorageDeepLinkHandler.getPendingIntentForFileStorageSection(
+                    context,
+                    actionGroup.destination,
+                    actionGroup.selectedNames,
                 )
+            } else {
+                createPendingIntent(
+                    Intent(
+                        context,
+                        if (isLoggedIn) ManagerActivity::class.java else FileStorageActivity::class.java
+                    ).apply {
+                        if (isLoggedIn) {
+                            action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
+                            putExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, isOfflineDownload)
+                        } else {
+                            action = FileStorageActivity.Mode.BROWSE_FILES.action
+                        }
+                        putExtra(FileStorageActivity.EXTRA_PATH, actionGroup.destination)
+                        putStringArrayListExtra(
+                            FileStorageActivity.EXTRA_FILE_NAMES,
+                            ArrayList(actionGroup.selectedNames)
+                        )
+                    }
+                )
+
             }
         }
 
         !uploadLocationExists -> null
 
         else -> { // is not download
-            Intent(context, ManagerActivity::class.java).apply {
-                action = Constants.ACTION_OPEN_FOLDER
-                putExtra(
-                    Constants.INTENT_EXTRA_KEY_PARENT_HANDLE,
-                    actionGroup.pendingTransferNodeId?.nodeId?.longValue
+            if (singleActivity) {
+                CloudDriveDeepLinkHandler.getPendingIntentForCloudDriveSection(
+                    context,
+                    actionGroup.pendingTransferNodeId?.nodeId,
+                    actionGroup.selectedNames
                 )
-                putStringArrayListExtra(
-                    FileStorageActivity.EXTRA_FILE_NAMES,
-                    ArrayList(actionGroup.selectedNames)
+            } else {
+                createPendingIntent(
+                    Intent(context, ManagerActivity::class.java).apply {
+                        action = Constants.ACTION_OPEN_FOLDER
+                        putExtra(
+                            Constants.INTENT_EXTRA_KEY_PARENT_HANDLE,
+                            actionGroup.pendingTransferNodeId?.nodeId?.longValue
+                        )
+                        putStringArrayListExtra(
+                            FileStorageActivity.EXTRA_FILE_NAMES,
+                            ArrayList(actionGroup.selectedNames)
+                        )
+                    }
                 )
             }
         }
