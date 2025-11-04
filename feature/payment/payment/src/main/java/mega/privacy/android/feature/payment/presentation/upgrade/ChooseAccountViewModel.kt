@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -13,15 +12,13 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.billing.Pricing
+import mega.privacy.android.domain.entity.payment.Subscriptions
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
-import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
+import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
 import mega.privacy.android.feature.payment.model.ChooseAccountState
-import mega.privacy.android.feature.payment.model.mapper.AccountTypeToProductIdMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
 import timber.log.Timber
 import javax.inject.Inject
@@ -30,8 +27,7 @@ import javax.inject.Inject
  * Choose account view model
  *
  * @params getPricing use case to get the pricing list of products
- * @param getMonthlySubscriptionsUseCase use case to get the list of monthly subscriptions available in the app
- * @param getYearlySubscriptionsUseCase use case to get the list of yearly subscriptions available in the app
+ * @param getSubscriptionsUseCase use case to get the list of yearly subscriptions available in the app
  * @param localisedSubscriptionMapper mapper to map Subscription class to LocalisedSubscription class
  * @param getRecommendedSubscriptionUseCase use case to get the cheapest subscription available in the app
  *
@@ -40,8 +36,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ChooseAccountViewModel @Inject constructor(
     private val getPricing: GetPricing,
-    private val getMonthlySubscriptionsUseCase: GetMonthlySubscriptionsUseCase,
-    private val getYearlySubscriptionsUseCase: GetYearlySubscriptionsUseCase,
+    private val getSubscriptionsUseCase: GetSubscriptionsUseCase,
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
     private val getRecommendedSubscriptionUseCase: GetRecommendedSubscriptionUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
@@ -56,20 +51,12 @@ class ChooseAccountViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val monthlySubscriptionsDeferred = async {
-                runCatching { getMonthlySubscriptionsUseCase() }.getOrElse {
-                    Timber.Forest.e(it)
+            val (monthlySubscriptions, yearlySubscriptions) = runCatching { getSubscriptionsUseCase() }.getOrElse {
+                Subscriptions(
+                    emptyList(),
                     emptyList()
-                }
+                )
             }
-            val yearlySubscriptionsDeferred = async {
-                runCatching { getYearlySubscriptionsUseCase() }.getOrElse {
-                    Timber.Forest.e(it)
-                    emptyList()
-                }
-            }
-            val monthlySubscriptions = monthlySubscriptionsDeferred.await()
-            val yearlySubscriptions = yearlySubscriptionsDeferred.await()
             val localisedSubscriptions = monthlySubscriptions.associateWith { monthlySubscription ->
                 yearlySubscriptions.firstOrNull { it.accountType == monthlySubscription.accountType }
             }.mapNotNull { (monthlySubscription, yearlySubscription) ->

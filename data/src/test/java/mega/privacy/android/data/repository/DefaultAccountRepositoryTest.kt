@@ -179,6 +179,7 @@ class DefaultAccountRepositoryTest {
         transfer = 450,
         amount = CurrencyPoint.SystemCurrencyPoint(13),
         currency = currencyMapper("EUR"),
+        sku = "com.mega.pro1.monthly",
     )
     private val mockEmail = "my@email.com"
     private val excludeFileNames = setOf(

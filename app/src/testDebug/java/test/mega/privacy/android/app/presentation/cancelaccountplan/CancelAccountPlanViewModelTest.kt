@@ -10,8 +10,8 @@ import mega.privacy.android.app.presentation.cancelaccountplan.model.Cancellatio
 import mega.privacy.android.app.presentation.cancelaccountplan.model.UICancellationSurveyAnswer
 import mega.privacy.android.app.presentation.cancelaccountplan.model.mapper.CancellationInstructionsTypeMapper
 import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
-import mega.privacy.android.core.formatter.model.FormattedSize
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
+import mega.privacy.android.core.formatter.model.FormattedSize
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
@@ -91,6 +91,7 @@ internal class CancelAccountPlanViewModelTest {
         transfer: Int = 0,
     ) =
         SubscriptionOption(
+            sku = "testSku",
             accountType = accountType,
             months = 12,
             handle = 0,

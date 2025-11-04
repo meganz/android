@@ -283,8 +283,9 @@ class DefaultBillingRepositoryTest {
 
     @Test
     fun `test when querySkus billingGateway querySkus invoke`() = runTest {
-        underTest.querySkus()
-        verify(billingGateway, times(1)).querySkus()
+        val skus = listOf("testSku1", "testSku2")
+        underTest.querySkus(skus)
+        verify(billingGateway, times(1)).querySkus(skus)
     }
 
     @Test

@@ -50,7 +50,7 @@ interface BillingRepository {
      * Query skus
      *
      */
-    suspend fun querySkus(): List<MegaSku>
+    suspend fun querySkus(skus: List<String>): List<MegaSku>
 
     /**
      * Monitor billing event

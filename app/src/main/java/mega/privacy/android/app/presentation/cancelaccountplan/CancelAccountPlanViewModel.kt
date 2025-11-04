@@ -93,6 +93,7 @@ class CancelAccountPlanViewModel @Inject constructor(
                                     formattedPlanStorage = planStorage,
                                     formattedPlanTransfer = planTransfer,
                                     accountType = accountType,
+                                    sku = planDetails?.sku,
                                     rewindDaysQuota = planRewindDaysQuota,
                                     accountNameRes = accountNameMapper(accountType),
                                     isLoading = false,

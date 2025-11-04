@@ -22,6 +22,7 @@ class LocalisedSubscriptionMapperTest {
     @Test
     fun `test that mapper returns correctly LocalisedSubscription object`() {
         val subscriptionProIMonthly = Subscription(
+            sku = "pro_i_monthly",
             accountType = AccountType.PRO_I,
             handle = 1560943707714440503,
             storage = 2048,
@@ -34,6 +35,7 @@ class LocalisedSubscriptionMapperTest {
         )
 
         val subscriptionProIYearly = Subscription(
+            sku = "pro_i_yearly",
             accountType = AccountType.PRO_I,
             handle = 7472683699866478542,
             storage = 2048,

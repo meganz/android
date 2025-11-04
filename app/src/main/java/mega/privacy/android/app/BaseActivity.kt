@@ -292,8 +292,9 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                     getSerializable(PURCHASE_TYPE)
                 } as PurchaseType?
 
-                activeSubscriptionSku = getString(ACTIVE_SUBSCRIPTION_SKU)
-                showQueryPurchasesResult(MegaPurchase(sku = activeSubscriptionSku))
+                activeSubscriptionSku = getString(ACTIVE_SUBSCRIPTION_SKU)?.also {
+                    showQueryPurchasesResult(it)
+                }
             }
         }
 
@@ -1022,8 +1023,10 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                     || this is ManagerActivity && myAccountInfo.isUpgradeFromManager()
                     || this is FileManagementPreferencesActivity && myAccountInfo.isUpgradeFromSettings() -> {
                 purchaseType = type
-                activeSubscriptionSku = activeSubscription?.sku
-                showQueryPurchasesResult(activeSubscription)
+                // Remove the .test suffix for testing SKUs
+                activeSubscriptionSku = activeSubscription?.sku?.removeSuffix(".test")?.also {
+                    showQueryPurchasesResult(it)
+                }
             }
         }
     }
@@ -1041,7 +1044,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     /**
      * Shows the result of a purchase as an alert.
      */
-    private fun showQueryPurchasesResult(activeSubscription: MegaPurchase?) {
+    private fun showQueryPurchasesResult(activeSubscriptionSku: String) {
         if (purchaseType == null || isAlertDialogShown(upgradeAlert)) {
             return
         }
@@ -1071,9 +1074,8 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                         val account: Int
                         var color = R.color.red_600_red_300
                         val image: Int
-                        val activeSubscriptionSku = activeSubscription?.sku.orEmpty()
 
-                        when (activeSubscription?.sku) {
+                        when (activeSubscriptionSku) {
                             Skus.SKU_PRO_I_MONTH, Skus.SKU_PRO_I_YEAR -> {
                                 account = R.string.pro1_account
                                 image = R.drawable.ic_pro_i_big_crest

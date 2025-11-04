@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.account.OfferPeriod
  * @property offerPeriod     Period of the offer (Day, Month, or Year)
  */
 data class Subscription(
+    val sku: String,
     val accountType: AccountType,
     val handle: Long,
     val storage: Int,

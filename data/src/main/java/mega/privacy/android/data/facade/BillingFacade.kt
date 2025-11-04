@@ -40,14 +40,6 @@ import mega.privacy.android.data.gateway.VerifyPurchaseGateway
 import mega.privacy.android.data.mapper.MegaPurchaseMapper
 import mega.privacy.android.data.mapper.MegaSkuMapper
 import mega.privacy.android.domain.entity.account.MegaSku
-import mega.privacy.android.domain.entity.account.Skus.SKU_PRO_III_MONTH
-import mega.privacy.android.domain.entity.account.Skus.SKU_PRO_III_YEAR
-import mega.privacy.android.domain.entity.account.Skus.SKU_PRO_II_MONTH
-import mega.privacy.android.domain.entity.account.Skus.SKU_PRO_II_YEAR
-import mega.privacy.android.domain.entity.account.Skus.SKU_PRO_I_MONTH
-import mega.privacy.android.domain.entity.account.Skus.SKU_PRO_I_YEAR
-import mega.privacy.android.domain.entity.account.Skus.SKU_PRO_LITE_MONTH
-import mega.privacy.android.domain.entity.account.Skus.SKU_PRO_LITE_YEAR
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.exception.ConnectBillingServiceException
@@ -111,7 +103,6 @@ internal class BillingFacade @Inject constructor(
     override fun onStart(owner: LifecycleOwner) {
         applicationScope.launch(exceptionHandler) {
             ensureConnect()
-            querySkus()
             if (accountRepository.isMegaApiLoggedIn()) {
                 queryPurchase()
             }
@@ -221,7 +212,7 @@ internal class BillingFacade @Inject constructor(
                 && purchases.isNullOrEmpty().not()
             ) {
                 val client = ensureConnect()
-                val validPurchases = processPurchase(client, purchases.orEmpty())
+                val validPurchases = processPurchase(client, purchases)
                 billingEvent.emit(
                     BillingEvent.OnPurchaseUpdate(
                         validPurchases,
@@ -234,11 +225,11 @@ internal class BillingFacade @Inject constructor(
         }
     }
 
-    override suspend fun querySkus(): List<MegaSku> = withContext(ioDispatcher) {
+    override suspend fun querySkus(skus: List<String>): List<MegaSku> = withContext(ioDispatcher) {
         val client = ensureConnect()
         // check the caller still observer, sometime it takes time to connect to BillingClient
         ensureActive()
-        val productList = IN_APP_SKUS.map {
+        val productList = skus.map {
             QueryProductDetailsParams.Product.newBuilder()
                 .setProductId(it)
                 .setProductType(BillingClient.ProductType.SUBS)
@@ -255,14 +246,24 @@ internal class BillingFacade @Inject constructor(
                 result.billingResult.responseCode
             )
         }
+        // maintain old cache and update with new values
         val productsDetails = result.productDetailsList.orEmpty()
-        productDetailsListCache.set(productsDetails)
+        val newProductDetails =
+            productDetailsListCache.get().orEmpty().associateBy { it.productId }.toMutableMap()
+        productsDetails.forEach {
+            newProductDetails[it.productId] = it
+        }
+        productDetailsListCache.set(newProductDetails.values.toList())
         val megaSkus = productsDetails
             .mapNotNull {
                 Timber.d("Found product detail: %s", it)
                 megaSkuMapper(it)
             }
-        skusCache.set(megaSkus)
+        val newCache = skusCache.get().orEmpty().associateBy { it.sku }.toMutableMap()
+        megaSkus.forEach {
+            newCache[it.sku] = it
+        }
+        skusCache.set(newCache.values.toList())
         return@withContext megaSkus
     }
 
@@ -403,18 +404,5 @@ internal class BillingFacade @Inject constructor(
         Timber.d("Max purchase: $max")
         activeSubscription.set(max)
         accountInfoWrapper.updateActiveSubscription(max)
-    }
-
-    companion object {
-        private val IN_APP_SKUS = listOf(
-            SKU_PRO_I_MONTH,
-            SKU_PRO_I_YEAR,
-            SKU_PRO_II_MONTH,
-            SKU_PRO_II_YEAR,
-            SKU_PRO_III_MONTH,
-            SKU_PRO_III_YEAR,
-            SKU_PRO_LITE_MONTH,
-            SKU_PRO_LITE_YEAR,
-        )
     }
 }

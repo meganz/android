@@ -1,19 +1,19 @@
 package mega.privacy.android.app.main.ads
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
-import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.CurrencyAmount
+import mega.privacy.android.feature.payment.model.LocalisedSubscription
+import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,6 +27,7 @@ class AdsFreeIntroViewTest {
     var composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     private val subscriptionProLiteMonthly = Subscription(
+        sku = "pro_lite_monthly",
         accountType = AccountType.PRO_LITE,
         handle = -4226692769210777158,
         storage = 400,
@@ -39,6 +40,7 @@ class AdsFreeIntroViewTest {
     )
 
     private val subscriptionProLiteYearly = Subscription(
+        sku = "pro_lite_yearly",
         accountType = AccountType.PRO_LITE,
         handle = -5517769810977460898,
         storage = 400,

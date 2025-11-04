@@ -113,7 +113,6 @@ fun LoginScreen(
         onLoginClicked = {
             LoginActivity.isBackFromLoginPage = false
             viewModel.onLoginClicked(false)
-            billingViewModel.loadSkus()
             billingViewModel.loadPurchases()
         },
         onForgotPassword = viewModel::onForgotPassword,

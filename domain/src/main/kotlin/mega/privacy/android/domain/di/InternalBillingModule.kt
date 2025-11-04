@@ -5,7 +5,6 @@ import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
 import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.usecase.billing.QueryPurchase
-import mega.privacy.android.domain.usecase.billing.QuerySkus
 
 /**
  * Provide all Billing UseCases
@@ -15,9 +14,6 @@ import mega.privacy.android.domain.usecase.billing.QuerySkus
 @DisableInstallInCheck
 internal abstract class InternalBillingModule {
     companion object {
-        @Provides
-        fun provideQuerySkus(repository: BillingRepository) = QuerySkus(repository::querySkus)
-
         @Provides
         fun provideQueryPurchase(repository: BillingRepository) =
             QueryPurchase(repository::queryPurchase)

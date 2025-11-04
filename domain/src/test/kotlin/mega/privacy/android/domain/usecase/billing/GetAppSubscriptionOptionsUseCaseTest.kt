@@ -20,6 +20,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
     private val getSubscriptionOptionsUseCase = GetSubscriptionOptionsUseCase(accountRepository)
 
     private val subscriptionPlanProIMonthly = SubscriptionOption(
+        sku = "pro_i_monthly",
         handle = 1560943707714440503,
         accountType = AccountType.PRO_I,
         months = 1,
@@ -30,6 +31,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
     )
 
     private val subscriptionPlanProIYearly = SubscriptionOption(
+        sku = "pro_i_yearly",
         handle = 7472683699866478542,
         accountType = AccountType.PRO_I,
         months = 12,
@@ -40,6 +42,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
     )
 
     private val subscriptionPlanProIIMonthly = SubscriptionOption(
+        sku = "pro_ii_monthly",
         handle = 7974113413762509455,
         accountType = AccountType.PRO_II,
         months = 1,
@@ -50,6 +53,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
     )
 
     private val subscriptionPlanProIIYearly = SubscriptionOption(
+        sku = "pro_ii_yearly",
         handle = 370834413380951543,
         accountType = AccountType.PRO_II,
         months = 12,
@@ -60,6 +64,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
     )
 
     private val subscriptionPlanProIIIMonthly = SubscriptionOption(
+        sku = "pro_iii_monthly",
         handle = -2499193043825823892,
         accountType = AccountType.PRO_III,
         months = 1,
@@ -70,6 +75,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
     )
 
     private val subscriptionPlanProIIIYearly = SubscriptionOption(
+        sku = "pro_iii_yearly",
         handle = 7225413476571973499,
         accountType = AccountType.PRO_III,
         months = 12,
@@ -80,6 +86,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
     )
 
     private val subscriptionPlanProLiteMonthly = SubscriptionOption(
+        sku = "pro_lite_monthly",
         handle = -4226692769210777158,
         accountType = AccountType.PRO_LITE,
         months = 1,
@@ -90,6 +97,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
     )
 
     private val subscriptionPlanProLiteYearly = SubscriptionOption(
+        sku = "pro_lite_yearly",
         handle = -5517769810977460898,
         accountType = AccountType.PRO_LITE,
         months = 12,
@@ -100,6 +108,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
     )
 
     private val subscriptionPlanBusiness = SubscriptionOption(
+        sku = "business_monthly",
         handle = 7472683699866478542,
         accountType = AccountType.BUSINESS,
         months = 1,
@@ -110,6 +119,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
     )
 
     private val subscriptionPlanProFlexi = SubscriptionOption(
+        sku = "pro_flexi_monthly",
         handle = 7472683699866478511,
         accountType = AccountType.PRO_FLEXI,
         months = 1,
@@ -120,6 +130,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
     )
 
     private val subscriptionPlanUnknown = SubscriptionOption(
+        sku = "unknown_monthly",
         handle = 7472683699866478511,
         accountType = AccountType.UNKNOWN,
         months = 1,
