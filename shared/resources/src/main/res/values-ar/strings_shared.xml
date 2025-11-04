@@ -1069,15 +1069,15 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">إخفاء الملفات والمجلدات المهمة</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">يمكنك إخفاء الملفات والمجلدات الحساسة للخصوصية. يمكنك فقط الكشف عنها، إما بشكل فردي أو عن طريق عرض العناصر المخفية مؤقتًا من القائمة.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy in one easy step.</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">الاستبعاد من المخطط الزمني</string>
+    <string name="hidden_nodes_title_control_visibility">بعيدًا عن الأنظار</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">لا يمكن الوصول إلى العناصر المخفية إلا من خلال السواقة السحابية ولن تظهر في الصور أو الألبومات أو الأحداث الأخيرة.</string>
+    <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">بعيدًا عن الأنظار</string>
+    <string name="hidden_nodes_title_visible_shared_files">Blur for privacy</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">عليك أن تقرر متى تكون الملفات المخفية مرئية. هناك إعداد جديد لإظهار العناصر المخفية مؤقتًا.</string>
+    <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">حافظ على صورك آمنة دائمًا</string>
     <!--Camera backup permission screen description-->

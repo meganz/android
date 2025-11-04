@@ -1005,15 +1005,15 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">Belangrijke bestanden en mappen verbergen</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">U kunt gevoelige bestanden en mappen verbergen voor privacy. Alleen u kunt ze afzonderlijk onthullen of door tijdelijk verborgen items in het menu weer te geven.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy in one easy step.</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">Uitsluiten van de tijdlijn</string>
+    <string name="hidden_nodes_title_control_visibility">Uit het zicht</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Verborgen items zijn alleen toegankelijk via de Cloud-schijf en verschijnen niet in uw Foto\’s, Albums of Recent.</string>
+    <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Uit het zicht</string>
+    <string name="hidden_nodes_title_visible_shared_files">Blur for privacy</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">U bepaalt zelf wanneer verborgen bestanden zichtbaar zijn. Er is een nieuwe instelling om verborgen items tijdelijk weer te geven.</string>
+    <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Bewaar uw foto\’s altijd veilig</string>
     <!--Camera backup permission screen description-->

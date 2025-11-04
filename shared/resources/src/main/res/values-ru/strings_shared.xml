@@ -1037,15 +1037,15 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">Скрывайте важные файлы и папки</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">Вы можете скрывать важные файлы и папки в целях конфиденциальности. Отобразить их можете только вы: либо по отдельности, либо временно временно включить отображение скрытых элементов в меню.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy in one easy step.</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">Исключайте из «Ленты»</string>
+    <string name="hidden_nodes_title_control_visibility">С глаз долой</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Скрытые элементы доступны только через Облачный диск и не отображаются в «Фотографиях», «Альбомах» или «Недавних».</string>
+    <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">С глаз долой</string>
+    <string name="hidden_nodes_title_visible_shared_files">Blur for privacy</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Вы сами решаете, когда будут видны скрытые файлы. Появилась новая настройка для временного отображения скрытых элементов.</string>
+    <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Ваши фото всегда в безопасности</string>
     <!--Camera backup permission screen description-->
@@ -1366,7 +1366,7 @@
     <!-- Action label to start images slideshow -->
     <string name="action_slideshow">Слайдшоу</string>
     <!-- Bottom sheet button to unhide a node/file -->
-    <string name="general_unhide_node">Показывать</string>
+    <string name="general_unhide_node">Показать</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">Подтвердить %s</string>
     <!-- Title of the section Versions for files -->

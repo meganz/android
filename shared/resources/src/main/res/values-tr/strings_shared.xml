@@ -1005,15 +1005,15 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">Önemli dosyaları ve klasörleri gizle</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">Gizlilik için hassas dosyaları ve klasörleri gizleyebilirsiniz. Bunları yalnızca siz, tek tek veya menüden gizli öğeleri geçici olarak görüntüleyerek ortaya çıkarabilirsiniz.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy in one easy step.</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">Zaman akışından hariç tut</string>
+    <string name="hidden_nodes_title_control_visibility">Gözden uzak</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Gizli öğelere yalnızca bulut depolama üzerinden erişilebilir ve Fotoğraflarınızda, Albümlerinizde veya Son etkinliklerinizde görünmez.</string>
+    <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Gözden uzak</string>
+    <string name="hidden_nodes_title_visible_shared_files">Blur for privacy</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Gizli dosyaların ne zaman görüneceğine siz karar verirsiniz. Gizli öğeleri geçici olarak göstermek için yeni bir ayar bulunmaktadır.</string>
+    <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Fotoğraflarınızı her zaman güvende tutun</string>
     <!--Camera backup permission screen description-->
