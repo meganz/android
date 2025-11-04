@@ -989,15 +989,15 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">Sembunyikan file dan folder penting</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">Anda dapat menyembunyikan file dan folder sensitif untuk privasi. Hanya anda yang dapat mengungkapkannya, baik secara individual atau dengan menampilkan item tersembunyi sementara dari menu.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy in one easy step.</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">Kecualikan dari Timeline</string>
+    <string name="hidden_nodes_title_control_visibility">Tidak terlihat</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Item tersembunyi hanya dapat diakses melalui drive Cloud dan tidak akan muncul di Foto, Album, atau Terbaru anda.</string>
+    <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Tidak terlihat</string>
+    <string name="hidden_nodes_title_visible_shared_files">Blur for privacy</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Anda memutuskan kapan file tersembunyi terlihat. Ada pengaturan baru untuk menampilkan item tersembunyi sementara.</string>
+    <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Jaga foto anda tetap aman, selalu</string>
     <!--Camera backup permission screen description-->

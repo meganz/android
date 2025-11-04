@@ -1021,15 +1021,15 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">Nascondi file e cartelle importanti</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">Puoi nascondere file e cartelle sensibili per motivi di privacy. Solo tu puoi rivelarli, singolarmente o visualizzando temporaneamente gli oggetti nascosti dal menu.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy in one easy step.</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">Escludi dalla Cronologia</string>
+    <string name="hidden_nodes_title_control_visibility">Fuori dalla vista</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Gli oggetti nascosti sono accessibili solo tramite il Cloud drive e non verranno visualizzati nelle tue Foto, nei tuoi Album o in Recenti.</string>
+    <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Fuori dalla vista</string>
+    <string name="hidden_nodes_title_visible_shared_files">Blur for privacy</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Sei tu a decidere quando i file nascosti sono visibili. C\’è una nuova impostazione per mostrare temporaneamente gli oggetti nascosti.</string>
+    <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Mantieni le tue foto al sicuro, sempre</string>
     <!--Camera backup permission screen description-->

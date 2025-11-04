@@ -989,15 +989,15 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">ซ่อนไฟล์และโฟลเดอร์สำคัญ</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">คุณสามารถซ่อนไฟล์และโฟลเดอร์ส่วนตัวเพื่อเพิ่มความเป็นส่วนตัวได้ และมีเพียงคุณเท่านั้นที่จะสั่งให้แสดงไฟล์เหล่านั้นทีละรายการ หรือจะเลือกแสดงรายการที่ซ่อนทั้งหมดชั่วคราวจากเมนูก็ได้</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy in one easy step.</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">ไม่แสดงในไทม์ไลน์</string>
+    <string name="hidden_nodes_title_control_visibility">แสดงไฟล์ที่ซ่อนอยู่</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">ไฟล์ที่ซ่อนไว้จะเปิดดูได้จากคลาวด์ไดร์ฟเท่านั้น และจะไม่ไปแสดงในหน้ารูปถ่าย อัลบั้ม หรือ ล่าสุด</string>
+    <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">แสดงไฟล์ที่ซ่อนอยู่</string>
+    <string name="hidden_nodes_title_visible_shared_files">Blur for privacy</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">คุณเลือกได้ว่าจะให้ไฟล์ที่ซ่อนไว้แสดงขึ้นมาเมื่อใด โดยเราได้เพิ่มการตั้งค่าใหม่เพื่อให้คุณเลือกแสดงไฟล์ที่ซ่อนไว้ทั้งหมดเป็นการชั่วคราวได้</string>
+    <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">เก็บภาพถ่ายของคุณให้ปลอดภัยเสมอ</string>
     <!--Camera backup permission screen description-->

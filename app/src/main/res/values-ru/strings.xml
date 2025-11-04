@@ -4883,7 +4883,7 @@
         <item quantity="other">%1$d участника ждут подключения к звонку «%2$s».</item>
     </plurals>
     <!-- Title of video option of snapshot-->
-    <string name="media_player_video_option_snapshot_title">Съёмка</string>
+    <string name="media_player_video_option_snapshot_title">Снимок</string>
     <!-- Title of video option of lock-->
     <string name="media_player_video_option_lock_title">Заблокировать</string>
     <!-- Title of video option of zoom to fill-->

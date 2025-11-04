@@ -989,15 +989,15 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">중요한 파일과 폴더 숨기기</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">개인 정보 보호를 위해 민감한 파일 및 폴더를 숨길 수 있습니다. 당신만 그것들을 개별적으로 또는 일시적으로 숨겨진 항목들을 메뉴에서 나타나게 할 수 있습니다.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy in one easy step.</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">연표에서 제외</string>
+    <string name="hidden_nodes_title_control_visibility">시야 범위 밖</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">숨겨진 항목은 클라우드 드라이브를 통해서만 접근 가능하며 사진, 사진첩 또는 최근 항목에 나타나지 않습니다.</string>
+    <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">시야 범위 밖</string>
+    <string name="hidden_nodes_title_visible_shared_files">Blur for privacy</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">숨겨진 파일이 보일 때를 정할 수 있습니다. 숨겨진 항목을 일시적으로 보이게 하는 새로운 설정이 있습니다.</string>
+    <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">항상 사진을 안전하게 보관</string>
     <!--Camera backup permission screen description-->
@@ -1726,13 +1726,13 @@
     <string name="campaign_name_special_offer">특별 할인: %1$d%% 할인</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="one">first month</item>
-        <item quantity="other">first %1$d months</item>
+        <item quantity="one">%1$s for the first month</item>
+        <item quantity="other">%1$s for the first %2$d months</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one">first year</item>
-        <item quantity="other">first %1$d years</item>
+        <item quantity="one">%1$s for the first year</item>
+        <item quantity="other">%1$s for the first %2$d years</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGA 프라이버시 스위트</string>

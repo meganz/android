@@ -989,15 +989,15 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">Ẩn đi các tệp&#160;tin và thư&#160;mục quan&#160;trọng</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">Bạn có thể giấu đi các tệp&#160;tin và thư&#160;mục riêng&#160;tư của mình. Chỉ có bạn mới có thể hiện những mục đó lại, bằng cách thực&#160;hiện từng cái riêng&#160;lẻ hoặc bật hiển&#160;thị các mục đã ẩn đi trong phần menu.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy in one easy step.</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">Loại&#160;trừ khỏi Dòng thời&#160;gian</string>
+    <string name="hidden_nodes_title_control_visibility">Ra khỏi tầm nhìn</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Các mục đã ẩn đi chỉ có thể truy&#160;cập thông qua Ổ&#160;Mây và sẽ không xuất&#160;hiện trong Ảnh, Album hoặc hoạt&#160;động Gần&#160;đây của bạn.</string>
+    <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Ra khỏi tầm nhìn</string>
+    <string name="hidden_nodes_title_visible_shared_files">Blur for privacy</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Bạn tự quyết&#160;định khi bạn muốn các tệp&#160;tin ẩn đi được hiển&#160;thị. Có một mục lựa&#160;chọn mới trong thiết&#160;đặt để hiển&#160;thị các mục ẩn tạm&#160;thời.</string>
+    <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Luôn luôn giữ ảnh của bạn được an&#160;toàn</string>
     <!--Camera backup permission screen description-->
