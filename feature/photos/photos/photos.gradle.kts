@@ -53,6 +53,7 @@ dependencies {
     implementation(androidx.navigation3.runtime)
     implementation(google.services.mlkit.document.scanner)
     implementation(lib.coil.compose)
+    implementation(lib.kotlinx.collections.immutable)
 
     // test
     testImplementation(project(":core-test"))

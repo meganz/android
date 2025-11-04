@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -119,11 +120,13 @@ private fun BasicPhotosNode(
     Box(
         modifier = modifier
             .conditional(isSelected) {
-                Modifier.border(
-                    width = 2.dp,
-                    color = DSTokens.colors.border.strongSelected,
-                    shape = RoundedCornerShape(4.dp)
-                )
+                Modifier
+                    .border(
+                        width = 2.dp,
+                        color = DSTokens.colors.border.strongSelected,
+                        shape = RoundedCornerShape(4.dp)
+                    )
+                    .clip(RoundedCornerShape(4.dp))
             }
     ) {
         when (thumbnailData) {

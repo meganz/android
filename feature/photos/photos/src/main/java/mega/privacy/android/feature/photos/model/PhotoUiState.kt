@@ -42,6 +42,7 @@ sealed interface PhotoUiState {
         override val isTakenDown: Boolean = false,
         override val isSensitive: Boolean = false,
         override val isSensitiveInherited: Boolean = false,
+        val duration: String = "",
     ) : PhotoUiState
 
     data class Image(

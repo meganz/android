@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.photos.mapper
 
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -9,7 +10,9 @@ import mega.privacy.android.feature.photos.model.PhotoUiState
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -17,9 +20,13 @@ class PhotoUiStateMapperTest {
 
     private lateinit var underTest: PhotoUiStateMapper
 
+    private val durationInSecondsTextMapper: DurationInSecondsTextMapper = mock()
+
     @BeforeEach
     fun setup() {
-        underTest = PhotoUiStateMapper()
+        underTest = PhotoUiStateMapper(
+            durationInSecondsTextMapper = durationInSecondsTextMapper
+        )
     }
 
     @Test
@@ -51,6 +58,10 @@ class PhotoUiStateMapperTest {
     @Test
     fun `test that the video is mapped correctly`() {
         val photo = newVideo()
+        val duration = "02:15"
+        whenever(
+            durationInSecondsTextMapper(duration = photo.fileTypeInfo.duration)
+        ) doReturn duration
 
         val actual = underTest(photo = photo)
 
@@ -70,6 +81,7 @@ class PhotoUiStateMapperTest {
             isSensitive = photo.isSensitive,
             isSensitiveInherited = photo.isSensitiveInherited,
             base64Id = photo.base64Id,
+            duration = duration
         )
         assertThat(actual).isEqualTo(expected)
     }
