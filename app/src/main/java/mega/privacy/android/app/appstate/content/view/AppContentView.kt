@@ -1,5 +1,8 @@
 package mega.privacy.android.app.appstate.content.view
 
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -113,6 +116,30 @@ internal fun AppContentView(
                                 initialDestination = it.initialDestination,
                             )
                         }
+                    },
+                    transitionSpec = {
+                        // Slide in from right when navigating forward
+                        slideInHorizontally(
+                            initialOffsetX = { it },
+                        ) togetherWith slideOutHorizontally(
+                            targetOffsetX = { -it },
+                        )
+                    },
+                    popTransitionSpec = {
+                        // Slide in from left when navigating back
+                        slideInHorizontally(
+                            initialOffsetX = { -it },
+                        ) togetherWith slideOutHorizontally(
+                            targetOffsetX = { it },
+                        )
+                    },
+                    predictivePopTransitionSpec = {
+                        // Slide in from left when navigating back
+                        slideInHorizontally(
+                            initialOffsetX = { -it },
+                        ) togetherWith slideOutHorizontally(
+                            targetOffsetX = { it },
+                        )
                     }
                 )
 

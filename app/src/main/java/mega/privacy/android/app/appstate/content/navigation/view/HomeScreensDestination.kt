@@ -1,5 +1,9 @@
 package mega.privacy.android.app.appstate.content.navigation.view
 
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -94,10 +98,10 @@ fun HomeScreens(
                     },
                     isSelected = { destination ->
                         currentDestination == destination
-                        },
-                        navContent = { navigationUiController ->
-                            PsaContainer {
-                                NavDisplay(
+                    },
+                    navContent = { navigationUiController ->
+                        PsaContainer {
+                            NavDisplay(
                                 modifier = Modifier.fillMaxSize(),
                                 backStack = backStack,
                                 onBack = { backStack.removeLastOrNull() },
@@ -113,7 +117,14 @@ fun HomeScreens(
                                             transferHandler
                                         )
                                     }
-                                })
+                                },
+                                predictivePopTransitionSpec = {
+                                    ContentTransform(
+                                        fadeIn(animationSpec = tween(700)),
+                                        fadeOut(animationSpec = tween(700)),
+                                    )
+                                }
+                            )
                         }
                     },
                 )
