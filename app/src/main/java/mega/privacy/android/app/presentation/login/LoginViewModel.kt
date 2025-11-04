@@ -909,7 +909,7 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun getUserData() {
-        viewModelScope.launch {
+        applicationScope.launch {
             runCatching {
                 getUserDataUseCase()
             }.onFailure { exception ->

@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.login
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -75,6 +76,7 @@ class LoginInProgressViewModelTest {
             )
     }
     private val getUserDataUseCase: GetUserDataUseCase = mock()
+    private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
 
     @BeforeAll
     fun initialisation() {
@@ -119,6 +121,7 @@ class LoginInProgressViewModelTest {
             monitorAccountBlockedUseCase = monitorAccountBlockedUseCase,
             isMegaApiLoggedInUseCase = isMegaApiLoggedInUseCase,
             getUserDataUseCase = getUserDataUseCase,
+            applicationScope = applicationScope,
             route = MegaActivity.LoggedInScreens(
                 isFromLogin = false,
                 session = "test-session"

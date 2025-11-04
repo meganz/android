@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.exception.SessionNotRetrievedException
 import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import org.junit.Assert.assertThrows
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -29,6 +30,7 @@ class BackgroundFastLoginUseCaseTest {
     private val initialiseMegaChatUseCase = mock<InitialiseMegaChatUseCase>()
     private val getSessionUseCase = mock<GetSessionUseCase>()
     private val getRootNodeExistsUseCase = mock<RootNodeExistsUseCase>()
+    private val getUserDataUseCase: GetUserDataUseCase = mock()
     private val loginMutex = mock<Mutex>()
     private val session = "User session"
 
@@ -39,6 +41,7 @@ class BackgroundFastLoginUseCaseTest {
             initialiseMegaChatUseCase = initialiseMegaChatUseCase,
             getSessionUseCase = getSessionUseCase,
             getRootNodeExistsUseCase = getRootNodeExistsUseCase,
+            getUserDataUseCase = getUserDataUseCase,
             loginMutex = loginMutex
         )
     }
@@ -51,6 +54,7 @@ class BackgroundFastLoginUseCaseTest {
             initialiseMegaChatUseCase,
             getSessionUseCase,
             getRootNodeExistsUseCase,
+            getUserDataUseCase,
             loginMutex,
         )
     }

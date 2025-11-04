@@ -5,6 +5,7 @@ import mega.privacy.android.domain.exception.SessionNotRetrievedException
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import javax.inject.Inject
 
 /**
@@ -23,6 +24,7 @@ class BackgroundFastLoginUseCase @Inject constructor(
     private val initialiseMegaChatUseCase: InitialiseMegaChatUseCase,
     private val getSessionUseCase: GetSessionUseCase,
     private val getRootNodeExistsUseCase: RootNodeExistsUseCase,
+    private val getUserDataUseCase: GetUserDataUseCase,
     @LoginMutex private val loginMutex: Mutex,
 ) {
 
@@ -41,6 +43,8 @@ class BackgroundFastLoginUseCase @Inject constructor(
             if (!getRootNodeExistsUseCase()) {
                 initialiseMegaChatUseCase(session)
                 loginRepository.fastLogin(session)
+                // pre-fetch user data for API feature flag, we don't care about the result here
+                runCatching { getUserDataUseCase() }
                 loginRepository.fetchNodes()
                 // return new session
                 return getSessionUseCase().orEmpty()

@@ -8,6 +8,7 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +31,7 @@ import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.exception.LoginException
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesException
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
@@ -62,6 +64,7 @@ class LoginInProgressViewModel @AssistedInject constructor(
     private val monitorAccountBlockedUseCase: MonitorAccountBlockedUseCase,
     private val isMegaApiLoggedInUseCase: IsMegaApiLoggedInUseCase,
     private val getUserDataUseCase: GetUserDataUseCase,
+    @ApplicationScope private val applicationScope: CoroutineScope,
     @Assisted val route: MegaActivity.LoggedInScreens
 ) : ViewModel() {
 
@@ -257,7 +260,7 @@ class LoginInProgressViewModel @AssistedInject constructor(
     }
 
     private fun getUserData() {
-        viewModelScope.launch {
+        applicationScope.launch {
             runCatching {
                 getUserDataUseCase()
             }.onFailure { exception ->
