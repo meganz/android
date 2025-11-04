@@ -9,15 +9,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.usecase.billing.MonitorBillingEventUseCase
 import mega.privacy.android.domain.usecase.billing.QueryPurchase
-import mega.privacy.android.domain.usecase.billing.QuerySkus
 import mega.privacy.android.feature.payment.domain.LaunchPurchaseFlowUseCase
-import mega.privacy.android.feature.payment.model.mapper.AccountTypeToProductIdMapper
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -28,10 +26,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class BillingViewModel @Inject constructor(
-    private val querySkus: QuerySkus,
     private val queryPurchase: QueryPurchase,
     private val launchPurchaseFlowUseCase: LaunchPurchaseFlowUseCase,
-    private val accountTypeToProductIdMapper: AccountTypeToProductIdMapper,
     monitorBillingEventUseCase: MonitorBillingEventUseCase,
 ) : ViewModel() {
     private val _skus = MutableStateFlow<List<MegaSku>>(emptyList())
@@ -69,20 +65,6 @@ class BillingViewModel @Inject constructor(
     }
 
     /**
-     * Load skus
-     *
-     */
-    fun loadSkus() {
-        viewModelScope.launch {
-            _skus.value = runCatching { querySkus() }
-                .onFailure {
-                    Timber.Forest.e(it, "Failed to query SKUs")
-                }
-                .getOrElse { emptyList() }
-        }
-    }
-
-    /**
      * Load purchases
      *
      */
@@ -102,14 +84,11 @@ class BillingViewModel @Inject constructor(
      */
     fun startPurchase(
         activity: Activity,
-        accountType: AccountType,
-        isMonthly: Boolean,
-        offerId: String? = null,
+        subscription: Subscription,
     ) {
         viewModelScope.launch {
             runCatching {
-                val productId = accountTypeToProductIdMapper(accountType, isMonthly)
-                launchPurchaseFlowUseCase(activity, productId, offerId)
+                launchPurchaseFlowUseCase(activity, subscription.sku, subscription.offerId)
             }.onFailure {
                 Timber.Forest.e(it, "Failed to launch purchase flow")
             }

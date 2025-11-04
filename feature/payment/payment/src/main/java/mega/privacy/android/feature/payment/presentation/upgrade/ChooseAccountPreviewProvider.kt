@@ -30,6 +30,7 @@ internal class ChooseAccountPreviewProvider :
                 storage = 2048,
                 transfer = 2048,
                 amount = CurrencyAmount(9.99F, Currency("EUR")),
+                sku = "mega.android.pro1.onemonth"
             ),
             yearlySubscription = Subscription(
                 accountType = AccountType.PRO_I,
@@ -37,6 +38,7 @@ internal class ChooseAccountPreviewProvider :
                 storage = 2048,
                 transfer = 24576,
                 amount = CurrencyAmount(99.99F, Currency("EUR")),
+                sku = "mega.android.pro1.oneyear"
             ),
             localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
             formattedSize = formattedSizeMapper,
@@ -44,6 +46,7 @@ internal class ChooseAccountPreviewProvider :
 
         val subscriptionProII = LocalisedSubscription(
             monthlySubscription = Subscription(
+                sku = "mega.android.pro2.onemonth",
                 accountType = AccountType.PRO_II,
                 handle = 1560943707714440504,
                 storage = 8192,
@@ -51,6 +54,7 @@ internal class ChooseAccountPreviewProvider :
                 amount = CurrencyAmount(19.99F, Currency("EUR")),
             ),
             yearlySubscription = Subscription(
+                sku = "mega.android.pro2.oneyear",
                 accountType = AccountType.PRO_II,
                 handle = 1560943707714440504,
                 storage = 8192,
@@ -63,6 +67,7 @@ internal class ChooseAccountPreviewProvider :
 
         val subscriptionProIII = LocalisedSubscription(
             monthlySubscription = Subscription(
+                sku = "mega.android.pro3.onemonth",
                 accountType = AccountType.PRO_III,
                 handle = 1560943707714440505,
                 storage = 16384,
@@ -70,6 +75,7 @@ internal class ChooseAccountPreviewProvider :
                 amount = CurrencyAmount(29.99F, Currency("EUR")),
             ),
             yearlySubscription = Subscription(
+                sku = "mega.android.pro3.oneyear",
                 accountType = AccountType.PRO_III,
                 handle = 1560943707714440505,
                 storage = 16384,
@@ -82,6 +88,7 @@ internal class ChooseAccountPreviewProvider :
 
         val subscriptionProLite = LocalisedSubscription(
             monthlySubscription = Subscription(
+                sku = "mega.android.prolite.onemonth",
                 accountType = AccountType.PRO_LITE,
                 handle = 1560943707714440506,
                 storage = 400,
@@ -89,6 +96,7 @@ internal class ChooseAccountPreviewProvider :
                 amount = CurrencyAmount(4.99F, Currency("EUR")),
             ),
             yearlySubscription = Subscription(
+                sku = "mega.android.prolite.oneyear",
                 accountType = AccountType.PRO_LITE,
                 handle = 1560943707714440506,
                 storage = 400,

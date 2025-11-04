@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.billing
 
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Subscription
-import mega.privacy.android.domain.entity.account.Skus
+import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import javax.inject.Inject
 
@@ -25,6 +25,7 @@ class GetRecommendedSubscriptionUseCase @Inject constructor(
     private val getAppSubscriptionOptionsUseCase: GetAppSubscriptionOptionsUseCase,
     private val getCurrentSubscriptionPlanUseCase: GetCurrentSubscriptionPlanUseCase,
     private val subscriptionMapper: SubscriptionMapper,
+    private val billingRepository: BillingRepository,
 ) {
     /**
      * Invoke
@@ -40,17 +41,8 @@ class GetRecommendedSubscriptionUseCase @Inject constructor(
         val currentPlanIndex = availablePlans.indexOfFirst { it.accountType == currentPlan }
         // if current plan is not found or is the highest, return null
         val cheapestPlan = availablePlans.getOrNull(currentPlanIndex + 1) ?: return null
-
-        val sku = getSku(cheapestPlan.accountType)
-        val localPricing = sku?.let { getLocalPricingUseCase(it) }
+        billingRepository.querySkus(listOf(cheapestPlan.sku))
+        val localPricing = getLocalPricingUseCase(cheapestPlan.sku)
         return subscriptionMapper(cheapestPlan, localPricing)
-    }
-
-    private fun getSku(accountType: AccountType) = when (accountType) {
-        AccountType.PRO_LITE -> Skus.SKU_PRO_LITE_MONTH
-        AccountType.PRO_I -> Skus.SKU_PRO_I_MONTH
-        AccountType.PRO_II -> Skus.SKU_PRO_II_MONTH
-        AccountType.PRO_III -> Skus.SKU_PRO_III_MONTH
-        else -> null
     }
 }

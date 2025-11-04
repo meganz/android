@@ -50,6 +50,7 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.OfferPeriod
 import mega.privacy.android.feature.payment.R
 import mega.privacy.android.feature.payment.components.AdditionalBenefitProPlanView
@@ -72,7 +73,7 @@ import java.util.Locale
 
 @Composable
 fun NewChooseAccountScreen(
-    onBuyPlanClick: (AccountType, Boolean, String?) -> Unit,
+    onBuyPlanClick: (Subscription) -> Unit,
     maybeLaterClicked: () -> Unit,
     onFreePlanClicked: () -> Unit,
     uiState: ChooseAccountState = ChooseAccountState(),
@@ -176,11 +177,11 @@ fun NewChooseAccountScreen(
                     modifier = Modifier,
                     text = stringResource(it.toUIAccountType().textBuyButtonValue),
                     onClick = {
-                        val offerId =
-                            uiState.localisedSubscriptionsList
-                                .find { sub -> sub.accountType == chosenPlan }
-                                ?.getOfferId(isMonthly)
-                        onBuyPlanClick(it, isMonthly, offerId)
+                        uiState.localisedSubscriptionsList
+                            .find { sub -> sub.accountType == chosenPlan }
+                            ?.getSubscription(isMonthly)?.let {
+                                onBuyPlanClick(it)
+                            }
                     },
                 )
             }
@@ -470,7 +471,7 @@ internal fun NewChooseAccountScreenPreview(
             ),
             isNewCreationAccount = false,
             isUpgradeAccount = false,
-            onBuyPlanClick = { _, _, _ -> },
+            onBuyPlanClick = { },
             onFreePlanClicked = {},
             maybeLaterClicked = {},
             onBack = {}

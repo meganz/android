@@ -17,12 +17,12 @@ import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.domain.entity.billing.Pricing
+import mega.privacy.android.domain.entity.payment.Subscriptions
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
-import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
+import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceStringMapper
@@ -45,8 +45,7 @@ class ChooseAccountViewModelTest {
     private lateinit var underTest: ChooseAccountViewModel
 
     private val getPricing = mock<GetPricing>()
-    private val getMonthlySubscriptionsUseCase = mock<GetMonthlySubscriptionsUseCase>()
-    private val getYearlySubscriptionsUseCase = mock<GetYearlySubscriptionsUseCase>()
+    private val getSubscriptionsUseCase = mock<GetSubscriptionsUseCase>()
     private val localisedPriceStringMapper = mock<LocalisedPriceStringMapper>()
     private val localisedPriceCurrencyCodeStringMapper =
         mock<LocalisedPriceCurrencyCodeStringMapper>()
@@ -63,8 +62,7 @@ class ChooseAccountViewModelTest {
     @BeforeEach
     fun setUp() {
         reset(
-            getMonthlySubscriptionsUseCase,
-            getYearlySubscriptionsUseCase,
+            getSubscriptionsUseCase,
             localisedPriceStringMapper,
             localisedPriceCurrencyCodeStringMapper,
             formattedSizeMapper,
@@ -77,8 +75,7 @@ class ChooseAccountViewModelTest {
     private fun initViewModel() {
         underTest = ChooseAccountViewModel(
             getPricing = getPricing,
-            getMonthlySubscriptionsUseCase = getMonthlySubscriptionsUseCase,
-            getYearlySubscriptionsUseCase = getYearlySubscriptionsUseCase,
+            getSubscriptionsUseCase = getSubscriptionsUseCase,
             localisedSubscriptionMapper = localisedSubscriptionMapper,
             getRecommendedSubscriptionUseCase = getRecommendedSubscriptionUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
@@ -101,8 +98,12 @@ class ChooseAccountViewModelTest {
     @Test
     fun `test that initial state has all Pro plans listed`() = runTest {
         whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
-        whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
-        whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(
+                expectedMonthlySubscriptionsList,
+                expectedYearlySubscriptionsList
+            )
+        )
         initViewModel()
         underTest.state.map { it.localisedSubscriptionsList }.test {
             Truth.assertThat(awaitItem()).isEqualTo(expectedLocalisedSubscriptionsList)
@@ -119,8 +120,12 @@ class ChooseAccountViewModelTest {
         )
         whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
         whenever(getRecommendedSubscriptionUseCase()).thenReturn(subscriptionProLiteMonthly)
-        whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
-        whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(
+                expectedMonthlySubscriptionsList,
+                expectedYearlySubscriptionsList
+            )
+        )
         initViewModel()
         underTest.state.map { it.cheapestSubscriptionAvailable }.test {
             Truth.assertThat(awaitItem()).isEqualTo(expectedResult)
@@ -141,8 +146,12 @@ class ChooseAccountViewModelTest {
             }
             whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
             whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
-            whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
-            whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(
+                    expectedMonthlySubscriptionsList,
+                    expectedYearlySubscriptionsList
+                )
+            )
             initViewModel()
 
             underTest.state.test {
@@ -153,6 +162,7 @@ class ChooseAccountViewModelTest {
         }
 
     private val subscriptionProIMonthly = Subscription(
+        sku = "mega.android.pro1.onemonth",
         accountType = AccountType.PRO_I,
         handle = 1560943707714440503,
         storage = PRO_I_STORAGE_TRANSFER,
@@ -165,6 +175,7 @@ class ChooseAccountViewModelTest {
     )
 
     private val subscriptionProIIMonthly = Subscription(
+        sku = "mega.android.pro2.onemonth",
         accountType = AccountType.PRO_II,
         handle = 7974113413762509455,
         storage = PRO_II_STORAGE_TRANSFER,
@@ -177,6 +188,7 @@ class ChooseAccountViewModelTest {
     )
 
     private val subscriptionProIIIMonthly = Subscription(
+        sku = "mega.android.pro3.onemonth",
         accountType = AccountType.PRO_III,
         handle = -2499193043825823892,
         storage = PRO_III_STORAGE_TRANSFER,
@@ -189,6 +201,7 @@ class ChooseAccountViewModelTest {
     )
 
     private val subscriptionProLiteMonthly = Subscription(
+        sku = "mega.android.prolite.onemonth",
         accountType = AccountType.PRO_LITE,
         handle = -4226692769210777158,
         storage = PRO_LITE_STORAGE,
@@ -208,6 +221,7 @@ class ChooseAccountViewModelTest {
     )
 
     private val subscriptionProIYearly = Subscription(
+        sku = "mega.android.pro1.oneyear",
         accountType = AccountType.PRO_I,
         handle = 7472683699866478542,
         storage = PRO_I_STORAGE_TRANSFER,
@@ -220,6 +234,7 @@ class ChooseAccountViewModelTest {
     )
 
     private val subscriptionProIIYearly = Subscription(
+        sku = "mega.android.pro2.oneyear",
         accountType = AccountType.PRO_II,
         handle = 370834413380951543,
         storage = PRO_II_STORAGE_TRANSFER,
@@ -232,6 +247,7 @@ class ChooseAccountViewModelTest {
     )
 
     private val subscriptionProIIIYearly = Subscription(
+        sku = "mega.android.pro3.oneyear",
         accountType = AccountType.PRO_III,
         handle = 7225413476571973499,
         storage = PRO_III_STORAGE_TRANSFER,
@@ -244,6 +260,7 @@ class ChooseAccountViewModelTest {
     )
 
     private val subscriptionProLiteYearly = Subscription(
+        sku = "mega.android.prolite.oneyear",
         accountType = AccountType.PRO_LITE,
         handle = -5517769810977460898,
         storage = PRO_LITE_STORAGE,

@@ -11,11 +11,13 @@ import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.domain.entity.account.CurrencyPoint
 import mega.privacy.android.domain.entity.account.Skus
+import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -26,6 +28,7 @@ class GetRecommendedSubscriptionUseCaseTest {
     private val getAppSubscriptionOptionsUseCase = mock<GetAppSubscriptionOptionsUseCase>()
     private val getCurrentSubscriptionPlanUseCase = mock<GetCurrentSubscriptionPlanUseCase>()
     private val subscriptionMapper = mock<SubscriptionMapper>()
+    private val billingRepository = mock<BillingRepository>()
 
     @BeforeAll
     fun setUp() {
@@ -34,6 +37,7 @@ class GetRecommendedSubscriptionUseCaseTest {
             getAppSubscriptionOptionsUseCase = getAppSubscriptionOptionsUseCase,
             getCurrentSubscriptionPlanUseCase = getCurrentSubscriptionPlanUseCase,
             subscriptionMapper = subscriptionMapper,
+            billingRepository = billingRepository,
         )
     }
 
@@ -48,7 +52,8 @@ class GetRecommendedSubscriptionUseCaseTest {
             )
         )
 
-        whenever(getLocalPricingUseCase(Skus.SKU_PRO_I_MONTH)).thenReturn(localPricingProI)
+        whenever(billingRepository.querySkus(listOf(subscriptionOptionI.sku))).thenReturn(emptyList())
+        whenever(getLocalPricingUseCase(subscriptionOptionI.sku)).thenReturn(localPricingProI)
         whenever(subscriptionMapper(subscriptionOptionI, localPricingProI)).thenReturn(subscriptionProI)
 
         val actual = underTest.invoke()
@@ -81,14 +86,17 @@ class GetRecommendedSubscriptionUseCaseTest {
             )
         )
 
-        whenever(getLocalPricingUseCase(Skus.SKU_PRO_LITE_MONTH)).thenReturn(localPricingLite)
+        whenever(billingRepository.querySkus(listOf(subscriptionOptionLite.sku))).thenReturn(emptyList())
+        whenever(getLocalPricingUseCase(subscriptionOptionLite.sku)).thenReturn(localPricingLite)
         whenever(subscriptionMapper(subscriptionOptionLite, localPricingLite)).thenReturn(subscriptionLite)
 
         val actual = underTest.invoke()
         assertThat(actual).isEqualTo(subscriptionLite)
+        verify(billingRepository).querySkus(listOf(subscriptionOptionLite.sku))
     }
 
     private val subscriptionOptionLite = SubscriptionOption(
+        sku = "prolite_month",
         accountType = AccountType.PRO_LITE,
         months = 1,
         handle = 1560943707714440503,
@@ -99,6 +107,7 @@ class GetRecommendedSubscriptionUseCaseTest {
     )
 
     private val subscriptionOptionI = SubscriptionOption(
+        sku = "proi_month",
         handle = 1560943707714440503,
         accountType = AccountType.PRO_I,
         months = 1,
@@ -109,6 +118,7 @@ class GetRecommendedSubscriptionUseCaseTest {
     )
 
     private val subscriptionOptionII = SubscriptionOption(
+        sku = "proii_month",
         handle = 7974113413762509455,
         accountType = AccountType.PRO_II,
         months = 1,
@@ -133,6 +143,7 @@ class GetRecommendedSubscriptionUseCaseTest {
     )
 
     private val subscriptionLite = Subscription(
+        sku = "pro_lite_month",
         accountType = AccountType.PRO_LITE,
         handle = 1560943707714440503,
         storage = 450,
@@ -145,6 +156,7 @@ class GetRecommendedSubscriptionUseCaseTest {
     )
 
     private val subscriptionProI = Subscription(
+        sku = "pro_i_month",
         accountType = AccountType.PRO_I,
         handle = 1560943707714440503,
         storage = 2048,

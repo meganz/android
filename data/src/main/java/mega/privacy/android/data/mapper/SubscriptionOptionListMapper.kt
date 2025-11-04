@@ -21,6 +21,7 @@ internal class SubscriptionOptionListMapper @Inject constructor(
         request: MegaRequest
     ) = (0 until request.pricing.numProducts).map {
         SubscriptionOption(
+            request.pricing.getAndroidID(it),
             accountTypeMapper(request.pricing.getProLevel(it)),
             request.pricing.getMonths(it),
             request.pricing.getHandle(it),

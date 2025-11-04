@@ -116,9 +116,9 @@ data class LocalisedSubscription(
     /**
      * Get offer id based on subscription period
      */
-    fun getOfferId(isMonthly: Boolean): String? = if (isMonthly) {
-        monthlySubscription.offerId
+    fun getSubscription(isMonthly: Boolean): Subscription = if (isMonthly) {
+        monthlySubscription
     } else {
-        yearlySubscription.offerId
+        yearlySubscription
     }
 }

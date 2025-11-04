@@ -24,7 +24,6 @@ import mega.privacy.android.app.utils.MANAGE_PLAY_STORE_SUBSCRIPTION_URL
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.feature.payment.model.mapper.AccountTypeToProductIdMapper
 import mega.privacy.android.feature.payment.presentation.storage.AccountStorageViewModel
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.CancelSubscriptionContinueCancellationButtonPressedEvent
@@ -47,9 +46,6 @@ class CancelAccountPlanActivity : AppCompatActivity() {
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
-
-    @Inject
-    lateinit var accountTypeToProductIdMapper: AccountTypeToProductIdMapper
 
     private val viewModel: CancelAccountPlanViewModel by viewModels()
     private val accountStorageViewModel: AccountStorageViewModel by viewModels()
@@ -134,11 +130,8 @@ class CancelAccountPlanActivity : AppCompatActivity() {
                                     SubscriptionCancellationSurveyCancelSubscriptionButtonEvent
                                 )
                                 viewModel.cancelSubscription(reason, canContact)
-                                uiState.isMonthlySubscription?.let { isMonthlySubscription ->
-                                    redirectToCancelPlayStoreSubscription(
-                                        accountType,
-                                        isMonthlySubscription
-                                    )
+                                uiState.sku?.let { sku ->
+                                    redirectToCancelPlayStoreSubscription(sku)
                                 }
                             },
                             onDoNotCancelButtonClicked = {
@@ -162,16 +155,9 @@ class CancelAccountPlanActivity : AppCompatActivity() {
         )
     }
 
-    private fun redirectToCancelPlayStoreSubscription(
-        accountType: AccountType,
-        isMonthly: Boolean,
-    ) {
+    private fun redirectToCancelPlayStoreSubscription(sku: String) {
         val appPackage = applicationContext.packageName
-        val productID = accountTypeToProductIdMapper(
-            accountType = accountType,
-            isMonthly = isMonthly
-        )
-        val link = "${MANAGE_PLAY_STORE_SUBSCRIPTION_URL}${productID}&package=${appPackage}"
+        val link = "${MANAGE_PLAY_STORE_SUBSCRIPTION_URL}${sku}&package=${appPackage}"
         val uriUrl = Uri.parse(link)
         val launchBrowser = Intent(ACTION_VIEW, uriUrl)
         runCatching {

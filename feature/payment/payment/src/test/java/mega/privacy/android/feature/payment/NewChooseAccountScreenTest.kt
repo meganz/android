@@ -36,6 +36,7 @@ class NewChooseAccountScreenTest {
     private val formattedSizeMapper = FormattedSizeMapper()
 
     private val subscriptionProIMonthly = Subscription(
+        sku = "pro_i_monthly",
         accountType = AccountType.PRO_I,
         handle = 1560943707714440503,
         storage = 2048,
@@ -48,6 +49,7 @@ class NewChooseAccountScreenTest {
     )
 
     private val subscriptionProIYearly = Subscription(
+        sku = "pro_i_yearly",
         accountType = AccountType.PRO_I,
         handle = 7472683699866478542,
         storage = 2048,
@@ -60,6 +62,7 @@ class NewChooseAccountScreenTest {
     )
 
     private val subscriptionProIIMonthly = Subscription(
+        sku = "pro_ii_monthly",
         accountType = AccountType.PRO_II,
         handle = 7974113413762509455,
         storage = 8192,
@@ -72,6 +75,7 @@ class NewChooseAccountScreenTest {
     )
 
     private val subscriptionProIIYearly = Subscription(
+        sku = "pro_ii_yearly",
         accountType = AccountType.PRO_II,
         handle = 370834413380951543,
         storage = 8192,
@@ -84,6 +88,7 @@ class NewChooseAccountScreenTest {
     )
 
     private val subscriptionProIIIMonthly = Subscription(
+        sku = "pro_iii_monthly",
         accountType = AccountType.PRO_III,
         handle = -2499193043825823892,
         storage = 16384,
@@ -96,6 +101,7 @@ class NewChooseAccountScreenTest {
     )
 
     private val subscriptionProIIIYearly = Subscription(
+        sku = "pro_iii_yearly",
         accountType = AccountType.PRO_III,
         handle = 7225413476571973499,
         storage = 16384,
@@ -207,7 +213,7 @@ class NewChooseAccountScreenTest {
 
     private fun setContent(
         isUpgradeAccount: Boolean = false,
-        onBuyPlanClick: (AccountType, Boolean, String?) -> Unit = { _, _, _ -> },
+        onBuyPlanClick: (Subscription) -> Unit = {},
         onFreePlanClick: () -> Unit = {},
         maybeLaterClicked: () -> Unit = {},
     ) = composeRule.setContent {

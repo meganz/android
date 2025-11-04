@@ -25,6 +25,7 @@ internal class SubscriptionOptionListMapperTest {
         on { getGBStorage(0) }.thenReturn(450)
         on { getGBTransfer(0) }.thenReturn(450)
         on { getAmount(0) }.thenReturn(13)
+        on { getAndroidID(0) }.thenReturn("com.mega.pro1.monthly")
     }
 
     private val currency = mock<MegaCurrency> {
@@ -45,6 +46,7 @@ internal class SubscriptionOptionListMapperTest {
         transfer = 450,
         amount = CurrencyPoint.SystemCurrencyPoint(13),
         currency = currencyMapper("EUR"),
+        sku = "com.mega.pro1.monthly",
     )
 
     private val underTest = SubscriptionOptionListMapper(

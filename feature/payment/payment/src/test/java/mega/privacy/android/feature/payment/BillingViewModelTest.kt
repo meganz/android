@@ -6,16 +6,13 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.account.MegaSku
+import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.usecase.billing.MonitorBillingEventUseCase
 import mega.privacy.android.domain.usecase.billing.QueryPurchase
-import mega.privacy.android.domain.usecase.billing.QuerySkus
 import mega.privacy.android.feature.payment.domain.LaunchPurchaseFlowUseCase
-import mega.privacy.android.feature.payment.model.mapper.AccountTypeToProductIdMapper
 import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,14 +24,12 @@ import org.mockito.kotlin.whenever
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 internal class BillingViewModelTest {
     private lateinit var underTest: BillingViewModel
-    private val querySkus = mock<QuerySkus>()
     private val queryPurchase = mock<QueryPurchase>()
     private val launchPurchaseFlowUseCase = mock<LaunchPurchaseFlowUseCase>()
     private val eventFlow = MutableSharedFlow<BillingEvent>()
     private val monitorBillingEventUseCase = mock<MonitorBillingEventUseCase> {
         onBlocking { invoke() }.thenReturn(eventFlow)
     }
-    private val accountTypeToProductIdMapper: AccountTypeToProductIdMapper = mock()
 
     @BeforeEach
     fun setUp() {
@@ -43,34 +38,10 @@ internal class BillingViewModelTest {
 
     private fun initViewModel() {
         underTest = BillingViewModel(
-            querySkus = querySkus,
             queryPurchase = queryPurchase,
             launchPurchaseFlowUseCase = launchPurchaseFlowUseCase,
             monitorBillingEventUseCase = monitorBillingEventUseCase,
-            accountTypeToProductIdMapper = accountTypeToProductIdMapper
         )
-    }
-
-    @Test
-    fun `test that skus empty when loadSkus return empty`() = runTest {
-        whenever(querySkus()).thenReturn(emptyList())
-        underTest.loadSkus()
-        Truth.assertThat(underTest.skus.value).isEmpty()
-    }
-
-    @Test
-    fun `test that skus empty when loadSkus throw exception`() = runTest {
-        whenever(querySkus()).thenThrow(RuntimeException())
-        underTest.loadSkus()
-        Truth.assertThat(underTest.skus.value).isEmpty()
-    }
-
-    @Test
-    fun `test that skus not empty when loadSkus return not empty`() = runTest {
-        val list = listOf(MegaSku("", 1L, "USD", emptyList()))
-        whenever(querySkus()).thenReturn(list)
-        underTest.loadSkus()
-        Truth.assertThat(underTest.skus.value).isNotEmpty()
     }
 
     @Test
@@ -120,99 +91,90 @@ internal class BillingViewModelTest {
     }
 
     @Test
-    fun `test that accountTypeToProductIdMapper is called with correct parameters for monthly subscription`() =
+    fun `test that launchPurchaseFlowUseCase is called with correct sku for monthly subscription`() =
         runTest {
             val activity = mock<Activity>()
-            val accountType = AccountType.PRO_I
-            val isMonthly = true
-            val expectedProductId = Skus.SKU_PRO_I_MONTH
+            val expectedSku = Skus.SKU_PRO_I_MONTH
+            val subscription = mock<Subscription> {
+                on { sku }.thenReturn(expectedSku)
+                on { offerId }.thenReturn(null)
+            }
 
-            whenever(accountTypeToProductIdMapper(accountType, isMonthly))
-                .thenReturn(expectedProductId)
+            underTest.startPurchase(activity, subscription)
 
-            underTest.startPurchase(activity, accountType, isMonthly)
-
-            verify(accountTypeToProductIdMapper).invoke(accountType, isMonthly)
+            verify(launchPurchaseFlowUseCase).invoke(activity, expectedSku, null)
         }
 
     @Test
-    fun `test that accountTypeToProductIdMapper is called with correct parameters for yearly subscription`() =
+    fun `test that launchPurchaseFlowUseCase is called with correct sku for yearly subscription`() =
         runTest {
             val activity = mock<Activity>()
-            val accountType = AccountType.PRO_II
-            val isMonthly = false
-            val expectedProductId = Skus.SKU_PRO_II_YEAR
+            val expectedSku = Skus.SKU_PRO_II_YEAR
+            val subscription = mock<Subscription> {
+                on { sku }.thenReturn(expectedSku)
+                on { offerId }.thenReturn(null)
+            }
 
-            whenever(accountTypeToProductIdMapper(accountType, isMonthly))
-                .thenReturn(expectedProductId)
+            underTest.startPurchase(activity, subscription)
 
-            underTest.startPurchase(activity, accountType, isMonthly)
-
-            verify(accountTypeToProductIdMapper).invoke(accountType, isMonthly)
+            verify(launchPurchaseFlowUseCase).invoke(activity, expectedSku, null)
         }
 
     @Test
     fun `test that launchPurchaseFlowUseCase is called with correct activity and product id`() =
         runTest {
             val activity = mock<Activity>()
-            val accountType = AccountType.PRO_III
-            val isMonthly = true
-            val expectedProductId = Skus.SKU_PRO_III_MONTH
+            val expectedSku = Skus.SKU_PRO_III_MONTH
+            val subscription = mock<Subscription> {
+                on { sku }.thenReturn(expectedSku)
+                on { offerId }.thenReturn(null)
+            }
 
-            whenever(accountTypeToProductIdMapper(accountType, isMonthly))
-                .thenReturn(expectedProductId)
+            underTest.startPurchase(activity, subscription)
 
-            underTest.startPurchase(activity, accountType, isMonthly)
-
-            verify(launchPurchaseFlowUseCase).invoke(activity, expectedProductId, null)
+            verify(launchPurchaseFlowUseCase).invoke(activity, expectedSku, null)
         }
 
     @Test
     fun `test that startPurchase handles PRO_LITE monthly correctly`() = runTest {
         val activity = mock<Activity>()
-        val accountType = AccountType.PRO_LITE
-        val isMonthly = true
-        val expectedProductId = Skus.SKU_PRO_LITE_MONTH
+        val expectedSku = Skus.SKU_PRO_LITE_MONTH
+        val subscription = mock<Subscription> {
+            on { sku }.thenReturn(expectedSku)
+            on { offerId }.thenReturn(null)
+        }
 
-        whenever(accountTypeToProductIdMapper(accountType, isMonthly))
-            .thenReturn(expectedProductId)
+        underTest.startPurchase(activity, subscription)
 
-        underTest.startPurchase(activity, accountType, isMonthly)
-
-        verify(accountTypeToProductIdMapper).invoke(accountType, isMonthly)
-        verify(launchPurchaseFlowUseCase).invoke(activity, expectedProductId, null)
+        verify(launchPurchaseFlowUseCase).invoke(activity, expectedSku, null)
     }
 
     @Test
-    fun `test that startPurchase handles PRO_I yearly correctly`() = runTest {
+    fun `test that startPurchase handles PRO_I yearly correctly with offerId`() = runTest {
         val activity = mock<Activity>()
-        val accountType = AccountType.PRO_I
-        val isMonthly = false
-        val expectedProductId = Skus.SKU_PRO_I_YEAR
+        val expectedSku = Skus.SKU_PRO_I_YEAR
         val offerId = "offerId"
+        val subscription = mock<Subscription> {
+            on { sku }.thenReturn(expectedSku)
+            on { this.offerId }.thenReturn(offerId)
+        }
 
-        whenever(accountTypeToProductIdMapper(accountType, isMonthly))
-            .thenReturn(expectedProductId)
+        underTest.startPurchase(activity, subscription)
 
-        underTest.startPurchase(activity, accountType, isMonthly, offerId)
-
-        verify(accountTypeToProductIdMapper).invoke(accountType, isMonthly)
-        verify(launchPurchaseFlowUseCase).invoke(activity, expectedProductId, offerId)
+        verify(launchPurchaseFlowUseCase).invoke(activity, expectedSku, offerId)
     }
 
     @Test
-    fun `test that startPurchase does not throw exception when mapper returns empty product id`() =
+    fun `test that startPurchase does not throw exception when sku is empty`() =
         runTest {
             val activity = mock<Activity>()
-            val accountType = AccountType.FREE
-            val isMonthly = true
+            val subscription = mock<Subscription> {
+                on { sku }.thenReturn("")
+                on { offerId }.thenReturn(null)
+            }
 
-            whenever(accountTypeToProductIdMapper(accountType, isMonthly))
-                .thenReturn("")
+            underTest.startPurchase(activity, subscription)
 
-            underTest.startPurchase(activity, accountType, isMonthly)
-
-            verify(accountTypeToProductIdMapper).invoke(accountType, isMonthly)
             verify(launchPurchaseFlowUseCase).invoke(activity, "", null)
         }
 }

@@ -9,7 +9,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.android.billingclient.api.Purchase
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.billing.BillingEvent
@@ -30,7 +29,6 @@ import mega.privacy.mobile.analytics.event.BuyProLiteEvent
 import mega.privacy.mobile.analytics.event.GetStartedForFreeUpgradePlanButtonPressedEvent
 import mega.privacy.mobile.analytics.event.MaybeLaterUpgradeAccountButtonPressedEvent
 import mega.privacy.mobile.analytics.event.UpgradeAccountPlanScreenEvent
-import timber.log.Timber
 
 @Composable
 fun ChooseAccountRoute(
@@ -58,7 +56,6 @@ fun ChooseAccountRoute(
                     onPurchasesUpdated(
                         megaNavigator = megaNavigator,
                         activity = activity,
-                        purchases = it.purchases,
                         isUpgradeAccount = isUpgradeAccount,
                         openFromSource = openFromSource
                     )
@@ -85,19 +82,17 @@ fun ChooseAccountRoute(
             )
             activity?.let { onFreeClick(it, megaNavigator) }
         },
-        onBuyPlanClick = { accountType, isMonthly, offerId ->
+        onBuyPlanClick = { subscription ->
             sendAccountTypeAnalytics(
                 isUpgradeAccount = isUpgradeAccount,
                 openFromSource = openFromSource,
-                planType = accountType,
+                planType = subscription.accountType,
                 isUpgradeAccountDueToAds = accountStorageViewModel.isUpgradeAccountDueToAds()
             )
             activity?.let {
                 billingViewModel.startPurchase(
                     activity = activity,
-                    isMonthly = isMonthly,
-                    accountType = accountType,
-                    offerId = offerId
+                    subscription = subscription
                 )
             }
         },
@@ -170,26 +165,9 @@ private fun createNavigationBundle(activity: Activity, accountType: AccountType?
 private fun onPurchasesUpdated(
     megaNavigator: MegaNavigator,
     activity: Activity,
-    purchases: List<MegaPurchase>,
     isUpgradeAccount: Boolean,
     openFromSource: UpgradeAccountSource,
 ) {
-    if (purchases.isNotEmpty()) {
-        val purchase = purchases.first()
-        //payment may take time to process, we will not give privilege until it has been fully processed
-        val sku = purchase.sku
-        if (purchase.state == Purchase.PurchaseState.PURCHASED) {
-            //payment has been processed
-            Timber.d("Purchase $sku successfully")
-        } else {
-            //payment is being processed or in unknown state
-            Timber.d("Purchase %s is being processed or in unknown state.", sku)
-        }
-    } else {
-        //down grade case
-        Timber.d("Downgrade, the new subscription takes effect when the old one expires.")
-    }
-
     if (isUpgradeAccount) {
         if (openFromSource == UpgradeAccountSource.MY_ACCOUNT_SCREEN) {
             megaNavigator.openMyAccountActivity(

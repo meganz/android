@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.account.CurrencyPoint
  * @property currency        Currency of the subscription plan
  */
 data class SubscriptionOption(
+    val sku: String,
     val accountType: AccountType,
     val months: Int,
     val handle: Long,

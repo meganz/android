@@ -27,6 +27,7 @@ data class CancelAccountPlanUiState(
     val freePlanStorageQuota: String = "20",
     val rewindDaysQuota: String = "",
     val accountType: AccountType = AccountType.UNKNOWN,
+    val sku: String? = null,
     val accountNameRes: Int = R.string.recovering_info,
     val isLoading: Boolean = true,
     val subscriptionId: String? = null,
