@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 
 @Serializable
@@ -112,3 +113,8 @@ data class LegacyZipBrowserNavKey(
     val zipFilePath: String?,
     val nodeId: NodeId?,
 ) : NavKey
+
+@Serializable
+data class LegacyFileLinkNavKey(
+    val uriString: String?,
+) : NoSessionNavKey.Optional

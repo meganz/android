@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.filestorage
 
 import android.net.Uri
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.filestorage.FileStorageDeepLinkHandler.Companion.PATH_QUERY_PARAM
 import mega.privacy.android.app.presentation.filestorage.FileStorageDeepLinkHandler.Companion.getUriForFileStorageSection
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -46,7 +47,7 @@ class FileStorageDeepLinkHandlerTest {
     }
 
     @Test
-    fun `test that URIs are parsed correctly`() {
+    fun `test that URIs are parsed correctly`() = runTest {
         stubUriAndUriBuilder()
         val expected = LegacyFileExplorerNavKey(UriPath(DESTINATION))
         val uri = getUriForFileStorageSection(DESTINATION, emptyList(), mockUriBuilderFactory)

@@ -6,7 +6,7 @@ import android.net.Uri
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.navigation.contract.DeepLinkHandler
+import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.PendingIntentHandler
 import mega.privacy.android.navigation.destination.LegacyFileExplorerNavKey
 import javax.inject.Inject
@@ -22,7 +22,7 @@ class FileStorageDeepLinkHandler @Inject constructor() : DeepLinkHandler by Comp
         internal const val HIGHLIGHTED_FILES_QUERY_PARAM = "highlightedFiles"
 
         override val authority = "fileStorage"
-        override fun getNavKeysFromParameters(uri: Uri): List<NavKey> =
+        override suspend fun getNavKeysFromParameters(uri: Uri): List<NavKey> =
             listOf(
                 LegacyFileExplorerNavKey(
                     uri.getQueryParameter(PATH_QUERY_PARAM)?.let { UriPath(it) },

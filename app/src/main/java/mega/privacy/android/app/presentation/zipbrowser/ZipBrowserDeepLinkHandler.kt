@@ -6,7 +6,7 @@ import android.net.Uri
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.navigation.contract.DeepLinkHandler
+import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.PendingIntentHandler
 import mega.privacy.android.navigation.destination.LegacyZipBrowserNavKey
 import javax.inject.Inject
@@ -23,7 +23,7 @@ class ZipBrowserDeepLinkHandler @Inject constructor() : DeepLinkHandler by Compa
 
         override val authority: String = "zipBrowser"
 
-        override fun getNavKeysFromParameters(uri: Uri): List<NavKey> =
+        override suspend fun getNavKeysFromParameters(uri: Uri): List<NavKey> =
             listOf(
                 LegacyZipBrowserNavKey(
                     uri.getQueryParameter(PATH_QUERY_PARAM),

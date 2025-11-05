@@ -2,6 +2,7 @@ package mega.privacy.android.navigation.contract
 
 import android.net.Uri
 import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 
 /**
  * Helper interface for handling PendingIntents Uri's that are not intended to be handled as Deep links, only pending intents.
@@ -18,16 +19,16 @@ interface PendingIntentHandler : DeepLinkHandler {
      */
     val authority: String
 
-    override fun getNavKeysFromUri(uri: Uri): List<NavKey>? {
+    override suspend fun getNavKeysFromUri(uri: Uri): List<NavKey>? {
         return if (uri.scheme == scheme && uri.authority == authority) {
             getNavKeysFromParameters(uri)
         } else null
     }
 
     /**
-     * Helper class to thet the NavKey list from the Uri parameters once scheme and authority matches the specific values for this case
+     * Helper class to get the NavKey list from the Uri parameters once scheme and authority matches the specific values for this case
      */
-    fun getNavKeysFromParameters(uri: Uri): List<NavKey>?
+    suspend fun getNavKeysFromParameters(uri: Uri): List<NavKey>?
 
 
     /**

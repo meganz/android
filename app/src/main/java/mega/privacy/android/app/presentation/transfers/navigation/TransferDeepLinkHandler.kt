@@ -5,7 +5,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.appstate.MegaActivity
-import mega.privacy.android.navigation.contract.DeepLinkHandler
+import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.PendingIntentHandler
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import javax.inject.Inject
@@ -20,7 +20,7 @@ class TransferDeepLinkHandler @Inject constructor() : DeepLinkHandler by Compani
 
         override val authority = "trans"
 
-        override fun getNavKeysFromParameters(uri: Uri): List<NavKey> = listOf(
+        override suspend fun getNavKeysFromParameters(uri: Uri): List<NavKey> = listOf(
             TransfersNavKey(
                 uri.getQueryParameter(TAB_QUERY_PARAM)
                     ?.let { TransfersNavKey.Tab.valueOf(it) })

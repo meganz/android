@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.filelink
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -340,5 +341,13 @@ class FileLinkComposeActivity : PasscodeActivity(),
 
     companion object {
         private const val TAG_DECRYPT = "decrypt"
+
+        fun getIntent(context: Context, link: Uri?): Intent {
+            val fileLinkIntent = Intent(context, FileLinkComposeActivity::class.java)
+            fileLinkIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            fileLinkIntent.action = Constants.ACTION_IMPORT_LINK_FETCH_NODES
+            fileLinkIntent.data = link
+            return fileLinkIntent
+        }
     }
 }

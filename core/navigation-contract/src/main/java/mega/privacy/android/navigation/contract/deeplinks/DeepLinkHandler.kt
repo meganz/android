@@ -1,4 +1,4 @@
-package mega.privacy.android.navigation.contract
+package mega.privacy.android.navigation.contract.deeplinks
 
 import android.net.Uri
 import androidx.navigation3.runtime.NavKey
@@ -14,5 +14,5 @@ interface DeepLinkHandler {
      * @param uri The Uri to check
      * @return The NavKeys if the Uri is valid, null otherwise
      */
-    fun getNavKeysFromUri(uri: Uri): List<NavKey>?
+    suspend fun getNavKeysFromUri(uri: Uri): List<NavKey>?
 }

@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.transfers.navigation
 
 import android.net.Uri
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.transfers.navigation.TransferDeepLinkHandler.Companion.TAB_QUERY_PARAM
 import mega.privacy.android.app.presentation.transfers.navigation.TransferDeepLinkHandler.Companion.getUriForTransfersSection
 import mega.privacy.android.navigation.contract.PendingIntentHandler
@@ -61,7 +62,7 @@ class TransferDeepLinkHandlerTest {
     @NullSource
     fun `test that URIs are parsed correctly`(
         tab: TransfersNavKey.Tab?,
-    ) {
+    ) = runTest {
         stubUriAndUriBuilder(tabParam = tab?.toString())
         val expected = TransfersNavKey(tab)
         val uri = getUriForTransfersSection(tab, mockUriBuilderFactory)

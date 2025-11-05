@@ -6,7 +6,7 @@ import android.net.Uri
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.navigation.contract.DeepLinkHandler
+import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.PendingIntentHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import javax.inject.Inject
@@ -18,7 +18,7 @@ class CloudDriveDeepLinkHandler @Inject constructor() : DeepLinkHandler by Compa
         internal const val HIGHLIGHTED_FILES_QUERY_PARAM = "highlightedFiles"
 
         override val authority = "cloudDrive"
-        override fun getNavKeysFromParameters(uri: Uri): List<NavKey> =
+        override suspend fun getNavKeysFromParameters(uri: Uri): List<NavKey> =
             listOf(
                 CloudDriveNavKey(
                     uri.getQueryParameter(FOLDER_NODE_ID_PARAM)?.toLongOrNull() ?: -1L,
