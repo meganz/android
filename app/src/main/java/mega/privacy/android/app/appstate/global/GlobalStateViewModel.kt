@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.appstate.global.mapper.BlockedStateMapper
 import mega.privacy.android.app.appstate.global.model.BlockedState
 import mega.privacy.android.app.appstate.global.model.GlobalState
@@ -24,6 +25,7 @@ import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.account.HandleBlockedStateSessionUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
+import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
@@ -37,6 +39,7 @@ class GlobalStateViewModel @Inject constructor(
     private val monitorAccountBlockedUseCase: MonitorAccountBlockedUseCase,
     private val blockedStateMapper: BlockedStateMapper,
     private val handleBlockedStateSessionUseCase: HandleBlockedStateSessionUseCase,
+    private val snackbarEventQueue: SnackbarEventQueue,
 ) : ViewModel() {
     init {
         globalInitialiser.onAppStart()
@@ -90,6 +93,15 @@ class GlobalStateViewModel @Inject constructor(
             handleBlockedStateSessionUseCase(blockedState)
             result
         }
+
+    /**
+     * Queue a message to be displayed in the snackbar
+     */
+    fun queueMessage(message: String) {
+        viewModelScope.launch {
+            snackbarEventQueue.queueMessage(message)
+        }
+    }
 
 
     private val sessionFlow: Flow<String?> by lazy {

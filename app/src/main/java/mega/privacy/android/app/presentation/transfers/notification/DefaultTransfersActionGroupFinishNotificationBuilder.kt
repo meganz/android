@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.clouddrive.CloudDriveDeepLinkHandler
 import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
@@ -306,13 +307,16 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
 
             else -> {
                 val warningMessage = context.getString(R.string.intent_not_available)
-                //if (singleActivity) { // TRAN-1042
-                createPendingIntent(
-                    Intent(context, ManagerActivity::class.java).apply {
-                        action = Constants.ACTION_SHOW_WARNING
-                        putExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE, warningMessage)
-                    }
-                )
+                if (singleActivity) {
+                    MegaActivity.getPendingIntentForWarningMessage(context, warningMessage)
+                } else {
+                    createPendingIntent(
+                        Intent(context, ManagerActivity::class.java).apply {
+                            action = Constants.ACTION_SHOW_WARNING
+                            putExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE, warningMessage)
+                        }
+                    )
+                }
             }
         }
     }

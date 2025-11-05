@@ -26,6 +26,7 @@ import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.account.HandleBlockedStateSessionUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
+import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
@@ -51,6 +52,7 @@ class GlobalStateViewModelTest {
     private val monitorUserCredentialsUseCase = mock<MonitorUserCredentialsUseCase>()
     private val monitorAccountBlockedUseCase = mock<MonitorAccountBlockedUseCase>()
     private val handleBlockedStateSessionUseCase = mock<HandleBlockedStateSessionUseCase>()
+    private val snackbarEventQueue = mock<SnackbarEventQueue>()
 
     private val globalInitialiser = mock<GlobalInitialiser>()
 
@@ -73,6 +75,7 @@ class GlobalStateViewModelTest {
             monitorAccountBlockedUseCase = monitorAccountBlockedUseCase,
             blockedStateMapper = BlockedStateMapper(),
             handleBlockedStateSessionUseCase = handleBlockedStateSessionUseCase,
+            snackbarEventQueue = snackbarEventQueue,
         )
     }
 
@@ -83,6 +86,7 @@ class GlobalStateViewModelTest {
             monitorUserCredentialsUseCase,
             globalInitialiser,
             handleBlockedStateSessionUseCase,
+            snackbarEventQueue,
         )
     }
 
@@ -873,6 +877,14 @@ class GlobalStateViewModelTest {
 
         underTest.state.test { cancelAndIgnoreRemainingEvents() }
         verify(handleBlockedStateSessionUseCase).invoke(notBlockedEvent)
+    }
+
+    @Test
+    fun `test that queueMessage enqueues the message to snackbarEventQueue`() = runTest {
+        val message = "something important"
+        underTest.queueMessage(message)
+
+        verify(snackbarEventQueue).queueMessage(message)
     }
 
     private val notBlockedEvent = AccountBlockedEvent(

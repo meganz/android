@@ -12,6 +12,7 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +41,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginNavDisplay
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
+import mega.privacy.android.app.utils.Constants
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -51,9 +53,19 @@ class MegaActivity : ComponentActivity() {
     @Serializable
     data class LoggedInScreens(val isFromLogin: Boolean = false, val session: String) : NavKey
 
+    private lateinit var viewModel: GlobalStateViewModel
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         this.intent = intent
+        consumeWarningMessage()
+    }
+
+    private fun consumeWarningMessage() {
+        intent.getStringExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE)?.let { warningMessage ->
+            viewModel.queueMessage(warningMessage)
+            intent.removeExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,7 +75,7 @@ class MegaActivity : ComponentActivity() {
         splashScreen.setKeepOnScreenCondition { keepSplashScreen }
         enableEdgeToEdge()
         setContent {
-            val viewModel = viewModel<GlobalStateViewModel>()
+            viewModel = viewModel<GlobalStateViewModel>()
             val presenceViewModel = hiltViewModel<SignalPresenceViewModel>()
 
             val state by viewModel.state.collectAsStateWithLifecycle()
@@ -73,6 +85,9 @@ class MegaActivity : ComponentActivity() {
             // This is used to recompose the LoginGraph when new login request is made
             var fromLogin by remember { mutableStateOf(false) }
             keepSplashScreen = state is GlobalState.Loading
+            LaunchedEffect(Unit) {
+                consumeWarningMessage()
+            }
 
             AndroidTheme(isDark = state.themeMode.isDarkMode()) {
                 EventEffect(
@@ -149,6 +164,30 @@ class MegaActivity : ComponentActivity() {
                 context,
                 MegaActivity::class.java
             ).apply {
+                flags =
+                    Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+            return PendingIntent.getActivity(
+                context,
+                requestCode,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        }
+
+        /**
+         * Get a pending intent to open this activity with the specified warning message
+         */
+        fun getPendingIntentForWarningMessage(
+            context: Context,
+            warningMessage: String,
+            requestCode: Int = System.currentTimeMillis().toInt(),
+        ): PendingIntent {
+            val intent = Intent(
+                context,
+                MegaActivity::class.java
+            ).apply {
+                putExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE, warningMessage)
                 flags =
                     Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
             }
