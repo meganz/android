@@ -22,6 +22,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.SnackbarAttributes
+import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
@@ -178,6 +179,7 @@ internal fun NodeOptionsBottomSheetContent(
             modifier = Modifier.semantics { testTagsAsResourceId = true },
             title = uiState.node.name,
             titleColor = if (uiState.node.isTakenDown) TextColor.Error else TextColor.Primary,
+            titleTextStyle = AppTheme.typography.titleMedium,
             titleMaxLines = 1,
             subtitle = uiState.node.subtitle.text(),
             showVersion = uiState.node.hasVersion,

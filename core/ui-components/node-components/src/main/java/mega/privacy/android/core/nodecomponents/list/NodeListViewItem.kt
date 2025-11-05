@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -117,6 +118,7 @@ fun <T : TypedNode> NodeListViewItem(
  * @param thumbnailData Data for the thumbnail, can be a URL or any other data type supported by ThumbnailView
  * @param titleMaxLines Max lines of title
  * @param titleColor Color for the title text
+ * @param titleTextStyle Text style of title text
  * @param subtitleColor Color for the subtitle text
  * @param accessPermissionIcon Optional icon resource ID for access permission
  * @param highlightText Text to highlight in the title and description
@@ -147,6 +149,7 @@ fun NodeListViewItem(
     thumbnailData: Any? = null,
     titleColor: TextColor = TextColor.Primary,
     titleMaxLines: Int = 1,
+    titleTextStyle: TextStyle = AppTheme.typography.bodyLarge,
     subtitleColor: TextColor = TextColor.Secondary,
     @DrawableRes accessPermissionIcon: Int? = null,
     highlightText: String = "",
@@ -213,10 +216,11 @@ fun NodeListViewItem(
                         text = title,
                         highlightText = highlightText,
                         textColor = if (isTakenDown) TextColor.Error else titleColor,
-                        style = AppTheme.typography.bodyLarge,
+                        style = titleTextStyle,
                         modifier = Modifier
                             .weight(1f, fill = false)
                             .testTag(TITLE_TAG),
+                        maxLines = titleMaxLines
                     )
                 } else {
                     MegaText(
@@ -224,7 +228,7 @@ fun NodeListViewItem(
                         overflow = TextOverflow.MiddleEllipsis,
                         maxLines = titleMaxLines,
                         textColor = if (isTakenDown) TextColor.Error else titleColor,
-                        style = AppTheme.typography.bodyLarge,
+                        style = titleTextStyle,
                         modifier = Modifier
                             .weight(1f, fill = false)
                             .testTag(TITLE_TAG),
