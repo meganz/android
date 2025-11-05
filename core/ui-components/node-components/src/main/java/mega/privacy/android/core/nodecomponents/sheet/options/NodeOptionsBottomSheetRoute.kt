@@ -178,13 +178,14 @@ internal fun NodeOptionsBottomSheetContent(
             modifier = Modifier.semantics { testTagsAsResourceId = true },
             title = uiState.node.name,
             titleColor = if (uiState.node.isTakenDown) TextColor.Error else TextColor.Primary,
+            titleMaxLines = 1,
             subtitle = uiState.node.subtitle.text(),
             showVersion = uiState.node.hasVersion,
             icon = uiState.node.iconRes,
             thumbnailData = uiState.node.thumbnailData,
             accessPermissionIcon = uiState.node.accessPermissionIcon,
             onItemClicked = {},
-            enableClick = false
+            enableClick = false,
         )
     }
 

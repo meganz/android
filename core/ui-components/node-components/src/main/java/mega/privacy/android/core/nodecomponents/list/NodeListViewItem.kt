@@ -115,6 +115,7 @@ fun <T : TypedNode> NodeListViewItem(
  * @param description Optional description text to display below the subtitle
  * @param tags Optional list of tags to display below the description
  * @param thumbnailData Data for the thumbnail, can be a URL or any other data type supported by ThumbnailView
+ * @param titleMaxLines Max lines of title
  * @param titleColor Color for the title text
  * @param subtitleColor Color for the subtitle text
  * @param accessPermissionIcon Optional icon resource ID for access permission
@@ -145,6 +146,7 @@ fun NodeListViewItem(
     tags: List<String>? = null,
     thumbnailData: Any? = null,
     titleColor: TextColor = TextColor.Primary,
+    titleMaxLines: Int = 1,
     subtitleColor: TextColor = TextColor.Secondary,
     @DrawableRes accessPermissionIcon: Int? = null,
     highlightText: String = "",
@@ -220,7 +222,7 @@ fun NodeListViewItem(
                     MegaText(
                         text = title,
                         overflow = TextOverflow.MiddleEllipsis,
-                        maxLines = 1,
+                        maxLines = titleMaxLines,
                         textColor = if (isTakenDown) TextColor.Error else titleColor,
                         style = AppTheme.typography.bodyLarge,
                         modifier = Modifier
