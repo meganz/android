@@ -3,12 +3,13 @@ package mega.privacy.android.domain.usecase.node
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
@@ -45,14 +46,21 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
         nodeId: NodeId,
         nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
     ) = flow {
-        val effectiveNodeId = resolveEffectiveNodeId(nodeId, nodeSourceType)
+        val effectiveNodeId = resolveEffectiveNodeId(
+            nodeId = nodeId,
+            nodeSourceType = nodeSourceType
+        )
+        val offlineNodeIdsToMatch = resolveOfflineNodeIds(
+            originalNodeId = nodeId,
+            effectiveNodeId = effectiveNodeId
+        )
         emitAll(
             merge(
                 monitorOnlineNodeUpdates(
                     effectiveNodeId = effectiveNodeId,
                     nodeSourceType = nodeSourceType
                 ),
-                monitorOfflineNodeUpdates(effectiveNodeId),
+                monitorOfflineNodeUpdates(offlineNodeIdsToMatch),
                 monitorRefreshSessionUpdates(),
                 monitorContactNameUpdates(nodeSourceType)
             ).conflate().debounce(500L)
@@ -69,6 +77,21 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
         getRootNodeUseCase()?.id ?: nodeId
     } else {
         nodeId
+    }
+
+    /**
+     * Resolve node IDs for offline filtering
+     * Includes both effectiveNodeId and -1L if the original nodeId is root (-1L)
+     * since offline database stores parentId = -1L instead of actual root node id
+     */
+    private fun resolveOfflineNodeIds(
+        originalNodeId: NodeId,
+        effectiveNodeId: NodeId,
+    ) = buildSet {
+        add(effectiveNodeId.longValue)
+        if (originalNodeId.longValue == -1L) {
+            add(-1L)
+        }
     }
 
     private fun monitorOnlineNodeUpdates(
@@ -102,16 +125,17 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
             && ((node as? FolderNode)?.isShared == true
             || this.changes[node]?.contains(NodeChanges.Outshare) == true)
 
-    private fun monitorOfflineNodeUpdates(
-        effectiveNodeId: NodeId,
-    ) = monitorOfflineNodeUpdatesUseCase()
-        .mapNotNull { offlineList ->
-            val relevantOfflineNodes = offlineList.filter { offline ->
-                offline.parentId.toLong() == effectiveNodeId.longValue ||
-                        offline.handle.toLong() == effectiveNodeId.longValue
+    private fun monitorOfflineNodeUpdates(nodeIdsToMatch: Set<Long>) =
+        monitorOfflineNodeUpdatesUseCase()
+            .drop(1) // Skip the first emission (initial load from database)
+            .map { offlineList ->
+                offlineList.filter { offline ->
+                    offline.parentId.toLong() in nodeIdsToMatch ||
+                            offline.handle.toLong() in nodeIdsToMatch
+                }
             }
-            if (relevantOfflineNodes.isNotEmpty()) NodeChanges.Attributes else null
-        }
+            .distinctUntilChanged() // Only emit when the filtered list actually changes
+            .map { NodeChanges.Attributes }
 
     private fun monitorRefreshSessionUpdates() = monitorRefreshSessionUseCase().map {
         NodeChanges.Attributes

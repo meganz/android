@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.node
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -96,7 +97,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
         }
 
     @Test
-    fun `test that invoke returns NodeChanges_Attributes for offline node updates`() = runTest {
+    fun `test that invoke returns NodeChanges_Attributes when offline node is added`() = runTest {
         val nodeId = NodeId(1L)
         val offlineNode = Offline(
             id = 1,
@@ -109,17 +110,15 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             handleIncoming = ""
         )
 
-        whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf())
-        whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(listOf(offlineNode)))
-        whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf(Unit))
-        whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+        whenever(nodeRepository.monitorNodeUpdates()).thenReturn(emptyFlow())
+        whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(
             flowOf(
-                UserUpdate(
-                    emptyMap(),
-                    emptyMap()
-                )
+                emptyList(),
+                listOf(offlineNode)
             )
         )
+        whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
+        whenever(monitorContactNameUpdatesUseCase()).thenReturn(emptyFlow())
 
         underTest(nodeId).test {
             assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
@@ -131,7 +130,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
     fun `test that invoke returns NodeChanges_Attributes for refresh session updates`() = runTest {
         val nodeId = NodeId(1L)
 
-        whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf())
+        whenever(nodeRepository.monitorNodeUpdates()).thenReturn(emptyFlow())
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
         whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf(Unit))
         whenever(monitorContactNameUpdatesUseCase()).thenReturn(
@@ -207,6 +206,37 @@ class MonitorNodeUpdatesByIdUseCaseTest {
     }
 
     @Test
+    fun `test that invoke returns NodeChanges_Attributes when offline node is removed`() = runTest {
+        val nodeId = NodeId(1L)
+        val offlineNode = Offline(
+            id = 1,
+            handle = "1",
+            path = "/test",
+            name = "test",
+            parentId = 1,
+            type = Offline.FOLDER,
+            origin = Offline.OTHER,
+            handleIncoming = ""
+        )
+
+        whenever(nodeRepository.monitorNodeUpdates()).thenReturn(emptyFlow())
+        whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(
+            flowOf(
+                listOf(offlineNode),
+                emptyList()
+            )
+        )
+        whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
+        whenever(monitorContactNameUpdatesUseCase()).thenReturn(emptyFlow())
+
+        underTest(nodeId).test {
+            // Removal should be detected by distinctUntilChanged comparing filtered lists
+            assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun `test that invoke filters offline nodes by parent ID`() = runTest {
         val nodeId = NodeId(1L)
         val matchingOfflineNode = Offline(
@@ -230,18 +260,18 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             handleIncoming = ""
         )
 
-        whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf())
+        whenever(nodeRepository.monitorNodeUpdates()).thenReturn(emptyFlow())
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(
             flowOf(
-                listOf(
-                    matchingOfflineNode,
-                    nonMatchingOfflineNode
-                )
+                emptyList(),
+                listOf(matchingOfflineNode, nonMatchingOfflineNode)
             )
         )
-        whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf(Unit))
+        whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
+        whenever(monitorContactNameUpdatesUseCase()).thenReturn(emptyFlow())
 
         underTest(nodeId).test {
+            // Should emit because matchingOfflineNode was added
             assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
             cancelAndConsumeRemainingEvents()
         }
@@ -261,15 +291,60 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             handleIncoming = ""
         )
 
-        whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf())
-        whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(listOf(matchingOfflineNode)))
-        whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf(Unit))
+        whenever(nodeRepository.monitorNodeUpdates()).thenReturn(emptyFlow())
+        whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(
+            flowOf(
+                emptyList(),
+                listOf(matchingOfflineNode)
+            )
+        )
+        whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
+        whenever(monitorContactNameUpdatesUseCase()).thenReturn(emptyFlow())
 
         underTest(nodeId).test {
             assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
             cancelAndConsumeRemainingEvents()
         }
     }
+
+
+    @Test
+    fun `test that invoke monitors offline nodes with parentId -1L when nodeId is root`() =
+        runTest {
+            val rootNodeId = NodeId(0L)
+            val rootNode = mock<FolderNode> {
+                on { id } doReturn rootNodeId
+            }
+
+            // Offline database stores root nodes with parentId = -1L
+            val offlineNodeWithMinusOne = Offline(
+                id = 1,
+                handle = "123",
+                path = "/test",
+                name = "test",
+                parentId = -1, // Stored as -1 in offline DB
+                type = Offline.FOLDER,
+                origin = Offline.OTHER,
+                handleIncoming = ""
+            )
+
+            whenever(getRootNodeUseCase()).thenReturn(rootNode)
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(emptyFlow())
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(
+                flowOf(
+                    emptyList(),
+                    listOf(offlineNodeWithMinusOne)
+                )
+            )
+            whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
+            whenever(monitorContactNameUpdatesUseCase()).thenReturn(emptyFlow())
+
+            underTest(NodeId(-1L)).test {
+                // Should emit because offline node with parentId=-1L is matched
+                assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
 
     @Test
     fun `test that invoke returns NodeChanges_Remove when folder is moved to rubbish bin`() =
@@ -291,7 +366,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
 
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
-            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+            whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
             whenever(monitorContactNameUpdatesUseCase()).thenReturn(
                 flowOf(
                     UserUpdate(
@@ -328,7 +403,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
 
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
-            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+            whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
             whenever(monitorContactNameUpdatesUseCase()).thenReturn(
                 flowOf(
                     UserUpdate(
@@ -441,7 +516,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
 
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
-            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+            whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
             whenever(monitorContactNameUpdatesUseCase()).thenReturn(
                 flowOf(
                     UserUpdate(
@@ -518,7 +593,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
 
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
-            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+            whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
             whenever(monitorContactNameUpdatesUseCase()).thenReturn(
                 flowOf(
                     UserUpdate(
@@ -555,7 +630,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
 
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
-            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+            whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
             whenever(monitorContactNameUpdatesUseCase()).thenReturn(
                 flowOf(
                     UserUpdate(
@@ -592,7 +667,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
 
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
-            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+            whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
             whenever(monitorContactNameUpdatesUseCase()).thenReturn(
                 flowOf(
                     UserUpdate(
@@ -629,7 +704,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
 
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
-            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+            whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
             whenever(monitorContactNameUpdatesUseCase()).thenReturn(
                 flowOf(
                     UserUpdate(
@@ -666,7 +741,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
 
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
-            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+            whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
             whenever(monitorContactNameUpdatesUseCase()).thenReturn(
                 flowOf(
                     UserUpdate(
@@ -687,9 +762,9 @@ class MonitorNodeUpdatesByIdUseCaseTest {
         runTest {
             val nodeId = NodeId(1L)
 
-            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf())
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(emptyFlow())
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
-            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+            whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
             whenever(monitorContactNameUpdatesUseCase()).thenReturn(
                 flowOf(
                     UserUpdate(
@@ -710,9 +785,9 @@ class MonitorNodeUpdatesByIdUseCaseTest {
         runTest {
             val nodeId = NodeId(1L)
 
-            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf())
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(emptyFlow())
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
-            whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf())
+            whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
             whenever(monitorContactNameUpdatesUseCase()).thenReturn(
                 flowOf(
                     UserUpdate(
@@ -744,8 +819,13 @@ class MonitorNodeUpdatesByIdUseCaseTest {
                 handleIncoming = ""
             )
 
-            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf())
-            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(listOf(offlineNode)))
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(emptyFlow())
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(
+                flowOf(
+                    emptyList(),
+                    listOf(offlineNode)
+                )
+            )
             whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf(Unit))
             whenever(monitorContactNameUpdatesUseCase()).thenReturn(
                 flowOf(
