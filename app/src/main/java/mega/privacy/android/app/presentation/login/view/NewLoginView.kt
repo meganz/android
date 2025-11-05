@@ -165,7 +165,7 @@ fun NewLoginView(
     ) { paddingValues ->
         with(state) {
             when {
-                showLoginInProgress -> LoginInProgressContent(
+                showLoginInProgress -> FetchNodesContent(
                     isRequestStatusInProgress = state.isRequestStatusInProgress,
                     currentProgress = state.currentProgress,
                     currentStatusText = state.currentStatusText,

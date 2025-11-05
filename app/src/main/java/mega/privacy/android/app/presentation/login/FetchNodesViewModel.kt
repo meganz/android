@@ -20,10 +20,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.presentation.extensions.error
 import mega.privacy.android.app.presentation.extensions.newError
-import mega.privacy.android.app.presentation.login.model.LoginInProgressUiState
+import mega.privacy.android.app.presentation.login.model.FetchNodesUiState
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
@@ -50,8 +49,8 @@ import timber.log.Timber
  *
  * @property state View state as [LoginState]
  */
-@HiltViewModel(assistedFactory = LoginInProgressViewModel.Factory::class)
-class LoginInProgressViewModel @AssistedInject constructor(
+@HiltViewModel(assistedFactory = FetchNodesViewModel.Factory::class)
+class FetchNodesViewModel @AssistedInject constructor(
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val fastLoginUseCase: FastLoginUseCase,
@@ -64,12 +63,13 @@ class LoginInProgressViewModel @AssistedInject constructor(
     private val monitorAccountBlockedUseCase: MonitorAccountBlockedUseCase,
     private val isMegaApiLoggedInUseCase: IsMegaApiLoggedInUseCase,
     private val getUserDataUseCase: GetUserDataUseCase,
+    @Assisted val session: String,
+    @Assisted val isFromLogin: Boolean,
     @ApplicationScope private val applicationScope: CoroutineScope,
-    @Assisted val route: MegaActivity.LoggedInScreens
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(LoginInProgressUiState(isFromLogin = route.isFromLogin))
-    val state: StateFlow<LoginInProgressUiState> = _state
+    private val _state = MutableStateFlow(FetchNodesUiState(isFromLogin = isFromLogin))
+    val state: StateFlow<FetchNodesUiState> = _state
 
     /**
      * Is connected
@@ -113,7 +113,7 @@ class LoginInProgressViewModel @AssistedInject constructor(
             } else {
                 // this case mean user logged in and open app again, so we need to fast login
                 Timber.d("User is not logged in, fast login")
-                fastLogin(session = route.session, refreshChatUrl = false)
+                fastLogin(session = session, refreshChatUrl = false)
             }
         }
     }
@@ -320,7 +320,7 @@ class LoginInProgressViewModel @AssistedInject constructor(
         performFetchNodesJob?.cancel()
     }
 
-    companion object {
+    companion object Companion {
 
         /**
          * Intent action for opening app.
@@ -330,6 +330,6 @@ class LoginInProgressViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(navKey: MegaActivity.LoggedInScreens): LoginInProgressViewModel
+        fun create(session: String, isFromLogin: Boolean): FetchNodesViewModel
     }
 }

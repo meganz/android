@@ -15,7 +15,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.triggeredContent
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.Progress
@@ -52,8 +51,8 @@ import org.mockito.kotlin.wheneverBlocking
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class LoginInProgressViewModelTest {
-    private lateinit var underTest: LoginInProgressViewModel
+class FetchNodesViewModelTest {
+    private lateinit var underTest: FetchNodesViewModel
     private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
     private val rootNodeExistsUseCase = mock<RootNodeExistsUseCase>()
     private val fastLoginUseCase = mock<FastLoginUseCase>()
@@ -108,7 +107,7 @@ class LoginInProgressViewModelTest {
     }
 
     private fun initViewModel() {
-        underTest = LoginInProgressViewModel(
+        underTest = FetchNodesViewModel(
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             rootNodeExistsUseCase = rootNodeExistsUseCase,
             fastLoginUseCase = fastLoginUseCase,
@@ -121,11 +120,9 @@ class LoginInProgressViewModelTest {
             monitorAccountBlockedUseCase = monitorAccountBlockedUseCase,
             isMegaApiLoggedInUseCase = isMegaApiLoggedInUseCase,
             getUserDataUseCase = getUserDataUseCase,
+            isFromLogin = false,
+            session = "test-session",
             applicationScope = applicationScope,
-            route = MegaActivity.LoggedInScreens(
-                isFromLogin = false,
-                session = "test-session"
-            )
         )
     }
 

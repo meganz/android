@@ -74,13 +74,13 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param requestStatusProgress Progress of the request status, if applicable
  */
 @Composable
-fun LoginInProgressContent(
+fun FetchNodesContent(
     isRequestStatusInProgress: Boolean,
     currentProgress: Float,
     @StringRes currentStatusText: Int,
     requestStatusProgress: Progress?,
-    startProgress: Float = 0f,
     modifier: Modifier = Modifier,
+    startProgress: Float = 0f,
 ) {
     val isInLandscape =
         LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -231,7 +231,7 @@ private fun LoginInProgressScreenPreview(
     @PreviewParameter(LoginInProgressStateProvider::class) state: LoginState,
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        LoginInProgressContent(
+        FetchNodesContent(
             isRequestStatusInProgress = state.isRequestStatusInProgress,
             currentProgress = state.currentProgress,
             currentStatusText = state.currentStatusText,

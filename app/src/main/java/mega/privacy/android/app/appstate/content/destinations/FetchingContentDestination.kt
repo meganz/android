@@ -1,7 +1,35 @@
 package mega.privacy.android.app.appstate.content.destinations
 
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
+import mega.privacy.android.app.presentation.login.FetchNodesViewModel
+import mega.privacy.android.app.presentation.login.view.FetchNodesContent
 import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
 
 @Serializable
 data class FetchingContentNavKey(val session: String, val isFromLogin: Boolean) : NoNodeNavKey
+
+fun EntryProviderScope<NavKey>.fetchingContentDestination() {
+    entry<FetchingContentNavKey> {
+        val viewModel =
+            hiltViewModel<FetchNodesViewModel, FetchNodesViewModel.Factory>(
+                key = "FetchNodesViewModel ${it.session}",
+                creationCallback = { factory ->
+                    factory.create(session = it.session, isFromLogin = it.isFromLogin)
+                }
+            )
+        val state by viewModel.state.collectAsStateWithLifecycle()
+
+        FetchNodesContent(
+            isRequestStatusInProgress = state.isRequestStatusInProgress,
+            currentProgress = state.currentProgress,
+            currentStatusText = state.currentStatusText,
+            startProgress = if (state.isFromLogin) 0.275f else 0f,
+            requestStatusProgress = state.requestStatusProgress,
+        )
+    }
+}

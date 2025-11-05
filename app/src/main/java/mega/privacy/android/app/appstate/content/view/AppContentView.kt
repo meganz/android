@@ -34,7 +34,7 @@ import mega.privacy.android.app.appstate.content.navigation.view.PermissionScree
 import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
 import mega.privacy.android.app.appstate.content.transfer.TransferHandlerImpl
 import mega.privacy.android.app.appstate.global.event.AppDialogViewModel
-import mega.privacy.android.app.presentation.login.LoginInProgressViewModel
+import mega.privacy.android.app.presentation.login.FetchNodesViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
 import mega.privacy.android.navigation.contract.transparent.TransparentSceneStrategy
@@ -154,10 +154,10 @@ internal fun AppContentView(
 
         AppContentState.FetchingNodes -> {
             val viewModel =
-                hiltViewModel<LoginInProgressViewModel, LoginInProgressViewModel.Factory>(
-                    key = "LoginInProgressViewModel ${navKey.session}",
+                hiltViewModel<FetchNodesViewModel, FetchNodesViewModel.Factory>(
+                    key = "FetchNodesViewModel ${navKey.session}",
                     creationCallback = { factory ->
-                        factory.create(navKey)
+                        factory.create(navKey.session, navKey.isFromLogin)
                     }
                 )
             FetchingContentView(viewModel = viewModel)

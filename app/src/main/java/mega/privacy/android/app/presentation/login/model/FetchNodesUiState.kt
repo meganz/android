@@ -1,7 +1,10 @@
 package mega.privacy.android.app.presentation.login.model
 
+import androidx.annotation.StringRes
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.TemporaryWaitingError
@@ -16,7 +19,7 @@ import mega.privacy.android.domain.entity.login.TemporaryWaitingError
  * @param isFastLogin Indicates if it's fast login flow
  * @param isFromLogin Indicates if the login is initiated from the login screen
  */
-data class LoginInProgressUiState(
+data class FetchNodesUiState(
     val fetchNodesUpdate: FetchNodesUpdate? = null,
     val isFastLoginInProgress: Boolean = false,
     val loginTemporaryError: TemporaryWaitingError? = null,
@@ -56,4 +59,23 @@ data class LoginInProgressUiState(
                 else -> progressAfterLogin
             }
         }
-} 
+
+    /**
+     * Text to show below progress bar
+     */
+    @get:StringRes
+    val currentStatusText: Int
+        get() {
+            val temporaryError = loginTemporaryError ?: fetchNodesUpdate?.temporaryError
+            return when {
+                temporaryError != null && !isRequestStatusInProgress -> temporaryError.messageId
+                isFastLoginInProgress -> R.string.login_connecting_to_server
+                (fetchNodesUpdate?.progress?.floatValue
+                    ?: 0f) > 0f -> R.string.login_preparing_filelist
+
+                isFromLogin || fetchNodesUpdate != null -> R.string.download_updating_filelist
+                else -> R.string.login_connecting_to_server
+            }
+        }
+}
+
