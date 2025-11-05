@@ -141,7 +141,6 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     private fun onStartMeetingClick() {
         requestCallPermissions(permissionsRequest)
-        dismissAllowingStateLoss()
     }
 
     private fun onOccurrencesClick() {
@@ -252,7 +251,9 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
             if (checkMandatoryCallPermissions(requireActivity())) {
                 viewModel.startMeetingCall(
                     chatId,
-                    (requireActivity() as PasscodeActivity).passcodeFacade::enablePassCode
+                    {
+                        (activity as? PasscodeActivity)?.passcodeFacade?.enablePassCode()
+                    }
                 )
             } else {
                 viewModel.updateSnackBar(
