@@ -2,7 +2,7 @@ package mega.privacy.android.navigation.contract.deeplinks
 
 import android.net.Uri
 import androidx.navigation3.runtime.NavKey
-import mega.privacy.android.domain.usecase.GetDecodedUrlRegexPatternTypeUseCase
+import mega.privacy.android.domain.usecase.link.GetDecodedUrlRegexPatternTypeUseCase
 
 /**
  * Helper implementation of [DeepLinkHandlerRegexPatternType]

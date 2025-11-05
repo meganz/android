@@ -1,7 +1,7 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.link
 
 import mega.privacy.android.domain.entity.RegexPatternType
-import mega.privacy.android.domain.usecase.link.DecodeLinkUseCase
+import mega.privacy.android.domain.usecase.GetUrlRegexPatternTypeUseCase
 import javax.inject.Inject
 
 /**

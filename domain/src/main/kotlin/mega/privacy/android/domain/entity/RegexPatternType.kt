@@ -37,4 +37,5 @@ enum class RegexPatternType {
     OPEN_SYNC_MEGA_FOLDER_LINK,
     LOGIN_LINK,
     REGISTRATION_LINK,
+    MEGA_LINK,
 }

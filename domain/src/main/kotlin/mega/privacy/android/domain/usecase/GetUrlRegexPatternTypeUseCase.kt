@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.RegexPatternType.LOGIN_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.MEGA_BLOG_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.MEGA_DROP_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.MEGA_FILE_REQUEST_LINK
+import mega.privacy.android.domain.entity.RegexPatternType.MEGA_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.NEW_MESSAGE_CHAT_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.OPEN_DEVICE_CENTER_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.OPEN_SYNC_MEGA_FOLDER_LINK
@@ -90,6 +91,7 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             isUrlMatchesRegexUseCase(url, OPEN_DEVICE_CENTER_LINK_REGEX) -> OPEN_DEVICE_CENTER_LINK
             isUrlMatchesRegexUseCase(url, OPEN_LOGIN_LINK_REGEX) -> LOGIN_LINK
             isUrlMatchesRegexUseCase(url, OPEN_REGISTRATION_LINK_REGEX) -> REGISTRATION_LINK
+            isUrlMatchesRegexUseCase(url, MEGA_REGEX) -> MEGA_LINK
             else -> RESTRICTED
         }
 
