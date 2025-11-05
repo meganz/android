@@ -46,9 +46,8 @@ class AlbumUiStateMapperTest {
 
         val actual = underTest(mediaAlbum)
 
-        val expectedId = albumName.hashCode().toLong()
         val expected = AlbumUiState(
-            id = expectedId,
+            mediaAlbum = mediaAlbum,
             title = albumName,
             cover = null
         )
@@ -87,9 +86,8 @@ class AlbumUiStateMapperTest {
 
         val actual = underTest(mediaAlbum)
 
-        val expectedId = albumName.hashCode().toLong()
         val expected = AlbumUiState(
-            id = expectedId,
+            mediaAlbum = mediaAlbum,
             title = albumName,
             cover = photoUiState
         )
@@ -113,7 +111,7 @@ class AlbumUiStateMapperTest {
         val actual = underTest(mediaAlbum)
 
         val expected = AlbumUiState(
-            id = albumId.id,
+            mediaAlbum = mediaAlbum,
             title = title,
             cover = null
         )
@@ -157,7 +155,7 @@ class AlbumUiStateMapperTest {
         val actual = underTest(mediaAlbum)
 
         val expected = AlbumUiState(
-            id = albumId.id,
+            mediaAlbum = mediaAlbum,
             title = title,
             cover = photoUiState
         )
@@ -176,7 +174,7 @@ class AlbumUiStateMapperTest {
 
         val actual = underTest(mediaAlbum)
 
-        assertThat(actual.id).isEqualTo(albumName.hashCode().toLong())
+        assertThat(actual.mediaAlbum).isEqualTo(mediaAlbum)
         assertThat(actual.title).isEqualTo(albumName)
     }
 
@@ -195,7 +193,7 @@ class AlbumUiStateMapperTest {
 
         val actual = underTest(mediaAlbum)
 
-        assertThat(actual.id).isEqualTo(albumId.id)
+        assertThat(actual.mediaAlbum).isEqualTo(mediaAlbum)
         assertThat(actual.title).isEqualTo(title)
     }
 

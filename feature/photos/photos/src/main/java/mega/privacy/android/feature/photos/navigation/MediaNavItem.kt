@@ -16,13 +16,10 @@ import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdenti
 import mega.privacy.mobile.analytics.event.PhotosBottomNavigationItemEvent
 
 class MediaNavItem : MainNavItem {
-    override val destination: NavKey = PhotosNavKey
+    override val destination: NavKey = MediaMainNavKey
     override val screen: EntryProviderScope<NavKey>.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
         { navigationHandler, navigationController, transferHandler ->
-            photosScreen(
-                navigationHandler = navigationHandler,
-                onTransfer = transferHandler::setTransferEvent,
-            )
+            mediaMainRoute(navigationHandler = navigationHandler)
         }
     override val icon: ImageVector = IconPack.Medium.Thin.Outline.Image01
     override val selectedIcon: ImageVector = IconPack.Medium.Thin.Solid.Image01

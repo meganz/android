@@ -28,19 +28,23 @@ import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.feature.photos.model.MediaAppBarAction
 import mega.privacy.android.feature.photos.model.MediaAppBarAction.CameraUpload.CameraUploadStatus
 import mega.privacy.android.feature.photos.model.MediaScreen
+import mega.privacy.android.feature.photos.navigation.AlbumContentNavKey
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabRoute
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabRoute
 import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
-fun MediaMainRoute() {
-    MediaMainScreen()
+fun MediaMainRoute(
+    navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
+) {
+    MediaMainScreen(navigateToAlbumContent = navigateToAlbumContent)
 }
 
 @Composable
 fun MediaMainScreen(
     modifier: Modifier = Modifier,
     viewModel: MediaMainViewModel = hiltViewModel(),
+    navigateToAlbumContent: (AlbumContentNavKey) -> Unit
 ) {
     var currentTabIndex by rememberSaveable { mutableIntStateOf(0) }
 
@@ -100,7 +104,8 @@ fun MediaMainScreen(
                             content = { _, modifier ->
                                 MediaContent(
                                     mainViewModel = viewModel,
-                                    modifier = Modifier.fillMaxSize()
+                                    modifier = Modifier.fillMaxSize(),
+                                    navigateToAlbumContent = navigateToAlbumContent
                                 )
                             }
                         )
@@ -122,6 +127,7 @@ private fun MediaScreen.getTabItem() = when (this) {
 @Composable
 private fun MediaScreen.MediaContent(
     mainViewModel: MediaMainViewModel,
+    navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
@@ -135,7 +141,8 @@ private fun MediaScreen.MediaContent(
             AlbumsTabRoute(
                 modifier = Modifier.fillMaxSize(),
                 showNewAlbumDialogEvent = uiState.newAlbumDialogEvent,
-                resetNewAlbumDialogEvent = mainViewModel::resetNewAlbumDialog
+                resetNewAlbumDialogEvent = mainViewModel::resetNewAlbumDialog,
+                navigateToAlbumContent = navigateToAlbumContent
             )
         }
 
@@ -152,6 +159,6 @@ private fun MediaScreen.MediaContent(
 @Composable
 fun PhotosMainScreenPreview() {
     AndroidThemeForPreviews {
-        MediaMainScreen()
+        MediaMainScreen(navigateToAlbumContent = {})
     }
 }

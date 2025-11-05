@@ -11,6 +11,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import mega.privacy.android.domain.entity.media.MediaAlbum
+import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.shared.resources.R as sharedResR
 import org.junit.Rule
@@ -39,6 +41,7 @@ class AlbumsTabScreenComposeTest {
         addNewAlbum: (String) -> Unit = {},
         showNewAlbumDialogEvent: StateEvent = consumed,
         resetNewAlbumDialogEvent: () -> Unit = {},
+        navigateToAlbumContent: (mega.privacy.android.feature.photos.navigation.AlbumContentNavKey) -> Unit = {},
     ) {
         composeTestRule.setContent {
             AlbumsTabScreen(
@@ -46,7 +49,8 @@ class AlbumsTabScreenComposeTest {
                 modifier = Modifier,
                 addNewAlbum = addNewAlbum,
                 showNewAlbumDialogEvent = showNewAlbumDialogEvent,
-                resetNewAlbumDialogEvent = resetNewAlbumDialogEvent
+                resetNewAlbumDialogEvent = resetNewAlbumDialogEvent,
+                navigateToAlbumContent = navigateToAlbumContent
             )
         }
     }
@@ -106,8 +110,16 @@ class AlbumsTabScreenComposeTest {
     }
 
     private fun createMockAlbum(id: Long, title: String): AlbumUiState {
+        val mediaAlbum = MediaAlbum.User(
+            id = AlbumId(id),
+            title = title,
+            cover = null,
+            creationTime = 0L,
+            modificationTime = 0L,
+            isExported = false
+        )
         return AlbumUiState(
-            id = id,
+            mediaAlbum = mediaAlbum,
             title = title,
             cover = null
         )

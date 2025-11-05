@@ -25,6 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -73,7 +74,14 @@ class AlbumContentFragment : Fragment() {
     private val albumsViewModel: AlbumsViewModel by activityViewModels()
 
     private val photoDownloaderViewModel: PhotoDownloaderViewModel by viewModels()
-    internal val albumContentViewModel: AlbumContentViewModel by viewModels()
+    internal val albumContentViewModel: AlbumContentViewModel by viewModels(
+        extrasProducer = {
+            defaultViewModelCreationExtras
+                .withCreationCallback<AlbumContentViewModel.Factory> { factory ->
+                    factory.create(null)
+                }
+        }
+    )
 
     internal lateinit var managerActivity: ManagerActivity
 
@@ -213,7 +221,9 @@ class AlbumContentFragment : Fragment() {
 
                     if (currentAlbum is FavouriteAlbum) {
                         context?.let { ctx ->
-                            albumContentViewModel.state.value.uiAlbum?.title?.getTitleString(ctx)
+                            albumContentViewModel.state.value.uiAlbum?.title?.getTitleString(
+                                ctx
+                            )
                         }?.also { albumTitle ->
                             this[AlbumContentImageNodeFetcher.ALBUM_TITLE] = albumTitle
                         }
@@ -412,7 +422,8 @@ class AlbumContentFragment : Fragment() {
 
     private fun ackPhotosAddingProgressCompleted() {
         val album = albumContentViewModel.state.value.uiAlbum?.id as? UserAlbum ?: return
-        val isProgressCompleted = albumContentViewModel.state.value.isAddingPhotosProgressCompleted
+        val isProgressCompleted =
+            albumContentViewModel.state.value.isAddingPhotosProgressCompleted
 
         if (!isProgressCompleted) return
         albumContentViewModel.updatePhotosAddingProgressCompleted(albumId = album.id)

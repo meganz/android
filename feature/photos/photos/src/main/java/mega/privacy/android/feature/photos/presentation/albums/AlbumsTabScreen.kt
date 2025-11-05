@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.photos.presentation.albums
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,10 +21,13 @@ import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.components.AlbumGridItem
 import mega.privacy.android.feature.photos.extensions.downloadAsStateWithLifecycle
+import mega.privacy.android.feature.photos.navigation.AlbumContentNavKey
+import mega.privacy.android.feature.photos.presentation.albums.content.toAlbumContentNavKey
 import mega.privacy.android.feature.photos.presentation.albums.dialog.AddNewAlbumDialog
 
 @Composable
 fun AlbumsTabRoute(
+    navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AlbumsTabViewModel = hiltViewModel(),
     showNewAlbumDialogEvent: StateEvent = consumed,
@@ -34,6 +38,7 @@ fun AlbumsTabRoute(
     AlbumsTabScreen(
         uiState = uiState,
         addNewAlbum = viewModel::addNewAlbum,
+        navigateToAlbumContent = navigateToAlbumContent,
         modifier = modifier,
         showNewAlbumDialogEvent = showNewAlbumDialogEvent,
         resetNewAlbumDialogEvent = resetNewAlbumDialogEvent
@@ -44,6 +49,7 @@ fun AlbumsTabRoute(
 fun AlbumsTabScreen(
     uiState: AlbumsTabUiState,
     addNewAlbum: (String) -> Unit,
+    navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
     modifier: Modifier = Modifier,
     showNewAlbumDialogEvent: StateEvent = consumed,
     resetNewAlbumDialogEvent: () -> Unit = {},
@@ -63,7 +69,7 @@ fun AlbumsTabScreen(
     ) {
         items(
             count = uiState.albums.size,
-            key = { uiState.albums[it].id },
+            key = { uiState.albums[it].mediaAlbum.hashCode() },
             contentType = { index ->
                 uiState.albums[index]::class
             }
@@ -73,7 +79,10 @@ fun AlbumsTabScreen(
 
             AlbumGridItem(
                 modifier = Modifier
-                    .testTag("$ALBUMS_SCREEN_ALBUM_GRID_ITEM:${index}"),
+                    .testTag("$ALBUMS_SCREEN_ALBUM_GRID_ITEM:${index}")
+                    .clickable {
+                        navigateToAlbumContent(album.mediaAlbum.toAlbumContentNavKey())
+                    },
                 coverImage = when (val result = downloadResult?.value) {
                     is DownloadPhotoResult.Success -> result.thumbnailFilePath
                     else -> null

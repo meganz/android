@@ -3,6 +3,9 @@ package mega.privacy.android.feature.photos.presentation.albums.content
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -51,16 +54,16 @@ import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
 import mega.privacy.android.feature.photos.mapper.UIAlbumMapper
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.Sort
+import mega.privacy.android.feature.photos.navigation.AlbumContentNavKey
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.PhotoItemSelected
 import mega.privacy.mobile.analytics.event.PhotoItemSelectedEvent
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
-import javax.inject.Inject
 
-@HiltViewModel
-class AlbumContentViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = AlbumContentViewModel.Factory::class)
+class AlbumContentViewModel @AssistedInject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getDefaultAlbumPhotos: GetDefaultAlbumPhotos,
     private val getDefaultAlbumsMapUseCase: GetDefaultAlbumsMapUseCase,
@@ -83,6 +86,7 @@ class AlbumContentViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    @Assisted private val navKey: AlbumContentNavKey?,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumContentState())
     val state = _state.asStateFlow()
@@ -95,10 +99,11 @@ class AlbumContentViewModel @Inject constructor(
     private var showHiddenItems: Boolean? = null
 
     private val albumType: String?
-        get() = savedStateHandle["type"]
+        get() = savedStateHandle["type"] ?: navKey?.type
 
     private val albumId: AlbumId?
-        get() = savedStateHandle.get<Long?>("id")?.let { AlbumId(it) }
+        get() = (savedStateHandle["id"] ?: navKey?.id)
+            ?.let { AlbumId(it) }
 
     private val photosFetchers: Map<String, () -> Unit> = mapOf(
         "favourite" to { fetchSystemPhotos(systemAlbum = FavouriteAlbum) },
@@ -577,5 +582,10 @@ class AlbumContentViewModel @Inject constructor(
         _state.update {
             it.copy(isHiddenNodesOnboarded = true)
         }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(navKey: AlbumContentNavKey?): AlbumContentViewModel
     }
 }

@@ -26,7 +26,7 @@ class AlbumUiStateMapper @Inject constructor(
         }
 
         return AlbumUiState(
-            id = albumId,
+            mediaAlbum = album,
             title = title,
             cover = album.cover?.let { photoUiStateMapper(it) }
         )

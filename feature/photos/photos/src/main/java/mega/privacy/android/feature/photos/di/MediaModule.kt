@@ -5,7 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
-import mega.privacy.android.feature.photos.navigation.MediaFeatureGraph
+import mega.privacy.android.feature.photos.navigation.MediaFeatureDestination
 import mega.privacy.android.feature.photos.navigation.MediaNavItem
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
@@ -21,5 +21,5 @@ class MediaModule {
 
     @Provides
     @IntoSet
-    fun provideMediaFeatureDestination(): FeatureDestination = MediaFeatureGraph()
+    fun provideMediaFeatureDestination(): FeatureDestination = MediaFeatureDestination()
 }
