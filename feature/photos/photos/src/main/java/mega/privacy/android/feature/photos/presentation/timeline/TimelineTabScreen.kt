@@ -17,8 +17,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import mega.android.core.ui.components.chip.DefaultChipStyle
 import mega.android.core.ui.components.chip.MegaChip
+import mega.android.core.ui.components.chip.SelectionChipStyle
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
@@ -69,12 +69,11 @@ private fun PhotoModificationTimePeriodSelector(
             horizontalArrangement = Arrangement.Center,
         ) {
             PhotoModificationTimePeriod.entries.forEachIndexed { index, timePeriod ->
-                // VAP: The color will be updated after being finalized by the design team.
                 MegaChip(
                     onClick = { onPhotoTimePeriodSelected(timePeriod) },
                     selected = selectedTimePeriod == timePeriod,
                     text = stringResource(id = timePeriod.stringResId),
-                    style = DefaultChipStyle,
+                    style = SelectionChipStyle,
                 )
 
                 if (index != PhotoModificationTimePeriod.entries.lastIndex) {
