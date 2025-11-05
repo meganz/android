@@ -8,8 +8,9 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.RestoreNodeResult
 import mega.privacy.android.domain.entity.node.SingleNodeRestoreResult
 import mega.privacy.android.domain.exception.node.ForeignNodeException
-import mega.privacy.android.domain.exception.node.NodeInRubbishException
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.usecase.GetNodeNameByIdUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import javax.inject.Inject
 
 /**
@@ -18,9 +19,10 @@ import javax.inject.Inject
  */
 class RestoreNodesUseCase @Inject constructor(
     private val moveNodeUseCase: MoveNodeUseCase,
-    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
-    private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
+    private val isNodeInRubbishOrDeletedUseCase: IsNodeInRubbishOrDeletedUseCase,
+    private val getNodeNameByIdUseCase: GetNodeNameByIdUseCase,
     private val accountRepository: AccountRepository,
+    private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
 ) {
     /**
      * Invoke
@@ -33,23 +35,33 @@ class RestoreNodesUseCase @Inject constructor(
             nodes.map { entry ->
                 async {
                     val (nodeHandle, destinationHandle) = entry
-                    runCatching {
-                        if (isNodeInRubbishBinUseCase(NodeId(destinationHandle))) throw NodeInRubbishException()
-                        moveNodeUseCase(NodeId(nodeHandle), NodeId(destinationHandle))
+                    val actualDestinationHandle =
+                        if (isNodeInRubbishOrDeletedUseCase(destinationHandle)) {
+                            getRootNodeIdUseCase()?.longValue ?: destinationHandle
+                        } else {
+                            destinationHandle
+                        }
+
+                    val result = runCatching {
+                        moveNodeUseCase(NodeId(nodeHandle), NodeId(actualDestinationHandle))
                     }
+                    Pair(result, actualDestinationHandle)
                 }
             }
         }.awaitAll()
-        val successCount = results.count { it.isSuccess }
+        val successCount = results.count { it.first.isSuccess }
         if (successCount > 0) {
             accountRepository.resetAccountDetailsTimeStamp()
         }
         return when {
-            (results.any { it.exceptionOrNull() is ForeignNodeException }) -> throw ForeignNodeException()
+            (results.any { it.first.exceptionOrNull() is ForeignNodeException }) -> throw ForeignNodeException()
             results.size == 1 -> SingleNodeRestoreResult(
                 successCount = successCount,
                 destinationFolderName = takeIf { successCount > 0 }
-                    ?.let { getNodeByHandleUseCase(nodes.values.first(), true)?.name }
+                    ?.let {
+                        val actualDestinationHandle = results.first().second
+                        getNodeNameByIdUseCase(NodeId(actualDestinationHandle))
+                    }
             )
 
             else -> MultipleNodesRestoreResult(
