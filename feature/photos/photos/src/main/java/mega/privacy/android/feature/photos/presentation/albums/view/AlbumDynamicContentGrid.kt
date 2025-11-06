@@ -11,28 +11,32 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.domain.entity.photos.Photo
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.toImmutableList
+import mega.privacy.android.feature.photos.model.PhotoUiState
 
 @Composable
 fun AlbumDynamicContentGrid(
     lazyListState: LazyListState,
-    photos: List<Photo>,
+    photos: ImmutableList<PhotoUiState>,
     smallWidth: Dp,
-    selectedPhotos: Set<Photo>,
+    selectedPhotos: ImmutableSet<PhotoUiState>,
     modifier: Modifier = Modifier,
     endSpacing: Dp = 0.dp,
     shouldApplySensitiveMode: Boolean = false,
-    onClick: (Photo) -> Unit = {},
-    onLongPress: (Photo) -> Unit = {},
+    onClick: (PhotoUiState) -> Unit = {},
+    onLongPress: (PhotoUiState) -> Unit = {},
 ) {
     val albumContentLayouts = remember(photos) {
         photos.chunked(3).mapIndexed { i, chunkedPhotos ->
+            val immutableChunkedPhotos = chunkedPhotos.toImmutableList()
             if (i % 4 == 0) {
-                AlbumContentLayout.HighlightStart(chunkedPhotos)
+                AlbumContentLayout.HighlightStart(immutableChunkedPhotos)
             } else if (i % 4 == 1 || i % 4 == 3) {
-                AlbumContentLayout.Uniform(chunkedPhotos)
+                AlbumContentLayout.Uniform(immutableChunkedPhotos)
             } else {
-                AlbumContentLayout.HighlightEnd(chunkedPhotos)
+                AlbumContentLayout.HighlightEnd(immutableChunkedPhotos)
             }
         }
     }

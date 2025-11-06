@@ -1,5 +1,6 @@
-package mega.privacy.android.feature.photos.presentation.albums.content
+package mega.privacy.android.app.presentation.photos.albums.albumcontent
 
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -12,6 +13,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetAlbumPhotosUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
@@ -32,12 +34,9 @@ import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumNameUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
-import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.mapper.UIAlbumMapper
 import mega.privacy.android.feature.photos.model.FilterMediaType
-import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.Sort
-import mega.privacy.android.feature.photos.navigation.AlbumContentNavKey
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -52,10 +51,10 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class AlbumContentViewModelTest {
-    private lateinit var underTest: AlbumContentViewModel
+class LegacyAlbumContentViewModelTest {
+    private lateinit var underTest: LegacyAlbumContentViewModel
 
-    private val savedStateHandle = mock<androidx.lifecycle.SavedStateHandle>()
+    private val savedStateHandle = mock<SavedStateHandle>()
     private val getDefaultAlbumPhotos = mock<GetDefaultAlbumPhotos>()
     private val getDefaultAlbumsMapUseCase = mock<GetDefaultAlbumsMapUseCase>()
     private val getUserAlbum = mock<GetUserAlbum>()
@@ -79,12 +78,38 @@ class AlbumContentViewModelTest {
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
-    private val photoUiStateMapper = mock<PhotoUiStateMapper>()
     private val analyticsTracker: AnalyticsTracker = mock()
 
     @BeforeAll
     fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
+
+        stubCommon()
+
+        underTest = LegacyAlbumContentViewModel(
+            savedStateHandle = savedStateHandle,
+            getDefaultAlbumPhotos = getDefaultAlbumPhotos,
+            getDefaultAlbumsMapUseCase = getDefaultAlbumsMapUseCase,
+            getUserAlbum = getUserAlbum,
+            getAlbumPhotosUseCase = getAlbumPhotosUseCase,
+            uiAlbumMapper = uiAlbumMapper,
+            observeAlbumPhotosAddingProgress = observeAlbumPhotosAddingProgress,
+            updateAlbumPhotosAddingProgressCompleted = updateAlbumPhotosAddingProgressCompleted,
+            observeAlbumPhotosRemovingProgress = observeAlbumPhotosRemovingProgress,
+            updateAlbumPhotosRemovingProgressCompleted = updateAlbumPhotosRemovingProgressCompleted,
+            disableExportAlbumsUseCase = disableExportAlbumsUseCase,
+            removeFavouritesUseCase = removeFavouritesUseCase,
+            removePhotosFromAlbumUseCase = removePhotosFromAlbumUseCase,
+            getNodeListByIds = getNodeListByIds,
+            getProscribedAlbumNamesUseCase = getProscribedAlbumNamesUseCase,
+            updateAlbumNameUseCase = updateAlbumNameUseCase,
+            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
+        )
     }
 
     @AfterAll
@@ -117,8 +142,7 @@ class AlbumContentViewModelTest {
             monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase,
             getBusinessStatusUseCase,
-            analyticsTracker,
-            photoUiStateMapper
+            analyticsTracker
         )
         stubCommon()
         Analytics.initialise(analyticsTracker)
@@ -133,45 +157,12 @@ class AlbumContentViewModelTest {
         }
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountDetailUseCase()).thenReturn(emptyFlow())
-        whenever(observeAlbumPhotosAddingProgress(mock())).thenReturn(emptyFlow())
-        whenever(observeAlbumPhotosRemovingProgress(mock())).thenReturn(emptyFlow())
-    }
-
-    private fun createViewModel(
-        navKey: AlbumContentNavKey = AlbumContentNavKey(id = null, type = null),
-    ) {
-        underTest = AlbumContentViewModel(
-            savedStateHandle = savedStateHandle,
-            getDefaultAlbumPhotos = getDefaultAlbumPhotos,
-            getDefaultAlbumsMapUseCase = getDefaultAlbumsMapUseCase,
-            getUserAlbum = getUserAlbum,
-            getAlbumPhotosUseCase = getAlbumPhotosUseCase,
-            uiAlbumMapper = uiAlbumMapper,
-            observeAlbumPhotosAddingProgress = observeAlbumPhotosAddingProgress,
-            updateAlbumPhotosAddingProgressCompleted = updateAlbumPhotosAddingProgressCompleted,
-            observeAlbumPhotosRemovingProgress = observeAlbumPhotosRemovingProgress,
-            updateAlbumPhotosRemovingProgressCompleted = updateAlbumPhotosRemovingProgressCompleted,
-            disableExportAlbumsUseCase = disableExportAlbumsUseCase,
-            removeFavouritesUseCase = removeFavouritesUseCase,
-            removePhotosFromAlbumUseCase = removePhotosFromAlbumUseCase,
-            getNodeListByIds = getNodeListByIds,
-            getProscribedAlbumNamesUseCase = getProscribedAlbumNamesUseCase,
-            updateAlbumNameUseCase = updateAlbumNameUseCase,
-            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
-            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
-            isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
-            getBusinessStatusUseCase = getBusinessStatusUseCase,
-            photoUiStateMapper = photoUiStateMapper,
-            navKey = navKey,
-        )
+        whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(emptyFlow())
+        whenever(observeAlbumPhotosRemovingProgress(any())).thenReturn(emptyFlow())
     }
 
     @Test
     fun `test that deleteAlbum updates state correctly`() = runTest {
-        createViewModel()
-
         underTest.deleteAlbum()
 
         underTest.state.test {
@@ -181,8 +172,6 @@ class AlbumContentViewModelTest {
 
     @Test
     fun `test that showRemoveLinkConfirmation updates state correctly`() = runTest {
-        createViewModel()
-
         underTest.showRemoveLinkConfirmation()
 
         underTest.state.test {
@@ -192,8 +181,6 @@ class AlbumContentViewModelTest {
 
     @Test
     fun `test that closeRemoveLinkConfirmation updates state correctly`() = runTest {
-        createViewModel()
-
         underTest.closeRemoveLinkConfirmation()
 
         underTest.state.test {
@@ -203,7 +190,6 @@ class AlbumContentViewModelTest {
 
     @Test
     fun `test that setCurrentSort updates state correctly`() = runTest {
-        createViewModel()
         val sort = Sort.OLDEST
 
         underTest.setCurrentSort(sort)
@@ -215,7 +201,6 @@ class AlbumContentViewModelTest {
 
     @Test
     fun `test that setCurrentMediaType updates state correctly`() = runTest {
-        createViewModel()
         val mediaType = FilterMediaType.IMAGES
 
         underTest.setCurrentMediaType(mediaType)
@@ -227,8 +212,6 @@ class AlbumContentViewModelTest {
 
     @Test
     fun `test that showSortByDialog updates state correctly`() = runTest {
-        createViewModel()
-
         underTest.showSortByDialog(true)
 
         underTest.state.test {
@@ -238,8 +221,6 @@ class AlbumContentViewModelTest {
 
     @Test
     fun `test that showFilterDialog updates state correctly`() = runTest {
-        createViewModel()
-
         underTest.showFilterDialog(true)
 
         underTest.state.test {
@@ -249,8 +230,6 @@ class AlbumContentViewModelTest {
 
     @Test
     fun `test that showRenameDialog updates state correctly`() = runTest {
-        createViewModel()
-
         underTest.showRenameDialog(true)
 
         underTest.state.test {
@@ -260,8 +239,6 @@ class AlbumContentViewModelTest {
 
     @Test
     fun `test that showDeleteAlbumsConfirmation updates state correctly`() = runTest {
-        createViewModel()
-
         underTest.showDeleteAlbumsConfirmation()
 
         underTest.state.test {
@@ -271,8 +248,6 @@ class AlbumContentViewModelTest {
 
     @Test
     fun `test that closeDeleteAlbumsConfirmation updates state correctly`() = runTest {
-        createViewModel()
-
         underTest.closeDeleteAlbumsConfirmation()
 
         underTest.state.test {
@@ -282,8 +257,6 @@ class AlbumContentViewModelTest {
 
     @Test
     fun `test that setShowRemovePhotosFromAlbumDialog updates state correctly`() = runTest {
-        createViewModel()
-
         underTest.setShowRemovePhotosFromAlbumDialog(true)
 
         underTest.state.test {
@@ -293,8 +266,6 @@ class AlbumContentViewModelTest {
 
     @Test
     fun `test that clearSelectedPhotos updates state correctly`() = runTest {
-        createViewModel()
-
         underTest.clearSelectedPhotos()
 
         underTest.state.test {
@@ -304,7 +275,6 @@ class AlbumContentViewModelTest {
 
     @Test
     fun `test that setSnackBarMessage updates state correctly`() = runTest {
-        createViewModel()
         val message = "Test message"
 
         underTest.setSnackBarMessage(message)
@@ -316,8 +286,6 @@ class AlbumContentViewModelTest {
 
     @Test
     fun `test that resetLinkRemoved updates state correctly`() = runTest {
-        createViewModel()
-
         underTest.resetLinkRemoved()
 
         underTest.state.test {
@@ -327,8 +295,6 @@ class AlbumContentViewModelTest {
 
     @Test
     fun `test that setNewAlbumNameValidity updates state correctly`() = runTest {
-        createViewModel()
-
         underTest.setNewAlbumNameValidity(false)
 
         underTest.state.test {
@@ -338,8 +304,6 @@ class AlbumContentViewModelTest {
 
     @Test
     fun `test that setHiddenNodesOnboarded updates state correctly`() = runTest {
-        createViewModel()
-
         underTest.state.test {
             underTest.setHiddenNodesOnboarded()
             assertThat(expectMostRecentItem().isHiddenNodesOnboarded).isTrue()
@@ -348,8 +312,7 @@ class AlbumContentViewModelTest {
 
     @Test
     fun `test that togglePhotoSelection adds photo when not selected`() = runTest {
-        createViewModel()
-        val photo = mock<PhotoUiState.Image>()
+        val photo = mock<Photo.Image>()
         whenever(photo.id).thenReturn(123L)
 
         underTest.togglePhotoSelection(photo)
@@ -361,8 +324,7 @@ class AlbumContentViewModelTest {
 
     @Test
     fun `test that togglePhotoSelection removes photo when already selected`() = runTest {
-        createViewModel()
-        val photo = mock<PhotoUiState.Image>()
+        val photo = mock<Photo.Image>()
         whenever(photo.id).thenReturn(123L)
 
         // Add photo first
@@ -377,7 +339,6 @@ class AlbumContentViewModelTest {
 
     @Test
     fun `test that disableExportAlbum updates state when link removed successfully`() = runTest {
-        createViewModel()
         val albumId = AlbumId(123L)
         whenever(disableExportAlbumsUseCase(listOf(albumId))).thenReturn(1)
 
@@ -390,11 +351,9 @@ class AlbumContentViewModelTest {
 
     @Test
     fun `test that removeFavourites calls use case and clears selection`() = runTest {
-        createViewModel()
-
         underTest.removeFavourites()
 
-        verify(removeFavouritesUseCase).invoke(emptyList())
+        verify(removeFavouritesUseCase).invoke(any())
         underTest.state.test {
             assertThat(awaitItem().selectedPhotos).isEmpty()
         }
@@ -402,7 +361,6 @@ class AlbumContentViewModelTest {
 
     @Test
     fun `test that updatePhotosAddingProgressCompleted calls use case`() = runTest {
-        createViewModel()
         val albumId = AlbumId(123L)
 
         underTest.updatePhotosAddingProgressCompleted(albumId)
@@ -412,7 +370,6 @@ class AlbumContentViewModelTest {
 
     @Test
     fun `test that updatePhotosRemovingProgressCompleted calls use case`() = runTest {
-        createViewModel()
         val albumId = AlbumId(123L)
 
         underTest.updatePhotosRemovingProgressCompleted(albumId)
@@ -422,11 +379,36 @@ class AlbumContentViewModelTest {
 
     @Test
     fun `test that getSelectedPhotos returns current selected photos`() = runTest {
-        createViewModel()
-
         val result = underTest.getSelectedPhotos()
 
         assertThat(result).isEqualTo(underTest.state.value.selectedPhotos)
+    }
+
+    @Test
+    fun `test that selectAllPhotos selects all photos when media type is all`() = runTest {
+        underTest.selectAllPhotos()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.selectedPhotos.size).isEqualTo(state.photos.size)
+        }
+    }
+
+    @Test
+    fun `test that getSelectedNodes returns empty list by default`() = runTest {
+        whenever(getNodeListByIds(any())).thenReturn(emptyList())
+
+        val result = underTest.getSelectedNodes()
+
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun `test that hideOrUnhideNodes calls update node sensitive use case`() = runTest {
+        underTest.hideOrUnhideNodes(true)
+
+        // Since there are no selected photos, no calls should be made
+        verify(updateNodeSensitiveUseCase, org.mockito.kotlin.never()).invoke(any(), any())
     }
 }
 

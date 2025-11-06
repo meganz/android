@@ -25,7 +25,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -58,7 +57,6 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.feature.photos.presentation.albums.content.AlbumContentViewModel
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.AlbumContentDeleteAlbumEvent
 import mega.privacy.mobile.analytics.event.AlbumContentScreenEvent
@@ -74,14 +72,7 @@ class AlbumContentFragment : Fragment() {
     private val albumsViewModel: AlbumsViewModel by activityViewModels()
 
     private val photoDownloaderViewModel: PhotoDownloaderViewModel by viewModels()
-    internal val albumContentViewModel: AlbumContentViewModel by viewModels(
-        extrasProducer = {
-            defaultViewModelCreationExtras
-                .withCreationCallback<AlbumContentViewModel.Factory> { factory ->
-                    factory.create(null)
-                }
-        }
-    )
+    internal val albumContentViewModel: LegacyAlbumContentViewModel by viewModels()
 
     internal lateinit var managerActivity: ManagerActivity
 

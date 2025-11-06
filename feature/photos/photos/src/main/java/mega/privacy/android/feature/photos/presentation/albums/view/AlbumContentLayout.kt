@@ -1,7 +1,8 @@
 package mega.privacy.android.feature.photos.presentation.albums.view
 
 import androidx.compose.runtime.Immutable
-import mega.privacy.android.domain.entity.photos.Photo
+import kotlinx.collections.immutable.ImmutableList
+import mega.privacy.android.feature.photos.model.PhotoUiState
 
 /**
  * Defines the visual arrangement pattern for Album photos
@@ -10,7 +11,7 @@ import mega.privacy.android.domain.entity.photos.Photo
  */
 @Immutable
 sealed class AlbumContentLayout(
-    val content: List<Photo>,
+    val content: ImmutableList<PhotoUiState>,
 ) {
     abstract val key: String
 
@@ -19,7 +20,7 @@ sealed class AlbumContentLayout(
      * followed by 2 smaller tiles at the end
      */
     data class HighlightStart(
-        val photos: List<Photo>,
+        val photos: ImmutableList<PhotoUiState>,
     ) : AlbumContentLayout(photos) {
         override val key: String =
             "layout_highlight_start_${photos.joinToString { it.id.toString() }}"
@@ -30,7 +31,7 @@ sealed class AlbumContentLayout(
      * All tiles appear in the same row or column with the same size
      */
     data class Uniform(
-        val photos: List<Photo>,
+        val photos: ImmutableList<PhotoUiState>,
     ) : AlbumContentLayout(photos) {
         override val key: String = "layout_uniform_${photos.joinToString { it.id.toString() }}"
     }
@@ -41,7 +42,7 @@ sealed class AlbumContentLayout(
      * followed by 2 smaller tiles at the start.
      */
     data class HighlightEnd(
-        val photos: List<Photo>,
+        val photos: ImmutableList<PhotoUiState>,
     ) : AlbumContentLayout(photos) {
         override val key: String =
             "layout_highlight_end_${photos.joinToString { it.id.toString() }}"

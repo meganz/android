@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,23 +37,33 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.sharedcomponents.selectedBorder
+import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.feature.photos.extensions.downloadAsStateWithLifecycle
+import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 
 @Composable
 internal fun AlbumPhotoItem(
-    photo: Photo,
+    photo: PhotoUiState,
     width: Dp,
     height: Dp,
     modifier: Modifier = Modifier,
     isPreview: Boolean = false,
     isSensitive: Boolean = false,
 ) {
-    // Todo add photo downloader when ready
+    val downloadResult by photo.downloadAsStateWithLifecycle(isPreview = isPreview)
+    val downloadedPhoto = remember(downloadResult) {
+        when (val result = downloadResult) {
+            is DownloadPhotoResult.Success -> if (isPreview) result.previewFilePath else result.thumbnailFilePath
+            else -> null
+        }
+    }
+
     AsyncImage(
         model = ImageRequest.Builder(LocalContext.current)
-            .data(null)
+            .data(downloadedPhoto)
             .crossfade(true)
             .build(),
         contentDescription = null,
@@ -72,11 +83,11 @@ internal fun AlbumPhotoItem(
 @Composable
 internal fun AlbumPhotoContainer(
     albumPhotoView: @Composable () -> Unit,
-    photo: Photo,
+    photo: PhotoUiState,
     isSelected: Boolean,
     modifier: Modifier = Modifier,
-    onClick: (Photo) -> Unit = {},
-    onLongPress: (Photo) -> Unit = {},
+    onClick: (PhotoUiState) -> Unit = {},
+    onLongPress: (PhotoUiState) -> Unit = {},
 ) {
     Box(
         modifier = modifier

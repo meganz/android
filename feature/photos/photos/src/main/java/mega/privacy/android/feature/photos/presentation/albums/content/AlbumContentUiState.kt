@@ -1,8 +1,12 @@
 package mega.privacy.android.feature.photos.presentation.albums.content
 
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentSetOf
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.feature.photos.model.FilterMediaType
+import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 
@@ -35,7 +39,7 @@ import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
  * @property isBusinessAccountExpired True if the business account is expired, false otherwise.
  * @property hiddenNodeEnabled True if the hidden node is enabled, false otherwise.
  */
-data class AlbumContentState(
+data class AlbumContentUiState(
     val isLoading: Boolean = true,
     val isAddingPhotos: Boolean = false,
     val totalAddedPhotos: Int = 0,
@@ -45,8 +49,8 @@ data class AlbumContentState(
     val showRemoveLinkConfirmation: Boolean = false,
     val isLinkRemoved: Boolean = false,
     val uiAlbum: UIAlbum? = null,
-    val photos: List<Photo> = listOf(),
-    val selectedPhotos: Set<Photo> = emptySet(),
+    val photos: ImmutableList<PhotoUiState> = persistentListOf(),
+    val selectedPhotos: ImmutableSet<PhotoUiState> = persistentSetOf(),
     val currentSort: Sort = Sort.NEWEST,
     val currentMediaType: FilterMediaType = FilterMediaType.ALL_MEDIA,
     val snackBarMessage: String = "",

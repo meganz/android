@@ -1,16 +1,9 @@
-package mega.privacy.android.feature.photos.presentation.albums.content
+package mega.privacy.android.app.presentation.photos.albums.albumcontent
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentSetOf
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -55,21 +48,20 @@ import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumNameUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
-import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.mapper.UIAlbumMapper
 import mega.privacy.android.feature.photos.model.FilterMediaType
-import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.Sort
-import mega.privacy.android.feature.photos.navigation.AlbumContentNavKey
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.PhotoItemSelected
 import mega.privacy.mobile.analytics.event.PhotoItemSelectedEvent
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
+import javax.inject.Inject
 
-@HiltViewModel(assistedFactory = AlbumContentViewModel.Factory::class)
-class AlbumContentViewModel @AssistedInject constructor(
+@Deprecated("Use AlbumContentViewModel from media module instead")
+@HiltViewModel
+class LegacyAlbumContentViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getDefaultAlbumPhotos: GetDefaultAlbumPhotos,
     private val getDefaultAlbumsMapUseCase: GetDefaultAlbumsMapUseCase,
@@ -92,10 +84,8 @@ class AlbumContentViewModel @AssistedInject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
-    private val photoUiStateMapper: PhotoUiStateMapper,
-    @Assisted private val navKey: AlbumContentNavKey?,
 ) : ViewModel() {
-    private val _state = MutableStateFlow(AlbumContentUiState())
+    private val _state = MutableStateFlow(LegacyAlbumContentState())
     val state = _state.asStateFlow()
 
     private var observeAlbumPhotosJob: Job? = null
@@ -106,11 +96,10 @@ class AlbumContentViewModel @AssistedInject constructor(
     private var showHiddenItems: Boolean? = null
 
     private val albumType: String?
-        get() = savedStateHandle["type"] ?: navKey?.type
+        get() = savedStateHandle["type"]
 
     private val albumId: AlbumId?
-        get() = (savedStateHandle["id"] ?: navKey?.id)
-            ?.let { AlbumId(it) }
+        get() = savedStateHandle.get<Long?>("id")?.let { AlbumId(it) }
 
     private val photosFetchers: Map<String, () -> Unit> = mapOf(
         "favourite" to { fetchSystemPhotos(systemAlbum = FavouriteAlbum) },
@@ -188,13 +177,13 @@ class AlbumContentViewModel @AssistedInject constructor(
             updateSelection(filteredPhotos)
         }.launchIn(viewModelScope)
 
-    private fun updateSelection(photos: List<PhotoUiState>) {
+    private fun updateSelection(photos: List<Photo>) {
         val selectedPhotos = _state.value.selectedPhotos.filter { selectedPhoto ->
             photos.any { it.id == selectedPhoto.id }
         }.toSet()
 
         _state.update {
-            it.copy(selectedPhotos = selectedPhotos.toImmutableSet())
+            it.copy(selectedPhotos = selectedPhotos)
         }
     }
 
@@ -291,18 +280,15 @@ class AlbumContentViewModel @AssistedInject constructor(
         }
     }
 
-    private fun filterNonSensitivePhotos(photos: List<Photo>): ImmutableList<PhotoUiState> {
-        val photosUiState = photos.map { photoUiStateMapper(it) }
-        val showHiddenItems = showHiddenItems ?: return photosUiState.toImmutableList()
-        val isPaid = _state.value.accountType?.isPaid ?: return photosUiState.toImmutableList()
-        val filteredPhotos =
-            if (showHiddenItems || !isPaid || _state.value.isBusinessAccountExpired) {
-                photosUiState
-            } else {
-                photosUiState.filter { !it.isSensitive && !it.isSensitiveInherited }
-            }
+    private fun filterNonSensitivePhotos(photos: List<Photo>): List<Photo> {
+        val showHiddenItems = showHiddenItems ?: return photos
+        val isPaid = _state.value.accountType?.isPaid ?: return photos
 
-        return filteredPhotos.toImmutableList()
+        return if (showHiddenItems || !isPaid || _state.value.isBusinessAccountExpired) {
+            photos
+        } else {
+            photos.filter { !it.isSensitive && !it.isSensitiveInherited }
+        }
     }
 
     private fun observePhotosRemovingProgress(albumId: AlbumId) {
@@ -320,10 +306,8 @@ class AlbumContentViewModel @AssistedInject constructor(
         }
     }
 
-    fun updatePhotosRemovingProgressCompleted(albumId: AlbumId) {
-        viewModelScope.launch {
-            updateAlbumPhotosRemovingProgressCompleted(albumId)
-        }
+    fun updatePhotosRemovingProgressCompleted(albumId: AlbumId) = viewModelScope.launch {
+        updateAlbumPhotosRemovingProgressCompleted(albumId)
     }
 
     private fun observePhotosAddingProgress(albumId: AlbumId) {
@@ -349,10 +333,8 @@ class AlbumContentViewModel @AssistedInject constructor(
         }
     }
 
-    fun updatePhotosAddingProgressCompleted(albumId: AlbumId) {
-        viewModelScope.launch {
-            updateAlbumPhotosAddingProgressCompleted(albumId)
-        }
+    fun updatePhotosAddingProgressCompleted(albumId: AlbumId) = viewModelScope.launch {
+        updateAlbumPhotosAddingProgressCompleted(albumId)
     }
 
     fun deleteAlbum() {
@@ -373,12 +355,10 @@ class AlbumContentViewModel @AssistedInject constructor(
         }
     }
 
-    fun disableExportAlbum(albumId: AlbumId) {
-        viewModelScope.launch {
-            val numRemoved = disableExportAlbumsUseCase(albumIds = listOf(albumId))
-            _state.update {
-                it.copy(isLinkRemoved = numRemoved > 0)
-            }
+    fun disableExportAlbum(albumId: AlbumId) = viewModelScope.launch {
+        val numRemoved = disableExportAlbumsUseCase(albumIds = listOf(albumId))
+        _state.update {
+            it.copy(isLinkRemoved = numRemoved > 0)
         }
     }
 
@@ -441,7 +421,7 @@ class AlbumContentViewModel @AssistedInject constructor(
         removeFavouritesUseCase(selectedPhotoIds)
 
         _state.update {
-            it.copy(selectedPhotos = persistentSetOf())
+            it.copy(selectedPhotos = emptySet())
         }
     }
 
@@ -464,21 +444,21 @@ class AlbumContentViewModel @AssistedInject constructor(
         val photos = _state.value.photos
         val selectedPhotos = when (_state.value.currentMediaType) {
             FilterMediaType.ALL_MEDIA -> photos
-            FilterMediaType.IMAGES -> photos.filterIsInstance<PhotoUiState.Image>()
-            FilterMediaType.VIDEOS -> photos.filterIsInstance<PhotoUiState.Video>()
+            FilterMediaType.IMAGES -> photos.filterIsInstance<Photo.Image>()
+            FilterMediaType.VIDEOS -> photos.filterIsInstance<Photo.Video>()
         }
         _state.update {
-            it.copy(selectedPhotos = selectedPhotos.toImmutableSet())
+            it.copy(selectedPhotos = selectedPhotos.toMutableSet())
         }
     }
 
     fun clearSelectedPhotos() {
         _state.update {
-            it.copy(selectedPhotos = persistentSetOf())
+            it.copy(selectedPhotos = emptySet())
         }
     }
 
-    fun togglePhotoSelection(photo: PhotoUiState) {
+    fun togglePhotoSelection(photo: Photo) {
         val selectedPhotos = _state.value.selectedPhotos.toMutableSet()
         if (photo in selectedPhotos) {
             Analytics.tracker.trackEvent(
@@ -493,7 +473,7 @@ class AlbumContentViewModel @AssistedInject constructor(
         }
 
         _state.update {
-            it.copy(selectedPhotos = selectedPhotos.toImmutableSet())
+            it.copy(selectedPhotos = selectedPhotos)
         }
     }
 
@@ -598,10 +578,5 @@ class AlbumContentViewModel @AssistedInject constructor(
         _state.update {
             it.copy(isHiddenNodesOnboarded = true)
         }
-    }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(navKey: AlbumContentNavKey?): AlbumContentViewModel
     }
 }

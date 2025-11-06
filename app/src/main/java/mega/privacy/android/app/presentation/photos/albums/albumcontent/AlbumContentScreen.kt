@@ -72,7 +72,7 @@ internal fun AlbumContentScreen(
     photoDownloaderViewModel: PhotoDownloaderViewModel,
     timelineViewModel: TimelineViewModel,
     albumsViewModel: AlbumsViewModel,
-    albumContentViewModel: AlbumContentViewModel,
+    albumContentViewModel: LegacyAlbumContentViewModel,
     onNavigatePhotoPreview: (anchor: Photo, photos: List<Photo>) -> Unit,
     onNavigatePhotosSelection: (UserAlbum) -> Unit,
 ) {

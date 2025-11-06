@@ -11,19 +11,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableSet
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.feature.photos.model.PhotoUiState
 
 private val gap = 1.dp
 
 @Composable
 internal fun AlbumContentHighlightStart(
     size: Dp,
-    photos: List<Photo>,
-    selectedPhotos: Set<Photo>,
+    photos: ImmutableList<PhotoUiState>,
+    selectedPhotos: ImmutableSet<PhotoUiState>,
     shouldApplySensitiveMode: Boolean,
     modifier: Modifier = Modifier,
-    onClick: (Photo) -> Unit = {},
-    onLongPress: (Photo) -> Unit = {},
+    onClick: (PhotoUiState) -> Unit = {},
+    onLongPress: (PhotoUiState) -> Unit = {},
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -86,12 +89,12 @@ internal fun AlbumContentHighlightStart(
 @Composable
 internal fun AlbumContentUniform(
     size: Dp,
-    photos: List<Photo>,
-    selectedPhotos: Set<Photo>,
+    photos: ImmutableList<PhotoUiState>,
+    selectedPhotos: ImmutableSet<PhotoUiState>,
     shouldApplySensitiveMode: Boolean,
     modifier: Modifier = Modifier,
-    onClick: (Photo) -> Unit = {},
-    onLongPress: (Photo) -> Unit = {},
+    onClick: (PhotoUiState) -> Unit = {},
+    onLongPress: (PhotoUiState) -> Unit = {},
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -151,12 +154,13 @@ internal fun AlbumContentUniform(
 
 @Composable
 internal fun AlbumContentHighlightEnd(
-    size: Dp, photos: List<Photo>,
-    selectedPhotos: Set<Photo>,
+    size: Dp,
+    photos: ImmutableList<PhotoUiState>,
+    selectedPhotos: ImmutableSet<PhotoUiState>,
     shouldApplySensitiveMode: Boolean,
     modifier: Modifier = Modifier,
-    onClick: (Photo) -> Unit = {},
-    onLongPress: (Photo) -> Unit = {},
+    onClick: (PhotoUiState) -> Unit = {},
+    onLongPress: (PhotoUiState) -> Unit = {},
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
