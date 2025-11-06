@@ -24,6 +24,7 @@ import mega.privacy.android.domain.entity.DeviceInfo
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import timber.log.Timber
+import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
@@ -138,4 +139,9 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
     }
 
     override fun getTimezone(): String = deviceGateway.getTimezone()
+
+    override fun getLocale(): Locale = context.resources.configuration.locales
+        .takeIf { it.size() > 0 }
+        ?.get(0)
+        ?: Locale.getDefault()
 }

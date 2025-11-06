@@ -1,6 +1,7 @@
 package mega.privacy.android.data.repository
 
 import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cache.Cache
@@ -88,7 +89,7 @@ class DefaultBillingRepositoryTest {
 
             val actual = underTest.getLocalPricing(skuString)
 
-            Truth.assertThat(actual).isEqualTo(localPricing)
+            assertThat(actual).isEqualTo(localPricing)
         }
 
     @Test
@@ -296,7 +297,7 @@ class DefaultBillingRepositoryTest {
             whenever(accountInfoWrapper.subscriptionMethodId).thenReturn(3)
 
             val actual = underTest.getCurrentPaymentMethod()
-            Truth.assertThat(actual).isEqualTo(paymentMethod)
+            assertThat(actual).isEqualTo(paymentMethod)
         }
     }
 
@@ -307,7 +308,7 @@ class DefaultBillingRepositoryTest {
 
             val actual = underTest.isBillingAvailable()
 
-            Truth.assertThat(actual).isEqualTo(true)
+            assertThat(actual).isEqualTo(true)
         }
     }
 
@@ -318,7 +319,7 @@ class DefaultBillingRepositoryTest {
 
             val actual = underTest.isBillingAvailable()
 
-            Truth.assertThat(actual).isEqualTo(false)
+            assertThat(actual).isEqualTo(false)
         }
     }
 
@@ -368,7 +369,7 @@ class DefaultBillingRepositoryTest {
             }
 
             val actual = underTest.legacyCancelSubscriptions(feedback)
-            Truth.assertThat(actual).isTrue()
+            assertThat(actual).isTrue()
         }
     }
 
@@ -403,4 +404,25 @@ class DefaultBillingRepositoryTest {
             )
         }
     }
+
+    @Test
+    fun `test that getBillingCountryCode delegates to billingGateway getCountryCode`() = runTest {
+        val expectedCountryCode = "US"
+        whenever(billingGateway.getCountryCode()).thenReturn(expectedCountryCode)
+
+        val actual = underTest.getBillingCountryCode()
+
+        assertThat(actual).isEqualTo(expectedCountryCode)
+    }
+
+    @Test
+    fun `test that getBillingCountryCode returns null when billingGateway returns null`() =
+        runTest {
+            whenever(billingGateway.getCountryCode()).thenReturn(null)
+
+            val actual = underTest.getBillingCountryCode()
+
+            assertThat(actual).isNull()
+            verify(billingGateway).getCountryCode()
+        }
 }

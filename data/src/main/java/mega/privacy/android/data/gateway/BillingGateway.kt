@@ -25,6 +25,12 @@ internal interface BillingGateway {
     suspend fun querySkus(skus: List<String>): List<MegaSku>
 
     /**
+     * Get country code
+     *
+     */
+    suspend fun getCountryCode(): String?
+
+    /**
      * Monitor billing event
      * it will emit when calling queryProductDetails and queryPurchasesAsync
      */

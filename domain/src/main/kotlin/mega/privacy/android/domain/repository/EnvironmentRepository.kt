@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.DeviceInfo
 import mega.privacy.android.domain.entity.environment.DevicePowerConnectionState
 import mega.privacy.android.domain.entity.environment.ThermalState
+import java.util.Locale
 
 /**
  * Device repository
@@ -110,4 +111,9 @@ interface EnvironmentRepository {
      *
      */
     fun getTimezone(): String
+
+    /**
+     * Get current locale
+     */
+    fun getLocale(): Locale
 }

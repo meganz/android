@@ -86,6 +86,13 @@ interface BillingRepository {
     suspend fun legacyCancelSubscriptions(feedback: String?): Boolean
 
     /**
+     * Get the billing country code
+     *
+     * @return the billing country code as a String
+     */
+    suspend fun getBillingCountryCode(): String?
+
+    /**
      * Provide API with cancellation survey answers
      */
     suspend fun cancelSubscriptionWithSurveyAnswers(

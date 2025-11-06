@@ -133,6 +133,8 @@ internal class DefaultBillingRepository @Inject constructor(
 
     override fun isBillingAvailable(): Boolean = skusCache.get().isNullOrEmpty().not()
 
+    override suspend fun getBillingCountryCode(): String? = billingGateway.getCountryCode()
+
     override fun getActiveSubscription() = activeSubscriptionCache.get()
 
     override fun clearCache() {

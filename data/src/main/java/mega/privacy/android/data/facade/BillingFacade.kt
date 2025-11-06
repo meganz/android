@@ -13,6 +13,7 @@ import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingFlowParams.ProductDetailsParams
 import com.android.billingclient.api.BillingFlowParams.SubscriptionUpdateParams
 import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.GetBillingConfigParams
 import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
@@ -265,6 +266,26 @@ internal class BillingFacade @Inject constructor(
         }
         skusCache.set(newCache.values.toList())
         return@withContext megaSkus
+    }
+
+    override suspend fun getCountryCode(): String? = withContext(ioDispatcher) {
+        val client = ensureConnect()
+        ensureActive()
+        suspendCancellableCoroutine { continuation ->
+            client.getBillingConfigAsync(
+                GetBillingConfigParams.newBuilder().build()
+            ) { result, config ->
+                if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                    continuation.resumeWith(Result.success(config?.countryCode))
+                } else {
+                    Timber.w(
+                        "Failed to get billing config, error code is %s",
+                        result.responseCode
+                    )
+                    continuation.resumeWith(Result.success(null))
+                }
+            }
+        }
     }
 
     override suspend fun queryPurchase(): List<MegaPurchase> = withContext(ioDispatcher) {
