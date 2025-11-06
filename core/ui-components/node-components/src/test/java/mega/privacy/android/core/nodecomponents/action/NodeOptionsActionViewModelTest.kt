@@ -30,7 +30,6 @@ import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionModeMenuItem
 import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
-import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
@@ -79,6 +78,7 @@ import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -117,7 +117,7 @@ class NodeOptionsActionViewModelTest {
     private val nodeVersionHistoryRemoveMessageMapper =
         mock<NodeVersionHistoryRemoveMessageMapper>()
 
-    private val snackBarHandler = mock<SnackBarHandler>()
+    private val snackbarEventQueue = mock<SnackbarEventQueue>()
     private val checkBackupNodeTypeUseCase: CheckBackupNodeTypeUseCase = mock()
     private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase = mock()
     private val nodeSendToChatMessageMapper: NodeSendToChatMessageMapper = mock()
@@ -176,7 +176,7 @@ class NodeOptionsActionViewModelTest {
             deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
             moveRequestMessageMapper = moveRequestMessageMapper,
             versionHistoryRemoveMessageMapper = nodeVersionHistoryRemoveMessageMapper,
-            snackBarHandler = snackBarHandler,
+            snackbarEventQueue = snackbarEventQueue,
             checkBackupNodeTypeUseCase = checkBackupNodeTypeUseCase,
             attachMultipleNodesUseCase = attachMultipleNodesUseCase,
             nodeSendToChatMessageMapper = nodeSendToChatMessageMapper,
@@ -236,7 +236,7 @@ class NodeOptionsActionViewModelTest {
             deleteNodeVersionsUseCase,
             moveRequestMessageMapper,
             nodeVersionHistoryRemoveMessageMapper,
-            snackBarHandler,
+            snackbarEventQueue,
             checkBackupNodeTypeUseCase,
             attachMultipleNodesUseCase,
             nodeSendToChatMessageMapper,
@@ -622,7 +622,7 @@ class NodeOptionsActionViewModelTest {
             singleNodeActionHandlers = multipleHandlers,
             multipleNodesActionHandlers = multipleNodesActionHandlers,
             createShareKeyUseCase = createShareKeyUseCase,
-            snackBarHandler = snackBarHandler,
+            snackbarEventQueue = snackbarEventQueue,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
@@ -680,7 +680,7 @@ class NodeOptionsActionViewModelTest {
             singleNodeActionHandlers = singleNodeActionHandlers,
             multipleNodesActionHandlers = multipleHandlers,
             createShareKeyUseCase = createShareKeyUseCase,
-            snackBarHandler = snackBarHandler,
+            snackbarEventQueue = snackbarEventQueue,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
@@ -732,7 +732,7 @@ class NodeOptionsActionViewModelTest {
             singleNodeActionHandlers = emptySet(),
             multipleNodesActionHandlers = multipleNodesActionHandlers,
             createShareKeyUseCase = createShareKeyUseCase,
-            snackBarHandler = snackBarHandler,
+            snackbarEventQueue = snackbarEventQueue,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
@@ -776,7 +776,7 @@ class NodeOptionsActionViewModelTest {
             singleNodeActionHandlers = singleNodeActionHandlers,
             multipleNodesActionHandlers = emptySet(),
             createShareKeyUseCase = createShareKeyUseCase,
-            snackBarHandler = snackBarHandler,
+            snackbarEventQueue = snackbarEventQueue,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,

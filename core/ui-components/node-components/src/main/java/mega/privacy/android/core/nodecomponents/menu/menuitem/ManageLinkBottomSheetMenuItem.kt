@@ -5,7 +5,6 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.ManageLinkMenuAc
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.navigation.MegaNavigator
 import javax.inject.Inject
 
 /**
@@ -13,7 +12,6 @@ import javax.inject.Inject
  */
 class ManageLinkBottomSheetMenuItem @Inject constructor(
     override val menuAction: ManageLinkMenuAction,
-    private val megaNavigator: MegaNavigator
 ) :
     NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(

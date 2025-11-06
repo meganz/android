@@ -35,6 +35,7 @@ import mega.privacy.android.core.nodecomponents.action.clickhandler.RestoreActio
 import mega.privacy.android.core.nodecomponents.action.clickhandler.SendToChatActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.ShareActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.ShareFolderActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.SyncActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.UnhideActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.VerifyActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.VersionsActionClickHandler
@@ -66,6 +67,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.RestoreMenuActio
 import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareFolderMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.SyncMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VerifyMenuAction
@@ -98,6 +100,7 @@ import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNod
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
+import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -151,6 +154,7 @@ class NodeActionClickHandlerTest {
 
     private val mockFolderNode = mock<TypedFolderNode> {
         on { id } doReturn NodeId(456L)
+        on { name } doReturn "foldername"
     }
 
     private val mockVersionsLauncher = mock<ActivityResultLauncher<Long>>()
@@ -1411,5 +1415,38 @@ class NodeActionClickHandlerTest {
         ).isFalse()
         assertThat(FavouriteActionClickHandler(mockUpdateNodeFavoriteUseCase).canHandle(wrongAction)).isFalse()
         assertThat(LeaveShareActionClickHandler(mockNodeHandlesToJsonMapper).canHandle(wrongAction)).isFalse()
+        assertThat(SyncActionClickHandler().canHandle(wrongAction)).isFalse()
+    }
+
+    @Test
+    fun `test SyncAction canHandle returns true for SyncMenuAction`() {
+        val action = SyncActionClickHandler()
+        val menuAction = mock<SyncMenuAction>()
+
+        assertThat(action.canHandle(menuAction)).isTrue()
+    }
+
+    @Test
+    fun `test SyncAction canHandle returns false for other actions`() {
+        val action = SyncActionClickHandler()
+        val otherAction = mock<CopyMenuAction>()
+
+        assertThat(action.canHandle(otherAction)).isFalse()
+    }
+
+    @Test
+    fun `test SyncAction single node handle calls navigate with correct parameters for folder`() {
+        val action = SyncActionClickHandler()
+        val menuAction = mock<SyncMenuAction>()
+
+        action.handle(menuAction, mockFolderNode, mockSingleNodeActionProvider)
+
+        verify(mockNavigationHandler).navigate(
+            SyncNewFolderNavKey(
+                remoteFolderHandle = mockFolderNode.id.longValue,
+                remoteFolderName = mockFolderNode.name,
+                isFromManagerActivity = true
+            )
+        )
     }
 }

@@ -41,6 +41,6 @@ data class NodeBottomSheetUIState(
      * True if Sync action is allowed for the node or False otherwise
      */
     val isSyncActionAllowed =
-        legacyNodeWrapper?.typedNode is TypedFolderNode == true && !isUserAttributeFolder && !isSyncedFolder
+        legacyNodeWrapper?.typedNode is TypedFolderNode && !isUserAttributeFolder && !isSyncedFolder
 }
 

@@ -33,6 +33,7 @@ import mega.privacy.android.core.nodecomponents.action.clickhandler.SendToChatAc
 import mega.privacy.android.core.nodecomponents.action.clickhandler.ShareActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.ShareFolderActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.SingleNodeAction
+import mega.privacy.android.core.nodecomponents.action.clickhandler.SyncActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.UnhideActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.VerifyActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.VersionsActionClickHandler
@@ -82,7 +83,8 @@ object NodeActionHandlerModule {
         getLinkAction: GetLinkActionClickHandler,
         unhideAction: UnhideActionClickHandler,
         favouriteAction: FavouriteActionClickHandler,
-        removeFavouriteAction: RemoveFavouriteActionClickHandler
+        removeFavouriteAction: RemoveFavouriteActionClickHandler,
+        syncAction: SyncActionClickHandler
     ): Set<SingleNodeAction> {
         return setOf(
             versionsAction,
@@ -113,7 +115,8 @@ object NodeActionHandlerModule {
             getLinkAction,
             unhideAction,
             favouriteAction,
-            removeFavouriteAction
+            removeFavouriteAction,
+            syncAction
         )
     }
 

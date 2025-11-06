@@ -33,6 +33,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuitem.SendToChatBottomSh
 import mega.privacy.android.core.nodecomponents.menu.menuitem.ShareBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.ShareFolderBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.SlideshowBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.SyncBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.TrashBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.UnhideBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.VerifyBottomSheetMenuItem
@@ -98,6 +99,7 @@ abstract class NodeActionsBottomSheetModule {
             verifyMenuAction: VerifyBottomSheetMenuItem,
             versionsMenuAction: VersionsBottomSheetMenuItem,
             viewInFolderMenuAction: ViewInFolderBottomSheetMenuItem,
+            syncBottomSheetMenuItem: SyncBottomSheetMenuItem
         ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
             return setOf(
                 availableOfflineMenuAction,
@@ -132,6 +134,7 @@ abstract class NodeActionsBottomSheetModule {
                 verifyMenuAction,
                 versionsMenuAction,
                 viewInFolderMenuAction,
+                syncBottomSheetMenuItem
             )
         }
 

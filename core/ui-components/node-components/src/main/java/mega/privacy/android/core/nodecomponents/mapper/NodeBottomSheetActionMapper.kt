@@ -4,6 +4,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -27,13 +28,16 @@ class NodeBottomSheetActionMapper @Inject constructor() {
         isInBackUps: Boolean,
         isConnected: Boolean,
     ) = toolbarOptions.filter {
-        it.shouldDisplay(
+        val shouldDisplay = it.shouldDisplay(
             isNodeInRubbish = isNodeInRubbish,
             accessPermission = accessPermission,
             isInBackups = isInBackUps,
             node = selectedNode,
             isConnected = isConnected,
         )
+
+        Timber.d("shouldDisplay: ${it::class.simpleName}: $shouldDisplay")
+        shouldDisplay
     }.map {
         NodeActionModeMenuItem(
             group = it.groupId,

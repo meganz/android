@@ -30,7 +30,6 @@ import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistor
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction.Companion.DEFAULT_MAX_VISIBLE_ITEMS
-import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
@@ -75,6 +74,7 @@ import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import java.io.File
@@ -89,7 +89,7 @@ import javax.inject.Inject
  * @property setMoveLatestTargetPathUseCase
  * @property setCopyLatestTargetPathUseCase
  * @property deleteNodeVersionsUseCase
- * @property snackBarHandler
+ * @property snackbarEventQueue
  * @property moveRequestMessageMapper
  * @property versionHistoryRemoveMessageMapper
  * @property checkBackupNodeTypeUseCase
@@ -126,7 +126,7 @@ class NodeOptionsActionViewModel @Inject constructor(
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase,
     private val createShareKeyUseCase: CreateShareKeyUseCase,
-    private val snackBarHandler: SnackBarHandler,
+    private val snackbarEventQueue: SnackbarEventQueue,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val nodeMenuProviderRegistry: NodeMenuProviderRegistry,
     private val nodeSelectionModeActionMapper: NodeSelectionModeActionMapper,
@@ -281,7 +281,7 @@ class NodeOptionsActionViewModel @Inject constructor(
             deleteNodeVersionsUseCase(NodeId(it))
         }
         versionHistoryRemoveMessageMapper(result.exceptionOrNull()).let {
-            snackBarHandler.postSnackbarMessage(it)
+            snackbarEventQueue.queueMessage(it)
         }
     }
 
@@ -406,7 +406,7 @@ class NodeOptionsActionViewModel @Inject constructor(
                     )
                 val message = nodeSendToChatMessageMapper(attachNodeRequest)
                 message?.let {
-                    snackBarHandler.postSnackbarMessage(it)
+                    snackbarEventQueue.queueMessage(it)
                 }
             }
         }
@@ -687,8 +687,11 @@ class NodeOptionsActionViewModel @Inject constructor(
         }
     }
 
-    fun postMessage(message: String) =
-        snackBarHandler.postSnackbarMessage(message)
+    fun postMessage(message: String) {
+        applicationScope.launch {
+            snackbarEventQueue.queueMessage(message)
+        }
+    }
 
     fun updateSelectionModeAvailableActions(
         selectedNodes: Set<TypedNode>,
