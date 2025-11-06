@@ -18,6 +18,8 @@ import mega.privacy.android.app.LegacyDatabaseMigrationImpl
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.appstate.global.event.AppDialogsEventQueueImpl
 import mega.privacy.android.app.appstate.global.event.AppDialogsEventQueueReceiver
+import mega.privacy.android.app.appstate.global.event.NavigationEventQueueImpl
+import mega.privacy.android.app.appstate.global.event.NavigationEventQueueReceiver
 import mega.privacy.android.app.consent.ConsentDialogDestinations
 import mega.privacy.android.app.nav.MegaActivityResultContractImpl
 import mega.privacy.android.app.nav.MegaNavigatorImpl
@@ -39,6 +41,7 @@ import mega.privacy.android.navigation.contract.AppDialogDestinations
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.dialog.AppDialogsEventQueue
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import javax.inject.Singleton
@@ -161,6 +164,13 @@ internal class AppModule {
 
     @Provides
     fun provideAppDialogsEventQueueReceiver(queue: AppDialogsEventQueueImpl): AppDialogsEventQueueReceiver =
+        queue
+
+    @Provides
+    fun provideNavigationEventQueue(queue: NavigationEventQueueImpl): NavigationEventQueue = queue
+
+    @Provides
+    fun provideNavigationEventQueueReceiver(queue: NavigationEventQueueImpl): NavigationEventQueueReceiver =
         queue
 
     @Provides

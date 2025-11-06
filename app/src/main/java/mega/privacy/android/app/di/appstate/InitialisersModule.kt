@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import dagger.multibindings.IntoSet
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPermissionInitialiser
 import mega.privacy.android.app.appstate.initialisation.initialisers.AppStartInitialiser
 import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.app.appstate.initialisation.initialisers.PreLoginInitialiser
@@ -67,5 +68,10 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun provideRemoteLogoutInitialiser(initialiser: RemoteLogoutInitialiser): PostLoginInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
+    fun provideOnboardingPermissionInitialiser(initialiser: OnboardingPermissionInitialiser): PostLoginInitialiser =
         initialiser
 }

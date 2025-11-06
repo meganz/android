@@ -8,6 +8,7 @@ import dagger.hilt.testing.TestInstallIn
 import dagger.multibindings.ElementsIntoSet
 import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.app.appstate.global.event.AppDialogsEventQueueReceiver
+import mega.privacy.android.app.appstate.global.event.NavigationEventQueueReceiver
 import mega.privacy.android.core.sharedcomponents.container.AppContainerProvider
 import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.qualifier.MegaApi
@@ -20,6 +21,7 @@ import mega.privacy.android.navigation.contract.AppDialogDestinations
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.dialog.AppDialogsEventQueue
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import org.mockito.kotlin.mock
@@ -80,6 +82,12 @@ object TestAppModule {
 
     @Provides
     fun provideAppDialogsEventQueueReceiver(): AppDialogsEventQueueReceiver = mock()
+
+    @Provides
+    fun provideNavigationEventQueue(): NavigationEventQueue = mock()
+
+    @Provides
+    fun provideNavigationEventQueueReceiver(): NavigationEventQueueReceiver = mock()
 
     @Provides
     fun provideAppContainerProvider(): AppContainerProvider = mock()
