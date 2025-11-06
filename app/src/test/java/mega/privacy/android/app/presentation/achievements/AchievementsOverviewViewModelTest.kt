@@ -6,6 +6,8 @@ import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.achievements.model.AwardAchievementExpirationStatus
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.achievement.Achievement
 import mega.privacy.android.domain.entity.achievement.AchievementType
@@ -24,6 +26,8 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
+import java.util.Calendar
+import java.util.concurrent.TimeUnit
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -250,9 +254,17 @@ class AchievementsOverviewViewModelTest {
             }
         }
 
-    @Test
-    fun `test that values regarding mega vpn free trial are updated as expected`() =
+    @ParameterizedTest(name = "when expirationTimestampInSeconds is {0}")
+    @ValueSource(longs = [10000L, -1, 0])
+    fun `test that values regarding mega vpn free trial are updated as expected`(
+        expirationTimestampInSeconds: Long,
+    ) =
         runTest {
+            val mockExpirationTimes = if (expirationTimestampInSeconds > 0) {
+                System.currentTimeMillis() + expirationTimestampInSeconds
+            } else {
+                expirationTimestampInSeconds
+            }
             val mockStorage = 1000L
             val mockDurationInDays = 365
             val mockAchievement = mock<Achievement> {
@@ -264,6 +276,7 @@ class AchievementsOverviewViewModelTest {
             val mockAwardedAchievement = mock<AwardedAchievementInvite> {
                 on { type }.thenReturn(AchievementType.MEGA_ACHIEVEMENT_MEGA_VPN_TRIAL)
                 on { rewardedStorageInBytes }.thenReturn(mockStorage)
+                on { this.expirationTimestampInSeconds }.thenReturn(mockExpirationTimes)
             }
             val mockOverview = initAchievementsOverview(
                 allAchievements = listOf(mockAchievement),
@@ -278,13 +291,35 @@ class AchievementsOverviewViewModelTest {
                 assertThat(state.megaVPNTrialStorage).isEqualTo(mockStorage)
                 assertThat(state.megaVPNTrialAwardStorage).isEqualTo(mockStorage)
                 assertThat(state.megaVPNTrialDurationInDays).isEqualTo(mockDurationInDays)
+                assertThat(state.megaVPNTrialAwardDaysLeft).isEqualTo(
+                    when (expirationTimestampInSeconds) {
+                        -1L -> AwardAchievementExpirationStatus.Expired
+                        0L -> AwardAchievementExpirationStatus.Permanent
+                        else -> {
+                            val expirationDate =
+                                Util.calculateDateFromTimestamp(mockExpirationTimes)
+                            val now = Calendar.getInstance()
+                            val diffTime = expirationDate.timeInMillis - now.timeInMillis
+                            val daysLeft = diffTime / TimeUnit.DAYS.toMillis(1)
+                            AwardAchievementExpirationStatus.Valid(daysLeft)
+                        }
+                    }
+                )
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
-    @Test
-    fun `test that values regarding mega pass free trial are updated as expected`() =
+    @ParameterizedTest(name = "when expirationTimestampInSeconds is {0}")
+    @ValueSource(longs = [10000L, -1, 0])
+    fun `test that values regarding mega pass free trial are updated as expected`(
+        expirationTimestampInSeconds: Long,
+    ) =
         runTest {
+            val mockExpirationTimes = if (expirationTimestampInSeconds > 0) {
+                System.currentTimeMillis() + expirationTimestampInSeconds
+            } else {
+                expirationTimestampInSeconds
+            }
             val mockStorage = 1000L
             val mockDurationInDays = 365
             val mockAchievement = mock<Achievement> {
@@ -296,6 +331,7 @@ class AchievementsOverviewViewModelTest {
             val mockAwardedAchievement = mock<AwardedAchievementInvite> {
                 on { type }.thenReturn(AchievementType.MEGA_ACHIEVEMENT_MEGA_PWM_TRIAL)
                 on { rewardedStorageInBytes }.thenReturn(mockStorage)
+                on { this.expirationTimestampInSeconds }.thenReturn(mockExpirationTimes)
             }
             val mockOverview = initAchievementsOverview(
                 allAchievements = listOf(mockAchievement),
@@ -310,6 +346,20 @@ class AchievementsOverviewViewModelTest {
                 assertThat(state.megaPassTrialStorage).isEqualTo(mockStorage)
                 assertThat(state.megaPassTrialAwardStorage).isEqualTo(mockStorage)
                 assertThat(state.megaPassTrialDurationInDays).isEqualTo(mockDurationInDays)
+                assertThat(state.megaPassTrialAwardDaysLeft).isEqualTo(
+                    when (expirationTimestampInSeconds) {
+                        -1L -> AwardAchievementExpirationStatus.Expired
+                        0L -> AwardAchievementExpirationStatus.Permanent
+                        else -> {
+                            val expirationDate =
+                                Util.calculateDateFromTimestamp(mockExpirationTimes)
+                            val now = Calendar.getInstance()
+                            val diffTime = expirationDate.timeInMillis - now.timeInMillis
+                            val daysLeft = diffTime / TimeUnit.DAYS.toMillis(1)
+                            AwardAchievementExpirationStatus.Valid(daysLeft)
+                        }
+                    }
+                )
                 cancelAndIgnoreRemainingEvents()
             }
         }

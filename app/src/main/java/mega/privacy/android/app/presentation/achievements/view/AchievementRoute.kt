@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.achievements.view
 
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -20,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,6 +34,7 @@ import mega.privacy.android.app.data.extensions.getTextByDurationInDays
 import mega.privacy.android.app.data.extensions.toStorageString
 import mega.privacy.android.app.data.extensions.toUnitString
 import mega.privacy.android.app.presentation.achievements.AchievementsOverviewViewModel
+import mega.privacy.android.app.presentation.achievements.model.AwardAchievementExpirationStatus
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
@@ -61,8 +65,8 @@ internal fun AchievementRoute(
     onNavigateToInviteFriends: (Long) -> Unit,
     onNavigateToInfoAchievements: (achievementType: AchievementType) -> Unit,
     onNavigateToReferralBonuses: () -> Unit,
-    onNavigateToMegaVPNFreeTrial: (Boolean, Long, Long, Int) -> Unit,
-    onNavigateToMegaPassFreeTrial: (Boolean, Long, Long, Int) -> Unit,
+    onNavigateToMegaVPNFreeTrial: (Boolean, Long, Long, Int, Int?) -> Unit,
+    onNavigateToMegaPassFreeTrial: (Boolean, Long, Long, Int, Int?) -> Unit,
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
@@ -74,15 +78,18 @@ internal fun AchievementRoute(
         areAllRewardsExpired = uiState.areAllRewardsExpired,
         referralsStorage = uiState.referralsStorage,
         referralsAwardStorage = uiState.referralsAwardStorage,
+        referralsDurationInDays = uiState.referralsDurationInDays,
         installAppStorage = uiState.installAppStorage,
         installAppAwardDaysLeft = uiState.installAppAwardDaysLeft,
         installAppAwardStorage = uiState.installAppAwardStorage,
+        installAppDurationInDays = uiState.installAppDurationInDays,
         hasRegistrationAward = uiState.hasRegistrationAward,
         registrationAwardDaysLeft = uiState.registrationAwardDaysLeft,
         registrationAwardStorage = uiState.registrationAwardStorage,
         installDesktopStorage = uiState.installDesktopStorage,
         installDesktopAwardDaysLeft = uiState.installDesktopAwardDaysLeft,
         installDesktopAwardStorage = uiState.installDesktopAwardStorage,
+        installDesktopDurationInDays = uiState.installDesktopDurationInDays,
         onInviteFriendsClicked = onNavigateToInviteFriends,
         onShowInfoAchievementsClicked = onNavigateToInfoAchievements,
         onReferBonusesClicked = onNavigateToReferralBonuses,
@@ -91,14 +98,13 @@ internal fun AchievementRoute(
         hasMegaPassTrial = uiState.hasMegaPassTrial,
         megaPassTrialStorage = uiState.megaPassTrialStorage,
         megaPassTrialAwardStorage = uiState.megaPassTrialAwardStorage,
+        megaPassTrialDurationInDays = uiState.megaPassTrialDurationInDays,
+        megaPassTrialAwardDaysLeft = uiState.megaPassTrialAwardDaysLeft,
         hasMegaVPNTrial = uiState.hasMegaVPNTrial,
         megaVPNTrialStorage = uiState.megaVPNTrialStorage,
         megaVPNTrialAwardStorage = uiState.megaVPNTrialAwardStorage,
-        referralsDurationInDays = uiState.referralsDurationInDays,
-        installAppDurationInDays = uiState.installAppDurationInDays,
-        installDesktopDurationInDays = uiState.installDesktopDurationInDays,
-        megaPassTrialDurationInDays = uiState.megaPassTrialDurationInDays,
         megaVPNTrialDurationInDays = uiState.megaVPNTrialDurationInDays,
+        megaVPNTrialAwardDaysLeft = uiState.megaVPNTrialAwardDaysLeft,
     )
 }
 
@@ -126,15 +132,17 @@ internal fun AchievementView(
     megaPassTrialStorage: Long?,
     megaPassTrialAwardStorage: Long,
     megaPassTrialDurationInDays: Int,
+    megaPassTrialAwardDaysLeft: AwardAchievementExpirationStatus?,
     hasMegaVPNTrial: Boolean,
     megaVPNTrialStorage: Long?,
     megaVPNTrialAwardStorage: Long,
     megaVPNTrialDurationInDays: Int,
+    megaVPNTrialAwardDaysLeft: AwardAchievementExpirationStatus?,
     onInviteFriendsClicked: (Long) -> Unit = {},
     onShowInfoAchievementsClicked: (achievementType: AchievementType) -> Unit = {},
     onReferBonusesClicked: () -> Unit = {},
-    onMegaVPNFreeTrialClicked: (Boolean, Long, Long, Int) -> Unit = { _, _, _, _ -> },
-    onMegaPassFreeTrialClicked: (Boolean, Long, Long, Int) -> Unit = { _, _, _, _ -> },
+    onMegaVPNFreeTrialClicked: (Boolean, Long, Long, Int, Int?) -> Unit = { _, _, _, _, _ -> },
+    onMegaPassFreeTrialClicked: (Boolean, Long, Long, Int, Int?) -> Unit = { _, _, _, _, _ -> },
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val scrollState = rememberScrollState()
@@ -316,27 +324,24 @@ internal fun AchievementView(
                                         megaVPNTrialAwardStorage > 0,
                                         megaVPNTrialStorage ?: 0,
                                         megaVPNTrialAwardStorage,
-                                        megaVPNTrialDurationInDays
+                                        megaVPNTrialDurationInDays,
+                                        when (megaVPNTrialAwardDaysLeft) {
+                                            is AwardAchievementExpirationStatus.Valid ->
+                                                megaVPNTrialAwardDaysLeft.daysLeft.toInt()
+
+                                            is AwardAchievementExpirationStatus.Expired -> 0
+                                            else -> null
+                                        }
                                     )
                                 }
                         ) {
-                            AchievementListItem(
+                            TrialAchievementItem(
                                 iconId = iconPackR.drawable.ic_mega_vpn_free_trial,
                                 titleId = sharedR.string.title_start_mega_vpn_free_trial,
-                                zeroFiguresTitle = if (megaVPNTrialAwardStorage <= 0) {
-                                    megaVPNTrialStorage?.let {
-                                        megaVPNTrialDurationInDays.getTextByDurationInDays(
-                                            context = LocalContext.current,
-                                            daysStringId = sharedR.string.figures_storage_achievements_text,
-                                            permanentStringId = sharedR.string.figures_storage_achievements_text_permanent,
-                                            storage = it.toUnitString(LocalContext.current)
-                                        )
-                                    }
-                                } else null,
-                                hasFiguresTitle = if (megaVPNTrialAwardStorage > 0) {
-                                    megaVPNTrialAwardStorage.toUnitString(LocalContext.current)
-                                } else null,
-                                applied = megaVPNTrialAwardStorage > 0
+                                trialAwardStorage = megaVPNTrialAwardStorage,
+                                trialStorage = megaVPNTrialStorage,
+                                durationInDays = megaVPNTrialDurationInDays,
+                                awardDaysLeft = megaVPNTrialAwardDaysLeft
                             )
                         }
                     }
@@ -356,27 +361,24 @@ internal fun AchievementView(
                                         megaPassTrialAwardStorage > 0,
                                         megaPassTrialStorage ?: 0,
                                         megaPassTrialAwardStorage,
-                                        megaPassTrialDurationInDays
+                                        megaPassTrialDurationInDays,
+                                        when (megaPassTrialAwardDaysLeft) {
+                                            is AwardAchievementExpirationStatus.Valid ->
+                                                megaPassTrialAwardDaysLeft.daysLeft.toInt()
+
+                                            is AwardAchievementExpirationStatus.Expired -> 0
+                                            else -> null
+                                        }
                                     )
                                 }
                         ) {
-                            AchievementListItem(
+                            TrialAchievementItem(
                                 iconId = iconPackR.drawable.ic_mega_pass_free_trial,
                                 titleId = sharedR.string.title_start_mega_pass_free_trial,
-                                zeroFiguresTitle = if (megaPassTrialAwardStorage <= 0) {
-                                    megaPassTrialStorage?.let {
-                                        megaPassTrialDurationInDays.getTextByDurationInDays(
-                                            context = LocalContext.current,
-                                            daysStringId = sharedR.string.figures_storage_achievements_text,
-                                            permanentStringId = sharedR.string.figures_storage_achievements_text_permanent,
-                                            storage = it.toUnitString(LocalContext.current)
-                                        )
-                                    }
-                                } else null,
-                                hasFiguresTitle = if (megaPassTrialAwardStorage > 0) {
-                                    megaPassTrialAwardStorage.toUnitString(LocalContext.current)
-                                } else null,
-                                applied = megaPassTrialAwardStorage > 0
+                                trialAwardStorage = megaPassTrialAwardStorage,
+                                trialStorage = megaPassTrialStorage,
+                                durationInDays = megaPassTrialDurationInDays,
+                                awardDaysLeft = megaPassTrialAwardDaysLeft
                             )
                         }
                     }
@@ -384,6 +386,90 @@ internal fun AchievementView(
             }
         }
     }
+}
+
+@Composable
+private fun TrialAchievementItem(
+    @StringRes titleId: Int,
+    @DrawableRes iconId: Int,
+    trialAwardStorage: Long,
+    trialStorage: Long?,
+    durationInDays: Int,
+    awardDaysLeft: AwardAchievementExpirationStatus?
+) {
+    if (trialAwardStorage > 0) {
+        AwardedTrialAchievementItem(
+            titleId = titleId,
+            iconId = iconId,
+            trialAwardStorage = trialAwardStorage,
+            awardDaysLeft = awardDaysLeft
+        )
+    } else {
+        UnawardedTrialAchievementItem(
+            titleId = titleId,
+            iconId = iconId,
+            trialAwardStorage = trialAwardStorage,
+            trialStorage = trialStorage,
+            durationInDays = durationInDays
+        )
+    }
+}
+
+@Composable
+private fun UnawardedTrialAchievementItem(
+    @StringRes titleId: Int,
+    @DrawableRes iconId: Int,
+    trialAwardStorage: Long,
+    trialStorage: Long?,
+    durationInDays: Int,
+) {
+    AchievementListItem(
+        iconId = iconId,
+        titleId = titleId,
+        zeroFiguresTitle =
+            trialStorage?.let {
+                durationInDays.getTextByDurationInDays(
+                    context = LocalContext.current,
+                    daysStringId = sharedR.string.figures_storage_achievements_text,
+                    permanentStringId = sharedR.string.figures_storage_achievements_text_permanent,
+                    storage = it.toUnitString(LocalContext.current)
+                )
+            },
+        hasFiguresTitle = null,
+        applied = trialAwardStorage > 0
+    )
+}
+
+@Composable
+private fun AwardedTrialAchievementItem(
+    @StringRes titleId: Int,
+    @DrawableRes iconId: Int,
+    trialAwardStorage: Long,
+    awardDaysLeft: AwardAchievementExpirationStatus?,
+) {
+    val resources = LocalResources.current
+    val isPermanent = awardDaysLeft is AwardAchievementExpirationStatus.Permanent
+    AchievementListItem(
+        iconId = iconId,
+        titleId = titleId,
+        zeroFiguresTitle = when (awardDaysLeft) {
+            is AwardAchievementExpirationStatus.Valid ->
+                resources.getQuantityString(
+                    sharedR.plurals.trial_awarded_achievement_days_left_text,
+                    awardDaysLeft.daysLeft.toInt(),
+                    awardDaysLeft.daysLeft.toInt()
+                )
+
+            is AwardAchievementExpirationStatus.Expired ->
+                resources.getString(R.string.expired_label)
+
+            else -> null
+        },
+        hasFiguresTitle = if (isPermanent) {
+            trialAwardStorage.toUnitString(LocalContext.current)
+        } else null,
+        applied = isPermanent
+    )
 }
 
 /**
@@ -419,6 +505,8 @@ fun AchievementPreview() {
             installDesktopDurationInDays = 365,
             megaPassTrialDurationInDays = 0,
             megaVPNTrialDurationInDays = 365,
+            megaVPNTrialAwardDaysLeft = null,
+            megaPassTrialAwardDaysLeft = null,
         )
     }
 }
@@ -447,15 +535,17 @@ fun AchievementPreviewDark() {
             installDesktopAwardStorage = 12,
             hasMegaVPNTrial = true,
             hasMegaPassTrial = true,
-            megaPassTrialStorage = 123456789,
-            megaPassTrialAwardStorage = 1024 * 1024 * 1024,
-            megaVPNTrialStorage = 123456789,
-            megaVPNTrialAwardStorage = 1024 * 1024 * 1024,
+            megaPassTrialStorage = 5L * 1024 * 1024 * 1024,
+            megaPassTrialAwardStorage = 5L * 1024 * 1024 * 1024,
+            megaVPNTrialStorage = 5L * 1024 * 1024 * 1024,
+            megaVPNTrialAwardStorage = 5L * 1024 * 1024 * 1024,
             referralsDurationInDays = 365,
             installAppDurationInDays = 365,
             installDesktopDurationInDays = 365,
             megaPassTrialDurationInDays = 365,
             megaVPNTrialDurationInDays = 365,
+            megaVPNTrialAwardDaysLeft = AwardAchievementExpirationStatus.Permanent,
+            megaPassTrialAwardDaysLeft = AwardAchievementExpirationStatus.Valid(100),
         )
     }
 }

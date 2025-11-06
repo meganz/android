@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.achievements.model.AchievementsUIState
+import mega.privacy.android.app.presentation.achievements.model.AwardAchievementExpirationStatus
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
@@ -180,7 +181,7 @@ class AchievementsOverviewViewModel @Inject constructor(
     private fun AchievementsOverview.megaPassTrialAwardDaysLeft() =
         this.awardedAchievements.firstOrNull {
             it.type == AchievementType.MEGA_ACHIEVEMENT_MEGA_PWM_TRIAL
-        }?.expirationTimestampInSeconds?.getDaysLeft()
+        }?.expirationTimestampInSeconds?.getExpirationStatus()
 
     private fun AchievementsOverview.megaPassTrialAwardStorage() =
         this.awardedAchievements.firstOrNull {
@@ -203,7 +204,7 @@ class AchievementsOverviewViewModel @Inject constructor(
     private fun AchievementsOverview.megaVPNTrialAwardDaysLeft() =
         this.awardedAchievements.firstOrNull {
             it.type == AchievementType.MEGA_ACHIEVEMENT_MEGA_VPN_TRIAL
-        }?.expirationTimestampInSeconds?.getDaysLeft()
+        }?.expirationTimestampInSeconds?.getExpirationStatus()
 
     private fun AchievementsOverview.megaVPNTrialAwardStorage() =
         this.awardedAchievements.firstOrNull {
@@ -240,6 +241,23 @@ class AchievementsOverviewViewModel @Inject constructor(
         val endTime = end.timeInMillis
         val diffTime = startTime - endTime
         return diffTime / TimeUnit.DAYS.toMillis(1)
+    }
+
+    /**
+     * Gets the numbers of days left from the expiration timestamp received
+     */
+    private fun Long.getExpirationStatus(): AwardAchievementExpirationStatus {
+        if (this == 0L) return AwardAchievementExpirationStatus.Permanent
+
+        val expirationDate = Util.calculateDateFromTimestamp(this)
+        val now = Calendar.getInstance()
+        val diffTime = expirationDate.timeInMillis - now.timeInMillis
+
+        return if (diffTime > 0) {
+            AwardAchievementExpirationStatus.Valid(diffTime / TimeUnit.DAYS.toMillis(1))
+        } else {
+            AwardAchievementExpirationStatus.Expired
+        }
     }
 
     /**

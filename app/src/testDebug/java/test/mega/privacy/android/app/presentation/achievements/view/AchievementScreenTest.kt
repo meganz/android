@@ -12,6 +12,7 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fromId
+import mega.privacy.android.app.presentation.achievements.model.AwardAchievementExpirationStatus
 import mega.privacy.android.app.presentation.achievements.view.AchievementView
 import mega.privacy.android.app.presentation.achievements.view.AchievementViewTestTags
 import mega.privacy.android.domain.entity.achievement.AchievementType
@@ -60,13 +61,15 @@ internal class AchievementScreenTest {
         onInviteFriendsClicked: (Long) -> Unit = {},
         onShowInfoAchievementsClicked: (achievementType: AchievementType) -> Unit = {},
         onReferBonusesClicked: () -> Unit = {},
-        onMegaVPNFreeTrialClicked: (Boolean, Long, Long, Int) -> Unit = { _, _, _, _ -> },
-        onMegaPassFreeTrialClicked: (Boolean, Long, Long, Int) -> Unit = { _, _, _, _ -> },
+        onMegaVPNFreeTrialClicked: (Boolean, Long, Long, Int, Int?) -> Unit = { _, _, _, _, _ -> },
+        onMegaPassFreeTrialClicked: (Boolean, Long, Long, Int, Int?) -> Unit = { _, _, _, _, _ -> },
         referralsDurationInDays: Int = 365,
         installAppDurationInDays: Int = 365,
         installDesktopDurationInDays: Int = 365,
         megaVPNTrialDurationInDays: Int = 365,
         megaPassTrialDurationInDays: Int = 365,
+        megaPassTrialAwardDaysLeft: AwardAchievementExpirationStatus? = null,
+        megaVPNTrialAwardDaysLeft: AwardAchievementExpirationStatus? = null,
     ) {
         composeTestRule.setContent {
             AchievementView(
@@ -99,7 +102,9 @@ internal class AchievementScreenTest {
                 installAppDurationInDays = installAppDurationInDays,
                 installDesktopDurationInDays = installDesktopDurationInDays,
                 megaVPNTrialDurationInDays = megaVPNTrialDurationInDays,
-                megaPassTrialDurationInDays = megaPassTrialDurationInDays
+                megaPassTrialDurationInDays = megaPassTrialDurationInDays,
+                megaVPNTrialAwardDaysLeft = megaVPNTrialAwardDaysLeft,
+                megaPassTrialAwardDaysLeft = megaPassTrialAwardDaysLeft
             )
         }
     }
@@ -171,9 +176,11 @@ internal class AchievementScreenTest {
 
     @Test
     fun `test that mega vpn trial reward is visible`() {
-        val onMegaVPNFreeTrialClicked = mock<(Boolean, Long, Long, Int) -> Unit>()
+        val onMegaVPNFreeTrialClicked =
+            mock<(Boolean, Long, Long, Int, Int?) -> Unit>()
         setComposeContent(
             hasMegaVPNTrial = true,
+            megaVPNTrialAwardDaysLeft = AwardAchievementExpirationStatus.Valid(100),
             onMegaVPNFreeTrialClicked = onMegaVPNFreeTrialClicked
         )
 
@@ -183,14 +190,54 @@ internal class AchievementScreenTest {
                 performClick()
             }
         assertThat(analyticsRule.events).contains(StartMEGAVPNFreeTrialEvent)
-        verify(onMegaVPNFreeTrialClicked).invoke(false, 0, 0, 365)
+        verify(onMegaVPNFreeTrialClicked).invoke(false, 0, 0, 365, 100)
+    }
+
+    @Test
+    fun `test that mega vpn trial reward is visible when award achievement is permanent`() {
+        val onMegaVPNFreeTrialClicked =
+            mock<(Boolean, Long, Long, Int, Int?) -> Unit>()
+        setComposeContent(
+            hasMegaVPNTrial = true,
+            megaVPNTrialAwardDaysLeft = AwardAchievementExpirationStatus.Permanent,
+            onMegaVPNFreeTrialClicked = onMegaVPNFreeTrialClicked
+        )
+
+        composeTestRule.onNodeWithTag(AchievementViewTestTags.START_MEGA_VPN_FREE_TRIAL_SECTION)
+            .apply {
+                assertIsDisplayed()
+                performClick()
+            }
+        assertThat(analyticsRule.events).contains(StartMEGAVPNFreeTrialEvent)
+        verify(onMegaVPNFreeTrialClicked).invoke(false, 0, 0, 365, null)
+    }
+
+    @Test
+    fun `test that mega vpn trial reward is visible when award achievement is expired`() {
+        val onMegaVPNFreeTrialClicked =
+            mock<(Boolean, Long, Long, Int, Int?) -> Unit>()
+        setComposeContent(
+            hasMegaVPNTrial = true,
+            megaVPNTrialAwardDaysLeft = AwardAchievementExpirationStatus.Expired,
+            onMegaVPNFreeTrialClicked = onMegaVPNFreeTrialClicked
+        )
+
+        composeTestRule.onNodeWithTag(AchievementViewTestTags.START_MEGA_VPN_FREE_TRIAL_SECTION)
+            .apply {
+                assertIsDisplayed()
+                performClick()
+            }
+        assertThat(analyticsRule.events).contains(StartMEGAVPNFreeTrialEvent)
+        verify(onMegaVPNFreeTrialClicked).invoke(false, 0, 0, 365, 0)
     }
 
     @Test
     fun `test that mega pass trial reward is visible`() {
-        val onMegaPassFreeTrialClicked = mock<(Boolean, Long, Long, Int) -> Unit>()
+        val onMegaPassFreeTrialClicked =
+            mock<(Boolean, Long, Long, Int, Int?) -> Unit>()
         setComposeContent(
             hasMegaPassTrial = true,
+            megaPassTrialAwardDaysLeft = AwardAchievementExpirationStatus.Valid(100),
             onMegaPassFreeTrialClicked = onMegaPassFreeTrialClicked
         )
 
@@ -201,6 +248,46 @@ internal class AchievementScreenTest {
             }
 
         assertThat(analyticsRule.events).contains(StartMEGAPWMFreeTrialEvent)
-        verify(onMegaPassFreeTrialClicked).invoke(false, 0, 0, 365)
+        verify(onMegaPassFreeTrialClicked).invoke(false, 0, 0, 365, 100)
+    }
+
+    @Test
+    fun `test that mega pass trial reward is visible when award achievement is permanent`() {
+        val onMegaPassFreeTrialClicked =
+            mock<(Boolean, Long, Long, Int, Int?) -> Unit>()
+        setComposeContent(
+            hasMegaPassTrial = true,
+            megaPassTrialAwardDaysLeft = AwardAchievementExpirationStatus.Permanent,
+            onMegaPassFreeTrialClicked = onMegaPassFreeTrialClicked
+        )
+
+        composeTestRule.onNodeWithTag(AchievementViewTestTags.START_MEGA_PASS_FREE_TRIAL_SECTION)
+            .apply {
+                assertIsDisplayed()
+                performClick()
+            }
+
+        assertThat(analyticsRule.events).contains(StartMEGAPWMFreeTrialEvent)
+        verify(onMegaPassFreeTrialClicked).invoke(false, 0, 0, 365, null)
+    }
+
+    @Test
+    fun `test that mega pass trial reward is visible when award achievement is expired`() {
+        val onMegaPassFreeTrialClicked =
+            mock<(Boolean, Long, Long, Int, Int?) -> Unit>()
+        setComposeContent(
+            hasMegaPassTrial = true,
+            megaPassTrialAwardDaysLeft = AwardAchievementExpirationStatus.Expired,
+            onMegaPassFreeTrialClicked = onMegaPassFreeTrialClicked
+        )
+
+        composeTestRule.onNodeWithTag(AchievementViewTestTags.START_MEGA_PASS_FREE_TRIAL_SECTION)
+            .apply {
+                assertIsDisplayed()
+                performClick()
+            }
+
+        assertThat(analyticsRule.events).contains(StartMEGAPWMFreeTrialEvent)
+        verify(onMegaPassFreeTrialClicked).invoke(false, 0, 0, 365, 0)
     }
 }

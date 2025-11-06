@@ -211,6 +211,7 @@ dependencies {
     implementation(project(":feature:photos:photos-snowflake-components"))
     implementation(project(":feature:notifications:notifications-snowflakes"))
     implementation(project(":core:ui-components:shared-components"))
+    implementation(project(":core:ui-components:achievement-snowflake-components"))
     implementation(project(":core:navigation-snowflake-components"))
     implementation(project(":core:navigation-contract"))
     implementation(project(":core:feature-flags"))

@@ -4,6 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.achievements.info.view.AchievementsInfoRoute
 import mega.privacy.android.app.presentation.achievements.view.AchievementRoute
@@ -13,7 +14,7 @@ import mega.privacy.android.domain.entity.achievement.AchievementType
  * Route for [AchievementsInfoRoute]
  */
 @Serializable
-data object AchievementMain
+data object AchievementMain : NavKey
 
 /**
  * Composable destination for [AchievementRoute]
@@ -22,8 +23,8 @@ fun NavGraphBuilder.achievementScreen(
     onNavigateToInviteFriends: (Long) -> Unit,
     onNavigateToInfoAchievements: (achievementType: AchievementType) -> Unit,
     onNavigateToReferralBonuses: () -> Unit,
-    onNavigateToMegaVPNFreeTrial: (Boolean, Long, Long, Int) -> Unit,
-    onNavigateToMegaPassFreeTrial: (Boolean, Long, Long, Int) -> Unit,
+    onNavigateToMegaVPNFreeTrial: (Boolean, Long, Long, Int, Int?) -> Unit,
+    onNavigateToMegaPassFreeTrial: (Boolean, Long, Long, Int, Int?) -> Unit,
 ) {
     composable<AchievementMain> {
         AchievementRoute(

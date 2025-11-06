@@ -2,9 +2,11 @@ package mega.privacy.android.app.presentation.achievements.freetrial.view
 
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.icon.pack.R as iconPackR
@@ -23,6 +25,7 @@ class FreeTrialViewKtTest {
 
     private fun setComposeContent(
         isReceivedAward: Boolean = false,
+        isExpired: Boolean = false,
         installButtonClicked: () -> Unit = {},
     ) {
         composeTestRule.setContent {
@@ -38,6 +41,7 @@ class FreeTrialViewKtTest {
                     "5 GB"
                 ),
                 isReceivedAward = isReceivedAward,
+                isExpired = isExpired,
                 installButtonClicked = installButtonClicked
             )
         }
@@ -53,10 +57,15 @@ class FreeTrialViewKtTest {
             FreeTrialViewTestTags.DESCRIPTION,
             FreeTrialViewTestTags.INSTALL_APP_BUTTON,
             FreeTrialViewTestTags.HOW_IT_WORKS_TITLE,
-            FreeTrialViewTestTags.HOW_IT_WORKS_DESCRIPTION
         ).forEach {
             composeTestRule.onNodeWithTag(testTag = it, useUnmergedTree = true).assertIsDisplayed()
         }
+        composeTestRule.onNodeWithTag(testTag = FreeTrialViewTestTags.ROOT, useUnmergedTree = true)
+            .performScrollToNode(hasTestTag(FreeTrialViewTestTags.HOW_IT_WORKS_DESCRIPTION))
+        composeTestRule.onNodeWithTag(
+            FreeTrialViewTestTags.HOW_IT_WORKS_DESCRIPTION,
+            useUnmergedTree = true
+        ).assertIsDisplayed()
     }
 
     @Test
