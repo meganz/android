@@ -16,8 +16,14 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.drawerlayout.widget.DrawerLayout
@@ -52,6 +58,7 @@ import mega.privacy.android.app.presentation.meeting.NoteToSelfChatViewModel
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingManagementViewModel
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity
 import mega.privacy.android.app.presentation.meeting.model.ShareLinkOption
+import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity.Companion.EXTRA_NEW_CHAT_ID
 import mega.privacy.android.app.utils.CallUtil
@@ -239,27 +246,51 @@ class ChatTabsFragment : Fragment() {
                     }
                 }
                 OriginalTheme(isDark = mode.isDarkMode()) {
-                    ChatTabsView(
-                        state = chatsTabState,
-                        managementState = managementState,
-                        noteToSelfChatState = noteToSelfChatState,
-                        showMeetingTab = showMeetingTab,
-                        onTabSelected = ::onTabSelected,
-                        onItemClick = ::onItemClick,
-                        onItemMoreClick = ::onItemMoreClick,
-                        onItemSelected = ::onItemSelected,
-                        onResetStateSnackbarMessage = viewModel::onSnackbarMessageConsumed,
-                        onResetManagementStateSnackbarMessage = scheduledMeetingManagementViewModel::onSnackbarMessageConsumed,
-                        onCancelScheduledMeeting = {
-                            scheduledMeetingManagementViewModel.onCancelScheduledMeeting()
-                            onDismissDialog()
-                        },
-                        onDismissDialog = ::onDismissDialog,
-                        onStartChatClick = ::startChatAction,
-                        onShowNextTooltip = viewModel::setNextMeetingTooltip,
-                        onDismissForceAppUpdateDialog = viewModel::onForceUpdateDialogDismissed,
-                        onScheduleMeeting = ::onScheduleMeeting
-                    )
+                    ConstraintLayout(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        val (audioPlayer, videoSectionFeatureScreen) = createRefs()
+
+                        MiniAudioPlayerView(
+                            modifier = Modifier
+                                .constrainAs(audioPlayer) {
+                                    bottom.linkTo(parent.bottom)
+                                }
+                                .fillMaxWidth(),
+                            lifecycle = lifecycle,
+                        )
+
+                        Box(
+                            modifier = Modifier
+                                .constrainAs(videoSectionFeatureScreen) {
+                                    top.linkTo(parent.top)
+                                    bottom.linkTo(audioPlayer.top)
+                                    height = Dimension.fillToConstraints
+                                }
+                        ) {
+                            ChatTabsView(
+                                state = chatsTabState,
+                                managementState = managementState,
+                                noteToSelfChatState = noteToSelfChatState,
+                                showMeetingTab = showMeetingTab,
+                                onTabSelected = ::onTabSelected,
+                                onItemClick = ::onItemClick,
+                                onItemMoreClick = ::onItemMoreClick,
+                                onItemSelected = ::onItemSelected,
+                                onResetStateSnackbarMessage = viewModel::onSnackbarMessageConsumed,
+                                onResetManagementStateSnackbarMessage = scheduledMeetingManagementViewModel::onSnackbarMessageConsumed,
+                                onCancelScheduledMeeting = {
+                                    scheduledMeetingManagementViewModel.onCancelScheduledMeeting()
+                                    onDismissDialog()
+                                },
+                                onDismissDialog = ::onDismissDialog,
+                                onStartChatClick = ::startChatAction,
+                                onShowNextTooltip = viewModel::setNextMeetingTooltip,
+                                onDismissForceAppUpdateDialog = viewModel::onForceUpdateDialogDismissed,
+                                onScheduleMeeting = ::onScheduleMeeting
+                            )
+                        }
+                    }
                 }
             }
         }
