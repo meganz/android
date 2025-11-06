@@ -2,6 +2,7 @@ package mega.privacy.android.legacy.core.ui.controls.appbar
 
 import android.content.res.Configuration
 import android.view.ViewTreeObserver
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -39,6 +40,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -57,8 +59,12 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBarSubTitle
+import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBarTitleAndSubtitle
 import mega.privacy.android.shared.original.core.ui.controls.appbar.ProvideDefaultMegaAppBarColors
 import mega.privacy.android.shared.original.core.ui.controls.menus.MenuActions
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.utils.composeLet
 
 
 /**
@@ -81,8 +87,11 @@ fun LegacySearchAppBar(
     title: String,
     hintId: Int,
     modifier: Modifier = Modifier,
+    subtitle: String? = null,
     isHideAfterSearch: Boolean = false,
     actions: List<MenuAction>? = null,
+    maxActionsToShow: Int = 3,
+    showSearchButton: Boolean = true,
     leadingActions: List<MenuAction>? = null,
     onActionPressed: ((MenuAction) -> Unit)? = null,
     windowInsets: WindowInsets = WindowInsets.statusBars,
@@ -95,10 +104,13 @@ fun LegacySearchAppBar(
                     onSearchClicked = onSearchClicked,
                     elevation = elevation,
                     title = title,
+                    subtitle = subtitle,
                     actions = actions,
                     leadingActions = leadingActions,
                     onActionPressed = onActionPressed,
                     modifier = modifier,
+                    showSearchButton = showSearchButton,
+                    maxActionsToShow = maxActionsToShow,
                     windowInsets = windowInsets
                 )
             }
@@ -128,6 +140,7 @@ fun CollapsedSearchAppBar(
     elevation: Boolean,
     title: String,
     modifier: Modifier = Modifier,
+    subtitle: String? = null,
     onSearchClicked: (() -> Unit)? = null,
     actions: List<MenuAction>? = null,
     leadingActions: List<MenuAction>? = null,
@@ -141,13 +154,22 @@ fun CollapsedSearchAppBar(
 
     TopAppBar(
         title = {
-            Text(
-                modifier = Modifier.testTag(SEARCH_TOOLBAR_TITLE_VIEW_TEST_TAG),
-                text = title,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.subtitle1,
-                fontWeight = FontWeight.Medium,
+            MegaAppBarTitleAndSubtitle(
+                title = {
+                    Text(
+                        modifier = Modifier.testTag(SEARCH_TOOLBAR_TITLE_VIEW_TEST_TAG),
+                        text = title,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.subtitle1,
+                        fontWeight = FontWeight.Medium,
+                    )
+                },
+                subtitle = subtitle?.composeLet {
+                    MegaAppBarSubTitle(
+                        subtitle = subtitle
+                    )
+                },
             )
         },
         navigationIcon = {
@@ -156,7 +178,7 @@ fun CollapsedSearchAppBar(
                 onClick = onBackPressed
             ) {
                 Icon(
-                    imageVector = Icons.Filled.ArrowBack,
+                    painter = rememberVectorPainter(Icons.Filled.ArrowBack),
                     contentDescription = "Back button",
                     tint = iconColor
                 )
@@ -347,12 +369,14 @@ private fun keyboardAsState(): State<Boolean> {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkAppBarPreview")
 @Composable
 fun AppBarPreview() {
-    CollapsedSearchAppBar(
-        onBackPressed = {},
-        onSearchClicked = {},
-        elevation = false,
-        title = "Screen Title"
-    )
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
+        CollapsedSearchAppBar(
+            onBackPressed = {},
+            onSearchClicked = {},
+            elevation = false,
+            title = "Screen Title"
+        )
+    }
 }
 
 /**
@@ -362,13 +386,15 @@ fun AppBarPreview() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkSearchAppBarPreview")
 @Composable
 fun SearchAppBarPreview() {
-    ExpandedSearchAppBar(
-        text = "Some random text",
-        hintId = 0,
-        onSearchTextChange = {},
-        onCloseClicked = {},
-        elevation = false
-    )
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
+        ExpandedSearchAppBar(
+            text = "Some random text",
+            hintId = 0,
+            onSearchTextChange = {},
+            onCloseClicked = {},
+            elevation = false
+        )
+    }
 }
 
 /**
