@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.folderlink
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -537,5 +538,12 @@ class FolderLinkComposeActivity : PasscodeActivity(),
 
     companion object {
         private const val TAG_DECRYPT = "decrypt"
+
+        fun getIntent(context: Context, link: Uri?): Intent =
+            Intent(context, FolderLinkComposeActivity::class.java).also { intent ->
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                intent.action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK
+                intent.data = link
+            }
     }
 }

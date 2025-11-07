@@ -5,6 +5,7 @@ import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.chat.navigation.chatLegacyDestination
 import mega.privacy.android.app.presentation.contact.navigation.contactsLegacyDestination
 import mega.privacy.android.app.presentation.filelink.legacyFileLinkScreen
+import mega.privacy.android.app.presentation.folderlink.legacyFolderLinkScreen
 import mega.privacy.android.app.presentation.search.navigation.searchLegacyDestination
 import mega.privacy.android.app.presentation.settings.cookieSettingsNavigationDestination
 import mega.privacy.android.app.presentation.settings.settingsCameraUploadsNavigationDestination
@@ -31,5 +32,6 @@ class LegacyCoreActivityFeatureGraph : FeatureDestination {
             syncNewFolderDestination(navigationHandler::back)
             syncSelectStopBackupDestinationDestination(navigationHandler::back)
             legacyFileLinkScreen(navigationHandler::back)
+            legacyFolderLinkScreen(navigationHandler::back)
         }
 }

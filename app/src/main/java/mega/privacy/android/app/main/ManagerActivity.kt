@@ -2718,13 +2718,11 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
                 Constants.ACTION_OPEN_MEGA_FOLDER_LINK -> {
                     Timber.d("ACTION_OPEN_MEGA_FOLDER_LINK")
-                    val intentFolderLink = Intent(this, FolderLinkComposeActivity::class.java)
-                    intentFolderLink.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    intentFolderLink.action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK
-                    intent.dataString?.let {
-                        intentFolderLink.data = Uri.parse(it)
-                        startActivity(intentFolderLink)
-                    }
+                    startActivity(
+                        FolderLinkComposeActivity.getIntent(this, intent.dataString?.let {
+                            Uri.parse(it)
+                        })
+                    )
                     finish()
                 }
 

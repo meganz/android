@@ -118,3 +118,8 @@ data class LegacyZipBrowserNavKey(
 data class LegacyFileLinkNavKey(
     val uriString: String?,
 ) : NoSessionNavKey.Optional
+
+@Serializable
+data class LegacyFolderLinkNavKey(
+    val uriString: String?,
+) : NoSessionNavKey.Optional
