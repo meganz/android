@@ -14,13 +14,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.components.chatsession.ChatSessionContainer
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
-import mega.privacy.android.app.presentation.transfers.navigation.TransferDeepLinkHandler
 import mega.privacy.android.app.presentation.transfers.view.navigation.transfersScreen
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -126,22 +126,21 @@ class TransfersActivity : AppCompatActivity() {
          * Helper method to create a pending intent for transfers section with optional selected tab
          * that works with both values of single activity feature flag
          * Once the [SingleActivity] feature flag is removed this activity will be removed as well and
-         * we can replace calls to this method with calls to similar method:
-         * [TransferDeepLinkHandler.getPendingIntentForTransfersSection]
+         * we can replace calls to this method with calls to the mapper
          */
         fun getPendingIntentForTransfersSection(
             singleActivity: Boolean,
             context: Context,
             tab: TransfersNavKey.Tab? = null,
-            requestCode: Int = 0,
         ): PendingIntent = if (singleActivity) {
-            TransferDeepLinkHandler.getPendingIntentForTransfersSection(
-                context, tab, requestCode
+            MegaActivity.getPendingIntentWithExtraDestination(
+                context = context,
+                navKey = TransfersNavKey(tab),
             )
         } else {
             PendingIntent.getActivity(
                 context,
-                requestCode,
+                System.currentTimeMillis().toInt(),
                 when (tab) {
                     TransfersNavKey.Tab.Active -> getActiveTabIntent(context)
                     TransfersNavKey.Tab.Completed -> getCompletedTabIntent(context)

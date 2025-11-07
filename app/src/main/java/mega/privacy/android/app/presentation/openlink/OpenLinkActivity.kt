@@ -149,6 +149,18 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
         ActivityOpenLinkBinding.inflate(layoutInflater)
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        this.intent = intent
+        consumeIntentDataDestination()
+    }
+
+    private fun consumeIntentDataDestination() {
+        intent.data?.let {
+            viewModel.decodeUri(it)
+        }
+    }
+
     /**
      * onCreate
      */
@@ -216,10 +228,17 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                     }
                     viewModel.onResetPasswordLinkResultConsumed()
                 }
+                if (deepLinkDestinationsAddedEvent) {
+                    val intent = MegaActivity.getIntent(
+                        this@OpenLinkActivity,
+                    )
+                    startActivity(intent)
+                    finish()
+                }
             }
         }
 
-        url?.let { viewModel.decodeUrl(it) }
+        consumeIntentDataDestination()
     }
 
     private fun handleUrlRedirection(isLoggedIn: Boolean, needsRefreshSession: Boolean) {

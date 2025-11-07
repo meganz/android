@@ -103,7 +103,6 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
                 getFeatureFlagValueUseCase(AppFeatures.SingleActivity),
                 context,
                 TransfersNavKey.Tab.Active,
-                System.currentTimeMillis().toInt(),
             )
         } else {
             PendingIntent.getActivity(

@@ -318,7 +318,7 @@ private fun onViewInFolder(
         is ViewInFolderEvent.Download -> {
             FileStorageActivity.getBrowseFilesIntent(
                 activity,
-                viewInFolderEvent.uriPath,
+                viewInFolderEvent.uriPath.value,
                 viewInFolderEvent.fileName
             )
         }
@@ -363,7 +363,7 @@ private fun onViewInFolderSingleActivity(
         is ViewInFolderEvent.Download -> {
             navigationHandler?.navigate(
                 LegacyFileExplorerNavKey(
-                    uriPath = viewInFolderEvent.uriPath,
+                    uriPath = viewInFolderEvent.uriPath.value,
                     highlightedFiles = listOf(viewInFolderEvent.fileName),
                 )
             )

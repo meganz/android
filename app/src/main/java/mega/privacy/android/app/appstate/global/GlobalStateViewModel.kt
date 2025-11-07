@@ -2,6 +2,7 @@ package mega.privacy.android.app.appstate.global
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -25,6 +26,7 @@ import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.account.HandleBlockedStateSessionUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
@@ -40,6 +42,7 @@ class GlobalStateViewModel @Inject constructor(
     private val blockedStateMapper: BlockedStateMapper,
     private val handleBlockedStateSessionUseCase: HandleBlockedStateSessionUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
+    private val navigationEventQueue: NavigationEventQueue,
 ) : ViewModel() {
     init {
         globalInitialiser.onAppStart()
@@ -100,6 +103,17 @@ class GlobalStateViewModel @Inject constructor(
     fun queueMessage(message: String) {
         viewModelScope.launch {
             snackbarEventQueue.queueMessage(message)
+        }
+    }
+
+    /**
+     * Add nav keys to navigation event queue
+     */
+    fun addNavKeysToEventQueue(navKeys: List<NavKey>) {
+        viewModelScope.launch {
+            navKeys.forEach {
+                navigationEventQueue.emit(it)
+            }
         }
     }
 

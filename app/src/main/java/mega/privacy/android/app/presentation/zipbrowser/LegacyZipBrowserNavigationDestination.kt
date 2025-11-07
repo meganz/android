@@ -22,7 +22,6 @@ fun EntryProviderScope<NavKey>.legacyZipBrowserScreen(removeDestination: () -> U
         LaunchedEffect(Unit) {
             val intent = Intent(context, ZipBrowserComposeActivity::class.java).apply {
                 putExtra(EXTRA_PATH_ZIP, key.zipFilePath)
-                putExtra(EXTRA_HANDLE_ZIP, key.nodeId?.longValue)
             }
             context.startActivity(intent)
 

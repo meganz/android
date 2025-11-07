@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.openlink
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,12 +14,16 @@ import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.QueryResetPasswordLinkUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.link.DecodeLinkUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
+import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -36,6 +41,9 @@ class OpenLinkViewModel @Inject constructor(
     private val decodeLinkUseCase: DecodeLinkUseCase,
     private val queryResetPasswordLinkUseCase: QueryResetPasswordLinkUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    private val deepLinkHandlers: List<@JvmSuppressWildcards DeepLinkHandler>,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val navigationEventQueue: NavigationEventQueue,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OpenLinkUiState())
@@ -50,23 +58,27 @@ class OpenLinkViewModel @Inject constructor(
      * decodes the url and updates the state
      * @param url url to decode
      */
-    fun decodeUrl(url: String) {
+    fun decodeUri(uri: Uri) {
         viewModelScope.launch {
-            runCatching {
-                val accountCredentials = getAccountCredentials()
-                val needToRefresh = getRootNodeUseCase() == null
-                val decodedUrl = decodeLinkUseCase(url)
-                _uiState.update {
-                    it.copy(
-                        decodedUrl = decodedUrl,
-                        userEmail = accountCredentials?.email,
-                        isLoggedIn = accountCredentials != null,
-                        needsRefreshSession = needToRefresh,
-                        urlRedirectionEvent = true
-                    )
+            if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
+                consumeDestination(uri)
+            } else {
+                runCatching {
+                    val accountCredentials = getAccountCredentials()
+                    val needToRefresh = getRootNodeUseCase() == null
+                    val decodedUrl = decodeLinkUseCase(uri.toString())
+                    _uiState.update {
+                        it.copy(
+                            decodedUrl = decodedUrl,
+                            userEmail = accountCredentials?.email,
+                            isLoggedIn = accountCredentials != null,
+                            needsRefreshSession = needToRefresh,
+                            urlRedirectionEvent = true
+                        )
+                    }
+                }.onFailure { error ->
+                    Timber.d("Error on decode url $error")
                 }
-            }.onFailure { error ->
-                Timber.d("Error on decode url $error")
             }
         }
     }
@@ -161,6 +173,25 @@ class OpenLinkViewModel @Inject constructor(
     fun onResetPasswordLinkResultConsumed() {
         _uiState.update {
             it.copy(resetPasswordLinkResult = null)
+        }
+    }
+
+    /**
+     * Consume the destination related to this Uri, if any, and updates the corresponding navigation action
+     *
+     * @param uri
+     */
+    private suspend fun consumeDestination(uri: Uri) {
+        deepLinkHandlers.firstNotNullOfOrNull { deepLinkHandler ->
+            deepLinkHandler.getNavKeysFromUri(uri)?.takeIf { it.isNotEmpty() }
+        }?.let { navKeys ->
+            navKeys.forEach {
+                Timber.d("Adding NavKey from deep link: $it")
+                navigationEventQueue.emit(it)
+            }
+            _uiState.update {
+                it.copy(deepLinkDestinationsAddedEvent = true)
+            }
         }
     }
 }

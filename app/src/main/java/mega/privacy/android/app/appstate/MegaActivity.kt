@@ -3,8 +3,9 @@ package mega.privacy.android.app.appstate
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -42,6 +43,7 @@ import mega.privacy.android.app.presentation.login.LoginNavDisplay
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.utils.Constants
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -59,12 +61,23 @@ class MegaActivity : ComponentActivity() {
         super.onNewIntent(intent)
         this.intent = intent
         consumeWarningMessage()
+        consumeIntentDestinations()
     }
 
     private fun consumeWarningMessage() {
         intent.getStringExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE)?.let { warningMessage ->
             viewModel.queueMessage(warningMessage)
             intent.removeExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE)
+        }
+    }
+
+    private fun consumeIntentDestinations() {
+        intent.getDestinations()?.let { navKeys ->
+            //Add nav keys to navigation queue
+            navKeys.forEach {
+                Timber.d("NavKey from intent: $it")
+            }
+            viewModel.addNavKeysToEventQueue(navKeys)
         }
     }
 
@@ -86,7 +99,9 @@ class MegaActivity : ComponentActivity() {
             var fromLogin by remember { mutableStateOf(false) }
             keepSplashScreen = state is GlobalState.Loading
             LaunchedEffect(Unit) {
+                //consume intent extras
                 consumeWarningMessage()
+                consumeIntentDestinations()
             }
 
             AndroidTheme(isDark = state.themeMode.isDarkMode()) {
@@ -150,29 +165,15 @@ class MegaActivity : ComponentActivity() {
     )
 
     companion object {
+
         /**
-         * Get a pending intent to open this activity with the specified Uri as data, this should be used by notification actions
+         * Get Intent to open this activity with Single top and clear top flags
          */
-        fun getPendingIntent(
-            context: Context,
-            uri: Uri,
-            requestCode: Int = System.currentTimeMillis().toInt(),
-        ): PendingIntent {
-            val intent = Intent(
-                Intent.ACTION_VIEW,
-                uri,
-                context,
-                MegaActivity::class.java
-            ).apply {
-                flags =
-                    Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            }
-            return PendingIntent.getActivity(
-                context,
-                requestCode,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
+        fun getIntent(context: Context) = Intent(
+            context,
+            MegaActivity::class.java
+        ).apply {
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
 
         /**
@@ -181,7 +182,7 @@ class MegaActivity : ComponentActivity() {
         fun getPendingIntentForWarningMessage(
             context: Context,
             warningMessage: String,
-            requestCode: Int = System.currentTimeMillis().toInt(),
+            requestCode: Int = warningMessage.hashCode(), //unique request code per warning message
         ): PendingIntent {
             val intent = Intent(
                 context,
@@ -198,5 +199,48 @@ class MegaActivity : ComponentActivity() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         }
+
+        /**
+         * Get a pending intent to open this activity with the specified nav key
+         */
+        fun <T> getPendingIntentWithExtraDestination(
+            context: Context,
+            navKey: T,
+            requestCode: Int = navKey.hashCode(), //unique request code per nav key
+        ) where T : NavKey, T : Parcelable = getPendingIntentWithExtraDestinations(
+            context, listOf(navKey), requestCode
+        )
+
+        /**
+         * Get a pending intent to open this activity with the specified nav keys
+         */
+        fun <T> getPendingIntentWithExtraDestinations(
+            context: Context,
+            navKeys: List<T>,
+            requestCode: Int = navKeys.hashCode(), //unique request code per nav keys
+        ): PendingIntent where T : NavKey, T : Parcelable = PendingIntent.getActivity(
+            context,
+            requestCode,
+            getIntentWithExtraDestinations(context, navKeys),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        private fun <T> getIntentWithExtraDestinations(
+            context: Context,
+            navKeys: List<T>,
+        ) where T : NavKey, T : Parcelable = getIntent(context).apply {
+            putParcelableArrayListExtra(EXTRA_NAV_KEYS, ArrayList(navKeys))
+        }
+
+        private fun Intent.getDestinations(): List<NavKey>? {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                getParcelableArrayListExtra(EXTRA_NAV_KEYS, NavKey::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                getParcelableArrayListExtra(EXTRA_NAV_KEYS)
+            }
+        }
+
+        private const val EXTRA_NAV_KEYS = "navKeys"
     }
 }

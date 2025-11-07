@@ -1,12 +1,12 @@
 package mega.privacy.android.navigation.destination
 
+import android.os.Parcelable
 import androidx.annotation.Keep
 import androidx.navigation3.runtime.NavKey
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.sync.SyncType
-import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 
@@ -103,16 +103,17 @@ data class UpgradeAccountNavKey(
 ) : NavKey
 
 @Serializable
+@Parcelize
 data class LegacyFileExplorerNavKey(
-    val uriPath: UriPath?,
+    val uriPath: String?,
     val highlightedFiles: List<String> = emptyList(),
-) : NavKey
+) : NavKey, Parcelable
 
 @Serializable
+@Parcelize
 data class LegacyZipBrowserNavKey(
     val zipFilePath: String?,
-    val nodeId: NodeId?,
-) : NavKey
+) : NavKey, Parcelable
 
 @Serializable
 data class LegacyFileLinkNavKey(

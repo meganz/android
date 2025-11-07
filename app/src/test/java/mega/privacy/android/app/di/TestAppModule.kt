@@ -20,6 +20,7 @@ import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.AppDialogDestinations
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.dialog.AppDialogsEventQueue
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import nz.mega.sdk.MegaApiAndroid
@@ -68,6 +69,9 @@ object TestAppModule {
     @ElementsIntoSet
     fun provideFeatureDestinations(): Set<@JvmSuppressWildcards FeatureDestination> =
         emptySet<FeatureDestination>()
+
+    @Provides
+    fun provideOrderedDeepLinkHandlers(): List<DeepLinkHandler> = emptyList()
 
     @Provides
     fun provideDisableChatApiUseCase(): DisableChatApiUseCase = mock()

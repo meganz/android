@@ -11,13 +11,13 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.clouddrive.CloudDriveDeepLinkHandler
+import mega.privacy.android.app.presentation.clouddrive.CloudDrivePendingIntentMapper
 import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
-import mega.privacy.android.app.presentation.filestorage.FileStorageDeepLinkHandler
+import mega.privacy.android.app.presentation.filestorage.FileStoragePendingIntentMapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
-import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserDeepLinkHandler
+import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserPendingIntentMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
 import mega.privacy.android.app.utils.MegaApiUtils
@@ -57,6 +57,9 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
     private val getFullNodePathByIdUseCase: GetFullNodePathByIdUseCase,
     private val getNodePathByIdUseCase: GetNodePathByIdUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val cloudDrivePendingIntentMapper: CloudDrivePendingIntentMapper,
+    private val zipBrowserPendingIntentMapper: ZipBrowserPendingIntentMapper,
+    private val fileStoragePendingIntentMapper: FileStoragePendingIntentMapper,
 ) : TransfersActionGroupFinishNotificationBuilder {
     private val resources get() = context.resources
     override suspend fun invoke(
@@ -274,7 +277,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
         return when {
             previewFile?.exists() == true && isZipFile -> {
                 if (singleActivity) {
-                    ZipBrowserDeepLinkHandler.getPendingIntentForZipBrowserSection(
+                    zipBrowserPendingIntentMapper(
                         context,
                         previewFile.absolutePath,
                     )
@@ -331,7 +334,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
     ): PendingIntent? = when {
         isDownload -> {
             if (singleActivity) {
-                FileStorageDeepLinkHandler.getPendingIntentForFileStorageSection(
+                fileStoragePendingIntentMapper(
                     context,
                     actionGroup.destination,
                     actionGroup.selectedNames,
@@ -363,7 +366,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
 
         else -> { // is not download
             if (singleActivity) {
-                CloudDriveDeepLinkHandler.getPendingIntentForCloudDriveSection(
+                cloudDrivePendingIntentMapper(
                     context,
                     actionGroup.pendingTransferNodeId?.nodeId,
                     actionGroup.selectedNames

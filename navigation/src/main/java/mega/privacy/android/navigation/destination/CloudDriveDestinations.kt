@@ -1,6 +1,8 @@
 package mega.privacy.android.navigation.destination
 
+import android.os.Parcelable
 import androidx.navigation3.runtime.NavKey
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.node.NodeSourceType
 
@@ -14,6 +16,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
  * @property highlightedNodeNames the names of the nodes to highlight
  */
 @Serializable
+@Parcelize
 data class CloudDriveNavKey(
     val nodeHandle: Long = -1L,
     val nodeName: String? = null,
@@ -21,7 +24,7 @@ data class CloudDriveNavKey(
     val isNewFolder: Boolean = false,
     val highlightedNodeHandle: Long? = null,
     val highlightedNodeNames: List<String>? = null,
-) : NavKey
+) : NavKey, Parcelable
 
 /**
  * Shares route args

@@ -29,6 +29,6 @@ class CloudDriveModule {
 
     @Provides
     @IntoMap
-    @IntKey(10)
+    @IntKey(20)
     fun provideDeviceCenterDeepLinkHandler(handler: DeviceCenterDeepLinkHandler): DeepLinkHandler = handler
 }

@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.openlink
 
+import android.net.Uri
+import androidx.navigation3.runtime.NavKey
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
@@ -10,12 +12,16 @@ import mega.privacy.android.domain.entity.resetpassword.ResetPasswordLinkInfo
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.QueryResetPasswordLinkUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.link.DecodeLinkUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
+import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,11 +30,13 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -45,6 +53,9 @@ class OpenLinkViewModelTest {
     private val decodeLinkUseCase: DecodeLinkUseCase = mock()
     private val queryResetPasswordLinkUseCase: QueryResetPasswordLinkUseCase = mock()
     private val applicationScope = CoroutineScope(extension.testDispatcher)
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val deepLinkHandler = mock<DeepLinkHandler>()
+    private val navigationEventQueue = mock<NavigationEventQueue>()
 
     @BeforeEach
     fun setup() {
@@ -57,8 +68,12 @@ class OpenLinkViewModelTest {
             getRootNodeUseCase = getRootNodeUseCase,
             decodeLinkUseCase = decodeLinkUseCase,
             queryResetPasswordLinkUseCase = queryResetPasswordLinkUseCase,
-            applicationScope = applicationScope
+            applicationScope = applicationScope,
+            deepLinkHandlers = listOf(deepLinkHandler),
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            navigationEventQueue = navigationEventQueue,
         )
+        wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) } doReturn false
     }
 
     private fun provideParameters(): Stream<Arguments> = Stream.of(
@@ -87,13 +102,16 @@ class OpenLinkViewModelTest {
         runTest {
             // Given
             val url = randomLink()
+            val uri = mock<Uri> {
+                on { toString() } doReturn url
+            }
             val decodedLink = "decodedLink"
 
             whenever(decodeLinkUseCase(url)).thenReturn(decodedLink)
             whenever(getAccountCredentialsUseCase()).thenReturn(userCredentials)
             whenever(getRootNodeUseCase()).thenReturn(mock())
             // When
-            underTest.decodeUrl(url)
+            underTest.decodeUri(uri)
 
             // Then
             underTest.uiState.test {
@@ -108,6 +126,9 @@ class OpenLinkViewModelTest {
         runTest {
             // Given
             val url = randomLink()
+            val uri = mock<Uri> {
+                on { toString() } doReturn url
+            }
             val decodedLink = "decodedLink"
             val userCredentials = UserCredentials(
                 email = randomString(),
@@ -121,11 +142,31 @@ class OpenLinkViewModelTest {
             whenever(getAccountCredentialsUseCase()).thenReturn(userCredentials)
             whenever(getRootNodeUseCase()).thenReturn(mock())
             // When
-            underTest.decodeUrl(url)
+            underTest.decodeUri(uri)
 
             // Then
             underTest.uiState.test {
                 assertThat(expectMostRecentItem().decodedUrl).isEqualTo(decodedLink)
+            }
+        }
+
+    @Test
+    fun `test that navigationEventQueue is updated with the correct nav keys when single activity feature flag is true`() =
+        runTest {
+            val url = randomLink()
+            val uri = mock<Uri> {
+                on { toString() } doReturn url
+            }
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn true
+            val expected = mock<NavKey>()
+            whenever(deepLinkHandler.getNavKeysFromUri(uri)) doReturn listOf(expected)
+
+            underTest.decodeUri(uri)
+
+            verify(navigationEventQueue).emit(expected)
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().deepLinkDestinationsAddedEvent).isTrue()
             }
         }
 
@@ -255,7 +296,8 @@ class OpenLinkViewModelTest {
     fun `test that reset password link result is updated when successfully querying reset password link`() =
         runTest {
             val link = randomLink()
-            val resetPasswordLinkInfo = ResetPasswordLinkInfo(email = "lh@mega.co.nz", isRequiredRecoveryKey = true)
+            val resetPasswordLinkInfo =
+                ResetPasswordLinkInfo(email = "lh@mega.co.nz", isRequiredRecoveryKey = true)
             val result = Result.success(resetPasswordLinkInfo)
 
             whenever(queryResetPasswordLinkUseCase(link)).thenReturn(resetPasswordLinkInfo)
