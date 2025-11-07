@@ -634,7 +634,7 @@
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">Cihazınızdaki bir klasörü MEGA’daki bir klasörle senkronize edin veya yedekleyin</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
-    <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA toplantı adınızı ve açıklamanızı görebilir, ancak bunları gizli tutarız</string>
+    <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA toplantı adınızı ve açıklamanızı görebilir ancak bunları gizli tutarız</string>
     <!-- Capital letters. Text of the label of a new historic notifications-->
     <string name="notifications_notification_item_new_tag">Yeni</string>
     <!-- Title in the display over other apps permission screen -->
@@ -1778,9 +1778,27 @@
     <!-- Title of raw album. -->
     <string name="system_album_raw_title">RAW</string>
     <!-- General error message to show when an invalid string is detected -->
-    <string name="general_invalid_string">Geçersiz</string>
+    <string name="general_invalid_string">Boş bırakılamaz</string>
     <!-- Error message for creating an album with a system albums name -->
     <string name="album_invalid_name_error_message">Bu albüm adına izin verilmiyor. Farklı bir ad girin.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="album_name_exists_error_message">Bu adda bir albüm zaten var. Farklı bir ad girin.</string>
+    <!-- sentence to detail the permanent awarded text related to VPN achievement -->
+    <string name="mega_vpn_achievement_awarded_storage_text_permanent">MEGA&#160;VPN ücretsiz denemenizi başlattığınızda kalıcı olarak geçerli %1$s ücretsiz depolama alanı kazanın</string>
+    <!-- sentence to detail the permanent awarded text related to PWM achievement -->
+    <string name="mega_pass_achievement_awarded_storage_text_permanent">MEGA&#160;Pass ücretsiz denemenizi başlattığınızda kalıcı olarak geçerli %1$s ücretsiz depolama alanı kazanın</string>
+    <!-- sentence to detail the figures of award achievement days left -->
+    <plurals name="trial_awarded_achievement_days_left_text">
+        <item quantity="one">%1$d gün kaldı</item>
+        <item quantity="other">%1$d gün kaldı</item>
+    </plurals>
+    <!-- sentence to detail the figures of award achievement days left -->
+    <plurals name="trial_awarded_achievement_days_left_detail_title">
+        <item quantity="one">Bonusun süresi %1$d gün sonra doluyor</item>
+        <item quantity="other">Bonusun süresi %1$d gün sonra doluyor</item>
+    </plurals>
+    <!-- Discount label for first month singular -->
+    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
+    <!-- Discount label for first year singular -->
+    <string name="label_first_time_in_years_full_singular">İlk yıl için %1$s</string>
 </resources>

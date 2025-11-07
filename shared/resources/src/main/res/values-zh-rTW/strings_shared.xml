@@ -1737,9 +1737,25 @@
     <!-- Title of raw album. -->
     <string name="system_album_raw_title">RAW</string>
     <!-- General error message to show when an invalid string is detected -->
-    <string name="general_invalid_string">不正確</string>
+    <string name="general_invalid_string">不能空白</string>
     <!-- Error message for creating an album with a system albums name -->
     <string name="album_invalid_name_error_message">不允許使用此相簿名稱。請輸入不同的名稱。</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="album_name_exists_error_message">已存在相同名稱的相簿。請輸入不同的名稱。</string>
+    <!-- sentence to detail the permanent awarded text related to VPN achievement -->
+    <string name="mega_vpn_achievement_awarded_storage_text_permanent">立即開始MEGA&#160;VPN免費試用，即可獲得%1$s免費儲存空間，永久有效。</string>
+    <!-- sentence to detail the permanent awarded text related to PWM achievement -->
+    <string name="mega_pass_achievement_awarded_storage_text_permanent">立即開始MEGA&#160;Pass免費試用，即可獲得%1$s免費儲存空間，永久有效。</string>
+    <!-- sentence to detail the figures of award achievement days left -->
+    <plurals name="trial_awarded_achievement_days_left_text">
+        <item quantity="other">還剩%1$d天</item>
+    </plurals>
+    <!-- sentence to detail the figures of award achievement days left -->
+    <plurals name="trial_awarded_achievement_days_left_detail_title">
+        <item quantity="other">獎勵將在%1$d天後到期</item>
+    </plurals>
+    <!-- Discount label for first month singular -->
+    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
+    <!-- Discount label for first year singular -->
+    <string name="label_first_time_in_years_full_singular">%1$s首年</string>
 </resources>

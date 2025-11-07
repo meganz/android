@@ -685,9 +685,9 @@
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">Enhorabuena, tu nueva dirección de correo electrónico para esta cuenta MEGA es: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
-    <string name="invalid_string">Incorrecto</string>
+    <string name="invalid_string">Cannot be empty</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
-    <string name="invalid_input">Entrada inválida</string>
+    <string name="invalid_input">Not a valid entry</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Restablecer la contraseña</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->

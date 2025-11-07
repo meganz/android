@@ -675,9 +675,9 @@
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">恭喜您完成更改，您MEGA帳戶所使用的新電子郵件地址為：%1$s</string>
     <!-- Error when the user leaves empty the password field -->
-    <string name="invalid_string">不正確</string>
+    <string name="invalid_string">不能空白</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
-    <string name="invalid_input">無效的輸入</string>
+    <string name="invalid_input">Not a valid entry</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">密碼重設</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->

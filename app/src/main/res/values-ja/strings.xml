@@ -675,9 +675,9 @@
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">おめでとうございます。このMEGAアカウント用のあなたの新しいメールアドレスは次のとおりです：%1$s</string>
     <!-- Error when the user leaves empty the password field -->
-    <string name="invalid_string">エラー</string>
+    <string name="invalid_string">空欄にできません</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
-    <string name="invalid_input">入力が無効です</string>
+    <string name="invalid_input">有効な入力ではありません</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">パスワードをリセット</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->

@@ -1819,9 +1819,29 @@
     <!-- Title of raw album. -->
     <string name="system_album_raw_title">RAW</string>
     <!-- General error message to show when an invalid string is detected -->
-    <string name="general_invalid_string">Erroné</string>
+    <string name="general_invalid_string">Ne peut pas être vide</string>
     <!-- Error message for creating an album with a system albums name -->
     <string name="album_invalid_name_error_message">Ce nom d’album n’est pas permis. Saisissez un nom différent.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="album_name_exists_error_message">Un album du même nom existe déjà. Saisissez un nom différent.</string>
+    <!-- sentence to detail the permanent awarded text related to VPN achievement -->
+    <string name="mega_vpn_achievement_awarded_storage_text_permanent">Obtenez %1$s d\’espace de stockage gratuit lorsque vous commencez un essai gratuit de MEGA&#160;VPN, valable de façon permanente</string>
+    <!-- sentence to detail the permanent awarded text related to PWM achievement -->
+    <string name="mega_pass_achievement_awarded_storage_text_permanent">Obtenez %1$s d\’espace de stockage gratuit lorsque vous commencez un essai gratuit de MEGA&#160;Pass, valable de façon permanente</string>
+    <!-- sentence to detail the figures of award achievement days left -->
+    <plurals name="trial_awarded_achievement_days_left_text">
+        <item quantity="one">%1$d jour restant</item>
+        <item quantity="many">%1$d jours restants</item>
+        <item quantity="other">%1$d jours restants</item>
+    </plurals>
+    <!-- sentence to detail the figures of award achievement days left -->
+    <plurals name="trial_awarded_achievement_days_left_detail_title">
+        <item quantity="one">La prime arrivera à expiration dans %1$d&#160;jour</item>
+        <item quantity="many">La prime arrivera à expiration dans %1$d de jours</item>
+        <item quantity="other">La prime arrivera à expiration dans %1$d&#160;jours</item>
+    </plurals>
+    <!-- Discount label for first month singular -->
+    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
+    <!-- Discount label for first year singular -->
+    <string name="label_first_time_in_years_full_singular">%1$s pour la première année</string>
 </resources>
