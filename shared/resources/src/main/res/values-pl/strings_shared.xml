@@ -1037,15 +1037,15 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">Ukryj ważne pliki i katalogi</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy in one easy step.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">Możesz ukryć wrażliwe pliki i katalogi dla zachowania prywatności w jednym prostym kroku.</string>
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">Poza zasięgiem wzroku</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
+    <string name="hidden_nodes_description_control_visibility">Tylko Ty możesz ujawnić ukryte pliki, albo indywidualnie, albo tymczasowo wyświetlając ukryte elementy w ustawieniach.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Blur for privacy</string>
+    <string name="hidden_nodes_title_visible_shared_files">Zamazywanie dla prywatności</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
+    <string name="hidden_nodes_description_visible_shared_files">Pokaż ukryte elementy z rozmytymi miniaturami, aby można je było zidentyfikować bez ujawniania ich zawartości.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Chroń swoje zdjęcia, zawsze</string>
     <!--Camera backup permission screen description-->
@@ -1860,9 +1860,31 @@
     <!-- Title of raw album. -->
     <string name="system_album_raw_title">RAW</string>
     <!-- General error message to show when an invalid string is detected -->
-    <string name="general_invalid_string">Niepoprawne</string>
+    <string name="general_invalid_string">Nie może być pusty</string>
     <!-- Error message for creating an album with a system albums name -->
     <string name="album_invalid_name_error_message">Ta nazwa albumu jest niedozwolona. Wprowadź inną nazwę.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="album_name_exists_error_message">Album o tej nazwie już istnieje. Wprowadź inną nazwę.</string>
+    <!-- sentence to detail the permanent awarded text related to VPN achievement -->
+    <string name="mega_vpn_achievement_awarded_storage_text_permanent">Uzyskaj %1$s darmowej pojemności, gdy rozpoczniesz darmowy okres próbny MEGA&#160;VPN. Ważne na stałe.</string>
+    <!-- sentence to detail the permanent awarded text related to PWM achievement -->
+    <string name="mega_pass_achievement_awarded_storage_text_permanent">Uzyskaj %1$s darmowej pojemności, gdy rozpoczniesz darmowy okres próbny MEGA&#160;Pass. Ważne na stałe.</string>
+    <!-- sentence to detail the figures of award achievement days left -->
+    <plurals name="trial_awarded_achievement_days_left_text">
+        <item quantity="one">Pozostał %1$d dzień</item>
+        <item quantity="few">Pozostało %1$d dni</item>
+        <item quantity="many">Pozostało %1$d dni</item>
+        <item quantity="other">Pozostało %1$d dni</item>
+    </plurals>
+    <!-- sentence to detail the figures of award achievement days left -->
+    <plurals name="trial_awarded_achievement_days_left_detail_title">
+        <item quantity="one">Bonus wygasa za %1$d dzień</item>
+        <item quantity="few">Bonus wygasa za %1$d dni</item>
+        <item quantity="many">Bonus wygasa za %1$d dni</item>
+        <item quantity="other">Bonus wygasa za %1$d dni</item>
+    </plurals>
+    <!-- Discount label for first month singular -->
+    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
+    <!-- Discount label for first year singular -->
+    <string name="label_first_time_in_years_full_singular">%1$s za pierwszy rok</string>
 </resources>

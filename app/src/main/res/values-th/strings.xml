@@ -675,9 +675,9 @@
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">ขอแสดงความยินดี อีเมลใหม่ของคุณสำหรับบัญชี MEGA นี้คือ: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
-    <string name="invalid_string">ไม่ถูกต้อง</string>
+    <string name="invalid_string">Cannot be empty</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
-    <string name="invalid_input">กรอกข้อมูลไม่ถูกต้อง</string>
+    <string name="invalid_input">Not a valid entry</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">รีเซ็ตรหัสผ่าน</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->

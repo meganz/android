@@ -1037,15 +1037,15 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">Скрывайте важные файлы и папки</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy in one easy step.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">Вы можете скрыть конфиденциальные файлы и папки всего за один шаг.</string>
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">С глаз долой</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
+    <string name="hidden_nodes_description_control_visibility">Отобразить скрытые файлы можете только вы: либо по отдельности, либо временно временно включить отображение скрытых элементов в настройках.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Blur for privacy</string>
+    <string name="hidden_nodes_title_visible_shared_files">Размытие для конфиденциальности</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
+    <string name="hidden_nodes_description_visible_shared_files">Показывайте скрытые элементы с размытыми эскизами, чтобы их можно было идентифицировать, не раскрывая их содержимое.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Ваши фото всегда в безопасности</string>
     <!--Camera backup permission screen description-->
@@ -1860,9 +1860,31 @@
     <!-- Title of raw album. -->
     <string name="system_album_raw_title">RAW</string>
     <!-- General error message to show when an invalid string is detected -->
-    <string name="general_invalid_string">Неверно</string>
+    <string name="general_invalid_string">Не может быть пустым</string>
     <!-- Error message for creating an album with a system albums name -->
     <string name="album_invalid_name_error_message">Недопустимое название альбома. Введите другое название.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="album_name_exists_error_message">Альбом с таким названием уже существует. Введите другое название.</string>
+    <!-- sentence to detail the permanent awarded text related to VPN achievement -->
+    <string name="mega_vpn_achievement_awarded_storage_text_permanent">%1$s бесплатного хранилища при активации бесплатной пробной версии MEGA&#160;VPN, действует постоянно</string>
+    <!-- sentence to detail the permanent awarded text related to PWM achievement -->
+    <string name="mega_pass_achievement_awarded_storage_text_permanent">%1$s бесплатного хранилища при активации бесплатной пробной версии MEGA&#160;Pass, действует постоянно</string>
+    <!-- sentence to detail the figures of award achievement days left -->
+    <plurals name="trial_awarded_achievement_days_left_text">
+        <item quantity="one">Остался %1$d день</item>
+        <item quantity="few">Осталось %1$d дня</item>
+        <item quantity="many">Осталось %1$d дней</item>
+        <item quantity="other">Осталось %1$d дня</item>
+    </plurals>
+    <!-- sentence to detail the figures of award achievement days left -->
+    <plurals name="trial_awarded_achievement_days_left_detail_title">
+        <item quantity="one">Бонус истекает через %1$d день</item>
+        <item quantity="few">Бонус истекает через %1$d дня</item>
+        <item quantity="many">Бонус истекает через %1$d дней</item>
+        <item quantity="other">Бонус истекает через %1$d дня</item>
+    </plurals>
+    <!-- Discount label for first month singular -->
+    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
+    <!-- Discount label for first year singular -->
+    <string name="label_first_time_in_years_full_singular">%1$s за первый год</string>
 </resources>

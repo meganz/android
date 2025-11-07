@@ -1819,9 +1819,28 @@
     <!-- Title of raw album. -->
     <string name="system_album_raw_title">RAW</string>
     <!-- General error message to show when an invalid string is detected -->
-    <string name="general_invalid_string">Incorrecto</string>
+    <string name="general_invalid_string">Cannot be empty</string>
     <!-- Error message for creating an album with a system albums name -->
     <string name="album_invalid_name_error_message">Este nombre no está permitido. Introducir un nombre diferente.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="album_name_exists_error_message">Ya existe un álbum con este nombre. Introducir un nombre diferente.</string>
+    <!-- sentence to detail the permanent awarded text related to VPN achievement -->
+    <string name="mega_vpn_achievement_awarded_storage_text_permanent">Get %1$s of free storage when you start a MEGA&#160;VPN free trial, valid permanently</string>
+    <!-- sentence to detail the permanent awarded text related to PWM achievement -->
+    <string name="mega_pass_achievement_awarded_storage_text_permanent">Get %1$s of free storage when you start a MEGA&#160;Pass free trial, valid permanently</string>
+    <!-- sentence to detail the figures of award achievement days left -->
+    <plurals name="trial_awarded_achievement_days_left_text">
+        <item quantity="one">%1$d day left</item>
+        <item quantity="other">%1$d days left</item>
+    </plurals>
+    <!-- sentence to detail the figures of award achievement days left -->
+    <plurals name="trial_awarded_achievement_days_left_detail_title">
+        <item quantity="one">El bono caducará en %1$d día.</item>
+        <item quantity="many">El bono caducará en %1$d días.</item>
+        <item quantity="other">El bono caducará en %1$d días</item>
+    </plurals>
+    <!-- Discount label for first month singular -->
+    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
+    <!-- Discount label for first year singular -->
+    <string name="label_first_time_in_years_full_singular">%1$s for the first year</string>
 </resources>

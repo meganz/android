@@ -995,7 +995,7 @@
     <!-- Hidden nodes description: control visibility feature -->
     <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Blur for privacy</string>
+    <string name="hidden_nodes_title_visible_shared_files">Làm mờ để giữ riêng tư</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
     <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
     <!--Camera backup permission screen title-->
@@ -1709,11 +1709,11 @@
     <!-- Billing info with discount label -->
     <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s for %3$s</string>
     <!-- campaign name for Black Friday deal -->
-    <string name="campaign_name_black_friday">Black Friday deal: %1$d%% off</string>
+    <string name="campaign_name_black_friday">Khuyến mại ngày Thứ&#160;Sáu Đen: giảm giá %1$d%%</string>
     <!-- campaign name for Cyber Monday deal -->
-    <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
+    <string name="campaign_name_cyber_monday">Khuyến mại ngày Thứ&#160;Hai Điện&#160;Tử: giảm giá %1$d%%</string>
     <!-- campaign name for Special offer -->
-    <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
+    <string name="campaign_name_special_offer">Ưu đãi đặc biệt: giảm giá %1$d%%</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
         <item quantity="other"></item>
@@ -1725,7 +1725,7 @@
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">Bộ trọn&#160;gói bảo&#160;mật MEGA</string>
     <!-- Message about savings on yearly plan in case it has discount -->
-    <string name="account_upgrade_account_label_save_at_least">Save at least 16% on a yearly plan</string>
+    <string name="account_upgrade_account_label_save_at_least">Tiết kiệm lên đến 16% với gói hằng năm</string>
     <!-- Add new album on Media screen dialog title -->
     <string name="media_add_new_album_dialog_title">Điền tên album</string>
     <!-- Add new album on Media screen dialog positive button text -->
@@ -1737,9 +1737,26 @@
     <!-- Title of raw album. -->
     <string name="system_album_raw_title">RAW</string>
     <!-- General error message to show when an invalid string is detected -->
-    <string name="general_invalid_string">Xin nhập mật khẩu</string>
+    <string name="general_invalid_string">Không thể để trống</string>
     <!-- Error message for creating an album with a system albums name -->
     <string name="album_invalid_name_error_message">Không&#160;được phép sử&#160;dụng tên này cho album. Nhập một tên khác.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="album_name_exists_error_message">Đã có một album với tên này rồi. Nhập một tên khác.</string>
+    <!-- sentence to detail the permanent awarded text related to VPN achievement -->
+    <string name="mega_vpn_achievement_awarded_storage_text_permanent">Get %1$s of free storage when you start a MEGA&#160;VPN free trial, valid permanently</string>
+    <!-- sentence to detail the permanent awarded text related to PWM achievement -->
+    <string name="mega_pass_achievement_awarded_storage_text_permanent">Get %1$s of free storage when you start a MEGA&#160;Pass free trial, valid permanently</string>
+    <!-- sentence to detail the figures of award achievement days left -->
+    <plurals name="trial_awarded_achievement_days_left_text">
+        <item quantity="one">%1$d day left</item>
+        <item quantity="other">%1$d days left</item>
+    </plurals>
+    <!-- sentence to detail the figures of award achievement days left -->
+    <plurals name="trial_awarded_achievement_days_left_detail_title">
+        <item quantity="other">Phần&#160;thưởng hết&#160;hạn trong %1$d ngày</item>
+    </plurals>
+    <!-- Discount label for first month singular -->
+    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
+    <!-- Discount label for first year singular -->
+    <string name="label_first_time_in_years_full_singular">%1$s for the first year</string>
 </resources>

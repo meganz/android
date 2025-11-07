@@ -1942,9 +1942,31 @@
     <!-- Title of raw album. -->
     <string name="system_album_raw_title">RAW</string>
     <!-- General error message to show when an invalid string is detected -->
-    <string name="general_invalid_string">غير صحيح</string>
+    <string name="general_invalid_string">Cannot be empty</string>
     <!-- Error message for creating an album with a system albums name -->
     <string name="album_invalid_name_error_message">اسم هذا الألبوم غير مسموح به. أدخل اسمًا مختلفًا.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="album_name_exists_error_message">يوجد بالفعل ألبوم بهذا الاسم. أدخل اسمًا مختلفًا.</string>
+    <!-- sentence to detail the permanent awarded text related to VPN achievement -->
+    <string name="mega_vpn_achievement_awarded_storage_text_permanent">Get %1$s of free storage when you start a MEGA&#160;VPN free trial, valid permanently</string>
+    <!-- sentence to detail the permanent awarded text related to PWM achievement -->
+    <string name="mega_pass_achievement_awarded_storage_text_permanent">Get %1$s of free storage when you start a MEGA&#160;Pass free trial, valid permanently</string>
+    <!-- sentence to detail the figures of award achievement days left -->
+    <plurals name="trial_awarded_achievement_days_left_text">
+        <item quantity="one">%1$d day left</item>
+        <item quantity="other">%1$d days left</item>
+    </plurals>
+    <!-- sentence to detail the figures of award achievement days left -->
+    <plurals name="trial_awarded_achievement_days_left_detail_title">
+        <item quantity="zero">تنتهي صلاحية المكافأة في %1$d يوم</item>
+        <item quantity="one">تنتهي صلاحية المكافأة في %1$d يوم</item>
+        <item quantity="two">تنتهي صلاحية المكافأة في %1$d يومين</item>
+        <item quantity="few">تنتهي صلاحية المكافأة في %1$d أيام</item>
+        <item quantity="many">تنتهي صلاحية المكافأة في %1$d يوماً</item>
+        <item quantity="other">تنتهي صلاحية المكافأة في %1$d يوم</item>
+    </plurals>
+    <!-- Discount label for first month singular -->
+    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
+    <!-- Discount label for first year singular -->
+    <string name="label_first_time_in_years_full_singular">%1$s for the first year</string>
 </resources>

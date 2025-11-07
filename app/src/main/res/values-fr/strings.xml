@@ -685,9 +685,9 @@
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">Félicitations, votre nouvelle adresse courriel pour ce compte&#160;MEGA est&#160;: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
-    <string name="invalid_string">Erroné</string>
+    <string name="invalid_string">Ne peut pas être vide</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
-    <string name="invalid_input">L’entrée est invalide</string>
+    <string name="invalid_input">Entrée non valide</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Réinitialisation du mot de passe</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->

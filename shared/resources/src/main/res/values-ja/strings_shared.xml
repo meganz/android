@@ -1737,9 +1737,25 @@
     <!-- Title of raw album. -->
     <string name="system_album_raw_title">RAW</string>
     <!-- General error message to show when an invalid string is detected -->
-    <string name="general_invalid_string">エラー</string>
+    <string name="general_invalid_string">空欄にできません</string>
     <!-- Error message for creating an album with a system albums name -->
     <string name="album_invalid_name_error_message">このアルバム名は使用できません。別の名前を入力してください。</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="album_name_exists_error_message">この名前のアルバムはすでに存在します。別の名前を入力してください。</string>
+    <!-- sentence to detail the permanent awarded text related to VPN achievement -->
+    <string name="mega_vpn_achievement_awarded_storage_text_permanent">MEGA&#160;VPNの無料トライアルを開始すると、%1$sの無料ストレージが付与されます。無期限に有効です。</string>
+    <!-- sentence to detail the permanent awarded text related to PWM achievement -->
+    <string name="mega_pass_achievement_awarded_storage_text_permanent">MEGA&#160;Passの無料トライアルを開始すると、%1$sの無料ストレージが付与されます。無期限に有効です。</string>
+    <!-- sentence to detail the figures of award achievement days left -->
+    <plurals name="trial_awarded_achievement_days_left_text">
+        <item quantity="other">残り%1$d日</item>
+    </plurals>
+    <!-- sentence to detail the figures of award achievement days left -->
+    <plurals name="trial_awarded_achievement_days_left_detail_title">
+        <item quantity="other">ボーナスは%1$d日後に有効期限が切れます</item>
+    </plurals>
+    <!-- Discount label for first month singular -->
+    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
+    <!-- Discount label for first year singular -->
+    <string name="label_first_time_in_years_full_singular">最初の1年間は%1$s</string>
 </resources>
