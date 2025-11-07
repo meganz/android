@@ -13,6 +13,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
+import dagger.multibindings.IntKey
+import dagger.multibindings.IntoMap
 import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.LegacyDatabaseMigrationImpl
 import mega.privacy.android.app.MegaApplication
@@ -24,6 +26,7 @@ import mega.privacy.android.app.consent.ConsentDialogDestinations
 import mega.privacy.android.app.nav.MegaActivityResultContractImpl
 import mega.privacy.android.app.nav.MegaNavigatorImpl
 import mega.privacy.android.app.presentation.container.MegaAppContainerProvider
+import mega.privacy.android.app.presentation.login.LoginDeepLinkHandler
 import mega.privacy.android.app.presentation.login.logoutdialog.RemoteLogoutDialogDestinations
 import mega.privacy.android.app.presentation.transfers.navigation.TransfersFeatureDestination
 import mega.privacy.android.app.presentation.transfers.transferoverquota.view.dialog.TransferOverQuotaDialogDestinations
@@ -40,6 +43,7 @@ import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.AppDialogDestinations
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.dialog.AppDialogsEventQueue
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import nz.mega.sdk.MegaApiAndroid
@@ -177,4 +181,9 @@ internal class AppModule {
     fun provideAppContainerProvider(
         provider: MegaAppContainerProvider,
     ): AppContainerProvider = provider
+
+    @Provides
+    @IntoMap
+    @IntKey(10)
+    fun provideLoginDeepLinkHandler(handler: LoginDeepLinkHandler): DeepLinkHandler = handler
 }
