@@ -182,6 +182,7 @@ internal fun RubbishBinScreen(
             if (uiState.isInSelectionMode) {
                 NodeSelectionModeAppBar(
                     count = uiState.selectedNodes.size,
+                    isAllSelected = uiState.isAllSelected,
                     isSelecting = uiState.isSelecting,
                     onSelectAllClicked = { viewModel.selectAllNodes() },
                     onCancelSelectionClicked = { viewModel.clearAllSelectedNodes() }

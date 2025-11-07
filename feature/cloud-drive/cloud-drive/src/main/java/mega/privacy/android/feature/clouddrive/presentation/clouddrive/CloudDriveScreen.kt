@@ -67,6 +67,7 @@ fun CloudDriveScreen(
             if (uiState.isInSelectionMode) {
                 NodeSelectionModeAppBar(
                     count = uiState.selectedItemsCount,
+                    isAllSelected = uiState.isAllSelected,
                     isSelecting = uiState.isSelecting,
                     onSelectAllClicked = { viewModel.processAction(SelectAllItems) },
                     onCancelSelectionClicked = { viewModel.processAction(DeselectAllItems) }

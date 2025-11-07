@@ -70,6 +70,11 @@ data class CloudDriveUiState(
      */
     val selectedItemsCount: Int
 
+    /**
+     * True is all nodes are selected
+     */
+    val isAllSelected: Boolean
+
     init {
         // Count visible and selected items based on hidden nodes settings with single loop
         if (showHiddenNodes || !isHiddenNodesEnabled) {
@@ -89,6 +94,7 @@ data class CloudDriveUiState(
             visibleItemsCount = visible
             selectedItemsCount = selected
         }
+        isAllSelected = visibleItemsCount == selectedItemsCount
     }
 
     /**

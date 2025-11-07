@@ -25,7 +25,6 @@ data class LinksUiState(
     val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
 ) {
 
-
     /**
      * Count of visible selected items
      */
@@ -35,6 +34,11 @@ data class LinksUiState(
      * True if any item is selected
      */
     val isInSelectionMode = selectedItemsCount > 0
+
+    /**
+     * True if all items are selected
+     */
+    val isAllSelected = selectedItemsCount == items.size
 
     /**
      * True if there are no visible items and not loading

@@ -11,6 +11,7 @@ import java.util.Locale
 @Composable
 fun NodeSelectionModeAppBar(
     count: Int,
+    isAllSelected: Boolean,
     isSelecting: Boolean,
     onSelectAllClicked: () -> Unit,
     onCancelSelectionClicked: () -> Unit,
@@ -22,10 +23,12 @@ fun NodeSelectionModeAppBar(
         } else {
             String.format(Locale.ROOT, "%s", count)
         },
-        actions = if (isSelecting) {
-            listOf(NodeSelectionAction.Selecting)
-        } else {
-            listOf(NodeSelectionAction.SelectAll)
+        actions = buildList {
+            if (isSelecting) {
+                add(NodeSelectionAction.Selecting)
+            } else if (!isAllSelected) {
+                add(NodeSelectionAction.SelectAll)
+            }
         },
         onActionPressed = {
             when (it) {

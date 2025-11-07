@@ -103,6 +103,7 @@ internal fun DriveSyncScreen(
             if (cloudDriveUiState.isInSelectionMode) {
                 NodeSelectionModeAppBar(
                     count = cloudDriveUiState.selectedItemsCount,
+                    isAllSelected = cloudDriveUiState.isAllSelected,
                     isSelecting = cloudDriveUiState.nodesLoadingState != NodesLoadingState.FullyLoaded,
                     onSelectAllClicked = { cloudDriveViewModel.processAction(SelectAllItems) },
                     onCancelSelectionClicked = { cloudDriveViewModel.processAction(DeselectAllItems) }

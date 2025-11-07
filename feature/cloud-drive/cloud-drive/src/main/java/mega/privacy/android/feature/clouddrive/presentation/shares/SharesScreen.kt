@@ -138,6 +138,12 @@ internal fun SharesScreen(
         SharesTab.Links -> linksUiState.isInSelectionMode to linksUiState.selectedItemsCount
     }
 
+    val isAllItemsSelected = when (selectedTab) {
+        SharesTab.IncomingShares -> incomingSharesUiState.isAllSelected
+        SharesTab.OutgoingShares -> outgoingSharesUiState.isAllSelected
+        SharesTab.Links -> linksUiState.isAllSelected
+    }
+
     fun deselectAllItems() {
         when (selectedTab) {
             SharesTab.IncomingShares -> incomingSharesViewModel.processAction(IncomingSharesAction.DeselectAllItems)
@@ -181,6 +187,7 @@ internal fun SharesScreen(
             if (isInSelectionMode) {
                 NodeSelectionModeAppBar(
                     count = selectedItemsCount,
+                    isAllSelected = isAllItemsSelected,
                     isSelecting = false,
                     onSelectAllClicked = {
                         selectAllItems()

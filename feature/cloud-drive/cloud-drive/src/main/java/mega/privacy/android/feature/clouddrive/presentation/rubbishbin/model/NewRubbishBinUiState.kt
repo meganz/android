@@ -71,6 +71,11 @@ data class NewRubbishBinUiState(
         get() = items.filter { it.isSelected }.map { it.node }
 
     /**
+     * True if all items are selected
+     */
+    val isAllSelected = items.size == selectedNodes.size
+
+    /**
      * Number of selected file nodes
      */
     val selectedFileNodes: Int
