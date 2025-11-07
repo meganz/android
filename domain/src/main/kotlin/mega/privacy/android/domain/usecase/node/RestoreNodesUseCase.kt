@@ -61,7 +61,9 @@ class RestoreNodesUseCase @Inject constructor(
                     ?.let {
                         val actualDestinationHandle = results.first().second
                         getNodeNameByIdUseCase(NodeId(actualDestinationHandle))
-                    }
+                    },
+                destinationHandle = takeIf { successCount > 0 }
+                    ?.let { results.first().second }
             )
 
             else -> MultipleNodesRestoreResult(

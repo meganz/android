@@ -1,8 +1,5 @@
 package mega.privacy.android.core.nodecomponents.action
 
-import mega.privacy.android.core.nodecomponents.action.clickhandler.SingleNodeAction
-import mega.privacy.android.core.nodecomponents.action.clickhandler.MultiNodeAction
-
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEvent
@@ -13,6 +10,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.android.core.ui.model.SnackbarAttributes
+import mega.android.core.ui.model.SnackbarDuration
+import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.action.clickhandler.MultiNodeAction
+import mega.privacy.android.core.nodecomponents.action.clickhandler.SingleNodeAction
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSelectionModeActionMapper
@@ -25,11 +27,10 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VersionsMenuAction
-import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionModeMenuItem
-import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
@@ -90,6 +91,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -1343,4 +1345,31 @@ class NodeOptionsActionViewModelTest {
             mock<FileNodeContent.UrlContent>()
         )
     )
+
+    @Test
+    fun `test postMessageWithAction queues message with correct attributes and executes action click callback`() =
+        runTest {
+            initViewModel()
+            val message = "Restored to Cloud Drive"
+            val actionLabel = "Locate"
+
+            argumentCaptor<SnackbarAttributes>().apply {
+                viewModel.postMessageWithAction(
+                    message = message,
+                    actionLabel = actionLabel,
+                    actionClick = { }
+                )
+
+                verify(snackbarEventQueue).queueMessage(capture())
+
+                // Verify attributes are correct
+                assertThat(firstValue.message).isEqualTo(message)
+                assertThat(firstValue.action).isEqualTo(actionLabel)
+                assertThat(firstValue.duration).isEqualTo(SnackbarDuration.Long)
+                assertThat(firstValue.actionClick).isNotNull()
+
+                // Verify action click lambda can be executed without errors
+                firstValue.actionClick?.invoke()
+            }
+        }
 } 

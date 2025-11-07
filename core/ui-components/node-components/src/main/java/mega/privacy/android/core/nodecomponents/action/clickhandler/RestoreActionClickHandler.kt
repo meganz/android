@@ -11,10 +11,13 @@ import mega.privacy.android.core.nodecomponents.action.SingleNodeActionProvider
 import mega.privacy.android.core.nodecomponents.mapper.RestoreNodeResultMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RestoreMenuAction
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.SingleNodeRestoreResult
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -66,7 +69,19 @@ class RestoreActionClickHandler @Inject constructor(
                         if (result.noConflictNodes.isNotEmpty()) {
                             val restoreResult = restoreNodesUseCase(result.noConflictNodes)
                             val message = restoreNodeResultMapper(restoreResult)
-                            provider.postMessage(message)
+
+                            if (restoreResult is SingleNodeRestoreResult) {
+                                restoreResult.destinationHandle?.let { destinationHandle ->
+                                    postMessageWithAction(
+                                        provider,
+                                        result.noConflictNodes.keys.first(),
+                                        destinationHandle,
+                                        message
+                                    )
+                                } ?: provider.postMessage(message)
+                            } else {
+                                provider.postMessage(message)
+                            }
                         }
                     }.onFailure { throwable ->
                         Timber.e(throwable)
@@ -74,5 +89,28 @@ class RestoreActionClickHandler @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun postMessageWithAction(
+        provider: NodeActionProvider,
+        restoredNodeHandle: Long,
+        destinationHandle: Long,
+        message: String,
+    ) {
+        val locateActionLabel = provider.context.getString(
+            sharedResR.string.transfers_notification_location_action
+        )
+        provider.viewModel.postMessageWithAction(
+            message = message,
+            actionLabel = locateActionLabel,
+            actionClick = {
+                provider.navigationHandler?.navigate(
+                    CloudDriveNavKey(
+                        nodeHandle = destinationHandle,
+                        highlightedNodeHandle = restoredNodeHandle,
+                    )
+                )
+            }
+        )
     }
 }

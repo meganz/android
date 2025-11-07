@@ -60,6 +60,7 @@ internal class RestoreNodesUseCaseTest {
         val singleResult = result as SingleNodeRestoreResult
         assertThat(singleResult.successCount).isEqualTo(1)
         assertThat(singleResult.destinationFolderName).isEqualTo(rootNodeName)
+        assertThat(singleResult.destinationHandle).isEqualTo(rootNodeId.longValue)
     }
 
     @Test
@@ -79,7 +80,7 @@ internal class RestoreNodesUseCaseTest {
         verify(getNodeNameByIdUseCase).invoke(destinationNodeId)
         verifyNoInteractions(getRootNodeIdUseCase)
         verify(accountRepository).resetAccountDetailsTimeStamp()
-        assertThat(result).isEqualTo(SingleNodeRestoreResult(1, destinationNodeName))
+        assertThat(result).isEqualTo(SingleNodeRestoreResult(1, destinationNodeName, moveFirstNode.second))
     }
 
     @Test
@@ -121,9 +122,9 @@ internal class RestoreNodesUseCaseTest {
             whenever(moveNodeUseCase(NodeId(moveFirstNode.first), destinationNodeId))
                 .thenReturn(NodeId(moveFirstNode.first))
             val result = underTest(mapOf(moveFirstNode))
-            verify(getNodeNameByIdUseCase).invoke(destinationNodeId)
-            verify(accountRepository).resetAccountDetailsTimeStamp()
-            assertThat(result).isEqualTo(SingleNodeRestoreResult(1, nodeName))
+        verify(getNodeNameByIdUseCase).invoke(destinationNodeId)
+        verify(accountRepository).resetAccountDetailsTimeStamp()
+        assertThat(result).isEqualTo(SingleNodeRestoreResult(1, nodeName, moveFirstNode.second))
         }
 
     @Test
@@ -135,7 +136,7 @@ internal class RestoreNodesUseCaseTest {
                 .thenThrow(RuntimeException::class.java)
             val result = underTest(mapOf(moveFirstNode))
             verifyNoInteractions(accountRepository)
-            assertThat(result).isEqualTo(SingleNodeRestoreResult(0, null))
+            assertThat(result).isEqualTo(SingleNodeRestoreResult(0, null, null))
         }
 
     @Test
@@ -160,5 +161,6 @@ internal class RestoreNodesUseCaseTest {
         val singleResult = result as SingleNodeRestoreResult
         assertThat(singleResult.successCount).isEqualTo(1)
         assertThat(singleResult.destinationFolderName).isEqualTo(destinationNodeName)
+        assertThat(singleResult.destinationHandle).isEqualTo(moveFirstNode.second)
     }
 }

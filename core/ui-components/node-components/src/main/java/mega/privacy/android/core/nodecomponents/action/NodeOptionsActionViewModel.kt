@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.LocalizedText
+import mega.android.core.ui.model.SnackbarAttributes
+import mega.android.core.ui.model.SnackbarDuration
 import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.action.clickhandler.MultiNodeAction
@@ -23,10 +25,10 @@ import mega.privacy.android.core.nodecomponents.action.clickhandler.SingleNodeAc
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSelectionModeActionMapper
-import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeSendToChatMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
+import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction.Companion.DEFAULT_MAX_VISIBLE_ITEMS
@@ -770,4 +772,28 @@ class NodeOptionsActionViewModel @Inject constructor(
                 isNodeInBackupsUseCase(handle = it.id.longValue)
             }.getOrDefault(false)
         }
+
+    /**
+     * Post snackbar message with action
+     *
+     * @param message The message to display
+     * @param actionLabel The label for the action button
+     * @param actionClick The callback to execute when action is clicked
+     */
+    fun postMessageWithAction(
+        message: String,
+        actionLabel: String,
+        actionClick: () -> Unit,
+    ) {
+        applicationScope.launch {
+            snackbarEventQueue.queueMessage(
+                SnackbarAttributes(
+                    message = message,
+                    action = actionLabel,
+                    duration = SnackbarDuration.Long,
+                    actionClick = actionClick,
+                )
+            )
+        }
+    }
 }

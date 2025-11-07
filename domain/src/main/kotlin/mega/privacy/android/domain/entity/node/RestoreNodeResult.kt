@@ -11,10 +11,12 @@ sealed interface RestoreNodeResult
  *
  * @property successCount
  * @property destinationFolderName
+ * @property destinationHandle The handle of the destination folder where the node was restored
  */
 data class SingleNodeRestoreResult(
     val successCount: Int,
     val destinationFolderName: String?,
+    val destinationHandle: Long? = null,
 ) : RestoreNodeResult
 
 /**
