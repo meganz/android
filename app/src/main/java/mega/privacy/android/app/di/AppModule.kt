@@ -26,6 +26,7 @@ import mega.privacy.android.app.consent.ConsentDialogDestinations
 import mega.privacy.android.app.nav.MegaActivityResultContractImpl
 import mega.privacy.android.app.nav.MegaNavigatorImpl
 import mega.privacy.android.app.presentation.container.MegaAppContainerProvider
+import mega.privacy.android.app.presentation.login.createaccount.CreateAccountDeepLinkHandler
 import mega.privacy.android.app.presentation.login.LoginDeepLinkHandler
 import mega.privacy.android.app.presentation.login.logoutdialog.RemoteLogoutDialogDestinations
 import mega.privacy.android.app.presentation.transfers.navigation.TransfersFeatureDestination
@@ -181,6 +182,12 @@ internal class AppModule {
     fun provideAppContainerProvider(
         provider: MegaAppContainerProvider,
     ): AppContainerProvider = provider
+
+    @Provides
+    @IntoMap
+    @IntKey(10)
+    fun provideCreateAccountDeepLinkHandler(handler: CreateAccountDeepLinkHandler): DeepLinkHandler =
+        handler
 
     @Provides
     @IntoMap
