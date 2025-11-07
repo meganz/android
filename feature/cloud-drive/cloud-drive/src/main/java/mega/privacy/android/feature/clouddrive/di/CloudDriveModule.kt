@@ -4,8 +4,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import dagger.multibindings.IntKey
-import dagger.multibindings.IntoMap
 import dagger.multibindings.IntoSet
 import mega.privacy.android.feature.clouddrive.navigation.CloudDriveFeatureDestination
 import mega.privacy.android.feature.clouddrive.navigation.DriveSyncNavItem
@@ -28,7 +26,7 @@ class CloudDriveModule {
     fun provideDriveSyncNavItem(): MainNavItem = DriveSyncNavItem()
 
     @Provides
-    @IntoMap
-    @IntKey(20)
-    fun provideDeviceCenterDeepLinkHandler(handler: DeviceCenterDeepLinkHandler): DeepLinkHandler = handler
+    @IntoSet
+    fun provideDeviceCenterDeepLinkHandler(handler: DeviceCenterDeepLinkHandler): DeepLinkHandler =
+        handler
 }

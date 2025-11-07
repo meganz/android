@@ -37,4 +37,9 @@ class WebViewDeepLinkHandler @Inject constructor(
             null
         }
     }
+
+    /**
+     * We want to open in a web view only if there are no other deep link handlers that can handle the link
+     */
+    override val priority = Int.MAX_VALUE
 }

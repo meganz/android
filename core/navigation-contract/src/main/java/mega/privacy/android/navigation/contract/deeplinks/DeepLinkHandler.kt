@@ -15,4 +15,10 @@ interface DeepLinkHandler {
      * @return The NavKeys if the Uri is valid, null otherwise
      */
     suspend fun getNavKeysFromUri(uri: Uri): List<NavKey>?
+
+    /**
+     * Priority of this deep link handlers. Lower values will be handled first. Use big value if you want to handle it last if no other handler can handle it.
+     *
+     */
+    val priority get() = 10
 }

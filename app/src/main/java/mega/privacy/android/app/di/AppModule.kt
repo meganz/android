@@ -13,8 +13,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
-import dagger.multibindings.IntKey
-import dagger.multibindings.IntoMap
 import dagger.multibindings.IntoSet
 import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.LegacyDatabaseMigrationImpl
@@ -29,8 +27,9 @@ import mega.privacy.android.app.nav.MegaActivityResultContractImpl
 import mega.privacy.android.app.nav.MegaNavigatorImpl
 import mega.privacy.android.app.presentation.container.MegaAppContainerProvider
 import mega.privacy.android.app.presentation.filelink.FileLinkDeepLinkHandler
-import mega.privacy.android.app.presentation.login.createaccount.CreateAccountDeepLinkHandler
+import mega.privacy.android.app.presentation.folderlink.FolderLinkDeepLinkHandler
 import mega.privacy.android.app.presentation.login.LoginDeepLinkHandler
+import mega.privacy.android.app.presentation.login.createaccount.CreateAccountDeepLinkHandler
 import mega.privacy.android.app.presentation.login.logoutdialog.RemoteLogoutDialogDestinations
 import mega.privacy.android.app.presentation.transfers.navigation.TransfersFeatureDestination
 import mega.privacy.android.app.presentation.transfers.transferoverquota.view.dialog.TransferOverQuotaDialogDestinations
@@ -153,19 +152,22 @@ internal class AppModule {
     fun provideTransferFeatureDestinations(): FeatureDestination = TransfersFeatureDestination()
 
     @Provides
-    @IntoMap
-    @IntKey(1)
+    @IntoSet
     fun provideFileLinkDeepLinkHandler(handler: FileLinkDeepLinkHandler): DeepLinkHandler = handler
 
     @Provides
-    @IntoMap
-    @IntKey(100)
+    @IntoSet
+    fun provideFolderLinkDeepLinkHandler(handler: FolderLinkDeepLinkHandler): DeepLinkHandler =
+        handler
+
+    @Provides
+    @IntoSet
     fun provideWebViewDeepLinkHandler(handler: WebViewDeepLinkHandler): DeepLinkHandler = handler
 
     @Provides
     fun provideOrderedDeepLinkHandlers(
-        features: Map<Int, @JvmSuppressWildcards DeepLinkHandler>,
-    ): List<DeepLinkHandler> = features.toSortedMap().values.toList()
+        handlers: Set<@JvmSuppressWildcards DeepLinkHandler>,
+    ): List<DeepLinkHandler> = handlers.sortedBy { it.priority }
 
     @Provides
     @ElementsIntoSet
@@ -201,13 +203,11 @@ internal class AppModule {
     ): AppContainerProvider = provider
 
     @Provides
-    @IntoMap
-    @IntKey(5)
+    @IntoSet
     fun provideCreateAccountDeepLinkHandler(handler: CreateAccountDeepLinkHandler): DeepLinkHandler =
         handler
 
     @Provides
-    @IntoMap
-    @IntKey(10)
+    @IntoSet
     fun provideLoginDeepLinkHandler(handler: LoginDeepLinkHandler): DeepLinkHandler = handler
 }
