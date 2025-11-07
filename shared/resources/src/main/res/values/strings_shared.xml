@@ -1755,16 +1755,50 @@
     <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="one">%1$s for the first month</item>
+        <item quantity="one">%1$s for the first %2$d month</item>
         <item quantity="other">%1$s for the first %2$d months</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one">%1$s for the first year</item>
+        <item quantity="one">%1$s for the first %2$d year</item>
         <item quantity="other">%1$s for the first %2$d years</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGA privacy suite</string>
     <!-- Message about savings on yearly plan in case it has discount -->
     <string name="account_upgrade_account_label_save_at_least">Save at least 16% on a yearly plan</string>
+    <!-- Add new album on Media screen dialog title -->
+    <string name="media_add_new_album_dialog_title">Enter album name</string>
+    <!-- Add new album on Media screen dialog positive button text -->
+    <string name="media_add_new_album_dialog_positive_button">Create</string>
+    <!-- Title of favourite album. -->
+    <string name="system_album_favourites_title">Favourites</string>
+    <!-- Title of gif album. -->
+    <string name="system_album_gif_title">GIFs</string>
+    <!-- Title of raw album. -->
+    <string name="system_album_raw_title">RAW</string>
+    <!-- General error message to show when an invalid string is detected -->
+    <string name="general_invalid_string">Cannot be empty</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="album_invalid_name_error_message">This album name is not allowed. Enter a different name.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="album_name_exists_error_message">An album with this name already exists. Enter a different name.</string>
+    <!-- sentence to detail the permanent awarded text related to VPN achievement -->
+    <string name="mega_vpn_achievement_awarded_storage_text_permanent">Get %1$s of free storage when you start a MEGA&#160;VPN free trial, valid permanently</string>
+    <!-- sentence to detail the permanent awarded text related to PWM achievement -->
+    <string name="mega_pass_achievement_awarded_storage_text_permanent">Get %1$s of free storage when you start a MEGA&#160;Pass free trial, valid permanently</string>
+    <!-- sentence to detail the figures of award achievement days left -->
+    <plurals name="trial_awarded_achievement_days_left_text">
+        <item quantity="one">%1$d day left</item>
+        <item quantity="other">%1$d days left</item>
+    </plurals>
+    <!-- sentence to detail the figures of award achievement days left -->
+    <plurals name="trial_awarded_achievement_days_left_detail_title">
+        <item quantity="one">Bonus expires in %1$d day</item>
+        <item quantity="other">Bonus expires in %1$d days</item>
+    </plurals>
+    <!-- Discount label for first month singular -->
+    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
+    <!-- Discount label for first year singular -->
+    <string name="label_first_time_in_years_full_singular">%1$s for the first year</string>
 </resources>

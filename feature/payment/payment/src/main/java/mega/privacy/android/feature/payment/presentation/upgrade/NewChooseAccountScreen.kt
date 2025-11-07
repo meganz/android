@@ -427,19 +427,33 @@ fun isCurrentPlan(
 
 @Composable
 fun getOfferPeriodLabel(discountedPrice: String, period: OfferPeriod) = when (period) {
-    is OfferPeriod.Month -> pluralStringResource(
-        id = sharedR.plurals.label_first_time_in_months_full,
-        period.value,
-        discountedPrice,
-        period.value
-    )
+    is OfferPeriod.Month -> if (period.value == 1) {
+        stringResource(
+            id = sharedR.string.label_first_time_in_months_full_singular,
+            discountedPrice
+        )
+    } else {
+        pluralStringResource(
+            id = sharedR.plurals.label_first_time_in_months_full,
+            period.value,
+            discountedPrice,
+            period.value
+        )
+    }
 
-    is OfferPeriod.Year -> pluralStringResource(
-        id = sharedR.plurals.label_first_time_in_years_full,
-        period.value,
-        discountedPrice,
-        period.value
-    )
+    is OfferPeriod.Year -> if (period.value == 1) {
+        stringResource(
+            id = sharedR.string.label_first_time_in_years_full_singular,
+            discountedPrice
+        )
+    } else {
+        pluralStringResource(
+            id = sharedR.plurals.label_first_time_in_years_full,
+            period.value,
+            discountedPrice,
+            period.value
+        )
+    }
 }
 
 fun getCampaignName(context: Context, offerId: String?, discountPercentage: Int): String =
