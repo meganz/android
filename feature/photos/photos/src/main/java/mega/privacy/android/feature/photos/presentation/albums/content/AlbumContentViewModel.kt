@@ -7,6 +7,8 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toImmutableList
@@ -24,6 +26,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Album.FavouriteAlbum
 import mega.privacy.android.domain.entity.photos.Album.GifAlbum
@@ -38,6 +41,7 @@ import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetAlbumPhotosUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
+import mega.privacy.android.domain.usecase.GetNodeListByIdsUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbum
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
@@ -54,7 +58,6 @@ import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumNameUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
-import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.mapper.UIAlbumMapper
 import mega.privacy.android.feature.photos.model.FilterMediaType
@@ -65,7 +68,6 @@ import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.PhotoItemSelected
 import mega.privacy.mobile.analytics.event.PhotoItemSelectedEvent
-import nz.mega.sdk.MegaNode
 import timber.log.Timber
 
 @HiltViewModel(assistedFactory = AlbumContentViewModel.Factory::class)
@@ -83,7 +85,7 @@ class AlbumContentViewModel @AssistedInject constructor(
     private val disableExportAlbumsUseCase: DisableExportAlbumsUseCase,
     private val removeFavouritesUseCase: RemoveFavouritesUseCase,
     private val removePhotosFromAlbumUseCase: RemovePhotosFromAlbumUseCase,
-    private val getNodeListByIds: GetNodeListByIds,
+    private val getNodeListByIdsUseCase: GetNodeListByIdsUseCase,
     private val getProscribedAlbumNamesUseCase: GetProscribedAlbumNamesUseCase,
     private val updateAlbumNameUseCase: UpdateAlbumNameUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
@@ -460,6 +462,59 @@ class AlbumContentViewModel @AssistedInject constructor(
         }
     }
 
+    internal fun savePhotosToDevice() {
+        fetchNodesAndExecute { nodes ->
+            _state.update { it.copy(savePhotosToDeviceEvent = triggered(nodes)) }
+        }
+    }
+
+    internal fun resetSavePhotosToDevice() {
+        _state.update { it.copy(savePhotosToDeviceEvent = consumed()) }
+    }
+
+    internal fun sharePhotos() {
+        fetchNodesAndExecute { nodes ->
+            _state.update { it.copy(sharePhotosEvent = triggered(nodes)) }
+        }
+    }
+
+    internal fun resetSharePhotos() {
+        _state.update { it.copy(sharePhotosEvent = consumed()) }
+    }
+
+    internal fun sendPhotosToChat() {
+        fetchNodesAndExecute { nodes ->
+            _state.update { it.copy(sendPhotosToChatEvent = triggered(nodes)) }
+        }
+    }
+
+    internal fun resetSendPhotosToChat() {
+        _state.update { it.copy(sendPhotosToChatEvent = consumed()) }
+    }
+
+    internal fun hidePhotos() {
+        fetchNodesAndExecute { nodes ->
+            _state.update { it.copy(hidePhotosEvent = triggered(nodes)) }
+        }
+    }
+
+    internal fun resetHidePhotos() {
+        _state.update { it.copy(hidePhotosEvent = consumed()) }
+    }
+
+    private fun fetchNodesAndExecute(block: (List<TypedNode>) -> Unit) {
+        viewModelScope.launch {
+            runCatching {
+                val selectedPhotoIds = _state.value.selectedPhotos.map { NodeId(it.id) }
+                getNodeListByIdsUseCase(selectedPhotoIds)
+            }.onSuccess { nodes ->
+                if (nodes.isNotEmpty()) {
+                    block(nodes)
+                }
+            }
+        }
+    }
+
     fun selectAllPhotos() {
         val photos = _state.value.photos
         val selectedPhotos = when (_state.value.currentMediaType) {
@@ -501,13 +556,6 @@ class AlbumContentViewModel @AssistedInject constructor(
         _state.update {
             it.copy(snackBarMessage = snackBarMessage)
         }
-    }
-
-    suspend fun getSelectedNodes(): List<MegaNode> {
-        return runCatching {
-            val selectedPhotoIds = _state.value.selectedPhotos.map { it.id }
-            getNodeListByIds(selectedPhotoIds)
-        }.onFailure { Timber.e(it) }.getOrDefault(emptyList())
     }
 
     suspend fun getSelectedPhotos() = _state.value.selectedPhotos

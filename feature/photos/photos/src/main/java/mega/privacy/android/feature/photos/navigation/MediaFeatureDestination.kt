@@ -10,8 +10,8 @@ class MediaFeatureDestination : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
         { navigationHandler, transferHandler ->
             albumContentScreen(
-                onBack = navigationHandler::back,
-                onTransfer = transferHandler::setTransferEvent,
+                navigationHandler = navigationHandler,
+                onTransfer = transferHandler::setTransferEvent
             )
         }
 }

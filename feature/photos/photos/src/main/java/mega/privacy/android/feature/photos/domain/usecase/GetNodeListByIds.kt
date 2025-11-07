@@ -5,7 +5,7 @@ import nz.mega.sdk.MegaNode
 /**
  * Interface to get nodeList by ids
  */
-@Deprecated("Should create a new use case that returns List<TypedNode> instead")
+@Deprecated("Replace with GetNodeListByIdsUseCase")
 interface GetNodeListByIds {
     /**
      * Get nodeList by ids

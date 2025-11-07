@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.photos.presentation.albums.view
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,6 +26,7 @@ fun AlbumDynamicContentGrid(
     modifier: Modifier = Modifier,
     endSpacing: Dp = 0.dp,
     shouldApplySensitiveMode: Boolean = false,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     onClick: (PhotoUiState) -> Unit = {},
     onLongPress: (PhotoUiState) -> Unit = {},
 ) {
@@ -45,6 +47,7 @@ fun AlbumDynamicContentGrid(
         modifier = modifier,
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(1.dp),
+        contentPadding = contentPadding
     ) {
         this.items(
             albumContentLayouts,

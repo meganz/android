@@ -1,10 +1,13 @@
 package mega.privacy.android.feature.photos.presentation.albums.content
 
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentSetOf
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.Sort
@@ -67,6 +70,10 @@ data class AlbumContentUiState(
     val isBusinessAccountExpired: Boolean = false,
     val hiddenNodeEnabled: Boolean = false,
     val showProgressMessage: Boolean = false,
+    val savePhotosToDeviceEvent: StateEventWithContent<List<TypedNode>> = consumed(),
+    val sharePhotosEvent: StateEventWithContent<List<TypedNode>> = consumed(),
+    val sendPhotosToChatEvent: StateEventWithContent<List<TypedNode>> = consumed(),
+    val hidePhotosEvent: StateEventWithContent<List<TypedNode>> = consumed(),
 ) {
     val isAddingPhotosProgressCompleted: Boolean
         get() = !isAddingPhotos && totalAddedPhotos > 0

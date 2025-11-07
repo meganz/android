@@ -2,6 +2,8 @@ package mega.privacy.android.feature.photos.presentation.albums.content
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
@@ -11,10 +13,13 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.usecase.GetAlbumPhotosUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
+import mega.privacy.android.domain.usecase.GetNodeListByIdsUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbum
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
@@ -31,7 +36,6 @@ import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumNameUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
-import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.mapper.UIAlbumMapper
 import mega.privacy.android.feature.photos.model.FilterMediaType
@@ -70,7 +74,7 @@ class AlbumContentViewModelTest {
     private val disableExportAlbumsUseCase = mock<DisableExportAlbumsUseCase>()
     private val removeFavouritesUseCase = mock<RemoveFavouritesUseCase>()
     private val removePhotosFromAlbumUseCase = mock<RemovePhotosFromAlbumUseCase>()
-    private val getNodeListByIds = mock<GetNodeListByIds>()
+    private val getNodeListByIdsUseCase = mock<GetNodeListByIdsUseCase>()
     private val getProscribedAlbumNamesUseCase = mock<GetProscribedAlbumNamesUseCase>()
     private val updateAlbumNameUseCase = mock<UpdateAlbumNameUseCase>()
     private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
@@ -108,7 +112,7 @@ class AlbumContentViewModelTest {
             disableExportAlbumsUseCase,
             removeFavouritesUseCase,
             removePhotosFromAlbumUseCase,
-            getNodeListByIds,
+            getNodeListByIdsUseCase,
             getProscribedAlbumNamesUseCase,
             updateAlbumNameUseCase,
             updateNodeSensitiveUseCase,
@@ -154,7 +158,7 @@ class AlbumContentViewModelTest {
             disableExportAlbumsUseCase = disableExportAlbumsUseCase,
             removeFavouritesUseCase = removeFavouritesUseCase,
             removePhotosFromAlbumUseCase = removePhotosFromAlbumUseCase,
-            getNodeListByIds = getNodeListByIds,
+            getNodeListByIdsUseCase = getNodeListByIdsUseCase,
             getProscribedAlbumNamesUseCase = getProscribedAlbumNamesUseCase,
             updateAlbumNameUseCase = updateAlbumNameUseCase,
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
@@ -428,5 +432,255 @@ class AlbumContentViewModelTest {
 
         assertThat(result).isEqualTo(underTest.state.value.selectedPhotos)
     }
+
+    @Test
+    fun `test that savePhotosToDevice updates state correctly when nodes are fetched`() = runTest {
+        createViewModel()
+        val node = mock<TypedNode>()
+        whenever(getNodeListByIdsUseCase(any())).thenReturn(listOf(node))
+
+        underTest.savePhotosToDevice()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.savePhotosToDeviceEvent).isEqualTo(triggered(listOf(node)))
+        }
+    }
+
+    @Test
+    fun `test that resetSavePhotosToDevice updates state correctly`() = runTest {
+        createViewModel()
+
+        underTest.resetSavePhotosToDevice()
+
+        underTest.state.test {
+            assertThat(awaitItem().savePhotosToDeviceEvent).isEqualTo(consumed())
+        }
+    }
+
+    @Test
+    fun `test that sharePhotos updates state correctly when nodes are fetched`() = runTest {
+        createViewModel()
+        val node = mock<TypedNode>()
+        whenever(getNodeListByIdsUseCase(any())).thenReturn(listOf(node))
+
+        underTest.sharePhotos()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.sharePhotosEvent).isEqualTo(triggered(listOf(node)))
+        }
+    }
+
+    @Test
+    fun `test that resetSharePhotos updates state correctly`() = runTest {
+        createViewModel()
+
+        underTest.resetSharePhotos()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.sharePhotosEvent).isEqualTo(consumed())
+        }
+    }
+
+    @Test
+    fun `test that sendPhotosToChat updates state correctly when nodes are fetched`() = runTest {
+        createViewModel()
+        val node = mock<TypedNode>()
+        whenever(getNodeListByIdsUseCase(any())).thenReturn(listOf(node))
+
+        underTest.sendPhotosToChat()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.sendPhotosToChatEvent).isEqualTo(triggered(listOf(node)))
+        }
+    }
+
+    @Test
+    fun `test that resetSendPhotosToChat updates state correctly`() = runTest {
+        createViewModel()
+
+        underTest.resetSendPhotosToChat()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.sendPhotosToChatEvent).isEqualTo(consumed())
+        }
+    }
+
+    @Test
+    fun `test that hidePhotos updates state correctly when nodes are fetched`() = runTest {
+        createViewModel()
+        val node = mock<TypedNode>()
+        whenever(getNodeListByIdsUseCase(any())).thenReturn(listOf(node))
+
+        underTest.hidePhotos()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.hidePhotosEvent).isEqualTo(triggered(listOf(node)))
+        }
+    }
+
+    @Test
+    fun `test that resetHidePhotos updates state correctly`() = runTest {
+        createViewModel()
+
+        underTest.resetHidePhotos()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.hidePhotosEvent).isEqualTo(consumed())
+        }
+    }
+
+    @Test
+    fun `test that selectAllPhotos selects all photos when filter is ALL_MEDIA`() = runTest {
+        createViewModel()
+        val photo1 = mock<PhotoUiState.Image>()
+        val photo2 = mock<PhotoUiState.Video>()
+        whenever(photo1.id).thenReturn(1L)
+        whenever(photo2.id).thenReturn(2L)
+
+        underTest.selectAllPhotos()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.currentMediaType).isEqualTo(FilterMediaType.ALL_MEDIA)
+        }
+    }
+
+    @Test
+    fun `test that selectAllPhotos selects only images when filter is IMAGES`() = runTest {
+        createViewModel()
+        underTest.setCurrentMediaType(FilterMediaType.IMAGES)
+
+        underTest.selectAllPhotos()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.currentMediaType).isEqualTo(FilterMediaType.IMAGES)
+        }
+    }
+
+    @Test
+    fun `test that selectAllPhotos selects only videos when filter is VIDEOS`() = runTest {
+        createViewModel()
+        underTest.setCurrentMediaType(FilterMediaType.VIDEOS)
+
+        underTest.selectAllPhotos()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.currentMediaType).isEqualTo(FilterMediaType.VIDEOS)
+        }
+    }
+
+    @Test
+    fun `test that updateAlbumName updates state correctly with valid name`() = runTest {
+        createViewModel()
+        val newName = "New Album Name"
+        val albumNames = listOf("Existing Album")
+        whenever(getProscribedAlbumNamesUseCase()).thenReturn(emptyList())
+
+        underTest.updateAlbumName(newName, albumNames)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isInputNameValid).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that updateAlbumName updates state with error when name is empty`() = runTest {
+        createViewModel()
+        val newName = ""
+        val albumNames = listOf("Existing Album")
+        whenever(getProscribedAlbumNamesUseCase()).thenReturn(emptyList())
+
+        underTest.updateAlbumName(newName, albumNames)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isInputNameValid).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that updateAlbumName updates state with error when name is proscribed`() = runTest {
+        createViewModel()
+        val newName = "ProscribedName"
+        val albumNames = listOf("Existing Album")
+        whenever(getProscribedAlbumNamesUseCase()).thenReturn(listOf("ProscribedName"))
+
+        underTest.updateAlbumName(newName, albumNames)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isInputNameValid).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that updateAlbumName updates state with error when name already exists`() = runTest {
+        createViewModel()
+        val newName = "Existing Album"
+        val albumNames = listOf("Existing Album")
+        whenever(getProscribedAlbumNamesUseCase()).thenReturn(emptyList())
+
+        underTest.updateAlbumName(newName, albumNames)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isInputNameValid).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that updateAlbumName updates state with error when name contains invalid characters`() =
+        runTest {
+            createViewModel()
+            val newName = "Invalid/Name"
+            val albumNames = listOf("Existing Album")
+            whenever(getProscribedAlbumNamesUseCase()).thenReturn(emptyList())
+
+            underTest.updateAlbumName(newName, albumNames)
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.isInputNameValid).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that revalidateAlbumNameInput revalidates name when rename dialog is shown`() =
+        runTest {
+            createViewModel()
+            val albumNames = listOf("Existing Album")
+            whenever(getProscribedAlbumNamesUseCase()).thenReturn(emptyList())
+
+            underTest.showRenameDialog(true)
+            underTest.revalidateAlbumNameInput(albumNames)
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.showRenameDialog).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that hideOrUnhideNodes calls updateNodeSensitiveUseCase with correct parameters`() =
+        runTest {
+            createViewModel()
+            val photo = mock<PhotoUiState.Image>()
+            whenever(photo.id).thenReturn(123L)
+
+            underTest.togglePhotoSelection(photo)
+            underTest.hideOrUnhideNodes(hide = true)
+
+            verify(updateNodeSensitiveUseCase).invoke(NodeId(123L), true)
+        }
 }
 
