@@ -53,6 +53,7 @@ import mega.privacy.android.domain.entity.account.CurrencyPoint
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
+import mega.privacy.android.domain.entity.featureflag.MiscLoadedState
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.user.UserCredentials
@@ -1651,6 +1652,7 @@ class DefaultAccountRepositoryTest {
         val actual = underTest.getUserData()
 
         // Then
+        verify(appEventGateway).broadcastMiscState(MiscLoadedState.MethodCalled)
         verify(megaApiGateway).getUserData(any())
         assertThat(actual).isEqualTo(Unit)
     }
@@ -1678,6 +1680,7 @@ class DefaultAccountRepositoryTest {
         assertThrows<MegaException> {
             underTest.getUserData()
         }
+        verify(appEventGateway).broadcastMiscState(MiscLoadedState.MethodCalled)
     }
 
     private fun provideMegaError() = Stream.of(
@@ -2209,22 +2212,31 @@ class DefaultAccountRepositoryTest {
         }
 
     @Test
-    fun `test that monitorMiscLoaded is invoked when monitorMiscLoaded called`() =
+    fun `test that monitorMiscState is invoked when monitorMiscState called`() =
         runTest {
-            whenever(appEventGateway.monitorMiscLoaded()).thenReturn(
-                flowOf(true)
-            )
-            underTest.monitorMiscLoaded().test {
-                assertThat(awaitItem()).isEqualTo(true)
-                cancelAndIgnoreRemainingEvents()
+            val flow = flowOf(MiscLoadedState.FlagsReady)
+            whenever(appEventGateway.monitorMiscState()).thenReturn(flow)
+            underTest.monitorMiscState().test {
+                assertThat(awaitItem()).isEqualTo(MiscLoadedState.FlagsReady)
+                awaitComplete()
             }
         }
 
     @Test
-    fun `test that appEventGateway invokes broadcastMiscLoaded when calling broadcastMiscLoaded`() =
+    fun `test that getCurrentMiscState is invoked when getCurrentMiscState called`() =
         runTest {
-            underTest.broadcastMiscLoaded()
-            verify(appEventGateway).broadcastMiscLoaded()
+            val state = MiscLoadedState.FlagsReady
+            whenever(appEventGateway.getCurrentMiscState()).thenReturn(state)
+            assertThat(underTest.getCurrentMiscState()).isEqualTo(state)
+            verify(appEventGateway).getCurrentMiscState()
+        }
+
+    @Test
+    fun `test that appEventGateway invokes broadcastMiscState when calling broadcastMiscState`() =
+        runTest {
+            val state = MiscLoadedState.FlagsReady
+            underTest.broadcastMiscState(state)
+            verify(appEventGateway).broadcastMiscState(state)
         }
 
     @Test

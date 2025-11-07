@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
+import mega.privacy.android.domain.entity.featureflag.MiscLoadedState
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 
 internal interface AppEventGateway {
@@ -364,19 +365,23 @@ internal interface AppEventGateway {
     suspend fun broadcastUpgradeDialogClosed()
 
     /**
-     * Monitor misc loaded
+     * Monitor misc state
      */
-    fun monitorMiscLoaded(): Flow<Boolean>
+    fun monitorMiscState(): Flow<MiscLoadedState>
 
     /**
-     * Broadcast misc loaded
+     * Get current misc state
+     *
+     * @return The current misc state
      */
-    suspend fun broadcastMiscLoaded()
+    fun getCurrentMiscState(): MiscLoadedState
 
     /**
-     * Broadcast misc unloaded
+     * Broadcast misc state
+     *
+     * @param state The misc state to broadcast
      */
-    suspend fun broadcastMiscUnloaded()
+    suspend fun broadcastMiscState(state: MiscLoadedState)
 
     /**
      * Broadcast SSL verification failed

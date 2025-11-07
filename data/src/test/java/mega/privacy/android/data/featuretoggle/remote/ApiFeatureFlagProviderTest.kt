@@ -3,6 +3,7 @@ package mega.privacy.android.data.featuretoggle.remote
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
@@ -12,13 +13,14 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.featureflag.FlagMapper
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.featureflag.ApiFeature
 import mega.privacy.android.domain.entity.featureflag.Flag
 import mega.privacy.android.domain.entity.featureflag.GroupFlagTypes
+import mega.privacy.android.domain.entity.featureflag.MiscLoadedState
+import mega.privacy.android.domain.repository.AccountRepository
 import nz.mega.sdk.MegaFlag
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -27,6 +29,7 @@ import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -40,7 +43,7 @@ class ApiFeatureFlagProviderTest {
 
     private val megaApiGateway = mock<MegaApiGateway>()
     private val flagMapper = mock<FlagMapper>()
-    private val appEventGateway = mock<AppEventGateway>()
+    private val accountRepository = mock<AccountRepository>()
 
     @BeforeEach
     internal fun setUp() {
@@ -49,13 +52,14 @@ class ApiFeatureFlagProviderTest {
             ioDispatcher = UnconfinedTestDispatcher(),
             megaApiGateway = megaApiGateway,
             flagMapper = flagMapper,
-            appEventGateway = appEventGateway
+            accountRepository = accountRepository
         )
     }
 
     @AfterEach
     internal fun tearDown() {
         Dispatchers.resetMain()
+        reset(megaApiGateway, flagMapper, accountRepository)
     }
 
     @Test
@@ -89,7 +93,10 @@ class ApiFeatureFlagProviderTest {
         }
         whenever(megaApiGateway.getFlag(feature.experimentName, true)).thenReturn(megaFlag)
         whenever(flagMapper(megaFlag)).thenReturn(flag)
-        appEventGateway.stub { on { monitorMiscLoaded() } doReturn flowOf(true) }
+        accountRepository.stub {
+            on { monitorMiscState() } doReturn flowOf(MiscLoadedState.FlagsReady)
+            on { getCurrentMiscState() } doReturn MiscLoadedState.FlagsReady
+        }
 
         val expected = underTest.isEnabled(feature)
         assertThat(expected).isTrue()
@@ -108,7 +115,10 @@ class ApiFeatureFlagProviderTest {
         val flag = mock<Flag> {
             on { group } doReturn GroupFlagTypes.Disabled
         }
-        appEventGateway.stub { on { monitorMiscLoaded() } doReturn flowOf(true) }
+        accountRepository.stub {
+            on { monitorMiscState() } doReturn flowOf(MiscLoadedState.FlagsReady)
+            on { getCurrentMiscState() } doReturn MiscLoadedState.FlagsReady
+        }
 
         whenever(megaApiGateway.getFlag(feature.experimentName, true)).thenReturn(megaFlag)
         whenever(flagMapper(megaFlag)).thenReturn(flag)
@@ -128,14 +138,17 @@ class ApiFeatureFlagProviderTest {
         whenever(megaApiGateway.getFlag(feature.experimentName, true)).thenReturn(mock<MegaFlag>())
         whenever(flagMapper(any())).thenReturn(mock<Flag>())
 
-        val miscLoadedFlow = MutableStateFlow(false)
-        appEventGateway.stub { on { monitorMiscLoaded() } doReturn miscLoadedFlow }
+        val miscLoadedFlow = MutableStateFlow<MiscLoadedState>(MiscLoadedState.NotLoaded)
+        accountRepository.stub {
+            on { monitorMiscState() } doReturn miscLoadedFlow
+            on { getCurrentMiscState() } doReturn MiscLoadedState.NotLoaded
+        }
 
         val job = launch { underTest.isEnabled(feature) }
 
         verifyNoInteractions(megaApiGateway)
 
-        miscLoadedFlow.emit(true)
+        miscLoadedFlow.emit(MiscLoadedState.FlagsReady)
         advanceUntilIdle()
 
         verify(megaApiGateway).getFlag(feature.experimentName, true)
@@ -160,12 +173,50 @@ class ApiFeatureFlagProviderTest {
             ).thenReturn(mock<MegaFlag>())
             whenever(flagMapper(any())).thenReturn(mock<Flag>())
 
-            val miscLoadedFlow = MutableStateFlow(false)
-            appEventGateway.stub { on { monitorMiscLoaded() } doReturn miscLoadedFlow }
+            val miscLoadedFlow = MutableStateFlow<MiscLoadedState>(MiscLoadedState.NotLoaded)
+            accountRepository.stub {
+                on { monitorMiscState() } doReturn miscLoadedFlow
+                on { getCurrentMiscState() } doReturn MiscLoadedState.NotLoaded
+            }
 
             val result = underTest.isEnabled(feature)
             advanceTimeBy(underTest.timeOut)
 
             assertThat(result).isNull()
         }
+
+    @Test
+    fun `test that fail safe triggers user data request when misc flags not loaded`() = runTest {
+        val feature = mock<ApiFeature> {
+            on { experimentName } doReturn "chmon"
+            on { checkRemote } doReturn true
+            on { mapValue(GroupFlagTypes.Enabled) } doReturn true
+        }
+
+        val miscLoadedFlow = MutableStateFlow<MiscLoadedState>(MiscLoadedState.NotLoaded)
+        accountRepository.stub {
+            on { monitorMiscState() } doReturn miscLoadedFlow
+            on { getCurrentMiscState() } doReturn MiscLoadedState.NotLoaded
+        }
+
+        val megaFlag = mock<MegaFlag> {
+            on { group } doReturn 1L
+        }
+        val flag = mock<Flag> {
+            on { group } doReturn GroupFlagTypes.Enabled
+        }
+        whenever(megaApiGateway.getFlag(feature.experimentName, true)).thenReturn(megaFlag)
+        whenever(flagMapper(megaFlag)).thenReturn(flag)
+
+        val job = async { underTest.isEnabled(feature) }
+
+        advanceUntilIdle()
+
+        verify(accountRepository).getUserData()
+
+        miscLoadedFlow.emit(MiscLoadedState.FlagsReady)
+        advanceUntilIdle()
+
+        job.await()
+    }
 }

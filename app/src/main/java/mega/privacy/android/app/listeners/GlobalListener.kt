@@ -38,6 +38,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate.Action
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.featureflag.MiscLoadedState
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
@@ -56,7 +57,7 @@ import mega.privacy.android.domain.usecase.domainmigration.UpdateDomainNameUseCa
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCountUseCase
 import mega.privacy.android.domain.usecase.pdf.CheckIfShouldDeleteLastPageViewedInPdfUseCase
-import mega.privacy.android.domain.usecase.setting.BroadcastMiscLoadedUseCase
+import mega.privacy.android.domain.usecase.setting.BroadcastMiscStateUseCase
 import mega.privacy.android.icon.pack.R as IconPackR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -94,7 +95,7 @@ class GlobalListener @Inject constructor(
     private val updatePushNotificationSettingsUseCase: UpdatePushNotificationSettingsUseCase,
     private val shouldShowRichLinkWarningUseCase: ShouldShowRichLinkWarningUseCase,
     private val isRichPreviewsEnabledUseCase: IsRichPreviewsEnabledUseCase,
-    private val broadcastMiscLoadedUseCase: BroadcastMiscLoadedUseCase,
+    private val broadcastMiscStateUseCase: BroadcastMiscStateUseCase,
     private val getUserDataUseCase: GetUserDataUseCase,
     private val checkIfShouldDeleteLastPageViewedInPdfUseCase: CheckIfShouldDeleteLastPageViewedInPdfUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
@@ -295,8 +296,8 @@ class GlobalListener @Inject constructor(
             MegaEvent.EVENT_BUSINESS_STATUS -> sendBroadcastUpdateAccountDetails()
             MegaEvent.EVENT_MISC_FLAGS_READY -> {
                 applicationScope.launch {
+                    broadcastMiscStateUseCase(MiscLoadedState.FlagsReady)
                     updateDomainName()
-                    broadcastMiscLoadedUseCase()
                 }
                 getInstance().checkEnabledCookies()
                 initialiseAdsIfNeeded()

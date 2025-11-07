@@ -5,7 +5,6 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SubscriptionOption
-import mega.privacy.android.domain.entity.resetpassword.ResetPasswordLinkInfo
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountSession
@@ -15,7 +14,9 @@ import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.contacts.User
+import mega.privacy.android.domain.entity.featureflag.MiscLoadedState
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
+import mega.privacy.android.domain.entity.resetpassword.ResetPasswordLinkInfo
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.entity.user.UserId
@@ -723,19 +724,23 @@ interface AccountRepository {
 
 
     /**
-     * Monitor misc loaded
+     * Monitor misc state
      */
-    fun monitorMiscLoaded(): Flow<Boolean>
+    fun monitorMiscState(): Flow<MiscLoadedState>
 
     /**
-     * Broadcast misc loaded
+     * Get current misc state
+     *
+     * @return The current misc state
      */
-    suspend fun broadcastMiscLoaded()
+    fun getCurrentMiscState(): MiscLoadedState
 
     /**
-     * Broadcast misc un loaded
+     * Broadcast misc state
+     *
+     * @param state The misc state to broadcast
      */
-    suspend fun broadcastMiscUnLoaded()
+    suspend fun broadcastMiscState(state: MiscLoadedState)
 
     /**
      *  Resend the verification email for Weak Account Protection

@@ -65,14 +65,15 @@ import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate.Action
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SubscriptionOption
-import mega.privacy.android.domain.entity.resetpassword.ResetPasswordLinkInfo
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.entity.contacts.User
+import mega.privacy.android.domain.entity.featureflag.MiscLoadedState
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
+import mega.privacy.android.domain.entity.resetpassword.ResetPasswordLinkInfo
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.entity.user.UserId
@@ -1140,6 +1141,7 @@ internal class DefaultAccountRepository @Inject constructor(
     }
 
     override suspend fun getUserData() = withContext(ioDispatcher) {
+        broadcastMiscState(MiscLoadedState.MethodCalled)
         suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, error ->
@@ -1410,11 +1412,12 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override fun getInvalidAffiliateType(): Int = megaApiGateway.getInvalidAffiliateType()
 
-    override fun monitorMiscLoaded() = appEventGateway.monitorMiscLoaded()
+    override fun monitorMiscState() = appEventGateway.monitorMiscState()
 
-    override suspend fun broadcastMiscLoaded() = appEventGateway.broadcastMiscLoaded()
+    override fun getCurrentMiscState() = appEventGateway.getCurrentMiscState()
 
-    override suspend fun broadcastMiscUnLoaded() = appEventGateway.broadcastMiscUnloaded()
+    override suspend fun broadcastMiscState(state: MiscLoadedState) =
+        appEventGateway.broadcastMiscState(state)
 
     override suspend fun resendVerificationEmail() = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
