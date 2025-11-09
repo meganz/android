@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.hidenode
 
+import android.content.Intent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,16 +14,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,27 +23,32 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import mega.android.core.ui.components.LinkSpannedText
+import mega.android.core.ui.components.toolbar.AppBarNavigationType
+import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.model.MegaSpanStyle
+import mega.android.core.ui.model.SpanIndicator
+import mega.android.core.ui.model.SpanStyleWithAnnotation
+import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.values.LinkColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.settings.SettingsActivity
+import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.NAVIGATE_TO_SHOW_HIDDEN_ITEMS_PREFERENCE
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as RPack
-import mega.privacy.android.shared.original.core.ui.theme.accent_050
-import mega.privacy.android.shared.original.core.ui.theme.accent_900
-import mega.privacy.android.shared.original.core.ui.theme.black
-import mega.privacy.android.shared.original.core.ui.theme.dark_grey
-import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
-import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
-import mega.privacy.android.shared.original.core.ui.theme.teal_200_alpha_038
-import mega.privacy.android.shared.original.core.ui.theme.teal_300_alpha_038
-import mega.privacy.android.shared.original.core.ui.theme.white
-import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
+import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.HideNodeOnboardingScreenEvent
 import mega.privacy.mobile.analytics.event.HideNodeUpgradeScreenEvent
@@ -70,8 +67,10 @@ internal fun HiddenNodesOnboardingScreen(
             if (isOnboarding) HideNodeOnboardingScreenEvent else HideNodeUpgradeScreenEvent
         )
     }
-    Scaffold(
-        modifier = Modifier.systemBarsPadding().fillMaxSize(),
+    MegaScaffold(
+        modifier = Modifier
+            .systemBarsPadding()
+            .fillMaxSize(),
         topBar = {
             HiddenNodesOnboardingAppBar(
                 onClickBack = onClickBack,
@@ -90,6 +89,7 @@ internal fun HiddenNodesOnboardingScreen(
         },
         content = { paddingValues ->
             HiddenNodesOnboardingContent(
+                disableNavigateToSettings = state.accountType?.isPaid == false || state.isBusinessAccountExpired,
                 modifier = Modifier.padding(paddingValues),
             )
         },
@@ -101,24 +101,12 @@ private fun HiddenNodesOnboardingAppBar(
     modifier: Modifier = Modifier,
     onClickBack: () -> Unit,
 ) {
-    val isLight = MaterialTheme.colors.isLight
-
-    TopAppBar(
-        title = {},
+    MegaTopAppBar(
         modifier = modifier,
-        navigationIcon = {
-            IconButton(
-                onClick = onClickBack,
-                content = {
-                    Icon(
-                        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.X),
-                        contentDescription = null,
-                        tint = black.takeIf { isLight } ?: white,
-                    )
-                },
-            )
-        },
-        elevation = 0.dp,
+        title = "",
+        navigationType = AppBarNavigationType.Close(
+            onNavigationIconClicked = onClickBack,
+        )
     )
 }
 
@@ -131,12 +119,9 @@ private fun HiddenNodesOnboardingBottomBar(
     onClickBack: () -> Unit,
     onClickContinue: () -> Unit,
 ) {
-    val isLight = MaterialTheme.colors.isLight
-
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(white.takeIf { isLight } ?: dark_grey)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically,
@@ -149,53 +134,39 @@ private fun HiddenNodesOnboardingBottomBar(
             R.string.general_close to onClickBack
         }
 
-        Button(
+        RaisedDefaultMegaButton(
+            text = stringResource(strRes),
             onClick = action,
-            shape = RoundedCornerShape(4.dp),
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = accent_900.takeIf { isLight } ?: accent_050,
-                disabledBackgroundColor = teal_300_alpha_038.takeIf { isLight }
-                    ?: teal_200_alpha_038,
-            ),
-        ) {
-            Text(
-                text = stringResource(strRes),
-                color = white.takeIf { isLight } ?: dark_grey,
-                fontWeight = FontWeight.W500,
-                style = MaterialTheme.typography.button,
-            )
-        }
+        )
     }
 }
 
 @Composable
 private fun HiddenNodesOnboardingContent(
+    disableNavigateToSettings: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val isLight = MaterialTheme.colors.isLight
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState),
-        verticalArrangement = Arrangement.Center,
+        modifier = modifier.verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
         content = {
+            Spacer(modifier = Modifier.height(32.dp))
+
             Image(
                 painter = painterResource(id = R.drawable.hidden_node),
                 contentDescription = null,
-                modifier = Modifier.size(120.dp),
+                modifier = Modifier.size(120.dp)
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Text(
+            MegaText(
                 text = stringResource(id = sharedR.string.hidden_nodes_new_feature),
-                color = dark_grey.takeIf { isLight } ?: white,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.W500,
-                style = MaterialTheme.typography.subtitle1,
+                textColor = TextColor.Primary,
+                style = MaterialTheme.typography.titleMedium,
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -208,11 +179,27 @@ private fun HiddenNodesOnboardingContent(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            HiddenNodesBenefit(
-                icon = painterResource(id = RPack.drawable.ic_images),
-                title = stringResource(id = sharedR.string.hidden_nodes_title_control_visibility),
-                description = stringResource(id = sharedR.string.hidden_nodes_description_control_visibility),
-            )
+            if (disableNavigateToSettings) {
+                HiddenNodesBenefit(
+                    icon = painterResource(id = RPack.drawable.ic_images),
+                    title = stringResource(id = sharedR.string.hidden_nodes_title_control_visibility),
+                    description = stringResource(id = sharedR.string.hidden_nodes_description_control_visibility),
+                )
+            } else {
+                HiddenNodesBenefit(
+                    icon = painterResource(id = RPack.drawable.ic_images),
+                    title = stringResource(id = sharedR.string.hidden_nodes_title_control_visibility),
+                    description = stringResource(id = sharedR.string.hidden_nodes_description_control_visibility_tag),
+                    onActionClicked = {
+                        context.startActivity(
+                            Intent(
+                                context,
+                                SettingsActivity::class.java
+                            ).putExtra(NAVIGATE_TO_SHOW_HIDDEN_ITEMS_PREFERENCE, true)
+                        )
+                    }
+                )
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -231,45 +218,61 @@ private fun HiddenNodesBenefit(
     icon: Painter,
     title: String,
     description: String,
+    onActionClicked: (() -> Unit)? = null,
 ) {
-    val isLight = MaterialTheme.colors.isLight
-
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         content = {
-            Icon(
+            MegaIcon(
                 painter = icon,
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
-                tint = if (isLight) accent_900 else accent_050,
             )
 
             Spacer(modifier = Modifier.width(16.dp))
 
             Column(
                 content = {
-                    Text(
+                    MegaText(
                         text = title,
-                        color = dark_grey.takeIf { isLight } ?: white,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.W500,
-                        style = MaterialTheme.typography.subtitle2medium,
+                        textColor = TextColor.Primary,
+                        style = MaterialTheme.typography.labelLarge,
                     )
 
                     Spacer(modifier = Modifier.height(2.dp))
 
-                    Text(
-                        text = description,
-                        color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.W400,
-                        lineHeight = 18.sp,
-                    )
-                },
+                    if (onActionClicked == null) {
+                        MegaText(
+                            text = description,
+                            textColor = TextColor.Secondary,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    } else {
+                        LinkSpannedText(
+                            value = description,
+                            spanStyles = hashMapOf(
+                                SpanIndicator('A') to SpanStyleWithAnnotation(
+                                    MegaSpanStyle.LinkColorStyle(
+                                        SpanStyle(),
+                                        LinkColor.Primary
+                                    ),
+                                    description
+                                        .substringAfter("[A]")
+                                        .substringBefore("[/A]")
+                                )
+                            ),
+                            onAnnotationClick = {
+                                onActionClicked()
+                            },
+                            baseStyle = AppTheme.typography.bodyMedium,
+                            baseTextColor = TextColor.Secondary
+                        )
+                    }
+                }
             )
-        },
+        }
     )
 }

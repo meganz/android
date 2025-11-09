@@ -115,6 +115,7 @@ class SettingsFragment :
         super.onViewCreated(view, savedInstanceState)
         observeState()
         navigateToInitialPreference()
+        navigateToShowHiddenItemsPreference()
     }
 
     private fun observeState() {
@@ -195,6 +196,17 @@ class SettingsFragment :
             scrollToPreference(it)
             if (arguments?.getBoolean(NAVIGATE_TO_INITIAL_PREFERENCE, false) == true) {
                 onPreferenceTreeClick(it)
+            }
+        }
+    }
+
+    private fun navigateToShowHiddenItemsPreference() {
+        val hiddenItemsPreference =
+            findPreference<SwitchPreferenceCompat>(KEY_HIDDEN_ITEMS)
+
+        hiddenItemsPreference?.let {
+            if (arguments?.getBoolean(NAVIGATE_TO_SHOW_HIDDEN_ITEMS_PREFERENCE, false) == true) {
+                scrollToPreference(it)
             }
         }
     }
@@ -484,6 +496,8 @@ class SettingsFragment :
     companion object {
         internal const val INITIAL_PREFERENCE = "initial"
         internal const val NAVIGATE_TO_INITIAL_PREFERENCE = "navigateToInitial"
+        internal const val NAVIGATE_TO_SHOW_HIDDEN_ITEMS_PREFERENCE =
+            "navigateToShowHiddenItemsPreference"
 
         internal const val COOKIES_URI = "https://mega.io/cookie"
         internal const val GITHUB_URL = "https://github.com/meganz/android"
