@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -196,6 +197,7 @@ internal class DefaultSettingsRepository @Inject constructor(
 
     override fun monitorShowHiddenItems(): Flow<Boolean> = showHiddenNodesFlow
         .onStart {
+            Timber.d("monitorShowHiddenItems, isShowHiddenNodesPopulated: $isShowHiddenNodesPopulated")
             if (!isShowHiddenNodesPopulated) {
                 isShowHiddenNodesPopulated = true
                 populateShowHiddenNodesPreference()
@@ -204,11 +206,13 @@ internal class DefaultSettingsRepository @Inject constructor(
 
     private suspend fun populateShowHiddenNodesPreference() {
         val isEnabled = getShowHiddenNodesPreference()
+        Timber.d("populateShowHiddenNodesPreference isEnabled: $isEnabled")
         showHiddenNodesFlow.update { isEnabled }
     }
 
     override suspend fun setShowHiddenItems(enabled: Boolean) {
         showHiddenNodesFlow.update { enabled }
+        Timber.d("setShowHiddenItems enable: $enabled")
         setShowHiddenNodesPreference(enabled)
     }
 

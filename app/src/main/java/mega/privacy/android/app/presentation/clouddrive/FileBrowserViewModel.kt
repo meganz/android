@@ -1196,6 +1196,7 @@ class FileBrowserViewModel @Inject constructor(
             .conflate()
             .onEach { show ->
                 showHiddenItems = show
+                Timber.d("monitorShowHiddenItems showHiddenItems: $show")
                 if (_state.value.isLoading) return@onEach
 
                 val nodes = filterNonSensitiveNodes(nodes = _state.value.sourceNodesList)
