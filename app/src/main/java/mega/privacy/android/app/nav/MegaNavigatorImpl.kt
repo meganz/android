@@ -6,7 +6,6 @@ import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
-import androidx.core.net.toUri
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
@@ -511,7 +510,7 @@ internal class MegaNavigatorImpl @Inject constructor(
             Intent(context, ManagerActivity::class.java)
                 .setAction(ACTION_OPEN_SYNC_MEGA_FOLDER)
                 .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
-                .setData("https://${getDomainNameUseCase()}/opensync#${handle}".toUri())
+                .putExtra(INTENT_EXTRA_KEY_HANDLE, handle)
         )
     }
 

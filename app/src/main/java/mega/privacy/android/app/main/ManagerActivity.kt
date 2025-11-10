@@ -241,6 +241,7 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.tintIcon
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.FileUtil
@@ -5785,13 +5786,15 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         } else if (Constants.ACTION_OPEN_DEVICE_CENTER == intent.action) {
             selectDrawerItem(DrawerItem.DEVICE_CENTER)
         } else if (Constants.ACTION_OPEN_SYNC_MEGA_FOLDER == intent.action) {
-            intent.dataString?.split("#")?.get(1)?.toLong()?.let { handle ->
-                megaNavigator.openNodeInCloudDrive(
-                    activity = this,
-                    nodeHandle = handle,
-                    errorMessage = null,
-                    isFromSyncFolders = true,
-                )
+            intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE).let { handle ->
+                if (handle != INVALID_HANDLE) {
+                    megaNavigator.openNodeInCloudDrive(
+                        activity = this,
+                        nodeHandle = handle,
+                        errorMessage = null,
+                        isFromSyncFolders = true,
+                    )
+                }
             }
         }
         setIntent(intent)

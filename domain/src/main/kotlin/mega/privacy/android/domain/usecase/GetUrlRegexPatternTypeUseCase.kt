@@ -22,7 +22,6 @@ import mega.privacy.android.domain.entity.RegexPatternType.MEGA_FILE_REQUEST_LIN
 import mega.privacy.android.domain.entity.RegexPatternType.MEGA_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.NEW_MESSAGE_CHAT_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.OPEN_DEVICE_CENTER_LINK
-import mega.privacy.android.domain.entity.RegexPatternType.OPEN_SYNC_MEGA_FOLDER_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.PASSWORD_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.PENDING_CONTACTS_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.PURCHASE_LINK
@@ -67,9 +66,6 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             isUrlMatchesRegexUseCase(url, VERIFY_CHANGE_MAIL_LINK_REGEX) -> VERIFY_CHANGE_MAIL_LINK
             isUrlMatchesRegexUseCase(url, RESET_PASSWORD_LINK_REGEX) -> RESET_PASSWORD_LINK
             isUrlMatchesRegexUseCase(url, PENDING_CONTACTS_LINK_REGEX) -> PENDING_CONTACTS_LINK
-            isUrlMatchesRegexUseCase(url, OPEN_SYNC_MEGA_FOLDER_LINK_REGEX)
-                -> OPEN_SYNC_MEGA_FOLDER_LINK
-
             isUrlMatchesRegexUseCase(url, HANDLE_LINK_REGEX) -> HANDLE_LINK
             isUrlMatchesRegexUseCase(url, CONTACT_LINK_REGEX) -> CONTACT_LINK
             isUrlMatchesRegexUseCase(url, MEGA_DROP_LINK_REGEX) -> MEGA_DROP_LINK
@@ -418,14 +414,6 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
         private val OPEN_DEVICE_CENTER_LINK_REGEX = arrayOf(
             "^https://mega\\.nz/devicecenter",
             "^https://mega\\.app/devicecenter"
-        )
-
-        /**
-         * Regex pattern to open a Sync remote folder in Cloud Drive
-         */
-        private val OPEN_SYNC_MEGA_FOLDER_LINK_REGEX = arrayOf(
-            "^https://mega\\.nz/opensync#.+$",
-            "^https://mega\\.app/opensync#.+$"
         )
 
         /**

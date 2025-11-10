@@ -300,15 +300,6 @@ class GetUrlRegexPatternTypeUseCaseTest {
     }
 
     @ParameterizedTest(name = "{0}: {1}")
-    @MethodSource("invalidOpenSyncLinks")
-    fun `test that when url does not match open sync link pattern, it does not return OPEN_SYNC_MEGA_FOLDER_LINK pattern type`(
-        name: String,
-        urlToCheck: String?,
-    ) {
-        assertThat(underTest(urlToCheck)).isNotEqualTo(RegexPatternType.OPEN_SYNC_MEGA_FOLDER_LINK)
-    }
-
-    @ParameterizedTest(name = "{0}: {1}")
     @MethodSource("invalidLoginLinks")
     fun `test that when url does not match login link pattern, it does not return LOGIN_LINK pattern type`(
         name: String,
@@ -485,16 +476,6 @@ class GetUrlRegexPatternTypeUseCaseTest {
             "Open Device Center Link",
             "https://mega.app/devicecenter",
             RegexPatternType.OPEN_DEVICE_CENTER_LINK
-        ),
-        Arguments.of(
-            "Open Sync Folder Link",
-            "https://mega.nz/opensync#1234567890",
-            RegexPatternType.OPEN_SYNC_MEGA_FOLDER_LINK
-        ),
-        Arguments.of(
-            "Open Sync Folder Link",
-            "https://mega.app/opensync#1234567890",
-            RegexPatternType.OPEN_SYNC_MEGA_FOLDER_LINK
         ),
         Arguments.of(
             "Purchase Link",
@@ -839,15 +820,6 @@ class GetUrlRegexPatternTypeUseCaseTest {
         Arguments.of(
             "Invalid Device Center Link - Extra Path",
             "https://mega.nz/devicecenter/extra"
-        ),
-    )
-
-    private fun invalidOpenSyncLinks(): Stream<Arguments> = Stream.of(
-        Arguments.of("Invalid Open Sync Folder Link - Missing Hash", "https://mega.nz/opensync"),
-        Arguments.of("Invalid Open Sync Folder Link - Empty Hash", "https://mega.nz/opensync#"),
-        Arguments.of(
-            "Invalid Open Sync Folder Link - Wrong Domain",
-            "https://mega.io/opensync#abc123"
         ),
     )
 
