@@ -17,6 +17,7 @@ import dagger.multibindings.IntoSet
 import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.LegacyDatabaseMigrationImpl
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.activities.UpgradeAccountDeepLinkHandler
 import mega.privacy.android.app.activities.navigation.WebViewDeepLinkHandler
 import mega.privacy.android.app.appstate.global.event.AppDialogsEventQueueImpl
 import mega.privacy.android.app.appstate.global.event.AppDialogsEventQueueReceiver
@@ -233,5 +234,10 @@ internal class AppModule {
     @Provides
     @IntoSet
     fun provideAccountInvitationDeepLinkHandler(handler: AccountInvitationDeepLinkHandler): DeepLinkHandler =
+        handler
+
+    @Provides
+    @IntoSet
+    fun provideUpgradeAccountDeepLinkHandler(handler: UpgradeAccountDeepLinkHandler): DeepLinkHandler =
         handler
 }
