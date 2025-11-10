@@ -27,6 +27,7 @@ import mega.privacy.android.app.consent.ConsentDialogDestinations
 import mega.privacy.android.app.nav.MegaActivityResultContractImpl
 import mega.privacy.android.app.nav.MegaNavigatorImpl
 import mega.privacy.android.app.presentation.chat.navigation.ChatsDeepLinkHandler
+import mega.privacy.android.app.presentation.contact.navigation.ContactsDeepLinkHandler
 import mega.privacy.android.app.presentation.container.MegaAppContainerProvider
 import mega.privacy.android.app.presentation.filelink.FileLinkDeepLinkHandler
 import mega.privacy.android.app.presentation.folderlink.FolderLinkDeepLinkHandler
@@ -240,4 +241,8 @@ internal class AppModule {
     @IntoSet
     fun provideUpgradeAccountDeepLinkHandler(handler: UpgradeAccountDeepLinkHandler): DeepLinkHandler =
         handler
+
+    @Provides
+    @IntoSet
+    fun provideContactsDeepLinkHandler(handler: ContactsDeepLinkHandler): DeepLinkHandler = handler
 }
