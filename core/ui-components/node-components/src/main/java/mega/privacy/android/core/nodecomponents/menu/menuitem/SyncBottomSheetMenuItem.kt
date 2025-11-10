@@ -3,6 +3,7 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.menu.menuaction.SyncMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.extension.isNotS4Container
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -28,7 +29,8 @@ class SyncBottomSheetMenuItem @Inject constructor(
                 node is TypedFolderNode &&
                 !node.isTakenDown &&
                 !node.isSynced &&
-                !node.isUserAttributeFolder()
+                !node.isUserAttributeFolder() &&
+                node.isNotS4Container()
 
     private suspend fun TypedFolderNode.isUserAttributeFolder(): Boolean {
         val isCameraUploadsFolder = this.id.longValue == getCameraUploadsFolderHandleUseCase()

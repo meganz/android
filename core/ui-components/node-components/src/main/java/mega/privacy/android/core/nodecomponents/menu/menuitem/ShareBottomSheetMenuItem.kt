@@ -4,6 +4,7 @@ import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.extension.isNotS4Container
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import javax.inject.Inject
@@ -25,6 +26,7 @@ class ShareBottomSheetMenuItem @Inject constructor(
     ) = node.isTakenDown.not()
             && accessPermission == AccessPermission.OWNER
             && isNodeInRubbish.not()
+            && node.isNotS4Container()
 
     override fun getOnClickFunction(
         node: TypedNode,

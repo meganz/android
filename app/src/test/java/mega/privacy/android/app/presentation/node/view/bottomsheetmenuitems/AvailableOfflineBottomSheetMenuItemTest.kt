@@ -11,6 +11,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.foldernode.IsFolderEmptyUseCase
@@ -163,5 +164,22 @@ class AvailableOfflineBottomSheetMenuItemTest {
         verifyNoInteractions(removeOfflineNodeUseCase)
         verify(onDismiss).invoke()
         verify(actionHandler).invoke(any(), any())
+    }
+
+    @Test
+    fun `test that shouldDisplay returns false when node is S4 container`() = runTest {
+        val folderNode = mock<TypedFolderNode> {
+            on { isTakenDown } doReturn false
+            on { isS4Container } doReturn true
+        }
+        whenever(isFolderEmptyUseCase(folderNode)).thenReturn(false)
+        val result = underTest.shouldDisplay(
+            isNodeInRubbish = false,
+            accessPermission = null,
+            isInBackups = false,
+            node = folderNode,
+            isConnected = true
+        )
+        assertFalse(result)
     }
 }

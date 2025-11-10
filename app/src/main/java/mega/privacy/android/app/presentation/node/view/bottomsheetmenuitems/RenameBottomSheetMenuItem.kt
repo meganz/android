@@ -6,6 +6,7 @@ import mega.privacy.android.app.presentation.node.model.menuaction.RenameMenuAct
 import mega.privacy.android.app.presentation.search.navigation.searchRenameDialog
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.app.presentation.view.extension.isNotS4Container
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import javax.inject.Inject
@@ -25,6 +26,7 @@ class RenameBottomSheetMenuItem @Inject constructor() :
         AccessPermission.OWNER,
         AccessPermission.FULL
     ) && isInBackups.not()
+            && node.isNotS4Container()
 
     override fun getOnClickFunction(
         node: TypedNode,

@@ -3,6 +3,7 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveLinkMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.extension.isNotS4Container
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import javax.inject.Inject
@@ -24,6 +25,7 @@ class RemoveLinkBottomSheetMenuItem @Inject constructor(
             && node.exportedData?.publicLink != null
             && isNodeInRubbish.not()
             && accessPermission == AccessPermission.OWNER
+            && node.isNotS4Container()
 
     override val groupId = 7
 }

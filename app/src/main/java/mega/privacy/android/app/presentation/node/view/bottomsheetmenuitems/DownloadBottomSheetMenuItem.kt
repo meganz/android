@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import mega.privacy.android.app.presentation.node.model.menuaction.DownloadMenuAction
+import mega.privacy.android.app.presentation.view.extension.isNotS4Container
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -20,7 +21,7 @@ class DownloadBottomSheetMenuItem @Inject constructor(
         isInBackups: Boolean,
         node: TypedNode,
         isConnected: Boolean,
-    ) = node.isTakenDown.not() && isNodeInRubbish.not()
+    ) = node.isTakenDown.not() && isNodeInRubbish.not() && node.isNotS4Container()
 
     override val groupId = 6
 }

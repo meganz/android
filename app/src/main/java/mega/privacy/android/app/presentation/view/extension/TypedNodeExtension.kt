@@ -12,6 +12,7 @@ import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
 import nz.mega.sdk.MegaNode
@@ -76,3 +77,9 @@ internal fun TypedNode.getNodeTitle(): String = with(this) {
 internal fun TypedNode.getNodeLabel() = colorResource(
     id = MegaNodeUtil.getNodeLabelColor(this.label)
 ).takeIf { this.label != MegaNode.NODE_LBL_UNKNOWN }
+
+/**
+ * Check if the node is not an S4 container
+ */
+internal fun TypedNode.isNotS4Container(): Boolean =
+    (this as? TypedFolderNode)?.isS4Container != true

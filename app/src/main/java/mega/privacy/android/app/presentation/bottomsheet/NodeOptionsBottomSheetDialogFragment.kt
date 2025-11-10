@@ -66,6 +66,7 @@ import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivit
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesComposeViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
+import mega.privacy.android.app.presentation.view.extension.isNotS4Container
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -588,7 +589,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 }
 
                 viewLifecycleOwner.lifecycleScope.launch {
-                    if (mode == CLOUD_DRIVE_MODE && !isTakenDown && state.isOnline && state.isSyncActionAllowed) {
+                    if (mode == CLOUD_DRIVE_MODE && !isTakenDown && state.isOnline && state.isSyncActionAllowed && state.legacyNodeWrapper.typedNode.isNotS4Container()) {
                         optionSync.visibility = View.VISIBLE
                         separatorSync.visibility = View.VISIBLE
                         optionSync.setOnClickListener {
@@ -853,6 +854,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     typedNode = nodeInfo.typedNode,
                     decrementShares = { counterShares-- },
                     decrementModify = { counterModify-- },
+                    decrementSave = { counterSave-- },
                 )
                 separatorOpen.visibility = if (counterOpen <= 0) View.GONE else View.VISIBLE
                 separatorDownload.visibility = if (counterSave <= 0) View.GONE else View.VISIBLE
@@ -913,9 +915,11 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         }
                     }
                 }
+                // Recalculate bottom sheet peek height after visibility of views are updated
+                if (nodeInfo.typedNode.isNotS4Container()) {
+                    calculatePeekHeight()
+                }
             }
-            // Recalculate bottom sheet peek height after visibility of views are updated
-            calculatePeekHeight()
         }
         super.onViewCreated(view, savedInstanceState)
     }
@@ -1321,16 +1325,19 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     /**
      * Checks if the node is an S4 container and hides the appropriate actions:
-     * Delete (move to rubbish bin), Move, Rename, Share link (get link), Manage link, Remove link, Share folder
+     * Delete (move to rubbish bin), Move, Rename, Share link (get link), Manage link, Remove link, Share folder,
+     * Copy, Save to device (Download), Available offline, Sync, Info
      *
      * @param typedNode The typed node to check
      * @param decrementShares Callback to decrement the shares counter
      * @param decrementModify Callback to decrement the modify counter
+     * @param decrementSave Callback to decrement the save counter
      */
     private fun checkIfShouldHideS4ContainerActions(
         typedNode: TypedNode,
         decrementShares: () -> Unit,
         decrementModify: () -> Unit,
+        decrementSave: () -> Unit,
     ) {
         val isS4Container = (typedNode as? TypedFolderNode)?.isS4Container == true
 
@@ -1342,6 +1349,14 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             val optionRemoveLink = contentView.findViewById<TextView>(R.id.remove_link_option)
             val optionShare = contentView.findViewById<TextView>(R.id.share_option)
             val optionShareFolder = contentView.findViewById<TextView>(R.id.share_folder_option)
+            val optionCopy = contentView.findViewById<TextView>(R.id.copy_option)
+            val optionDownload = contentView.findViewById<TextView>(R.id.download_option)
+            val optionOffline = contentView.findViewById<LinearLayout>(R.id.option_offline_layout)
+            val optionSync = contentView.findViewById<LinearLayout>(R.id.option_sync_layout)
+            val optionInfo = contentView.findViewById<TextView>(R.id.properties_option)
+            val separatorInfo = contentView.findViewById<View>(R.id.separator_info_option)
+            val separatorSync = contentView.findViewById<View>(R.id.separator_sync)
+            val separatorLabel = contentView.findViewById<View>(R.id.label_separator)
 
             if (optionRename.isVisible) {
                 optionRename.visibility = View.GONE
@@ -1371,6 +1386,26 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionShareFolder.visibility = View.GONE
                 decrementShares()
             }
+            if (optionCopy.isVisible) {
+                optionCopy.visibility = View.GONE
+                decrementModify()
+            }
+            if (optionDownload.isVisible) {
+                optionDownload.visibility = View.GONE
+                decrementSave()
+            }
+            if (optionOffline.isVisible) {
+                optionOffline.visibility = View.GONE
+                decrementSave()
+            }
+            if (optionInfo.isVisible) {
+                optionInfo.visibility = View.GONE
+                separatorInfo.visibility = View.GONE
+            }
+            optionSync.visibility = View.GONE
+            separatorSync.visibility = View.GONE
+            separatorLabel.visibility = View.GONE
+            setStateBottomSheetBehaviorExtended()
         }
     }
 
@@ -1779,7 +1814,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private fun showShareFolderOptions(legacyNodeWrapper: LegacyNodeWrapper?) {
         legacyNodeWrapper?.let {
-            viewLifecycleOwner.lifecycleScope.launch  {
+            viewLifecycleOwner.lifecycleScope.launch {
                 val nodeType = withContext(ioDispatcher) {
                     checkBackupNodeTypeByHandle(megaApi, it.node)
                 }

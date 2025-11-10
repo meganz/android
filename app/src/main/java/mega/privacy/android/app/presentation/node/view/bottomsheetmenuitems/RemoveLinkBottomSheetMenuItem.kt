@@ -6,6 +6,7 @@ import mega.privacy.android.app.presentation.node.model.menuaction.RemoveLinkMen
 import mega.privacy.android.app.presentation.search.model.navigation.removeNodeLinkRoute
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.app.presentation.view.extension.isNotS4Container
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
@@ -29,6 +30,7 @@ class RemoveLinkBottomSheetMenuItem @Inject constructor(
             && node.exportedData?.publicLink != null
             && isNodeInRubbish.not()
             && accessPermission == AccessPermission.OWNER
+            && node.isNotS4Container()
 
     override fun getOnClickFunction(
         node: TypedNode,

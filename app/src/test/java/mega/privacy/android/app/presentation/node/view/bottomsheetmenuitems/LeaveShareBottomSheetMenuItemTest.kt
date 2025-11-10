@@ -106,5 +106,16 @@ class LeaveShareBottomSheetMenuItemTest {
             },
             true
         ),
+        Arguments.of(
+            false,
+            AccessPermission.OWNER,
+            false,
+            mock<TypedFolderNode> {
+                on { isTakenDown } doReturn false
+                on { isIncomingShare } doReturn true
+                on { isS4Container } doReturn true
+            },
+            false
+        ),
     )
 }

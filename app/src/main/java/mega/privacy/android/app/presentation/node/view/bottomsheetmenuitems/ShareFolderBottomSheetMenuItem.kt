@@ -6,9 +6,12 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.android.core.ui.model.menu.MenuAction
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
 import mega.privacy.android.app.presentation.search.navigation.searchFolderShareDialog
+import mega.privacy.android.app.presentation.view.extension.isNotS4Container
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
@@ -16,8 +19,6 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
-import mega.android.core.ui.model.menu.MenuAction
-import mega.android.core.ui.model.menu.MenuActionWithIcon
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -43,6 +44,7 @@ class ShareFolderBottomSheetMenuItem @Inject constructor(
             && isNodeInRubbish.not()
             && node.isOutShare().not()
             && accessPermission == AccessPermission.OWNER
+            && node.isNotS4Container()
 
 
     override fun getOnClickFunction(

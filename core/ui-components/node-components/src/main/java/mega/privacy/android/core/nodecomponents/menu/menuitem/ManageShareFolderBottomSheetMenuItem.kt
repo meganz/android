@@ -3,6 +3,7 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ManageShareFolderMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.extension.isNotS4Container
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.shares.IsOutShareUseCase
@@ -27,6 +28,7 @@ class ManageShareFolderBottomSheetMenuItem @Inject constructor(
             && accessPermission == AccessPermission.OWNER
             && isNodeInRubbish.not()
             && isOutShareUseCase(node)
+            && node.isNotS4Container()
 
     override val groupId = 7
 

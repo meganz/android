@@ -216,6 +216,11 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
             BottomSheetBehavior.STATE_HIDDEN
     }
 
+    protected fun setStateBottomSheetBehaviorExtended() {
+        BottomSheetBehavior.from(contentView.parent as View).state =
+            BottomSheetBehavior.STATE_EXPANDED
+    }
+
     /**
      * Gets the initial height of a BottomSheet.
      * It depends on the number of visible options on it, the display height

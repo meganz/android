@@ -6,6 +6,7 @@ import mega.privacy.android.app.presentation.node.model.menuaction.LeaveShareMen
 import mega.privacy.android.app.presentation.search.navigation.searchLeaveShareFolderDialog
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.app.presentation.view.extension.isNotS4Container
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
@@ -30,6 +31,7 @@ class LeaveShareBottomSheetMenuItem @Inject constructor(
     ) = node.isTakenDown.not()
             && node.isIncomingShare
             && isInBackups.not()
+            && node.isNotS4Container()
 
     override fun getOnClickFunction(
         node: TypedNode,

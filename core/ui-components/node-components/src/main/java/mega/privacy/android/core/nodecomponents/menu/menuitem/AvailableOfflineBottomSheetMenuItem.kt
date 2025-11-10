@@ -7,6 +7,7 @@ import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AvailableOfflineMenuAction
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.extension.isNotS4Container
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.foldernode.IsFolderEmptyUseCase
@@ -31,7 +32,8 @@ class AvailableOfflineBottomSheetMenuItem @Inject constructor(
     ) = !node.isAvailableOffline &&
             isNodeInRubbish.not() &&
             node.isTakenDown.not() &&
-            isFolderEmptyUseCase(node).not()
+            isFolderEmptyUseCase(node).not() &&
+            node.isNotS4Container()
 
     override val groupId = 6
 }

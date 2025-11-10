@@ -74,6 +74,17 @@ class ShareBottomSheetMenuItemTest {
             mock<TypedFolderNode> { on { isTakenDown } doReturn false },
             false,
             true,
-        )
+        ),
+        Arguments.of(
+            false,
+            AccessPermission.OWNER,
+            false,
+            mock<TypedFolderNode> {
+                on { isTakenDown } doReturn false
+                on { isS4Container } doReturn true
+            },
+            false,
+            false,
+        ),
     )
 }

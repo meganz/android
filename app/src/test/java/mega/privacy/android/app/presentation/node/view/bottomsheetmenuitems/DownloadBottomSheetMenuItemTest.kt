@@ -4,6 +4,7 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.node.model.menuaction.DownloadMenuAction
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -88,6 +89,22 @@ class DownloadBottomSheetMenuItemTest {
             isConnected = true
         )
         Truth.assertThat(result).isTrue()
+    }
+
+    @Test
+    fun `test that shouldDisplay returns false when node is S4 container`() = runTest {
+        val folderNode = mock<TypedFolderNode> {
+            on { isTakenDown } doReturn false
+            on { isS4Container } doReturn true
+        }
+        val result = underTest.shouldDisplay(
+            isNodeInRubbish = false,
+            accessPermission = null,
+            isInBackups = false,
+            node = folderNode,
+            isConnected = true
+        )
+        Truth.assertThat(result).isFalse()
     }
 
 

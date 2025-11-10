@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.node.model.menuaction.InfoMenuAction
+import mega.privacy.android.app.presentation.view.extension.isNotS4Container
 import mega.privacy.android.app.utils.Constants
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
@@ -26,7 +27,7 @@ class InfoBottomSheetMenuItem @Inject constructor(
         isInBackups: Boolean,
         node: TypedNode,
         isConnected: Boolean,
-    ) = true
+    ) = node.isNotS4Container()
 
     override fun getOnClickFunction(
         node: TypedNode,

@@ -8,6 +8,7 @@ import mega.privacy.android.app.presentation.node.model.menuaction.ManageLinkMen
 import mega.privacy.android.app.utils.Constants
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.app.presentation.view.extension.isNotS4Container
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import javax.inject.Inject
@@ -27,6 +28,7 @@ class ManageLinkBottomSheetMenuItem @Inject constructor() :
             && node.exportedData?.publicLink != null
             && isNodeInRubbish.not()
             && accessPermission == AccessPermission.OWNER
+            && node.isNotS4Container()
 
     override fun getOnClickFunction(
         node: TypedNode,

@@ -5,15 +5,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.presentation.node.model.menuaction.AvailableOfflineMenuAction
-import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.app.presentation.node.model.menuaction.AvailableOfflineMenuAction
+import mega.privacy.android.app.presentation.view.extension.isNotS4Container
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.foldernode.IsFolderEmptyUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
+import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -59,7 +60,10 @@ class AvailableOfflineBottomSheetMenuItem @Inject constructor(
         isInBackups: Boolean,
         node: TypedNode,
         isConnected: Boolean,
-    ) = isNodeInRubbish.not() && node.isTakenDown.not() && isFolderEmptyUseCase(node).not()
+    ) = isNodeInRubbish.not()
+            && node.isTakenDown.not()
+            && isFolderEmptyUseCase(node).not()
+            && node.isNotS4Container()
 
     override fun getOnClickFunction(
         node: TypedNode,

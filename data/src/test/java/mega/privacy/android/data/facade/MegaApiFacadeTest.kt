@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -40,7 +41,7 @@ internal class MegaApiFacadeTest {
 
     @Test
     fun `test that isNodeS4Container returns false when S4 is not enabled`() = runTest {
-        whenever(megaApi.isS4Enabled).thenReturn(false)
+        whenever(megaApi.isS4Enabled) doReturn false
         val nodeHandle = 12345L
 
         val result = underTest.isNodeS4Container(nodeHandle)
@@ -50,7 +51,7 @@ internal class MegaApiFacadeTest {
 
     @Test
     fun `test that isNodeS4Container returns false when node handle is invalid`() = runTest {
-        whenever(megaApi.isS4Enabled).thenReturn(true)
+        whenever(megaApi.isS4Enabled) doReturn true
 
         val result = underTest.isNodeS4Container(MegaApiAndroid.INVALID_HANDLE)
 
@@ -60,8 +61,8 @@ internal class MegaApiFacadeTest {
     @Test
     fun `test that isNodeS4Container returns false when S4 container handle is invalid`() =
         runTest {
-            whenever(megaApi.isS4Enabled).thenReturn(true)
-            whenever(megaApi.s4Container).thenReturn(MegaApiAndroid.INVALID_HANDLE)
+            whenever(megaApi.isS4Enabled) doReturn true
+            whenever(megaApi.s4Container) doReturn MegaApiAndroid.INVALID_HANDLE
             val nodeHandle = 12345L
 
             val result = underTest.isNodeS4Container(nodeHandle)
@@ -72,8 +73,8 @@ internal class MegaApiFacadeTest {
     @Test
     fun `test that isNodeS4Container returns false when node handle does not match S4 container handle`() =
         runTest {
-            whenever(megaApi.isS4Enabled).thenReturn(true)
-            whenever(megaApi.s4Container).thenReturn(12345L)
+            whenever(megaApi.isS4Enabled) doReturn true
+            whenever(megaApi.s4Container) doReturn 12345L
             val nodeHandle = 67890L
 
             val result = underTest.isNodeS4Container(nodeHandle)
@@ -85,8 +86,8 @@ internal class MegaApiFacadeTest {
     fun `test that isNodeS4Container returns true when node handle matches S4 container handle`() =
         runTest {
             val s4ContainerHandle = 12345L
-            whenever(megaApi.isS4Enabled).thenReturn(true)
-            whenever(megaApi.s4Container).thenReturn(s4ContainerHandle)
+            whenever(megaApi.isS4Enabled) doReturn true
+            whenever(megaApi.s4Container) doReturn s4ContainerHandle
 
             val result = underTest.isNodeS4Container(s4ContainerHandle)
 

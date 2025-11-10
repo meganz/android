@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import org.junit.jupiter.api.Assertions.*
@@ -94,6 +95,17 @@ class ManageLinkBottomSheetMenuItemTest {
                 on { exportedData } doReturn exportedData
             },
             true
+        ),
+        Arguments.of(
+            false,
+            AccessPermission.OWNER,
+            false,
+            mock<TypedFolderNode> {
+                on { isTakenDown } doReturn false
+                on { exportedData } doReturn exportedData
+                on { isS4Container } doReturn true
+            },
+            false
         ),
     )
 }

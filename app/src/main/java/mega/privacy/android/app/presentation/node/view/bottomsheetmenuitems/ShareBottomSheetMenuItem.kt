@@ -15,6 +15,7 @@ import mega.privacy.android.app.presentation.node.model.menuaction.ShareMenuActi
 import mega.privacy.android.app.utils.Constants
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.app.presentation.view.extension.isNotS4Container
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -46,6 +47,7 @@ class ShareBottomSheetMenuItem @Inject constructor(
     ) = node.isTakenDown.not()
             && accessPermission == AccessPermission.OWNER
             && isNodeInRubbish.not()
+            && node.isNotS4Container()
 
     override val groupId = 7
 

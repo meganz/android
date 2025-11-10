@@ -9,6 +9,7 @@ import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
 import mega.privacy.android.app.presentation.filecontact.FileContactListComposeActivity
 import mega.privacy.android.app.presentation.node.model.menuaction.ManageShareFolderMenuAction
+import mega.privacy.android.app.presentation.view.extension.isNotS4Container
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -34,6 +35,7 @@ class ManageShareFolderBottomSheetMenuItem @Inject constructor(
             && accessPermission == AccessPermission.OWNER
             && isNodeInRubbish.not()
             && node.isOutShare()
+            && node.isNotS4Container()
 
     override fun getOnClickFunction(
         node: TypedNode,
