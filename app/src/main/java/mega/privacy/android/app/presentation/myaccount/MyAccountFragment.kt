@@ -31,8 +31,12 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.StorageState
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -65,6 +69,9 @@ class MyAccountFragment : Fragment(), MyAccountHomeViewActions {
 
     @Inject
     lateinit var megaNavigator: MegaNavigator
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     /**
      * onCreateView
@@ -142,10 +149,19 @@ class MyAccountFragment : Fragment(), MyAccountHomeViewActions {
     override fun onEditProfile() =
         findNavController().navigate(R.id.action_my_account_to_edit_profile)
 
-    override fun onClickUsageMeter() =
-        findNavController().navigate(
-            MyAccountFragmentDirections.actionMyAccountToMyAccountUsage()
-        )
+    override fun onClickUsageMeter() {
+        lifecycleScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.MyAccountUsageFragmentComposeUI)) {
+                findNavController().navigate(
+                    MyAccountFragmentDirections.actionMyAccountToMyAccountUsageCompose()
+                )
+            } else {
+                findNavController().navigate(
+                    MyAccountFragmentDirections.actionMyAccountToMyAccountUsage()
+                )
+            }
+        }
+    }
 
     override fun onUpgradeAccount() {
         Analytics.tracker.trackEvent(UpgradeMyAccountEvent)

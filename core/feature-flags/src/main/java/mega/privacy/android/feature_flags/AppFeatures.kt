@@ -171,6 +171,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
         "Convert the NodeLabelBottomSheetDialogFragment to Kotlin",
         true
     ),
+
+    /**
+     * Feature flag to control the migration of MyAccountUsageFragment to ComposeUI.
+     */
+    MyAccountUsageFragmentComposeUI(
+        "Convert the MyAccountUsageFragment to ComposeUI",
+        false
+    ),
     ;
 
     companion object : FeatureFlagValueProvider {
