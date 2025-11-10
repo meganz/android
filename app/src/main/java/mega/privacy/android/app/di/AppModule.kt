@@ -32,6 +32,7 @@ import mega.privacy.android.app.presentation.folderlink.FolderLinkDeepLinkHandle
 import mega.privacy.android.app.presentation.login.LoginDeepLinkHandler
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountDeepLinkHandler
 import mega.privacy.android.app.presentation.login.logoutdialog.RemoteLogoutDialogDestinations
+import mega.privacy.android.app.presentation.settings.SettingsDeepLinkHandler
 import mega.privacy.android.app.presentation.transfers.navigation.TransfersFeatureDestination
 import mega.privacy.android.app.presentation.transfers.transferoverquota.view.dialog.TransferOverQuotaDialogDestinations
 import mega.privacy.android.app.sslverification.SSLAppDialogDestinations
@@ -215,5 +216,10 @@ internal class AppModule {
     @Provides
     @IntoSet
     fun provideChatsDeepLinkHandler(handler: ChatsDeepLinkHandler): DeepLinkHandler =
+        handler
+
+    @Provides
+    @IntoSet
+    fun provideSettingsDeepLinkHandler(handler: SettingsDeepLinkHandler): DeepLinkHandler =
         handler
 }
