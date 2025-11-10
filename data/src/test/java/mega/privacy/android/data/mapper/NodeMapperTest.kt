@@ -1,6 +1,7 @@
 package mega.privacy.android.data.mapper
 
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
@@ -79,6 +80,9 @@ class NodeMapperTest {
             on { size() }.thenReturn(0)
         }
         whenever(megaApiGateway.getSyncs()).thenReturn(syncList)
+        runBlocking {
+            whenever(megaApiGateway.isNodeS4Container(any())).thenReturn(false)
+        }
         underTest = NodeMapper(
             fileNodeMapper = FileNodeMapper(
                 cacheGateway = mock(),

@@ -43,6 +43,11 @@ interface FolderNode : UnTypedNode {
     val childFileCount: Int
 
     /**
+     * Is the folder the S4 container
+     */
+    val isS4Container: Boolean
+
+    /**
      * Fetch children
      */
     val fetchChildren: suspend (SortOrder) -> List<UnTypedNode>

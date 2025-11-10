@@ -271,6 +271,14 @@ interface MegaApiGateway {
     suspend fun getRubbishBinNode(): MegaNode?
 
     /**
+     * Check if the provided node handle is the S4 container
+     *
+     * @param nodeHandle The node handle to check
+     * @return True if the node is the S4 container and S4 is enabled, false otherwise
+     */
+    suspend fun isNodeS4Container(nodeHandle: Long): Boolean
+
+    /**
      * Sdk version
      */
     fun getSdkVersion(): String?

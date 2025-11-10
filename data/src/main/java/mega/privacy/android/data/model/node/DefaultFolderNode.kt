@@ -30,6 +30,7 @@ internal data class DefaultFolderNode(
     override val isSynced: Boolean,
     override val device: String?,
     override val isNodeKeyDecrypted: Boolean,
+    override val isS4Container: Boolean,
     override val creationTime: Long,
     override val fetchChildren: suspend (SortOrder) -> List<UnTypedNode>,
     override val serializedData: String?,

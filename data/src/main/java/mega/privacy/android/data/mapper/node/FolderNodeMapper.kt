@@ -77,6 +77,7 @@ internal class FolderNodeMapper @Inject constructor(
         isSynced = syncedNodeIds?.contains(NodeId(megaNode.handle)) ?: isSynced(megaNode),
         device = megaNode.deviceId,
         isNodeKeyDecrypted = megaNode.isNodeKeyDecrypted,
+        isS4Container = megaApiGateway.isNodeS4Container(megaNode.handle),
         creationTime = megaNode.creationTime,
         fetchChildren = fetChildrenMapper(megaNode),
         serializedData = if (requireSerializedData) megaNode.serialize() else null,

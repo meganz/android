@@ -173,6 +173,13 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun getRubbishBinNode(): MegaNode? = megaApi.rubbishNode
 
+    override suspend fun isNodeS4Container(nodeHandle: Long): Boolean {
+        return if (megaApi.isS4Enabled && nodeHandle != MegaApiAndroid.INVALID_HANDLE) {
+            val s4Handle = megaApi.s4Container
+            s4Handle != MegaApiAndroid.INVALID_HANDLE && s4Handle == nodeHandle
+        } else false
+    }
+
     override fun getSdkVersion(): String? = megaApi.version
 
     override val globalRequestEvents = callbackFlow {

@@ -21,6 +21,7 @@ internal class SampleNodeDataProvider {
             override val device = null
             override val childFolderCount = 1
             override val childFileCount = 1
+            override val isS4Container = false
             override val fetchChildren: suspend (SortOrder) -> List<UnTypedNode> = { emptyList() }
             override val type = FolderType.Default
             override val id = NodeId(1L)
@@ -53,6 +54,7 @@ internal class SampleNodeDataProvider {
             override val device = null
             override val childFolderCount = 1
             override val childFileCount = 1
+            override val isS4Container = false
             override val fetchChildren: suspend (SortOrder) -> List<UnTypedNode> = { emptyList() }
             override val type = FolderType.Default
             override val id = NodeId(2L)
@@ -85,6 +87,7 @@ internal class SampleNodeDataProvider {
             override val device = null
             override val childFolderCount = 1
             override val childFileCount = 1
+            override val isS4Container = false
             override val fetchChildren: suspend (SortOrder) -> List<UnTypedNode> = { emptyList() }
             override val type = FolderType.Default
             override val id = NodeId(3L)

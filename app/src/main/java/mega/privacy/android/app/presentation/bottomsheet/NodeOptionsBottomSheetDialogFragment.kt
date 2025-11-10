@@ -109,13 +109,13 @@ import mega.privacy.android.icon.pack.R as RPack
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.CloudDriveHideNodeMenuItemEvent
 import mega.privacy.mobile.analytics.event.HideNodeMenuItemEvent
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import javax.inject.Inject
-import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * [BaseBottomSheetDialogFragment] used to display actions of a particular Node
@@ -848,6 +848,12 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     decrementOpen = { counterOpen-- },
                     decrementModify = { counterModify-- },
                 )
+                // Check if S4 container actions should be hidden
+                checkIfShouldHideS4ContainerActions(
+                    typedNode = nodeInfo.typedNode,
+                    decrementShares = { counterShares-- },
+                    decrementModify = { counterModify-- },
+                )
                 separatorOpen.visibility = if (counterOpen <= 0) View.GONE else View.VISIBLE
                 separatorDownload.visibility = if (counterSave <= 0) View.GONE else View.VISIBLE
                 separatorShares.visibility = if (counterShares <= 0) View.GONE else View.VISIBLE
@@ -1310,6 +1316,61 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             decrementModify()
             decrementModify()
             decrementOpen()
+        }
+    }
+
+    /**
+     * Checks if the node is an S4 container and hides the appropriate actions:
+     * Delete (move to rubbish bin), Move, Rename, Share link (get link), Manage link, Remove link, Share folder
+     *
+     * @param typedNode The typed node to check
+     * @param decrementShares Callback to decrement the shares counter
+     * @param decrementModify Callback to decrement the modify counter
+     */
+    private fun checkIfShouldHideS4ContainerActions(
+        typedNode: TypedNode,
+        decrementShares: () -> Unit,
+        decrementModify: () -> Unit,
+    ) {
+        val isS4Container = (typedNode as? TypedFolderNode)?.isS4Container == true
+
+        if (isS4Container) {
+            val optionRename = contentView.findViewById<TextView>(R.id.rename_option)
+            val optionMove = contentView.findViewById<TextView>(R.id.move_option)
+            val optionRubbishBin = contentView.findViewById<TextView>(R.id.rubbish_bin_option)
+            val optionLink = contentView.findViewById<TextView>(R.id.link_option)
+            val optionRemoveLink = contentView.findViewById<TextView>(R.id.remove_link_option)
+            val optionShare = contentView.findViewById<TextView>(R.id.share_option)
+            val optionShareFolder = contentView.findViewById<TextView>(R.id.share_folder_option)
+
+            if (optionRename.isVisible) {
+                optionRename.visibility = View.GONE
+                decrementModify()
+            }
+            if (optionMove.isVisible) {
+                optionMove.visibility = View.GONE
+                decrementModify()
+            }
+            if (optionRubbishBin.isVisible) {
+                optionRubbishBin.visibility = View.GONE
+                decrementModify()
+            }
+            if (optionLink.isVisible) {
+                optionLink.visibility = View.GONE
+                decrementShares()
+            }
+            if (optionRemoveLink.isVisible) {
+                optionRemoveLink.visibility = View.GONE
+                decrementShares()
+            }
+            if (optionShare.isVisible) {
+                optionShare.visibility = View.GONE
+                decrementShares()
+            }
+            if (optionShareFolder.isVisible) {
+                optionShareFolder.visibility = View.GONE
+                decrementShares()
+            }
         }
     }
 
