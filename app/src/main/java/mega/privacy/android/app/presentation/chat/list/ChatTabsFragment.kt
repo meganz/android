@@ -19,7 +19,11 @@ import androidx.appcompat.view.ActionMode
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.SnackbarResult
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -38,25 +42,32 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.SendToChatActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.NavigationDrawerManager
 import mega.privacy.android.app.main.dialog.chatstatus.ChatStatusDialogFragment
+import mega.privacy.android.app.main.dialog.link.OpenLinkDialogFragment
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.chat.archived.ArchivedChatsActivity
 import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.view.ChatTabsView
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
+import mega.privacy.android.app.presentation.data.SnackBarItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
 import mega.privacy.android.app.presentation.meeting.NoteToSelfChatViewModel
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingManagementViewModel
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity
+import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
 import mega.privacy.android.app.presentation.meeting.model.ShareLinkOption
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
@@ -69,21 +80,23 @@ import mega.privacy.android.app.utils.ScheduledMeetingDateUtil
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
-import mega.privacy.android.domain.entity.chat.ChatStatus
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.ArchivedChatsMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatRoomDNDMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatScreenEvent
 import mega.privacy.mobile.analytics.event.ChatTabFABPressedEvent
 import mega.privacy.mobile.analytics.event.ChatsTabEvent
 import mega.privacy.mobile.analytics.event.InviteFriendsPressedEvent
 import mega.privacy.mobile.analytics.event.MeetingsTabEvent
+import mega.privacy.mobile.analytics.event.OpenLinkMenuItemEvent
 import mega.privacy.mobile.analytics.event.OpenNoteToSelfButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ScheduleMeetingPressedEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingShareMeetingLinkButtonEvent
 import mega.privacy.mobile.analytics.event.SendMeetingLinkToChatScheduledMeetingEvent
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
@@ -129,16 +142,18 @@ class ChatTabsFragment : Fragment() {
     private val viewModel by viewModels<ChatTabsViewModel>()
     private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>()
     private val noteToSelfChatViewModel by viewModels<NoteToSelfChatViewModel>()
+    private val isNewSingleActivity by lazy { activity is ChatHostActivity }
 
     private val bluetoothPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGrant ->
             if (isGrant) {
                 openMeetingToCreate()
             } else {
-                (activity as? BaseActivity)?.showSnackbar(
-                    Constants.PERMISSIONS_TYPE,
-                    getString(R.string.meeting_bluetooth_connect_required_permissions_warning),
-                    MegaApiJava.INVALID_HANDLE
+                viewModel.updateSnackBar(
+                    SnackBarItem(
+                        type = Constants.PERMISSIONS_TYPE,
+                        stringRes = R.string.meeting_bluetooth_connect_required_permissions_warning
+                    )
                 )
             }
         }
@@ -218,6 +233,45 @@ class ChatTabsFragment : Fragment() {
                 val chatsTabState by viewModel.getState().collectAsStateWithLifecycle()
                 val managementState by scheduledMeetingManagementViewModel.state.collectAsStateWithLifecycle()
                 val noteToSelfChatState by noteToSelfChatViewModel.state.collectAsStateWithLifecycle()
+                val scaffoldState = rememberScaffoldState()
+                val coroutineScope = rememberCoroutineScope()
+
+                LaunchedEffect(chatsTabState.snackBar) {
+                    val snackBar = chatsTabState.snackBar
+                    if (snackBar != null) {
+                        val type = snackBar.type
+                        when (type) {
+                            Constants.NOT_CALL_PERMISSIONS_SNACKBAR_TYPE -> {
+                                val result =
+                                    scaffoldState.snackbarHostState.showAutoDurationSnackbar(
+                                        message = snackBar.getMessage(resources),
+                                        actionLabel = getString(R.string.general_allow)
+                                    )
+                                if (result == SnackbarResult.ActionPerformed) {
+                                    context.navigateToAppSettings()
+                                }
+                            }
+
+                            Constants.PERMISSIONS_TYPE -> {
+                                val result =
+                                    scaffoldState.snackbarHostState.showAutoDurationSnackbar(
+                                        message = snackBar.getMessage(resources),
+                                        actionLabel = getString(R.string.action_settings)
+                                    )
+                                if (result == SnackbarResult.ActionPerformed) {
+                                    context.navigateToAppSettings()
+                                }
+                            }
+
+                            else -> {
+                                scaffoldState.snackbarHostState.showAutoDurationSnackbar(
+                                    message = snackBar.getMessage(resources),
+                                )
+                            }
+                        }
+                        viewModel.updateSnackBar(null)
+                    }
+                }
 
                 EventEffect(
                     managementState.meetingLinkCreated,
@@ -269,6 +323,8 @@ class ChatTabsFragment : Fragment() {
                                 }
                         ) {
                             ChatTabsView(
+                                scaffoldState = scaffoldState,
+                                isNewSingleActivity = isNewSingleActivity,
                                 state = chatsTabState,
                                 managementState = managementState,
                                 noteToSelfChatState = noteToSelfChatState,
@@ -287,7 +343,50 @@ class ChatTabsFragment : Fragment() {
                                 onStartChatClick = ::startChatAction,
                                 onShowNextTooltip = viewModel::setNextMeetingTooltip,
                                 onDismissForceAppUpdateDialog = viewModel::onForceUpdateDialogDismissed,
-                                onScheduleMeeting = ::onScheduleMeeting
+                                onScheduleMeeting = ::onScheduleMeeting,
+                                onSearchTextChange = viewModel::setSearchQuery,
+                                onSearchCloseClicked = viewModel::clearSearchQuery,
+                                onNavigationClick = {
+                                    activity?.finish()
+                                },
+                                onChangeUserStatus = ::openChangeStatusDialog,
+                                onDoNotDisturbActionClick = {
+                                    Analytics.tracker.trackEvent(ChatRoomDNDMenuItemEvent)
+                                    if (ChatUtil.getGeneralNotification() == Constants.NOTIFICATIONS_ENABLED) {
+                                        ChatUtil.createMuteNotificationsChatAlertDialog(
+                                            requireActivity(),
+                                            null
+                                        )
+                                    } else {
+                                        coroutineScope.launch {
+                                            val result =
+                                                scaffoldState.snackbarHostState.showAutoDurationSnackbar(
+                                                    message = getString(R.string.notifications_are_already_muted),
+                                                    actionLabel = getString(R.string.general_unmute)
+                                                )
+                                            if (result == SnackbarResult.ActionPerformed) {
+                                                getPushNotificationSettingManagement().controlMuteNotifications(
+                                                    context,
+                                                    Constants.NOTIFICATIONS_ENABLED,
+                                                    null
+                                                )
+                                            }
+                                        }
+                                    }
+                                },
+                                onOpenLinkActionClick = {
+                                    Analytics.tracker.trackEvent(OpenLinkMenuItemEvent)
+                                    showOpenLinkDialog(false)
+                                },
+                                onArchivedActionClick = {
+                                    Analytics.tracker.trackEvent(ArchivedChatsMenuItemEvent)
+                                    startActivity(
+                                        Intent(
+                                            requireContext(),
+                                            ArchivedChatsActivity::class.java
+                                        )
+                                    )
+                                }
                             )
                         }
                     }
@@ -295,13 +394,26 @@ class ChatTabsFragment : Fragment() {
             }
         }
 
+    /**
+     * Shows an Open link dialog.
+     */
+    fun showOpenLinkDialog(isJoinMeeting: Boolean) {
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+
+            OpenLinkDialogFragment.newInstance(
+                isChatScreen = true,
+                isJoinMeeting = isJoinMeeting
+            ).show(childFragmentManager, OpenLinkDialogFragment.TAG)
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         (activity as? NavigationDrawerManager)?.addDrawerListener(drawerListener)
         view.post {
             (activity as? ManagerActivity?)?.showHideBottomNavigationView(false)
             (activity as? ManagerActivity?)?.invalidateOptionsMenu()
             (activity as? ManagerActivity?)?.findViewById<View>(R.id.toolbar)?.setOnClickListener {
-                ChatStatusDialogFragment().show(childFragmentManager, ChatStatusDialogFragment.TAG)
+                openChangeStatusDialog()
             }
             setupMenu()
         }
@@ -320,20 +432,9 @@ class ChatTabsFragment : Fragment() {
             } else {
                 actionMode?.finish()
             }
-
-            when (state.currentChatStatus) {
-                ChatStatus.Online -> R.string.online_status
-                ChatStatus.Offline -> R.string.offline_status
-                ChatStatus.Away -> R.string.away_status
-                ChatStatus.Busy -> R.string.busy_status
-                ChatStatus.NoNetworkConnection -> R.string.error_server_connection_problem
-                ChatStatus.Reconnecting -> R.string.invalid_connection_state
-                ChatStatus.Connecting -> R.string.chat_connecting
-                else -> null
-            }?.let { subtitle ->
-                (activity as? AppCompatActivity?)?.supportActionBar?.setSubtitle(subtitle)
+            state.currentChatStatus?.text?.let { subtitle ->
+                (activity as? ManagerActivity?)?.supportActionBar?.setSubtitle(subtitle)
             }
-
             state.currentCallChatId?.let { chatId ->
                 launchChatCallScreen(chatId)
                 viewModel.removeCurrentCallAndWaitingRoom()
@@ -344,21 +445,15 @@ class ChatTabsFragment : Fragment() {
                 viewModel.removeCurrentCallAndWaitingRoom()
             }
 
-            state.snackBar?.let { snackBar ->
-                (activity as? BaseActivity?)?.showSnackbar(
-                    snackBar.type,
-                    view,
-                    snackBar.getMessage(resources),
-                    MEGACHAT_INVALID_HANDLE
-                )
-                viewModel.updateSnackBar(null)
-            }
-
             state.isParticipatingInChatCallResult?.let { isInCall ->
                 handleUserInCall(isInCall)
             }
             archivedMenuItem?.isVisible = state.hasArchivedChats
         }
+    }
+
+    private fun openChangeStatusDialog() {
+        ChatStatusDialogFragment().show(childFragmentManager, ChatStatusDialogFragment.TAG)
     }
 
     private fun collectFlows() {
@@ -586,6 +681,7 @@ class ChatTabsFragment : Fragment() {
                 )
             } else {
                 (activity as? ManagerActivity?)?.onCreateMeeting()
+                    ?: (activity as? ChatHostActivity?)?.onCreateMeeting()
             }
 
         } else {

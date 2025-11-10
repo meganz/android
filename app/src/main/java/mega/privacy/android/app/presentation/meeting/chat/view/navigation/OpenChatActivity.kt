@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.commit
+import mega.privacy.android.app.presentation.chat.list.ChatTabsFragment
 import mega.privacy.android.app.presentation.meeting.chat.ChatFragment
 import mega.privacy.android.app.presentation.meeting.chat.extension.findChatHostActivity
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
@@ -37,6 +38,9 @@ internal fun openChatFragment(
 
             supportFragmentManager.commit {
                 replace(android.R.id.content, ChatFragment::class.java, extras)
+                if (supportFragmentManager.findFragmentById(android.R.id.content) is ChatTabsFragment) {
+                    addToBackStack("ChatFragment")
+                }
             }
         }
     } ?: run {

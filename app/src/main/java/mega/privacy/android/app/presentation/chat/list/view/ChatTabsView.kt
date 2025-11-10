@@ -8,17 +8,17 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarHost
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.rememberScaffoldState
@@ -39,6 +39,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.normalize
 import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.model.ChatsTabState
+import mega.privacy.android.app.presentation.chat.list.toolbar.ChatListToolBar
 import mega.privacy.android.app.presentation.meeting.model.NoteToSelfChatUIState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
 import mega.privacy.android.app.presentation.meeting.view.dialog.CancelScheduledMeetingDialog
@@ -46,6 +47,7 @@ import mega.privacy.android.app.presentation.meeting.view.dialog.ForceAppUpdateD
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.legacy.core.ui.controls.tooltips.LegacyMegaTooltip
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.tab.Tabs
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
@@ -66,9 +68,11 @@ import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackb
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChatTabsView(
+    isNewSingleActivity: Boolean,
     state: ChatsTabState,
     managementState: ScheduledMeetingManagementUiState,
     noteToSelfChatState: NoteToSelfChatUIState,
+    scaffoldState: ScaffoldState = rememberScaffoldState(),
     showMeetingTab: Boolean = false,
     onTabSelected: (ChatTab) -> Unit = {},
     onItemClick: (Long, Boolean) -> Unit = { _, _ -> },
@@ -82,10 +86,16 @@ fun ChatTabsView(
     onScheduleMeeting: () -> Unit = {},
     onShowNextTooltip: (MeetingTooltipItem) -> Unit = {},
     onDismissForceAppUpdateDialog: () -> Unit = {},
+    onSearchTextChange: (String) -> Unit = {},
+    onSearchCloseClicked: () -> Unit = {},
+    onNavigationClick: () -> Unit = {},
+    onChangeUserStatus: () -> Unit = {},
+    onDoNotDisturbActionClick: () -> Unit = {},
+    onOpenLinkActionClick: () -> Unit = {},
+    onArchivedActionClick: () -> Unit = {},
 ) {
     val initialPage = if (showMeetingTab) ChatTab.MEETINGS.ordinal else ChatTab.CHATS.ordinal
     val context = LocalContext.current
-    val scaffoldState = rememberScaffoldState()
     val pagerState = rememberPagerState(
         initialPage = initialPage,
         initialPageOffsetFraction = 0f
@@ -97,19 +107,24 @@ fun ChatTabsView(
     var filteredChats by remember { mutableStateOf<List<ChatRoomItem>?>(listOf()) }
     var filteredMeetings by remember { mutableStateOf<List<ChatRoomItem>?>(listOf()) }
 
-    Scaffold(
+    MegaScaffold(
+        modifier = if (isNewSingleActivity) Modifier.systemBarsPadding() else Modifier,
         scaffoldState = scaffoldState,
-        snackbarHost = { hostState ->
-            SnackbarHost(
-                hostState = hostState,
-                snackbar = { data ->
-                    Snackbar(
-                        snackbarData = data,
-                        modifier = Modifier.padding(bottom = 4.dp),
-                        backgroundColor = MaterialTheme.colors.onPrimary,
-                    )
-                }
-            )
+        contentWindowInsets = WindowInsets(0.dp),
+        topBar = {
+            if (isNewSingleActivity) {
+                ChatListToolBar(
+                    state = state,
+                    noteToSelfChatState = noteToSelfChatState,
+                    onNavigationClick = onNavigationClick,
+                    onChangeUserStatus = onChangeUserStatus,
+                    onSearchTextChange = onSearchTextChange,
+                    onSearchCloseClicked = onSearchCloseClicked,
+                    onOpenLinkActionClick = onOpenLinkActionClick,
+                    onDoNotDisturbActionClick = onDoNotDisturbActionClick,
+                    onArchivedActionClick = onArchivedActionClick
+                )
+            }
         },
         floatingActionButton = {
             if (state.tooltip == MeetingTooltipItem.CREATE && pagerState.currentPage == ChatTab.MEETINGS.ordinal) {
@@ -222,7 +237,7 @@ fun ChatTabsView(
                 event = state.snackbarMessageContent, onConsumed = onResetStateSnackbarMessage
             ) { resId ->
                 scaffoldState.snackbarHostState.showAutoDurationSnackbar(
-                    context.resources.getString(
+                    context.getString(
                         resId
                     )
                 )
@@ -283,6 +298,7 @@ private fun FabButton(showFabButton: Boolean, onStartChatClick: (isFabClicked: B
 private fun PreviewEmptyView() {
     OriginalTheme(isSystemInDarkTheme()) {
         ChatTabsView(
+            isNewSingleActivity = false,
             state = ChatsTabState(currentUnreadStatus = true to false),
             managementState = ScheduledMeetingManagementUiState(),
             noteToSelfChatState = NoteToSelfChatUIState(),

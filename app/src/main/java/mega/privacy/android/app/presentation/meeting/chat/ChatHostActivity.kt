@@ -6,25 +6,45 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.commit
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.app.R
+import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
+import mega.privacy.android.app.presentation.chat.list.ChatTabsFragment
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openChatFragment
+import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.mobile.analytics.event.JoinMeetingPressedEvent
+import mega.privacy.mobile.analytics.event.StartMeetingNowPressedEvent
 
 /**
  * Host Activity for new chat room
  */
 @AndroidEntryPoint
-class ChatHostActivity : AppCompatActivity() {
+class ChatHostActivity : AppCompatActivity(), MeetingBottomSheetDialogActionListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         if (savedInstanceState == null) {
+            val isOpenChatList = intent.getBooleanExtra(OPEN_CHAT_LIST, false)
             supportFragmentManager.commit {
-                replace(android.R.id.content, ChatFragment().apply {
-                    arguments = intent.extras
-                })
+                if (isOpenChatList) {
+                    replace(
+                        android.R.id.content,
+                        ChatTabsFragment().apply {
+                            arguments = intent.extras
+                        },
+                    )
+                } else {
+                    replace(
+                        android.R.id.content,
+                        ChatFragment().apply {
+                            arguments = intent.extras
+                        },
+                    )
+                }
             }
         }
     }
@@ -37,6 +57,41 @@ class ChatHostActivity : AppCompatActivity() {
         val chatId = intent.getLongExtra(Constants.CHAT_ID, -1L)
         val link = intent.getStringExtra(EXTRA_LINK)
         val action = intent.getStringExtra(EXTRA_ACTION)
-        openChatFragment(this, chatId = chatId, chatLink = link, action = action)
+        val isOpenChatList = intent.getBooleanExtra(OPEN_CHAT_LIST, false)
+        if (isOpenChatList) {
+            supportFragmentManager.commit {
+                replace(
+                    android.R.id.content,
+                    ChatTabsFragment().apply {
+                        arguments = intent.extras
+                    },
+                )
+            }
+        } else {
+            openChatFragment(this, chatId = chatId, chatLink = link, action = action)
+        }
+    }
+
+    override fun onJoinMeeting() {
+        Analytics.tracker.trackEvent(JoinMeetingPressedEvent)
+        if (CallUtil.participatingInACall()) {
+            CallUtil.showConfirmationInACall(
+                this,
+                getString(R.string.text_join_call),
+            )
+        } else {
+            (supportFragmentManager.findFragmentById(android.R.id.content) as? ChatTabsFragment)
+                ?.showOpenLinkDialog(true)
+        }
+    }
+
+    override fun onCreateMeeting() {
+        Analytics.tracker.trackEvent(StartMeetingNowPressedEvent)
+        (supportFragmentManager.findFragmentById(android.R.id.content) as? ChatTabsFragment)
+            ?.onCreateMeeting()
+    }
+
+    companion object {
+        const val OPEN_CHAT_LIST = "open_chat_list"
     }
 }

@@ -165,7 +165,7 @@ internal class ChatFragment : Fragment() {
                                                     it
                                                 )
                                             },
-                                            onBackPress = { requireActivity().supportFinishAfterTransition() },
+                                            onBackPress = { requireActivity().onBackPressedDispatcher.onBackPressed() },
                                             onCameraPermissionDenied = {
                                                 showPermissionNotAllowedSnackbar(
                                                     context,

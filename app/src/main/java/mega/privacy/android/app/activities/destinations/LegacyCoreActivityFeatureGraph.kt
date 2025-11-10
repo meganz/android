@@ -3,6 +3,7 @@ package mega.privacy.android.app.activities.destinations
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.chat.navigation.chatLegacyDestination
+import mega.privacy.android.app.presentation.chat.navigation.chatListLegacyDestination
 import mega.privacy.android.app.presentation.contact.navigation.contactsLegacyDestination
 import mega.privacy.android.app.presentation.filelink.legacyFileLinkScreen
 import mega.privacy.android.app.presentation.folderlink.legacyFolderLinkScreen
@@ -33,5 +34,6 @@ class LegacyCoreActivityFeatureGraph : FeatureDestination {
             syncSelectStopBackupDestinationDestination(navigationHandler::back)
             legacyFileLinkScreen(navigationHandler::back)
             legacyFolderLinkScreen(navigationHandler::back)
+            chatListLegacyDestination(navigationHandler::back)
         }
 }
