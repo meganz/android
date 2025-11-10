@@ -30,6 +30,7 @@ import mega.privacy.android.app.presentation.container.MegaAppContainerProvider
 import mega.privacy.android.app.presentation.filelink.FileLinkDeepLinkHandler
 import mega.privacy.android.app.presentation.folderlink.FolderLinkDeepLinkHandler
 import mega.privacy.android.app.presentation.login.LoginDeepLinkHandler
+import mega.privacy.android.app.presentation.login.createaccount.AccountInvitationDeepLinkHandler
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountDeepLinkHandler
 import mega.privacy.android.app.presentation.login.logoutdialog.RemoteLogoutDialogDestinations
 import mega.privacy.android.app.presentation.settings.SettingsDeepLinkHandler
@@ -227,5 +228,10 @@ internal class AppModule {
     @Provides
     @IntoSet
     fun provideExportRecoveryKeyDeepLinkHandler(handler: ExportRecoveryKeyDeepLinkHandler): DeepLinkHandler =
+        handler
+
+    @Provides
+    @IntoSet
+    fun provideAccountInvitationDeepLinkHandler(handler: AccountInvitationDeepLinkHandler): DeepLinkHandler =
         handler
 }

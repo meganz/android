@@ -150,7 +150,7 @@ fun LoginNavDisplay(
 
     LoginNavigationHandler(
         navigateToLoginScreen = { loginNavigationHandler.navigate(LoginNavKey) },
-        navigateToCreateAccountScreen = { loginNavigationHandler.navigate(CreateAccountNavKey) },
+        navigateToCreateAccountScreen = { loginNavigationHandler.navigate(CreateAccountNavKey()) },
         navigateToTourScreen = {
             loginNavigationHandler.navigateAndClearBackStack(TourNavKey)
         },

@@ -21,7 +21,7 @@ enum class LoginScreen(val value: Int, val navKey: NavKey) {
     /**
      * Create account screen.
      */
-    CreateAccount(Constants.CREATE_ACCOUNT_FRAGMENT, CreateAccountNavKey),
+    CreateAccount(Constants.CREATE_ACCOUNT_FRAGMENT, CreateAccountNavKey()),
 
     /**
      * Confirm email screen.

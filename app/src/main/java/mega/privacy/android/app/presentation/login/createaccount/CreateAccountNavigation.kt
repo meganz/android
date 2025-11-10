@@ -22,8 +22,14 @@ import mega.privacy.android.app.presentation.login.createaccount.view.NewCreateA
 import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 
+/**
+ * Create Account Screen
+ * @param initialEmail if set, the email field will be pre-filled with this value
+ */
 @Serializable
-data object CreateAccountNavKey : NoSessionNavKey.Mandatory
+data class CreateAccountNavKey(
+    val initialEmail: String? = null,
+) : NoSessionNavKey.Mandatory
 
 internal fun NavGraphBuilder.createAccountScreen(
     navController: NavController,
@@ -40,7 +46,7 @@ internal fun NavGraphBuilder.createAccountScreen(
         }
         LoginNavigationHandler(
             navigateToLoginScreen = { navController.navigate(LoginNavKey) },
-            navigateToCreateAccountScreen = { navController.navigate(CreateAccountNavKey) },
+            navigateToCreateAccountScreen = { navController.navigate(CreateAccountNavKey()) },
             navigateToTourScreen = {
                 navController.navigate(TourNavKey, navOptions {
                     popUpTo<StartRoute> {
@@ -67,11 +73,15 @@ internal fun EntryProviderScope<NavKey>.createAccountScreen(
     entry<CreateAccountNavKey> { key ->
         NewCreateAccountRoute(
             activityViewModel = sharedViewModel,
+            initialEmail = key.initialEmail,
             modifier = Modifier.fillMaxSize(),
         )
     }
 }
 
-internal fun NavController.openCreateAccountScreen(navOptions: NavOptions? = null) {
-    navigate(CreateAccountNavKey, navOptions)
+internal fun NavController.openCreateAccountScreen(
+    initialEmail: String? = null,
+    navOptions: NavOptions? = null,
+) {
+    navigate(CreateAccountNavKey(initialEmail = initialEmail), navOptions)
 }

@@ -112,6 +112,7 @@ internal fun NewCreateAccountRoute(
     activityViewModel: LoginViewModel,
     modifier: Modifier = Modifier,
     viewModel: CreateAccountViewModel = hiltViewModel(),
+    initialEmail: String? = null,
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -126,6 +127,7 @@ internal fun NewCreateAccountRoute(
     NewCreateAccountScreen(
         uiState = uiState,
         snackBarHostState = snackBarHostState,
+        initialEmail = initialEmail,
         onFirstNameInputChanged = viewModel::onFirstNameInputChanged,
         onLastNameInputChanged = viewModel::onLastNameInputChanged,
         onEmailInputChanged = viewModel::onEmailInputChanged,
@@ -173,6 +175,7 @@ internal fun NewCreateAccountScreen(
     onBackIconPressed: () -> Unit,
     onNetworkWarningShown: () -> Unit,
     modifier: Modifier = Modifier,
+    initialEmail: String? = null,
 ) {
     val scrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
@@ -214,6 +217,16 @@ internal fun NewCreateAccountScreen(
     LaunchedEffect(Unit) {
         delay(300L)
         firstNameFocusRequester.requestFocus()
+    }
+
+    LaunchedEffect(initialEmail) {
+        initialEmail?.let { emailValue ->
+            val normalizedEmail = emailValue.trim().lowercase()
+            if (normalizedEmail.isNotEmpty() && email.isEmpty()) {
+                email = normalizedEmail
+                onEmailInputChanged(normalizedEmail)
+            }
+        }
     }
 
     EventEffect(

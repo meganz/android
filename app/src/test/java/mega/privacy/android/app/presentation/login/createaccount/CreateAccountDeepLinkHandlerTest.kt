@@ -34,7 +34,7 @@ class CreateAccountDeepLinkHandlerTest {
     fun `test that correct nav key is returned when uri matches REGISTRATION_LINK pattern type`() =
         runTest {
             val uriString = "mega://register"
-            val expected = CreateAccountNavKey
+            val expected = CreateAccountNavKey()
             val uri = mock<Uri> {
                 on { this.toString() } doReturn uriString
             }
