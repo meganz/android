@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":icon-pack"))
     implementation(project(":shared:resources"))
     implementation(platform(androidx.compose.bom))
+    implementation(androidx.compose.icons)
     implementation(androidx.navigation.compose)
     implementation(androidx.navigation3.runtime)
     implementation(androidx.material3.adaptive.navigation.suite)
