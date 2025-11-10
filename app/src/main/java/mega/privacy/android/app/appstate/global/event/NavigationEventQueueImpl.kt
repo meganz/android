@@ -12,11 +12,23 @@ import javax.inject.Singleton
 class NavigationEventQueueImpl @Inject constructor() : NavigationEventQueue,
     NavigationEventQueueReceiver {
     private val _events =
-        Channel<NavKey>(
+        Channel<List<NavKey>>(
             capacity = 10,
             onUndeliveredElement = { Timber.w("Failed to deliver navigation event: $it") })
-    override val events: ReceiveChannel<NavKey> = _events
+    override val events: ReceiveChannel<List<NavKey>> = _events
     override suspend fun emit(navKey: NavKey) {
-        _events.send(navKey)
+        _events.send(listOf(navKey))
+    }
+
+    override suspend fun emit(navKeys: List<NavKey>) {
+        _events.send(navKeys)
+    }
+
+    override fun tryEmit(navKey: NavKey) {
+        _events.trySend(listOf(navKey))
+    }
+
+    override fun tryEmit(navKeys: List<NavKey>) {
+        _events.trySend(navKeys)
     }
 }

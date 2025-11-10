@@ -4,4 +4,7 @@ import androidx.navigation3.runtime.NavKey
 
 interface NavigationEventQueue {
     suspend fun emit(navKey: NavKey)
+    suspend fun emit(navKeys: List<NavKey>)
+    fun tryEmit(navKey: NavKey)
+    fun tryEmit(navKeys: List<NavKey>)
 }

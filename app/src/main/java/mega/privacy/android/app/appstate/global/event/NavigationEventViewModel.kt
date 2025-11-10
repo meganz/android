@@ -19,7 +19,7 @@ class NavigationEventViewModel @Inject constructor(
 ) : ViewModel() {
     private var acknowledged: CompletableDeferred<Unit>? = null
 
-    val navigationEvents: StateFlow<StateEventWithContent<NavKey>> by lazy {
+    val navigationEvents: StateFlow<StateEventWithContent<List<NavKey>>> by lazy {
         flow {
             for (event in navigationEventQueueReceiver.events) {
                 acknowledged = CompletableDeferred()

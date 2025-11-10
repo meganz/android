@@ -68,14 +68,14 @@ class PendingBackStackNavigationHandlerTest {
     fun `test that back removes last element from backStack`() {
         backStack.add(Destination1)
         underTest.back()
-        assertThat(backStack).isEmpty()
+        assertThat(backStack).containsExactly(DefaultLandingScreen)
     }
 
     @Test
     fun `test that navigate adds multiple destinations to backStack`() {
         val list = listOf(Destination1, Destination2)
         underTest.navigate(list)
-        assertThat(backStack).containsExactly(Destination1, Destination2)
+        assertThat(backStack).containsExactly(DefaultLandingScreen, Destination1, Destination2)
     }
 
     @Test
@@ -89,7 +89,7 @@ class PendingBackStackNavigationHandlerTest {
     fun `test that backTo removes items until target destination`() {
         backStack.addAll(listOf(Destination1, Destination2, Destination3))
         underTest.backTo(Destination1, inclusive = false)
-        assertThat(backStack).containsExactly(Destination1)
+        assertThat(backStack).containsExactly(DefaultLandingScreen, Destination1)
     }
 
     @Test
@@ -97,7 +97,7 @@ class PendingBackStackNavigationHandlerTest {
         backStack.addAll(listOf(Destination1, Destination2, Destination3))
 
         underTest.navigateAndClearTo(Destination3, newParent = Destination2, inclusive = true)
-        assertThat(backStack).containsExactly(Destination1, Destination3)
+        assertThat(backStack).containsExactly(DefaultLandingScreen, Destination1, Destination3)
     }
 
     @Test
@@ -111,7 +111,7 @@ class PendingBackStackNavigationHandlerTest {
             assert(awaitItem() == "resultValue")
         }
 
-        assertThat(backStack).isEmpty()
+        assertThat(backStack).containsExactly(DefaultLandingScreen)
     }
 
     @Test
@@ -448,7 +448,7 @@ class PendingBackStackNavigationHandlerTest {
             backStack.addAll(navTree)
             underTest.onPasscodeStateChanged(true)
             assertThat(backStack).containsExactly(PasscodeDestination)
-            assertThat(backStack.pending).containsExactlyElementsIn(navTree)
+            assertThat(backStack.pending).containsExactlyElementsIn(listOf(DefaultLandingScreen) + navTree)
         }
 
     @Test
@@ -459,10 +459,10 @@ class PendingBackStackNavigationHandlerTest {
             underTest.onPasscodeStateChanged(true)
 
             assertThat(backStack).containsExactly(PasscodeDestination)
-            assertThat(backStack.pending).containsExactlyElementsIn(navTree)
+            assertThat(backStack.pending).containsExactlyElementsIn(listOf(DefaultLandingScreen) + navTree)
 
             underTest.onPasscodeStateChanged(false)
-            assertThat(backStack).containsExactly(Destination1, Destination2)
+            assertThat(backStack).containsExactly(DefaultLandingScreen, Destination1, Destination2)
             assertThat(backStack.pending).isEmpty()
         }
 
@@ -510,5 +510,30 @@ class PendingBackStackNavigationHandlerTest {
             assertThat(tempBackStack).containsExactly(PasscodeDestination)
             assertThat(tempBackStack.pending).containsExactlyElementsIn(navTree)
         }
+
+    @Test
+    fun `test that backstack is not empty after initialising handler`() = runTest {
+        assertThat(backStack).containsExactly(DefaultLandingScreen)
+    }
+
+    @Test
+    fun `test that logging out removes fetch nodes destination`() = runTest {
+        val tempBackStack = PendingBackStack<NavKey>(NavBackStack(DefaultLandingScreen))
+        val tempHandler = PendingBackStackNavigationHandler(
+            backstack = tempBackStack,
+            currentAuthStatus = PendingBackStackNavigationHandler.AuthStatus.LoggedIn(
+                initialSession
+            ),
+            hasRootNode = false,
+            defaultLandingScreen = DefaultLandingScreen,
+            defaultLoginDestination = DefaultLoginDestination,
+            fetchRootNodeDestination = getFetchNodeDestinationFunction,
+            isPasscodeLocked = true,
+            passcodeDestination = PasscodeDestination,
+        )
+        tempHandler.onLoginChange(PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn)
+
+        assertThat(tempBackStack).containsExactly(DefaultLoginDestination)
+    }
 
 }

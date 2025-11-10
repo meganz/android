@@ -10,6 +10,7 @@ import mega.privacy.android.app.presentation.login.LoginNavKey
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
+import timber.log.Timber
 
 /**
  * NavigationHandler implementation that wraps pending back stack functionality.
@@ -28,6 +29,7 @@ class PendingBackStackNavigationHandler(
     private var fromLogin = false
 
     init {
+        Timber.d("PendingBackStackNavigationHandler::init")
         if (hasRootNode.not()) {
             val rootNodeDestinations = removeRootNodeRequiredDestinations()
             backstack.pending = rootNodeDestinations + backstack.pending
@@ -35,21 +37,27 @@ class PendingBackStackNavigationHandler(
         if (currentAuthStatus.isLoggedIn.not()) {
             val authRequiredDestinations = removeAuthRequiredDestinations()
             backstack.pending = authRequiredDestinations + backstack.pending
+            if (backstack.isEmpty()) backstack.add(defaultLoginDestination)
         }
+        if (backstack.isEmpty()) backstack.add(defaultLandingScreen)
         onPasscodeStateChanged(isPasscodeLocked)
+
+        logBackStack()
     }
 
     private fun removeAuthRequiredDestinations(): List<NavKey> {
+        Timber.d("PendingBackStackNavigationHandler::removeAuthRequiredDestinations")
         val authRequiredDestinations = backstack.takeLastWhile { it !is NoSessionNavKey }
 
         repeat(authRequiredDestinations.size) {
             backstack.removeLastOrNull()
         }
-        if (backstack.isEmpty()) backstack.add(defaultLoginDestination)
+        logBackStack()
         return authRequiredDestinations
     }
 
     private fun removeRootNodeRequiredDestinations(): List<NavKey> {
+        Timber.d("PendingBackStackNavigationHandler::removeRootNodeRequiredDestinations")
         val rootNodeRequiredDestinations = backstack.takeLastWhile { it !is NoNodeNavKey }
 
         repeat(rootNodeRequiredDestinations.size) {
@@ -60,11 +68,19 @@ class PendingBackStackNavigationHandler(
             val fetchDestination = fetchRootNodeDestination(it, fromLogin)
             if (backstack.lastOrNull() != fetchDestination) backstack.add(fetchDestination)
         }
+        logBackStack()
         return rootNodeRequiredDestinations
     }
 
     override fun back() {
-        backstack.removeLastOrNull()
+        Timber.d("PendingBackStackNavigationHandler::back")
+        if (backstack.size == 1 && backstack.last() != defaultLandingScreen) {
+            backstack.removeLastOrNull()
+            navigate(defaultLandingScreen)
+        } else {
+            backstack.removeLastOrNull()
+        }
+        logBackStack()
     }
 
     override fun navigate(destination: NavKey) {
@@ -72,6 +88,7 @@ class PendingBackStackNavigationHandler(
     }
 
     override fun navigate(destinations: List<NavKey>) {
+        Timber.d("PendingBackStackNavigationHandler::navigate")
         when {
             destinations.last() is NoSessionNavKey.Mandatory && currentAuthStatus.isLoggedIn -> {
                 if (backstack.isEmpty()) navigate(defaultLandingScreen)
@@ -108,6 +125,7 @@ class PendingBackStackNavigationHandler(
                 backstack.addAll(destinations)
             }
         }
+        logBackStack()
     }
 
     private fun currentFetchNodesDestinationOrNull(currentAuthStatus: AuthStatus) =
@@ -141,6 +159,7 @@ class PendingBackStackNavigationHandler(
         backstack.removeLastOrNull()
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T> monitorResult(key: String): Flow<T?> {
         // Get or create the StateFlow for this key
         val resultFlow = resultFlows.getOrPut(key) { MutableStateFlow(null) }
@@ -183,6 +202,7 @@ class PendingBackStackNavigationHandler(
     }
 
     fun onLoginChange(authStatus: AuthStatus) {
+        Timber.d("PendingBackStackNavigationHandler::onLoginChange")
         if (authStatus.isLoggedIn) {
             fromLogin = true
         } else {
@@ -199,10 +219,12 @@ class PendingBackStackNavigationHandler(
             navigate(listOf(fetchNodeOrLoginDestination))
         } else {
             removeAuthRequiredDestinations()
+            if (backstack.isEmpty()) backstack.add(defaultLoginDestination)
         }
     }
 
     fun onRootNodeChange(hasRootNode: Boolean) {
+        Timber.d("PendingBackStackNavigationHandler::onRootNodeChange")
         if (this.hasRootNode == hasRootNode) return
         this.hasRootNode = hasRootNode
 
@@ -218,6 +240,7 @@ class PendingBackStackNavigationHandler(
     }
 
     fun onPasscodeStateChanged(isLocked: Boolean) {
+        Timber.d("PendingBackStackNavigationHandler::onPasscodeStateChanged")
         isPasscodeLocked = isLocked
 
         if (isPasscodeLocked) {
@@ -232,6 +255,24 @@ class PendingBackStackNavigationHandler(
                 navigate(pendingDestinations)
             }
         }
+    }
+
+    fun displayDialog(dialogDestination: NavKey) {
+        if (backstack.pending.isNotEmpty()) {
+            backstack.pending = backstack.pending + dialogDestination
+        } else {
+            navigate(dialogDestination)
+        }
+    }
+
+    private fun logBackStack() {
+        Timber.d(
+            "Pending backstack: \n BackStack: \n ${backstack.joinToString("\n") { it.toString() }} \n Pending: \n ${
+                backstack.pending.joinToString(
+                    "\n"
+                ) { it.toString() }
+            }"
+        )
     }
 
     sealed interface AuthStatus {

@@ -27,7 +27,6 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import kotlinx.serialization.Serializable
 import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.content.navigation.MainNavigationStateViewModel
 import mega.privacy.android.app.appstate.content.navigation.model.MainNavState
@@ -37,11 +36,6 @@ import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.mobile.navigation.snowflake.MainNavigationScaffold
-
-@Serializable
-data class HomeScreensNavKey(
-    val initialDestination: NavKey?,
-) : NavKey
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

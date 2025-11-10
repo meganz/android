@@ -1,10 +1,14 @@
 package mega.privacy.android.app.appstate.content.destinations
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.ui.NavDisplay
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.login.FetchNodesViewModel
 import mega.privacy.android.app.presentation.login.view.FetchNodesContent
@@ -14,7 +18,11 @@ import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
 data class FetchingContentNavKey(val session: String, val isFromLogin: Boolean) : NoNodeNavKey
 
 fun EntryProviderScope<NavKey>.fetchingContentDestination() {
-    entry<FetchingContentNavKey> {
+    entry<FetchingContentNavKey>(
+        metadata = NavDisplay.transitionSpec {
+            EnterTransition.None togetherWith ExitTransition.None
+        }
+    ) {
         val viewModel =
             hiltViewModel<FetchNodesViewModel, FetchNodesViewModel.Factory>(
                 key = "FetchNodesViewModel ${it.session}",

@@ -14,16 +14,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.appstate.content.navigation.NavigationHandlerImpl
+import mega.privacy.android.app.appstate.content.navigation.PendingBackStackNavigationHandler
+import mega.privacy.android.app.appstate.content.navigation.rememberPendingBackStack
 import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
 import mega.privacy.android.app.appstate.content.transfer.TransferHandlerImpl
 import mega.privacy.android.app.presentation.container.SharedAppContainer
 import mega.privacy.android.app.presentation.filecontact.navigation.FileContactFeatureDestination
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.app.presentation.passcode.navigation.PasscodeNavKey
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
@@ -54,13 +55,21 @@ internal class FileContactListComposeActivity : AppCompatActivity() {
         setContent {
             val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val appTransferViewModel = hiltViewModel<AppTransferViewModel>()
-            val backStack = rememberNavBackStack(
-                FileContactInfoNavKey(
-                    folderHandle = nodeHandle,
-                    folderName = nodeName,
-                )
+            val navKey = FileContactInfoNavKey(
+                folderHandle = nodeHandle,
+                folderName = nodeName,
             )
-            val navigationHandler = NavigationHandlerImpl(backStack)
+            val backStack = rememberPendingBackStack(
+                navKey
+            )
+            val navigationHandler = PendingBackStackNavigationHandler(
+                backStack,
+                currentAuthStatus = PendingBackStackNavigationHandler.AuthStatus.LoggedIn("initial"), // Not a valid session, but should be replaced
+                hasRootNode = true,
+                defaultLandingScreen = navKey,
+                isPasscodeLocked = false,
+                passcodeDestination = PasscodeNavKey,
+            )
 
             SharedAppContainer(
                 themeMode = themeMode,

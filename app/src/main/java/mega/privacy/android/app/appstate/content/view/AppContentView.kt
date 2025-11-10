@@ -26,10 +26,10 @@ import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.appstate.content.AppContentStateViewModel
+import mega.privacy.android.app.appstate.content.destinations.HomeScreensNavKey
 import mega.privacy.android.app.appstate.content.model.AppContentState
 import mega.privacy.android.app.appstate.content.navigation.NavigationHandlerImpl
 import mega.privacy.android.app.appstate.content.navigation.view.HomeScreens
-import mega.privacy.android.app.appstate.content.navigation.view.HomeScreensNavKey
 import mega.privacy.android.app.appstate.content.navigation.view.PermissionScreensNavKey
 import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
 import mega.privacy.android.app.appstate.content.transfer.TransferHandlerImpl

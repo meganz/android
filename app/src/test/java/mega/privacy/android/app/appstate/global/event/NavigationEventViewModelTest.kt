@@ -35,7 +35,7 @@ class NavigationEventViewModelTest {
 
     @Test
     fun `test that triggered event is received when new event enters the queue`() = runTest {
-        navigationEventQueueImpl.emit(mock())
+        navigationEventQueueImpl.emit(listOf(mock()))
 
         underTest.navigationEvents.test {
             assertThat(awaitItem()).isInstanceOf(StateEventWithContentTriggered::class.java)
@@ -44,7 +44,7 @@ class NavigationEventViewModelTest {
 
     @Test
     fun `test that event is updated to consumed when dialogDisplayed is called`() = runTest {
-        navigationEventQueueImpl.emit(mock())
+        navigationEventQueueImpl.emit(listOf(mock()))
 
         underTest.navigationEvents.test {
             assertThat(awaitItem()).isInstanceOf(StateEventWithContentTriggered::class.java)
@@ -55,8 +55,8 @@ class NavigationEventViewModelTest {
 
     @Test
     fun `test that new event is not emitted if previous event is not yet handled`() = runTest {
-        navigationEventQueueImpl.emit(mock())
-        navigationEventQueueImpl.emit(mock())
+        navigationEventQueueImpl.emit(listOf(mock()))
+        navigationEventQueueImpl.emit(listOf(mock()))
 
         underTest.navigationEvents.test {
             assertThat(awaitItem()).isInstanceOf(StateEventWithContentTriggered::class.java)
@@ -72,9 +72,13 @@ class NavigationEventViewModelTest {
         navigationEventQueueImpl.emit(navKey2)
 
         underTest.navigationEvents.test {
-            assertThat((awaitItem() as StateEventWithContentTriggered).content).isEqualTo(navKey1)
+            assertThat((awaitItem() as StateEventWithContentTriggered).content).containsExactly(
+                navKey1
+            )
             underTest.eventHandled()
-            assertThat((awaitItem() as StateEventWithContentTriggered).content).isEqualTo(navKey2)
+            assertThat((awaitItem() as StateEventWithContentTriggered).content).containsExactly(
+                navKey2
+            )
         }
     }
 
