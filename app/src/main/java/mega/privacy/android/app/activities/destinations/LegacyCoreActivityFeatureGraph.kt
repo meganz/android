@@ -9,6 +9,7 @@ import mega.privacy.android.app.presentation.filelink.legacyFileLinkScreen
 import mega.privacy.android.app.presentation.folderlink.legacyFolderLinkScreen
 import mega.privacy.android.app.presentation.search.navigation.searchLegacyDestination
 import mega.privacy.android.app.presentation.settings.cookieSettingsNavigationDestination
+import mega.privacy.android.app.presentation.settings.exportrecoverykey.legacyExportRecoveryKeyScreen
 import mega.privacy.android.app.presentation.settings.settingsCameraUploadsNavigationDestination
 import mega.privacy.android.app.presentation.testpassword.navigation.testPasswordLegacyDestination
 import mega.privacy.android.navigation.contract.FeatureDestination
@@ -33,6 +34,7 @@ class LegacyCoreActivityFeatureGraph : FeatureDestination {
             syncNewFolderDestination(navigationHandler::back)
             syncSelectStopBackupDestinationDestination(navigationHandler::back)
             legacyFileLinkScreen(navigationHandler::back)
+            legacyExportRecoveryKeyScreen(navigationHandler::back)
             legacyFolderLinkScreen(navigationHandler::back)
             chatListLegacyDestination(navigationHandler::back)
         }

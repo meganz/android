@@ -121,6 +121,9 @@ data class LegacyFileLinkNavKey(
 ) : NoSessionNavKey.Optional
 
 @Serializable
+data object LegacyExportRecoveryKeyNavKey : NavKey
+
+@Serializable
 data class LegacyFolderLinkNavKey(
     val uriString: String?,
 ) : NoSessionNavKey.Optional

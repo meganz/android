@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.settings.exportrecoverykey
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -16,8 +17,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.view.ExportRecoveryKeyView
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util.showAlert
@@ -209,5 +210,7 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
          * in order to save the Recovery Key
          */
         const val WRITE_STORAGE_TO_SAVE_RK = 1
+
+        fun getIntent(context: Context) = Intent(context, ExportRecoveryKeyActivity::class.java)
     }
 }

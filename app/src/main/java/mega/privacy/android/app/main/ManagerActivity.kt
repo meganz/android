@@ -1503,7 +1503,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 if (intent.action != null) {
                     if (intent.action == Constants.ACTION_EXPORT_MASTER_KEY) {
                         Timber.d("Intent to export Master Key - im logged in!")
-                        startActivity(Intent(this, ExportRecoveryKeyActivity::class.java))
+                        startActivity(ExportRecoveryKeyActivity.getIntent(this))
                         return true
                     } else if (intent.action == Constants.ACTION_CANCEL_ACCOUNT) {
                         intent.data?.let {
