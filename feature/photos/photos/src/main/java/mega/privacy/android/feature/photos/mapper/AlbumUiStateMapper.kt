@@ -20,9 +20,9 @@ class AlbumUiStateMapper @Inject constructor(
      * purposes, even though they don't have a native Long ID like User albums.
      */
     operator fun invoke(album: MediaAlbum): AlbumUiState {
-        val (albumId, title) = when (album) {
-            is MediaAlbum.System -> album.id.albumName.hashCode().toLong() to album.id.albumName
-            is MediaAlbum.User -> album.id.id to album.title
+        val title = when (album) {
+            is MediaAlbum.System -> album.id.albumName
+            is MediaAlbum.User -> album.title
         }
 
         return AlbumUiState(

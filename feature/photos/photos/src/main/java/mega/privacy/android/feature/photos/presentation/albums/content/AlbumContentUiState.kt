@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.Sort
+import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 
 /**
@@ -51,7 +52,7 @@ data class AlbumContentUiState(
     val totalRemovedPhotos: Int = 0,
     val showRemoveLinkConfirmation: Boolean = false,
     val isLinkRemoved: Boolean = false,
-    val uiAlbum: UIAlbum? = null,
+    val uiAlbum: AlbumUiState? = null,
     val photos: ImmutableList<PhotoUiState> = persistentListOf(),
     val selectedPhotos: ImmutableSet<PhotoUiState> = persistentSetOf(),
     val currentSort: Sort = Sort.NEWEST,

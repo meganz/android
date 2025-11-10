@@ -1805,4 +1805,10 @@
     <string name="hidden_nodes_description_control_visibility_tag">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the [A]settings[/A].</string>
     <!-- Dialog confirmation text for removing photos in an album -->
     <string name="album_content_remove_photos_dialog_description">Remove from album?</string>
+    <!--Album content more options action description-->
+    <string name="album_content_selection_action_more_description">More</string>
+    <!--Album content select album cover action description-->
+    <string name="album_content_selection_action_select_album_cover_description">Select album cover</string>
+    <!--Album content delete action description-->
+    <string name="album_content_selection_action_delete_description">Delete</string>
 </resources>

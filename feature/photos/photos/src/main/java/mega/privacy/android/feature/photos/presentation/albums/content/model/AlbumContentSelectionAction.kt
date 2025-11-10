@@ -14,7 +14,8 @@ sealed interface AlbumContentSelectionAction {
         override val testTag: String = "album_content_selection_action:more"
 
         @Composable
-        override fun getDescription() = "More"
+        override fun getDescription() =
+            stringResource(sharedR.string.album_content_selection_action_more_description)
 
         @Composable
         override fun getIconPainter() =
@@ -47,7 +48,8 @@ sealed interface AlbumContentSelectionAction {
         override val testTag: String = "album_content_selection_action:select_album_cover"
 
         @Composable
-        override fun getDescription() = "Select album cover"
+        override fun getDescription() =
+            stringResource(sharedR.string.album_content_selection_action_select_album_cover_description)
 
         @Composable
         override fun getIconPainter() =
@@ -103,11 +105,13 @@ sealed interface AlbumContentSelectionAction {
 
         @Composable
         override fun getDescription() =
-            stringResource(sharedR.string.node_option_move_to_rubbish_bin)
+            stringResource(sharedR.string.album_content_selection_action_delete_description)
 
         @Composable
         override fun getIconPainter() =
             rememberVectorPainter(IconPack.Medium.Thin.Outline.Trash)
+
+        override val highlightIcon: Boolean = true
     }
 
     data object Download : MenuActionWithIcon {

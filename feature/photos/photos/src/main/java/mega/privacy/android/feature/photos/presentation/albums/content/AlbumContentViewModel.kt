@@ -25,13 +25,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Album.FavouriteAlbum
 import mega.privacy.android.domain.entity.photos.Album.GifAlbum
 import mega.privacy.android.domain.entity.photos.Album.RawAlbum
-import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.AlbumPhotosAddingProgress
@@ -42,7 +42,6 @@ import mega.privacy.android.domain.usecase.GetAlbumPhotosUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetNodeListByIdsUseCase
-import mega.privacy.android.domain.usecase.GetUserAlbum
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
@@ -52,14 +51,17 @@ import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.media.GetUserAlbumCoverPhotoUseCase
+import mega.privacy.android.domain.usecase.media.MonitorUserAlbumByIdUseCase
 import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumNameUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
+import mega.privacy.android.feature.photos.mapper.LegacyMediaSystemAlbumMapper
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
-import mega.privacy.android.feature.photos.mapper.UIAlbumMapper
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.Sort
@@ -75,9 +77,10 @@ class AlbumContentViewModel @AssistedInject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getDefaultAlbumPhotos: GetDefaultAlbumPhotos,
     private val getDefaultAlbumsMapUseCase: GetDefaultAlbumsMapUseCase,
-    private val getUserAlbum: GetUserAlbum,
+    private val getUserAlbum: MonitorUserAlbumByIdUseCase,
     private val getAlbumPhotosUseCase: GetAlbumPhotosUseCase,
-    private val uiAlbumMapper: UIAlbumMapper,
+    private val albumUiStateMapper: AlbumUiStateMapper,
+    private val legacyMediaSystemAlbumMapper: LegacyMediaSystemAlbumMapper,
     private val observeAlbumPhotosAddingProgress: ObserveAlbumPhotosAddingProgress,
     private val updateAlbumPhotosAddingProgressCompleted: UpdateAlbumPhotosAddingProgressCompleted,
     private val observeAlbumPhotosRemovingProgress: ObserveAlbumPhotosRemovingProgress,
@@ -95,6 +98,7 @@ class AlbumContentViewModel @AssistedInject constructor(
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val photoUiStateMapper: PhotoUiStateMapper,
+    private val getUserAlbumCoverPhotoUseCase: GetUserAlbumCoverPhotoUseCase,
     @Assisted private val navKey: AlbumContentNavKey?,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumContentUiState())
@@ -208,25 +212,25 @@ class AlbumContentViewModel @AssistedInject constructor(
             }.getOrDefault(false)
 
             runCatching {
+                // Will be refactored later in the next phase
+                val albumCover = albumId?.let { getUserAlbumCoverPhotoUseCase(it) }
+
                 getDefaultAlbumPhotos(isPaginationEnabled, listOf(filter))
                     .onEach { sourcePhotos = it }
                     .map(::filterNonSensitivePhotos)
                     .onEach(::updateSelection)
                     .collectLatest { photos ->
-                        val uiAlbum = uiAlbumMapper(
-                            count = 0,
-                            imageCount = 0,
-                            videoCount = 0,
-                            cover = null,
-                            defaultCover = null,
+                        val mediaSystemAlbum = legacyMediaSystemAlbumMapper(
                             album = systemAlbum,
+                            cover = albumCover
                         )
-
                         _state.update {
                             it.copy(
                                 isLoading = false,
-                                uiAlbum = uiAlbum,
                                 photos = photos,
+                                uiAlbum = mediaSystemAlbum?.let { album ->
+                                    albumUiStateMapper(album)
+                                }
                             )
                         }
                     }
@@ -250,16 +254,7 @@ class AlbumContentViewModel @AssistedInject constructor(
             runCatching {
                 getUserAlbum(albumId)
                     .collectLatest { album ->
-                        val uiAlbum = album?.let {
-                            uiAlbumMapper(
-                                count = 0,
-                                imageCount = 0,
-                                videoCount = 0,
-                                cover = null,
-                                defaultCover = null,
-                                album = it,
-                            )
-                        }
+                        val uiAlbum = album?.let(albumUiStateMapper::invoke)
 
                         _state.update {
                             it.copy(uiAlbum = uiAlbum)
@@ -448,7 +443,7 @@ class AlbumContentViewModel @AssistedInject constructor(
     }
 
     fun removePhotosFromAlbum() = viewModelScope.launch {
-        val album = _state.value.uiAlbum?.id as? UserAlbum ?: return@launch
+        val album = _state.value.uiAlbum?.mediaAlbum as? MediaAlbum.User ?: return@launch
         _state.value.selectedPhotos.mapNotNull { photo ->
             photo.albumPhotoId?.let {
                 AlbumPhotoId(
@@ -566,7 +561,7 @@ class AlbumContentViewModel @AssistedInject constructor(
             val proscribedAlbumNames = getProscribedAlbumNamesUseCase()
 
             if (checkTitleValidity(finalTitle, proscribedAlbumNames, albumNames)) {
-                val albumId = (_state.value.uiAlbum?.id as? UserAlbum)?.id
+                val albumId = (_state.value.uiAlbum?.mediaAlbum as? MediaAlbum.User)?.id
                 albumId?.let { updateAlbumNameUseCase(it, finalTitle) }
 
                 _state.update {

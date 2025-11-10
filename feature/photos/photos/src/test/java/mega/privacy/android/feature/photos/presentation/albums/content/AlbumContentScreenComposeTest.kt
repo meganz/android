@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentSetOf
@@ -22,7 +23,9 @@ import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.photos.extensions.LocalDownloadPhotoResultMock
 import mega.privacy.android.feature.photos.model.PhotoUiState
+import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumTitle
+import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import org.junit.Rule
 import org.junit.Test
@@ -89,9 +92,9 @@ class AlbumContentScreenComposeTest {
     @Test
     fun `test that default toolbar is displayed when no photos are selected`() {
         val albumTitle = "My Album"
-        val uiAlbum = createMockUIAlbum(title = albumTitle)
+        val albumUiState = createMockAlbumUiState(title = albumTitle)
         val uiState = AlbumContentUiState(
-            uiAlbum = uiAlbum,
+            uiAlbum = albumUiState,
             selectedPhotos = persistentSetOf()
         )
 
@@ -134,7 +137,7 @@ class AlbumContentScreenComposeTest {
     fun `test that default toolbar is hidden when photos are selected`() {
         val photos = listOf(createMockPhoto(id = 1L))
         val uiState = AlbumContentUiState(
-            uiAlbum = createMockUIAlbum(),
+            uiAlbum = createMockAlbumUiState(),
             photos = photos.toImmutableList(),
             selectedPhotos = setOf(photos[0]).toImmutableSet()
         )
@@ -212,9 +215,9 @@ class AlbumContentScreenComposeTest {
     @Test
     fun `test that album title is displayed correctly in default toolbar`() {
         val albumTitle = "Vacation 2024"
-        val uiAlbum = createMockUIAlbum(title = albumTitle)
+        val albumUiState = createMockAlbumUiState(title = albumTitle)
         val uiState = AlbumContentUiState(
-            uiAlbum = uiAlbum,
+            uiAlbum = albumUiState,
             selectedPhotos = persistentSetOf()
         )
 
@@ -252,7 +255,7 @@ class AlbumContentScreenComposeTest {
     @Test
     fun `test that only default toolbar is shown when no photos are selected`() {
         val uiState = AlbumContentUiState(
-            uiAlbum = createMockUIAlbum(),
+            uiAlbum = createMockAlbumUiState(),
             photos = persistentListOf(),
             selectedPhotos = persistentSetOf()
         )
@@ -303,6 +306,66 @@ class AlbumContentScreenComposeTest {
         composeTestRule
             .onNodeWithTag(ALBUM_CONTENT_SCREEN_DELETE_PHOTOS_DIALOG)
             .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that on more options clicked triggers bottom sheet`() {
+        val uiState = AlbumContentUiState(
+            uiAlbum = createMockAlbumUiState(),
+            photos = persistentListOf(),
+            selectedPhotos = persistentSetOf()
+        )
+
+        setComposeContent(uiState)
+
+        composeTestRule
+            .onNodeWithTag(AlbumContentSelectionAction.More.testTag)
+            .performClick()
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule
+            .onNodeWithTag(ALBUM_CONTENT_SCREEN_MORE_OPTIONS_BOTTOM_SHEET)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that album options bottom sheet is not displayed when not visible`() {
+        val albumUiState = createMockAlbumUiState()
+
+        composeTestRule.setContent {
+            CompositionLocalProvider(LocalDownloadPhotoResultMock provides DownloadPhotoResult.Idle) {
+                AlbumOptionsBottomSheet(
+                    isVisible = false,
+                    onDismiss = {},
+                    albumUiState = albumUiState
+                )
+            }
+        }
+
+        composeTestRule
+            .onNodeWithTag(ALBUM_CONTENT_SCREEN_MORE_OPTIONS_BOTTOM_SHEET)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that album options bottom sheet displays album title`() {
+        val albumTitle = "My Vacation Album"
+        val albumUiState = createMockAlbumUiState(title = albumTitle)
+
+        composeTestRule.setContent {
+            CompositionLocalProvider(LocalDownloadPhotoResultMock provides DownloadPhotoResult.Idle) {
+                AlbumOptionsBottomSheet(
+                    isVisible = true,
+                    onDismiss = {},
+                    albumUiState = albumUiState
+                )
+            }
+        }
+
+        composeTestRule
+            .onNodeWithText(albumTitle)
+            .assertIsDisplayed()
     }
 
     private fun createMockPhoto(id: Long): PhotoUiState.Image {
@@ -361,6 +424,25 @@ class AlbumContentScreenComposeTest {
             creationTime = 0L,
             modificationTime = 0L,
             isExported = false,
+            cover = null
+        )
+    }
+
+    private fun createMockAlbumUiState(
+        title: String = "Test Album",
+        albumId: Long = 1L,
+    ): AlbumUiState {
+        val mediaAlbum = MediaAlbum.User(
+            id = AlbumId(albumId),
+            title = title,
+            creationTime = 0L,
+            modificationTime = 0L,
+            isExported = false,
+            cover = null
+        )
+        return AlbumUiState(
+            mediaAlbum = mediaAlbum,
+            title = title,
             cover = null
         )
     }

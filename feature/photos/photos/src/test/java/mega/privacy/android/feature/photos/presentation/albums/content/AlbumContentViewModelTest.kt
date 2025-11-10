@@ -20,7 +20,6 @@ import mega.privacy.android.domain.usecase.GetAlbumPhotosUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetNodeListByIdsUseCase
-import mega.privacy.android.domain.usecase.GetUserAlbum
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
@@ -30,14 +29,17 @@ import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.media.GetUserAlbumCoverPhotoUseCase
+import mega.privacy.android.domain.usecase.media.MonitorUserAlbumByIdUseCase
 import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumNameUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
+import mega.privacy.android.feature.photos.mapper.LegacyMediaSystemAlbumMapper
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
-import mega.privacy.android.feature.photos.mapper.UIAlbumMapper
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.Sort
@@ -62,9 +64,10 @@ class AlbumContentViewModelTest {
     private val savedStateHandle = mock<androidx.lifecycle.SavedStateHandle>()
     private val getDefaultAlbumPhotos = mock<GetDefaultAlbumPhotos>()
     private val getDefaultAlbumsMapUseCase = mock<GetDefaultAlbumsMapUseCase>()
-    private val getUserAlbum = mock<GetUserAlbum>()
+    private val getUserAlbum = mock<MonitorUserAlbumByIdUseCase>()
     private val getAlbumPhotosUseCase = mock<GetAlbumPhotosUseCase>()
-    private val uiAlbumMapper = mock<UIAlbumMapper>()
+    private val albumUiStateMapper = mock<AlbumUiStateMapper>()
+    private val legacyMediaSystemAlbumMapper = mock<LegacyMediaSystemAlbumMapper>()
     private val observeAlbumPhotosAddingProgress = mock<ObserveAlbumPhotosAddingProgress>()
     private val updateAlbumPhotosAddingProgressCompleted =
         mock<UpdateAlbumPhotosAddingProgressCompleted>()
@@ -84,6 +87,7 @@ class AlbumContentViewModelTest {
     private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
     private val photoUiStateMapper = mock<PhotoUiStateMapper>()
+    private val getUserAlbumCoverPhotoUseCase = mock<GetUserAlbumCoverPhotoUseCase>()
     private val analyticsTracker: AnalyticsTracker = mock()
 
     @BeforeAll
@@ -104,7 +108,8 @@ class AlbumContentViewModelTest {
             getDefaultAlbumsMapUseCase,
             getUserAlbum,
             getAlbumPhotosUseCase,
-            uiAlbumMapper,
+            albumUiStateMapper,
+            legacyMediaSystemAlbumMapper,
             observeAlbumPhotosAddingProgress,
             updateAlbumPhotosAddingProgressCompleted,
             observeAlbumPhotosRemovingProgress,
@@ -122,7 +127,8 @@ class AlbumContentViewModelTest {
             isHiddenNodesOnboardedUseCase,
             getBusinessStatusUseCase,
             analyticsTracker,
-            photoUiStateMapper
+            photoUiStateMapper,
+            getUserAlbumCoverPhotoUseCase
         )
         stubCommon()
         Analytics.initialise(analyticsTracker)
@@ -150,7 +156,8 @@ class AlbumContentViewModelTest {
             getDefaultAlbumsMapUseCase = getDefaultAlbumsMapUseCase,
             getUserAlbum = getUserAlbum,
             getAlbumPhotosUseCase = getAlbumPhotosUseCase,
-            uiAlbumMapper = uiAlbumMapper,
+            albumUiStateMapper = albumUiStateMapper,
+            legacyMediaSystemAlbumMapper = legacyMediaSystemAlbumMapper,
             observeAlbumPhotosAddingProgress = observeAlbumPhotosAddingProgress,
             updateAlbumPhotosAddingProgressCompleted = updateAlbumPhotosAddingProgressCompleted,
             observeAlbumPhotosRemovingProgress = observeAlbumPhotosRemovingProgress,
@@ -168,6 +175,7 @@ class AlbumContentViewModelTest {
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             photoUiStateMapper = photoUiStateMapper,
+            getUserAlbumCoverPhotoUseCase = getUserAlbumCoverPhotoUseCase,
             navKey = navKey,
         )
     }
