@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.photos.model
 
 import mega.privacy.android.domain.entity.photos.Photo
 
+@Deprecated("Please use PhotosNodeListCard")
 sealed class DateCard(
     open val date: String,
     open val photo: Photo,
