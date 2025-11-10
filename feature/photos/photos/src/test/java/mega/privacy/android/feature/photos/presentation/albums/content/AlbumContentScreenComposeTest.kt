@@ -54,6 +54,7 @@ class AlbumContentScreenComposeTest {
         resetSendPhotosToChatEvent: () -> Unit = {},
         hidePhotosEvent: () -> Unit = {},
         resetHidePhotosEvent: () -> Unit = {},
+        removePhotos: () -> Unit = {},
         onTransfer: (TransferTriggerEvent) -> Unit = {},
         consumeDownloadEvent: () -> Unit = {},
         consumeInfoToShowEvent: () -> Unit = {},
@@ -76,6 +77,7 @@ class AlbumContentScreenComposeTest {
                     resetSendPhotosToChatEvent = resetSendPhotosToChatEvent,
                     hidePhotosEvent = hidePhotosEvent,
                     resetHidePhotosEvent = resetHidePhotosEvent,
+                    removePhotos = removePhotos,
                     onTransfer = onTransfer,
                     consumeDownloadEvent = consumeDownloadEvent,
                     consumeInfoToShowEvent = consumeInfoToShowEvent
@@ -271,6 +273,36 @@ class AlbumContentScreenComposeTest {
         composeTestRule
             .onNodeWithTag(ALBUM_CONTENT_SCREEN_SELECTION_BOTTOM_BAR)
             .assertIsNotDisplayed()
+    }
+
+    @Test
+    fun `test that delete photos dialog is displayed when triggered`() {
+        composeTestRule.setContent {
+            RemovePhotosConfirmationDialog(
+                isVisible = true,
+                onConfirm = {},
+                onDismiss = {}
+            )
+        }
+
+        composeTestRule
+            .onNodeWithTag(ALBUM_CONTENT_SCREEN_DELETE_PHOTOS_DIALOG)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that delete photos dialog is not displayed when not visible`() {
+        composeTestRule.setContent {
+            RemovePhotosConfirmationDialog(
+                isVisible = false,
+                onConfirm = {},
+                onDismiss = {}
+            )
+        }
+
+        composeTestRule
+            .onNodeWithTag(ALBUM_CONTENT_SCREEN_DELETE_PHOTOS_DIALOG)
+            .assertDoesNotExist()
     }
 
     private fun createMockPhoto(id: Long): PhotoUiState.Image {

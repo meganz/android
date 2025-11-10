@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.photos.presentation.albums.content
 
+import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -14,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
@@ -22,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
+import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
@@ -44,6 +47,7 @@ import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
 import mega.privacy.android.feature.photos.presentation.albums.view.AlbumDynamicContentGrid
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AlbumContentDeleteAlbumEvent
 
 @Composable
@@ -76,6 +80,7 @@ fun AlbumContentScreen(
         resetSendPhotosToChatEvent = viewModel::resetSendPhotosToChat,
         hidePhotosEvent = viewModel::hidePhotos,
         resetHidePhotosEvent = viewModel::resetHidePhotos,
+        removePhotos = viewModel::removePhotosFromAlbum,
         onTransfer = onTransfer,
         consumeDownloadEvent = actionViewModel::markDownloadEventConsumed,
         consumeInfoToShowEvent = actionViewModel::onInfoToShowEventConsumed
@@ -100,6 +105,7 @@ internal fun AlbumContentScreen(
     resetSendPhotosToChatEvent: () -> Unit,
     hidePhotosEvent: () -> Unit,
     resetHidePhotosEvent: () -> Unit,
+    removePhotos: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     consumeDownloadEvent: () -> Unit,
     consumeInfoToShowEvent: () -> Unit,
@@ -253,7 +259,40 @@ internal fun AlbumContentScreen(
                     && !uiState.isBusinessAccountExpired,
             contentPadding = PaddingValues(bottom = innerPadding.calculateBottomPadding())
         )
+
+        RemovePhotosConfirmationDialog(
+            isVisible = showDeletePhotosConfirmation,
+            onConfirm = {
+                Analytics.tracker.trackEvent(AlbumContentDeleteAlbumEvent)
+                removePhotos()
+                deselectAll()
+                showDeletePhotosConfirmation = false
+            },
+            onDismiss = {
+                deselectAll()
+                showDeletePhotosConfirmation = false
+            }
+        )
     }
+}
+
+@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+@Composable
+internal fun RemovePhotosConfirmationDialog(
+    isVisible: Boolean,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    BasicDialog(
+        modifier = Modifier.testTag(ALBUM_CONTENT_SCREEN_DELETE_PHOTOS_DIALOG),
+        description = stringResource(sharedR.string.album_content_remove_photos_dialog_description),
+        positiveButtonText = stringResource(sharedR.string.general_remove),
+        onPositiveButtonClicked = onConfirm,
+        negativeButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
+        onNegativeButtonClicked = onDismiss,
+        onDismiss = onDismiss,
+        isVisible = isVisible
+    )
 }
 
 @CombinedThemePreviews
@@ -276,6 +315,7 @@ private fun AlbumContentScreenPreview() {
             resetSendPhotosToChatEvent = {},
             hidePhotosEvent = {},
             resetHidePhotosEvent = {},
+            removePhotos = {},
             onTransfer = {},
             consumeDownloadEvent = {},
             consumeInfoToShowEvent = {}
@@ -287,3 +327,5 @@ internal const val ALBUM_CONTENT_SCREEN_DEFAULT_TOOLBAR = "album_content_screen:
 internal const val ALBUM_CONTENT_SCREEN_SELECTION_TOOLBAR = "album_content_screen:selection_toolbar"
 internal const val ALBUM_CONTENT_SCREEN_SELECTION_BOTTOM_BAR =
     "album_content_screen:selection_bottom_bar"
+internal const val ALBUM_CONTENT_SCREEN_DELETE_PHOTOS_DIALOG =
+    "album_content_screen:delete_photos_dialog"
