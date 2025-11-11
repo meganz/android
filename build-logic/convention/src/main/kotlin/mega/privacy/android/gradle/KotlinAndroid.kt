@@ -55,9 +55,7 @@ fun Project.configureKotlin() {
             suppressWarnings = shouldSuppressWarnings
             freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
             freeCompilerArgs.add("-XXLanguage:+ExplicitBackingFields")
+            freeCompilerArgs.add("-Xannotation-default-target=param-property")
         }
     }
 }
-
-
-
