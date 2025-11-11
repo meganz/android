@@ -347,6 +347,10 @@ class FolderLinkComposeActivity : PasscodeActivity(),
             viewModel.openFolder(nodeUIItem)
         } else if (nodeUIItem.node is FileNode) {
             val fileNode = nodeUIItem.node
+            if (fileNode.isNodeKeyDecrypted.not()) {
+                viewModel.showSnackbar(sharedR.string.preview_not_available_undecrypted_files)
+                return
+            }
             val nameType = MimeTypeList.typeForName(fileNode.name)
             when {
                 nameType.isImage -> {
@@ -436,6 +440,9 @@ class FolderLinkComposeActivity : PasscodeActivity(),
     }
 
     private fun onShareClicked() {
+        if (viewModel.state.value.parentNode?.isNodeKeyDecrypted == false) {
+            return
+        }
         MegaNodeUtil.shareLink(this, viewModel.state.value.url, viewModel.state.value.title)
     }
 

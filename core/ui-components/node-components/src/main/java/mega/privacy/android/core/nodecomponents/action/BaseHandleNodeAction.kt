@@ -49,6 +49,12 @@ fun BaseHandleNodeAction(
     val context = LocalContext.current
     val megaNavigator = remember { context.megaNavigator }
 
+    if (!typedFileNode.isNodeKeyDecrypted) {
+        showSnackbar(context.getString(sharedR.string.preview_not_available_undecrypted_files))
+        onActionHandled()
+        return
+    }
+
     LaunchedEffect(key1 = typedFileNode) {
         runCatching {
             nodeActionsViewModel.handleFileNodeClicked(typedFileNode)

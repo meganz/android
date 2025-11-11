@@ -211,7 +211,7 @@ internal fun FolderLinkView(
             },
             bottomBar = {
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    if (state.showContentActions) {
+                    if (state.showContentActions && state.parentNode?.isNodeKeyDecrypted == true) {
                         ImportDownloadView(
                             Modifier
                                 .fillMaxWidth()

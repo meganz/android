@@ -970,6 +970,8 @@
     <string name="transfers_fake_preview_screen_general_error">Preview failed to load, try again</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
     <string name="transfers_error_cancelling_preview_download">Something went wrong. Preview was not cancelled. See notification for details.</string>
+    <!-- Message shown when user tries to preview an undecrypted file -->
+    <string name="preview_not_available_undecrypted_files">Preview not available for undecrypted files</string>
     <!-- Title of the Rename and Create Backup Dialog -->
     <string name="sync_rename_and_create_backup_dialog_title">Backup name already exists</string>
     <!-- Text of the Rename and Create Backup Dialog -->

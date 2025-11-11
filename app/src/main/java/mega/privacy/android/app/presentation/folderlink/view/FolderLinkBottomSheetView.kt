@@ -137,27 +137,28 @@ private fun BottomSheetContent(
             dividerType = DividerType.SmallStartPadding,
             strong = true,
         )
-
-        MenuActionListTile(
-            modifier = Modifier.testTag(Constants.BOTTOM_SHEET_SAVE),
-            icon = rememberVectorPainter(
-                IconPack.Medium.Thin.Outline.Download),
-            text = stringResource(R.string.general_save_to_device),
-            onActionClicked = {
-                coroutineScope.launch { modalSheetState.hide() }
-                onSaveToDeviceClicked(nodeUIItem)
-            }
-        )
-        if (showImport) {
+        if (nodeUIItem?.node?.isNodeKeyDecrypted == true) {
             MenuActionListTile(
-                modifier = Modifier.testTag(Constants.BOTTOM_SHEET_IMPORT),
-                icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.CloudUpload),
-                text = stringResource(R.string.add_to_cloud),
+                modifier = Modifier.testTag(Constants.BOTTOM_SHEET_SAVE),
+                icon = rememberVectorPainter(
+                    IconPack.Medium.Thin.Outline.Download),
+                text = stringResource(R.string.general_save_to_device),
                 onActionClicked = {
                     coroutineScope.launch { modalSheetState.hide() }
-                    onImportClicked(nodeUIItem)
+                    onSaveToDeviceClicked(nodeUIItem)
                 }
             )
+            if (showImport) {
+                MenuActionListTile(
+                    modifier = Modifier.testTag(Constants.BOTTOM_SHEET_IMPORT),
+                    icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.CloudUpload),
+                    text = stringResource(R.string.add_to_cloud),
+                    onActionClicked = {
+                        coroutineScope.launch { modalSheetState.hide() }
+                        onImportClicked(nodeUIItem)
+                    }
+                )
+            }
         }
     }
 }
