@@ -208,7 +208,7 @@ fun NodeGridViewItem(
                 if (showFavourite) {
                     MegaIcon(
                         imageVector = IconPack.Small.Thin.Solid.Heart,
-                        tint = IconColor.Secondary,
+                        tint = IconColor.OnColor,
                         contentDescription = "Favourite",
                         modifier = Modifier
                             .testTag(GRID_VIEW_FAVOURITE_ICON_TEST_TAG)
@@ -218,7 +218,7 @@ fun NodeGridViewItem(
                 if (showLink) {
                     MegaIcon(
                         imageVector = IconPack.Medium.Thin.Outline.Link01,
-                        tint = IconColor.Secondary,
+                        tint = IconColor.OnColor,
                         contentDescription = "Link",
                         modifier = Modifier
                             .testTag(GRID_VIEW_LINK_ICON_TEST_TAG)
@@ -333,7 +333,7 @@ private val folderMinHeight = 44.dp
 private fun Modifier.badgeStyle(): Modifier = this
     .size(24.dp)
     .background(
-        color = DSTokens.colors.background.surface1,
+        color = DSTokens.colors.background.surfaceTransparent,
         shape = DSTokens.shapes.extraSmall
     )
     .padding(4.dp)
