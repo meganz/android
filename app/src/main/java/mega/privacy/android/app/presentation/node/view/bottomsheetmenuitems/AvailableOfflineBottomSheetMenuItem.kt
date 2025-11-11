@@ -63,7 +63,7 @@ class AvailableOfflineBottomSheetMenuItem @Inject constructor(
     ) = isNodeInRubbish.not()
             && node.isTakenDown.not()
             && isFolderEmptyUseCase(node).not()
-            && node.isNotS4Container()
+            && node.isNotS4Container() && node.isNodeKeyDecrypted
 
     override fun getOnClickFunction(
         node: TypedNode,

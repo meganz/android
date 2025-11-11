@@ -2,10 +2,10 @@ package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
-import mega.privacy.android.app.presentation.node.model.menuaction.RemoveLinkMenuAction
-import mega.privacy.android.app.presentation.search.model.navigation.removeNodeLinkRoute
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.app.presentation.node.model.menuaction.RemoveLinkMenuAction
+import mega.privacy.android.app.presentation.search.model.navigation.removeNodeLinkRoute
 import mega.privacy.android.app.presentation.view.extension.isNotS4Container
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -30,7 +30,7 @@ class RemoveLinkBottomSheetMenuItem @Inject constructor(
             && node.exportedData?.publicLink != null
             && isNodeInRubbish.not()
             && accessPermission == AccessPermission.OWNER
-            && node.isNotS4Container()
+            && node.isNotS4Container() && node.isNodeKeyDecrypted
 
     override fun getOnClickFunction(
         node: TypedNode,

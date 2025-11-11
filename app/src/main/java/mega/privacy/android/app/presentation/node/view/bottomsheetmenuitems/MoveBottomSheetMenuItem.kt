@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
-import mega.privacy.android.app.presentation.node.model.menuaction.MoveMenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.app.presentation.node.model.menuaction.MoveMenuAction
 import mega.privacy.android.app.presentation.view.extension.isNotS4Container
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -27,7 +27,7 @@ class MoveBottomSheetMenuItem @Inject constructor(
             && accessPermission in listOf(
         AccessPermission.OWNER,
         AccessPermission.FULL,
-    ) && node.isNotS4Container()
+    ) && node.isNotS4Container() && node.isNodeKeyDecrypted
 
     override val groupId: Int
         get() = 8

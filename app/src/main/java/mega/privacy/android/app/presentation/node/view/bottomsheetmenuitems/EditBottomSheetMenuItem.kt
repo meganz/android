@@ -39,7 +39,7 @@ class EditBottomSheetMenuItem @Inject constructor(
             && node.isTakenDown.not()
             && node is FileNode
             && MimeTypeList.typeForName(node.name).isOpenableTextFile(node.size)
-            && accessPermission in listOf(OWNER, READWRITE, FULL)
+            && accessPermission in listOf(OWNER, READWRITE, FULL) && node.isNodeKeyDecrypted
 
     override val groupId = 1
 

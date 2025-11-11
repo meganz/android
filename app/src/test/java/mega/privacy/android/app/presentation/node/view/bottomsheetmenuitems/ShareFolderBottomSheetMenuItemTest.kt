@@ -56,7 +56,10 @@ class ShareFolderBottomSheetMenuItemTest {
             true,
             AccessPermission.OWNER,
             false,
-            mock<TypedFolderNode> { on { isTakenDown } doReturn true },
+            mock<TypedFolderNode> {
+                on { isTakenDown } doReturn true
+                on { isNodeKeyDecrypted } doReturn true
+            },
             false,
             false,
         ),
@@ -64,7 +67,10 @@ class ShareFolderBottomSheetMenuItemTest {
             true,
             AccessPermission.OWNER,
             false,
-            mock<TypedFolderNode> { on { isTakenDown } doReturn false },
+            mock<TypedFolderNode> {
+                on { isTakenDown } doReturn false
+                on { isNodeKeyDecrypted } doReturn true
+            },
             false,
             false,
         ),
@@ -75,6 +81,7 @@ class ShareFolderBottomSheetMenuItemTest {
             mock<TypedFolderNode> {
                 on { isTakenDown } doReturn false
                 on { isPendingShare } doReturn true
+                on { isNodeKeyDecrypted } doReturn true
             },
             false,
             false,
@@ -86,6 +93,7 @@ class ShareFolderBottomSheetMenuItemTest {
             mock<TypedFolderNode> {
                 on { isTakenDown } doReturn false
                 on { isPendingShare } doReturn true
+                on { isNodeKeyDecrypted } doReturn true
             },
             false,
             false,
@@ -97,6 +105,7 @@ class ShareFolderBottomSheetMenuItemTest {
             mock<TypedFolderNode> {
                 on { isTakenDown } doReturn false
                 on { isPendingShare } doReturn false
+                on { isNodeKeyDecrypted } doReturn true
             },
             false,
             true,
@@ -108,6 +117,7 @@ class ShareFolderBottomSheetMenuItemTest {
             mock<TypedFolderNode> {
                 on { isTakenDown } doReturn false
                 on { isPendingShare } doReturn false
+                on { isNodeKeyDecrypted } doReturn true
             },
             false,
             false,
@@ -120,6 +130,19 @@ class ShareFolderBottomSheetMenuItemTest {
                 on { isTakenDown } doReturn false
                 on { isPendingShare } doReturn false
                 on { isS4Container } doReturn true
+                on { isNodeKeyDecrypted } doReturn true
+            },
+            false,
+            false,
+        ),
+        Arguments.of(
+            false,
+            AccessPermission.OWNER,
+            false,
+            mock<TypedFolderNode> {
+                on { isTakenDown } doReturn false
+                on { isPendingShare } doReturn false
+                on { isNodeKeyDecrypted } doReturn false
             },
             false,
             false,

@@ -849,12 +849,13 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     decrementOpen = { counterOpen-- },
                     decrementModify = { counterModify-- },
                 )
-                // Check if S4 container actions should be hidden
-                checkIfShouldHideS4ContainerActions(
+                // Check if actions should be hidden
+                checkIfShouldHideActions(
                     typedNode = nodeInfo.typedNode,
                     decrementShares = { counterShares-- },
                     decrementModify = { counterModify-- },
                     decrementSave = { counterSave-- },
+                    decrementOpen = { counterOpen-- },
                 )
                 separatorOpen.visibility = if (counterOpen <= 0) View.GONE else View.VISIBLE
                 separatorDownload.visibility = if (counterSave <= 0) View.GONE else View.VISIBLE
@@ -916,7 +917,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     }
                 }
                 // Recalculate bottom sheet peek height after visibility of views are updated
-                if (nodeInfo.typedNode.isNotS4Container()) {
+                if (nodeInfo.typedNode.isNotS4Container() || nodeInfo.typedNode.isNodeKeyDecrypted) {
                     calculatePeekHeight()
                 }
             }
@@ -1324,24 +1325,27 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     /**
-     * Checks if the node is an S4 container and hides the appropriate actions:
-     * Delete (move to rubbish bin), Move, Rename, Share link (get link), Manage link, Remove link, Share folder,
+     * Checks if the node is an S4 container or node is undecrypted and hides the appropriate actions:
+     * S4 container: Delete (move to rubbish bin), Move, Rename, Share link (get link), Manage link, Remove link, Share folder,
      * Copy, Save to device (Download), Available offline, Sync, Info
-     *
+     * Node undecrypted: Delete (move to rubbish bin), Move, Rename, Share link (get link), Manage link, Remove link, Share folder,
+     * Copy, Save to device (Download), Available offline, Sync, Edit, Versions, Open With, Send to chat
      * @param typedNode The typed node to check
      * @param decrementShares Callback to decrement the shares counter
      * @param decrementModify Callback to decrement the modify counter
      * @param decrementSave Callback to decrement the save counter
      */
-    private fun checkIfShouldHideS4ContainerActions(
+    private fun checkIfShouldHideActions(
         typedNode: TypedNode,
         decrementShares: () -> Unit,
         decrementModify: () -> Unit,
         decrementSave: () -> Unit,
+        decrementOpen: () -> Unit,
     ) {
         val isS4Container = (typedNode as? TypedFolderNode)?.isS4Container == true
+        val isNodeUndecrypted = !typedNode.isNodeKeyDecrypted
 
-        if (isS4Container) {
+        if (isS4Container || isNodeUndecrypted) {
             val optionRename = contentView.findViewById<TextView>(R.id.rename_option)
             val optionMove = contentView.findViewById<TextView>(R.id.move_option)
             val optionRubbishBin = contentView.findViewById<TextView>(R.id.rubbish_bin_option)
@@ -1354,6 +1358,12 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             val optionOffline = contentView.findViewById<LinearLayout>(R.id.option_offline_layout)
             val optionSync = contentView.findViewById<LinearLayout>(R.id.option_sync_layout)
             val optionInfo = contentView.findViewById<TextView>(R.id.properties_option)
+            val optionEdit = contentView.findViewById<LinearLayout>(R.id.edit_file_option)
+            val optionVersionsLayout =
+                contentView.findViewById<LinearLayout>(R.id.option_versions_layout)
+            val optionOpenWith = contentView.findViewById<TextView>(R.id.open_with_option)
+            val optionSendChat = contentView.findViewById<TextView>(R.id.send_chat_option)
+
             val separatorInfo = contentView.findViewById<View>(R.id.separator_info_option)
             val separatorSync = contentView.findViewById<View>(R.id.separator_sync)
             val separatorLabel = contentView.findViewById<View>(R.id.label_separator)
@@ -1398,9 +1408,27 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionOffline.visibility = View.GONE
                 decrementSave()
             }
-            if (optionInfo.isVisible) {
+            if (isS4Container && optionInfo.isVisible) {
                 optionInfo.visibility = View.GONE
                 separatorInfo.visibility = View.GONE
+            }
+
+            if (isNodeUndecrypted) {
+                if (optionEdit.isVisible) {
+                    optionEdit.visibility = View.GONE
+                    decrementModify()
+                }
+                if (optionVersionsLayout.isVisible) {
+                    optionVersionsLayout.visibility = View.GONE
+                }
+                if (optionOpenWith.isVisible) {
+                    optionOpenWith.visibility = View.GONE
+                    decrementOpen()
+                }
+                if (optionSendChat.isVisible) {
+                    optionSendChat.visibility = View.GONE
+                    decrementShares()
+                }
             }
             optionSync.visibility = View.GONE
             separatorSync.visibility = View.GONE

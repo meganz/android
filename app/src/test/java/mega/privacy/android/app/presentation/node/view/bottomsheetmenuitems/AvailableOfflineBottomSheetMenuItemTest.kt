@@ -6,9 +6,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.AvailableOfflineMenuAction
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -16,7 +16,8 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.foldernode.IsFolderEmptyUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
@@ -91,7 +92,10 @@ class AvailableOfflineBottomSheetMenuItemTest {
             false,
             AccessPermission.OWNER,
             false,
-            mock<TypedFileNode> { on { isTakenDown } doReturn true },
+            mock<TypedFileNode> {
+                on { isTakenDown } doReturn true
+                on { isNodeKeyDecrypted } doReturn true
+            },
             false,
             false,
         ),
@@ -99,7 +103,10 @@ class AvailableOfflineBottomSheetMenuItemTest {
             false,
             AccessPermission.OWNER,
             false,
-            mock<TypedFileNode> { on { isTakenDown } doReturn false },
+            mock<TypedFileNode> {
+                on { isTakenDown } doReturn false
+                on { isNodeKeyDecrypted } doReturn true
+            },
             false,
             true,
         ),
@@ -110,7 +117,10 @@ class AvailableOfflineBottomSheetMenuItemTest {
             false,
             AccessPermission.OWNER,
             false,
-            mock<TypedFileNode> { on { isTakenDown } doReturn true },
+            mock<TypedFileNode> {
+                on { isTakenDown } doReturn true
+                on { isNodeKeyDecrypted } doReturn true
+            },
             false,
             false,
         ),
@@ -118,7 +128,10 @@ class AvailableOfflineBottomSheetMenuItemTest {
             false,
             AccessPermission.OWNER,
             false,
-            mock<TypedFileNode> { on { isTakenDown } doReturn false },
+            mock<TypedFileNode> {
+                on { isTakenDown } doReturn false
+                on { isNodeKeyDecrypted } doReturn true
+            },
             false,
             false,
         ),
@@ -178,6 +191,23 @@ class AvailableOfflineBottomSheetMenuItemTest {
             accessPermission = null,
             isInBackups = false,
             node = folderNode,
+            isConnected = true
+        )
+        assertFalse(result)
+    }
+
+    @Test
+    fun `test that shouldDisplay returns false when node key is not decrypted`() = runTest {
+        val node = mock<TypedFileNode> {
+            on { isTakenDown } doReturn false
+            on { isNodeKeyDecrypted } doReturn false
+        }
+        whenever(isFolderEmptyUseCase(node)).thenReturn(false)
+        val result = underTest.shouldDisplay(
+            isNodeInRubbish = false,
+            accessPermission = null,
+            isInBackups = false,
+            node = node,
             isConnected = true
         )
         assertFalse(result)

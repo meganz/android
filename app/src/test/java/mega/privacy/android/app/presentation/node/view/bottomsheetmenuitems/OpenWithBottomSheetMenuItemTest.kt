@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
+import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.OpenWithMenuAction
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
-import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -16,7 +16,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunnin
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -73,42 +73,70 @@ class OpenWithBottomSheetMenuItemTest {
             false,
             AccessPermission.OWNER,
             false,
-            mock<TypedFileNode> { on { isTakenDown } doReturn true },
+            mock<TypedFileNode> {
+                on { isTakenDown } doReturn true
+                on { isNodeKeyDecrypted } doReturn true
+            },
             false
         ),
         Arguments.of(
             false,
             AccessPermission.OWNER,
             false,
-            mock<TypedFileNode> { on { isTakenDown } doReturn false },
+            mock<TypedFileNode> {
+                on { isTakenDown } doReturn false
+                on { isNodeKeyDecrypted } doReturn true
+            },
             true
         ),
         Arguments.of(
             false,
             AccessPermission.READWRITE,
             false,
-            mock<TypedFileNode> { on { isTakenDown } doReturn false },
+            mock<TypedFileNode> {
+                on { isTakenDown } doReturn false
+                on { isNodeKeyDecrypted } doReturn true
+            },
             true
         ),
         Arguments.of(
             true,
             AccessPermission.OWNER,
             false,
-            mock<TypedFileNode> { on { isTakenDown } doReturn false },
+            mock<TypedFileNode> {
+                on { isTakenDown } doReturn false
+                on { isNodeKeyDecrypted } doReturn true
+            },
             false
         ),
         Arguments.of(
             false,
             AccessPermission.OWNER,
             true,
-            mock<TypedFileNode> { on { isTakenDown } doReturn false },
+            mock<TypedFileNode> {
+                on { isTakenDown } doReturn false
+                on { isNodeKeyDecrypted } doReturn true
+            },
             true
         ),
         Arguments.of(
             false,
             AccessPermission.OWNER,
             true,
-            mock<TypedFolderNode> { on { isTakenDown } doReturn false },
+            mock<TypedFolderNode> {
+                on { isTakenDown } doReturn false
+                on { isNodeKeyDecrypted } doReturn true
+            },
+            false
+        ),
+        Arguments.of(
+            false,
+            AccessPermission.OWNER,
+            false,
+            mock<TypedFileNode> {
+                on { isTakenDown } doReturn false
+                on { isNodeKeyDecrypted } doReturn false
+            },
             false
         ),
     )

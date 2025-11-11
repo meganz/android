@@ -69,8 +69,21 @@ class VersionsBottomSheetMenuItemTest {
                 on { isTakenDown } doReturn false
                 on { versionCount } doReturn 2
                 on { hasVersion } doReturn true
+                on { isNodeKeyDecrypted } doReturn true
             },
             true
+        ),
+        Arguments.of(
+            false,
+            AccessPermission.OWNER,
+            false,
+            mock<TypedFileNode> {
+                on { isTakenDown } doReturn false
+                on { versionCount } doReturn 2
+                on { hasVersion } doReturn true
+                on { isNodeKeyDecrypted } doReturn false
+            },
+            false
         ),
     )
 }

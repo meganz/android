@@ -44,7 +44,7 @@ class ShareFolderBottomSheetMenuItem @Inject constructor(
             && isNodeInRubbish.not()
             && node.isOutShare().not()
             && accessPermission == AccessPermission.OWNER
-            && node.isNotS4Container()
+            && node.isNotS4Container() && node.isNodeKeyDecrypted
 
 
     override fun getOnClickFunction(
