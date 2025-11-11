@@ -25,9 +25,9 @@ class FetchPsaUseCase @Inject constructor(
      *
      * @param currentTime
      */
-    suspend operator fun invoke(currentTime: Long): Psa? {
+    suspend operator fun invoke(currentTime: Long, forceRefresh: Boolean): Psa? {
         if (!isUserLoggedInUseCase()) return null
-        val refreshCache = shouldRefreshCache(currentTime)
+        val refreshCache = forceRefresh || shouldRefreshCache(currentTime)
         if (refreshCache) psaRepository.setLastFetchedTime(currentTime)
         return psaRepository.fetchPsa(refreshCache)
     }

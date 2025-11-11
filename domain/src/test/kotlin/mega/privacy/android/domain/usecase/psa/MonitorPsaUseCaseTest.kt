@@ -43,7 +43,8 @@ class MonitorPsaUseCaseTest {
             cancelAndIgnoreRemainingEvents()
         }
 
-        verify(fetchPsaUseCase).invoke(currentTime)
+        verify(fetchPsaUseCase).invoke(currentTime, true)
+        verify(fetchPsaUseCase).invoke(currentTime, false)
     }
 
     @Test
@@ -54,14 +55,14 @@ class MonitorPsaUseCaseTest {
             })
         }
         fetchPsaUseCase.stub {
-            onBlocking { invoke(any()) }.thenReturn(getPsa(1))
+            onBlocking { invoke(any(), any()) }.thenReturn(getPsa(1))
         }
 
         val initial = testScheduler.currentTime
         underTest.invoke { testScheduler.currentTime - initial }.test {
             testScheduler.advanceTimeBy(50.seconds)
             val events: List<Event<Psa>> = cancelAndConsumeRemainingEvents()
-            assertThat(events.filterIsInstance<Event.Item<Psa>>().size).isEqualTo(5)
+            assertThat(events.filterIsInstance<Event.Item<Psa>>().size).isEqualTo(6)
         }
     }
 

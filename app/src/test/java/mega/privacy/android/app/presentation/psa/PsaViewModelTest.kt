@@ -61,13 +61,13 @@ class PsaViewModelTest {
         }
 
         fetchPsaUseCase.stub {
-            onBlocking { invoke(any()) }.thenReturn(null)
+            onBlocking { invoke(any(), any()) }.thenReturn(null)
         }
     }
 
 
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
-        onBlocking { invoke(AppFeatures.NewPsaState) }.thenReturn(true)
+        onBlocking { invoke(AppFeatures.SingleActivity) }.thenReturn(true)
     }
 
     private fun initViewModel() {
@@ -120,7 +120,7 @@ class PsaViewModelTest {
         initViewModel()
         underTest.markAsSeen(1)
 
-        verifyBlocking(fetchPsaUseCase) { invoke(any()) }
+        verifyBlocking(fetchPsaUseCase) { invoke(any(), any()) }
     }
 
     @Test
@@ -131,7 +131,7 @@ class PsaViewModelTest {
             }
             val expectedId = 2
             fetchPsaUseCase.stub {
-                onBlocking { invoke(any()) }.thenReturn(createPsa(expectedId))
+                onBlocking { invoke(any(), any()) }.thenReturn(createPsa(expectedId))
             }
 
             initViewModel()

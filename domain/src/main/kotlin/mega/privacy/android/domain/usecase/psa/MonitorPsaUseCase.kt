@@ -5,8 +5,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
 import mega.privacy.android.domain.entity.psa.Psa
+import mega.privacy.android.domain.logging.Log
 import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import javax.inject.Inject
 import kotlin.time.Duration
@@ -40,13 +42,22 @@ class MonitorPsaUseCase(
      */
     @OptIn(ExperimentalCoroutinesApi::class)
     operator fun invoke(currentMilliSecondTimeProvider: () -> Long): Flow<Psa> =
-        monitorMiscLoadedUseCase().take(1).flatMapLatest {
-            flow {
-                while (true) {
-                    fetchPsaUseCase(currentMilliSecondTimeProvider())
-                        ?.let { emit(it) }
-                    delay(psaCheckFrequency)
+        monitorMiscLoadedUseCase()
+            .onEach { Log.d("Monitor PSA use case - monitorMiscLoadedUseCase: $it") }
+            .take(1).flatMapLatest {
+                flow {
+                    fetchPsaUseCase(
+                        currentTime = currentMilliSecondTimeProvider(),
+                        forceRefresh = true
+                    )?.let { emit(it) }
+                    while (true) {
+                        fetchPsaUseCase(
+                            currentTime = currentMilliSecondTimeProvider(),
+                            forceRefresh = false
+                        )
+                            ?.let { emit(it) }
+                        delay(psaCheckFrequency)
+                    }
                 }
             }
-        }
 }

@@ -35,7 +35,7 @@ class FetchPsaUseCaseTest {
             onBlocking { fetchPsa(any()) }.thenReturn(expected)
         }
 
-        assertThat(underTest.invoke(10L)).isEqualTo(expected)
+        assertThat(underTest.invoke(10L, false)).isEqualTo(expected)
     }
 
     @Test
@@ -45,7 +45,7 @@ class FetchPsaUseCaseTest {
             onBlocking { fetchPsa(true) }.thenReturn(null)
         }
 
-        assertThat(underTest(10L)).isNull()
+        assertThat(underTest(10L, false)).isNull()
     }
 
     @Test
@@ -61,7 +61,23 @@ class FetchPsaUseCaseTest {
                 onBlocking { fetchPsa(false) }.thenReturn(null)
             }
 
-            assertThat(underTest.invoke(currentTime)).isNull()
+            assertThat(underTest.invoke(currentTime, false)).isNull()
+        }
+
+    @Test
+    internal fun `test that cache is refreshed if last fetch was within refresh period but force refresh is true`() =
+        runTest {
+            val currentTime = 10_000_000L
+            val lastFetchedTime = currentTime - (underTest.psaRequestTimeout / 2)
+            val expected = createPsaTestData()
+            whenever(isUserLoggedInUseCase()).thenReturn(true)
+            psaRepository.stub {
+                onBlocking { getLastPsaFetchedTime() }.thenReturn(lastFetchedTime)
+                onBlocking { fetchPsa(true) }.thenReturn(expected)
+                onBlocking { fetchPsa(false) }.thenReturn(null)
+            }
+
+            assertThat(underTest.invoke(currentTime, true)).isEqualTo(expected)
         }
 
     @Test
@@ -78,7 +94,7 @@ class FetchPsaUseCaseTest {
                 onBlocking { fetchPsa(false) }.thenReturn(null)
             }
 
-            assertThat(underTest.invoke(currentTime)).isEqualTo(expected)
+            assertThat(underTest.invoke(currentTime, false)).isEqualTo(expected)
         }
 
     @Test
@@ -92,7 +108,7 @@ class FetchPsaUseCaseTest {
             onBlocking { fetchPsa(false) }.thenReturn(null)
         }
 
-        underTest(currentTime)
+        underTest(currentTime, false)
 
         verify(psaRepository).setLastFetchedTime(currentTime)
     }
@@ -101,7 +117,7 @@ class FetchPsaUseCaseTest {
     fun `test that user is not logged in then use case returns null`() = runTest {
         whenever(isUserLoggedInUseCase()).thenReturn(false)
 
-        assertThat(underTest.invoke(10L)).isNull()
+        assertThat(underTest.invoke(10L, false)).isNull()
     }
 
     private fun createPsaTestData() = Psa(

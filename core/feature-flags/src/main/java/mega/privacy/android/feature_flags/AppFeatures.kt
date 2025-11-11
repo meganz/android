@@ -56,14 +56,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * New psa state
-     */
-    NewPsaState(
-        "Use new psa state in stead of legacy psa state singleton. Legacy psa state exists to unify behaviour while legacy screens still exist",
-        false,
-    ),
-
-    /**
      * Enable compose implementation of the main settings screen
      */
     SettingsComposeUI(
