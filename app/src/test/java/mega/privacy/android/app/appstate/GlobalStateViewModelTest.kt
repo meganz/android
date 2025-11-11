@@ -1,6 +1,5 @@
 package mega.privacy.android.app.appstate
 
-import androidx.navigation3.runtime.NavKey
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -24,11 +23,12 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.HandleBlockedStateSessionUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
-import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
@@ -55,7 +55,8 @@ class GlobalStateViewModelTest {
     private val monitorAccountBlockedUseCase = mock<MonitorAccountBlockedUseCase>()
     private val handleBlockedStateSessionUseCase = mock<HandleBlockedStateSessionUseCase>()
     private val snackbarEventQueue = mock<SnackbarEventQueue>()
-    private val navigationEventQueue = mock<NavigationEventQueue>()
+    private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase = mock()
+    private val rootNodeExistsUseCase: RootNodeExistsUseCase = mock()
 
     private val globalInitialiser = mock<GlobalInitialiser>()
 
@@ -79,7 +80,8 @@ class GlobalStateViewModelTest {
             blockedStateMapper = BlockedStateMapper(),
             handleBlockedStateSessionUseCase = handleBlockedStateSessionUseCase,
             snackbarEventQueue = snackbarEventQueue,
-            navigationEventQueue = navigationEventQueue,
+            monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
+            rootNodeExistsUseCase = rootNodeExistsUseCase,
         )
     }
 
@@ -91,7 +93,8 @@ class GlobalStateViewModelTest {
             globalInitialiser,
             handleBlockedStateSessionUseCase,
             snackbarEventQueue,
-            navigationEventQueue,
+            monitorFetchNodesFinishUseCase,
+            rootNodeExistsUseCase,
         )
     }
 
@@ -891,19 +894,6 @@ class GlobalStateViewModelTest {
 
         verify(snackbarEventQueue).queueMessage(message)
     }
-
-    @Test
-    fun `test that addNavKeysToEventQueue enqueues the navigation to navigationEventQueue`() =
-        runTest {
-
-            val navKeys = (0..3).map { mock<NavKey>() }
-
-            underTest.addNavKeysToEventQueue(navKeys)
-
-            navKeys.forEach {
-                verify(navigationEventQueue).emit(it)
-            }
-        }
 
     private val notBlockedEvent = AccountBlockedEvent(
         handle = -1L,

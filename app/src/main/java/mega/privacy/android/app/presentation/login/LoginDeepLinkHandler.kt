@@ -15,7 +15,7 @@ class LoginDeepLinkHandler @Inject constructor(
         uri: Uri,
     ): List<NavKey>? =
         if (regexPatternType == RegexPatternType.LOGIN_LINK) {
-            listOf(LoginNavKey)
+            listOf(LoginNavKey())
         } else {
             null
         }

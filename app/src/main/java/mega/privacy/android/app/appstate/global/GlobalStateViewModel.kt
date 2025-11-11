@@ -2,7 +2,6 @@ package mega.privacy.android.app.appstate.global
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -14,6 +13,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.appstate.global.mapper.BlockedStateMapper
@@ -23,11 +23,12 @@ import mega.privacy.android.app.appstate.initialisation.GlobalInitialiser
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.extension.onFirst
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.HandleBlockedStateSessionUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
-import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
@@ -42,7 +43,8 @@ class GlobalStateViewModel @Inject constructor(
     private val blockedStateMapper: BlockedStateMapper,
     private val handleBlockedStateSessionUseCase: HandleBlockedStateSessionUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
-    private val navigationEventQueue: NavigationEventQueue,
+    private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
+    private val rootNodeExistsUseCase: RootNodeExistsUseCase,
 ) : ViewModel() {
     init {
         globalInitialiser.onAppStart()
@@ -86,6 +88,16 @@ class GlobalStateViewModel @Inject constructor(
         }
     }
 
+    val rootNodeExistsFlow: StateFlow<Boolean> by lazy {
+        monitorFetchNodesFinishUseCase()
+            .onStart { emit(rootNodeExistsUseCase()) }
+            .catch { Timber.e(it, "Error monitoring fetch nodes finish") }
+            .asUiStateFlow(
+                scope = viewModelScope,
+                initialValue = false
+            )
+    }
+
 
     private fun monitorBlockedState() =
         combine(
@@ -103,17 +115,6 @@ class GlobalStateViewModel @Inject constructor(
     fun queueMessage(message: String) {
         viewModelScope.launch {
             snackbarEventQueue.queueMessage(message)
-        }
-    }
-
-    /**
-     * Add nav keys to navigation event queue
-     */
-    fun addNavKeysToEventQueue(navKeys: List<NavKey>) {
-        viewModelScope.launch {
-            navKeys.forEach {
-                navigationEventQueue.emit(it)
-            }
         }
     }
 

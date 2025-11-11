@@ -22,7 +22,7 @@ class PendingBackStackNavigationHandler(
     private val defaultLandingScreen: NavKey,
     private var isPasscodeLocked: Boolean,
     private val passcodeDestination: NavKey,
-    private val defaultLoginDestination: NavKey = LoginNavKey,
+    private val defaultLoginDestination: NavKey = LoginNavKey(true),
     private val fetchRootNodeDestination: (session: String, fromLogin: Boolean) -> NavKey = ::FetchingContentNavKey,
 ) : NavigationHandler {
     private val resultFlows = mutableMapOf<String, MutableStateFlow<Any?>>()

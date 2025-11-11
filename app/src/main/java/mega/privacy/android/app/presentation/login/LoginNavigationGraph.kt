@@ -1,35 +1,27 @@
 package mega.privacy.android.app.presentation.login
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
-import androidx.navigation3.ui.NavDisplay
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import mega.privacy.android.app.appstate.content.navigation.NavigationHandlerImpl
-import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailNavKey
 import mega.privacy.android.app.presentation.login.confirmemail.changeemail.ChangeEmailAddressViewModel
 import mega.privacy.android.app.presentation.login.confirmemail.changeemail.changeEmailAddress
 import mega.privacy.android.app.presentation.login.confirmemail.confirmationEmailScreen
 import mega.privacy.android.app.presentation.login.confirmemail.openConfirmationEmailScreen
-import mega.privacy.android.app.presentation.login.createaccount.CreateAccountNavKey
 import mega.privacy.android.app.presentation.login.createaccount.createAccountScreen
 import mega.privacy.android.app.presentation.login.createaccount.openCreateAccountScreen
 import mega.privacy.android.app.presentation.login.model.LoginScreen
-import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
 import mega.privacy.android.app.presentation.login.onboarding.openTourScreen
 import mega.privacy.android.app.presentation.login.onboarding.tourScreen
 import mega.privacy.android.app.utils.Constants
@@ -134,59 +126,11 @@ fun NavGraphBuilder.loginNavigationGraph(
     }
 }
 
-@Composable
-fun LoginNavDisplay(
-    onFinish: () -> Unit,
-    activityViewModel: LoginViewModel? = null,
-    stopShowingSplashScreen: () -> Unit,
-) {
-    val backStack = rememberNavBackStack(StartRoute)
-    // Create NavigationHandler to provide a clean abstraction over backStack operations
-    // This allows screens to use high-level navigation methods instead of direct backStack manipulation
-    val loginNavigationHandler = remember {
-        NavigationHandlerImpl(backStack)
-    }
-    val sharedViewModel = activityViewModel ?: hiltViewModel<LoginViewModel>()
-
-    LoginNavigationHandler(
-        navigateToLoginScreen = { loginNavigationHandler.navigate(LoginNavKey) },
-        navigateToCreateAccountScreen = { loginNavigationHandler.navigate(CreateAccountNavKey()) },
-        navigateToTourScreen = {
-            loginNavigationHandler.navigateAndClearBackStack(TourNavKey)
-        },
-        navigateToConfirmationEmailScreen = {
-            loginNavigationHandler.navigate(
-                ConfirmationEmailNavKey
-            )
-        },
-        viewModel = sharedViewModel,
-        onFinish = onFinish,
-        stopShowingSplashScreen = stopShowingSplashScreen,
-    ) {
-        NavDisplay(
-            backStack = backStack,
-            entryDecorators = listOf(
-                rememberSaveableStateHolderNavEntryDecorator(),
-                rememberViewModelStoreNavEntryDecorator()
-            ),
-            entryProvider = loginEntryProvider(
-                loginViewModel = sharedViewModel,
-                navigationHandler = loginNavigationHandler,
-                onFinish = onFinish
-            )
-        )
-    }
-
-}
-
-fun loginEntryProvider(
-    loginViewModel: LoginViewModel,
+internal fun EntryProviderScope<NavKey>.loginEntryProvider(
     navigationHandler: NavigationHandler,
+    loginViewModel: LoginViewModel,
     onFinish: () -> Unit,
-) = entryProvider {
-
-    loginStartScreen()
-
+) {
     loginScreen(
         sharedViewModel = loginViewModel,
     )
@@ -197,7 +141,7 @@ fun loginEntryProvider(
 
     tourScreen(
         sharedViewModel = loginViewModel,
-        onBackPressed = onFinish
+        onBackPressed = onFinish,
     )
 
     confirmationEmailScreen(
@@ -213,6 +157,6 @@ fun loginEntryProvider(
                 key = ChangeEmailAddressViewModel.EMAIL,
                 value = newEmail
             )
-        }
+        },
     )
 }

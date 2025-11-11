@@ -9,40 +9,73 @@ import android.os.Parcelable
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.scene.DialogSceneStrategy
+import androidx.navigation3.scene.Scene
+import androidx.navigation3.scene.SceneStrategy
+import androidx.navigation3.scene.SceneStrategyScope
+import androidx.navigation3.ui.NavDisplay
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
-import kotlinx.serialization.Serializable
+import de.palm.composestateevents.NavigationEventEffect
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.app.appstate.content.AppContentStateViewModel
-import mega.privacy.android.app.appstate.content.view.AppContentView
+import mega.privacy.android.app.appstate.content.NavigationGraphViewModel
+import mega.privacy.android.app.appstate.content.destinations.HomeScreensNavKey
+import mega.privacy.android.app.appstate.content.model.NavigationGraphState
+import mega.privacy.android.app.appstate.content.navigation.PendingBackStack
+import mega.privacy.android.app.appstate.content.navigation.PendingBackStackNavigationHandler
+import mega.privacy.android.app.appstate.content.navigation.rememberPendingBackStack
+import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
+import mega.privacy.android.app.appstate.content.transfer.TransferHandlerImpl
 import mega.privacy.android.app.appstate.global.GlobalStateViewModel
 import mega.privacy.android.app.appstate.global.SnackbarEventsViewModel
+import mega.privacy.android.app.appstate.global.event.AppDialogViewModel
+import mega.privacy.android.app.appstate.global.event.NavigationEventViewModel
 import mega.privacy.android.app.appstate.global.model.GlobalState
 import mega.privacy.android.app.appstate.global.util.show
 import mega.privacy.android.app.presence.SignalPresenceViewModel
-import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.login.LoginNavDisplay
+import mega.privacy.android.app.presentation.login.LoginNavKey
+import mega.privacy.android.app.presentation.login.LoginViewModel
+import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailNavKey
+import mega.privacy.android.app.presentation.login.createaccount.CreateAccountNavKey
+import mega.privacy.android.app.presentation.login.loginEntryProvider
+import mega.privacy.android.app.presentation.login.model.LoginScreen
+import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
-import mega.privacy.android.app.presentation.security.check.PasscodeContainer
+import mega.privacy.android.app.presentation.passcode.navigation.PasscodeNavKey
+import mega.privacy.android.app.presentation.passcode.navigation.passcodeView
+import mega.privacy.android.app.presentation.security.check.PasscodeCheckViewModel
+import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckState
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.navigation.contract.transparent.TransparentSceneStrategy
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -52,10 +85,12 @@ class MegaActivity : ComponentActivity() {
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
 
-    @Serializable
-    data class LoggedInScreens(val isFromLogin: Boolean = false, val session: String) : NavKey
+    @Inject
+    lateinit var navigationEventQueue: NavigationEventQueue
 
-    private lateinit var viewModel: GlobalStateViewModel
+    private val passcodeViewModel: PasscodeCheckViewModel by viewModels()
+
+    private val globalStateViewModel: GlobalStateViewModel by viewModels()
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
@@ -66,7 +101,7 @@ class MegaActivity : ComponentActivity() {
 
     private fun consumeWarningMessage() {
         intent.getStringExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE)?.let { warningMessage ->
-            viewModel.queueMessage(warningMessage)
+            globalStateViewModel.queueMessage(warningMessage)
             intent.removeExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE)
         }
     }
@@ -77,7 +112,7 @@ class MegaActivity : ComponentActivity() {
             navKeys.forEach {
                 Timber.d("NavKey from intent: $it")
             }
-            viewModel.addNavKeysToEventQueue(navKeys)
+            navigationEventQueue.tryEmit(navKeys)
         }
     }
 
@@ -88,28 +123,73 @@ class MegaActivity : ComponentActivity() {
         splashScreen.setKeepOnScreenCondition { keepSplashScreen }
         enableEdgeToEdge()
         setContent {
-            viewModel = viewModel<GlobalStateViewModel>()
+            val navGraphViewModel = hiltViewModel<NavigationGraphViewModel>() // nav graph content
             val presenceViewModel = hiltViewModel<SignalPresenceViewModel>()
-
-            val state by viewModel.state.collectAsStateWithLifecycle()
             val snackbarEventsViewModel = viewModel<SnackbarEventsViewModel>()
-            val snackbarEventsState by snackbarEventsViewModel.snackbarEventState.collectAsStateWithLifecycle()
+            val appDialogViewModel = hiltViewModel<AppDialogViewModel>()
+            val appTransferViewModel = hiltViewModel<AppTransferViewModel>()
+            val loginViewModel = hiltViewModel<LoginViewModel>()
+            val navigationEventViewModel = hiltViewModel<NavigationEventViewModel>()
+
+            val navGraphState by navGraphViewModel.state.collectAsStateWithLifecycle()
+            val globalState by globalStateViewModel.state.collectAsStateWithLifecycle()
+
             val snackbarHostState = remember { SnackbarHostState() }
-            // This is used to recompose the LoginGraph when new login request is made
-            var fromLogin by remember { mutableStateOf(false) }
-            keepSplashScreen = state is GlobalState.Loading
+
+            keepSplashScreen =
+                globalState is GlobalState.Loading || navGraphState is NavigationGraphState.Loading
+
+            val backStack: PendingBackStack<NavKey> =
+                rememberPendingBackStack(HomeScreensNavKey(null))
+
+            val passcodeState by passcodeViewModel.state.collectAsStateWithLifecycle()
+            val rootNodeState by globalStateViewModel.rootNodeExistsFlow.collectAsStateWithLifecycle()
+
             LaunchedEffect(Unit) {
                 //consume intent extras
                 consumeWarningMessage()
                 consumeIntentDestinations()
             }
 
-            AndroidTheme(isDark = state.themeMode.isDarkMode()) {
-                EventEffect(
-                    event = snackbarEventsState,
-                    onConsumed = snackbarEventsViewModel::consumeEvent,
-                    action = { snackbarHostState.show(it) }
+            val navigationHandler = remember {
+                val authStatus = (globalState as? GlobalState.LoggedIn)?.session?.let {
+                    PendingBackStackNavigationHandler.AuthStatus.LoggedIn(it)
+                } ?: PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn
+                PendingBackStackNavigationHandler(
+                    backstack = backStack,
+                    currentAuthStatus = authStatus,
+                    defaultLandingScreen = HomeScreensNavKey(null),
+                    hasRootNode = rootNodeState,
+                    isPasscodeLocked = passcodeState is PasscodeCheckState.Locked,
+                    passcodeDestination = PasscodeNavKey,
                 )
+            }
+
+            LaunchedEffect(globalState) {
+                val authStatus =
+                    (globalState as? GlobalState.LoggedIn)?.session?.let {
+                        PendingBackStackNavigationHandler.AuthStatus.LoggedIn(it)
+                    } ?: PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn
+
+                navigationHandler.onLoginChange(authStatus)
+            }
+
+            LaunchedEffect(rootNodeState) {
+                navigationHandler.onRootNodeChange(rootNodeState)
+            }
+
+            LaunchedEffect(passcodeState) {
+                navigationHandler.onPasscodeStateChanged(passcodeState is PasscodeCheckState.Locked)
+            }
+
+
+            val transferHandler = remember { TransferHandlerImpl(appTransferViewModel) }
+            val transparentStrategy = remember { TransparentSceneStrategy<NavKey>() }
+            val dialogStrategy = remember { DialogSceneStrategy<NavKey>() }
+            val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
+
+            AndroidTheme(isDark = globalState.themeMode.isDarkMode()) {
+
 
                 Box(modifier = Modifier.pointerInput(Unit) {
                     awaitEachGesture {
@@ -121,48 +201,149 @@ class MegaActivity : ComponentActivity() {
                         } while (event.changes.any { it.pressed })
                     }
                 }) {
-                    when (val currentState = state) {
-                        is GlobalState.Loading -> {}
-                        is GlobalState.LoggedIn -> {
-                            AppContainer(
-                                containers = containers,
+                    when (val graphstate = navGraphState) {
+                        is NavigationGraphState.Loading -> {}
+                        is NavigationGraphState.Data -> {
+                            val snackbarEventsState by snackbarEventsViewModel.snackbarEventState.collectAsStateWithLifecycle()
+                            val dialogEvents by appDialogViewModel.dialogEvents.collectAsStateWithLifecycle()
+                            val transferState by appTransferViewModel.state.collectAsStateWithLifecycle()
+                            val loginState by loginViewModel.state.collectAsStateWithLifecycle()
+                            val navigationEvents by navigationEventViewModel.navigationEvents.collectAsStateWithLifecycle()
+
+
+                            LaunchedEffect(loginState.isPendingToFinishActivity) {
+                                if (loginState.isPendingToFinishActivity) {
+                                    finish()
+                                }
+                            }
+
+                            EventEffect(
+                                event = snackbarEventsState,
+                                onConsumed = snackbarEventsViewModel::consumeEvent,
+                                action = { snackbarHostState.show(it) }
+                            )
+
+
+                            CompositionLocalProvider(
+                                LocalSnackBarHostState provides snackbarHostState
                             ) {
-                                val appContentStateViewModel =
-                                    hiltViewModel<AppContentStateViewModel>()
-                                AppContentView(
-                                    viewModel = appContentStateViewModel,
-                                    snackbarHostState = snackbarHostState,
-                                    navKey = LoggedInScreens(
-                                        isFromLogin = fromLogin,
-                                        session = currentState.session
+                                NavDisplay(
+                                    backStack = backStack,
+                                    onBack = { navigationHandler.back() },
+                                    sceneStrategy = transparentStrategy.chain(dialogStrategy)
+                                        .chain(bottomSheetStrategy),
+                                    entryDecorators = listOf(
+                                        rememberSaveableStateHolderNavEntryDecorator(),
+                                        rememberViewModelStoreNavEntryDecorator()
                                     ),
+                                    entryProvider = entryProvider {
+                                        graphstate.featureDestinations
+                                            .forEach { destination ->
+                                                destination.navigationGraph(
+                                                    this,
+                                                    navigationHandler,
+                                                    transferHandler
+                                                )
+                                            }
+
+                                        graphstate.appDialogDestinations.forEach { destination ->
+                                            destination.navigationGraph(
+                                                this,
+                                                navigationHandler,
+                                                appDialogViewModel::eventHandled
+                                            )
+                                        }
+
+                                        loginEntryProvider(
+                                            navigationHandler = navigationHandler,
+                                            loginViewModel = loginViewModel,
+                                            onFinish = ::finish
+                                        )
+
+                                        passcodeView(passcodeCryptObjectFactory)
+                                    },
+                                    transitionSpec = {
+                                        // Slide in from right when navigating forward
+                                        slideInHorizontally(
+                                            initialOffsetX = { it },
+                                        ) togetherWith slideOutHorizontally(
+                                            targetOffsetX = { -it },
+                                        )
+                                    },
+                                    popTransitionSpec = {
+                                        // Slide in from left when navigating back
+                                        slideInHorizontally(
+                                            initialOffsetX = { -it },
+                                        ) togetherWith slideOutHorizontally(
+                                            targetOffsetX = { it },
+                                        )
+                                    },
+                                    predictivePopTransitionSpec = {
+                                        // Slide in from left when navigating back
+                                        slideInHorizontally(
+                                            initialOffsetX = { -it },
+                                        ) togetherWith slideOutHorizontally(
+                                            targetOffsetX = { it },
+                                        )
+                                    }
+                                )
+
+                                StartTransferComponent(
+                                    event = transferState.transferEvent,
+                                    onConsumeEvent = appTransferViewModel::consumedTransferEvent,
                                 )
                             }
-                        }
 
-                        is GlobalState.RequireLogin -> {
-                            fromLogin = true
-                            LoginNavDisplay(
-                                onFinish = ::finish,
-                                stopShowingSplashScreen = {
+                            NavigationEventEffect(
+                                event = dialogEvents,
+                                onConsumed = appDialogViewModel::dialogDisplayed
+                            ) {
+                                navigationHandler.displayDialog(it.dialogDestination)
+                            }
+
+                            NavigationEventEffect(
+                                event = navigationEvents,
+                                onConsumed = navigationEventViewModel::eventHandled
+                            ) {
+                                navigationHandler.navigate(it)
+                            }
+
+                            val focusManager = LocalFocusManager.current
+                            NavigationEventEffect(
+                                loginState.isPendingToShowFragment,
+                                loginViewModel::isPendingToShowFragmentConsumed
+                            ) {
+                                if (it != LoginScreen.LoginScreen) {
                                     keepSplashScreen = false
-                                },
-                            )
+                                }
+
+                                when (it) {
+                                    LoginScreen.LoginScreen -> navigationHandler.navigate(
+                                        LoginNavKey()
+                                    )
+
+                                    LoginScreen.CreateAccount -> navigationHandler.navigate(
+                                        CreateAccountNavKey()
+                                    )
+
+                                    LoginScreen.Tour -> {
+                                        focusManager.clearFocus()
+                                        navigationHandler.navigate(TourNavKey)
+                                    }
+
+                                    LoginScreen.ConfirmEmail -> navigationHandler.navigate(
+                                        ConfirmationEmailNavKey
+                                    )
+                                }
+                            }
+
                         }
                     }
+
                 }
             }
         }
     }
-
-    private val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
-        {
-            PasscodeContainer(
-                passcodeCryptObjectFactory = passcodeCryptObjectFactory,
-                content = it
-            )
-        },
-    )
 
     companion object {
 
@@ -244,3 +425,16 @@ class MegaActivity : ComponentActivity() {
         private const val EXTRA_NAV_KEYS = "navKeys"
     }
 }
+
+
+infix fun <T : Any> SceneStrategy<T>.chain(sceneStrategy: SceneStrategy<T>): SceneStrategy<T> =
+    object : SceneStrategy<T> {
+        override fun SceneStrategyScope<T>.calculateScene(
+            entries: List<NavEntry<T>>,
+        ): Scene<T>? =
+            this@chain.run { calculateScene(entries) } ?: with(sceneStrategy) {
+                calculateScene(
+                    entries
+                )
+            }
+    }

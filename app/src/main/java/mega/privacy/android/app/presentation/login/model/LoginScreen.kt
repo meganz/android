@@ -16,7 +16,7 @@ enum class LoginScreen(val value: Int, val navKey: NavKey) {
     /**
      * Login screen.
      */
-    LoginScreen(Constants.LOGIN_FRAGMENT, LoginNavKey),
+    LoginScreen(Constants.LOGIN_FRAGMENT, LoginNavKey()),
 
     /**
      * Create account screen.

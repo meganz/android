@@ -45,7 +45,7 @@ fun EntryProviderScope<NavKey>.transferOverQuotaDialogDestination(
                 navigate(UpgradeAccountNavKey())
             },
             navigateToLogin = {
-                navigate(LoginNavKey)
+                navigate(LoginNavKey())
             },
             onDismiss = {
                 viewModel.bandwidthOverQuotaDelayConsumed()

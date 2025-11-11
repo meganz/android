@@ -34,7 +34,7 @@ class LoginDeepLinkHandlerTest {
     fun `test that correct nav key is returned when uri matches LOGIN_LINK pattern type`() =
         runTest {
             val uriString = "mega://login"
-            val expected = LoginNavKey
+            val expected = LoginNavKey()
             val uri = mock<Uri> {
                 on { this.toString() } doReturn uriString
             }
