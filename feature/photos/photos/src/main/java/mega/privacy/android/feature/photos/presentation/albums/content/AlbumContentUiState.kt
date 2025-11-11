@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.photos.presentation.albums.content
 
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import kotlinx.collections.immutable.ImmutableList
@@ -33,7 +34,6 @@ import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
  * @property showRenameDialog True if the rename dialog is shown, false otherwise.
  * @property showSortByDialog True if the sort by dialog is shown, false otherwise.
  * @property showFilterDialog True if the filter dialog is shown, false otherwise.
- * @property showDeleteAlbumsConfirmation True if the delete albums confirmation is shown, false otherwise.
  * @property showRemovePhotosDialog True if the remove photos dialog is shown, false otherwise.
  * @property isInputNameValid True if the input name is valid, false otherwise.
  * @property createDialogErrorMessage The create dialog error message.
@@ -47,7 +47,6 @@ data class AlbumContentUiState(
     val isLoading: Boolean = true,
     val isAddingPhotos: Boolean = false,
     val totalAddedPhotos: Int = 0,
-    val isDeleteAlbum: Boolean = false,
     val isRemovingPhotos: Boolean = false,
     val totalRemovedPhotos: Int = 0,
     val showRemoveLinkConfirmation: Boolean = false,
@@ -61,7 +60,6 @@ data class AlbumContentUiState(
     val showRenameDialog: Boolean = false,
     val showSortByDialog: Boolean = false,
     val showFilterDialog: Boolean = false,
-    val showDeleteAlbumsConfirmation: Boolean = false,
     val showRemovePhotosDialog: Boolean = false,
     val isInputNameValid: Boolean = true,
     val createDialogErrorMessage: Int? = null,
@@ -75,6 +73,8 @@ data class AlbumContentUiState(
     val sharePhotosEvent: StateEventWithContent<List<TypedNode>> = consumed(),
     val sendPhotosToChatEvent: StateEventWithContent<List<TypedNode>> = consumed(),
     val hidePhotosEvent: StateEventWithContent<List<TypedNode>> = consumed(),
+    val deleteAlbumSuccessEvent: StateEvent = consumed,
+    val showDeleteConfirmation: StateEvent = consumed
 ) {
     val isAddingPhotosProgressCompleted: Boolean
         get() = !isAddingPhotos && totalAddedPhotos > 0

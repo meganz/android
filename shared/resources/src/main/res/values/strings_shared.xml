@@ -1813,4 +1813,18 @@
     <string name="album_content_selection_action_select_album_cover_description">Select album cover</string>
     <!--Album content delete action description-->
     <string name="album_content_selection_action_delete_description">Delete</string>
+    <!-- Delete album confirmation dialog positive button text. -->
+    <string name="delete_album_confirmation_positive_button_text">Delete</string>
+    <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
+    <string name="delete_singular_album_confirmation_message">“%s” deleted</string>
+    <!-- Delete albums confirmation title. -->
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="one">Delete album?</item>
+        <item quantity="other">Delete albums?</item>
+    </plurals>
+    <!-- Delete albums confirmation description. -->
+    <plurals name="delete_album_confirmation_dialog_description">
+        <item quantity="one">Album will be deleted but its contents will stay in your Timeline.</item>
+        <item quantity="other">Albums will be deleted but their contents will stay in your Timeline.</item>
+    </plurals>
 </resources>

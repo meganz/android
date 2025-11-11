@@ -1,5 +1,7 @@
 package mega.privacy.android.app.appstate.global.event
 
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -18,6 +20,7 @@ import javax.inject.Inject
 class SnackbarEventQueueImpl @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    @ApplicationContext private val context: Context,
 ) : SnackbarEventQueue {
     private val _events = Channel<SnackbarAttributes>(Channel.UNLIMITED)
     private val isSingleActivityEnabled = MutableStateFlow<Boolean?>(null)
@@ -34,6 +37,10 @@ class SnackbarEventQueueImpl @Inject constructor(
 
     override suspend fun queueMessage(message: String) =
         queueMessage(SnackbarAttributes(message))
+
+    override suspend fun queueMessage(resId: Int, vararg args: Any) {
+        queueMessage(context.getString(resId, *args))
+    }
 
     override suspend fun queueMessage(attributes: SnackbarAttributes) {
         requireFeatureEnabled {

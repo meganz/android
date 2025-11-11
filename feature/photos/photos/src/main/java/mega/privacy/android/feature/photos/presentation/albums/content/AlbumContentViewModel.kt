@@ -56,6 +56,7 @@ import mega.privacy.android.domain.usecase.media.MonitorUserAlbumByIdUseCase
 import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
+import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumNameUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -67,6 +68,7 @@ import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.feature.photos.navigation.AlbumContentNavKey
 import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.PhotoItemSelected
 import mega.privacy.mobile.analytics.event.PhotoItemSelectedEvent
@@ -99,6 +101,8 @@ class AlbumContentViewModel @AssistedInject constructor(
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val photoUiStateMapper: PhotoUiStateMapper,
     private val getUserAlbumCoverPhotoUseCase: GetUserAlbumCoverPhotoUseCase,
+    private val removeAlbumsUseCase: RemoveAlbumsUseCase,
+    private val snackbarEventQueue: SnackbarEventQueue,
     @Assisted private val navKey: AlbumContentNavKey?,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumContentUiState())
@@ -352,11 +356,44 @@ class AlbumContentViewModel @AssistedInject constructor(
         }
     }
 
-    fun deleteAlbum() {
-        _state.update {
-            it.copy(isDeleteAlbum = true)
+    internal fun deleteAlbum() {
+        viewModelScope.launch {
+            runCatching {
+                val albumIdToRemove = albumId
+                checkNotNull(albumIdToRemove)
+                removeAlbumsUseCase(listOf(albumIdToRemove))
+            }.onFailure {
+                Timber.e(it)
+            }.onSuccess {
+                snackbarEventQueue.queueMessage(
+                    sharedResR.string.delete_singular_album_confirmation_message,
+                    state.value.uiAlbum?.title.orEmpty()
+                )
+                _state.update {
+                    it.copy(deleteAlbumSuccessEvent = triggered)
+                }
+            }
         }
     }
+
+    internal fun showDeleteConfirmation() {
+        _state.update {
+            it.copy(showDeleteConfirmation = triggered)
+        }
+    }
+
+    internal fun resetDeleteAlbumSuccess() {
+        _state.update {
+            it.copy(deleteAlbumSuccessEvent = consumed)
+        }
+    }
+
+    internal fun resetShowDeleteConfirmation() {
+        _state.update {
+            it.copy(showDeleteConfirmation = consumed)
+        }
+    }
+
 
     fun showRemoveLinkConfirmation() {
         _state.update {
@@ -412,18 +449,6 @@ class AlbumContentViewModel @AssistedInject constructor(
     fun showRenameDialog(showRenameDialog: Boolean) {
         _state.update {
             it.copy(showRenameDialog = showRenameDialog)
-        }
-    }
-
-    fun showDeleteAlbumsConfirmation() {
-        _state.update {
-            it.copy(showDeleteAlbumsConfirmation = true)
-        }
-    }
-
-    fun closeDeleteAlbumsConfirmation() {
-        _state.update {
-            it.copy(showDeleteAlbumsConfirmation = false)
         }
     }
 

@@ -27,7 +27,8 @@ class SnackbarEventQueueImplTest {
     private fun init() {
         snackbarEventQueue = SnackbarEventQueueImpl(
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            applicationScope = TestScope(testDispatcher)
+            applicationScope = TestScope(testDispatcher),
+            context = mock() // Temporary, will be removed later
         )
     }
 

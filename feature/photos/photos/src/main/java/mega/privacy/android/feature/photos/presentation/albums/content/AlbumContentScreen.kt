@@ -37,6 +37,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
@@ -67,11 +68,13 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.photos.extensions.downloadAsStateWithLifecycle
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
+import mega.privacy.android.feature.photos.presentation.albums.dialog.RemoveAlbumConfirmationDialog
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.feature.photos.presentation.albums.view.AlbumDynamicContentGrid
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AlbumContentDeleteAlbumEvent
+import mega.privacy.mobile.analytics.event.DeleteAlbumCancelButtonPressedEvent
 
 @Composable
 fun AlbumContentScreen(
@@ -104,6 +107,10 @@ fun AlbumContentScreen(
         hidePhotosEvent = viewModel::hidePhotos,
         resetHidePhotosEvent = viewModel::resetHidePhotos,
         removePhotos = viewModel::removePhotosFromAlbum,
+        deleteAlbum = viewModel::deleteAlbum,
+        resetDeleteAlbumSuccessEvent = viewModel::resetDeleteAlbumSuccess,
+        showDeleteConfirmation = viewModel::showDeleteConfirmation,
+        hideDeleteConfirmation = viewModel::resetShowDeleteConfirmation,
         onTransfer = onTransfer,
         consumeDownloadEvent = actionViewModel::markDownloadEventConsumed,
         consumeInfoToShowEvent = actionViewModel::onInfoToShowEventConsumed
@@ -129,6 +136,10 @@ internal fun AlbumContentScreen(
     hidePhotosEvent: () -> Unit,
     resetHidePhotosEvent: () -> Unit,
     removePhotos: () -> Unit,
+    deleteAlbum: () -> Unit,
+    resetDeleteAlbumSuccessEvent: () -> Unit,
+    showDeleteConfirmation: () -> Unit,
+    hideDeleteConfirmation: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     consumeDownloadEvent: () -> Unit,
     consumeInfoToShowEvent: () -> Unit,
@@ -189,6 +200,12 @@ internal fun AlbumContentScreen(
         }
     )
 
+    EventEffect(
+        event = uiState.deleteAlbumSuccessEvent,
+        onConsumed = resetDeleteAlbumSuccessEvent,
+        action = onBack
+    )
+
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
             .fillMaxSize()
@@ -233,7 +250,6 @@ internal fun AlbumContentScreen(
                         is AlbumContentSelectionAction.Delete -> {
                             Analytics.tracker.trackEvent(AlbumContentDeleteAlbumEvent)
                             showDeletePhotosConfirmation = true
-                            // Todo show dialog and delete photos
                         }
 
                         is AlbumContentSelectionAction.Download -> {
@@ -298,10 +314,33 @@ internal fun AlbumContentScreen(
             }
         )
 
+        RemoveAlbumConfirmationDialog(
+            modifier = Modifier.testTag(ALBUM_CONTENT_SCREEN_DELETE_ALBUM_DIALOG),
+            size = 1,
+            isVisible = uiState.showDeleteConfirmation == triggered,
+            onConfirm = {
+                Analytics.tracker.trackEvent(AlbumContentDeleteAlbumEvent)
+                deleteAlbum()
+                hideDeleteConfirmation()
+            },
+            onDismiss = {
+                Analytics.tracker.trackEvent(DeleteAlbumCancelButtonPressedEvent)
+                hideDeleteConfirmation()
+            }
+        )
+
         AlbumOptionsBottomSheet(
             isVisible = isMoreOptionsSheetVisible,
             onDismiss = { isMoreOptionsSheetVisible = false },
-            albumUiState = uiState.uiAlbum
+            albumUiState = uiState.uiAlbum,
+            deleteAlbum = {
+                if (uiState.photos.isEmpty()) {
+                    Analytics.tracker.trackEvent(AlbumContentDeleteAlbumEvent)
+                    deleteAlbum()
+                } else {
+                    showDeleteConfirmation()
+                }
+            }
         )
     }
 }
@@ -331,6 +370,7 @@ internal fun RemovePhotosConfirmationDialog(
 internal fun AlbumOptionsBottomSheet(
     onDismiss: () -> Unit,
     albumUiState: AlbumUiState?,
+    deleteAlbum: () -> Unit,
     isVisible: Boolean = false,
 ) {
     val sheetState = rememberModalBottomSheetState()
@@ -412,7 +452,8 @@ internal fun AlbumOptionsBottomSheet(
                                 }
 
                                 is AlbumContentSelectionAction.Delete -> {
-                                    // Todo delete album
+                                    deleteAlbum()
+                                    onDismiss()
                                 }
 
                                 else -> {}
@@ -447,6 +488,10 @@ private fun AlbumContentScreenPreview() {
             hidePhotosEvent = {},
             resetHidePhotosEvent = {},
             removePhotos = {},
+            deleteAlbum = {},
+            resetDeleteAlbumSuccessEvent = {},
+            showDeleteConfirmation = {},
+            hideDeleteConfirmation = {},
             onTransfer = {},
             consumeDownloadEvent = {},
             consumeInfoToShowEvent = {}
@@ -462,3 +507,5 @@ internal const val ALBUM_CONTENT_SCREEN_DELETE_PHOTOS_DIALOG =
     "album_content_screen:delete_photos_dialog"
 internal const val ALBUM_CONTENT_SCREEN_MORE_OPTIONS_BOTTOM_SHEET =
     "album_content_screen:more_options_bottom_sheet"
+internal const val ALBUM_CONTENT_SCREEN_DELETE_ALBUM_DIALOG =
+    "album_content_screen:delete_album_dialog"

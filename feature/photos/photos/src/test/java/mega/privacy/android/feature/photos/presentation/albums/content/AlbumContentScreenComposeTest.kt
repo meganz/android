@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import de.palm.composestateevents.triggered
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toImmutableList
@@ -58,6 +59,10 @@ class AlbumContentScreenComposeTest {
         hidePhotosEvent: () -> Unit = {},
         resetHidePhotosEvent: () -> Unit = {},
         removePhotos: () -> Unit = {},
+        deleteAlbum: () -> Unit = {},
+        resetDeleteAlbumSuccessEvent: () -> Unit = {},
+        showDeleteConfirmation: () -> Unit = {},
+        hideDeleteConfirmation: () -> Unit = {},
         onTransfer: (TransferTriggerEvent) -> Unit = {},
         consumeDownloadEvent: () -> Unit = {},
         consumeInfoToShowEvent: () -> Unit = {},
@@ -81,6 +86,10 @@ class AlbumContentScreenComposeTest {
                     hidePhotosEvent = hidePhotosEvent,
                     resetHidePhotosEvent = resetHidePhotosEvent,
                     removePhotos = removePhotos,
+                    deleteAlbum = deleteAlbum,
+                    showDeleteConfirmation = showDeleteConfirmation,
+                    hideDeleteConfirmation = hideDeleteConfirmation,
+                    resetDeleteAlbumSuccessEvent = resetDeleteAlbumSuccessEvent,
                     onTransfer = onTransfer,
                     consumeDownloadEvent = consumeDownloadEvent,
                     consumeInfoToShowEvent = consumeInfoToShowEvent
@@ -338,7 +347,8 @@ class AlbumContentScreenComposeTest {
                 AlbumOptionsBottomSheet(
                     isVisible = false,
                     onDismiss = {},
-                    albumUiState = albumUiState
+                    albumUiState = albumUiState,
+                    deleteAlbum = {}
                 )
             }
         }
@@ -358,13 +368,36 @@ class AlbumContentScreenComposeTest {
                 AlbumOptionsBottomSheet(
                     isVisible = true,
                     onDismiss = {},
-                    albumUiState = albumUiState
+                    albumUiState = albumUiState,
+                    deleteAlbum = {}
                 )
             }
         }
 
         composeTestRule
             .onNodeWithText(albumTitle)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that delete album confirmation dialog is visible when showDeleteConfirmation is triggered`() {
+        val mockPhotos = listOf(
+            createMockPhoto(1),
+            createMockPhoto(2),
+            createMockPhoto(3)
+        )
+        val uiState = AlbumContentUiState(
+            uiAlbum = createMockAlbumUiState(),
+            photos = mockPhotos.toImmutableList(),
+            selectedPhotos = persistentSetOf(),
+            showDeleteConfirmation = triggered
+        )
+
+        setComposeContent(uiState = uiState)
+
+        // Verify delete album confirmation dialog is displayed
+        composeTestRule
+            .onNodeWithTag(ALBUM_CONTENT_SCREEN_DELETE_ALBUM_DIALOG)
             .assertIsDisplayed()
     }
 

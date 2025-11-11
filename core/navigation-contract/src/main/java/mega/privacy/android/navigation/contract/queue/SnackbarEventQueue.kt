@@ -1,5 +1,6 @@
 package mega.privacy.android.navigation.contract.queue
 
+import androidx.annotation.StringRes
 import kotlinx.coroutines.channels.ReceiveChannel
 import mega.android.core.ui.model.SnackbarAttributes
 
@@ -28,6 +29,17 @@ interface SnackbarEventQueue {
      * @param message The message to be displayed in the snackbar
      */
     suspend fun queueMessage(message: String)
+
+    /**
+     * Queues a simple snackbar message for consumption by subscribers.
+     *
+     * This method adds a string message to the internal queue. The message will be
+     * available for consumption through the [eventQueue] channel.
+     *
+     * @param resId The res id of the message to be displayed in the snackbar
+     * @param args The arguments to be used in the message
+     */
+    suspend fun queueMessage(@StringRes resId: Int, vararg args: Any)
 
     /**
      * Queues a snackbar message for consumption by subscribers.

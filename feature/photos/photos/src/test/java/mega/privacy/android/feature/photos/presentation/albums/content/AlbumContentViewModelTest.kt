@@ -34,6 +34,7 @@ import mega.privacy.android.domain.usecase.media.MonitorUserAlbumByIdUseCase
 import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
+import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumNameUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -44,6 +45,7 @@ import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.feature.photos.navigation.AlbumContentNavKey
+import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -88,6 +90,8 @@ class AlbumContentViewModelTest {
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
     private val photoUiStateMapper = mock<PhotoUiStateMapper>()
     private val getUserAlbumCoverPhotoUseCase = mock<GetUserAlbumCoverPhotoUseCase>()
+    private val removeAlbumsUseCase = mock<RemoveAlbumsUseCase>()
+    private val snackbarEventQueue = mock<SnackbarEventQueue>()
     private val analyticsTracker: AnalyticsTracker = mock()
 
     @BeforeAll
@@ -128,7 +132,9 @@ class AlbumContentViewModelTest {
             getBusinessStatusUseCase,
             analyticsTracker,
             photoUiStateMapper,
-            getUserAlbumCoverPhotoUseCase
+            getUserAlbumCoverPhotoUseCase,
+            removeAlbumsUseCase,
+            snackbarEventQueue
         )
         stubCommon()
         Analytics.initialise(analyticsTracker)
@@ -176,18 +182,85 @@ class AlbumContentViewModelTest {
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             photoUiStateMapper = photoUiStateMapper,
             getUserAlbumCoverPhotoUseCase = getUserAlbumCoverPhotoUseCase,
+            removeAlbumsUseCase = removeAlbumsUseCase,
+            snackbarEventQueue = snackbarEventQueue,
             navKey = navKey,
         )
     }
 
     @Test
-    fun `test that deleteAlbum updates state correctly`() = runTest {
+    fun `test that deleteAlbum calls removeAlbumsUseCase and updates state on success`() = runTest {
+        val albumId = AlbumId(123L)
+        whenever(savedStateHandle.get<Long>("id")).thenReturn(albumId.id)
+        whenever(removeAlbumsUseCase(listOf(albumId))).thenReturn(Unit)
+        createViewModel()
+
+        underTest.deleteAlbum()
+
+        verify(removeAlbumsUseCase).invoke(listOf(albumId))
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.deleteAlbumSuccessEvent).isEqualTo(triggered)
+        }
+    }
+
+    @Test
+    fun `test that deleteAlbum queues snackbar message on success`() = runTest {
+        val albumId = AlbumId(123L)
+        val albumTitle = "My Album"
+        whenever(savedStateHandle.get<Long>("id")).thenReturn(albumId.id)
+        whenever(removeAlbumsUseCase(listOf(albumId))).thenReturn(Unit)
+        createViewModel()
+        underTest.state.value.uiAlbum?.let {
+            whenever(it.title).thenReturn(albumTitle)
+        }
+
+        underTest.deleteAlbum()
+
+        verify(snackbarEventQueue).queueMessage(any(), any())
+    }
+
+    @Test
+    fun `test that deleteAlbum does not update state when albumId is null`() = runTest {
+        whenever(savedStateHandle.get<Long>("id")).thenReturn(null)
         createViewModel()
 
         underTest.deleteAlbum()
 
         underTest.state.test {
-            assertThat(awaitItem().isDeleteAlbum).isTrue()
+            val state = awaitItem()
+            assertThat(state.deleteAlbumSuccessEvent).isEqualTo(consumed)
+        }
+    }
+
+    @Test
+    fun `test that deleteAlbum does not update state on failure`() = runTest {
+        val albumId = AlbumId(123L)
+        whenever(savedStateHandle.get<Long>("id")).thenReturn(albumId.id)
+        whenever(removeAlbumsUseCase(listOf(albumId))).thenThrow(RuntimeException("Delete failed"))
+        createViewModel()
+
+        underTest.deleteAlbum()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.deleteAlbumSuccessEvent).isEqualTo(consumed)
+        }
+    }
+
+    @Test
+    fun `test that resetDeleteAlbumSuccess updates state correctly`() = runTest {
+        val albumId = AlbumId(123L)
+        whenever(savedStateHandle.get<Long>("id")).thenReturn(albumId.id)
+        whenever(removeAlbumsUseCase(listOf(albumId))).thenReturn(Unit)
+        createViewModel()
+
+        underTest.deleteAlbum()
+        underTest.resetDeleteAlbumSuccess()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.deleteAlbumSuccessEvent).isEqualTo(consumed)
         }
     }
 
@@ -267,28 +340,6 @@ class AlbumContentViewModelTest {
 
         underTest.state.test {
             assertThat(awaitItem().showRenameDialog).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that showDeleteAlbumsConfirmation updates state correctly`() = runTest {
-        createViewModel()
-
-        underTest.showDeleteAlbumsConfirmation()
-
-        underTest.state.test {
-            assertThat(awaitItem().showDeleteAlbumsConfirmation).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that closeDeleteAlbumsConfirmation updates state correctly`() = runTest {
-        createViewModel()
-
-        underTest.closeDeleteAlbumsConfirmation()
-
-        underTest.state.test {
-            assertThat(awaitItem().showDeleteAlbumsConfirmation).isFalse()
         }
     }
 
