@@ -49,8 +49,6 @@ import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
-import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaBannerM3
-import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
 import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.NewFolderNodeDialog
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
 import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
@@ -82,6 +80,7 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import mega.privacy.android.feature.clouddrive.presentation.upload.UploadingFiles
+import mega.privacy.android.feature.transfers.components.OverQuotaBanner
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.camera.CameraArg
@@ -305,20 +304,22 @@ internal fun CloudDriveContent(
         modifier = modifier
             .padding(contentPadding.excludingBottomPadding())
     ) {
-        // Storage Over Quota Banner
-        val isOverQuotaBannerShow = uiState.storageCapacity != StorageOverQuotaCapacity.DEFAULT
+        val showQuotaBanner = uiState.isStorageOverQuota || uiState.isTransferOverQuota
         val showContactVerificationBanner =
             !uiState.isLoading && uiState.showContactNotVerifiedBanner && uiState.title.text.isNotEmpty()
         val topPadding =
-            if (isOverQuotaBannerShow || isTabContent || showContactVerificationBanner) 12.dp else 0.dp
+            if (showQuotaBanner || isTabContent || showContactVerificationBanner) 12.dp else 0.dp
 
-        if (isOverQuotaBannerShow) {
-            StorageOverQuotaBannerM3(
-                storageCapacity = uiState.storageCapacity,
-                onStorageAlmostFullWarningDismiss = { onAction(CloudDriveAction.StorageAlmostFullWarningDismiss) },
-                onUpgradeClicked = {
+        if (showQuotaBanner) {
+            OverQuotaBanner(
+                isStorageOverQuota = uiState.isStorageOverQuota,
+                isTransferOverQuota = uiState.isTransferOverQuota,
+                onUpgradeClick = {
                     megaNavigator.openUpgradeAccount(context)
                 },
+                onCancelButtonClick = {
+                    onAction(CloudDriveAction.OverQuotaConsumptionWarning)
+                }
             )
         }
 

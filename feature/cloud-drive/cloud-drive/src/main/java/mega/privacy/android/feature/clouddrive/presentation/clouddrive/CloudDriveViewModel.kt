@@ -22,8 +22,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.core.nodecomponents.components.banners.StorageCapacityMapper
-import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
@@ -43,10 +41,8 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetNodeNameByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
-import mega.privacy.android.domain.usecase.MonitorAlmostFullStorageBannerVisibilityUseCase
-import mega.privacy.android.domain.usecase.SetAlmostFullStorageBannerClosingTimestampUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
-import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -57,6 +53,7 @@ import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEna
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingShareParentUserEmailUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction
@@ -81,14 +78,12 @@ class CloudDriveViewModel @AssistedInject constructor(
     private val getNodesByIdInChunkUseCase: GetNodesByIdInChunkUseCase,
     private val setCloudSortOrderUseCase: SetCloudSortOrder,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
-    private val storageCapacityMapper: StorageCapacityMapper,
-    private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
-    private val monitorAlmostFullStorageBannerVisibilityUseCase: MonitorAlmostFullStorageBannerVisibilityUseCase,
-    private val setAlmostFullStorageBannerClosingTimestampUseCase: SetAlmostFullStorageBannerClosingTimestampUseCase,
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase,
     private val getIncomingShareParentUserEmailUseCase: GetIncomingShareParentUserEmailUseCase,
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
+    private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
     @Assisted private val navKey: CloudDriveNavKey,
 ) : ViewModel() {
 
@@ -111,7 +106,8 @@ class CloudDriveViewModel @AssistedInject constructor(
         setupNodesLoading()
         monitorNodeUpdates()
         monitorCloudSortOrder()
-        monitorStorageOverQuotaCapacity()
+        monitorStorageOverQuota()
+        monitorTransferOverQuota()
     }
 
     /**
@@ -128,7 +124,7 @@ class CloudDriveViewModel @AssistedInject constructor(
             is CloudDriveAction.NavigateToFolderEventConsumed -> onNavigateToFolderEventConsumed()
             is CloudDriveAction.NavigateBackEventConsumed -> onNavigateBackEventConsumed()
             is CloudDriveAction.StartDocumentScanning -> prepareDocumentScanner()
-            is CloudDriveAction.StorageAlmostFullWarningDismiss -> setStorageCapacityAsDefault()
+            is CloudDriveAction.OverQuotaConsumptionWarning -> onConsumeOverQuotaWarning()
         }
     }
 
@@ -491,36 +487,45 @@ class CloudDriveViewModel @AssistedInject constructor(
     }
 
     /**
-     * Monitor storage quota capacity
+     * Monitor storage over quota state
      */
-    private fun monitorStorageOverQuotaCapacity() {
+    private fun monitorStorageOverQuota() {
         viewModelScope.launch {
-            combine(
-                monitorStorageStateUseCase().catch { Timber.e(it) },
-                monitorAlmostFullStorageBannerVisibilityUseCase().catch { Timber.e(it) }
-            ) { storageState: StorageState, shouldShow: Boolean ->
-                storageCapacityMapper(
-                    storageState = storageState,
-                    shouldShow = shouldShow
-                )
-            }.collectLatest { storageCapacity ->
-                _uiState.update {
-                    it.copy(storageCapacity = storageCapacity)
+            monitorStorageStateEventUseCase()
+                .collectLatest { storageState ->
+                    _uiState.update { state ->
+                        val isStorageOverQuota = storageState.storageState == StorageState.Red
+                                || storageState.storageState == StorageState.PayWall
+
+                        state.copy(
+                            isStorageOverQuota = isStorageOverQuota,
+                        )
+                    }
                 }
-            }
         }
     }
 
     /**
-     * Reset storage capacity to default and set closing timestamp
+     * Monitor transfer over quota state
      */
-    fun setStorageCapacityAsDefault() {
-        _uiState.update { it.copy(storageCapacity = StorageOverQuotaCapacity.DEFAULT) }
+    private fun monitorTransferOverQuota() {
         viewModelScope.launch {
-            runCatching {
-                setAlmostFullStorageBannerClosingTimestampUseCase()
-            }.onFailure { Timber.e(it) }
+            monitorTransferOverQuotaUseCase()
+                .collectLatest { isTransferOverQuota ->
+                    _uiState.update { state ->
+                        state.copy(
+                            isTransferOverQuota = isTransferOverQuota,
+                        )
+                    }
+                }
         }
+    }
+
+    /**
+     * Consume transfer over quota warning.
+     */
+    private fun onConsumeOverQuotaWarning() {
+        _uiState.update { state -> state.copy(isTransferOverQuota = false, isStorageOverQuota = false) }
     }
 
     /**

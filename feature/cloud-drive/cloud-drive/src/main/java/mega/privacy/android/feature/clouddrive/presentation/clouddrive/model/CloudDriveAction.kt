@@ -54,7 +54,7 @@ sealed interface CloudDriveAction {
     data object StartDocumentScanning : CloudDriveAction
 
     /**
-     * Storage almost full warning dismiss action
+     * Consume transfer over quota warning action
      */
-    data object StorageAlmostFullWarningDismiss : CloudDriveAction
+    data object OverQuotaConsumptionWarning : CloudDriveAction
 }

@@ -5,7 +5,6 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
@@ -50,7 +49,8 @@ data class CloudDriveUiState(
     val hasMediaItems: Boolean = false,
     val selectedSortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC,
     val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
-    val storageCapacity: StorageOverQuotaCapacity = StorageOverQuotaCapacity.DEFAULT,
+    val isStorageOverQuota: Boolean = false,
+    val isTransferOverQuota: Boolean = false,
     val isContactVerificationOn: Boolean = false,
     val showContactNotVerifiedBanner: Boolean = false,
 ) {
