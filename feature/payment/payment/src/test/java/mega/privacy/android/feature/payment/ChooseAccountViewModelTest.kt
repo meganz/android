@@ -19,12 +19,12 @@ import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.payment.Subscriptions
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.feature.payment.domain.featuretoggle.PaymentFeatures
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature_flags.ABTestFeatures
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
@@ -180,7 +180,7 @@ class ChooseAccountViewModelTest {
                 expectedYearlySubscriptionsList
             )
         )
-        whenever(getFeatureFlagValueUseCase(PaymentFeatures.EnableUSExternalBillingForEligibleUsers))
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers))
             .thenReturn(true)
         whenever(getFeatureFlagValueUseCase(ABTestFeatures.ande)).thenReturn(false)
 
@@ -200,7 +200,7 @@ class ChooseAccountViewModelTest {
                 expectedYearlySubscriptionsList
             )
         )
-        wheneverBlocking { getFeatureFlagValueUseCase(PaymentFeatures.EnableUSExternalBillingForEligibleUsers) }
+        wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers) }
             .thenReturn(false)
         wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(false)
 
@@ -220,7 +220,7 @@ class ChooseAccountViewModelTest {
                 expectedYearlySubscriptionsList
             )
         )
-        wheneverBlocking { getFeatureFlagValueUseCase(PaymentFeatures.EnableUSExternalBillingForEligibleUsers) }
+        wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers) }
             .thenReturn(true)
         wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(true)
 
@@ -240,7 +240,7 @@ class ChooseAccountViewModelTest {
                 expectedYearlySubscriptionsList
             )
         )
-        whenever(getFeatureFlagValueUseCase(PaymentFeatures.EnableUSExternalBillingForEligibleUsers))
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers))
             .thenReturn(true)
         whenever(getFeatureFlagValueUseCase(ABTestFeatures.ande)).thenReturn(false)
 
@@ -260,7 +260,7 @@ class ChooseAccountViewModelTest {
                 expectedYearlySubscriptionsList
             )
         )
-        wheneverBlocking { getFeatureFlagValueUseCase(PaymentFeatures.EnableUSExternalBillingForEligibleUsers) }
+        wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers) }
             .thenReturn(true)
         wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(true)
 

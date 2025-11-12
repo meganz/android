@@ -15,12 +15,12 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.featureflag.ABTestFeature
 import mega.privacy.android.domain.entity.payment.Subscriptions
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.feature.payment.domain.featuretoggle.PaymentFeatures
 import mega.privacy.android.feature.payment.model.ChooseAccountState
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.feature_flags.ABTestFeatures
@@ -94,7 +94,7 @@ class ChooseAccountViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 val isExternalCheckoutEnabled =
-                    getFeatureFlagValueUseCase(PaymentFeatures.EnableUSExternalBillingForEligibleUsers)
+                    getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers)
                 val isExternalCheckoutDefault = getFeatureFlagValueUseCase(ABTestFeatures.ande)
                 _state.update {
                     it.copy(

@@ -61,6 +61,12 @@ enum class ApiFeatures(
         "site",
         "Enable migration to mega app domain",
         false
+    ),
+
+    EnableUSExternalBillingForEligibleUsers(
+        "aepay",
+        "Enables US external billing for eligible users",
+        false
     );
 
     companion object : FeatureFlagValueProvider {
