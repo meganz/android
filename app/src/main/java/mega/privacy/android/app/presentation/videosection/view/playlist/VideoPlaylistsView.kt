@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.videosection.view.playlist
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
@@ -12,14 +11,8 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,7 +25,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -52,11 +45,10 @@ import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyColumn
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
-import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.VideoPlaylistCreationButtonPressedEvent
@@ -65,13 +57,14 @@ import mega.privacy.mobile.analytics.event.VideoPlaylistCreationButtonPressedEve
 internal fun VideoPlaylistsView(
     items: List<VideoPlaylistUIEntity>,
     progressBarShowing: Boolean,
-    searchMode: Boolean,
     scrollToTop: Boolean,
     lazyListState: LazyListState,
     sortOrder: String,
     isInputTitleValid: Boolean,
     showDeleteVideoPlaylistDialog: Boolean,
+    showRenameVideoPlaylistDialog: Boolean,
     inputPlaceHolderText: String,
+    onMenuClick: () -> Unit,
     modifier: Modifier,
     updateShowDeleteVideoPlaylist: (Boolean) -> Unit,
     setDialogInputPlaceholder: (String) -> Unit,
@@ -88,75 +81,51 @@ internal fun VideoPlaylistsView(
     errorMessage: Int? = null,
     onLongClick: ((item: VideoPlaylistUIEntity, index: Int) -> Unit) = { _, _ -> },
     isStorageOverQuota: () -> Boolean,
+    updateShowRenameVideoPlaylist: (Boolean) -> Unit,
 ) {
     var showCreateVideoPlaylistDialog by rememberSaveable { mutableStateOf(false) }
-    var showRenameVideoPlaylistDialog by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(items) {
         if (scrollToTop) {
             lazyListState.scrollToItem(0)
         }
         if (showRenameVideoPlaylistDialog) {
-            showRenameVideoPlaylistDialog = false
+            updateShowRenameVideoPlaylist(false)
         }
         if (showCreateVideoPlaylistDialog) {
             showCreateVideoPlaylistDialog = false
         }
     }
 
-    val snackBarHostState = remember { SnackbarHostState() }
-    val isLight = MaterialTheme.colors.isLight
-
+    val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
-    val modalSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        skipHalfExpanded = false,
-    )
     var clickedItem: Int by rememberSaveable { mutableIntStateOf(-1) }
-
-    val context = LocalContext.current
+    val resources = LocalResources.current
 
     LaunchedEffect(deletedVideoPlaylistTitles) {
         if (deletedVideoPlaylistTitles.isNotEmpty()) {
             val deletedMessage = if (deletedVideoPlaylistTitles.size == 1) {
-                context.resources.getString(
+                resources.getString(
                     sharedR.string.video_section_playlists_delete_playlists_message_singular,
                     deletedVideoPlaylistTitles[0]
                 )
             } else {
-                context.resources.getQuantityString(
+                resources.getQuantityString(
                     sharedR.plurals.video_section_playlists_delete_playlists_message,
                     deletedVideoPlaylistTitles.size,
                     deletedVideoPlaylistTitles.size
                 )
             }
             coroutineScope.launch {
-                snackBarHostState.showAutoDurationSnackbar(deletedMessage)
+                scaffoldState.snackbarHostState.showAutoDurationSnackbar(deletedMessage)
             }
             onDeletedMessageShown()
         }
     }
 
-    BackHandler(enabled = modalSheetState.isVisible) {
-        coroutineScope.launch {
-            modalSheetState.hide()
-        }
-    }
-
-    Scaffold(
+    MegaScaffold(
         modifier = modifier,
-        scaffoldState = rememberScaffoldState(),
-        snackbarHost = {
-            SnackbarHost(
-                hostState = snackBarHostState,
-                snackbar = { data ->
-                    Snackbar(
-                        snackbarData = data,
-                        backgroundColor = black.takeIf { isLight } ?: white,
-                    )
-                }
-            )
-        },
+        scaffoldState = scaffoldState,
         floatingActionButton = {
             val placeholderText = "New playlist"
             val scrollNotInProgress by remember {
@@ -210,7 +179,7 @@ internal fun VideoPlaylistsView(
                     errorMessage = errorMessage,
                     onDialogInputChange = setInputValidity,
                     onDismissRequest = {
-                        showRenameVideoPlaylistDialog = false
+                        updateShowRenameVideoPlaylist(false)
                         setInputValidity(true)
                     },
                     initialInputText = {
@@ -300,7 +269,7 @@ internal fun VideoPlaylistsView(
                                 onClick = { onClick(videoPlaylistItem, it) },
                                 onMenuClick = {
                                     clickedItem = it
-                                    coroutineScope.launch { modalSheetState.show() }
+                                    onMenuClick()
                                 },
                                 onLongClick = { onLongClick(videoPlaylistItem, it) }
                             )
@@ -309,24 +278,6 @@ internal fun VideoPlaylistsView(
                 }
             }
         }
-        VideoPlaylistBottomSheet(
-            modalSheetState = modalSheetState,
-            coroutineScope = coroutineScope,
-            onRenameVideoPlaylistClicked = {
-                if (isStorageOverQuota()) {
-                    showOverDiskQuotaPaywallWarning()
-                } else {
-                    showRenameVideoPlaylistDialog = true
-                }
-            },
-            onDeleteVideoPlaylistClicked = {
-                if (isStorageOverQuota()) {
-                    showOverDiskQuotaPaywallWarning()
-                } else {
-                    updateShowDeleteVideoPlaylist(true)
-                }
-            }
-        )
     }
 }
 
@@ -410,12 +361,12 @@ private fun VideoPlaylistsViewPreview() {
         VideoPlaylistsView(
             items = emptyList(),
             progressBarShowing = false,
-            searchMode = false,
             scrollToTop = false,
             lazyListState = LazyListState(),
             sortOrder = "Sort by name",
             isInputTitleValid = true,
             showDeleteVideoPlaylistDialog = false,
+            showRenameVideoPlaylistDialog = false,
             modifier = Modifier.fillMaxSize(),
             onClick = { _, _ -> },
             onSortOrderClick = {},
@@ -430,6 +381,8 @@ private fun VideoPlaylistsViewPreview() {
             onDeletePlaylistsDialogPositiveButtonClicked = {},
             onDeleteDialogNegativeButtonClicked = {},
             isStorageOverQuota = { false },
+            updateShowRenameVideoPlaylist = {},
+            onMenuClick = {}
         )
     }
 }
@@ -441,12 +394,12 @@ private fun VideoPlaylistsViewCreateDialogShownPreview() {
         VideoPlaylistsView(
             items = emptyList(),
             progressBarShowing = false,
-            searchMode = false,
             scrollToTop = false,
             lazyListState = LazyListState(),
             sortOrder = "Sort by name",
             isInputTitleValid = true,
             showDeleteVideoPlaylistDialog = true,
+            showRenameVideoPlaylistDialog = false,
             modifier = Modifier.fillMaxSize(),
             onClick = { _, _ -> },
             onSortOrderClick = {},
@@ -461,6 +414,8 @@ private fun VideoPlaylistsViewCreateDialogShownPreview() {
             onDeletePlaylistsDialogPositiveButtonClicked = {},
             onDeleteDialogNegativeButtonClicked = {},
             isStorageOverQuota = { false },
+            updateShowRenameVideoPlaylist = {},
+            onMenuClick = {}
         )
     }
 }

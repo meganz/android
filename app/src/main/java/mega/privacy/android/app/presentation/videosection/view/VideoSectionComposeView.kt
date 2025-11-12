@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,22 +24,40 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
+import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
+import mega.privacy.android.app.presentation.videosection.model.LocationFilterOption
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
+import mega.privacy.android.app.presentation.videosection.model.VideosFilterOptionEntity
 import mega.privacy.android.app.presentation.videosection.view.allvideos.AllVideosView
+import mega.privacy.android.app.presentation.videosection.view.allvideos.VideosFilterBottomSheet
+import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPlaylistBottomSheet
 import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPlaylistsView
+import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.DurationFilterAllDurationsClickedEvent
+import mega.privacy.mobile.analytics.event.DurationFilterBetween10and60SecondsClickedEvent
+import mega.privacy.mobile.analytics.event.DurationFilterBetween1and4MinutesClickedEvent
+import mega.privacy.mobile.analytics.event.DurationFilterBetween4and20MinutesClickedEvent
+import mega.privacy.mobile.analytics.event.DurationFilterLessThan10SecondsClickedEvent
+import mega.privacy.mobile.analytics.event.DurationFilterMoreThan20MinutesClickedEvent
+import mega.privacy.mobile.analytics.event.LocationFilterAllLocationsClickedEvent
+import mega.privacy.mobile.analytics.event.LocationFilterCameraUploadClickedEvent
+import mega.privacy.mobile.analytics.event.LocationFilterCloudDriveClickedEvent
+import mega.privacy.mobile.analytics.event.LocationFilterSharedItemClickedEvent
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 internal fun VideoSectionComposeView(
     videoSectionViewModel: VideoSectionViewModel,
@@ -55,6 +75,14 @@ internal fun VideoSectionComposeView(
     val tabState by videoSectionViewModel.tabState.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
 
+    var showLocationBottomSheet by rememberSaveable { mutableStateOf(false) }
+    var showDurationBottomSheet by rememberSaveable { mutableStateOf(false) }
+    var showPlaylistBottomSheet by rememberSaveable { mutableStateOf(false) }
+
+    val locationModalSheetState = rememberModalBottomSheetState(true)
+    val durationModalSheetState = rememberModalBottomSheetState(true)
+    val playlistModalSheetState = rememberModalBottomSheetState(true)
+
     val allLazyListState = rememberLazyListState()
     val playlistsLazyListState = rememberLazyListState()
 
@@ -67,7 +95,13 @@ internal fun VideoSectionComposeView(
         tabState.tabs.size
     }
 
+    val locationTitle =
+        stringResource(id = sharedR.string.video_section_videos_location_filter_title)
+    val durationTitle =
+        stringResource(id = sharedR.string.video_section_videos_duration_filter_title)
+
     var showDeleteVideoPlaylist by rememberSaveable { mutableStateOf(false) }
+    var showRenameVideoPlaylistDialog by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(pagerState.currentPage) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
@@ -167,7 +201,6 @@ internal fun VideoSectionComposeView(
                             && uiState.accountType?.isPaid == true
                             && !uiState.isBusinessAccountExpired,
                     progressBarShowing = uiState.progressBarShowing,
-                    searchMode = uiState.searchState == SearchWidgetState.EXPANDED,
                     scrollToTop = uiState.scrollToTop,
                     lazyListState = allLazyListState,
                     sortOrder = stringResource(
@@ -176,8 +209,18 @@ internal fun VideoSectionComposeView(
                     ),
                     selectedDurationFilterOption = uiState.durationSelectedFilterOption,
                     selectedLocationFilterOption = uiState.locationSelectedFilterOption,
-                    onLocationFilterItemClicked = videoSectionViewModel::setLocationSelectedFilterOption,
-                    onDurationFilterItemClicked = videoSectionViewModel::setDurationSelectedFilterOption,
+                    onLocationFilterClicked = {
+                        coroutineScope.launch {
+                            showLocationBottomSheet = true
+                            locationModalSheetState.show()
+                        }
+                    },
+                    onDurationFilterClicked = {
+                        coroutineScope.launch {
+                            showDurationBottomSheet = true
+                            durationModalSheetState.show()
+                        }
+                    },
                     modifier = Modifier,
                     onSortOrderClick = onSortOrderClick,
                     onClick = onClick,
@@ -195,7 +238,6 @@ internal fun VideoSectionComposeView(
                 VideoPlaylistsView(
                     items = uiState.videoPlaylists,
                     progressBarShowing = uiState.isPlaylistProgressBarShown,
-                    searchMode = uiState.searchState == SearchWidgetState.EXPANDED,
                     scrollToTop = uiState.scrollToTop,
                     lazyListState = playlistsLazyListState,
                     sortOrder = stringResource(
@@ -226,6 +268,7 @@ internal fun VideoSectionComposeView(
                     onCreateDialogPositiveButtonClicked = videoSectionViewModel::createNewPlaylist,
                     onRenameDialogPositiveButtonClicked = videoSectionViewModel::updateVideoPlaylistTitle,
                     showDeleteVideoPlaylistDialog = showDeleteVideoPlaylist,
+                    showRenameVideoPlaylistDialog = showRenameVideoPlaylistDialog,
                     updateShowDeleteVideoPlaylist = { showDeleteVideoPlaylist = it },
                     onDeleteDialogPositiveButtonClicked = { playlist ->
                         showDeleteVideoPlaylist = false
@@ -246,6 +289,13 @@ internal fun VideoSectionComposeView(
                     },
                     onDeleteDialogNegativeButtonClicked = videoSectionViewModel::clearAllSelectedVideoPlaylists,
                     isStorageOverQuota = { getStorageState() == StorageState.PayWall },
+                    updateShowRenameVideoPlaylist = { showRenameVideoPlaylistDialog = it },
+                    onMenuClick = {
+                        coroutineScope.launch {
+                            showPlaylistBottomSheet = true
+                            playlistModalSheetState.show()
+                        }
+                    }
                 )
             },
             selectedTab = tabState.selectedTab,
@@ -260,6 +310,143 @@ internal fun VideoSectionComposeView(
                 }
             },
             swipeEnabled = uiState.searchState == SearchWidgetState.COLLAPSED && !uiState.isInSelection
+        )
+    }
+
+    if (showLocationBottomSheet) {
+        VideosFilterBottomSheet(
+            modifier = Modifier,
+            sheetState = locationModalSheetState,
+            title = locationTitle,
+            options = LocationFilterOption.entries.map { option ->
+                VideosFilterOptionEntity(
+                    id = option.ordinal,
+                    title = stringResource(id = option.titleResId),
+                    isSelected = option == uiState.locationSelectedFilterOption
+                )
+            },
+            onDismissRequest = {
+                coroutineScope.launch {
+                    showLocationBottomSheet = false
+                    locationModalSheetState.hide()
+                }
+            },
+            onItemSelected = { item ->
+                coroutineScope.launch {
+                    showLocationBottomSheet = false
+                    locationModalSheetState.hide()
+                }
+                val locationOption =
+                    if (item.id in LocationFilterOption.entries.indices) {
+                        LocationFilterOption.entries.firstOrNull { it.ordinal == item.id }
+                            ?: LocationFilterOption.AllLocations
+                    } else {
+                        LocationFilterOption.AllLocations
+                    }
+                when (locationOption) {
+                    LocationFilterOption.AllLocations ->
+                        Analytics.tracker.trackEvent(LocationFilterAllLocationsClickedEvent)
+
+                    LocationFilterOption.CloudDrive ->
+                        Analytics.tracker.trackEvent(LocationFilterCloudDriveClickedEvent)
+
+                    LocationFilterOption.CameraUploads ->
+                        Analytics.tracker.trackEvent(LocationFilterCameraUploadClickedEvent)
+
+                    LocationFilterOption.SharedItems ->
+                        Analytics.tracker.trackEvent(LocationFilterSharedItemClickedEvent)
+                }
+                videoSectionViewModel.setLocationSelectedFilterOption(locationOption)
+            }
+        )
+    }
+
+    if (showDurationBottomSheet) {
+        VideosFilterBottomSheet(
+            modifier = Modifier,
+            sheetState = durationModalSheetState,
+            title = durationTitle,
+            options = DurationFilterOption.entries.map { option ->
+                VideosFilterOptionEntity(
+                    id = option.ordinal,
+                    title = stringResource(id = option.titleResId),
+                    isSelected = option == uiState.durationSelectedFilterOption
+                )
+            },
+            onDismissRequest = {
+                coroutineScope.launch {
+                    showDurationBottomSheet = false
+                    durationModalSheetState.hide()
+                }
+            },
+            onItemSelected = { item ->
+                coroutineScope.launch {
+                    showDurationBottomSheet = false
+                    durationModalSheetState.hide()
+                }
+                val durationOption =
+                    if (item.id in DurationFilterOption.entries.indices) {
+                        DurationFilterOption.entries.firstOrNull { it.ordinal == item.id }
+                            ?: DurationFilterOption.AllDurations
+                    } else {
+                        DurationFilterOption.AllDurations
+                    }
+
+                when (durationOption) {
+                    DurationFilterOption.AllDurations ->
+                        Analytics.tracker.trackEvent(DurationFilterAllDurationsClickedEvent)
+
+                    DurationFilterOption.LessThan10Seconds ->
+                        Analytics.tracker.trackEvent(DurationFilterLessThan10SecondsClickedEvent)
+
+                    DurationFilterOption.Between10And60Seconds ->
+                        Analytics.tracker.trackEvent(DurationFilterBetween10and60SecondsClickedEvent)
+
+                    DurationFilterOption.Between1And4 ->
+                        Analytics.tracker.trackEvent(DurationFilterBetween1and4MinutesClickedEvent)
+
+                    DurationFilterOption.Between4And20 ->
+                        Analytics.tracker.trackEvent(DurationFilterBetween4and20MinutesClickedEvent)
+
+                    DurationFilterOption.MoreThan20 ->
+                        Analytics.tracker.trackEvent(DurationFilterMoreThan20MinutesClickedEvent)
+                }
+                videoSectionViewModel.setDurationSelectedFilterOption(durationOption)
+            }
+        )
+    }
+
+    if (showPlaylistBottomSheet) {
+        VideoPlaylistBottomSheet(
+            sheetState = playlistModalSheetState,
+            onDismissRequest = {
+                coroutineScope.launch {
+                    showPlaylistBottomSheet = false
+                    playlistModalSheetState.hide()
+                }
+            },
+            onRenameVideoPlaylistClicked = {
+                coroutineScope.launch {
+                    showPlaylistBottomSheet = false
+                    playlistModalSheetState.hide()
+                }
+                if (getStorageState() == StorageState.PayWall) {
+                    showOverDiskQuotaPaywallWarning()
+                } else {
+                    showRenameVideoPlaylistDialog = true
+                }
+            },
+            onDeleteVideoPlaylistClicked = {
+                coroutineScope.launch {
+                    showPlaylistBottomSheet = false
+                    playlistModalSheetState.hide()
+                }
+                if (getStorageState() == StorageState.PayWall) {
+                    showOverDiskQuotaPaywallWarning()
+                } else {
+                    showDeleteVideoPlaylist = true
+                }
+            }
         )
     }
 }

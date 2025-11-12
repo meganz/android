@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.videosection
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -23,7 +24,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 
-@OptIn(ExperimentalCoilApi::class)
+@OptIn(ExperimentalCoilApi::class, ExperimentalMaterial3Api::class)
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class AllVideosViewTest {
@@ -34,15 +35,12 @@ class AllVideosViewTest {
         items: List<VideoUIEntity> = emptyList(),
         shouldApplySensitiveMode: Boolean = false,
         progressBarShowing: Boolean = false,
-        searchMode: Boolean = false,
         scrollToTop: Boolean = false,
         lazyListState: LazyListState = LazyListState(),
         sortOrder: String = "",
         modifier: Modifier = Modifier,
         selectedLocationFilterOption: LocationFilterOption = LocationFilterOption.AllLocations,
         selectedDurationFilterOption: DurationFilterOption = DurationFilterOption.AllDurations,
-        onLocationFilterItemClicked: (LocationFilterOption?) -> Unit = {},
-        onDurationFilterItemClicked: (DurationFilterOption?) -> Unit = {},
         onClick: (item: VideoUIEntity, index: Int) -> Unit = { _, _ -> },
         onMenuClick: (VideoUIEntity) -> Unit = { _ -> },
         onSortOrderClick: () -> Unit = {},
@@ -50,21 +48,22 @@ class AllVideosViewTest {
         addToPlaylistsTitles: List<String>? = null,
         clearAddToPlaylistsTitles: () -> Unit = {},
         retryActionCallback: () -> Unit = {},
+        onLocationFilterClicked: () -> Unit = {},
+        onDurationFilterClicked: () -> Unit = {},
     ) {
         composeTestRule.setContent {
             AllVideosView(
                 items = items,
                 shouldApplySensitiveMode = shouldApplySensitiveMode,
                 progressBarShowing = progressBarShowing,
-                searchMode = searchMode,
                 scrollToTop = scrollToTop,
                 lazyListState = lazyListState,
                 sortOrder = sortOrder,
                 modifier = modifier,
                 selectedLocationFilterOption = selectedLocationFilterOption,
                 selectedDurationFilterOption = selectedDurationFilterOption,
-                onLocationFilterItemClicked = onLocationFilterItemClicked,
-                onDurationFilterItemClicked = onDurationFilterItemClicked,
+                onLocationFilterClicked = onLocationFilterClicked,
+                onDurationFilterClicked = onDurationFilterClicked,
                 onClick = onClick,
                 onMenuClick = onMenuClick,
                 onSortOrderClick = onSortOrderClick,

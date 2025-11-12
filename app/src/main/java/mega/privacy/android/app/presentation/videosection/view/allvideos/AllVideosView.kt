@@ -1,33 +1,28 @@
 package mega.privacy.android.app.presentation.videosection.view.allvideos
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.SnackbarResult
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
-import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
 import mega.privacy.android.app.presentation.videosection.model.LocationFilterOption
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
-import mega.privacy.android.app.presentation.videosection.model.VideosFilterOptionEntity
 import mega.privacy.android.app.presentation.videosection.view.VideoSectionLoadingView
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.core.formatter.formatFileSize
@@ -41,32 +36,22 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.mobile.analytics.event.DurationFilterAllDurationsClickedEvent
-import mega.privacy.mobile.analytics.event.DurationFilterBetween10and60SecondsClickedEvent
-import mega.privacy.mobile.analytics.event.DurationFilterBetween1and4MinutesClickedEvent
-import mega.privacy.mobile.analytics.event.DurationFilterBetween4and20MinutesClickedEvent
-import mega.privacy.mobile.analytics.event.DurationFilterLessThan10SecondsClickedEvent
-import mega.privacy.mobile.analytics.event.DurationFilterMoreThan20MinutesClickedEvent
-import mega.privacy.mobile.analytics.event.LocationFilterAllLocationsClickedEvent
-import mega.privacy.mobile.analytics.event.LocationFilterCameraUploadClickedEvent
-import mega.privacy.mobile.analytics.event.LocationFilterCloudDriveClickedEvent
-import mega.privacy.mobile.analytics.event.LocationFilterSharedItemClickedEvent
 import nz.mega.sdk.MegaNode
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun AllVideosView(
     items: List<VideoUIEntity>,
     shouldApplySensitiveMode: Boolean,
     progressBarShowing: Boolean,
-    searchMode: Boolean,
     scrollToTop: Boolean,
     lazyListState: LazyListState,
     sortOrder: String,
     modifier: Modifier,
     selectedLocationFilterOption: LocationFilterOption,
     selectedDurationFilterOption: DurationFilterOption,
-    onLocationFilterItemClicked: (LocationFilterOption) -> Unit,
-    onDurationFilterItemClicked: (DurationFilterOption) -> Unit,
+    onLocationFilterClicked: () -> Unit,
+    onDurationFilterClicked: () -> Unit,
     onClick: (item: VideoUIEntity, index: Int) -> Unit,
     onMenuClick: (VideoUIEntity) -> Unit,
     onSortOrderClick: () -> Unit,
@@ -74,27 +59,17 @@ internal fun AllVideosView(
     clearAddToPlaylistsTitles: () -> Unit,
     retryActionCallback: () -> Unit,
     onLongClick: ((item: VideoUIEntity, index: Int) -> Unit) = { _, _ -> },
-    highlightText: String = ""
+    highlightText: String = "",
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val locationModalSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        skipHalfExpanded = false
-    )
-
-    val durationModalSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        skipHalfExpanded = true
-    )
-
     val context = LocalContext.current
+    val resources = LocalResources.current
     val scaffoldState = rememberScaffoldState()
 
     LaunchedEffect(addToPlaylistsTitles) {
         addToPlaylistsTitles?.let { titles ->
             if (titles.isNotEmpty()) {
                 scaffoldState.snackbarHostState.showAutoDurationSnackbar(
-                    context.resources.getQuantityString(
+                    resources.getQuantityString(
                         sharedR.plurals.video_section_playlists_add_to_playlists_successfully_message,
                         titles.size,
                         if (titles.size == 1) titles.first() else titles.size
@@ -119,18 +94,6 @@ internal fun AllVideosView(
         }
     }
 
-    BackHandler(enabled = locationModalSheetState.isVisible || durationModalSheetState.isVisible) {
-        coroutineScope.launch {
-            if (locationModalSheetState.isVisible) {
-                locationModalSheetState.hide()
-            }
-
-            if (durationModalSheetState.isVisible) {
-                durationModalSheetState.hide()
-            }
-        }
-    }
-
     MegaScaffold(
         modifier = modifier,
         scaffoldState = scaffoldState,
@@ -150,16 +113,8 @@ internal fun AllVideosView(
                 isLocationFilterSelected = isAllLocations.not(),
                 isDurationFilterSelected = isAllDurations.not(),
                 modifier = Modifier.testTag(VIDEOS_FILTER_BUTTON_VIEW_TEST_TAG),
-                onDurationFilterClicked = {
-                    coroutineScope.launch {
-                        durationModalSheetState.show()
-                    }
-                },
-                onLocationFilterClicked = {
-                    coroutineScope.launch {
-                        locationModalSheetState.show()
-                    }
-                },
+                onDurationFilterClicked = onDurationFilterClicked,
+                onLocationFilterClicked = onLocationFilterClicked,
                 locationDefaultText = locationTitle,
                 durationDefaultText = durationTitle,
                 locationFilterSelectText = if (isAllLocations) {
@@ -240,95 +195,10 @@ internal fun AllVideosView(
                 }
             }
         }
-        VideosFilterBottomSheet(
-            modifier = Modifier,
-            modalSheetState = locationModalSheetState,
-            coroutineScope = coroutineScope,
-            title = locationTitle,
-            options = LocationFilterOption.entries.map { option ->
-                VideosFilterOptionEntity(
-                    id = option.ordinal,
-                    title = stringResource(id = option.titleResId),
-                    isSelected = option == selectedLocationFilterOption
-                )
-            },
-            onItemSelected = { item ->
-                coroutineScope.launch {
-                    locationModalSheetState.hide()
-                }
-                val locationOption =
-                    if (item.id in LocationFilterOption.entries.indices) {
-                        LocationFilterOption.entries.firstOrNull { it.ordinal == item.id }
-                            ?: LocationFilterOption.AllLocations
-                    } else {
-                        LocationFilterOption.AllLocations
-                    }
-                when (locationOption) {
-                    LocationFilterOption.AllLocations ->
-                        Analytics.tracker.trackEvent(LocationFilterAllLocationsClickedEvent)
-
-                    LocationFilterOption.CloudDrive ->
-                        Analytics.tracker.trackEvent(LocationFilterCloudDriveClickedEvent)
-
-                    LocationFilterOption.CameraUploads ->
-                        Analytics.tracker.trackEvent(LocationFilterCameraUploadClickedEvent)
-
-                    LocationFilterOption.SharedItems ->
-                        Analytics.tracker.trackEvent(LocationFilterSharedItemClickedEvent)
-                }
-                onLocationFilterItemClicked(locationOption)
-            }
-        )
-
-        VideosFilterBottomSheet(
-            modifier = Modifier,
-            modalSheetState = durationModalSheetState,
-            coroutineScope = coroutineScope,
-            title = durationTitle,
-            options = DurationFilterOption.entries.map { option ->
-                VideosFilterOptionEntity(
-                    id = option.ordinal,
-                    title = stringResource(id = option.titleResId),
-                    isSelected = option == selectedDurationFilterOption
-                )
-            },
-            onItemSelected = { item ->
-                coroutineScope.launch {
-                    durationModalSheetState.hide()
-                }
-                val durationOption =
-                    if (item.id in DurationFilterOption.entries.indices) {
-                        DurationFilterOption.entries.firstOrNull { it.ordinal == item.id }
-                            ?: DurationFilterOption.AllDurations
-                    } else {
-                        DurationFilterOption.AllDurations
-                    }
-
-                when (durationOption) {
-                    DurationFilterOption.AllDurations ->
-                        Analytics.tracker.trackEvent(DurationFilterAllDurationsClickedEvent)
-
-                    DurationFilterOption.LessThan10Seconds ->
-                        Analytics.tracker.trackEvent(DurationFilterLessThan10SecondsClickedEvent)
-
-                    DurationFilterOption.Between10And60Seconds ->
-                        Analytics.tracker.trackEvent(DurationFilterBetween10and60SecondsClickedEvent)
-
-                    DurationFilterOption.Between1And4 ->
-                        Analytics.tracker.trackEvent(DurationFilterBetween1and4MinutesClickedEvent)
-
-                    DurationFilterOption.Between4And20 ->
-                        Analytics.tracker.trackEvent(DurationFilterBetween4and20MinutesClickedEvent)
-
-                    DurationFilterOption.MoreThan20 ->
-                        Analytics.tracker.trackEvent(DurationFilterMoreThan20MinutesClickedEvent)
-                }
-                onDurationFilterItemClicked(durationOption)
-            }
-        )
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @CombinedThemePreviews
 @Composable
 private fun AllVideosViewPreview() {
@@ -337,7 +207,6 @@ private fun AllVideosViewPreview() {
             items = emptyList(),
             shouldApplySensitiveMode = false,
             progressBarShowing = false,
-            searchMode = false,
             scrollToTop = false,
             lazyListState = LazyListState(),
             sortOrder = "Sort by name",
@@ -346,13 +215,13 @@ private fun AllVideosViewPreview() {
             onMenuClick = { },
             onSortOrderClick = { },
             onLongClick = { _, _ -> },
-            selectedLocationFilterOption = LocationFilterOption.AllLocations,
+            selectedLocationFilterOption = LocationFilterOption.CloudDrive,
             selectedDurationFilterOption = DurationFilterOption.MoreThan20,
-            onLocationFilterItemClicked = { },
-            onDurationFilterItemClicked = { },
             addToPlaylistsTitles = null,
             clearAddToPlaylistsTitles = { },
-            retryActionCallback = { }
+            retryActionCallback = { },
+            onLocationFilterClicked = {},
+            onDurationFilterClicked = {},
         )
     }
 }

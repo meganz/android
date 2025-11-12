@@ -1,14 +1,18 @@
 package mega.privacy.android.app.presentation.videosection
 
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.videosection.model.FavouritesPlaylistBottomSheetOption
 import mega.privacy.android.app.presentation.videosection.view.playlist.FAVOURITES_PLAYLIST_DOWNLOAD_BOTTOM_SHEET_TILE_TEST_TAG
@@ -22,8 +26,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
+import org.mockito.kotlin.verify
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RunWith(AndroidJUnit4::class)
 class FavouritesPlaylistBottomSheetKtTest {
     @get:Rule
@@ -33,14 +38,25 @@ class FavouritesPlaylistBottomSheetKtTest {
         isHideMenuActionVisible: Boolean = false,
         isUnhideMenuActionVisible: Boolean = false,
         onBottomSheetOptionClicked: (FavouritesPlaylistBottomSheetOption) -> Unit = {},
+        onDismissRequest: () -> Unit = {}
     ) {
         composeTestRule.setContent {
+            val sheetState = rememberModalBottomSheetState(
+                skipPartiallyExpanded = true,
+                confirmValueChange = { true }
+            )
+
+            LaunchedEffect(Unit) {
+                delay(500)
+                sheetState.show()
+            }
+
             FavouritesPlaylistBottomSheet(
-                modalSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded),
-                coroutineScope = rememberCoroutineScope(),
+                sheetState = sheetState,
                 isHideMenuActionVisible = isHideMenuActionVisible,
                 isUnhideMenuActionVisible = isUnhideMenuActionVisible,
-                onBottomSheetOptionClicked = onBottomSheetOptionClicked
+                onBottomSheetOptionClicked = onBottomSheetOptionClicked,
+                onDismissRequest = onDismissRequest
             )
         }
     }
@@ -123,7 +139,19 @@ class FavouritesPlaylistBottomSheetKtTest {
                 isUnhideMenuActionVisible = true,
                 onBottomSheetOptionClicked = onBottomSheetOptionClicked
             )
-            FAVOURITES_PLAYLIST_HIDE_BOTTOM_SHEET_TILE_TEST_TAG.performClick()
+
+            val tagNode = composeTestRule.onNodeWithTag(
+                testTag = FAVOURITES_PLAYLIST_HIDE_BOTTOM_SHEET_TILE_TEST_TAG,
+                useUnmergedTree = true
+            )
+            tagNode.assertIsDisplayed()
+
+            tagNode
+                .assert(hasClickAction())
+                .performSemanticsAction(SemanticsActions.OnClick)
+
+            composeTestRule.waitForIdle()
+
             verify(onBottomSheetOptionClicked).invoke(FavouritesPlaylistBottomSheetOption.Hide)
         }
 
@@ -137,7 +165,19 @@ class FavouritesPlaylistBottomSheetKtTest {
                 isUnhideMenuActionVisible = true,
                 onBottomSheetOptionClicked = onBottomSheetOptionClicked
             )
-            FAVOURITES_PLAYLIST_UNHIDE_BOTTOM_SHEET_TILE_TEST_TAG.performClick()
+
+            val tagNode = composeTestRule.onNodeWithTag(
+                testTag = FAVOURITES_PLAYLIST_UNHIDE_BOTTOM_SHEET_TILE_TEST_TAG,
+                useUnmergedTree = true
+            )
+            tagNode.assertIsDisplayed()
+
+            tagNode
+                .assert(hasClickAction())
+                .performSemanticsAction(SemanticsActions.OnClick)
+
+            composeTestRule.waitForIdle()
+
             verify(onBottomSheetOptionClicked).invoke(FavouritesPlaylistBottomSheetOption.Unhide)
         }
 
@@ -151,7 +191,19 @@ class FavouritesPlaylistBottomSheetKtTest {
                 isUnhideMenuActionVisible = true,
                 onBottomSheetOptionClicked = onBottomSheetOptionClicked
             )
-            FAVOURITES_PLAYLIST_DOWNLOAD_BOTTOM_SHEET_TILE_TEST_TAG.performClick()
+
+            val tagNode = composeTestRule.onNodeWithTag(
+                testTag = FAVOURITES_PLAYLIST_DOWNLOAD_BOTTOM_SHEET_TILE_TEST_TAG,
+                useUnmergedTree = true
+            )
+            tagNode.assertIsDisplayed()
+
+            tagNode
+                .assert(hasClickAction())
+                .performSemanticsAction(SemanticsActions.OnClick)
+
+            composeTestRule.waitForIdle()
+
             verify(onBottomSheetOptionClicked).invoke(FavouritesPlaylistBottomSheetOption.Download)
         }
 
@@ -165,7 +217,19 @@ class FavouritesPlaylistBottomSheetKtTest {
                 isUnhideMenuActionVisible = true,
                 onBottomSheetOptionClicked = onBottomSheetOptionClicked
             )
-            FAVOURITES_PLAYLIST_SEND_TO_CHAT_BOTTOM_SHEET_TILE_TEST_TAG.performClick()
+
+            val tagNode = composeTestRule.onNodeWithTag(
+                testTag = FAVOURITES_PLAYLIST_SEND_TO_CHAT_BOTTOM_SHEET_TILE_TEST_TAG,
+                useUnmergedTree = true
+            )
+            tagNode.assertIsDisplayed()
+
+            tagNode
+                .assert(hasClickAction())
+                .performSemanticsAction(SemanticsActions.OnClick)
+
+            composeTestRule.waitForIdle()
+
             verify(onBottomSheetOptionClicked).invoke(FavouritesPlaylistBottomSheetOption.SendToChat)
         }
 
@@ -179,7 +243,19 @@ class FavouritesPlaylistBottomSheetKtTest {
                 isUnhideMenuActionVisible = true,
                 onBottomSheetOptionClicked = onBottomSheetOptionClicked
             )
-            FAVOURITES_PLAYLIST_SHARE_BOTTOM_SHEET_TILE_TEST_TAG.performClick()
+
+            val tagNode = composeTestRule.onNodeWithTag(
+                testTag = FAVOURITES_PLAYLIST_SHARE_BOTTOM_SHEET_TILE_TEST_TAG,
+                useUnmergedTree = true
+            )
+            tagNode.assertIsDisplayed()
+
+            tagNode
+                .assert(hasClickAction())
+                .performSemanticsAction(SemanticsActions.OnClick)
+
+            composeTestRule.waitForIdle()
+
             verify(onBottomSheetOptionClicked).invoke(FavouritesPlaylistBottomSheetOption.Share)
         }
 
@@ -193,11 +269,19 @@ class FavouritesPlaylistBottomSheetKtTest {
                 isUnhideMenuActionVisible = true,
                 onBottomSheetOptionClicked = onBottomSheetOptionClicked
             )
-            FAVOURITES_PLAYLIST_REMOVE_FAVOURITE_BOTTOM_SHEET_TILE_TEST_TAG.performClick()
+
+            val tagNode = composeTestRule.onNodeWithTag(
+                testTag = FAVOURITES_PLAYLIST_REMOVE_FAVOURITE_BOTTOM_SHEET_TILE_TEST_TAG,
+                useUnmergedTree = true
+            )
+            tagNode.assertIsDisplayed()
+
+            tagNode
+                .assert(hasClickAction())
+                .performSemanticsAction(SemanticsActions.OnClick)
+
+            composeTestRule.waitForIdle()
+
             verify(onBottomSheetOptionClicked).invoke(FavouritesPlaylistBottomSheetOption.RemoveFavourite)
         }
-
-
-    private fun String.performClick() =
-        composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true).performClick()
 }

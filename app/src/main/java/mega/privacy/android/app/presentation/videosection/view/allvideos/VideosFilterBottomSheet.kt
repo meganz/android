@@ -6,39 +6,40 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineScope
+import mega.android.core.ui.components.sheets.MegaModalBottomSheet
+import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
 import mega.privacy.android.app.presentation.videosection.model.LocationFilterOption
 import mega.privacy.android.app.presentation.videosection.model.VideosFilterOptionEntity
 import mega.privacy.android.shared.original.core.ui.controls.lists.SettingsItemWithRadioButton
-import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.TextColor
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 internal fun VideosFilterBottomSheet(
     modifier: Modifier,
-    modalSheetState: ModalBottomSheetState,
-    coroutineScope: CoroutineScope,
+    sheetState: SheetState,
     title: String,
     options: List<VideosFilterOptionEntity>,
     onItemSelected: (VideosFilterOptionEntity) -> Unit,
+    onDismissRequest: () -> Unit,
 ) {
-    BottomSheet(
+    MegaModalBottomSheet(
         modifier = modifier,
-        modalSheetState = modalSheetState,
-        sheetBody = {
+        bottomSheetBackground = MegaModalBottomSheetBackground.PageBackground,
+        sheetState = sheetState,
+        onDismissRequest = onDismissRequest,
+        content = {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 MegaText(
                     modifier = Modifier.padding(16.dp),
@@ -59,7 +60,7 @@ internal fun VideosFilterBottomSheet(
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @CombinedThemePreviews
 @Composable
 private fun VideosLocationFilterBottomSheetPreview() {
@@ -67,11 +68,7 @@ private fun VideosLocationFilterBottomSheetPreview() {
         VideosFilterBottomSheet(
             modifier = Modifier,
             title = "Location",
-            modalSheetState = rememberModalBottomSheetState(
-                initialValue = ModalBottomSheetValue.Expanded,
-                skipHalfExpanded = false,
-            ),
-            coroutineScope = rememberCoroutineScope(),
+            sheetState = rememberModalBottomSheetState { true },
             options = LocationFilterOption.entries.map { option ->
                 VideosFilterOptionEntity(
                     id = option.ordinal,
@@ -79,12 +76,13 @@ private fun VideosLocationFilterBottomSheetPreview() {
                     isSelected = false
                 )
             },
-            onItemSelected = {}
+            onItemSelected = {},
+            onDismissRequest = {}
         )
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @CombinedThemePreviews
 @Composable
 private fun VideosDurationFilterBottomSheetPreview() {
@@ -92,11 +90,7 @@ private fun VideosDurationFilterBottomSheetPreview() {
         VideosFilterBottomSheet(
             modifier = Modifier,
             title = "Duration",
-            modalSheetState = rememberModalBottomSheetState(
-                initialValue = ModalBottomSheetValue.Expanded,
-                skipHalfExpanded = false,
-            ),
-            coroutineScope = rememberCoroutineScope(),
+            sheetState = rememberModalBottomSheetState { true },
             options = DurationFilterOption.entries.map { option ->
                 VideosFilterOptionEntity(
                     id = option.ordinal,
@@ -104,7 +98,8 @@ private fun VideosDurationFilterBottomSheetPreview() {
                     isSelected = option == DurationFilterOption.MoreThan20
                 )
             },
-            onItemSelected = {}
+            onItemSelected = {},
+            onDismissRequest = {}
         )
     }
 }

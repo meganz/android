@@ -5,7 +5,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -16,29 +15,26 @@ import mega.privacy.android.app.presentation.videosection.view.playlist.DELETE_V
 import mega.privacy.android.app.presentation.videosection.view.playlist.FAB_BUTTON_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.VIDEO_PLAYLISTS_EMPTY_VIEW_TEST_TAG
-import mega.privacy.android.app.presentation.videosection.view.playlist.VIDEO_PLAYLIST_DELETE_BOTTOM_SHEET_TILE_TEST_TAG
-import mega.privacy.android.app.presentation.videosection.view.playlist.VIDEO_PLAYLIST_RENAME_BOTTOM_SHEET_TILE_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPlaylistsView
 import mega.privacy.android.domain.entity.node.NodeId
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 class VideoPlaylistsViewTest {
     @get:Rule
     val composeTestRule = createComposeRule()
+
     private fun setComposeContent(
         items: List<VideoPlaylistUIEntity> = emptyList(),
         progressBarShowing: Boolean = false,
-        searchMode: Boolean = false,
         scrollToTop: Boolean = false,
         lazyListState: LazyListState = LazyListState(),
         sortOrder: String = "",
         isInputTitleValid: Boolean = true,
         showDeleteVideoPlaylistDialog: Boolean = false,
+        showRenameVideoPlaylistDialog: Boolean = false,
         inputPlaceHolderText: String = "",
         modifier: Modifier = Modifier,
         updateShowDeleteVideoPlaylist: (Boolean) -> Unit = {},
@@ -54,13 +50,14 @@ class VideoPlaylistsViewTest {
         errorMessage: Int? = null,
         onLongClick: ((item: VideoPlaylistUIEntity, index: Int) -> Unit) = { _, _ -> },
         onDeletePlaylistsDialogPositiveButtonClicked: () -> Unit = {},
-        onDeleteDialogNegativeButtonClicked: () -> Unit = {}
+        onDeleteDialogNegativeButtonClicked: () -> Unit = {},
+        updateShowRenameVideoPlaylist: (Boolean) -> Unit = {},
+        onMenuClick: () -> Unit = {}
     ) {
         composeTestRule.setContent {
             VideoPlaylistsView(
                 items = items,
                 progressBarShowing = progressBarShowing,
-                searchMode = searchMode,
                 scrollToTop = scrollToTop,
                 lazyListState = lazyListState,
                 sortOrder = sortOrder,
@@ -83,6 +80,9 @@ class VideoPlaylistsViewTest {
                 onDeletePlaylistsDialogPositiveButtonClicked = onDeletePlaylistsDialogPositiveButtonClicked,
                 onDeleteDialogNegativeButtonClicked = onDeleteDialogNegativeButtonClicked,
                 isStorageOverQuota = { false },
+                onMenuClick = onMenuClick,
+                showRenameVideoPlaylistDialog = showRenameVideoPlaylistDialog,
+                updateShowRenameVideoPlaylist = updateShowRenameVideoPlaylist
             )
         }
     }
@@ -126,19 +126,6 @@ class VideoPlaylistsViewTest {
     }
 
     @Test
-    fun `test that RenameVideoPlaylistDialog is displayed`() {
-        val entity = mock<VideoPlaylistUIEntity> {
-            on { title }.thenReturn("title")
-        }
-        setComposeContent(items = listOf(entity))
-
-        composeTestRule.onNodeWithContentDescription(label = "3 dots", useUnmergedTree = true)
-            .performClick()
-        VIDEO_PLAYLIST_RENAME_BOTTOM_SHEET_TILE_TEST_TAG.performClick()
-        RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsDisplayed()
-    }
-
-    @Test
     fun `test that RenameVideoPlaylistDialog is not displayed by default`() {
         setComposeContent()
 
@@ -157,23 +144,5 @@ class VideoPlaylistsViewTest {
         setComposeContent(showDeleteVideoPlaylistDialog = false)
 
         DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsNotDisplayed()
-    }
-
-    @Test
-    fun `test that setShouldDeleteVideoPlaylist function is invoked as expected`() {
-        val setShouldDeleteVideoPlaylist = mock<(Boolean) -> Unit>()
-        val entity = mock<VideoPlaylistUIEntity> {
-            on { title }.thenReturn("title")
-        }
-        setComposeContent(
-            items = listOf(entity),
-            updateShowDeleteVideoPlaylist = setShouldDeleteVideoPlaylist
-        )
-
-        composeTestRule.onNodeWithContentDescription(label = "3 dots", useUnmergedTree = true)
-            .performClick()
-        VIDEO_PLAYLIST_DELETE_BOTTOM_SHEET_TILE_TEST_TAG.performClick()
-
-        verify(setShouldDeleteVideoPlaylist).invoke(true)
     }
 }

@@ -2,12 +2,16 @@ package mega.privacy.android.app.presentation.videosection
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import coil.annotation.ExperimentalCoilApi
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
@@ -159,13 +163,24 @@ class VideoPlaylistDetailViewTest {
     fun `test that RenameVideoPlaylistDialog is displayed`() {
         setComposeContent(playlist = playlist)
 
+        TEST_TAG_VIDEO_SECTION_MORE_ACTION.assertIsDisplayed()
         TEST_TAG_VIDEO_SECTION_MORE_ACTION.performClick()
-        VIDEO_PLAYLIST_RENAME_BOTTOM_SHEET_TILE_TEST_TAG.performClick()
+
+        composeTestRule.waitForIdle()
+        VIDEO_PLAYLIST_RENAME_BOTTOM_SHEET_TILE_TEST_TAG.assertIsDisplayed()
+        VIDEO_PLAYLIST_RENAME_BOTTOM_SHEET_TILE_TEST_TAG.performSemanticsAction()
+
+        composeTestRule.waitForIdle()
         DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsDisplayed()
     }
 
     private fun String.performClick() =
         composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true).performClick()
+
+    private fun String.performSemanticsAction() =
+        composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true)
+            .assert(hasClickAction())
+            .performSemanticsAction(SemanticsActions.OnClick)
 
     @Test
     fun `test that RenameVideoPlaylistDialog is not displayed by default`() {
@@ -178,8 +193,14 @@ class VideoPlaylistDetailViewTest {
     fun `test that DeleteVideoPlaylistDialog is displayed`() {
         setComposeContent(playlist = playlist)
 
+        TEST_TAG_VIDEO_SECTION_MORE_ACTION.assertIsDisplayed()
         TEST_TAG_VIDEO_SECTION_MORE_ACTION.performClick()
-        VIDEO_PLAYLIST_DELETE_BOTTOM_SHEET_TILE_TEST_TAG.performClick()
+
+        composeTestRule.waitForIdle()
+        VIDEO_PLAYLIST_DELETE_BOTTOM_SHEET_TILE_TEST_TAG.assertIsDisplayed()
+        VIDEO_PLAYLIST_DELETE_BOTTOM_SHEET_TILE_TEST_TAG.performSemanticsAction()
+
+        composeTestRule.waitForIdle()
         DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsDisplayed()
     }
 

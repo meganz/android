@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.videosection.view.playlist
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,9 +19,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -36,9 +34,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -59,6 +57,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
@@ -69,12 +68,13 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_050_grey_800
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaNode
 
 /**
  * Video playlist detail view
  */
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun VideoPlaylistDetailView(
     playlist: VideoPlaylistUIEntity?,
@@ -122,23 +122,20 @@ fun VideoPlaylistDetailView(
     val scaffoldState = rememberScaffoldState()
 
     val coroutineScope = rememberCoroutineScope()
-    val modalSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        skipHalfExpanded = false
-    )
-    val favouritesPlaylistModalSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        skipHalfExpanded = true
-    )
+
+    var showCustomiseBottomSheet by rememberSaveable { mutableStateOf(false) }
+    var showFavouritesBottomSheet by rememberSaveable { mutableStateOf(false) }
+    val customizeSheetState = rememberModalBottomSheetState(true)
+    val favouritesSheetState = rememberModalBottomSheetState(true)
 
     val scrollNotInProgress by remember {
         derivedStateOf { !lazyListState.isScrollInProgress }
     }
 
-    val context = LocalContext.current
+    val resources = LocalResources.current
     LaunchedEffect(numberOfAddedVideos) {
         if (numberOfAddedVideos > 0) {
-            val message = context.resources.getQuantityString(
+            val message = resources.getQuantityString(
                 sharedR.plurals.video_section_playlist_detail_add_videos_message,
                 numberOfAddedVideos,
                 numberOfAddedVideos,
@@ -163,7 +160,7 @@ fun VideoPlaylistDetailView(
 
     LaunchedEffect(numberOfRemovedItems) {
         if (numberOfRemovedItems > 0) {
-            val message = context.resources.getQuantityString(
+            val message = resources.getQuantityString(
                 sharedR.plurals.video_section_playlist_detail_remove_videos_message,
                 numberOfRemovedItems,
                 numberOfRemovedItems,
@@ -176,26 +173,8 @@ fun VideoPlaylistDetailView(
         }
     }
 
-    BackHandler(modalSheetState.isVisible) {
-        if (modalSheetState.isVisible) {
-            coroutineScope.launch {
-                modalSheetState.hide()
-            }
-        }
-    }
-
-    BackHandler(enabled = favouritesPlaylistModalSheetState.isVisible || selectedSize > 0) {
-        when {
-            favouritesPlaylistModalSheetState.isVisible -> {
-                coroutineScope.launch {
-                    favouritesPlaylistModalSheetState.hide()
-                }
-            }
-
-            selectedSize > 0 -> {
-                onBackPressed()
-            }
-        }
+    BackHandler(enabled = selectedSize > 0) {
+        onBackPressed()
     }
 
     MegaScaffold(
@@ -214,9 +193,11 @@ fun VideoPlaylistDetailView(
                         is VideoSectionMenuAction.VideoSectionMoreAction -> {
                             coroutineScope.launch {
                                 if (isSystemVideoPlaylist) {
-                                    favouritesPlaylistModalSheetState.show()
+                                    showFavouritesBottomSheet = true
+                                    favouritesSheetState.show()
                                 } else {
-                                    modalSheetState.show()
+                                    showCustomiseBottomSheet = true
+                                    customizeSheetState.show()
                                 }
                             }
                         }
@@ -250,7 +231,6 @@ fun VideoPlaylistDetailView(
                     onDismissRequest = {
                         showRenameVideoPlaylistDialog = false
                         setInputValidity(true)
-                        coroutineScope.launch { modalSheetState.hide() }
                     },
                     initialInputText = { playlist.title },
                     onDialogPositiveButtonClicked = { newTitle ->
@@ -273,7 +253,6 @@ fun VideoPlaylistDetailView(
                     },
                     onDismiss = {
                         showDeleteVideoPlaylistDialog = false
-                        coroutineScope.launch { modalSheetState.hide() }
                     }
                 )
             }
@@ -294,7 +273,6 @@ fun VideoPlaylistDetailView(
                     },
                     onDismiss = {
                         showDeleteVideosDialog = false
-                        coroutineScope.launch { modalSheetState.hide() }
                     }
                 )
             }
@@ -365,52 +343,79 @@ fun VideoPlaylistDetailView(
             }
         }
     }
-    VideoPlaylistBottomSheet(
-        modalSheetState = modalSheetState,
-        coroutineScope = coroutineScope,
-        onRenameVideoPlaylistClicked = {
-            if (isStorageOverQuota()) {
-                showOverDiskQuotaPaywallWarning()
-            } else {
-                showRenameVideoPlaylistDialog = true
+
+    if (showCustomiseBottomSheet) {
+        VideoPlaylistBottomSheet(
+            sheetState = customizeSheetState,
+            onDismissRequest = {
+                coroutineScope.launch {
+                    showCustomiseBottomSheet = false
+                    customizeSheetState.hide()
+                }
+            },
+            onRenameVideoPlaylistClicked = {
+                coroutineScope.launch {
+                    showCustomiseBottomSheet = false
+                    customizeSheetState.hide()
+                }
+                if (isStorageOverQuota()) {
+                    showOverDiskQuotaPaywallWarning()
+                } else {
+                    showRenameVideoPlaylistDialog = true
+                }
+            },
+            onDeleteVideoPlaylistClicked = {
+                coroutineScope.launch {
+                    showCustomiseBottomSheet = false
+                    customizeSheetState.hide()
+                }
+                if (isStorageOverQuota()) {
+                    showOverDiskQuotaPaywallWarning()
+                } else {
+                    showDeleteVideoPlaylistDialog = true
+                }
             }
-        },
-        onDeleteVideoPlaylistClicked = {
-            if (isStorageOverQuota()) {
-                showOverDiskQuotaPaywallWarning()
-            } else {
-                showDeleteVideoPlaylistDialog = true
+        )
+    }
+
+    if (showFavouritesBottomSheet) {
+        FavouritesPlaylistBottomSheet(
+            sheetState = favouritesSheetState,
+            isHideMenuActionVisible = isHideMenuActionVisible,
+            isUnhideMenuActionVisible = isUnhideMenuActionVisible,
+            onDismissRequest = {
+                coroutineScope.launch {
+                    showFavouritesBottomSheet = false
+                    favouritesSheetState.hide()
+                }
+            },
+            onBottomSheetOptionClicked = { option ->
+                coroutineScope.launch {
+                    showFavouritesBottomSheet = false
+                    favouritesSheetState.hide()
+                }
+                when (option) {
+                    FavouritesPlaylistBottomSheetOption.Download ->
+                        onMenuActionClick(VideoSectionMenuAction.VideoSectionDownloadAction)
+
+                    FavouritesPlaylistBottomSheetOption.SendToChat ->
+                        onMenuActionClick(VideoSectionMenuAction.VideoSectionSendToChatAction)
+
+                    FavouritesPlaylistBottomSheetOption.Share ->
+                        onMenuActionClick(VideoSectionMenuAction.VideoSectionShareAction)
+
+                    FavouritesPlaylistBottomSheetOption.Hide ->
+                        onMenuActionClick(VideoSectionMenuAction.VideoSectionHideAction)
+
+                    FavouritesPlaylistBottomSheetOption.Unhide ->
+                        onMenuActionClick(VideoSectionMenuAction.VideoSectionUnhideAction)
+
+                    FavouritesPlaylistBottomSheetOption.RemoveFavourite ->
+                        onRemoveFavouriteOptionClicked()
+                }
             }
-        }
-    )
-
-    FavouritesPlaylistBottomSheet(
-        modalSheetState = favouritesPlaylistModalSheetState,
-        coroutineScope = coroutineScope,
-        isHideMenuActionVisible = isHideMenuActionVisible,
-        isUnhideMenuActionVisible = isUnhideMenuActionVisible,
-        onBottomSheetOptionClicked = { option ->
-            when (option) {
-                FavouritesPlaylistBottomSheetOption.Download ->
-                    onMenuActionClick(VideoSectionMenuAction.VideoSectionDownloadAction)
-
-                FavouritesPlaylistBottomSheetOption.SendToChat ->
-                    onMenuActionClick(VideoSectionMenuAction.VideoSectionSendToChatAction)
-
-                FavouritesPlaylistBottomSheetOption.Share ->
-                    onMenuActionClick(VideoSectionMenuAction.VideoSectionShareAction)
-
-                FavouritesPlaylistBottomSheetOption.Hide ->
-                    onMenuActionClick(VideoSectionMenuAction.VideoSectionHideAction)
-
-                FavouritesPlaylistBottomSheetOption.Unhide ->
-                    onMenuActionClick(VideoSectionMenuAction.VideoSectionUnhideAction)
-
-                FavouritesPlaylistBottomSheetOption.RemoveFavourite ->
-                    onRemoveFavouriteOptionClicked()
-            }
-        }
-    )
+        )
+    }
 }
 
 @Composable

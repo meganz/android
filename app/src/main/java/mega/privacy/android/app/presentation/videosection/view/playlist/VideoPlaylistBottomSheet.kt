@@ -3,40 +3,37 @@ package mega.privacy.android.app.presentation.videosection.view.playlist
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import mega.android.core.ui.components.sheets.MegaModalBottomSheet
+import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
-import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 internal fun VideoPlaylistBottomSheet(
-    modalSheetState: ModalBottomSheetState,
-    coroutineScope: CoroutineScope,
+    sheetState: SheetState,
     onRenameVideoPlaylistClicked: () -> Unit,
     onDeleteVideoPlaylistClicked: () -> Unit,
+    onDismissRequest: () -> Unit,
 ) {
-    BottomSheet(modalSheetState = modalSheetState,
-        sheetBody = {
+    MegaModalBottomSheet(
+        sheetState = sheetState,
+        bottomSheetBackground = MegaModalBottomSheetBackground.PageBackground,
+        onDismissRequest = onDismissRequest,
+        content = {
             VideoPlaylistBottomSheetBody(
-                onRenameVideoPlaylistClicked = {
-                    coroutineScope.launch { modalSheetState.hide() }
-                    onRenameVideoPlaylistClicked()
-                },
-                onDeleteVideoPlaylistClicked = {
-                    coroutineScope.launch { modalSheetState.hide() }
-                    onDeleteVideoPlaylistClicked()
-                }
+                onRenameVideoPlaylistClicked = onRenameVideoPlaylistClicked,
+                onDeleteVideoPlaylistClicked = onDeleteVideoPlaylistClicked
             )
         }
     )
