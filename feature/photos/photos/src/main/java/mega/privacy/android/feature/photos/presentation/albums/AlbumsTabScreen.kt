@@ -23,7 +23,7 @@ import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.components.AlbumGridItem
 import mega.privacy.android.feature.photos.extensions.downloadAsStateWithLifecycle
-import mega.privacy.android.feature.photos.navigation.AlbumContentNavKey
+import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.feature.photos.presentation.albums.content.toAlbumContentNavKey
 import mega.privacy.android.feature.photos.presentation.albums.dialog.EnterAlbumNameDialog
 

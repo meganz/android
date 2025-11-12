@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.photos.presentation.albums.content
 
 import mega.privacy.android.domain.entity.media.MediaAlbum
-import mega.privacy.android.feature.photos.navigation.AlbumContentNavKey
+import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.feature.photos.presentation.albums.model.FavouriteSystemAlbum
 import mega.privacy.android.feature.photos.presentation.albums.model.GifSystemAlbum
 import mega.privacy.android.feature.photos.presentation.albums.model.RawSystemAlbum

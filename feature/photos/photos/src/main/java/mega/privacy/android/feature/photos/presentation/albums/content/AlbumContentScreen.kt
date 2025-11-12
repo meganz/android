@@ -68,6 +68,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.photos.R
@@ -79,6 +80,7 @@ import mega.privacy.android.feature.photos.presentation.albums.dialog.RemoveAlbu
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.feature.photos.presentation.albums.view.AlbumDynamicContentGrid
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AlbumContentDeleteAlbumEvent
 import mega.privacy.mobile.analytics.event.DeleteAlbumCancelButtonPressedEvent
@@ -122,9 +124,14 @@ fun AlbumContentScreen(
         resetUpdateAlbumNameErrorMessage = viewModel::resetUpdateAlbumNameErrorMessage,
         showUpdateAlbumName = viewModel::showUpdateAlbumName,
         resetShowUpdateAlbumName = viewModel::resetShowUpdateAlbumName,
+        selectAlbumCover = {
+            navigationHandler.navigate(
+                LegacyAlbumCoverSelectionNavKey(it.id)
+            )
+        },
         onTransfer = onTransfer,
         consumeDownloadEvent = actionViewModel::markDownloadEventConsumed,
-        consumeInfoToShowEvent = actionViewModel::onInfoToShowEventConsumed
+        consumeInfoToShowEvent = actionViewModel::onInfoToShowEventConsumed,
     )
 }
 
@@ -155,6 +162,7 @@ internal fun AlbumContentScreen(
     resetUpdateAlbumNameErrorMessage: () -> Unit,
     showUpdateAlbumName: () -> Unit,
     resetShowUpdateAlbumName: () -> Unit,
+    selectAlbumCover: (AlbumId) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     consumeDownloadEvent: () -> Unit,
     consumeInfoToShowEvent: () -> Unit,
@@ -171,6 +179,7 @@ internal fun AlbumContentScreen(
     }
     var showDeletePhotosConfirmation by remember { mutableStateOf(false) }
     var isMoreOptionsSheetVisible by rememberSaveable { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     EventEffect(
         event = actionState.downloadEvent,
@@ -364,7 +373,13 @@ internal fun AlbumContentScreen(
                 }
             },
             renameAlbum = showUpdateAlbumName,
-            isDarkTheme = uiState.themeMode.isDarkMode()
+            isDarkTheme = uiState.themeMode.isDarkMode(),
+            selectAlbumCover = {
+                val userAlbum = uiState.uiAlbum?.mediaAlbum as? MediaAlbum.User
+                    ?: return@AlbumOptionsBottomSheet
+
+                selectAlbumCover(userAlbum.id)
+            }
         )
 
         if (uiState.showUpdateAlbumName == triggered) {
@@ -408,6 +423,7 @@ internal fun AlbumOptionsBottomSheet(
     albumUiState: AlbumUiState?,
     deleteAlbum: () -> Unit,
     renameAlbum: () -> Unit,
+    selectAlbumCover: () -> Unit,
     isVisible: Boolean = false,
     isDarkTheme: Boolean = isSystemInDarkTheme()
 ) {
@@ -486,7 +502,7 @@ internal fun AlbumOptionsBottomSheet(
                                 }
 
                                 is AlbumContentSelectionAction.SelectAlbumCover -> {
-                                    // Todo select album cover
+                                    selectAlbumCover()
                                 }
 
                                 is AlbumContentSelectionAction.ManageLink -> {
@@ -543,6 +559,7 @@ private fun AlbumContentScreenPreview() {
             resetUpdateAlbumNameErrorMessage = {},
             showUpdateAlbumName = {},
             resetShowUpdateAlbumName = {},
+            selectAlbumCover = {},
             onTransfer = {},
             consumeDownloadEvent = {},
             consumeInfoToShowEvent = {}

@@ -14,6 +14,7 @@ import de.palm.composestateevents.triggered
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
+import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.shared.resources.R as sharedResR
 import org.junit.Rule
 import org.junit.Test
@@ -41,7 +42,7 @@ class AlbumsTabScreenComposeTest {
         addNewAlbum: (String) -> Unit = {},
         showNewAlbumDialogEvent: StateEvent = consumed,
         resetNewAlbumDialogEvent: () -> Unit = {},
-        navigateToAlbumContent: (mega.privacy.android.feature.photos.navigation.AlbumContentNavKey) -> Unit = {},
+        navigateToAlbumContent: (AlbumContentNavKey) -> Unit = {},
     ) {
         composeTestRule.setContent {
             AlbumsTabScreen(

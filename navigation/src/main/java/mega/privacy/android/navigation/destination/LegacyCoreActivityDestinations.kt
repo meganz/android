@@ -127,3 +127,10 @@ data object LegacyExportRecoveryKeyNavKey : NavKey
 data class LegacyFolderLinkNavKey(
     val uriString: String?,
 ) : NoSessionNavKey.Optional
+
+@Serializable
+data class LegacyAlbumCoverSelectionNavKey(val albumId: Long) : NavKey {
+    companion object Companion {
+        const val MESSAGE = "extra_message"
+    }
+}

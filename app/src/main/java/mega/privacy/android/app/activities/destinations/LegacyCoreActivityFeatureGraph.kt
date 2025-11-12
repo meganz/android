@@ -37,5 +37,6 @@ class LegacyCoreActivityFeatureGraph : FeatureDestination {
             legacyExportRecoveryKeyScreen(navigationHandler::back)
             legacyFolderLinkScreen(navigationHandler::back)
             chatListLegacyDestination(navigationHandler::back)
+            legacyAlbumCoverSelection(navigationHandler::returnResult)
         }
 }

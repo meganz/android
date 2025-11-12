@@ -11,7 +11,8 @@ class MediaFeatureDestination : FeatureDestination {
         { navigationHandler, transferHandler ->
             albumContentScreen(
                 navigationHandler = navigationHandler,
-                onTransfer = transferHandler::setTransferEvent
+                onTransfer = transferHandler::setTransferEvent,
+                resultFlow = navigationHandler::monitorResult
             )
         }
 }

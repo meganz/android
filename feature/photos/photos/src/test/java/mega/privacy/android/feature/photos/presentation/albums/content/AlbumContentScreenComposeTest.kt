@@ -67,6 +67,7 @@ class AlbumContentScreenComposeTest {
         resetUpdateAlbumNameErrorMessage: () -> Unit = {},
         showUpdateAlbumName: () -> Unit = {},
         resetShowUpdateAlbumName: () -> Unit = {},
+        selectAlbumCover: (AlbumId) -> Unit = {},
         onTransfer: (TransferTriggerEvent) -> Unit = {},
         consumeDownloadEvent: () -> Unit = {},
         consumeInfoToShowEvent: () -> Unit = {},
@@ -98,9 +99,10 @@ class AlbumContentScreenComposeTest {
                     showUpdateAlbumName = showUpdateAlbumName,
                     resetShowUpdateAlbumName = resetShowUpdateAlbumName,
                     resetDeleteAlbumSuccessEvent = resetDeleteAlbumSuccessEvent,
+                    selectAlbumCover = selectAlbumCover,
                     onTransfer = onTransfer,
                     consumeDownloadEvent = consumeDownloadEvent,
-                    consumeInfoToShowEvent = consumeInfoToShowEvent
+                    consumeInfoToShowEvent = consumeInfoToShowEvent,
                 )
             }
         }
@@ -357,7 +359,8 @@ class AlbumContentScreenComposeTest {
                     onDismiss = {},
                     albumUiState = albumUiState,
                     deleteAlbum = {},
-                    renameAlbum = {}
+                    renameAlbum = {},
+                    selectAlbumCover = {}
                 )
             }
         }
@@ -379,7 +382,8 @@ class AlbumContentScreenComposeTest {
                     onDismiss = {},
                     albumUiState = albumUiState,
                     deleteAlbum = {},
-                    renameAlbum = {}
+                    renameAlbum = {},
+                    selectAlbumCover = {}
                 )
             }
         }

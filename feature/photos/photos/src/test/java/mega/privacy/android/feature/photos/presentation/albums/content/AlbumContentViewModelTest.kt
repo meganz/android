@@ -51,7 +51,7 @@ import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.Sort
-import mega.privacy.android.feature.photos.navigation.AlbumContentNavKey
+import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import org.junit.jupiter.api.AfterAll

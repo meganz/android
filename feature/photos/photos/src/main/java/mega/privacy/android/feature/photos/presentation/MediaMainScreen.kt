@@ -28,7 +28,7 @@ import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.feature.photos.model.MediaAppBarAction
 import mega.privacy.android.feature.photos.model.MediaAppBarAction.CameraUpload.CameraUploadStatus
 import mega.privacy.android.feature.photos.model.MediaScreen
-import mega.privacy.android.feature.photos.navigation.AlbumContentNavKey
+import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabRoute
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabRoute
 import mega.privacy.android.shared.resources.R as sharedResR
