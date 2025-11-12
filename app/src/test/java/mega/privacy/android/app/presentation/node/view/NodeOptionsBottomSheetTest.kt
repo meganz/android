@@ -31,6 +31,7 @@ class NodeOptionsBottomSheetTest {
 
     private val node = mock<TypedFolderNode> {
         on { name }.thenReturn("name")
+        on { isNodeKeyDecrypted }.thenReturn(true)
         on { childFileCount }.thenReturn(1)
         on { childFolderCount }.thenReturn(1)
     }
@@ -38,13 +39,15 @@ class NodeOptionsBottomSheetTest {
     @Test
     fun `test that a single group has no dividers`() {
         viewModel.stub {
-            on { state }.thenReturn(MutableStateFlow(
+            on { state }.thenReturn(
+                MutableStateFlow(
                 NodeBottomSheetState(
                     name = "",
                     isOnline = true,
                     node = node,
-                    actions = persistentListOf(persistentListOf(
-                        BottomSheetMenuItem(
+                    actions = persistentListOf(
+                        persistentListOf(
+                            BottomSheetMenuItem(
                             group = 1,
                             orderInGroup = 1,
                             control = { _, _, _, _ -> }
@@ -73,8 +76,9 @@ class NodeOptionsBottomSheetTest {
     @Test
     fun `test that two groups have a divider`() {
         viewModel.stub {
-            on { state }.thenReturn(MutableStateFlow(
-                NodeBottomSheetState(
+            on { state }.thenReturn(
+                MutableStateFlow(
+                    NodeBottomSheetState(
                     name = "",
                     isOnline = true,
                     node = node,

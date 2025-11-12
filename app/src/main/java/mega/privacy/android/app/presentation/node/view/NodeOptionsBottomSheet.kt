@@ -23,6 +23,7 @@ import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.view.extension.fileInfo
 import mega.privacy.android.app.presentation.view.extension.folderInfo
+import mega.privacy.android.app.presentation.view.extension.getNodeTitle
 import mega.privacy.android.core.nodecomponents.extension.getIcon
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.FileNode
@@ -84,7 +85,7 @@ internal fun NodeOptionsBottomSheetContent(
     if (uiState.node != null) {
         NodeListViewItem(
             modifier = Modifier.semantics { testTagsAsResourceId = true },
-            title = node?.name.orEmpty(),
+            title = node?.getNodeTitle() ?: "",
             titleColor = if (node?.isTakenDown == true) TextColor.Error else TextColor.Primary,
             titleOverflow = LongTextBehaviour.MiddleEllipsis,
             subtitle = uiState.shareInfo ?: getOutShareInfo() ?: when (node) {

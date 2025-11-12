@@ -113,7 +113,7 @@ internal data class FileInfoViewState(
         title = typedNode.name,
         isFile = typedNode is FileNode,
         sizeInBytes = (typedNode as? FileNode)?.size ?: this.sizeInBytes,
-        isAvailableOfflineAvailable = if (typedNode is FileNode) {
+        isAvailableOfflineAvailable = if (typedNode is FileNode && typedNode.isNodeKeyDecrypted) {
             true
         } else {
             this.isAvailableOfflineAvailable
