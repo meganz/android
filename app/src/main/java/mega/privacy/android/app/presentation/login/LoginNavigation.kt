@@ -33,7 +33,7 @@ internal fun NavGraphBuilder.loginScreen(
         val sharedViewModel = activityViewModel ?: hiltViewModel<LoginViewModel>(parentEntry)
         val billingViewModel = hiltViewModel<BillingViewModel>(parentEntry)
         LoginNavigationHandler(
-            navigateToLoginScreen = { navController.navigate(LoginNavKey) },
+            navigateToLoginScreen = { navController.navigate(LoginNavKey()) },
             navigateToCreateAccountScreen = { navController.navigate(CreateAccountNavKey()) },
             navigateToTourScreen = {
                 navController.navigate(TourNavKey, navOptions {
@@ -84,5 +84,5 @@ internal fun NavController.openLoginScreen(
         }
     },
 ) {
-    navigate(LoginNavKey, options)
+    navigate(LoginNavKey(), options)
 }

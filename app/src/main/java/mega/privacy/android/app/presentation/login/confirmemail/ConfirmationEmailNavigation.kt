@@ -50,7 +50,7 @@ internal fun NavGraphBuilder.confirmationEmailScreen(
         }
 
         LoginNavigationHandler(
-            navigateToLoginScreen = { navController.navigate(LoginNavKey) },
+            navigateToLoginScreen = { navController.navigate(LoginNavKey()) },
             navigateToCreateAccountScreen = { navController.navigate(CreateAccountNavKey) },
             navigateToTourScreen = {
                 navController.navigate(TourNavKey, navOptions {

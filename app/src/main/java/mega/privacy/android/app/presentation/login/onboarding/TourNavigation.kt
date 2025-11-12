@@ -38,7 +38,7 @@ internal fun NavGraphBuilder.tourScreen(
             hiltViewModel<LoginViewModel>(parentEntry)
         }
         LoginNavigationHandler(
-            navigateToLoginScreen = { navController.navigate(LoginNavKey) },
+            navigateToLoginScreen = { navController.navigate(LoginNavKey()) },
             navigateToCreateAccountScreen = { navController.navigate(CreateAccountNavKey) },
             navigateToTourScreen = {
                 navController.navigate(TourNavKey, navOptions {
