@@ -350,7 +350,7 @@ class MonitorTimelinePhotosUseCase @Inject constructor(
         return PhotoDateResult.Day(
             date = date,
             photo = photo,
-            photosCount = photosCount.toString()
+            photosCount = photosCount
         )
     }
 

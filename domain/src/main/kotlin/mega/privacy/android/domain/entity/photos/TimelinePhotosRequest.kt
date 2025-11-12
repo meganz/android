@@ -30,7 +30,7 @@ sealed class PhotoDateResult(
     data class Day(
         override val date: String,
         override val photo: PhotoResult,
-        val photosCount: String,
+        val photosCount: Int,
     ) : PhotoDateResult(
         date = date,
         photo = photo

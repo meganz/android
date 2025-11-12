@@ -29,12 +29,12 @@ class DownloadPhotoViewModel @Inject constructor(
     private val photoMapper: PhotoMapper,
 ) : ViewModel() {
 
-    private val downloadResultMap =
-        object : LinkedHashMap<Long, StateFlow<DownloadPhotoResult>>(MAX_DOWNLOAD_CACHE_SIZE) {
-            override fun removeEldestEntry(
-                eldest: MutableMap.MutableEntry<Long, StateFlow<DownloadPhotoResult>>?,
-            ): Boolean = size > MAX_DOWNLOAD_CACHE_SIZE
-        }
+    private val downloadResultMap = object :
+        LinkedHashMap<DownloadResultKey, StateFlow<DownloadPhotoResult>>(MAX_DOWNLOAD_CACHE_SIZE) {
+        override fun removeEldestEntry(
+            eldest: MutableMap.MutableEntry<DownloadResultKey, StateFlow<DownloadPhotoResult>>?,
+        ): Boolean = size > MAX_DOWNLOAD_CACHE_SIZE
+    }
     private val cacheMutex = Mutex()
 
     /**
@@ -54,7 +54,11 @@ class DownloadPhotoViewModel @Inject constructor(
         isPreview: Boolean,
         isPublicNode: Boolean = false,
     ): StateFlow<DownloadPhotoResult> = cacheMutex.withLock {
-        downloadResultMap.getOrPut(photoUiState.id) {
+        val key = DownloadResultKey(
+            photoUiState = photoUiState,
+            isPreview = isPreview,
+        )
+        downloadResultMap.getOrPut(key) {
             flow {
                 val result = runCatching {
                     downloadPhotoUseCase(
@@ -82,6 +86,11 @@ class DownloadPhotoViewModel @Inject constructor(
             }
         }
     }
+
+    data class DownloadResultKey(
+        val photoUiState: PhotoUiState,
+        val isPreview: Boolean,
+    )
 
     companion object {
         private const val MAX_DOWNLOAD_CACHE_SIZE = 300

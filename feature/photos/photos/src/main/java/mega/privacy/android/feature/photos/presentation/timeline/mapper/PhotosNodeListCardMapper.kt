@@ -3,10 +3,14 @@ package mega.privacy.android.feature.photos.presentation.timeline.mapper
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import mega.privacy.android.domain.entity.photos.PhotoDateResult
+import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
+import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoNodeListCardItem
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
 import javax.inject.Inject
 
-class PhotosNodeListCardMapper @Inject constructor() {
+class PhotosNodeListCardMapper @Inject constructor(
+    private val photoUiStateMapper: PhotoUiStateMapper,
+) {
 
     operator fun invoke(photosDateResults: List<PhotoDateResult>): ImmutableList<PhotosNodeListCard> =
         photosDateResults.map {
@@ -14,7 +18,10 @@ class PhotosNodeListCardMapper @Inject constructor() {
                 is PhotoDateResult.Day -> {
                     PhotosNodeListCard.Days(
                         date = it.date,
-                        photo = it.photo,
+                        photoItem = PhotoNodeListCardItem(
+                            photo = photoUiStateMapper(photo = it.photo.photo),
+                            isMarkedSensitive = it.photo.isMarkedSensitive
+                        ),
                         photosCount = it.photosCount
                     )
                 }
@@ -22,14 +29,20 @@ class PhotosNodeListCardMapper @Inject constructor() {
                 is PhotoDateResult.Month -> {
                     PhotosNodeListCard.Months(
                         date = it.date,
-                        photo = it.photo
+                        photoItem = PhotoNodeListCardItem(
+                            photo = photoUiStateMapper(photo = it.photo.photo),
+                            isMarkedSensitive = it.photo.isMarkedSensitive
+                        ),
                     )
                 }
 
                 is PhotoDateResult.Year -> {
                     PhotosNodeListCard.Years(
                         date = it.date,
-                        photo = it.photo
+                        photoItem = PhotoNodeListCardItem(
+                            photo = photoUiStateMapper(photo = it.photo.photo),
+                            isMarkedSensitive = it.photo.isMarkedSensitive
+                        ),
                     )
                 }
             }
