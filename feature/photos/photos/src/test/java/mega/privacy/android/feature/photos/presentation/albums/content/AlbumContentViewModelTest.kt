@@ -6,21 +6,28 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
+import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.exception.account.AlbumNameValidationException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetAlbumPhotosUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetNodeListByIdsUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
@@ -31,13 +38,13 @@ import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.media.GetUserAlbumCoverPhotoUseCase
 import mega.privacy.android.domain.usecase.media.MonitorUserAlbumByIdUseCase
+import mega.privacy.android.domain.usecase.media.ValidateAndUpdateUserAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
-import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
-import mega.privacy.android.domain.usecase.photos.UpdateAlbumNameUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.feature.photos.mapper.AlbumNameValidationExceptionMessageMapper
 import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
 import mega.privacy.android.feature.photos.mapper.LegacyMediaSystemAlbumMapper
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
@@ -45,6 +52,7 @@ import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.feature.photos.navigation.AlbumContentNavKey
+import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -80,8 +88,7 @@ class AlbumContentViewModelTest {
     private val removeFavouritesUseCase = mock<RemoveFavouritesUseCase>()
     private val removePhotosFromAlbumUseCase = mock<RemovePhotosFromAlbumUseCase>()
     private val getNodeListByIdsUseCase = mock<GetNodeListByIdsUseCase>()
-    private val getProscribedAlbumNamesUseCase = mock<GetProscribedAlbumNamesUseCase>()
-    private val updateAlbumNameUseCase = mock<UpdateAlbumNameUseCase>()
+    private val validateAndUpdateUserAlbumUseCase = mock<ValidateAndUpdateUserAlbumUseCase>()
     private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
@@ -93,6 +100,11 @@ class AlbumContentViewModelTest {
     private val removeAlbumsUseCase = mock<RemoveAlbumsUseCase>()
     private val snackbarEventQueue = mock<SnackbarEventQueue>()
     private val analyticsTracker: AnalyticsTracker = mock()
+    private val albumNameValidationExceptionMessageMapper: AlbumNameValidationExceptionMessageMapper =
+        mock()
+    private val monitorThemeModeUseCase: MonitorThemeModeUseCase = mock()
+
+    private val themeModeFlow = MutableStateFlow(ThemeMode.System)
 
     @BeforeAll
     fun setup() {
@@ -122,8 +134,7 @@ class AlbumContentViewModelTest {
             removeFavouritesUseCase,
             removePhotosFromAlbumUseCase,
             getNodeListByIdsUseCase,
-            getProscribedAlbumNamesUseCase,
-            updateAlbumNameUseCase,
+            validateAndUpdateUserAlbumUseCase,
             updateNodeSensitiveUseCase,
             getFeatureFlagValueUseCase,
             monitorShowHiddenItemsUseCase,
@@ -134,7 +145,8 @@ class AlbumContentViewModelTest {
             photoUiStateMapper,
             getUserAlbumCoverPhotoUseCase,
             removeAlbumsUseCase,
-            snackbarEventQueue
+            snackbarEventQueue,
+            monitorThemeModeUseCase
         )
         stubCommon()
         Analytics.initialise(analyticsTracker)
@@ -151,6 +163,7 @@ class AlbumContentViewModelTest {
         whenever(monitorAccountDetailUseCase()).thenReturn(emptyFlow())
         whenever(observeAlbumPhotosAddingProgress(mock())).thenReturn(emptyFlow())
         whenever(observeAlbumPhotosRemovingProgress(mock())).thenReturn(emptyFlow())
+        whenever(monitorThemeModeUseCase()).thenReturn(themeModeFlow)
     }
 
     private fun createViewModel(
@@ -172,8 +185,7 @@ class AlbumContentViewModelTest {
             removeFavouritesUseCase = removeFavouritesUseCase,
             removePhotosFromAlbumUseCase = removePhotosFromAlbumUseCase,
             getNodeListByIdsUseCase = getNodeListByIdsUseCase,
-            getProscribedAlbumNamesUseCase = getProscribedAlbumNamesUseCase,
-            updateAlbumNameUseCase = updateAlbumNameUseCase,
+            updateAlbumNameUseCase = validateAndUpdateUserAlbumUseCase,
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
@@ -184,6 +196,8 @@ class AlbumContentViewModelTest {
             getUserAlbumCoverPhotoUseCase = getUserAlbumCoverPhotoUseCase,
             removeAlbumsUseCase = removeAlbumsUseCase,
             snackbarEventQueue = snackbarEventQueue,
+            albumNameValidationExceptionMessageMapper = albumNameValidationExceptionMessageMapper,
+            monitorThemeModeUseCase = monitorThemeModeUseCase,
             navKey = navKey,
         )
     }
@@ -638,98 +652,6 @@ class AlbumContentViewModelTest {
     }
 
     @Test
-    fun `test that updateAlbumName updates state correctly with valid name`() = runTest {
-        createViewModel()
-        val newName = "New Album Name"
-        val albumNames = listOf("Existing Album")
-        whenever(getProscribedAlbumNamesUseCase()).thenReturn(emptyList())
-
-        underTest.updateAlbumName(newName, albumNames)
-
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.isInputNameValid).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that updateAlbumName updates state with error when name is empty`() = runTest {
-        createViewModel()
-        val newName = ""
-        val albumNames = listOf("Existing Album")
-        whenever(getProscribedAlbumNamesUseCase()).thenReturn(emptyList())
-
-        underTest.updateAlbumName(newName, albumNames)
-
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.isInputNameValid).isFalse()
-        }
-    }
-
-    @Test
-    fun `test that updateAlbumName updates state with error when name is proscribed`() = runTest {
-        createViewModel()
-        val newName = "ProscribedName"
-        val albumNames = listOf("Existing Album")
-        whenever(getProscribedAlbumNamesUseCase()).thenReturn(listOf("ProscribedName"))
-
-        underTest.updateAlbumName(newName, albumNames)
-
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.isInputNameValid).isFalse()
-        }
-    }
-
-    @Test
-    fun `test that updateAlbumName updates state with error when name already exists`() = runTest {
-        createViewModel()
-        val newName = "Existing Album"
-        val albumNames = listOf("Existing Album")
-        whenever(getProscribedAlbumNamesUseCase()).thenReturn(emptyList())
-
-        underTest.updateAlbumName(newName, albumNames)
-
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.isInputNameValid).isFalse()
-        }
-    }
-
-    @Test
-    fun `test that updateAlbumName updates state with error when name contains invalid characters`() =
-        runTest {
-            createViewModel()
-            val newName = "Invalid/Name"
-            val albumNames = listOf("Existing Album")
-            whenever(getProscribedAlbumNamesUseCase()).thenReturn(emptyList())
-
-            underTest.updateAlbumName(newName, albumNames)
-
-            underTest.state.test {
-                val state = awaitItem()
-                assertThat(state.isInputNameValid).isFalse()
-            }
-        }
-
-    @Test
-    fun `test that revalidateAlbumNameInput revalidates name when rename dialog is shown`() =
-        runTest {
-            createViewModel()
-            val albumNames = listOf("Existing Album")
-            whenever(getProscribedAlbumNamesUseCase()).thenReturn(emptyList())
-
-            underTest.showRenameDialog(true)
-            underTest.revalidateAlbumNameInput(albumNames)
-
-            underTest.state.test {
-                val state = awaitItem()
-                assertThat(state.showRenameDialog).isTrue()
-            }
-        }
-
-    @Test
     fun `test that hideOrUnhideNodes calls updateNodeSensitiveUseCase with correct parameters`() =
         runTest {
             createViewModel()
@@ -741,5 +663,88 @@ class AlbumContentViewModelTest {
 
             verify(updateNodeSensitiveUseCase).invoke(NodeId(123L), true)
         }
+
+    @Test
+    fun `test that on update album name update success should reset state`() = runTest {
+        val mockUserAlbum = mock<MediaAlbum.User> {
+            on { id }.thenReturn(AlbumId(123L))
+        }
+        val mockAlbumUiState = mock<AlbumUiState> {
+            on { mediaAlbum }.thenReturn(mockUserAlbum)
+            on { title }.thenReturn("Album")
+            on { cover }.thenReturn(null)
+        }
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
+            false
+        )
+        whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
+        whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
+        whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf())
+        whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
+        whenever(observeAlbumPhotosRemovingProgress(any())).thenReturn(flowOf())
+
+        createViewModel(AlbumContentNavKey(id = mockUserAlbum.id.id, type = "custom"))
+
+        underTest.updateAlbumName("Album")
+
+        underTest.state.test {
+            assertThat(awaitItem().showUpdateAlbumName).isEqualTo(consumed)
+        }
+
+        verify(validateAndUpdateUserAlbumUseCase).invoke(mockUserAlbum.id, "Album")
+    }
+
+    @Test
+    fun `test that on update album name validation exception should update error message`() =
+        runTest {
+            val mockUserAlbum = mock<MediaAlbum.User> {
+                on { id }.thenReturn(AlbumId(123L))
+            }
+            val mockAlbumUiState = mock<AlbumUiState> {
+                on { mediaAlbum }.thenReturn(mockUserAlbum)
+                on { title }.thenReturn("Album")
+                on { cover }.thenReturn(null)
+            }
+            val expectedMessage = "expectedMessage"
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
+                false
+            )
+            whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
+            whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
+            whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf())
+            whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
+            whenever(observeAlbumPhotosRemovingProgress(any())).thenReturn(flowOf())
+            whenever(validateAndUpdateUserAlbumUseCase(any(), any())).thenAnswer {
+                throw AlbumNameValidationException.Exists
+            }
+            whenever(albumNameValidationExceptionMessageMapper(any())).thenReturn(expectedMessage)
+
+            createViewModel(AlbumContentNavKey(id = mockUserAlbum.id.id, type = "custom"))
+
+            underTest.updateAlbumName("Album")
+
+            underTest.state.test {
+                assertThat(awaitItem().updateAlbumNameErrorMessage).isEqualTo(
+                    triggered(
+                        expectedMessage
+                    )
+                )
+            }
+
+            verify(validateAndUpdateUserAlbumUseCase).invoke(mockUserAlbum.id, "Album")
+        }
+
+    @Test
+    fun `test that monitor theme mode should update ui state`() = runTest {
+        val expected = ThemeMode.Light
+
+        createViewModel()
+
+        themeModeFlow.emit(expected)
+
+        underTest.state.test {
+            assertThat(expectMostRecentItem().themeMode).isEqualTo(expected)
+        }
+    }
 }
 

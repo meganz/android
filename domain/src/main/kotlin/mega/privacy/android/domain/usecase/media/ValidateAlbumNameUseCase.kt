@@ -29,12 +29,16 @@ class ValidateAlbumNameUseCase @Inject constructor(
         }
 
         if (name.hasSpecialCharacters()) {
-            throw AlbumNameValidationException.InvalidCharacters
+            throw AlbumNameValidationException.InvalidCharacters(SPECIAL_CHARACTERS)
         }
     }
 
     private fun String.hasSpecialCharacters(): Boolean {
-        val specialCharacters = "[\\\\*/:<>?\"|]".toRegex()
+        val specialCharacters = SPECIAL_CHARACTERS.toRegex()
         return specialCharacters.containsMatchIn(this)
+    }
+
+    companion object {
+        private const val SPECIAL_CHARACTERS = "[\\\\*/:<>?\"|]"
     }
 }

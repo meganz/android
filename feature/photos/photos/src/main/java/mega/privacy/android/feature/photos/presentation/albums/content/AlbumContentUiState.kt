@@ -8,12 +8,12 @@ import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentSetOf
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
-import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 
 /**
  * State of the Album Content screen.
@@ -74,7 +74,10 @@ data class AlbumContentUiState(
     val sendPhotosToChatEvent: StateEventWithContent<List<TypedNode>> = consumed(),
     val hidePhotosEvent: StateEventWithContent<List<TypedNode>> = consumed(),
     val deleteAlbumSuccessEvent: StateEvent = consumed,
-    val showDeleteConfirmation: StateEvent = consumed
+    val showDeleteConfirmation: StateEvent = consumed,
+    val updateAlbumNameErrorMessage: StateEventWithContent<String> = consumed(),
+    val showUpdateAlbumName: StateEvent = consumed,
+    val themeMode: ThemeMode = ThemeMode.System
 ) {
     val isAddingPhotosProgressCompleted: Boolean
         get() = !isAddingPhotos && totalAddedPhotos > 0

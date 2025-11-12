@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.photos.presentation.albums.content
 
 import androidx.annotation.VisibleForTesting
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
@@ -27,6 +28,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -37,6 +39,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
@@ -62,12 +65,16 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
+import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.extensions.downloadAsStateWithLifecycle
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
+import mega.privacy.android.feature.photos.presentation.albums.dialog.EnterAlbumNameDialog
 import mega.privacy.android.feature.photos.presentation.albums.dialog.RemoveAlbumConfirmationDialog
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.feature.photos.presentation.albums.view.AlbumDynamicContentGrid
@@ -111,6 +118,10 @@ fun AlbumContentScreen(
         resetDeleteAlbumSuccessEvent = viewModel::resetDeleteAlbumSuccess,
         showDeleteConfirmation = viewModel::showDeleteConfirmation,
         hideDeleteConfirmation = viewModel::resetShowDeleteConfirmation,
+        renameAlbum = viewModel::updateAlbumName,
+        resetUpdateAlbumNameErrorMessage = viewModel::resetUpdateAlbumNameErrorMessage,
+        showUpdateAlbumName = viewModel::showUpdateAlbumName,
+        resetShowUpdateAlbumName = viewModel::resetShowUpdateAlbumName,
         onTransfer = onTransfer,
         consumeDownloadEvent = actionViewModel::markDownloadEventConsumed,
         consumeInfoToShowEvent = actionViewModel::onInfoToShowEventConsumed
@@ -140,6 +151,10 @@ internal fun AlbumContentScreen(
     resetDeleteAlbumSuccessEvent: () -> Unit,
     showDeleteConfirmation: () -> Unit,
     hideDeleteConfirmation: () -> Unit,
+    renameAlbum: (String) -> Unit,
+    resetUpdateAlbumNameErrorMessage: () -> Unit,
+    showUpdateAlbumName: () -> Unit,
+    resetShowUpdateAlbumName: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     consumeDownloadEvent: () -> Unit,
     consumeInfoToShowEvent: () -> Unit,
@@ -150,6 +165,9 @@ internal fun AlbumContentScreen(
     val configuration = LocalConfiguration.current
     val smallWidth = remember(configuration) {
         (configuration.screenWidthDp.dp - 1.dp) / 3
+    }
+    val isUserAlbum = remember(uiState.uiAlbum) {
+        uiState.uiAlbum?.mediaAlbum is MediaAlbum.User
     }
     var showDeletePhotosConfirmation by remember { mutableStateOf(false) }
     var isMoreOptionsSheetVisible by rememberSaveable { mutableStateOf(false) }
@@ -231,11 +249,15 @@ internal fun AlbumContentScreen(
                         .testTag(ALBUM_CONTENT_SCREEN_DEFAULT_TOOLBAR),
                     navigationType = AppBarNavigationType.Back(onBack),
                     title = uiState.uiAlbum?.title.orEmpty(),
-                    actions = listOf(
-                        MenuActionWithClick(AlbumContentSelectionAction.More) {
-                            isMoreOptionsSheetVisible = true
+                    actions = buildList {
+                        if (isUserAlbum) {
+                            add(
+                                MenuActionWithClick(AlbumContentSelectionAction.More) {
+                                    isMoreOptionsSheetVisible = true
+                                }
+                            )
                         }
-                    )
+                    }
                 )
             }
         },
@@ -330,7 +352,7 @@ internal fun AlbumContentScreen(
         )
 
         AlbumOptionsBottomSheet(
-            isVisible = isMoreOptionsSheetVisible,
+            isVisible = isMoreOptionsSheetVisible && isUserAlbum,
             onDismiss = { isMoreOptionsSheetVisible = false },
             albumUiState = uiState.uiAlbum,
             deleteAlbum = {
@@ -340,8 +362,22 @@ internal fun AlbumContentScreen(
                 } else {
                     showDeleteConfirmation()
                 }
-            }
+            },
+            renameAlbum = showUpdateAlbumName,
+            isDarkTheme = uiState.themeMode.isDarkMode()
         )
+
+        if (uiState.showUpdateAlbumName == triggered) {
+            EnterAlbumNameDialog(
+                modifier = Modifier
+                    .testTag(ALBUM_CONTENT_SCREEN_UPDATE_ALBUM_DIALOG),
+                onDismiss = resetShowUpdateAlbumName,
+                onConfirm = renameAlbum,
+                resetErrorMessage = resetUpdateAlbumNameErrorMessage,
+                errorText = (uiState.updateAlbumNameErrorMessage as? StateEventWithContentTriggered)?.content,
+                name = uiState.uiAlbum?.title.orEmpty()
+            )
+        }
     }
 }
 
@@ -371,7 +407,9 @@ internal fun AlbumOptionsBottomSheet(
     onDismiss: () -> Unit,
     albumUiState: AlbumUiState?,
     deleteAlbum: () -> Unit,
+    renameAlbum: () -> Unit,
     isVisible: Boolean = false,
+    isDarkTheme: Boolean = isSystemInDarkTheme()
 ) {
     val sheetState = rememberModalBottomSheetState()
     val cover = albumUiState?.cover?.downloadAsStateWithLifecycle(isPreview = false)
@@ -403,6 +441,12 @@ internal fun AlbumOptionsBottomSheet(
             bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
             onDismissRequest = onDismiss
         ) {
+            val placeholder = if (isDarkTheme) {
+                painterResource(R.drawable.ic_album_cover_d)
+            } else {
+                painterResource(R.drawable.ic_album_cover)
+            }
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -421,7 +465,9 @@ internal fun AlbumOptionsBottomSheet(
                             modifier = Modifier
                                 .size(32.dp)
                                 .aspectRatio(1f)
-                                .clip(RoundedCornerShape(8.dp))
+                                .clip(RoundedCornerShape(8.dp)),
+                            placeholder = placeholder,
+                            error = placeholder
                         )
                     },
                     onClickListener = null
@@ -436,7 +482,7 @@ internal fun AlbumOptionsBottomSheet(
                         onActionClicked = {
                             when (action) {
                                 is AlbumContentSelectionAction.Rename -> {
-                                    // Todo rename album
+                                    renameAlbum()
                                 }
 
                                 is AlbumContentSelectionAction.SelectAlbumCover -> {
@@ -453,11 +499,12 @@ internal fun AlbumOptionsBottomSheet(
 
                                 is AlbumContentSelectionAction.Delete -> {
                                     deleteAlbum()
-                                    onDismiss()
                                 }
 
                                 else -> {}
                             }
+
+                            onDismiss()
                         },
                         isDestructive = action.highlightIcon
                     )
@@ -492,6 +539,10 @@ private fun AlbumContentScreenPreview() {
             resetDeleteAlbumSuccessEvent = {},
             showDeleteConfirmation = {},
             hideDeleteConfirmation = {},
+            renameAlbum = {},
+            resetUpdateAlbumNameErrorMessage = {},
+            showUpdateAlbumName = {},
+            resetShowUpdateAlbumName = {},
             onTransfer = {},
             consumeDownloadEvent = {},
             consumeInfoToShowEvent = {}
@@ -509,3 +560,5 @@ internal const val ALBUM_CONTENT_SCREEN_MORE_OPTIONS_BOTTOM_SHEET =
     "album_content_screen:more_options_bottom_sheet"
 internal const val ALBUM_CONTENT_SCREEN_DELETE_ALBUM_DIALOG =
     "album_content_screen:delete_album_dialog"
+internal const val ALBUM_CONTENT_SCREEN_UPDATE_ALBUM_DIALOG =
+    "album_content_screen:update_album_dialog"

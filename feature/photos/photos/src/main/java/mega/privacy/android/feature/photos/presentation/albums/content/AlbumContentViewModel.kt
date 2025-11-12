@@ -37,12 +37,14 @@ import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.AlbumPhotosAddingProgress
 import mega.privacy.android.domain.entity.photos.AlbumPhotosRemovingProgress
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.exception.account.AlbumNameValidationException
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetAlbumPhotosUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetNodeListByIdsUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
@@ -53,13 +55,13 @@ import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.media.GetUserAlbumCoverPhotoUseCase
 import mega.privacy.android.domain.usecase.media.MonitorUserAlbumByIdUseCase
+import mega.privacy.android.domain.usecase.media.ValidateAndUpdateUserAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
-import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
-import mega.privacy.android.domain.usecase.photos.UpdateAlbumNameUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.feature.photos.mapper.AlbumNameValidationExceptionMessageMapper
 import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
 import mega.privacy.android.feature.photos.mapper.LegacyMediaSystemAlbumMapper
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
@@ -91,8 +93,7 @@ class AlbumContentViewModel @AssistedInject constructor(
     private val removeFavouritesUseCase: RemoveFavouritesUseCase,
     private val removePhotosFromAlbumUseCase: RemovePhotosFromAlbumUseCase,
     private val getNodeListByIdsUseCase: GetNodeListByIdsUseCase,
-    private val getProscribedAlbumNamesUseCase: GetProscribedAlbumNamesUseCase,
-    private val updateAlbumNameUseCase: UpdateAlbumNameUseCase,
+    private val updateAlbumNameUseCase: ValidateAndUpdateUserAlbumUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
@@ -103,6 +104,8 @@ class AlbumContentViewModel @AssistedInject constructor(
     private val getUserAlbumCoverPhotoUseCase: GetUserAlbumCoverPhotoUseCase,
     private val removeAlbumsUseCase: RemoveAlbumsUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
+    private val albumNameValidationExceptionMessageMapper: AlbumNameValidationExceptionMessageMapper,
+    private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
     @Assisted private val navKey: AlbumContentNavKey?,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumContentUiState())
@@ -130,6 +133,7 @@ class AlbumContentViewModel @AssistedInject constructor(
     )
 
     init {
+        monitorThemeMode()
         fetchPhotos()
         fetchIsHiddenNodesOnboarded()
 
@@ -139,6 +143,14 @@ class AlbumContentViewModel @AssistedInject constructor(
                 monitorAccountDetail()
             }
         }
+    }
+
+    private fun monitorThemeMode() {
+        monitorThemeModeUseCase()
+            .onEach { mode ->
+                _state.update { it.copy(themeMode = mode) }
+            }
+            .launchIn(viewModelScope)
     }
 
     private suspend fun isHiddenNodesActive(): Boolean {
@@ -580,68 +592,39 @@ class AlbumContentViewModel @AssistedInject constructor(
 
     suspend fun getSelectedPhotos() = _state.value.selectedPhotos
 
-    fun updateAlbumName(title: String, albumNames: List<String>) = viewModelScope.launch {
+    fun updateAlbumName(name: String) = viewModelScope.launch {
         runCatching {
-            val finalTitle = title.trim()
-            val proscribedAlbumNames = getProscribedAlbumNamesUseCase()
+            val albumId = (_state.value.uiAlbum?.mediaAlbum as? MediaAlbum.User)?.id
+            albumId?.let { updateAlbumNameUseCase(it, name.trim()) }
+        }.onFailure { e ->
+            Timber.e(e)
 
-            if (checkTitleValidity(finalTitle, proscribedAlbumNames, albumNames)) {
-                val albumId = (_state.value.uiAlbum?.mediaAlbum as? MediaAlbum.User)?.id
-                albumId?.let { updateAlbumNameUseCase(it, finalTitle) }
-
+            if (e is AlbumNameValidationException) {
+                val message = albumNameValidationExceptionMessageMapper(e)
                 _state.update {
-                    it.copy(showRenameDialog = false)
+                    it.copy(updateAlbumNameErrorMessage = triggered(message))
                 }
             }
-        }.onFailure { exception ->
-            Timber.e(exception)
-
-            _state.update {
-                it.copy(showRenameDialog = false)
-            }
+        }.onSuccess {
+            resetShowUpdateAlbumName()
         }
     }
 
-    private fun checkTitleValidity(
-        title: String,
-        proscribedAlbumNames: List<String>,
-        albumNames: List<String>,
-    ): Boolean {
-        var errorMessage: Int? = null
-        var isTitleValid = true
-
-        if (title.isEmpty()) {
-            isTitleValid = false
-            errorMessage = sharedResR.string.general_invalid_string
-        } else if (title.isEmpty() || proscribedAlbumNames.any { it.equals(title, true) }) {
-            isTitleValid = false
-            errorMessage = sharedResR.string.general_invalid_characters_defined
-        } else if (title in albumNames) {
-            isTitleValid = false
-            errorMessage = sharedResR.string.album_invalid_name_error_message
-        } else if ("[\\\\*/:<>?\"|]".toRegex().containsMatchIn(title)) {
-            isTitleValid = false
-            errorMessage = sharedResR.string.album_name_exists_error_message
-        }
-
+    fun showUpdateAlbumName() {
         _state.update {
-            it.copy(
-                isInputNameValid = isTitleValid,
-                createDialogErrorMessage = errorMessage,
-                newAlbumTitleInput = title,
-            )
+            it.copy(showUpdateAlbumName = triggered)
         }
-
-        return isTitleValid
     }
 
-    fun revalidateAlbumNameInput(albumNames: List<String>) = viewModelScope.launch {
-        if (!_state.value.isInputNameValid && _state.value.showRenameDialog) {
-            checkTitleValidity(
-                title = _state.value.newAlbumTitleInput,
-                proscribedAlbumNames = getProscribedAlbumNamesUseCase(),
-                albumNames = albumNames,
-            )
+    fun resetShowUpdateAlbumName() {
+        _state.update {
+            it.copy(showUpdateAlbumName = consumed)
+        }
+    }
+
+    fun resetUpdateAlbumNameErrorMessage() {
+        _state.update {
+            it.copy(updateAlbumNameErrorMessage = consumed())
         }
     }
 

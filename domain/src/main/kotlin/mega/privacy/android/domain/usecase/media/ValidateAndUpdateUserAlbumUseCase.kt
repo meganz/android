@@ -4,7 +4,7 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.repository.AlbumRepository
 import javax.inject.Inject
 
-class UpdateUserAlbumUseCase @Inject constructor(
+class ValidateAndUpdateUserAlbumUseCase @Inject constructor(
     private val albumRepository: AlbumRepository,
     private val validateAlbumNameUseCase: ValidateAlbumNameUseCase
 ) {

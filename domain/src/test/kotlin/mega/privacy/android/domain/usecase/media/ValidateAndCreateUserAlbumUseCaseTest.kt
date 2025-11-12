@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.usecase.media
 
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.exception.account.AlbumNameValidationException
 import mega.privacy.android.domain.repository.AlbumRepository
 import org.junit.jupiter.api.BeforeAll
@@ -17,11 +16,11 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 /**
- * Test class for [UpdateUserAlbumUseCase]
+ * Test class for [ValidateAndCreateUserAlbumUseCase]
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class UpdateUserAlbumUseCaseTest {
-    private lateinit var underTest: UpdateUserAlbumUseCase
+internal class ValidateAndCreateUserAlbumUseCaseTest {
+    private lateinit var underTest: ValidateAndCreateUserAlbumUseCase
 
     private val albumRepository: AlbumRepository = mock()
     private val validateAlbumNameUseCase: ValidateAlbumNameUseCase = mock()
@@ -33,37 +32,35 @@ internal class UpdateUserAlbumUseCaseTest {
 
     @BeforeAll
     fun init() {
-        underTest = UpdateUserAlbumUseCase(
+        underTest = ValidateAndCreateUserAlbumUseCase(
             albumRepository = albumRepository,
             validateAlbumNameUseCase = validateAlbumNameUseCase
         )
     }
 
     @Test
-    fun `test that album name is updated successfully when validation passes`() = runTest {
-        val albumId = AlbumId(123L)
-        val newName = "Updated Album"
+    fun `test that album is created successfully when validation passes`() = runTest {
+        val albumName = "My Album"
+        val mockUserSet = mock<mega.privacy.android.domain.entity.set.UserSet>()
 
-        whenever(albumRepository.updateAlbumName(albumId, newName)).thenReturn(newName)
+        whenever(albumRepository.createAlbum(albumName)).thenReturn(mockUserSet)
 
-        underTest(albumId, newName)
+        underTest(albumName)
 
-        verify(validateAlbumNameUseCase).invoke(newName)
-        verify(albumRepository).updateAlbumName(albumId, newName)
+        verify(validateAlbumNameUseCase).invoke(albumName)
+        verify(albumRepository).createAlbum(albumName)
     }
 
     @Test
-    fun `test that on exception is thrown should not update album name`() = runTest {
-        val albumId = AlbumId(123L)
-
+    fun `test that on exception is thrown should not create album`() = runTest {
         whenever(validateAlbumNameUseCase(any())).thenThrow(AlbumNameValidationException.Empty)
 
         assertThrows<AlbumNameValidationException.Empty> {
-            underTest(albumId, "User")
+            underTest("User")
         }
 
         verify(validateAlbumNameUseCase).invoke("User")
-        verify(albumRepository, never()).updateAlbumName(any(), any())
+        verify(albumRepository, never()).createAlbum(any())
     }
 }
 

@@ -14,7 +14,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
@@ -23,7 +25,7 @@ import mega.privacy.android.feature.photos.components.AlbumGridItem
 import mega.privacy.android.feature.photos.extensions.downloadAsStateWithLifecycle
 import mega.privacy.android.feature.photos.navigation.AlbumContentNavKey
 import mega.privacy.android.feature.photos.presentation.albums.content.toAlbumContentNavKey
-import mega.privacy.android.feature.photos.presentation.albums.dialog.AddNewAlbumDialog
+import mega.privacy.android.feature.photos.presentation.albums.dialog.EnterAlbumNameDialog
 
 @Composable
 fun AlbumsTabRoute(
@@ -41,7 +43,9 @@ fun AlbumsTabRoute(
         navigateToAlbumContent = navigateToAlbumContent,
         modifier = modifier,
         showNewAlbumDialogEvent = showNewAlbumDialogEvent,
-        resetNewAlbumDialogEvent = resetNewAlbumDialogEvent
+        resetNewAlbumDialogEvent = resetNewAlbumDialogEvent,
+        resetErrorMessage = viewModel::resetErrorMessage,
+        resetAddNewAlbumSuccess = viewModel::resetAddNewAlbumSuccess
     )
 }
 
@@ -53,11 +57,20 @@ fun AlbumsTabScreen(
     modifier: Modifier = Modifier,
     showNewAlbumDialogEvent: StateEvent = consumed,
     resetNewAlbumDialogEvent: () -> Unit = {},
+    resetErrorMessage: () -> Unit = {},
+    resetAddNewAlbumSuccess: () -> Unit = {},
 ) {
     val placeholder = if (isSystemInDarkTheme()) {
         painterResource(R.drawable.ic_album_cover_d)
     } else {
         painterResource(R.drawable.ic_album_cover)
+    }
+
+    EventEffect(
+        event = uiState.addNewAlbumSuccessEvent,
+        onConsumed = resetAddNewAlbumSuccess
+    ) {
+        resetNewAlbumDialogEvent()
     }
 
     LazyVerticalGrid(
@@ -95,10 +108,12 @@ fun AlbumsTabScreen(
     }
 
     if (showNewAlbumDialogEvent == triggered) {
-        AddNewAlbumDialog(
+        EnterAlbumNameDialog(
             modifier = Modifier.testTag(ALBUMS_SCREEN_ADD_NEW_ALBUM_DIALOG),
             onDismiss = resetNewAlbumDialogEvent,
-            onConfirm = addNewAlbum
+            onConfirm = addNewAlbum,
+            resetErrorMessage = resetErrorMessage,
+            errorText = (uiState.addNewAlbumErrorMessage as? StateEventWithContentTriggered)?.content,
         )
     }
 }

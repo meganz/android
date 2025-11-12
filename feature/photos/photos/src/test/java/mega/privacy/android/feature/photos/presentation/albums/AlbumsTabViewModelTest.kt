@@ -2,12 +2,16 @@ package mega.privacy.android.feature.photos.presentation.albums
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.photos.AlbumId
-import mega.privacy.android.domain.usecase.media.CreateUserAlbumUseCase
+import mega.privacy.android.domain.exception.account.AlbumNameValidationException
+import mega.privacy.android.domain.usecase.media.ValidateAndCreateUserAlbumUseCase
+import mega.privacy.android.feature.photos.mapper.AlbumNameValidationExceptionMessageMapper
 import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.feature.photos.provider.AlbumsDataProvider
@@ -15,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -29,20 +34,28 @@ internal class AlbumsTabViewModelTest {
     private lateinit var underTest: AlbumsTabViewModel
 
     private val mockAlbumsDataProvider: AlbumsDataProvider = mock()
-    private val mockCreateUserAlbumUseCase: CreateUserAlbumUseCase = mock()
+    private val validateAndCreateUserAlbumUseCase: ValidateAndCreateUserAlbumUseCase = mock()
     private val mockAlbumUiStateMapper: AlbumUiStateMapper = mock()
+    private val albumNameValidationExceptionMessageMapper: AlbumNameValidationExceptionMessageMapper =
+        mock()
 
 
     @BeforeEach
     fun setUp() {
-        reset(mockAlbumsDataProvider, mockCreateUserAlbumUseCase, mockAlbumUiStateMapper)
+        reset(
+            mockAlbumsDataProvider,
+            validateAndCreateUserAlbumUseCase,
+            mockAlbumUiStateMapper,
+            albumNameValidationExceptionMessageMapper
+        )
     }
 
     private fun initViewModel() {
         underTest = AlbumsTabViewModel(
             albumsProvider = setOf(mockAlbumsDataProvider),
-            createUserAlbumUseCase = mockCreateUserAlbumUseCase,
-            albumUiStateMapper = mockAlbumUiStateMapper
+            validateAndCreateUserAlbumUseCase = validateAndCreateUserAlbumUseCase,
+            albumUiStateMapper = mockAlbumUiStateMapper,
+            albumNameValidationExceptionMessageMapper = albumNameValidationExceptionMessageMapper
         )
     }
 
@@ -99,8 +112,9 @@ internal class AlbumsTabViewModelTest {
 
         underTest = AlbumsTabViewModel(
             albumsProvider = setOf(mockProvider1, mockProvider2),
-            createUserAlbumUseCase = mockCreateUserAlbumUseCase,
-            albumUiStateMapper = mockAlbumUiStateMapper
+            validateAndCreateUserAlbumUseCase = validateAndCreateUserAlbumUseCase,
+            albumUiStateMapper = mockAlbumUiStateMapper,
+            albumNameValidationExceptionMessageMapper = albumNameValidationExceptionMessageMapper
         )
 
         underTest.uiState.test {
@@ -115,14 +129,37 @@ internal class AlbumsTabViewModelTest {
     }
 
     @Test
-    fun `test that add new albums calls the use case`() = runTest {
+    fun `test that add new albums calls the use case and update state on success`() = runTest {
         val expectedName = "New Album"
 
         initViewModel()
 
         underTest.addNewAlbum(expectedName)
 
-        verify(mockCreateUserAlbumUseCase).invoke(expectedName)
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.addNewAlbumErrorMessage).isEqualTo(consumed())
+            assertThat(state.addNewAlbumSuccessEvent).isEqualTo(triggered)
+        }
+
+        verify(validateAndCreateUserAlbumUseCase).invoke(expectedName)
+    }
+
+    @Test
+    fun `test that on validation exception should update error message`() = runTest {
+        val errorMessage = "errorMessage"
+        whenever(albumNameValidationExceptionMessageMapper(any())).thenReturn(errorMessage)
+        whenever(validateAndCreateUserAlbumUseCase(any())).thenAnswer {
+            throw AlbumNameValidationException.InvalidCharacters("/")
+        }
+
+        initViewModel()
+
+        underTest.addNewAlbum("album")
+
+        underTest.uiState.test {
+            assertThat(awaitItem().addNewAlbumErrorMessage).isEqualTo(triggered(errorMessage))
+        }
     }
 
     private fun createMockAlbums(): List<MediaAlbum> {

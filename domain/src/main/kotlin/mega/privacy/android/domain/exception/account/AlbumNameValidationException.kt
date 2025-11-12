@@ -13,7 +13,5 @@ sealed class AlbumNameValidationException : Exception("Album name validation fai
         private fun readResolve(): Any = Exists
     }
 
-    data object InvalidCharacters : AlbumNameValidationException() {
-        private fun readResolve(): Any = InvalidCharacters
-    }
+    data class InvalidCharacters(val chars: String) : AlbumNameValidationException()
 }

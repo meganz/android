@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.media
 import mega.privacy.android.domain.repository.AlbumRepository
 import javax.inject.Inject
 
-class CreateUserAlbumUseCase @Inject constructor(
+class ValidateAndCreateUserAlbumUseCase @Inject constructor(
     private val albumRepository: AlbumRepository,
     private val validateAlbumNameUseCase: ValidateAlbumNameUseCase
 ) {

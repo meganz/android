@@ -13,12 +13,15 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
-fun AddNewAlbumDialog(
+fun EnterAlbumNameDialog(
     onConfirm: (String) -> Unit,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    resetErrorMessage: () -> Unit,
+    modifier: Modifier = Modifier,
+    name: String = "",
+    errorText: String? = null,
 ) {
-    var albumName by rememberSaveable { mutableStateOf("") }
+    var albumName by rememberSaveable { mutableStateOf(name) }
 
     BasicInputDialog(
         modifier = modifier,
@@ -27,20 +30,22 @@ fun AddNewAlbumDialog(
         negativeButtonText = stringResource(sharedResR.string.general_dialog_cancel_button),
         inputValue = albumName,
         onPositiveButtonClicked = {
+            resetErrorMessage()
             onConfirm(albumName)
-            onDismiss()
         },
         onNegativeButtonClicked = {
+            resetErrorMessage()
             onDismiss()
-            albumName = ""
         },
         onValueChange = {
+            resetErrorMessage()
             albumName = it
         },
         onDismiss = {
+            resetErrorMessage()
             onDismiss()
-            albumName = ""
-        }
+        },
+        errorText = errorText
     )
 }
 
@@ -48,9 +53,10 @@ fun AddNewAlbumDialog(
 @Composable
 fun AddNewAlbumDialogPreview() {
     AndroidThemeForPreviews {
-        AddNewAlbumDialog(
+        EnterAlbumNameDialog(
             onConfirm = {},
-            onDismiss = {}
+            onDismiss = {},
+            resetErrorMessage = {}
         )
     }
 }

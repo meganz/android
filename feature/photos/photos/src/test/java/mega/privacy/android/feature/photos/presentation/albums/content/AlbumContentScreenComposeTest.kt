@@ -63,6 +63,10 @@ class AlbumContentScreenComposeTest {
         resetDeleteAlbumSuccessEvent: () -> Unit = {},
         showDeleteConfirmation: () -> Unit = {},
         hideDeleteConfirmation: () -> Unit = {},
+        renameAlbum: (String) -> Unit = {},
+        resetUpdateAlbumNameErrorMessage: () -> Unit = {},
+        showUpdateAlbumName: () -> Unit = {},
+        resetShowUpdateAlbumName: () -> Unit = {},
         onTransfer: (TransferTriggerEvent) -> Unit = {},
         consumeDownloadEvent: () -> Unit = {},
         consumeInfoToShowEvent: () -> Unit = {},
@@ -89,6 +93,10 @@ class AlbumContentScreenComposeTest {
                     deleteAlbum = deleteAlbum,
                     showDeleteConfirmation = showDeleteConfirmation,
                     hideDeleteConfirmation = hideDeleteConfirmation,
+                    renameAlbum = renameAlbum,
+                    resetUpdateAlbumNameErrorMessage = resetUpdateAlbumNameErrorMessage,
+                    showUpdateAlbumName = showUpdateAlbumName,
+                    resetShowUpdateAlbumName = resetShowUpdateAlbumName,
                     resetDeleteAlbumSuccessEvent = resetDeleteAlbumSuccessEvent,
                     onTransfer = onTransfer,
                     consumeDownloadEvent = consumeDownloadEvent,
@@ -348,7 +356,8 @@ class AlbumContentScreenComposeTest {
                     isVisible = false,
                     onDismiss = {},
                     albumUiState = albumUiState,
-                    deleteAlbum = {}
+                    deleteAlbum = {},
+                    renameAlbum = {}
                 )
             }
         }
@@ -369,7 +378,8 @@ class AlbumContentScreenComposeTest {
                     isVisible = true,
                     onDismiss = {},
                     albumUiState = albumUiState,
-                    deleteAlbum = {}
+                    deleteAlbum = {},
+                    renameAlbum = {}
                 )
             }
         }
@@ -398,6 +408,22 @@ class AlbumContentScreenComposeTest {
         // Verify delete album confirmation dialog is displayed
         composeTestRule
             .onNodeWithTag(ALBUM_CONTENT_SCREEN_DELETE_ALBUM_DIALOG)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that update album dialog is visible when state triggered`() {
+        val uiState = AlbumContentUiState(
+            uiAlbum = createMockAlbumUiState(),
+            photos = persistentListOf(),
+            selectedPhotos = persistentSetOf(),
+            showUpdateAlbumName = triggered
+        )
+
+        setComposeContent(uiState)
+
+        composeTestRule
+            .onNodeWithTag(ALBUM_CONTENT_SCREEN_UPDATE_ALBUM_DIALOG)
             .assertIsDisplayed()
     }
 
