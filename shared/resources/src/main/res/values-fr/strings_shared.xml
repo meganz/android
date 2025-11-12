@@ -1794,15 +1794,15 @@
     <string name="campaign_name_special_offer">Offre spéciale : %1$d%% de réduction</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">%1$s pour le premier mois</item>
+        <item quantity="many">%1$s pour les %2$d premiers mois</item>
+        <item quantity="other">%1$s pour les %2$d premiers mois</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">%1$s pour la première année</item>
+        <item quantity="many">%1$s pour les %2$d premières années</item>
+        <item quantity="other">%1$s pour les %2$d premières années</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">Solutions de confidentialité de MEGA</string>
@@ -1841,7 +1841,37 @@
         <item quantity="other">La prime arrivera à expiration dans %1$d&#160;jours</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
+    <string name="label_first_time_in_months_full_singular">%1$s pour le premier mois</string>
     <!-- Discount label for first year singular -->
     <string name="label_first_time_in_years_full_singular">%1$s pour la première année</string>
+    <!-- Hidden nodes description: control visibility feature with tag -->
+    <string name="hidden_nodes_description_control_visibility_tag">Vous seul pouvez afficher les fichiers cachés, soit individuellement, soit en affichant temporairement les éléments cachés depuis les [A]paramètres[/A].</string>
+    <!-- Dialog confirmation text for removing photos in an album -->
+    <string name="album_content_remove_photos_dialog_description">Supprimer de l’album ?</string>
+    <!--Album content more options action description-->
+    <string name="album_content_selection_action_more_description">Plus</string>
+    <!--Album content select album cover action description-->
+    <string name="album_content_selection_action_select_album_cover_description">Sélectionner la couverture de l’album</string>
+    <!--Album content delete action description-->
+    <string name="album_content_selection_action_delete_description">Supprimer</string>
+    <!-- Message shown when user tries to preview an undecrypted file -->
+    <string name="preview_not_available_undecrypted_files">Preview not available for undecrypted files</string>
+    <!-- Delete album confirmation dialog positive button text. -->
+    <string name="delete_album_confirmation_positive_button_text">Supprimer</string>
+    <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
+    <string name="delete_singular_album_confirmation_message">«&#160;%s&#160;» a été supprimé</string>
+    <!-- Delete albums confirmation title. -->
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="one"></item>
+        <item quantity="many"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Delete albums confirmation description. -->
+    <plurals name="delete_album_confirmation_dialog_description">
+        <item quantity="one">L’album sera supprimé, mais son contenu restera dans votre Vue chronologique.</item>
+        <item quantity="many">Les albums seront supprimés, mais leur contenu restera dans votre Vue chronologique.</item>
+        <item quantity="other">Les albums seront supprimés, mais leur contenu restera dans votre Vue chronologique.</item>
+    </plurals>
+    <!-- External checkout button text -->
+    <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
 </resources>

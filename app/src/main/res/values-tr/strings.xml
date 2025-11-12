@@ -184,7 +184,7 @@
     <!-- Label to reference a recents section -->
     <string name="section_recents">Son etkinlikler</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
-    <string name="section_secondary_media_uploads">Medya Yüklemeleri</string>
+    <string name="section_secondary_media_uploads">Medya yüklemeleri</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">Çevrim dışı</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -990,7 +990,7 @@
     <!-- Title of the settings section to configure the autoaway of chat presence -->
     <string name="settings_autoaway_title">Otomatik uzakta</string>
     <!-- Subtitle of the settings section to configure the autoaway of chat presence -->
-    <string name="settings_autoaway_subtitle">Hareketsizlikten sonra beni Uzakta göster</string>
+    <string name="settings_autoaway_subtitle">Şu kadar hareketsizlikten sonra beni Uzakta göster:</string>
     <!-- Value in the settings section of the autoaway chat presence -->
     <string name="settings_autoaway_value">%1$d dakika</string>
     <!-- Title of the settings section to configure the status persistence of chat presence -->

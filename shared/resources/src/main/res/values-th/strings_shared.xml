@@ -1716,11 +1716,13 @@
     <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="other"></item>
+        <item quantity="one">%1$s for the first %2$d month</item>
+        <item quantity="other">%1$s for the first %2$d months</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="other"></item>
+        <item quantity="one">%1$s for the first %2$d year</item>
+        <item quantity="other">%1$s for the first %2$d years</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">ชุดความเป็นส่วนตัวของ MEGA</string>
@@ -1759,4 +1761,30 @@
     <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
     <!-- Discount label for first year singular -->
     <string name="label_first_time_in_years_full_singular">%1$s for the first year</string>
+    <!-- Hidden nodes description: control visibility feature with tag -->
+    <string name="hidden_nodes_description_control_visibility_tag">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the [A]settings[/A].</string>
+    <!-- Dialog confirmation text for removing photos in an album -->
+    <string name="album_content_remove_photos_dialog_description">นำออกจากอัลบั้มหรือไม่</string>
+    <!--Album content more options action description-->
+    <string name="album_content_selection_action_more_description">เพิ่มเติม</string>
+    <!--Album content select album cover action description-->
+    <string name="album_content_selection_action_select_album_cover_description">เลือกปกอัลบั้ม</string>
+    <!--Album content delete action description-->
+    <string name="album_content_selection_action_delete_description">ลบ</string>
+    <!-- Message shown when user tries to preview an undecrypted file -->
+    <string name="preview_not_available_undecrypted_files">Preview not available for undecrypted files</string>
+    <!-- Delete album confirmation dialog positive button text. -->
+    <string name="delete_album_confirmation_positive_button_text">ลบ</string>
+    <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
+    <string name="delete_singular_album_confirmation_message">ลบ “%s” ออกแล้ว</string>
+    <!-- Delete albums confirmation title. -->
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Delete albums confirmation description. -->
+    <plurals name="delete_album_confirmation_dialog_description">
+        <item quantity="other">อัลบั้มจะถูกลบออก แต่เนื้อหายังคงอยู่ในไทม์ไลน์ของคุณ</item>
+    </plurals>
+    <!-- External checkout button text -->
+    <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
 </resources>

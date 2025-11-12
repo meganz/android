@@ -1755,13 +1755,13 @@
     <string name="campaign_name_special_offer">Speciale aanbieding: %1$d%% korting</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
+        <item quantity="one">%1$s voor de eerste %2$d maand</item>
+        <item quantity="other">%1$s voor de eerste %2$d maanden</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
+        <item quantity="one">%1$s voor de eerste %2$d jaar</item>
+        <item quantity="other">%1$s voor de eerste %2$d jaar</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGA-privacysuite</string>
@@ -1798,7 +1798,35 @@
         <item quantity="other">Bonus verloopt over %1$d dagen</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
+    <string name="label_first_time_in_months_full_singular">%1$s voor de eerste maand</string>
     <!-- Discount label for first year singular -->
     <string name="label_first_time_in_years_full_singular">%1$s voor het eerste jaar</string>
+    <!-- Hidden nodes description: control visibility feature with tag -->
+    <string name="hidden_nodes_description_control_visibility_tag">Alleen u kunt verborgen bestanden onthullen, afzonderlijk of door tijdelijk verborgen items weer te geven uit de [A]instellingen[/A].</string>
+    <!-- Dialog confirmation text for removing photos in an album -->
+    <string name="album_content_remove_photos_dialog_description">Verwijderen van album?</string>
+    <!--Album content more options action description-->
+    <string name="album_content_selection_action_more_description">Meer</string>
+    <!--Album content select album cover action description-->
+    <string name="album_content_selection_action_select_album_cover_description">Selecteer album omslag</string>
+    <!--Album content delete action description-->
+    <string name="album_content_selection_action_delete_description">Verwijderen</string>
+    <!-- Message shown when user tries to preview an undecrypted file -->
+    <string name="preview_not_available_undecrypted_files">Preview not available for undecrypted files</string>
+    <!-- Delete album confirmation dialog positive button text. -->
+    <string name="delete_album_confirmation_positive_button_text">Verwijderen</string>
+    <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
+    <string name="delete_singular_album_confirmation_message">“%s” verwijderd</string>
+    <!-- Delete albums confirmation title. -->
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="one"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Delete albums confirmation description. -->
+    <plurals name="delete_album_confirmation_dialog_description">
+        <item quantity="one">Album wordt verwijderd maar de inhoud blijft in uw Tijdlijn.</item>
+        <item quantity="other">Albums worden verwijderd maar de inhoud blijft in uw Tijdlijn.</item>
+    </plurals>
+    <!-- External checkout button text -->
+    <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
 </resources>

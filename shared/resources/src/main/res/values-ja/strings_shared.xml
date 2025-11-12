@@ -1716,11 +1716,11 @@
     <string name="campaign_name_special_offer">特別価格：%1$d%%OFF</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="other"></item>
+        <item quantity="other">最初の%2$dか月は%1$s</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="other"></item>
+        <item quantity="other">最初の%2$d年は%1$s</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGAプライバシースイート</string>
@@ -1755,7 +1755,33 @@
         <item quantity="other">ボーナスは%1$d日後に有効期限が切れます</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
+    <string name="label_first_time_in_months_full_singular">最初の1か月は%1$s</string>
     <!-- Discount label for first year singular -->
-    <string name="label_first_time_in_years_full_singular">最初の1年間は%1$s</string>
+    <string name="label_first_time_in_years_full_singular">最初の1年は%1$s</string>
+    <!-- Hidden nodes description: control visibility feature with tag -->
+    <string name="hidden_nodes_description_control_visibility_tag">隠しファイルを表示するのは、個別に、または[A]設定[/A]から​​隠し項目を一時的に表示することによってのみ可能です。</string>
+    <!-- Dialog confirmation text for removing photos in an album -->
+    <string name="album_content_remove_photos_dialog_description">アルバムから削除しますか？</string>
+    <!--Album content more options action description-->
+    <string name="album_content_selection_action_more_description">その他</string>
+    <!--Album content select album cover action description-->
+    <string name="album_content_selection_action_select_album_cover_description">アルバムの表紙を選択</string>
+    <!--Album content delete action description-->
+    <string name="album_content_selection_action_delete_description">削除</string>
+    <!-- Message shown when user tries to preview an undecrypted file -->
+    <string name="preview_not_available_undecrypted_files">Preview not available for undecrypted files</string>
+    <!-- Delete album confirmation dialog positive button text. -->
+    <string name="delete_album_confirmation_positive_button_text">削除</string>
+    <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
+    <string name="delete_singular_album_confirmation_message">「%s」が削除されました</string>
+    <!-- Delete albums confirmation title. -->
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Delete albums confirmation description. -->
+    <plurals name="delete_album_confirmation_dialog_description">
+        <item quantity="other">アルバムは削除されますが、その内容はタイムラインに残ります。</item>
+    </plurals>
+    <!-- External checkout button text -->
+    <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
 </resources>

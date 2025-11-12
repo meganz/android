@@ -989,15 +989,15 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">중요한 파일과 폴더 숨기기</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy in one easy step.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">프라이버시를 위해 쉬운 한 단계로 민감한 파일과 폴더를 감출 수 있습니다.</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">시야 범위 밖</string>
+    <string name="hidden_nodes_title_control_visibility">시야에서 벗어남</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
+    <string name="hidden_nodes_description_control_visibility">당신만 숨긴 파일을 설정에서 개별적으로 또는 일시적으로 숨겨진 항목들을 나타나게 할 수 있습니다.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Blur for privacy</string>
+    <string name="hidden_nodes_title_visible_shared_files">프라이버시를 위한 흐리게 하기</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
+    <string name="hidden_nodes_description_visible_shared_files">숨긴 항목을 썸네일을 흐리게 하여, 내용물을 노출하지 않고 식별할 수 있도록 할 수 있습니다.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">항상 사진을 안전하게 보관</string>
     <!--Camera backup permission screen description-->
@@ -1726,13 +1726,11 @@
     <string name="campaign_name_special_offer">특별 할인: %1$d%% 할인</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="one">%1$s for the first %2$d month</item>
-        <item quantity="other">%1$s for the first %2$d months</item>
+        <item quantity="other">첫 %2$d개월 동안 %1$s</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one">%1$s for the first %2$d year</item>
-        <item quantity="other">%1$s for the first %2$d years</item>
+        <item quantity="other">첫 %2$d년 동안 %1$s</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGA 프라이버시 스위트</string>
@@ -1749,26 +1747,51 @@
     <!-- Title of raw album. -->
     <string name="system_album_raw_title">RAW</string>
     <!-- General error message to show when an invalid string is detected -->
-    <string name="general_invalid_string">Cannot be empty</string>
+    <string name="general_invalid_string">비워둘 수 없음</string>
     <!-- Error message for creating an album with a system albums name -->
     <string name="album_invalid_name_error_message">이 사진첩 이름은 허용되지 않습니다. 다른 이름을 입력하세요.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="album_name_exists_error_message">이 이름을 가진 앨범이 이미 존재합니다. 다른 이름을 입력하세요.</string>
     <!-- sentence to detail the permanent awarded text related to VPN achievement -->
-    <string name="mega_vpn_achievement_awarded_storage_text_permanent">Get %1$s of free storage when you start a MEGA&#160;VPN free trial, valid permanently</string>
+    <string name="mega_vpn_achievement_awarded_storage_text_permanent">MEGA&#160;VPN 무료 체험을 시작하면 영구적으로 유효한 %1$s의 무료 저장소를 받습니다</string>
     <!-- sentence to detail the permanent awarded text related to PWM achievement -->
-    <string name="mega_pass_achievement_awarded_storage_text_permanent">Get %1$s of free storage when you start a MEGA&#160;Pass free trial, valid permanently</string>
+    <string name="mega_pass_achievement_awarded_storage_text_permanent">MEGA&#160;Pass 무료 체험을 시작하면 영구적으로 유효한 %1$s의 무료 저장소를 받습니다</string>
     <!-- sentence to detail the figures of award achievement days left -->
     <plurals name="trial_awarded_achievement_days_left_text">
-        <item quantity="one">%1$d day left</item>
-        <item quantity="other">%1$d days left</item>
+        <item quantity="other">%1$d일 남음</item>
     </plurals>
     <!-- sentence to detail the figures of award achievement days left -->
     <plurals name="trial_awarded_achievement_days_left_detail_title">
         <item quantity="other">%1$d일 내에 보너스가 만료됩니다</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
+    <string name="label_first_time_in_months_full_singular">첫 한 달만 %1$s</string>
     <!-- Discount label for first year singular -->
     <string name="label_first_time_in_years_full_singular">첫 1년만 %1$s</string>
+    <!-- Hidden nodes description: control visibility feature with tag -->
+    <string name="hidden_nodes_description_control_visibility_tag">당신만 숨긴 파일을 [A]설정[/A]에서 개별적으로 또는 일시적으로 숨겨진 항목들을 나타나게 할 수 있습니다.</string>
+    <!-- Dialog confirmation text for removing photos in an album -->
+    <string name="album_content_remove_photos_dialog_description">사진첩에서 제거할까요?</string>
+    <!--Album content more options action description-->
+    <string name="album_content_selection_action_more_description">더 보기</string>
+    <!--Album content select album cover action description-->
+    <string name="album_content_selection_action_select_album_cover_description">사진첩 표지 선택</string>
+    <!--Album content delete action description-->
+    <string name="album_content_selection_action_delete_description">삭제</string>
+    <!-- Message shown when user tries to preview an undecrypted file -->
+    <string name="preview_not_available_undecrypted_files">Preview not available for undecrypted files</string>
+    <!-- Delete album confirmation dialog positive button text. -->
+    <string name="delete_album_confirmation_positive_button_text">삭제</string>
+    <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
+    <string name="delete_singular_album_confirmation_message">“%s” 삭제됨</string>
+    <!-- Delete albums confirmation title. -->
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Delete albums confirmation description. -->
+    <plurals name="delete_album_confirmation_dialog_description">
+        <item quantity="other">사진첩이 삭제되지만 항목들은 연표에 남게 됩니다.</item>
+    </plurals>
+    <!-- External checkout button text -->
+    <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
 </resources>

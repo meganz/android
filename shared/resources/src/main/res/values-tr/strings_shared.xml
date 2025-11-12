@@ -836,7 +836,7 @@
     <!-- Name of the Camera uploads feature -->
     <string name="general_camera_uploads">Kamera yüklemeleri</string>
     <!-- Name of the Camera uploads feature -->
-    <string name="general_media_uploads">Medya Yüklemeleri</string>
+    <string name="general_media_uploads">Medya yüklemeleri</string>
     <!-- Generic settings label text -->
     <string name="general_settings">Ayarlar</string>
     <!-- Ad settings label in the cookie settings page -->
@@ -1755,13 +1755,13 @@
     <string name="campaign_name_special_offer">Özel teklif: %%%1$d indirim</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
+        <item quantity="one">İlk %2$d ay için %1$s</item>
+        <item quantity="other">İlk %2$d ay için %1$s</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
+        <item quantity="one">İlk %2$d yıl için %1$s</item>
+        <item quantity="other">İlk %2$d yıl için %1$s</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGA gizlilik paketi</string>
@@ -1798,7 +1798,35 @@
         <item quantity="other">Bonusun süresi %1$d gün sonra doluyor</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
+    <string name="label_first_time_in_months_full_singular">İlk ay için %1$s</string>
     <!-- Discount label for first year singular -->
     <string name="label_first_time_in_years_full_singular">İlk yıl için %1$s</string>
+    <!-- Hidden nodes description: control visibility feature with tag -->
+    <string name="hidden_nodes_description_control_visibility_tag">Gizli dosyaları yalnızca siz; ister tek tek, ister [A]ayarlardan[/A] gizli öğeleri geçici olarak göstererek ortaya çıkarabilirsiniz.</string>
+    <!-- Dialog confirmation text for removing photos in an album -->
+    <string name="album_content_remove_photos_dialog_description">Albümden kaldırılsın mı?</string>
+    <!--Album content more options action description-->
+    <string name="album_content_selection_action_more_description">Daha fazla</string>
+    <!--Album content select album cover action description-->
+    <string name="album_content_selection_action_select_album_cover_description">Albüm kapağını seç</string>
+    <!--Album content delete action description-->
+    <string name="album_content_selection_action_delete_description">Sil</string>
+    <!-- Message shown when user tries to preview an undecrypted file -->
+    <string name="preview_not_available_undecrypted_files">Preview not available for undecrypted files</string>
+    <!-- Delete album confirmation dialog positive button text. -->
+    <string name="delete_album_confirmation_positive_button_text">Sil</string>
+    <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
+    <string name="delete_singular_album_confirmation_message">“%s” silindi</string>
+    <!-- Delete albums confirmation title. -->
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="one"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Delete albums confirmation description. -->
+    <plurals name="delete_album_confirmation_dialog_description">
+        <item quantity="one">Albüm silinecek ancak içeriği Zaman akışınızda kalacaktır.</item>
+        <item quantity="other">Albümler silinecek ancak içerikleri Zaman akışınızda kalacaktır.</item>
+    </plurals>
+    <!-- External checkout button text -->
+    <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
 </resources>

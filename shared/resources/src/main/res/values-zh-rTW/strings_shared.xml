@@ -1716,11 +1716,11 @@
     <string name="campaign_name_special_offer">特價優惠：%1$d%%折扣</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="other"></item>
+        <item quantity="other">前%2$d個月只要%1$s</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="other"></item>
+        <item quantity="other">前%2$d年只要%1$s</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGA隱私套件</string>
@@ -1755,7 +1755,33 @@
         <item quantity="other">獎勵將在%1$d天後到期</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
+    <string name="label_first_time_in_months_full_singular">第一個月只要%1$s</string>
     <!-- Discount label for first year singular -->
     <string name="label_first_time_in_years_full_singular">%1$s首年</string>
+    <!-- Hidden nodes description: control visibility feature with tag -->
+    <string name="hidden_nodes_description_control_visibility_tag">只有您可以顯示隱藏的檔案，既可以個別顯示，也可以透過[A]設定[/A]暫時顯示隱藏的項目。</string>
+    <!-- Dialog confirmation text for removing photos in an album -->
+    <string name="album_content_remove_photos_dialog_description">要從相簿中移除？</string>
+    <!--Album content more options action description-->
+    <string name="album_content_selection_action_more_description">更多</string>
+    <!--Album content select album cover action description-->
+    <string name="album_content_selection_action_select_album_cover_description">設為相簿封面</string>
+    <!--Album content delete action description-->
+    <string name="album_content_selection_action_delete_description">刪除</string>
+    <!-- Message shown when user tries to preview an undecrypted file -->
+    <string name="preview_not_available_undecrypted_files">Preview not available for undecrypted files</string>
+    <!-- Delete album confirmation dialog positive button text. -->
+    <string name="delete_album_confirmation_positive_button_text">刪除</string>
+    <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
+    <string name="delete_singular_album_confirmation_message">「%s」已刪除</string>
+    <!-- Delete albums confirmation title. -->
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Delete albums confirmation description. -->
+    <plurals name="delete_album_confirmation_dialog_description">
+        <item quantity="other">相簿將會被刪除但裡面的內容將保留在您的時間軸中。</item>
+    </plurals>
+    <!-- External checkout button text -->
+    <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
 </resources>

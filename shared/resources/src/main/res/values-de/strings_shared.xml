@@ -1755,13 +1755,13 @@
     <string name="campaign_name_special_offer">Sonderaktion: %1$d %% gespart</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
+        <item quantity="one">%1$s für den %2$d. Monat</item>
+        <item quantity="other">%1$s für die ersten %2$d Monate</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
+        <item quantity="one">%1$s für das %2$d. Jahr</item>
+        <item quantity="other">%1$s für die ersten %2$d Jahre</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGA-Datenschutz-Suite</string>
@@ -1778,19 +1778,19 @@
     <!-- Title of raw album. -->
     <string name="system_album_raw_title">RAW</string>
     <!-- General error message to show when an invalid string is detected -->
-    <string name="general_invalid_string">Cannot be empty</string>
+    <string name="general_invalid_string">Darf nicht leer bleiben</string>
     <!-- Error message for creating an album with a system albums name -->
     <string name="album_invalid_name_error_message">Dieser Albumname ist nicht zulässig. Bitte geben Sie einen anderen Namen ein.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="album_name_exists_error_message">Ein Album mit diesem Namen existiert bereits. Bitte geben Sie einen anderen Namen ein.</string>
     <!-- sentence to detail the permanent awarded text related to VPN achievement -->
-    <string name="mega_vpn_achievement_awarded_storage_text_permanent">Get %1$s of free storage when you start a MEGA&#160;VPN free trial, valid permanently</string>
+    <string name="mega_vpn_achievement_awarded_storage_text_permanent">Sie erhalten dauerhaft %1$s kostenlosen Speicherplatz, wenn Sie einen kostenlosen Test von MEGA&#160;VPN starten</string>
     <!-- sentence to detail the permanent awarded text related to PWM achievement -->
-    <string name="mega_pass_achievement_awarded_storage_text_permanent">Get %1$s of free storage when you start a MEGA&#160;Pass free trial, valid permanently</string>
+    <string name="mega_pass_achievement_awarded_storage_text_permanent">Sie erhalten dauerhaft %1$s kostenlosen Speicherplatz, wenn Sie einen kostenlosen Test von MEGA&#160;Pass starten</string>
     <!-- sentence to detail the figures of award achievement days left -->
     <plurals name="trial_awarded_achievement_days_left_text">
-        <item quantity="one">%1$d day left</item>
-        <item quantity="other">%1$d days left</item>
+        <item quantity="one">Noch %1$d Tag</item>
+        <item quantity="other">Noch %1$d Tage</item>
     </plurals>
     <!-- sentence to detail the figures of award achievement days left -->
     <plurals name="trial_awarded_achievement_days_left_detail_title">
@@ -1798,7 +1798,35 @@
         <item quantity="other">Bonus läuft in %1$d Tagen ab</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
+    <string name="label_first_time_in_months_full_singular">%1$s für den ersten Monat</string>
     <!-- Discount label for first year singular -->
     <string name="label_first_time_in_years_full_singular">%1$s im ersten Jahr</string>
+    <!-- Hidden nodes description: control visibility feature with tag -->
+    <string name="hidden_nodes_description_control_visibility_tag">Nur Sie haben die Möglichkeit, verborgene Dateien sichtbar zu machen, entweder einzeln oder indem Sie über die [A]Einstellungen[/A] verborgene Elemente vorübergehend einblenden.</string>
+    <!-- Dialog confirmation text for removing photos in an album -->
+    <string name="album_content_remove_photos_dialog_description">Aus Album entfernen?</string>
+    <!--Album content more options action description-->
+    <string name="album_content_selection_action_more_description">Mehr</string>
+    <!--Album content select album cover action description-->
+    <string name="album_content_selection_action_select_album_cover_description">Albumcover auswählen</string>
+    <!--Album content delete action description-->
+    <string name="album_content_selection_action_delete_description">Löschen</string>
+    <!-- Message shown when user tries to preview an undecrypted file -->
+    <string name="preview_not_available_undecrypted_files">Preview not available for undecrypted files</string>
+    <!-- Delete album confirmation dialog positive button text. -->
+    <string name="delete_album_confirmation_positive_button_text">Löschen</string>
+    <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
+    <string name="delete_singular_album_confirmation_message">„%s“ wurde gelöscht</string>
+    <!-- Delete albums confirmation title. -->
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="one"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Delete albums confirmation description. -->
+    <plurals name="delete_album_confirmation_dialog_description">
+        <item quantity="one">Das Album wird gelöscht, aber sein Inhalt bleibt in Ihrer Zeitleiste.</item>
+        <item quantity="other">Die Alben werden gelöscht, aber ihre Inhalte bleiben in Ihrer Zeitleiste.</item>
+    </plurals>
+    <!-- External checkout button text -->
+    <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
 </resources>

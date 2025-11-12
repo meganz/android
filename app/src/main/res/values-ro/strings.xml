@@ -685,9 +685,9 @@
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">Felicitări, noua adresă de e-mail pentru acest cont MEGA este: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
-    <string name="invalid_string">Cannot be empty</string>
+    <string name="invalid_string">Nu poate fi gol</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
-    <string name="invalid_input">Not a valid entry</string>
+    <string name="invalid_input">Nu este o intrare validă</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Resetarea parolei</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->

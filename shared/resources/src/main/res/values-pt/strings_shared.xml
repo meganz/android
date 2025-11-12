@@ -1794,15 +1794,15 @@
     <string name="campaign_name_special_offer">Oferta especial: %1$d%% de desconto</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">%1$s durante o primeiro %2$d mês</item>
+        <item quantity="many">%1$s durante os primeiros %2$d de meses</item>
+        <item quantity="other">%1$s durante os primeiros %2$d meses</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">%1$s durante o primeiro %2$d ano</item>
+        <item quantity="many">%1$s durante os primeiros %2$d de anos</item>
+        <item quantity="other">%1$s durante os primeiros %2$d anos</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">Ferramentas de privacidade do MEGA</string>
@@ -1841,7 +1841,37 @@
         <item quantity="other">O bônus expira em %1$d dias</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
+    <string name="label_first_time_in_months_full_singular">%1$s durante o primeiro mês</string>
     <!-- Discount label for first year singular -->
     <string name="label_first_time_in_years_full_singular">%1$s durante o primeiro ano</string>
+    <!-- Hidden nodes description: control visibility feature with tag -->
+    <string name="hidden_nodes_description_control_visibility_tag">Somente você pode mostrar arquivos ocultos, seja individualmente ou exibindo temporariamente itens ocultos nas [A]configurações[/A].</string>
+    <!-- Dialog confirmation text for removing photos in an album -->
+    <string name="album_content_remove_photos_dialog_description">Você quer eliminar do álbum?</string>
+    <!--Album content more options action description-->
+    <string name="album_content_selection_action_more_description">Mais</string>
+    <!--Album content select album cover action description-->
+    <string name="album_content_selection_action_select_album_cover_description">Selecionar a capa do álbum</string>
+    <!--Album content delete action description-->
+    <string name="album_content_selection_action_delete_description">Deletar</string>
+    <!-- Message shown when user tries to preview an undecrypted file -->
+    <string name="preview_not_available_undecrypted_files">Preview not available for undecrypted files</string>
+    <!-- Delete album confirmation dialog positive button text. -->
+    <string name="delete_album_confirmation_positive_button_text">Deletar</string>
+    <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
+    <string name="delete_singular_album_confirmation_message">“%s” foi deletado</string>
+    <!-- Delete albums confirmation title. -->
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="one"></item>
+        <item quantity="many"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Delete albums confirmation description. -->
+    <plurals name="delete_album_confirmation_dialog_description">
+        <item quantity="one">O álbum será deletado, mas o conteúdo dele permanecerá na sua linha do tempo.</item>
+        <item quantity="many">Os álbuns serão deletados, mas o conteúdo deles permanecerá na sua linha do tempo.</item>
+        <item quantity="other">Os álbuns serão deletados, mas o conteúdo deles permanecerá na sua linha do tempo.</item>
+    </plurals>
+    <!-- External checkout button text -->
+    <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
 </resources>

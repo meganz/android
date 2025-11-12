@@ -675,9 +675,9 @@
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">축하합니다, 이 MEGA 계정에 대한 새 이메일 주소는 다음과 같습니다: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
-    <string name="invalid_string">Cannot be empty</string>
+    <string name="invalid_string">비워둘 수 없음</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
-    <string name="invalid_input">Not a valid entry</string>
+    <string name="invalid_input">유효한 입력 아님</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">암호 재설정</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->

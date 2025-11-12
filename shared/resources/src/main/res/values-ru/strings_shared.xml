@@ -1833,17 +1833,17 @@
     <string name="campaign_name_special_offer">Специальное предложение: скидка %1$d%%</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">%1$s за первый %2$d месяц</item>
+        <item quantity="few">%1$s за первые %2$d месяца</item>
+        <item quantity="many">%1$s за первые %2$d месяцев</item>
+        <item quantity="other">%1$s за первые %2$d месяца</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">%1$s за первый %2$d год</item>
+        <item quantity="few">%1$s за первые %2$d года</item>
+        <item quantity="many">%1$s за первые %2$d лет</item>
+        <item quantity="other">%1$s за первые %2$d года</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">Комплекс конфиденциальности MEGA</string>
@@ -1884,7 +1884,39 @@
         <item quantity="other">Бонус истекает через %1$d дня</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
+    <string name="label_first_time_in_months_full_singular">%1$s за первый месяц</string>
     <!-- Discount label for first year singular -->
     <string name="label_first_time_in_years_full_singular">%1$s за первый год</string>
+    <!-- Hidden nodes description: control visibility feature with tag -->
+    <string name="hidden_nodes_description_control_visibility_tag">Отобразить скрытые файлы можете только вы: либо по отдельности, либо временно временно включить отображение скрытых элементов в [A]настройках[/A].</string>
+    <!-- Dialog confirmation text for removing photos in an album -->
+    <string name="album_content_remove_photos_dialog_description">Удалить из альбома?</string>
+    <!--Album content more options action description-->
+    <string name="album_content_selection_action_more_description">Больше</string>
+    <!--Album content select album cover action description-->
+    <string name="album_content_selection_action_select_album_cover_description">Выбрать обложку альбома</string>
+    <!--Album content delete action description-->
+    <string name="album_content_selection_action_delete_description">Удалить</string>
+    <!-- Message shown when user tries to preview an undecrypted file -->
+    <string name="preview_not_available_undecrypted_files">Preview not available for undecrypted files</string>
+    <!-- Delete album confirmation dialog positive button text. -->
+    <string name="delete_album_confirmation_positive_button_text">Удалить</string>
+    <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
+    <string name="delete_singular_album_confirmation_message">Удалён альбом «%s»</string>
+    <!-- Delete albums confirmation title. -->
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="one"></item>
+        <item quantity="few"></item>
+        <item quantity="many"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Delete albums confirmation description. -->
+    <plurals name="delete_album_confirmation_dialog_description">
+        <item quantity="one">Альбом будет удалён, но его содержимое останется на «Временной шкале».</item>
+        <item quantity="few">Альбомы будут удалены, но их содержимое останется на «Временной шкале».</item>
+        <item quantity="many">Альбомы будут удалены, но их содержимое останется на «Временной шкале».</item>
+        <item quantity="other">Альбомы будут удалены, но их содержимое останется на «Временной шкале».</item>
+    </plurals>
+    <!-- External checkout button text -->
+    <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
 </resources>
