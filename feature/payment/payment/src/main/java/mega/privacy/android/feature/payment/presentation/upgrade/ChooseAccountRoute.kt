@@ -1,18 +1,20 @@
 package mega.privacy.android.feature.payment.presentation.upgrade
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.palm.composestateevents.EventEffect
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.billing.BillingEvent
-import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.feature.payment.model.AccountTypeInt
 import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
 import mega.privacy.android.feature.payment.presentation.storage.AccountStorageViewModel
@@ -20,6 +22,7 @@ import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AdFreeDialogUpgradeAccountPlanPageBuyButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AdsUpgradeAccountPlanPageBuyButtonPressedEvent
 import mega.privacy.mobile.analytics.event.BuyProIEvent
@@ -29,6 +32,7 @@ import mega.privacy.mobile.analytics.event.BuyProLiteEvent
 import mega.privacy.mobile.analytics.event.GetStartedForFreeUpgradePlanButtonPressedEvent
 import mega.privacy.mobile.analytics.event.MaybeLaterUpgradeAccountButtonPressedEvent
 import mega.privacy.mobile.analytics.event.UpgradeAccountPlanScreenEvent
+import timber.log.Timber
 
 @Composable
 fun ChooseAccountRoute(
@@ -42,6 +46,7 @@ fun ChooseAccountRoute(
 ) {
     val uiState by chooseAccountViewModel.state.collectAsStateWithLifecycle()
     val accountStorageUiState by accountStorageViewModel.state.collectAsStateWithLifecycle()
+    val billingUIState by billingViewModel.uiState.collectAsStateWithLifecycle()
     val megaNavigator = rememberMegaNavigator()
     val activity = LocalActivity.current
 
@@ -65,9 +70,24 @@ fun ChooseAccountRoute(
         }
     }
 
+    EventEffect(
+        event = billingUIState.onExternalPurchaseClick,
+        onConsumed = billingViewModel::onExternalPurchaseClickEventConsumed
+    ) { url ->
+        runCatching {
+            val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            activity?.startActivity(intent)
+        }.onFailure { e ->
+            Timber.Forest.e(e, "Failed to launch external purchase URL: $url")
+            billingViewModel.onGeneralError()
+        }
+    }
+
     NewChooseAccountScreen(
         uiState = uiState,
         accountStorageUiState = accountStorageUiState,
+        billingUIState = billingUIState,
         isNewCreationAccount = isNewCreationAccount,
         isUpgradeAccount = isUpgradeAccount,
         onFreePlanClicked = {
@@ -82,7 +102,7 @@ fun ChooseAccountRoute(
             )
             activity?.let { onFreeClick(it, megaNavigator) }
         },
-        onBuyPlanClick = { subscription ->
+        onInAppCheckoutClick = { subscription ->
             sendAccountTypeAnalytics(
                 isUpgradeAccount = isUpgradeAccount,
                 openFromSource = openFromSource,
@@ -96,6 +116,18 @@ fun ChooseAccountRoute(
                 )
             }
         },
+        onExternalCheckoutClick = { subscription, monthly ->
+            sendAccountTypeAnalytics(
+                isUpgradeAccount = isUpgradeAccount,
+                openFromSource = openFromSource,
+                planType = subscription.accountType,
+                isUpgradeAccountDueToAds = accountStorageViewModel.isUpgradeAccountDueToAds()
+            )
+            billingViewModel.onExternalPurchaseClick(subscription, monthly)
+        },
+        isExternalCheckoutEnabled = uiState.isExternalCheckoutEnabled,
+        isExternalCheckoutDefault = uiState.isExternalCheckoutDefault,
+        clearExternalPurchaseError = billingViewModel::clearExternalPurchaseError,
         onBack = onBack
     )
 }

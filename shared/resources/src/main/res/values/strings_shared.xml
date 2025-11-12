@@ -970,8 +970,6 @@
     <string name="transfers_fake_preview_screen_general_error">Preview failed to load, try again</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
     <string name="transfers_error_cancelling_preview_download">Something went wrong. Preview was not cancelled. See notification for details.</string>
-    <!-- Message shown when user tries to preview an undecrypted file -->
-    <string name="preview_not_available_undecrypted_files">Preview not available for undecrypted files</string>
     <!-- Title of the Rename and Create Backup Dialog -->
     <string name="sync_rename_and_create_backup_dialog_title">Backup name already exists</string>
     <!-- Text of the Rename and Create Backup Dialog -->
@@ -1813,6 +1811,8 @@
     <string name="album_content_selection_action_select_album_cover_description">Select album cover</string>
     <!--Album content delete action description-->
     <string name="album_content_selection_action_delete_description">Delete</string>
+    <!-- Message shown when user tries to preview an undecrypted file -->
+    <string name="preview_not_available_undecrypted_files">Preview not available for undecrypted files</string>
     <!-- Delete album confirmation dialog positive button text. -->
     <string name="delete_album_confirmation_positive_button_text">Delete</string>
     <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
@@ -1827,4 +1827,6 @@
         <item quantity="one">Album will be deleted but its contents will stay in your Timeline.</item>
         <item quantity="other">Albums will be deleted but their contents will stay in your Timeline.</item>
     </plurals>
+    <!-- External checkout button text -->
+    <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
 </resources>

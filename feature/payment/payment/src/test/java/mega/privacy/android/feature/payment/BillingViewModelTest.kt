@@ -1,11 +1,18 @@
 package mega.privacy.android.feature.payment
 
+import app.cash.turbine.test
 import android.app.Activity
 import com.android.billingclient.api.Purchase
 import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.triggered
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.BillingEvent
@@ -14,9 +21,11 @@ import mega.privacy.android.domain.usecase.billing.MonitorBillingEventUseCase
 import mega.privacy.android.domain.usecase.billing.QueryPurchase
 import mega.privacy.android.feature.payment.domain.LaunchPurchaseFlowUseCase
 import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
+import mega.privacy.android.feature.payment.usecase.GeneratePurchaseUrlUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -26,6 +35,7 @@ internal class BillingViewModelTest {
     private lateinit var underTest: BillingViewModel
     private val queryPurchase = mock<QueryPurchase>()
     private val launchPurchaseFlowUseCase = mock<LaunchPurchaseFlowUseCase>()
+    private val generatePurchaseUrlUseCase = mock<GeneratePurchaseUrlUseCase>()
     private val eventFlow = MutableSharedFlow<BillingEvent>()
     private val monitorBillingEventUseCase = mock<MonitorBillingEventUseCase> {
         onBlocking { invoke() }.thenReturn(eventFlow)
@@ -40,6 +50,7 @@ internal class BillingViewModelTest {
         underTest = BillingViewModel(
             queryPurchase = queryPurchase,
             launchPurchaseFlowUseCase = launchPurchaseFlowUseCase,
+            generatePurchaseUrlUseCase = generatePurchaseUrlUseCase,
             monitorBillingEventUseCase = monitorBillingEventUseCase,
         )
     }
@@ -177,4 +188,123 @@ internal class BillingViewModelTest {
 
             verify(launchPurchaseFlowUseCase).invoke(activity, "", null)
         }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that onExternalPurchaseClick generates URL and updates state for monthly subscription`() =
+        runTest {
+            val subscription = mock<Subscription> {
+                on { accountType }.thenReturn(AccountType.PRO_I)
+            }
+            val expectedUrl = "https://mega.nz/#propay_1/uao=Android app Ver 15.21?m=1&session=test"
+
+            whenever(generatePurchaseUrlUseCase(any(), any())).thenReturn(expectedUrl)
+
+            underTest.onExternalPurchaseClick(subscription, monthly = true)
+            advanceUntilIdle()
+
+            // Verify the use case was called with correct parameters (monthly = 1)
+            verify(generatePurchaseUrlUseCase).invoke("propay_1", 1)
+
+            // Verify the state is updated with the URL
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.onExternalPurchaseClick).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+                val triggeredEvent = state.onExternalPurchaseClick as StateEventWithContentTriggered
+                assertThat(triggeredEvent.content).isEqualTo(expectedUrl)
+            }
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that onExternalPurchaseClick generates URL and updates state for yearly subscription`() =
+        runTest {
+            val subscription = mock<Subscription> {
+                on { accountType }.thenReturn(AccountType.PRO_II)
+            }
+            val expectedUrl = "https://mega.nz/#propay_2/uao=Android app Ver 15.21?m=12&session=test"
+
+            whenever(generatePurchaseUrlUseCase(any(), any())).thenReturn(expectedUrl)
+
+            underTest.onExternalPurchaseClick(subscription, monthly = false)
+            advanceUntilIdle()
+
+            // Verify the use case was called with correct parameters (yearly = 12)
+            verify(generatePurchaseUrlUseCase).invoke("propay_2", 12)
+
+            // Verify the state is updated with the URL
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.onExternalPurchaseClick).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+                val triggeredEvent = state.onExternalPurchaseClick as StateEventWithContentTriggered
+                assertThat(triggeredEvent.content).isEqualTo(expectedUrl)
+            }
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that onExternalPurchaseClick handles different account types correctly`() = runTest {
+        val subscription = mock<Subscription> {
+            on { accountType }.thenReturn(AccountType.PRO_LITE)
+        }
+        val expectedUrl = "https://mega.nz/#propay_101/uao=Android app Ver 15.21?m=1&session=test"
+
+        whenever(generatePurchaseUrlUseCase(any(), any())).thenReturn(expectedUrl)
+
+        underTest.onExternalPurchaseClick(subscription, monthly = true)
+        advanceUntilIdle()
+
+        verify(generatePurchaseUrlUseCase).invoke("propay_101", 1)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that onExternalPurchaseClick handles errors gracefully`() = runTest {
+        val subscription = mock<Subscription> {
+            on { accountType }.thenReturn(AccountType.PRO_I)
+        }
+
+        whenever(generatePurchaseUrlUseCase(any(), any())).thenThrow(RuntimeException("Test error"))
+
+        underTest.onExternalPurchaseClick(subscription, monthly = true)
+        advanceUntilIdle()
+
+        // Verify error state is set to triggered
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.generalError).isEqualTo(triggered)
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that clearExternalPurchaseError resets error state`() = runTest {
+        val subscription = mock<Subscription> {
+            on { accountType }.thenReturn(AccountType.PRO_I)
+        }
+
+        whenever(generatePurchaseUrlUseCase(any(), any())).thenThrow(RuntimeException("Test error"))
+
+        underTest.onExternalPurchaseClick(subscription, monthly = true)
+        advanceUntilIdle()
+
+        // Verify error state is triggered
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.generalError).isEqualTo(triggered)
+        }
+
+        // Clear error
+        underTest.clearExternalPurchaseError()
+
+        // Verify error state is consumed (cleared)
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.generalError).isNotEqualTo(triggered)
+        }
+    }
 }

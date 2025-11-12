@@ -22,9 +22,11 @@ dependencies {
 
     implementation(project(":feature:payment:payment-snowflake-components"))
     implementation(project(":core:ui-components:shared-components"))
+    implementation(project(":core:feature-flags"))
     implementation(project(":core:formatter"))
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":shared:resources"))
+    implementation(project(":shared:original-core-ui"))
     implementation(project(":icon-pack"))
     implementation(project(":core:navigation-contract"))
     implementation(project(":navigation"))

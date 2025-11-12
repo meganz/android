@@ -23,7 +23,10 @@ import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature.payment.domain.featuretoggle.PaymentFeatures
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
+import mega.privacy.android.feature_flags.ABTestFeatures
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
@@ -36,6 +39,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
@@ -58,6 +62,7 @@ class ChooseAccountViewModelTest {
     private val getRecommendedSubscriptionUseCase =
         mock<GetRecommendedSubscriptionUseCase>()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -69,6 +74,7 @@ class ChooseAccountViewModelTest {
             getRecommendedSubscriptionUseCase,
             getPricing,
             monitorAccountDetailUseCase,
+            getFeatureFlagValueUseCase,
         )
     }
 
@@ -79,6 +85,7 @@ class ChooseAccountViewModelTest {
             localisedSubscriptionMapper = localisedSubscriptionMapper,
             getRecommendedSubscriptionUseCase = getRecommendedSubscriptionUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             savedStateHandle = mock { on { get<Boolean>(any()) }.thenReturn(true) },
         )
     }
@@ -104,6 +111,7 @@ class ChooseAccountViewModelTest {
                 expectedYearlySubscriptionsList
             )
         )
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
         initViewModel()
         underTest.state.map { it.localisedSubscriptionsList }.test {
             Truth.assertThat(awaitItem()).isEqualTo(expectedLocalisedSubscriptionsList)
@@ -126,6 +134,7 @@ class ChooseAccountViewModelTest {
                 expectedYearlySubscriptionsList
             )
         )
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
         initViewModel()
         underTest.state.map { it.cheapestSubscriptionAvailable }.test {
             Truth.assertThat(awaitItem()).isEqualTo(expectedResult)
@@ -152,6 +161,7 @@ class ChooseAccountViewModelTest {
                     expectedYearlySubscriptionsList
                 )
             )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
             initViewModel()
 
             underTest.state.test {
@@ -160,6 +170,108 @@ class ChooseAccountViewModelTest {
                 Truth.assertThat(initialState.subscriptionCycle).isEqualTo(expectedCycle)
             }
         }
+
+    @Test
+    fun `test that isExternalCheckoutEnabled is set from feature flag`() = runTest {
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(
+                expectedMonthlySubscriptionsList,
+                expectedYearlySubscriptionsList
+            )
+        )
+        whenever(getFeatureFlagValueUseCase(PaymentFeatures.EnableUSExternalBillingForEligibleUsers))
+            .thenReturn(true)
+        whenever(getFeatureFlagValueUseCase(ABTestFeatures.ande)).thenReturn(false)
+
+        initViewModel()
+
+        underTest.state.map { it.isExternalCheckoutEnabled }.test {
+            Truth.assertThat(awaitItem()).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that isExternalCheckoutEnabled is false when feature flag is disabled`() = runTest {
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(
+                expectedMonthlySubscriptionsList,
+                expectedYearlySubscriptionsList
+            )
+        )
+        wheneverBlocking { getFeatureFlagValueUseCase(PaymentFeatures.EnableUSExternalBillingForEligibleUsers) }
+            .thenReturn(false)
+        wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(false)
+
+        initViewModel()
+
+        underTest.state.map { it.isExternalCheckoutEnabled }.test {
+            Truth.assertThat(awaitItem()).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that isExternalCheckoutDefault is set from AB test flag`() = runTest {
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(
+                expectedMonthlySubscriptionsList,
+                expectedYearlySubscriptionsList
+            )
+        )
+        wheneverBlocking { getFeatureFlagValueUseCase(PaymentFeatures.EnableUSExternalBillingForEligibleUsers) }
+            .thenReturn(true)
+        wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(true)
+
+        initViewModel()
+
+        underTest.state.map { it.isExternalCheckoutDefault }.test {
+            Truth.assertThat(awaitItem()).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that isExternalCheckoutDefault is false when AB test flag is disabled`() = runTest {
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(
+                expectedMonthlySubscriptionsList,
+                expectedYearlySubscriptionsList
+            )
+        )
+        whenever(getFeatureFlagValueUseCase(PaymentFeatures.EnableUSExternalBillingForEligibleUsers))
+            .thenReturn(true)
+        whenever(getFeatureFlagValueUseCase(ABTestFeatures.ande)).thenReturn(false)
+
+        initViewModel()
+
+        underTest.state.map { it.isExternalCheckoutDefault }.test {
+            Truth.assertThat(awaitItem()).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that feature flags are loaded on initialization`() = runTest {
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(
+                expectedMonthlySubscriptionsList,
+                expectedYearlySubscriptionsList
+            )
+        )
+        wheneverBlocking { getFeatureFlagValueUseCase(PaymentFeatures.EnableUSExternalBillingForEligibleUsers) }
+            .thenReturn(true)
+        wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(true)
+
+        initViewModel()
+
+        underTest.state.test {
+            val state = awaitItem()
+            Truth.assertThat(state.isExternalCheckoutEnabled).isTrue()
+            Truth.assertThat(state.isExternalCheckoutDefault).isTrue()
+        }
+    }
 
     private val subscriptionProIMonthly = Subscription(
         sku = "mega.android.pro1.onemonth",

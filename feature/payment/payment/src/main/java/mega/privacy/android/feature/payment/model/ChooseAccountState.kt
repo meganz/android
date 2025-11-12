@@ -3,6 +3,7 @@ package mega.privacy.android.feature.payment.model
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Product
+import mega.privacy.android.domain.entity.billing.Pricing
 
 /**
  * Upgrade Account state
@@ -20,6 +21,8 @@ data class ChooseAccountState(
     val cheapestSubscriptionAvailable: LocalisedSubscription? = null,
     val currentSubscriptionPlan: AccountType? = null,
     val subscriptionCycle: AccountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
+    val isExternalCheckoutEnabled: Boolean = false,
+    val isExternalCheckoutDefault: Boolean = false,
 ) {
     // checking if there is any discount available it's different from current plan
     fun hasDiscount() = localisedSubscriptionsList.any {
