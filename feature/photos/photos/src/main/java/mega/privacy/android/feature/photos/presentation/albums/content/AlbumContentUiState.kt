@@ -10,8 +10,11 @@ import kotlinx.collections.immutable.persistentSetOf
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.media.MediaAlbum
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.feature.photos.model.AlbumSortConfiguration
+import mega.privacy.android.feature.photos.model.AlbumSortOption
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.Sort
@@ -82,7 +85,11 @@ data class AlbumContentUiState(
     val linkRemovedSuccessEvent: StateEvent = consumed,
     val paywallEvent: StateEvent = consumed,
     val manageLinkEvent: StateEventWithContent<ManageLinkEvent?> = consumed(),
-    val selectAlbumCoverEvent: StateEventWithContent<AlbumId?> = consumed()
+    val selectAlbumCoverEvent: StateEventWithContent<AlbumId?> = consumed(),
+    val albumSortConfiguration: AlbumSortConfiguration = AlbumSortConfiguration(
+        sortOption = AlbumSortOption.Modified,
+        sortDirection = SortDirection.Descending
+    ),
 ) {
     val isAddingPhotosProgressCompleted: Boolean
         get() = !isAddingPhotos && totalAddedPhotos > 0

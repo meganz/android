@@ -67,6 +67,8 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
+import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
+import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -75,6 +77,8 @@ import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.extensions.downloadAsStateWithLifecycle
+import mega.privacy.android.feature.photos.model.AlbumSortConfiguration
+import mega.privacy.android.feature.photos.model.AlbumSortOption
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
 import mega.privacy.android.feature.photos.presentation.albums.dialog.EnterAlbumNameDialog
@@ -149,6 +153,7 @@ fun AlbumContentScreen(
         navigateToPaywall = {
             navigationHandler.navigate(OverDiskQuotaPaywallWarningNavKey)
         },
+        sortPhotos = viewModel::sortPhotos,
         onTransfer = onTransfer,
         consumeDownloadEvent = actionViewModel::markDownloadEventConsumed,
         consumeInfoToShowEvent = actionViewModel::onInfoToShowEventConsumed,
@@ -190,6 +195,7 @@ internal fun AlbumContentScreen(
     handleBottomSheetAction: (AlbumContentSelectionAction) -> Unit,
     navigateToPaywall: () -> Unit,
     resetPaywallEvent: () -> Unit,
+    sortPhotos: (AlbumSortConfiguration) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     consumeDownloadEvent: () -> Unit,
     consumeInfoToShowEvent: () -> Unit,
@@ -207,6 +213,7 @@ internal fun AlbumContentScreen(
     }
     var showDeletePhotosConfirmation by remember { mutableStateOf(false) }
     var isMoreOptionsSheetVisible by rememberSaveable { mutableStateOf(false) }
+    var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
     EventEffect(
@@ -395,7 +402,11 @@ internal fun AlbumContentScreen(
             shouldApplySensitiveMode = uiState.hiddenNodeEnabled
                     && uiState.accountType?.isPaid == true
                     && !uiState.isBusinessAccountExpired,
-            contentPadding = PaddingValues(bottom = innerPadding.calculateBottomPadding())
+            contentPadding = PaddingValues(bottom = innerPadding.calculateBottomPadding()),
+            onSortOrderClick = {
+                showSortBottomSheet = true
+            },
+            sortConfiguration = uiState.albumSortConfiguration
         )
 
         RemovePhotosConfirmationDialog(
@@ -453,6 +464,34 @@ internal fun AlbumContentScreen(
                 resetErrorMessage = resetUpdateAlbumNameErrorMessage,
                 errorText = (uiState.updateAlbumNameErrorMessage as? StateEventWithContentTriggered)?.content,
                 name = uiState.uiAlbum?.title.orEmpty()
+            )
+        }
+
+        if (showSortBottomSheet) {
+            SortBottomSheet(
+                modifier = Modifier
+                    .testTag(ALBUM_CONTENT_SCREEN_SORT_BOTTOM_SHEET),
+                options = AlbumSortOption.entries,
+                title = stringResource(sharedR.string.action_sort_by_header),
+                sheetState = rememberModalBottomSheetState(),
+                selectedSort = SortBottomSheetResult(
+                    sortOptionItem = uiState.albumSortConfiguration.sortOption,
+                    sortDirection = uiState.albumSortConfiguration.sortDirection
+                ),
+                onSortOptionSelected = { result ->
+                    result?.let {
+                        sortPhotos(
+                            AlbumSortConfiguration(
+                                sortOption = it.sortOptionItem,
+                                sortDirection = it.sortDirection
+                            )
+                        )
+                        showSortBottomSheet = false
+                    }
+                },
+                onDismissRequest = {
+                    showSortBottomSheet = false
+                }
             )
         }
     }
@@ -632,6 +671,7 @@ private fun AlbumContentScreenPreview() {
             openGetLink = { _, _ -> },
             navigateToPaywall = {},
             resetPaywallEvent = {},
+            sortPhotos = {},
             onTransfer = {},
             consumeDownloadEvent = {},
             consumeInfoToShowEvent = {},
@@ -654,3 +694,5 @@ internal const val ALBUM_CONTENT_SCREEN_UPDATE_ALBUM_DIALOG =
     "album_content_screen:update_album_dialog"
 internal const val ALBUM_CONTENT_SCREEN_REMOVE_LINKS_DIALOG =
     "album_content_screen:remove_links_dialog"
+internal const val ALBUM_CONTENT_SCREEN_SORT_BOTTOM_SHEET =
+    "album_content_screen:sort_bottom_sheet"

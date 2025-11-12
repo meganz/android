@@ -23,11 +23,13 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.photos.extensions.LocalDownloadPhotoResultMock
+import mega.privacy.android.feature.photos.model.AlbumSortConfiguration
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumTitle
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
+import mega.privacy.android.feature.photos.presentation.albums.view.ALBUM_DYNAMIC_CONTENT_GRID_SORT_ITEM
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -75,6 +77,7 @@ class AlbumContentScreenComposeTest {
         handleBottomSheetAction: (AlbumContentSelectionAction) -> Unit = {},
         navigateToPaywall: () -> Unit = {},
         resetPaywallEvent: () -> Unit = {},
+        sortPhotos: (AlbumSortConfiguration) -> Unit = {},
         onTransfer: (TransferTriggerEvent) -> Unit = {},
         consumeDownloadEvent: () -> Unit = {},
         consumeInfoToShowEvent: () -> Unit = {},
@@ -114,6 +117,7 @@ class AlbumContentScreenComposeTest {
                     handleBottomSheetAction = handleBottomSheetAction,
                     navigateToPaywall = navigateToPaywall,
                     resetPaywallEvent = resetPaywallEvent,
+                    sortPhotos = sortPhotos,
                     onTransfer = onTransfer,
                     consumeDownloadEvent = consumeDownloadEvent,
                     consumeInfoToShowEvent = consumeInfoToShowEvent,
@@ -459,6 +463,28 @@ class AlbumContentScreenComposeTest {
 
         composeTestRule
             .onNodeWithTag(ALBUM_CONTENT_SCREEN_REMOVE_LINKS_DIALOG)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that sort bottom sheet is visible when sort option clicked`() {
+        val uiState = AlbumContentUiState(
+            uiAlbum = createMockAlbumUiState(),
+            photos = persistentListOf(),
+            selectedPhotos = persistentSetOf(),
+        )
+
+        setComposeContent(uiState)
+
+        composeTestRule
+            .onNodeWithTag(ALBUM_DYNAMIC_CONTENT_GRID_SORT_ITEM)
+            .assertIsDisplayed()
+            .performClick()
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule
+            .onNodeWithTag(ALBUM_CONTENT_SCREEN_SORT_BOTTOM_SHEET)
             .assertIsDisplayed()
     }
 

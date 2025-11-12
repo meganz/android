@@ -13,6 +13,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableSet
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,11 +24,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Album.FavouriteAlbum
@@ -40,6 +43,7 @@ import mega.privacy.android.domain.entity.photos.AlbumPhotosRemovingProgress
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.exception.account.AlbumNameValidationException
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetAlbumPhotosUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
@@ -67,10 +71,10 @@ import mega.privacy.android.feature.photos.mapper.AlbumNameValidationExceptionMe
 import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
 import mega.privacy.android.feature.photos.mapper.LegacyMediaSystemAlbumMapper
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
+import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
+import mega.privacy.android.feature.photos.model.AlbumSortConfiguration
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
-import mega.privacy.android.feature.photos.model.Sort
-import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
@@ -82,6 +86,7 @@ import timber.log.Timber
 
 @HiltViewModel(assistedFactory = AlbumContentViewModel.Factory::class)
 class AlbumContentViewModel @AssistedInject constructor(
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val savedStateHandle: SavedStateHandle,
     private val getDefaultAlbumPhotos: GetDefaultAlbumPhotos,
     private val getDefaultAlbumsMapUseCase: GetDefaultAlbumsMapUseCase,
@@ -473,9 +478,25 @@ class AlbumContentViewModel @AssistedInject constructor(
         }
     }
 
-    fun setCurrentSort(sort: Sort) {
-        _state.update {
-            it.copy(currentSort = sort)
+    fun sortPhotos(sortConfiguration: AlbumSortConfiguration) {
+        viewModelScope.launch {
+            val currentPhotos = _state.value.photos
+            val sortedPhotosUiState = withContext(defaultDispatcher) {
+                val comparator = if (sortConfiguration.sortDirection == SortDirection.Ascending) {
+                    compareBy<PhotoUiState> { it.modificationTime }
+                } else {
+                    compareByDescending { it.modificationTime }
+                }.thenByDescending { it.id }
+
+                currentPhotos.sortedWith(comparator).toImmutableList()
+            }
+
+            _state.update {
+                it.copy(
+                    albumSortConfiguration = sortConfiguration,
+                    photos = sortedPhotosUiState
+                )
+            }
         }
     }
 

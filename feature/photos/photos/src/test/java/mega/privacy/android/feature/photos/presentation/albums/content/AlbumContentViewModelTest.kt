@@ -17,9 +17,11 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
+import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -52,6 +54,8 @@ import mega.privacy.android.feature.photos.mapper.AlbumNameValidationExceptionMe
 import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
 import mega.privacy.android.feature.photos.mapper.LegacyMediaSystemAlbumMapper
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
+import mega.privacy.android.feature.photos.model.AlbumSortConfiguration
+import mega.privacy.android.feature.photos.model.AlbumSortOption
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.Sort
@@ -73,6 +77,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.LocalDateTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -113,10 +118,11 @@ class AlbumContentViewModelTest {
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase = mock()
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
     private val themeModeFlow = MutableStateFlow(ThemeMode.System)
+    private val testDispatcher = UnconfinedTestDispatcher()
 
     @BeforeAll
     fun setup() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
+        Dispatchers.setMain(testDispatcher)
     }
 
     @AfterAll
@@ -209,6 +215,7 @@ class AlbumContentViewModelTest {
             albumNameValidationExceptionMessageMapper = albumNameValidationExceptionMessageMapper,
             monitorThemeModeUseCase = monitorThemeModeUseCase,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
+            defaultDispatcher = testDispatcher,
             navKey = navKey,
         )
     }
@@ -308,18 +315,6 @@ class AlbumContentViewModelTest {
 
         underTest.state.test {
             assertThat(awaitItem().showRemoveLinkConfirmation).isEqualTo(consumed)
-        }
-    }
-
-    @Test
-    fun `test that setCurrentSort updates state correctly`() = runTest {
-        createViewModel()
-        val sort = Sort.OLDEST
-
-        underTest.setCurrentSort(sort)
-
-        underTest.state.test {
-            assertThat(awaitItem().currentSort).isEqualTo(sort)
         }
     }
 
@@ -978,5 +973,317 @@ class AlbumContentViewModelTest {
             MutableStateFlow(storageStateEvent)
         )
     }
+
+    @Test
+    fun `test that sortPhotos sorts photos correctly by modification time ascending`() =
+        runTest {
+            val mockUserAlbum = mock<MediaAlbum.User> {
+                on { id }.thenReturn(AlbumId(123L))
+            }
+            val mockAlbumUiState = mock<AlbumUiState> {
+                on { mediaAlbum }.thenReturn(mockUserAlbum)
+                on { title }.thenReturn("Album")
+                on { cover }.thenReturn(null)
+            }
+            val baseTime = LocalDateTime.of(2024, 1, 1, 12, 0, 0)
+            val photo1 = Photo.Image(
+                id = 1L,
+                albumPhotoId = null,
+                parentId = 0L,
+                name = "photo1.jpg",
+                isFavourite = false,
+                creationTime = baseTime,
+                modificationTime = baseTime.plusDays(3),
+                thumbnailFilePath = null,
+                previewFilePath = null,
+                fileTypeInfo = mock<StaticImageFileTypeInfo>(),
+                base64Id = null,
+                size = 0L,
+                isTakenDown = false,
+                isSensitive = false,
+                isSensitiveInherited = false,
+            )
+            val photo2 = Photo.Image(
+                id = 2L,
+                albumPhotoId = null,
+                parentId = 0L,
+                name = "photo2.jpg",
+                isFavourite = false,
+                creationTime = baseTime,
+                modificationTime = baseTime.plusDays(1),
+                thumbnailFilePath = null,
+                previewFilePath = null,
+                fileTypeInfo = mock<StaticImageFileTypeInfo>(),
+                base64Id = null,
+                size = 0L,
+                isTakenDown = false,
+                isSensitive = false,
+                isSensitiveInherited = false,
+            )
+            val photo3 = Photo.Image(
+                id = 3L,
+                albumPhotoId = null,
+                parentId = 0L,
+                name = "photo3.jpg",
+                isFavourite = false,
+                creationTime = baseTime,
+                modificationTime = baseTime.plusDays(2),
+                thumbnailFilePath = null,
+                previewFilePath = null,
+                fileTypeInfo = mock<StaticImageFileTypeInfo>(),
+                base64Id = null,
+                size = 0L,
+                isTakenDown = false,
+                isSensitive = false,
+                isSensitiveInherited = false,
+            )
+            val photos = listOf(photo1, photo2, photo3)
+            val photo1UiState = PhotoUiState.Image(
+                id = photo1.id,
+                albumPhotoId = photo1.albumPhotoId,
+                parentId = photo1.parentId,
+                name = photo1.name,
+                isFavourite = photo1.isFavourite,
+                creationTime = photo1.creationTime,
+                modificationTime = photo1.modificationTime,
+                thumbnailFilePath = photo1.thumbnailFilePath,
+                previewFilePath = photo1.previewFilePath,
+                fileTypeInfo = photo1.fileTypeInfo,
+                base64Id = photo1.base64Id,
+                size = photo1.size,
+                isTakenDown = photo1.isTakenDown,
+                isSensitive = photo1.isSensitive,
+                isSensitiveInherited = photo1.isSensitiveInherited,
+            )
+            val photo2UiState = PhotoUiState.Image(
+                id = photo2.id,
+                albumPhotoId = photo2.albumPhotoId,
+                parentId = photo2.parentId,
+                name = photo2.name,
+                isFavourite = photo2.isFavourite,
+                creationTime = photo2.creationTime,
+                modificationTime = photo2.modificationTime,
+                thumbnailFilePath = photo2.thumbnailFilePath,
+                previewFilePath = photo2.previewFilePath,
+                fileTypeInfo = photo2.fileTypeInfo,
+                base64Id = photo2.base64Id,
+                size = photo2.size,
+                isTakenDown = photo2.isTakenDown,
+                isSensitive = photo2.isSensitive,
+                isSensitiveInherited = photo2.isSensitiveInherited,
+            )
+            val photo3UiState = PhotoUiState.Image(
+                id = photo3.id,
+                albumPhotoId = photo3.albumPhotoId,
+                parentId = photo3.parentId,
+                name = photo3.name,
+                isFavourite = photo3.isFavourite,
+                creationTime = photo3.creationTime,
+                modificationTime = photo3.modificationTime,
+                thumbnailFilePath = photo3.thumbnailFilePath,
+                previewFilePath = photo3.previewFilePath,
+                fileTypeInfo = photo3.fileTypeInfo,
+                base64Id = photo3.base64Id,
+                size = photo3.size,
+                isTakenDown = photo3.isTakenDown,
+                isSensitive = photo3.isSensitive,
+                isSensitiveInherited = photo3.isSensitiveInherited,
+            )
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
+                false
+            )
+            whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
+            whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
+            whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf(photos))
+            whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
+            whenever(observeAlbumPhotosRemovingProgress(any())).thenReturn(flowOf())
+            whenever(photoUiStateMapper(photo1)).thenReturn(photo1UiState)
+            whenever(photoUiStateMapper(photo2)).thenReturn(photo2UiState)
+            whenever(photoUiStateMapper(photo3)).thenReturn(photo3UiState)
+
+            createViewModel(AlbumContentNavKey(id = mockUserAlbum.id.id, type = "custom"))
+
+            // Wait for photos to be loaded
+            underTest.state.test {
+                val state = awaitItem()
+                if (state.photos.isNotEmpty()) {
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+
+            val sortConfiguration = AlbumSortConfiguration(
+                sortOption = AlbumSortOption.Modified,
+                sortDirection = SortDirection.Ascending
+            )
+
+            underTest.sortPhotos(sortConfiguration)
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.albumSortConfiguration).isEqualTo(sortConfiguration)
+                assertThat(state.photos.size).isEqualTo(3)
+                // Photos should be sorted by modification time ascending, then by id descending
+                // photo2 (day 1), photo3 (day 2), photo1 (day 3)
+                assertThat(state.photos[0].id).isEqualTo(photo2UiState.id)
+                assertThat(state.photos[1].id).isEqualTo(photo3UiState.id)
+                assertThat(state.photos[2].id).isEqualTo(photo1UiState.id)
+            }
+        }
+
+    @Test
+    fun `test that sortPhotos sorts photos correctly by modification time descending`() =
+        runTest {
+            val mockUserAlbum = mock<MediaAlbum.User> {
+                on { id }.thenReturn(AlbumId(123L))
+            }
+            val mockAlbumUiState = mock<AlbumUiState> {
+                on { mediaAlbum }.thenReturn(mockUserAlbum)
+                on { title }.thenReturn("Album")
+                on { cover }.thenReturn(null)
+            }
+            val baseTime = LocalDateTime.of(2024, 1, 1, 12, 0, 0)
+            val photo1 = Photo.Image(
+                id = 1L,
+                albumPhotoId = null,
+                parentId = 0L,
+                name = "photo1.jpg",
+                isFavourite = false,
+                creationTime = baseTime,
+                modificationTime = baseTime.plusDays(1),
+                thumbnailFilePath = null,
+                previewFilePath = null,
+                fileTypeInfo = mock<StaticImageFileTypeInfo>(),
+                base64Id = null,
+                size = 0L,
+                isTakenDown = false,
+                isSensitive = false,
+                isSensitiveInherited = false,
+            )
+            val photo2 = Photo.Image(
+                id = 2L,
+                albumPhotoId = null,
+                parentId = 0L,
+                name = "photo2.jpg",
+                isFavourite = false,
+                creationTime = baseTime,
+                modificationTime = baseTime.plusDays(3),
+                thumbnailFilePath = null,
+                previewFilePath = null,
+                fileTypeInfo = mock<StaticImageFileTypeInfo>(),
+                base64Id = null,
+                size = 0L,
+                isTakenDown = false,
+                isSensitive = false,
+                isSensitiveInherited = false,
+            )
+            val photo3 = Photo.Image(
+                id = 3L,
+                albumPhotoId = null,
+                parentId = 0L,
+                name = "photo3.jpg",
+                isFavourite = false,
+                creationTime = baseTime,
+                modificationTime = baseTime.plusDays(2),
+                thumbnailFilePath = null,
+                previewFilePath = null,
+                fileTypeInfo = mock<StaticImageFileTypeInfo>(),
+                base64Id = null,
+                size = 0L,
+                isTakenDown = false,
+                isSensitive = false,
+                isSensitiveInherited = false,
+            )
+            val photos = listOf(photo1, photo2, photo3)
+            val photo1UiState = PhotoUiState.Image(
+                id = photo1.id,
+                albumPhotoId = photo1.albumPhotoId,
+                parentId = photo1.parentId,
+                name = photo1.name,
+                isFavourite = photo1.isFavourite,
+                creationTime = photo1.creationTime,
+                modificationTime = photo1.modificationTime,
+                thumbnailFilePath = photo1.thumbnailFilePath,
+                previewFilePath = photo1.previewFilePath,
+                fileTypeInfo = photo1.fileTypeInfo,
+                base64Id = photo1.base64Id,
+                size = photo1.size,
+                isTakenDown = photo1.isTakenDown,
+                isSensitive = photo1.isSensitive,
+                isSensitiveInherited = photo1.isSensitiveInherited,
+            )
+            val photo2UiState = PhotoUiState.Image(
+                id = photo2.id,
+                albumPhotoId = photo2.albumPhotoId,
+                parentId = photo2.parentId,
+                name = photo2.name,
+                isFavourite = photo2.isFavourite,
+                creationTime = photo2.creationTime,
+                modificationTime = photo2.modificationTime,
+                thumbnailFilePath = photo2.thumbnailFilePath,
+                previewFilePath = photo2.previewFilePath,
+                fileTypeInfo = photo2.fileTypeInfo,
+                base64Id = photo2.base64Id,
+                size = photo2.size,
+                isTakenDown = photo2.isTakenDown,
+                isSensitive = photo2.isSensitive,
+                isSensitiveInherited = photo2.isSensitiveInherited,
+            )
+            val photo3UiState = PhotoUiState.Image(
+                id = photo3.id,
+                albumPhotoId = photo3.albumPhotoId,
+                parentId = photo3.parentId,
+                name = photo3.name,
+                isFavourite = photo3.isFavourite,
+                creationTime = photo3.creationTime,
+                modificationTime = photo3.modificationTime,
+                thumbnailFilePath = photo3.thumbnailFilePath,
+                previewFilePath = photo3.previewFilePath,
+                fileTypeInfo = photo3.fileTypeInfo,
+                base64Id = photo3.base64Id,
+                size = photo3.size,
+                isTakenDown = photo3.isTakenDown,
+                isSensitive = photo3.isSensitive,
+                isSensitiveInherited = photo3.isSensitiveInherited,
+            )
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
+                false
+            )
+            whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
+            whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
+            whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf(photos))
+            whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
+            whenever(observeAlbumPhotosRemovingProgress(any())).thenReturn(flowOf())
+            whenever(photoUiStateMapper(photo1)).thenReturn(photo1UiState)
+            whenever(photoUiStateMapper(photo2)).thenReturn(photo2UiState)
+            whenever(photoUiStateMapper(photo3)).thenReturn(photo3UiState)
+
+            createViewModel(AlbumContentNavKey(id = mockUserAlbum.id.id, type = "custom"))
+
+            // Wait for photos to be loaded
+            underTest.state.test {
+                val state = awaitItem()
+                if (state.photos.isNotEmpty()) {
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+
+            val sortConfiguration = AlbumSortConfiguration(
+                sortOption = AlbumSortOption.Modified,
+                sortDirection = SortDirection.Descending
+            )
+
+            underTest.sortPhotos(sortConfiguration)
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.albumSortConfiguration).isEqualTo(sortConfiguration)
+                assertThat(state.photos.size).isEqualTo(3)
+                // Photos should be sorted by modification time descending, then by id descending
+                // photo2 (day 3), photo3 (day 2), photo1 (day 1)
+                assertThat(state.photos[0].id).isEqualTo(photo2UiState.id)
+                assertThat(state.photos[1].id).isEqualTo(photo3UiState.id)
+                assertThat(state.photos[2].id).isEqualTo(photo1UiState.id)
+            }
+        }
 }
 
