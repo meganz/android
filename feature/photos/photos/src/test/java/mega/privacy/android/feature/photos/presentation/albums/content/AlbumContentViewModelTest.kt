@@ -15,6 +15,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
+import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.NodeId
@@ -35,6 +37,7 @@ import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressComple
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.media.GetUserAlbumCoverPhotoUseCase
@@ -52,15 +55,18 @@ import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.Sort
-import mega.privacy.android.navigation.destination.AlbumContentNavKey
-import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
+import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -105,7 +111,7 @@ class AlbumContentViewModelTest {
     private val albumNameValidationExceptionMessageMapper: AlbumNameValidationExceptionMessageMapper =
         mock()
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase = mock()
-
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
     private val themeModeFlow = MutableStateFlow(ThemeMode.System)
 
     @BeforeAll
@@ -148,7 +154,8 @@ class AlbumContentViewModelTest {
             getUserAlbumCoverPhotoUseCase,
             removeAlbumsUseCase,
             snackbarEventQueue,
-            monitorThemeModeUseCase
+            monitorThemeModeUseCase,
+            monitorStorageStateEventUseCase
         )
         stubCommon()
         Analytics.initialise(analyticsTracker)
@@ -161,6 +168,7 @@ class AlbumContentViewModelTest {
         isHiddenNodesOnboardedUseCase.stub {
             onBlocking { invoke() }.thenReturn(false)
         }
+        mockMonitorStorageStateEvent(StorageState.Green)
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountDetailUseCase()).thenReturn(emptyFlow())
         whenever(observeAlbumPhotosAddingProgress(mock())).thenReturn(emptyFlow())
@@ -200,6 +208,7 @@ class AlbumContentViewModelTest {
             snackbarEventQueue = snackbarEventQueue,
             albumNameValidationExceptionMessageMapper = albumNameValidationExceptionMessageMapper,
             monitorThemeModeUseCase = monitorThemeModeUseCase,
+            monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             navKey = navKey,
         )
     }
@@ -756,15 +765,16 @@ class AlbumContentViewModelTest {
     }
 
     @Test
-    fun `test that handleBottomSheetAction with Rename action calls showUpdateAlbumName`() = runTest {
-        createViewModel()
+    fun `test that handleBottomSheetAction with Rename action calls showUpdateAlbumName`() =
+        runTest {
+            createViewModel()
 
-        underTest.handleBottomSheetAction(AlbumContentSelectionAction.Rename)
+            underTest.handleBottomSheetAction(AlbumContentSelectionAction.Rename)
 
-        underTest.state.test {
-            assertThat(awaitItem().showUpdateAlbumName).isEqualTo(triggered)
+            underTest.state.test {
+                assertThat(awaitItem().showUpdateAlbumName).isEqualTo(triggered)
+            }
         }
-    }
 
     @Test
     fun `test that handleBottomSheetAction with SelectAlbumCover action emits event with album id`() =
@@ -936,6 +946,37 @@ class AlbumContentViewModelTest {
         underTest.state.test {
             assertThat(awaitItem().selectAlbumCoverEvent).isEqualTo(consumed())
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideBottomSheetAction")
+    fun `test that paywall event should trigger when handling bottom sheet action and storage state is paywall`(
+        action: AlbumContentSelectionAction,
+    ) = runTest {
+        mockMonitorStorageStateEvent(StorageState.PayWall)
+
+        createViewModel()
+
+        underTest.handleBottomSheetAction(action)
+
+        underTest.state.test {
+            assertThat(awaitItem().paywallEvent).isEqualTo(triggered)
+        }
+    }
+
+    private fun provideBottomSheetAction() = listOf(
+        Arguments.of(AlbumContentSelectionAction.Rename),
+        Arguments.of(AlbumContentSelectionAction.SelectAlbumCover),
+        Arguments.of(AlbumContentSelectionAction.ManageLink),
+        Arguments.of(AlbumContentSelectionAction.RemoveLink),
+        Arguments.of(AlbumContentSelectionAction.Delete),
+    )
+
+    private fun mockMonitorStorageStateEvent(state: StorageState) {
+        val storageStateEvent = StorageStateEvent(1L, state)
+        whenever(monitorStorageStateEventUseCase.invoke()).thenReturn(
+            MutableStateFlow(storageStateEvent)
+        )
     }
 }
 

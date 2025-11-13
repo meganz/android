@@ -82,9 +82,9 @@ import mega.privacy.android.feature.photos.presentation.albums.dialog.RemoveAlbu
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.feature.photos.presentation.albums.view.AlbumDynamicContentGrid
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
-import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.navigation.destination.AlbumGetLinkNavKey
+import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
+import mega.privacy.android.navigation.destination.OverDiskQuotaPaywallWarningNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AlbumContentDeleteAlbumEvent
 import mega.privacy.mobile.analytics.event.DeleteAlbumCancelButtonPressedEvent
@@ -145,6 +145,10 @@ fun AlbumContentScreen(
             )
         },
         handleBottomSheetAction = viewModel::handleBottomSheetAction,
+        resetPaywallEvent = viewModel::resetPaywallEvent,
+        navigateToPaywall = {
+            navigationHandler.navigate(OverDiskQuotaPaywallWarningNavKey)
+        },
         onTransfer = onTransfer,
         consumeDownloadEvent = actionViewModel::markDownloadEventConsumed,
         consumeInfoToShowEvent = actionViewModel::onInfoToShowEventConsumed,
@@ -184,6 +188,8 @@ internal fun AlbumContentScreen(
     resetLinkRemovedSuccessEvent: () -> Unit,
     openGetLink: (AlbumId, Boolean) -> Unit,
     handleBottomSheetAction: (AlbumContentSelectionAction) -> Unit,
+    navigateToPaywall: () -> Unit,
+    resetPaywallEvent: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     consumeDownloadEvent: () -> Unit,
     consumeInfoToShowEvent: () -> Unit,
@@ -286,6 +292,12 @@ internal fun AlbumContentScreen(
                 selectAlbumCover(it)
             }
         }
+    )
+
+    EventEffect(
+        event = uiState.paywallEvent,
+        onConsumed = resetPaywallEvent,
+        action = navigateToPaywall
     )
 
     MegaScaffoldWithTopAppBarScrollBehavior(
@@ -618,6 +630,8 @@ private fun AlbumContentScreenPreview() {
             removeLink = {},
             resetLinkRemovedSuccessEvent = {},
             openGetLink = { _, _ -> },
+            navigateToPaywall = {},
+            resetPaywallEvent = {},
             onTransfer = {},
             consumeDownloadEvent = {},
             consumeInfoToShowEvent = {},

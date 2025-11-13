@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.NodeId
@@ -51,6 +52,7 @@ import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressComple
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.media.GetUserAlbumCoverPhotoUseCase
@@ -65,13 +67,13 @@ import mega.privacy.android.feature.photos.mapper.AlbumNameValidationExceptionMe
 import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
 import mega.privacy.android.feature.photos.mapper.LegacyMediaSystemAlbumMapper
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
-import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.Sort
-import mega.privacy.android.navigation.destination.AlbumContentNavKey
+import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.AlbumContentDeleteAlbumEvent
 import mega.privacy.mobile.analytics.event.PhotoItemSelected
@@ -108,6 +110,7 @@ class AlbumContentViewModel @AssistedInject constructor(
     private val snackbarEventQueue: SnackbarEventQueue,
     private val albumNameValidationExceptionMessageMapper: AlbumNameValidationExceptionMessageMapper,
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     @Assisted private val navKey: AlbumContentNavKey?,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumContentUiState())
@@ -687,45 +690,69 @@ class AlbumContentViewModel @AssistedInject constructor(
         }
     }
 
+    fun resetSelectAlbumCoverEvent() {
+        _state.update {
+            it.copy(selectAlbumCoverEvent = consumed())
+        }
+    }
+
     fun handleBottomSheetAction(action: AlbumContentSelectionAction) {
-        when (action) {
-            is AlbumContentSelectionAction.Rename -> {
-                showUpdateAlbumName()
-            }
+        viewModelScope.launch {
+            validateStorageState {
+                when (action) {
+                    is AlbumContentSelectionAction.Rename -> {
+                        showUpdateAlbumName()
+                    }
 
-            is AlbumContentSelectionAction.SelectAlbumCover -> {
-                val userAlbum = (_state.value.uiAlbum?.mediaAlbum as? MediaAlbum.User)
-                _state.update {
-                    it.copy(selectAlbumCoverEvent = triggered(userAlbum?.id))
+                    is AlbumContentSelectionAction.SelectAlbumCover -> {
+                        val userAlbum = (_state.value.uiAlbum?.mediaAlbum as? MediaAlbum.User)
+                        _state.update {
+                            it.copy(selectAlbumCoverEvent = triggered(userAlbum?.id))
+                        }
+                    }
+
+                    is AlbumContentSelectionAction.ManageLink -> {
+                        manageLink()
+                    }
+
+                    is AlbumContentSelectionAction.RemoveLink -> {
+                        showRemoveLinkConfirmation()
+                    }
+
+                    is AlbumContentSelectionAction.Delete -> {
+                        if (_state.value.photos.isEmpty()) {
+                            Analytics.tracker.trackEvent(AlbumContentDeleteAlbumEvent)
+                            deleteAlbum()
+                        } else {
+                            showDeleteAlbumConfirmation()
+                        }
+                    }
+
+                    else -> {
+                        Timber.d("handleBottomSheetAction: Unknown action $action")
+                    }
                 }
-            }
-
-            is AlbumContentSelectionAction.ManageLink -> {
-                manageLink()
-            }
-
-            is AlbumContentSelectionAction.RemoveLink -> {
-                showRemoveLinkConfirmation()
-            }
-
-            is AlbumContentSelectionAction.Delete -> {
-                if (_state.value.photos.isEmpty()) {
-                    Analytics.tracker.trackEvent(AlbumContentDeleteAlbumEvent)
-                    deleteAlbum()
-                } else {
-                    showDeleteAlbumConfirmation()
-                }
-            }
-
-            else -> {
-                // Other actions not handled in bottom sheet
             }
         }
     }
 
-    fun resetSelectAlbumCoverEvent() {
+    private fun validateStorageState(block: () -> Unit) {
+        runCatching {
+            monitorStorageStateEventUseCase().value.storageState
+        }.onSuccess { storageState ->
+            if (storageState == StorageState.PayWall) {
+                _state.update { it.copy(paywallEvent = triggered) }
+            } else {
+                block()
+            }
+        }.onFailure {
+            Timber.e("validateStorageState: $it")
+        }
+    }
+
+    fun resetPaywallEvent() {
         _state.update {
-            it.copy(selectAlbumCoverEvent = consumed())
+            it.copy(paywallEvent = consumed)
         }
     }
 

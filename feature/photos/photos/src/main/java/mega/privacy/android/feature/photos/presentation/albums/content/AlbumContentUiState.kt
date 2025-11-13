@@ -80,6 +80,7 @@ data class AlbumContentUiState(
     val themeMode: ThemeMode = ThemeMode.System,
     val showRemoveLinkConfirmation: StateEvent = consumed,
     val linkRemovedSuccessEvent: StateEvent = consumed,
+    val paywallEvent: StateEvent = consumed,
     val manageLinkEvent: StateEventWithContent<ManageLinkEvent?> = consumed(),
     val selectAlbumCoverEvent: StateEventWithContent<AlbumId?> = consumed()
 ) {
