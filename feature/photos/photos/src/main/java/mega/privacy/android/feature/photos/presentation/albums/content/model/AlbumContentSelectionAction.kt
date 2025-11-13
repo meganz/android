@@ -9,8 +9,8 @@ import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
 
-sealed interface AlbumContentSelectionAction {
-    data object More : MenuActionWithIcon {
+sealed interface AlbumContentSelectionAction : MenuActionWithIcon {
+    data object More : AlbumContentSelectionAction {
         override val testTag: String = "album_content_selection_action:more"
 
         @Composable
@@ -22,7 +22,7 @@ sealed interface AlbumContentSelectionAction {
             rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical)
     }
 
-    data object SelectAll : MenuActionWithIcon {
+    data object SelectAll : AlbumContentSelectionAction {
         override val testTag: String = "album_content_selection_action:select_all"
 
         @Composable
@@ -33,7 +33,7 @@ sealed interface AlbumContentSelectionAction {
             rememberVectorPainter(IconPack.Medium.Thin.Outline.CheckStack)
     }
 
-    data object Rename : MenuActionWithIcon {
+    data object Rename : AlbumContentSelectionAction {
         override val testTag: String = "album_content_selection_action:rename"
 
         @Composable
@@ -44,7 +44,7 @@ sealed interface AlbumContentSelectionAction {
             rememberVectorPainter(IconPack.Medium.Thin.Outline.Pen2)
     }
 
-    data object SelectAlbumCover : MenuActionWithIcon {
+    data object SelectAlbumCover : AlbumContentSelectionAction {
         override val testTag: String = "album_content_selection_action:select_album_cover"
 
         @Composable
@@ -56,7 +56,7 @@ sealed interface AlbumContentSelectionAction {
             rememberVectorPainter(IconPack.Medium.Thin.Outline.RectangleImageStack)
     }
 
-    data object Share : MenuActionWithIcon {
+    data object Share : AlbumContentSelectionAction {
         override val testTag: String = "album_content_selection_action:manage_link"
 
         @Composable
@@ -67,7 +67,7 @@ sealed interface AlbumContentSelectionAction {
             rememberVectorPainter(IconPack.Medium.Thin.Outline.ShareNetwork)
     }
 
-    data object ManageLink : MenuActionWithIcon {
+    data object ManageLink : AlbumContentSelectionAction {
         override val testTag: String = "album_content_selection_action:manage_link"
 
         @Composable
@@ -78,7 +78,7 @@ sealed interface AlbumContentSelectionAction {
             rememberVectorPainter(IconPack.Medium.Thin.Outline.Link01)
     }
 
-    data object RemoveLink : MenuActionWithIcon {
+    data object RemoveLink : AlbumContentSelectionAction {
         override val testTag: String = "album_content_selection_action:remove_link"
 
         @Composable
@@ -89,7 +89,7 @@ sealed interface AlbumContentSelectionAction {
             rememberVectorPainter(IconPack.Medium.Thin.Outline.LinkOff01)
     }
 
-    data object Hide : MenuActionWithIcon {
+    data object Hide : AlbumContentSelectionAction {
         override val testTag: String = "album_content_selection_action:hide"
 
         @Composable
@@ -100,7 +100,7 @@ sealed interface AlbumContentSelectionAction {
             rememberVectorPainter(IconPack.Medium.Thin.Outline.EyeOff)
     }
 
-    data object Delete : MenuActionWithIcon {
+    data object Delete : AlbumContentSelectionAction {
         override val testTag: String = "album_content_selection_action:delete"
 
         @Composable
@@ -114,7 +114,7 @@ sealed interface AlbumContentSelectionAction {
         override val highlightIcon: Boolean = true
     }
 
-    data object Download : MenuActionWithIcon {
+    data object Download : AlbumContentSelectionAction {
         override val testTag: String = "offline_selection_action:download"
 
         @Composable
@@ -126,7 +126,7 @@ sealed interface AlbumContentSelectionAction {
             rememberVectorPainter(IconPack.Medium.Thin.Outline.Download)
     }
 
-    data object SendToChat : MenuActionWithIcon {
+    data object SendToChat : AlbumContentSelectionAction {
         override val testTag: String = "offline_selection_action:send_to_chat"
 
         @Composable

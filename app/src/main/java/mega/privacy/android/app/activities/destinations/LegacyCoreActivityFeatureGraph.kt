@@ -38,5 +38,6 @@ class LegacyCoreActivityFeatureGraph : FeatureDestination {
             legacyFolderLinkScreen(navigationHandler::back)
             chatListLegacyDestination(navigationHandler::back)
             legacyAlbumCoverSelection(navigationHandler::returnResult)
+            legacyAlbumGetLink(navigationHandler::back)
         }
 }

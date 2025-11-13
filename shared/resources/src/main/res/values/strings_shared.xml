@@ -1827,6 +1827,21 @@
         <item quantity="one">Album will be deleted but its contents will stay in your Timeline.</item>
         <item quantity="other">Albums will be deleted but their contents will stay in your Timeline.</item>
     </plurals>
+    <!-- Title for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_title">
+        <item quantity="one">Remove link?</item>
+        <item quantity="other">Remove links?</item>
+    </plurals>
+    <!-- Explanation text for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_description">
+        <item quantity="one">People you shared this link with will lose access to the album.</item>
+        <item quantity="other">People you shared these links with will lose access to the albums.</item>
+    </plurals>
+    <!-- Remove button for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_positive_button">
+        <item quantity="one">Remove link</item>
+        <item quantity="other">Remove links</item>
+    </plurals>
     <!-- External checkout button text -->
     <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
 </resources>

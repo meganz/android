@@ -27,8 +27,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -81,6 +83,8 @@ import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiStat
 import mega.privacy.android.feature.photos.presentation.albums.view.AlbumDynamicContentGrid
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
+import mega.privacy.android.navigation.megaNavigator
+import mega.privacy.android.navigation.destination.AlbumGetLinkNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AlbumContentDeleteAlbumEvent
 import mega.privacy.mobile.analytics.event.DeleteAlbumCancelButtonPressedEvent
@@ -118,17 +122,29 @@ fun AlbumContentScreen(
         removePhotos = viewModel::removePhotosFromAlbum,
         deleteAlbum = viewModel::deleteAlbum,
         resetDeleteAlbumSuccessEvent = viewModel::resetDeleteAlbumSuccess,
-        showDeleteConfirmation = viewModel::showDeleteConfirmation,
         hideDeleteConfirmation = viewModel::resetShowDeleteConfirmation,
         renameAlbum = viewModel::updateAlbumName,
         resetUpdateAlbumNameErrorMessage = viewModel::resetUpdateAlbumNameErrorMessage,
-        showUpdateAlbumName = viewModel::showUpdateAlbumName,
         resetShowUpdateAlbumName = viewModel::resetShowUpdateAlbumName,
         selectAlbumCover = {
             navigationHandler.navigate(
                 LegacyAlbumCoverSelectionNavKey(it.id)
             )
         },
+        resetSelectAlbumCoverEvent = viewModel::resetSelectAlbumCoverEvent,
+        resetManageLink = viewModel::resetManageLink,
+        hideRemoveLinkConfirmation = viewModel::resetRemoveLinkConfirmation,
+        removeLink = viewModel::disableExportAlbum,
+        resetLinkRemovedSuccessEvent = viewModel::resetLinkRemovedSuccess,
+        openGetLink = { albumId, hasSensitiveContent ->
+            navigationHandler.navigate(
+                AlbumGetLinkNavKey(
+                    albumId = albumId.id,
+                    hasSensitiveContent = hasSensitiveContent
+                )
+            )
+        },
+        handleBottomSheetAction = viewModel::handleBottomSheetAction,
         onTransfer = onTransfer,
         consumeDownloadEvent = actionViewModel::markDownloadEventConsumed,
         consumeInfoToShowEvent = actionViewModel::onInfoToShowEventConsumed,
@@ -156,18 +172,24 @@ internal fun AlbumContentScreen(
     removePhotos: () -> Unit,
     deleteAlbum: () -> Unit,
     resetDeleteAlbumSuccessEvent: () -> Unit,
-    showDeleteConfirmation: () -> Unit,
     hideDeleteConfirmation: () -> Unit,
     renameAlbum: (String) -> Unit,
     resetUpdateAlbumNameErrorMessage: () -> Unit,
-    showUpdateAlbumName: () -> Unit,
     resetShowUpdateAlbumName: () -> Unit,
     selectAlbumCover: (AlbumId) -> Unit,
+    resetSelectAlbumCoverEvent: () -> Unit,
+    resetManageLink: () -> Unit,
+    hideRemoveLinkConfirmation: () -> Unit,
+    removeLink: () -> Unit,
+    resetLinkRemovedSuccessEvent: () -> Unit,
+    openGetLink: (AlbumId, Boolean) -> Unit,
+    handleBottomSheetAction: (AlbumContentSelectionAction) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     consumeDownloadEvent: () -> Unit,
     consumeInfoToShowEvent: () -> Unit,
 ) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val snackbarHostState = LocalSnackBarHostState.current
     val lazyListState = rememberLazyListState()
     val configuration = LocalConfiguration.current
@@ -231,6 +253,39 @@ internal fun AlbumContentScreen(
         event = uiState.deleteAlbumSuccessEvent,
         onConsumed = resetDeleteAlbumSuccessEvent,
         action = onBack
+    )
+
+    EventEffect(
+        event = uiState.manageLinkEvent,
+        onConsumed = resetManageLink,
+        action = { event ->
+            event?.let {
+                openGetLink(event.album.id, event.hasSensitiveContent)
+            }
+        }
+    )
+
+    EventEffect(
+        event = uiState.linkRemovedSuccessEvent,
+        onConsumed = resetLinkRemovedSuccessEvent,
+        action = {
+            snackbarHostState?.showSnackbar(
+                resources.getQuantityString(
+                    sharedR.plurals.context_link_removal_success,
+                    1
+                )
+            )
+        }
+    )
+
+    EventEffect(
+        event = uiState.selectAlbumCoverEvent,
+        onConsumed = resetSelectAlbumCoverEvent,
+        action = { albumId ->
+            albumId?.let {
+                selectAlbumCover(it)
+            }
+        }
     )
 
     MegaScaffoldWithTopAppBarScrollBehavior(
@@ -348,7 +403,7 @@ internal fun AlbumContentScreen(
         RemoveAlbumConfirmationDialog(
             modifier = Modifier.testTag(ALBUM_CONTENT_SCREEN_DELETE_ALBUM_DIALOG),
             size = 1,
-            isVisible = uiState.showDeleteConfirmation == triggered,
+            isVisible = uiState.showDeleteAlbumConfirmation == triggered,
             onConfirm = {
                 Analytics.tracker.trackEvent(AlbumContentDeleteAlbumEvent)
                 deleteAlbum()
@@ -360,26 +415,21 @@ internal fun AlbumContentScreen(
             }
         )
 
+        RemoveLinksDialog(
+            isVisible = uiState.showRemoveLinkConfirmation == triggered,
+            onConfirm = {
+                hideRemoveLinkConfirmation()
+                removeLink()
+            },
+            onDismiss = hideRemoveLinkConfirmation
+        )
+
         AlbumOptionsBottomSheet(
             isVisible = isMoreOptionsSheetVisible && isUserAlbum,
             onDismiss = { isMoreOptionsSheetVisible = false },
             albumUiState = uiState.uiAlbum,
-            deleteAlbum = {
-                if (uiState.photos.isEmpty()) {
-                    Analytics.tracker.trackEvent(AlbumContentDeleteAlbumEvent)
-                    deleteAlbum()
-                } else {
-                    showDeleteConfirmation()
-                }
-            },
-            renameAlbum = showUpdateAlbumName,
-            isDarkTheme = uiState.themeMode.isDarkMode(),
-            selectAlbumCover = {
-                val userAlbum = uiState.uiAlbum?.mediaAlbum as? MediaAlbum.User
-                    ?: return@AlbumOptionsBottomSheet
-
-                selectAlbumCover(userAlbum.id)
-            }
+            onAction = handleBottomSheetAction,
+            isDarkTheme = uiState.themeMode.isDarkMode()
         )
 
         if (uiState.showUpdateAlbumName == triggered) {
@@ -415,17 +465,44 @@ internal fun RemovePhotosConfirmationDialog(
     )
 }
 
+@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+@Composable
+internal fun RemoveLinksDialog(
+    isVisible: Boolean,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    BasicDialog(
+        modifier = Modifier.testTag(ALBUM_CONTENT_SCREEN_REMOVE_LINKS_DIALOG),
+        title = pluralStringResource(
+            id = sharedR.plurals.album_content_remove_links_dialog_title,
+            count = 1
+        ),
+        description = pluralStringResource(
+            id = sharedR.plurals.album_content_remove_links_dialog_description,
+            count = 1
+        ),
+        positiveButtonText = pluralStringResource(
+            id = sharedR.plurals.album_content_remove_links_dialog_positive_button,
+            count = 1
+        ),
+        onPositiveButtonClicked = onConfirm,
+        negativeButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
+        onNegativeButtonClicked = onDismiss,
+        onDismiss = onDismiss,
+        isVisible = isVisible
+    )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
 @Composable
 internal fun AlbumOptionsBottomSheet(
     onDismiss: () -> Unit,
     albumUiState: AlbumUiState?,
-    deleteAlbum: () -> Unit,
-    renameAlbum: () -> Unit,
-    selectAlbumCover: () -> Unit,
+    onAction: (AlbumContentSelectionAction) -> Unit,
     isVisible: Boolean = false,
-    isDarkTheme: Boolean = isSystemInDarkTheme()
+    isDarkTheme: Boolean = isSystemInDarkTheme(),
 ) {
     val sheetState = rememberModalBottomSheetState()
     val cover = albumUiState?.cover?.downloadAsStateWithLifecycle(isPreview = false)
@@ -496,30 +573,7 @@ internal fun AlbumOptionsBottomSheet(
                             .wrapContentHeight(),
                         menuAction = action,
                         onActionClicked = {
-                            when (action) {
-                                is AlbumContentSelectionAction.Rename -> {
-                                    renameAlbum()
-                                }
-
-                                is AlbumContentSelectionAction.SelectAlbumCover -> {
-                                    selectAlbumCover()
-                                }
-
-                                is AlbumContentSelectionAction.ManageLink -> {
-                                    // Todo manage link
-                                }
-
-                                is AlbumContentSelectionAction.RemoveLink -> {
-                                    // Todo share album
-                                }
-
-                                is AlbumContentSelectionAction.Delete -> {
-                                    deleteAlbum()
-                                }
-
-                                else -> {}
-                            }
-
+                            onAction(action)
                             onDismiss()
                         },
                         isDestructive = action.highlightIcon
@@ -553,16 +607,21 @@ private fun AlbumContentScreenPreview() {
             removePhotos = {},
             deleteAlbum = {},
             resetDeleteAlbumSuccessEvent = {},
-            showDeleteConfirmation = {},
             hideDeleteConfirmation = {},
             renameAlbum = {},
             resetUpdateAlbumNameErrorMessage = {},
-            showUpdateAlbumName = {},
             resetShowUpdateAlbumName = {},
             selectAlbumCover = {},
+            resetSelectAlbumCoverEvent = {},
+            resetManageLink = {},
+            hideRemoveLinkConfirmation = {},
+            removeLink = {},
+            resetLinkRemovedSuccessEvent = {},
+            openGetLink = { _, _ -> },
             onTransfer = {},
             consumeDownloadEvent = {},
-            consumeInfoToShowEvent = {}
+            consumeInfoToShowEvent = {},
+            handleBottomSheetAction = {}
         )
     }
 }
@@ -579,3 +638,5 @@ internal const val ALBUM_CONTENT_SCREEN_DELETE_ALBUM_DIALOG =
     "album_content_screen:delete_album_dialog"
 internal const val ALBUM_CONTENT_SCREEN_UPDATE_ALBUM_DIALOG =
     "album_content_screen:update_album_dialog"
+internal const val ALBUM_CONTENT_SCREEN_REMOVE_LINKS_DIALOG =
+    "album_content_screen:remove_links_dialog"

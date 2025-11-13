@@ -134,3 +134,9 @@ data class LegacyAlbumCoverSelectionNavKey(val albumId: Long) : NavKey {
         const val MESSAGE = "extra_message"
     }
 }
+
+@Serializable
+data class AlbumGetLinkNavKey(
+    val albumId: Long,
+    val hasSensitiveContent: Boolean
+) : NavKey

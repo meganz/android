@@ -9,7 +9,9 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentSetOf
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.Sort
@@ -49,8 +51,6 @@ data class AlbumContentUiState(
     val totalAddedPhotos: Int = 0,
     val isRemovingPhotos: Boolean = false,
     val totalRemovedPhotos: Int = 0,
-    val showRemoveLinkConfirmation: Boolean = false,
-    val isLinkRemoved: Boolean = false,
     val uiAlbum: AlbumUiState? = null,
     val photos: ImmutableList<PhotoUiState> = persistentListOf(),
     val selectedPhotos: ImmutableSet<PhotoUiState> = persistentSetOf(),
@@ -74,13 +74,22 @@ data class AlbumContentUiState(
     val sendPhotosToChatEvent: StateEventWithContent<List<TypedNode>> = consumed(),
     val hidePhotosEvent: StateEventWithContent<List<TypedNode>> = consumed(),
     val deleteAlbumSuccessEvent: StateEvent = consumed,
-    val showDeleteConfirmation: StateEvent = consumed,
+    val showDeleteAlbumConfirmation: StateEvent = consumed,
     val updateAlbumNameErrorMessage: StateEventWithContent<String> = consumed(),
     val showUpdateAlbumName: StateEvent = consumed,
-    val themeMode: ThemeMode = ThemeMode.System
+    val themeMode: ThemeMode = ThemeMode.System,
+    val showRemoveLinkConfirmation: StateEvent = consumed,
+    val linkRemovedSuccessEvent: StateEvent = consumed,
+    val manageLinkEvent: StateEventWithContent<ManageLinkEvent?> = consumed(),
+    val selectAlbumCoverEvent: StateEventWithContent<AlbumId?> = consumed()
 ) {
     val isAddingPhotosProgressCompleted: Boolean
         get() = !isAddingPhotos && totalAddedPhotos > 0
     val isRemovingPhotosProgressCompleted: Boolean
         get() = !isRemovingPhotos && totalRemovedPhotos > 0
 }
+
+data class ManageLinkEvent(
+    val album: MediaAlbum.User,
+    val hasSensitiveContent: Boolean
+)

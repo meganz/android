@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.exception.account.AlbumNameValidationException
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetAlbumPhotosUseCase
@@ -53,6 +54,7 @@ import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
+import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
 import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -285,7 +287,7 @@ class AlbumContentViewModelTest {
         underTest.showRemoveLinkConfirmation()
 
         underTest.state.test {
-            assertThat(awaitItem().showRemoveLinkConfirmation).isTrue()
+            assertThat(awaitItem().showRemoveLinkConfirmation).isEqualTo(triggered)
         }
     }
 
@@ -293,10 +295,10 @@ class AlbumContentViewModelTest {
     fun `test that closeRemoveLinkConfirmation updates state correctly`() = runTest {
         createViewModel()
 
-        underTest.closeRemoveLinkConfirmation()
+        underTest.resetRemoveLinkConfirmation()
 
         underTest.state.test {
-            assertThat(awaitItem().showRemoveLinkConfirmation).isFalse()
+            assertThat(awaitItem().showRemoveLinkConfirmation).isEqualTo(consumed)
         }
     }
 
@@ -392,17 +394,6 @@ class AlbumContentViewModelTest {
     }
 
     @Test
-    fun `test that resetLinkRemoved updates state correctly`() = runTest {
-        createViewModel()
-
-        underTest.resetLinkRemoved()
-
-        underTest.state.test {
-            assertThat(awaitItem().isLinkRemoved).isFalse()
-        }
-    }
-
-    @Test
     fun `test that setNewAlbumNameValidity updates state correctly`() = runTest {
         createViewModel()
 
@@ -454,14 +445,31 @@ class AlbumContentViewModelTest {
 
     @Test
     fun `test that disableExportAlbum updates state when link removed successfully`() = runTest {
-        createViewModel()
         val albumId = AlbumId(123L)
+        val mockUserAlbum = mock<MediaAlbum.User> {
+            on { id }.thenReturn(albumId)
+        }
+        val mockAlbumUiState = mock<AlbumUiState> {
+            on { mediaAlbum }.thenReturn(mockUserAlbum)
+            on { title }.thenReturn("Album")
+            on { cover }.thenReturn(null)
+        }
         whenever(disableExportAlbumsUseCase(listOf(albumId))).thenReturn(1)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
+            false
+        )
+        whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
+        whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
+        whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf())
+        whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
+        whenever(observeAlbumPhotosRemovingProgress(any())).thenReturn(flowOf())
 
-        underTest.disableExportAlbum(albumId)
+        createViewModel(AlbumContentNavKey(id = mockUserAlbum.id.id, type = "custom"))
+
+        underTest.disableExportAlbum()
 
         underTest.state.test {
-            assertThat(awaitItem().isLinkRemoved).isTrue()
+            assertThat(awaitItem().linkRemovedSuccessEvent).isEqualTo(triggered)
         }
     }
 
@@ -744,6 +752,189 @@ class AlbumContentViewModelTest {
 
         underTest.state.test {
             assertThat(expectMostRecentItem().themeMode).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    fun `test that handleBottomSheetAction with Rename action calls showUpdateAlbumName`() = runTest {
+        createViewModel()
+
+        underTest.handleBottomSheetAction(AlbumContentSelectionAction.Rename)
+
+        underTest.state.test {
+            assertThat(awaitItem().showUpdateAlbumName).isEqualTo(triggered)
+        }
+    }
+
+    @Test
+    fun `test that handleBottomSheetAction with SelectAlbumCover action emits event with album id`() =
+        runTest {
+            val albumId = AlbumId(123L)
+            val mockUserAlbum = mock<MediaAlbum.User> {
+                on { id }.thenReturn(albumId)
+            }
+            val mockAlbumUiState = mock<AlbumUiState> {
+                on { mediaAlbum }.thenReturn(mockUserAlbum)
+                on { title }.thenReturn("Album")
+                on { cover }.thenReturn(null)
+            }
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
+                false
+            )
+            whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
+            whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
+            whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf())
+            whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
+            whenever(observeAlbumPhotosRemovingProgress(any())).thenReturn(flowOf())
+
+            createViewModel(AlbumContentNavKey(id = albumId.id, type = "custom"))
+
+            underTest.handleBottomSheetAction(AlbumContentSelectionAction.SelectAlbumCover)
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.selectAlbumCoverEvent).isEqualTo(triggered(albumId))
+            }
+        }
+
+    @Test
+    fun `test that handleBottomSheetAction with SelectAlbumCover action emits null when not user album`() =
+        runTest {
+            createViewModel()
+
+            underTest.handleBottomSheetAction(AlbumContentSelectionAction.SelectAlbumCover)
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.selectAlbumCoverEvent).isEqualTo(triggered(null))
+            }
+        }
+
+    @Test
+    fun `test that handleBottomSheetAction with ManageLink action calls manageLink`() = runTest {
+        val albumId = AlbumId(123L)
+        val mockUserAlbum = mock<MediaAlbum.User> {
+            on { id }.thenReturn(albumId)
+        }
+        val mockAlbumUiState = mock<AlbumUiState> {
+            on { mediaAlbum }.thenReturn(mockUserAlbum)
+            on { title }.thenReturn("Album")
+            on { cover }.thenReturn(null)
+        }
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
+            false
+        )
+        whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
+        whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
+        whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf())
+        whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
+        whenever(observeAlbumPhotosRemovingProgress(any())).thenReturn(flowOf())
+
+        createViewModel(AlbumContentNavKey(id = albumId.id, type = "custom"))
+
+        underTest.handleBottomSheetAction(AlbumContentSelectionAction.ManageLink)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.manageLinkEvent).isNotEqualTo(consumed())
+        }
+    }
+
+    @Test
+    fun `test that handleBottomSheetAction with RemoveLink action calls showRemoveLinkConfirmation`() =
+        runTest {
+            createViewModel()
+
+            underTest.handleBottomSheetAction(AlbumContentSelectionAction.RemoveLink)
+
+            underTest.state.test {
+                assertThat(awaitItem().showRemoveLinkConfirmation).isEqualTo(triggered)
+            }
+        }
+
+    @Test
+    fun `test that handleBottomSheetAction with Delete action calls deleteAlbum when photos are empty`() =
+        runTest {
+            val albumId = AlbumId(123L)
+            whenever(savedStateHandle.get<Long>("id")).thenReturn(albumId.id)
+            whenever(removeAlbumsUseCase(listOf(albumId))).thenReturn(Unit)
+            createViewModel()
+
+            underTest.handleBottomSheetAction(AlbumContentSelectionAction.Delete)
+
+            verify(removeAlbumsUseCase).invoke(listOf(albumId))
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.deleteAlbumSuccessEvent).isEqualTo(triggered)
+            }
+        }
+
+    @Test
+    fun `test that handleBottomSheetAction with Delete action calls showDeleteAlbumConfirmation when photos are not empty`() =
+        runTest {
+            val albumId = AlbumId(123L)
+            val mockUserAlbum = mock<MediaAlbum.User> {
+                on { id }.thenReturn(albumId)
+            }
+            val mockAlbumUiState = mock<AlbumUiState> {
+                on { mediaAlbum }.thenReturn(mockUserAlbum)
+                on { title }.thenReturn("Album")
+                on { cover }.thenReturn(null)
+            }
+            val legacyPhoto = mock<Photo.Image> {
+                on { id }.thenReturn(1L)
+            }
+            val photo = mock<PhotoUiState.Image> {
+                on { id }.thenReturn(1L)
+            }
+            whenever(photo.id).thenReturn(1L)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
+                false
+            )
+            whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
+            whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
+            whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf(listOf(legacyPhoto)))
+            whenever(photoUiStateMapper(legacyPhoto)).thenReturn(photo)
+            whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
+            whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
+            whenever(observeAlbumPhotosRemovingProgress(any())).thenReturn(flowOf())
+
+            createViewModel(AlbumContentNavKey(id = albumId.id, type = "custom"))
+
+            underTest.handleBottomSheetAction(AlbumContentSelectionAction.Delete)
+
+            underTest.state.test {
+                assertThat(awaitItem().showDeleteAlbumConfirmation).isEqualTo(triggered)
+            }
+        }
+
+    @Test
+    fun `test that resetSelectAlbumCoverEvent updates state correctly`() = runTest {
+        val albumId = AlbumId(123L)
+        val mockUserAlbum = mock<MediaAlbum.User> {
+            on { id }.thenReturn(albumId)
+        }
+        val mockAlbumUiState = mock<AlbumUiState> {
+            on { mediaAlbum }.thenReturn(mockUserAlbum)
+            on { title }.thenReturn("Album")
+            on { cover }.thenReturn(null)
+        }
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
+            false
+        )
+        whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
+        whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
+        whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf())
+        whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
+        whenever(observeAlbumPhotosRemovingProgress(any())).thenReturn(flowOf())
+
+        createViewModel(AlbumContentNavKey(id = albumId.id, type = "custom"))
+
+        underTest.handleBottomSheetAction(AlbumContentSelectionAction.SelectAlbumCover)
+        underTest.resetSelectAlbumCoverEvent()
+
+        underTest.state.test {
+            assertThat(awaitItem().selectAlbumCoverEvent).isEqualTo(consumed())
         }
     }
 }

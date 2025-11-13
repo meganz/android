@@ -65,6 +65,7 @@ import mega.privacy.android.feature.photos.mapper.AlbumNameValidationExceptionMe
 import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
 import mega.privacy.android.feature.photos.mapper.LegacyMediaSystemAlbumMapper
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
+import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.Sort
@@ -72,6 +73,7 @@ import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.mobile.analytics.event.AlbumContentDeleteAlbumEvent
 import mega.privacy.mobile.analytics.event.PhotoItemSelected
 import mega.privacy.mobile.analytics.event.PhotoItemSelectedEvent
 import timber.log.Timber
@@ -388,9 +390,10 @@ class AlbumContentViewModel @AssistedInject constructor(
         }
     }
 
-    internal fun showDeleteConfirmation() {
+    internal fun showDeleteAlbumConfirmation() {
+        // Todo Add Paywall checking here
         _state.update {
-            it.copy(showDeleteConfirmation = triggered)
+            it.copy(showDeleteAlbumConfirmation = triggered)
         }
     }
 
@@ -402,35 +405,68 @@ class AlbumContentViewModel @AssistedInject constructor(
 
     internal fun resetShowDeleteConfirmation() {
         _state.update {
-            it.copy(showDeleteConfirmation = consumed)
+            it.copy(showDeleteAlbumConfirmation = consumed)
+        }
+    }
+
+    fun manageLink() {
+        // Todo Add Paywall checking here
+        _state.update {
+            it.copy(manageLinkEvent = triggered(getManageLinkEvent()))
+        }
+    }
+
+    private fun getManageLinkEvent(): ManageLinkEvent? {
+        val userAlbum = (_state.value.uiAlbum?.mediaAlbum as? MediaAlbum.User) ?: return null
+        val hasSensitiveMedia = sourcePhotos
+            ?.any { it.isSensitive || it.isSensitiveInherited }
+            ?: false
+
+        return ManageLinkEvent(
+            album = userAlbum,
+            hasSensitiveContent = hasSensitiveMedia
+        )
+    }
+
+    fun resetManageLink() {
+        _state.update {
+            it.copy(manageLinkEvent = consumed())
         }
     }
 
 
     fun showRemoveLinkConfirmation() {
+        // Todo Add Paywall checking here
         _state.update {
-            it.copy(showRemoveLinkConfirmation = true)
+            it.copy(showRemoveLinkConfirmation = triggered)
         }
     }
 
-    fun closeRemoveLinkConfirmation() {
+    fun resetRemoveLinkConfirmation() {
         _state.update {
-            it.copy(showRemoveLinkConfirmation = false)
+            it.copy(showRemoveLinkConfirmation = consumed)
         }
     }
 
-    fun disableExportAlbum(albumId: AlbumId) {
+    fun disableExportAlbum() {
         viewModelScope.launch {
-            val numRemoved = disableExportAlbumsUseCase(albumIds = listOf(albumId))
-            _state.update {
-                it.copy(isLinkRemoved = numRemoved > 0)
+            runCatching {
+                val userAlbum = (_state.value.uiAlbum?.mediaAlbum as? MediaAlbum.User)
+                checkNotNull(userAlbum)
+                disableExportAlbumsUseCase(albumIds = listOf(userAlbum.id))
+            }.onSuccess { linkRemoved ->
+                _state.update {
+                    it.copy(
+                        linkRemovedSuccessEvent = if (linkRemoved > 0) triggered else consumed
+                    )
+                }
             }
         }
     }
 
-    fun resetLinkRemoved() {
+    fun resetLinkRemovedSuccess() {
         _state.update {
-            it.copy(isLinkRemoved = false)
+            it.copy(linkRemovedSuccessEvent = consumed)
         }
     }
 
@@ -648,6 +684,48 @@ class AlbumContentViewModel @AssistedInject constructor(
     fun setHiddenNodesOnboarded() {
         _state.update {
             it.copy(isHiddenNodesOnboarded = true)
+        }
+    }
+
+    fun handleBottomSheetAction(action: AlbumContentSelectionAction) {
+        when (action) {
+            is AlbumContentSelectionAction.Rename -> {
+                showUpdateAlbumName()
+            }
+
+            is AlbumContentSelectionAction.SelectAlbumCover -> {
+                val userAlbum = (_state.value.uiAlbum?.mediaAlbum as? MediaAlbum.User)
+                _state.update {
+                    it.copy(selectAlbumCoverEvent = triggered(userAlbum?.id))
+                }
+            }
+
+            is AlbumContentSelectionAction.ManageLink -> {
+                manageLink()
+            }
+
+            is AlbumContentSelectionAction.RemoveLink -> {
+                showRemoveLinkConfirmation()
+            }
+
+            is AlbumContentSelectionAction.Delete -> {
+                if (_state.value.photos.isEmpty()) {
+                    Analytics.tracker.trackEvent(AlbumContentDeleteAlbumEvent)
+                    deleteAlbum()
+                } else {
+                    showDeleteAlbumConfirmation()
+                }
+            }
+
+            else -> {
+                // Other actions not handled in bottom sheet
+            }
+        }
+    }
+
+    fun resetSelectAlbumCoverEvent() {
+        _state.update {
+            it.copy(selectAlbumCoverEvent = consumed())
         }
     }
 

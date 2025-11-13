@@ -61,13 +61,18 @@ class AlbumContentScreenComposeTest {
         removePhotos: () -> Unit = {},
         deleteAlbum: () -> Unit = {},
         resetDeleteAlbumSuccessEvent: () -> Unit = {},
-        showDeleteConfirmation: () -> Unit = {},
         hideDeleteConfirmation: () -> Unit = {},
         renameAlbum: (String) -> Unit = {},
         resetUpdateAlbumNameErrorMessage: () -> Unit = {},
-        showUpdateAlbumName: () -> Unit = {},
         resetShowUpdateAlbumName: () -> Unit = {},
         selectAlbumCover: (AlbumId) -> Unit = {},
+        resetSelectAlbumCoverEvent: () -> Unit = {},
+        resetManageLink: () -> Unit = {},
+        hideRemoveLinkConfirmation: () -> Unit = {},
+        removeLink: () -> Unit = {},
+        resetLinkRemovedSuccessEvent: () -> Unit = {},
+        openGetLink: (AlbumId, Boolean) -> Unit = { _, _ -> },
+        handleBottomSheetAction: (AlbumContentSelectionAction) -> Unit = {},
         onTransfer: (TransferTriggerEvent) -> Unit = {},
         consumeDownloadEvent: () -> Unit = {},
         consumeInfoToShowEvent: () -> Unit = {},
@@ -92,14 +97,19 @@ class AlbumContentScreenComposeTest {
                     resetHidePhotosEvent = resetHidePhotosEvent,
                     removePhotos = removePhotos,
                     deleteAlbum = deleteAlbum,
-                    showDeleteConfirmation = showDeleteConfirmation,
                     hideDeleteConfirmation = hideDeleteConfirmation,
                     renameAlbum = renameAlbum,
                     resetUpdateAlbumNameErrorMessage = resetUpdateAlbumNameErrorMessage,
-                    showUpdateAlbumName = showUpdateAlbumName,
                     resetShowUpdateAlbumName = resetShowUpdateAlbumName,
                     resetDeleteAlbumSuccessEvent = resetDeleteAlbumSuccessEvent,
                     selectAlbumCover = selectAlbumCover,
+                    resetSelectAlbumCoverEvent = resetSelectAlbumCoverEvent,
+                    resetManageLink = resetManageLink,
+                    hideRemoveLinkConfirmation = hideRemoveLinkConfirmation,
+                    removeLink = removeLink,
+                    resetLinkRemovedSuccessEvent = resetLinkRemovedSuccessEvent,
+                    openGetLink = openGetLink,
+                    handleBottomSheetAction = handleBottomSheetAction,
                     onTransfer = onTransfer,
                     consumeDownloadEvent = consumeDownloadEvent,
                     consumeInfoToShowEvent = consumeInfoToShowEvent,
@@ -358,9 +368,7 @@ class AlbumContentScreenComposeTest {
                     isVisible = false,
                     onDismiss = {},
                     albumUiState = albumUiState,
-                    deleteAlbum = {},
-                    renameAlbum = {},
-                    selectAlbumCover = {}
+                    onAction = {}
                 )
             }
         }
@@ -381,9 +389,7 @@ class AlbumContentScreenComposeTest {
                     isVisible = true,
                     onDismiss = {},
                     albumUiState = albumUiState,
-                    deleteAlbum = {},
-                    renameAlbum = {},
-                    selectAlbumCover = {}
+                    onAction = {}
                 )
             }
         }
@@ -404,7 +410,7 @@ class AlbumContentScreenComposeTest {
             uiAlbum = createMockAlbumUiState(),
             photos = mockPhotos.toImmutableList(),
             selectedPhotos = persistentSetOf(),
-            showDeleteConfirmation = triggered
+            showDeleteAlbumConfirmation = triggered
         )
 
         setComposeContent(uiState = uiState)
@@ -428,6 +434,27 @@ class AlbumContentScreenComposeTest {
 
         composeTestRule
             .onNodeWithTag(ALBUM_CONTENT_SCREEN_UPDATE_ALBUM_DIALOG)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that remove links confirmation dialog is visible when showRemoveLinkConfirmation is triggered`() {
+        val mockPhotos = listOf(
+            createMockPhoto(1),
+            createMockPhoto(2),
+            createMockPhoto(3)
+        )
+        val uiState = AlbumContentUiState(
+            uiAlbum = createMockAlbumUiState(),
+            photos = mockPhotos.toImmutableList(),
+            selectedPhotos = persistentSetOf(),
+            showRemoveLinkConfirmation = triggered
+        )
+
+        setComposeContent(uiState = uiState)
+
+        composeTestRule
+            .onNodeWithTag(ALBUM_CONTENT_SCREEN_REMOVE_LINKS_DIALOG)
             .assertIsDisplayed()
     }
 
