@@ -52,6 +52,7 @@ dependencies {
     implementation(lib.kotlin.serialisation)
     implementation(androidx.navigation3.runtime)
     implementation(google.services.mlkit.document.scanner)
+    implementation(androidx.navigation3.ui)
 
     // test
     testImplementation(project(":core-test"))

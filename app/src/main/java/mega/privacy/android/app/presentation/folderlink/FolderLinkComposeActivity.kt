@@ -462,7 +462,7 @@ class FolderLinkComposeActivity : PasscodeActivity(),
         val builder = DecryptAlertDialog.Builder()
         val decryptAlertDialog = builder
             .setTitle(getString(R.string.alert_decryption_key))
-            .setPosText(R.string.general_decryp)
+            .setPosText(sharedR.string.general_decrypt)
             .setNegText(sharedR.string.general_dialog_cancel_button)
             .setMessage(getString(R.string.message_decryption_key))
             .setErrorMessage(R.string.invalid_decryption_key)

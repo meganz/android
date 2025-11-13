@@ -20,6 +20,7 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
+import mega.privacy.android.shared.resources.R as sharedR
 
 class OpenPasswordLinkActivity : PasscodeActivity(), DecryptDialogListener {
     private var progressBar: ProgressBar? = null
@@ -54,10 +55,10 @@ class OpenPasswordLinkActivity : PasscodeActivity(), DecryptDialogListener {
         Timber.d("askForPasswordDialog")
 
         DecryptAlertDialog.Builder()
-            .setTitle(getString(R.string.hint_set_password_protection_dialog))
-            .setPosText(R.string.general_decryp)
+            .setTitle(getString(sharedR.string.password_dialog_hint))
+            .setPosText(sharedR.string.general_decrypt)
             .setNegText(mega.privacy.android.shared.resources.R.string.general_dialog_cancel_button)
-            .setErrorMessage(R.string.invalid_link_password)
+            .setErrorMessage(sharedR.string.password_dialog_error)
             .setKey(key)
             .setShownPassword(true)
             .build()

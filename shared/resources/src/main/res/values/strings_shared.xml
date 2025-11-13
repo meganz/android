@@ -1827,6 +1827,8 @@
         <item quantity="one">Album will be deleted but its contents will stay in your Timeline.</item>
         <item quantity="other">Albums will be deleted but their contents will stay in your Timeline.</item>
     </plurals>
+    <!-- External checkout button text -->
+    <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
     <!-- Title for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_title">
         <item quantity="one">Remove link?</item>
@@ -1842,6 +1844,10 @@
         <item quantity="one">Remove link</item>
         <item quantity="other">Remove links</item>
     </plurals>
-    <!-- External checkout button text -->
-    <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
+    <!-- Hint for password dialog -->
+    <string name="password_dialog_hint">Enter password</string>
+    <!-- Text for decrypt button -->
+    <string name="general_decrypt">Decrypt</string>
+    <!-- error message shown on the link password dialog if the password typed in was wrong -->
+    <string name="password_dialog_error">Invalid link password</string>
 </resources>

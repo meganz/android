@@ -7,10 +7,13 @@ import mega.privacy.android.feature.clouddrive.presentation.drivesync.driveSyncS
 import mega.privacy.android.feature.clouddrive.presentation.offline.offlineInfoScreen
 import mega.privacy.android.feature.clouddrive.presentation.offline.offlineScreen
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.rubbishBin
+import mega.privacy.android.feature.clouddrive.presentation.shares.links.openPasswordLinkDialog
 import mega.privacy.android.feature.clouddrive.presentation.shares.shares
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.destination.LegacyFileLinkNavKey
+import mega.privacy.android.navigation.destination.LegacyFolderLinkNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
 import mega.privacy.android.navigation.destination.OfflineNavKey
 import mega.privacy.android.navigation.destination.SearchNodeNavKey
@@ -66,6 +69,17 @@ class CloudDriveFeatureDestination : FeatureDestination {
                         )
                     )
                 }
+            )
+            openPasswordLinkDialog(
+                onBack = navigationHandler::back,
+                onNavigateToFileLink = { folderLinkUri ->
+                    navigationHandler.back() //to dismiss the dialog
+                    navigationHandler.navigate(LegacyFileLinkNavKey(folderLinkUri))
+                },
+                onNavigateToFolderLink = { folderLinkUri ->
+                    navigationHandler.back() //to dismiss the dialog
+                    navigationHandler.navigate(LegacyFolderLinkNavKey(folderLinkUri))
+                },
             )
         }
 }

@@ -608,7 +608,7 @@ private fun TestPasswordModeLayout(
                     .padding(top = 24.dp)
                     .testTag(PASSWORD_TEXT_FIELD_TAG)
             },
-            label = stringResource(id = R.string.hint_set_password_protection_dialog),
+            label = stringResource(id = sharedResR.string.password_dialog_hint),
             passwordState = uiState.isCurrentPassword,
             isShowPassword = isShowPasswordChar,
             onValueChange = { value, _ ->

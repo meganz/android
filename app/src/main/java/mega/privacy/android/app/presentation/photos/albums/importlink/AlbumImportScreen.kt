@@ -627,7 +627,7 @@ private fun InputDecryptionKeyDialog(
                 enabled = text.isNotBlank(),
                 content = {
                     Text(
-                        text = stringResource(id = R.string.general_decryp),
+                        text = stringResource(id = sharedResR.string.general_decrypt),
                         color = accent_900,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,
