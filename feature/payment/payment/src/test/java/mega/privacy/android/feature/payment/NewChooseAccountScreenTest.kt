@@ -10,14 +10,16 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import de.palm.composestateevents.triggered
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.CurrencyAmount
+import mega.privacy.android.feature.payment.components.TEST_TAG_BUY_BUTTON
+import mega.privacy.android.feature.payment.components.TEST_TAG_BUY_ON_WEBSITE_BUTTON
 import mega.privacy.android.feature.payment.components.TEST_TAG_FREE_PLAN_CARD
 import mega.privacy.android.feature.payment.components.TEST_TAG_PRO_PLAN_CARD
-import de.palm.composestateevents.triggered
 import mega.privacy.android.feature.payment.model.BillingUIState
 import mega.privacy.android.feature.payment.model.ChooseAccountState
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
@@ -29,8 +31,6 @@ import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_LAZY_C
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_SUBSCRIPTION_INFO_DESC
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_SUBSCRIPTION_INFO_TITLE
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_TERMS_AND_POLICIES
-import mega.privacy.android.feature.payment.components.TEST_TAG_BUY_BUTTON
-import mega.privacy.android.feature.payment.components.TEST_TAG_BUY_ON_WEBSITE_BUTTON
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
@@ -418,6 +418,44 @@ class NewChooseAccountScreenTest {
             .assertIsDisplayed()
     }
 
+    @Test
+    fun `test that skeleton is shown when subscriptions list is empty`() {
+        setContent(
+            uiState = ChooseAccountState(
+                localisedSubscriptionsList = emptyList(),
+            )
+        )
+
+        // Verify skeleton items are displayed (3 items by default)
+        (0..2).forEach { index ->
+            val skeletonTag = "upgrade_account:pro_plan_card_skeleton$index"
+            composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+                .performScrollToNode(hasTestTag(skeletonTag))
+                .assertExists()
+        }
+
+        // Verify that actual pro plan cards are not displayed
+        composeRule.onNodeWithTag("${TEST_TAG_PRO_PLAN_CARD}0")
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that skeleton is not shown when subscriptions list has items`() {
+        setContent()
+
+        // Verify skeleton items are not displayed
+        composeRule.onNodeWithTag("upgrade_account:pro_plan_card_skeleton0")
+            .assertDoesNotExist()
+
+        // Verify that actual pro plan cards are displayed
+        (0..2).forEach { index ->
+            val tag = "${TEST_TAG_PRO_PLAN_CARD}$index"
+            composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+                .performScrollToNode(hasTestTag(tag))
+                .assertExists()
+        }
+    }
+
     private fun setContent(
         isUpgradeAccount: Boolean = false,
         onBuyPlanClick: (Subscription) -> Unit = {},
@@ -428,16 +466,17 @@ class NewChooseAccountScreenTest {
         onExternalCheckoutClick: (Subscription, Boolean) -> Unit = { _, _ -> },
         billingUIState: BillingUIState = BillingUIState(),
         clearExternalPurchaseError: () -> Unit = {},
+        uiState: ChooseAccountState = ChooseAccountState(
+            localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
+            isExternalCheckoutEnabled = isExternalCheckoutEnabled,
+            isExternalCheckoutDefault = isExternalCheckoutDefault,
+        ),
     ) = composeRule.setContent {
         NewChooseAccountScreen(
             onInAppCheckoutClick = onBuyPlanClick,
             onFreePlanClicked = onFreePlanClick,
             maybeLaterClicked = maybeLaterClicked,
-            uiState = ChooseAccountState(
-                localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
-                isExternalCheckoutEnabled = isExternalCheckoutEnabled,
-                isExternalCheckoutDefault = isExternalCheckoutDefault,
-            ),
+            uiState = uiState,
             billingUIState = billingUIState,
             clearExternalPurchaseError = clearExternalPurchaseError,
             onBack = {},

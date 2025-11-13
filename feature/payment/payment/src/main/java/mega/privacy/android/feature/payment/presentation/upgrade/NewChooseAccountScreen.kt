@@ -66,6 +66,7 @@ import mega.privacy.android.feature.payment.components.NewFeatureRow
 import mega.privacy.android.feature.payment.components.ProPlanCard
 import mega.privacy.android.feature.payment.components.TEST_TAG_FREE_PLAN_CARD
 import mega.privacy.android.feature.payment.components.TEST_TAG_PRO_PLAN_CARD
+import mega.privacy.android.feature.payment.components.upgradeAccountSkeleton
 import mega.privacy.android.feature.payment.model.AccountStorageUIState
 import mega.privacy.android.feature.payment.model.BillingUIState
 import mega.privacy.android.feature.payment.model.ChooseAccountState
@@ -324,90 +325,94 @@ fun NewChooseAccountScreen(
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            itemsIndexed(uiState.localisedSubscriptionsList) { index, subscription ->
-                val isRecommended = !hasDiscount
-                        && uiState.cheapestSubscriptionAvailable?.accountType == subscription.accountType
-                val storageFormattedSize = subscription.formatStorageSize()
-                val transferFormattedSize = subscription.formatTransferSize(isMonthly)
+            if (uiState.localisedSubscriptionsList.isEmpty()) {
+                upgradeAccountSkeleton(itemCount = 3)
+            } else {
+                itemsIndexed(uiState.localisedSubscriptionsList) { index, subscription ->
+                    val isRecommended = !hasDiscount
+                            && uiState.cheapestSubscriptionAvailable?.accountType == subscription.accountType
+                    val storageFormattedSize = subscription.formatStorageSize()
+                    val transferFormattedSize = subscription.formatTransferSize(isMonthly)
 
-                val uiAccountType = subscription.accountType.toUIAccountType()
+                    val uiAccountType = subscription.accountType.toUIAccountType()
 
-                val storageString = stringResource(
-                    id = sharedR.string.choose_account_screen_storage_label,
-                    stringResource(id = storageFormattedSize.unit, storageFormattedSize.size)
-                )
-                val transferString = stringResource(
-                    id = sharedR.string.choose_account_screen_transfer_quota_label,
-                    stringResource(id = transferFormattedSize.unit, transferFormattedSize.size)
-                )
-                val totalPrice =
-                    subscription.localisePriceCurrencyCode(locale, isMonthly)
+                    val storageString = stringResource(
+                        id = sharedR.string.choose_account_screen_storage_label,
+                        stringResource(id = storageFormattedSize.unit, storageFormattedSize.size)
+                    )
+                    val transferString = stringResource(
+                        id = sharedR.string.choose_account_screen_transfer_quota_label,
+                        stringResource(id = transferFormattedSize.unit, transferFormattedSize.size)
+                    )
+                    val totalPrice =
+                        subscription.localisePriceCurrencyCode(locale, isMonthly)
 
-                val yearlyPricePerMonth = if (!isMonthly) {
-                    subscription.localisePriceOfYearlyAmountPerMonth(locale)
-                } else null
+                    val yearlyPricePerMonth = if (!isMonthly) {
+                        subscription.localisePriceOfYearlyAmountPerMonth(locale)
+                    } else null
 
-                val currentSubscription =
-                    if (isMonthly) subscription.monthlySubscription else subscription.yearlySubscription
-                val discountPercentage = currentSubscription.discountedPercentage
-                val offerPeriod = currentSubscription.offerPeriod
-                val discountedPriceMonthly =
-                    subscription.localiseDiscountedPriceMonthlyCurrencyCode(locale, isMonthly)
-                val discountedPriceYearly =
-                    subscription.localiseDiscountedPriceYearlyCurrencyCode(locale, isMonthly)
+                    val currentSubscription =
+                        if (isMonthly) subscription.monthlySubscription else subscription.yearlySubscription
+                    val discountPercentage = currentSubscription.discountedPercentage
+                    val offerPeriod = currentSubscription.offerPeriod
+                    val discountedPriceMonthly =
+                        subscription.localiseDiscountedPriceMonthlyCurrencyCode(locale, isMonthly)
+                    val discountedPriceYearly =
+                        subscription.localiseDiscountedPriceYearlyCurrencyCode(locale, isMonthly)
 
-                // in case subscriptionCycle is UNKNOWN and currentSubscriptionPlan is PRO level, we show it as current plan for both monthly and yearly
-                val isCurrentPlan = isCurrentPlan(
-                    uiState = uiState,
-                    subscriptionAccountType = subscription.accountType,
-                    isMonthly = isMonthly,
-                    isUpgradeAccount = isUpgradeAccount
-                )
+                    // in case subscriptionCycle is UNKNOWN and currentSubscriptionPlan is PRO level, we show it as current plan for both monthly and yearly
+                    val isCurrentPlan = isCurrentPlan(
+                        uiState = uiState,
+                        subscriptionAccountType = subscription.accountType,
+                        isMonthly = isMonthly,
+                        isUpgradeAccount = isUpgradeAccount
+                    )
 
-                val billingInfo = if (!isMonthly) {
-                    if (!isCurrentPlan && discountedPriceYearly != null
-                        && discountPercentage != null && offerPeriod != null
-                    ) {
-                        "[A]${totalPrice.price}[/A] ${
-                            getOfferPeriodLabel(
-                                discountedPriceYearly.price,
-                                offerPeriod
+                    val billingInfo = if (!isMonthly) {
+                        if (!isCurrentPlan && discountedPriceYearly != null
+                            && discountPercentage != null && offerPeriod != null
+                        ) {
+                            "[A]${totalPrice.price}[/A] ${
+                                getOfferPeriodLabel(
+                                    discountedPriceYearly.price,
+                                    offerPeriod
+                                )
+                            }"
+                        } else {
+                            stringResource(
+                                sharedR.string.choose_account_screen_billed_yearly,
+                                totalPrice.price
                             )
-                        }"
-                    } else {
-                        stringResource(
-                            sharedR.string.choose_account_screen_billed_yearly,
-                            totalPrice.price
-                        )
-                    }
-                } else null
+                        }
+                    } else null
 
-                ProPlanCard(
-                    modifier = Modifier
-                        .padding(start = 16.dp, end = 16.dp)
-                        .testTag("$TEST_TAG_PRO_PLAN_CARD$index"),
-                    planName = stringResource(id = uiAccountType.textValue),
-                    isRecommended = isRecommended,
-                    isSelected = chosenPlan == subscription.accountType && !isCurrentPlan,
-                    storage = storageString,
-                    transfer = transferString,
-                    price = yearlyPricePerMonth?.price ?: totalPrice.price,
-                    billingInfo = billingInfo,
-                    offerName = discountPercentage?.takeIf { !isCurrentPlan }?.let {
-                        getCampaignName(
-                            context = context,
-                            offerId = currentSubscription.offerId,
-                            discountPercentage = discountPercentage
-                        )
-                    },
-                    discountedPrice = discountedPriceMonthly?.price?.takeIf { !isCurrentPlan },
-                    isCurrentPlan = isCurrentPlan,
-                    onSelected = {
-                        chosenPlan = subscription.accountType
-                    },
-                )
+                    ProPlanCard(
+                        modifier = Modifier
+                            .padding(start = 16.dp, end = 16.dp)
+                            .testTag("$TEST_TAG_PRO_PLAN_CARD$index"),
+                        planName = stringResource(id = uiAccountType.textValue),
+                        isRecommended = isRecommended,
+                        isSelected = chosenPlan == subscription.accountType && !isCurrentPlan,
+                        storage = storageString,
+                        transfer = transferString,
+                        price = yearlyPricePerMonth?.price ?: totalPrice.price,
+                        billingInfo = billingInfo,
+                        offerName = discountPercentage?.takeIf { !isCurrentPlan }?.let {
+                            getCampaignName(
+                                context = context,
+                                offerId = currentSubscription.offerId,
+                                discountPercentage = discountPercentage
+                            )
+                        },
+                        discountedPrice = discountedPriceMonthly?.price?.takeIf { !isCurrentPlan },
+                        isCurrentPlan = isCurrentPlan,
+                        onSelected = {
+                            chosenPlan = subscription.accountType
+                        },
+                    )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
 
             item("additional_benefits") {
