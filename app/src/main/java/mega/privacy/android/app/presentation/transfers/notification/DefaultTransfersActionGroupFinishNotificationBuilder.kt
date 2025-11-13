@@ -141,12 +141,14 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                 contentText?.let {
                     setContentText(it)
                 }
-                actionText?.let {
-                    addAction(
-                        iconPackR.drawable.ic_stat_notify,
-                        actionText,
-                        actionPendingIntent
-                    )
+                actionPendingIntent?.let {
+                    actionText?.let {
+                        addAction(
+                            iconPackR.drawable.ic_stat_notify,
+                            actionText,
+                            actionPendingIntent
+                        )
+                    }
                 }
             }
             .setGroup(finalSummaryGroup(transferType))
@@ -178,13 +180,14 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
     private fun createPendingIntent(
         intent: Intent?,
         requestCode: Int = System.currentTimeMillis().toInt(),
-    ) =
+    ) = intent?.let {
         PendingIntent.getActivity(
             context,
             requestCode,
-            intent,
+            it,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+    }
 
     private suspend fun contentText(
         isPreviewDownload: Boolean,
@@ -256,7 +259,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
         isLoggedIn: Boolean,
         actionGroup: ActiveTransferTotals.ActionGroup,
         singleActivity: Boolean,
-    ): PendingIntent {
+    ): PendingIntent? {
         val previewFile = actionGroup.singleFileName?.let {
             File(actionGroup.destination + actionGroup.singleFileName)
         }
