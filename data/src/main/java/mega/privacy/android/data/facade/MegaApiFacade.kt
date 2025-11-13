@@ -1117,7 +1117,7 @@ internal class MegaApiFacade @Inject constructor(
         filter: MegaSearchFilter,
         order: Int,
         megaCancelToken: MegaCancelToken,
-        megaSearchPage: MegaSearchPage?
+        megaSearchPage: MegaSearchPage?,
     ): List<MegaNode> = megaApi.search(
         filter,
         order,
@@ -1604,5 +1604,13 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun addRequestListener(listener: MegaRequestListenerInterface) {
         megaApi.addRequestListener(listener)
+    }
+
+    override fun decryptPasswordProtectedLink(
+        passwordProtectedLink: String,
+        password: String,
+        listener: MegaRequestListenerInterface,
+    ) {
+        megaApi.decryptPasswordProtectedLink(passwordProtectedLink, password, listener)
     }
 }

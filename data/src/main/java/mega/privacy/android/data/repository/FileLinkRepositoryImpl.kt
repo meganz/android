@@ -65,7 +65,8 @@ internal class FileLinkRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             getPreviewFile(node)?.let { preview ->
                 suspendCancellableCoroutine { continuation ->
-                    megaApiGateway.getPreview(node, preview.absolutePath,
+                    megaApiGateway.getPreview(
+                        node, preview.absolutePath,
                         OptionalMegaRequestListenerInterface(
                             onRequestFinish = { _, error ->
                                 if (error.errorCode == MegaError.API_OK) {

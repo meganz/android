@@ -2830,6 +2830,29 @@ interface MegaApiGateway {
         listener: MegaRequestListenerInterface,
     )
 
+
+    /**
+     * Decrypt password-protected public link
+     *
+     * The associated request type with this request is MegaRequest::TYPE_PASSWORD_LINK
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getLink - Returns the encrypted public link to the file/folder
+     * - MegaRequest::getPassword - Returns the password to decrypt the link
+     * 
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getText - Decrypted public link
+     *
+     * @param link     Password/protected public link to a file/folder in MEGA
+     * @param password Password to decrypt the link
+     * @param listener MegaRequestListener to track this request
+     */
+    fun decryptPasswordProtectedLink(
+        passwordProtectedLink: String,
+        password: String,
+        listener: MegaRequestListenerInterface,
+    )
+
     /**
      * Current upload speed
      */
