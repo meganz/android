@@ -56,7 +56,7 @@ import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
-import mega.privacy.android.feature.clouddrive.model.CloudDriveAppBarAction
+import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineSelectionAction
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
@@ -222,7 +222,7 @@ internal fun OfflineScreen(
                     actions = buildList {
                         if (uiState.nodeId != -1) {
                             add(
-                                MenuActionWithClick(CloudDriveAppBarAction.More) {
+                                MenuActionWithClick(CommonAppBarAction.More) {
                                     // Todo implement NodeOptionsBottomSheet
                                 }
                             )

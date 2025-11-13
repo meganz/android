@@ -98,6 +98,7 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineRotateCcwIm
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineRotateCwImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineScreenshotImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSearchLargeImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSearchSmallImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineShareNetworkImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineShieldImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineShieldInfoImageVector
@@ -416,6 +417,9 @@ public object IconPack : IconPackInterface {
 
                 override val SearchLarge: ImageVector by lazy {
                         createMediumThinOutlineSearchLargeImageVector() }
+
+                override val SearchSmall: ImageVector by lazy {
+                        createMediumThinOutlineSearchSmallImageVector() }
 
                 override val ShareNetwork: ImageVector by lazy {
                         createMediumThinOutlineShareNetworkImageVector() }

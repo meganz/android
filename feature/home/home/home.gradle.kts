@@ -15,10 +15,15 @@ android {
 }
 
 dependencies {
+    implementation(project(":navigation"))
     implementation(project(":core:navigation-contract"))
     implementation(project(":domain"))
     implementation(project(":icon-pack"))
     implementation(project(":shared:resources"))
+    implementation(project(":core:ui-components:node-components"))
+    implementation(project(":core:ui-components:shared-components"))
+    implementation(project(":feature:transfers:transfers-snowflake-components"))
+    implementation(project(":core:transfers"))
 
     implementation(platform(androidx.compose.bom))
     implementation(androidx.hilt.navigation)

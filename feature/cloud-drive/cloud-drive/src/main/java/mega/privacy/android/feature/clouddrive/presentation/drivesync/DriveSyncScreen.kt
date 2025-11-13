@@ -36,11 +36,11 @@ import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
+import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.feature.clouddrive.model.CloudDriveAppBarAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveScanDocumentHandler
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveViewModel
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.DeselectAllItems
@@ -118,7 +118,7 @@ internal fun DriveSyncScreen(
                     actions = buildList {
                         when {
                             selectedTabIndex == 0 && cloudDriveUiState.items.isNotEmpty() -> add(
-                                MenuActionWithClick(CloudDriveAppBarAction.Search) {
+                                MenuActionWithClick(CommonAppBarAction.Search) {
                                     openSearch(
                                         cloudDriveUiState.currentFolderId.longValue,
                                         cloudDriveViewModel.nodeSourceType
@@ -127,7 +127,7 @@ internal fun DriveSyncScreen(
 
                             selectedTabIndex == 1 -> add(
                                 MenuActionWithClick(
-                                    CloudDriveAppBarAction.More
+                                    CommonAppBarAction.More
                                 ) {
                                     showSyncSettings = true
                                 })

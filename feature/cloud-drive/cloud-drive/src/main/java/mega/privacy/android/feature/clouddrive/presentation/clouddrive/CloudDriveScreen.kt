@@ -18,11 +18,11 @@ import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
+import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.feature.clouddrive.model.CloudDriveAppBarAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.DeselectAllItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.SelectAllItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
@@ -80,7 +80,7 @@ fun CloudDriveScreen(
                     actions = buildList {
                         if (uiState.items.isNotEmpty()) {
                             add(
-                                MenuActionWithClick(CloudDriveAppBarAction.Search) {
+                                MenuActionWithClick(CommonAppBarAction.Search) {
                                     openSearch(
                                         uiState.currentFolderId.longValue,
                                         viewModel.nodeSourceType
@@ -92,7 +92,7 @@ fun CloudDriveScreen(
                         if (!uiState.isCloudDriveRoot) {
                             add(
                                 MenuActionWithClick(
-                                    CloudDriveAppBarAction.More
+                                    CommonAppBarAction.More
                                 ) {
                                     visibleNodeOptionId = uiState.currentFolderId
                                 }

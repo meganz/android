@@ -191,6 +191,7 @@ interface IconPackInterface {
                 val RotateCw: ImageVector
                 val Screenshot: ImageVector
                 val SearchLarge: ImageVector
+                val SearchSmall: ImageVector
                 val ShareNetwork: ImageVector
                 val Shield: ImageVector
                 val ShieldInfo: ImageVector

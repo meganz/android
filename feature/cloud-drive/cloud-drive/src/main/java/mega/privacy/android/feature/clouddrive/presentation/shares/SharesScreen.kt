@@ -58,7 +58,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
-import mega.privacy.android.feature.clouddrive.model.CloudDriveAppBarAction
+import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.HandleNodeOptionEvent
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesContent
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesViewModel
@@ -207,7 +207,7 @@ internal fun SharesScreen(
                     },
                     actions = buildList {
                         add(
-                            MenuActionWithClick(CloudDriveAppBarAction.Search) {
+                            MenuActionWithClick(CommonAppBarAction.Search) {
                                 navigationHandler.navigate(
                                     SearchNodeNavKey(
                                         nodeSourceType = selectedTab.toNodeSourceType(),
