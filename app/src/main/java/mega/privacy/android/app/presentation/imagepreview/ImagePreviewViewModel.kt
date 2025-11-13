@@ -75,7 +75,6 @@ import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseC
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.io.File
@@ -414,9 +413,6 @@ class ImagePreviewViewModel @Inject constructor(
     }
 
     suspend fun isPhotoEditorMenuVisible(imageNode: ImageNode): Boolean {
-        val isFeatureFlagEnabled = runCatching {
-            getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)
-        }.getOrDefault(false)
         val hasWritePermission = runCatching {
             getNodeAccessPermission(imageNode.id) in setOf(
                 AccessPermission.READWRITE,
@@ -433,7 +429,7 @@ class ImagePreviewViewModel @Inject constructor(
             ImagePreviewFetcherSource.FAVOURITE,
             ImagePreviewFetcherSource.SHARED_ITEMS,
         )
-        return isFeatureFlagEnabled && isValidSource && hasWritePermission && imageNode.type.mimeType in
+        return isValidSource && hasWritePermission && imageNode.type.mimeType in
                 setOf(
                     "image/jpeg",
                     "image/jpg",

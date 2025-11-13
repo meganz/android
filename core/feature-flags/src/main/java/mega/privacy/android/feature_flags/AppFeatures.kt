@@ -34,11 +34,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
         true
     ),
 
-    PhotoEditor(
-        "Enable photo editor in image viewer",
-        true,
-    ),
-
     /**
      * Single activity
      */

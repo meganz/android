@@ -62,7 +62,6 @@ import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseC
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.resources.R as sharedResR
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -626,7 +625,7 @@ class ImagePreviewViewModelTest {
             "image/heif"
         ]
     )
-    internal fun `test that isPhotoEditorMenuVisible returns true when feature flag is enabled and mime type is supported`(
+    internal fun `test that isPhotoEditorMenuVisible returns true when mime type is supported`(
         mimeType: String,
     ) =
         runTest {
@@ -637,7 +636,6 @@ class ImagePreviewViewModelTest {
                 )
                 on { id } doReturn NodeId(123L)
             }
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)).thenReturn(true)
             whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.OWNER)
             whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
                 .thenReturn(ImagePreviewFetcherSource.TIMELINE)
@@ -647,43 +645,6 @@ class ImagePreviewViewModelTest {
             assertThat(result).isTrue()
         }
 
-    @Test
-    internal fun `test that isPhotoEditorMenuVisible returns false when feature flag is disabled`() =
-        runTest {
-            val imageNode = mock<ImageNode> {
-                on { type } doReturn StaticImageFileTypeInfo("image/jpeg", "jpg")
-                on { id } doReturn NodeId(123L)
-            }
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)).thenReturn(false)
-            whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.OWNER)
-            whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
-                .thenReturn(ImagePreviewFetcherSource.TIMELINE)
-
-            val result = underTest.isPhotoEditorMenuVisible(imageNode)
-
-            assertThat(result).isFalse()
-        }
-
-    @Test
-    internal fun `test that isPhotoEditorMenuVisible returns false when feature flag throws exception`() =
-        runTest {
-            val imageNode = mock<ImageNode> {
-                on { type } doReturn StaticImageFileTypeInfo("image/jpeg", "jpg")
-                on { id } doReturn NodeId(123L)
-            }
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)).thenThrow(
-                RuntimeException(
-                    "Feature flag error"
-                )
-            )
-            whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.OWNER)
-            whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
-                .thenReturn(ImagePreviewFetcherSource.TIMELINE)
-
-            val result = underTest.isPhotoEditorMenuVisible(imageNode)
-
-            assertThat(result).isFalse()
-        }
 
     @Test
     internal fun `test that isPhotoEditorMenuVisible returns false when user has no write permission`() =
@@ -692,7 +653,6 @@ class ImagePreviewViewModelTest {
                 on { type } doReturn StaticImageFileTypeInfo("image/jpeg", "jpg")
                 on { id } doReturn NodeId(123L)
             }
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)).thenReturn(true)
             whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.READ)
             whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
                 .thenReturn(ImagePreviewFetcherSource.TIMELINE)
@@ -709,7 +669,6 @@ class ImagePreviewViewModelTest {
                 on { type } doReturn StaticImageFileTypeInfo("image/jpeg", "jpg")
                 on { id } doReturn NodeId(123L)
             }
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)).thenReturn(true)
             whenever(getNodeAccessPermission(NodeId(123L))).thenThrow(RuntimeException("Permission error"))
             whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
                 .thenReturn(ImagePreviewFetcherSource.TIMELINE)
@@ -726,7 +685,6 @@ class ImagePreviewViewModelTest {
                 on { type } doReturn StaticImageFileTypeInfo("image/jpeg", "jpg")
                 on { id } doReturn NodeId(123L)
             }
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)).thenReturn(true)
             whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.OWNER)
             whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
                 .thenReturn(ImagePreviewFetcherSource.OFFLINE)
@@ -758,7 +716,6 @@ class ImagePreviewViewModelTest {
                 )
                 on { id } doReturn NodeId(123L)
             }
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)).thenReturn(true)
             whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.OWNER)
             whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
                 .thenReturn(ImagePreviewFetcherSource.TIMELINE)
@@ -775,7 +732,6 @@ class ImagePreviewViewModelTest {
                 on { type } doReturn VideoFileTypeInfo("video/mp4", "mp4", Duration.parse("10s"))
                 on { id } doReturn NodeId(123L)
             }
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)).thenReturn(true)
             whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.OWNER)
             whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
                 .thenReturn(ImagePreviewFetcherSource.TIMELINE)
