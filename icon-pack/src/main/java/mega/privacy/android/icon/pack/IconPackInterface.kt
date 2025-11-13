@@ -62,6 +62,10 @@ interface IconPackInterface {
                 val ChevronDown: ImageVector
                 val Image04: ImageVector
                 val Check: ImageVector
+                val Film: ImageVector
+                val Heart: ImageVector
+                val ArrowDownCircle: ImageVector
+                val MessageChatCircle: ImageVector
             }
 
             /**

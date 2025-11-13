@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Temporary strings file, later it will be moved to Shared module in bulk -->
+
+    <string name="favourites_category_title">Favourites</string>
+    <string name="section_saved_for_offline_new">Offline</string>
+</resources>

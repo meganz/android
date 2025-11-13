@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.photos.widget
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterNotNull
@@ -38,7 +40,10 @@ class MultiCardExampleHomeWidget(
         .map { photo ->
             HomeWidgetViewHolder(
                 widgetFunction = { modifier, _ ->
-                    PhotoHomeWidgetCard(photo = photo, modifier = modifier)
+                    PhotoHomeWidgetCard(
+                        photo = photo,
+                        modifier = modifier.padding(horizontal = 16.dp)
+                    )
                 },
             )
         }

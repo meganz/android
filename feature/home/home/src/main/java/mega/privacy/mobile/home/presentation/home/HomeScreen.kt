@@ -1,5 +1,6 @@
 package mega.privacy.mobile.home.presentation.home
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -67,23 +68,23 @@ internal fun HomeScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues),
-                    contentPadding = PaddingValues(
-                        bottom = 50.dp,
-                        start = 12.dp,
-                        end = 12.dp
-                    ), // Dummy padding
+                    contentPadding = PaddingValues(top = 12.dp, bottom = 50.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     items(state.widgets, key = { it.identifier }) { it ->
                         it.content(Modifier, navigationHandler::navigate)
                         Spacer(modifier = Modifier.height(8.dp))
                     }
+
                     item {
                         MegaOutlinedButton(
                             text = "Configure Widgets",
                             onClick = {
                                 navigationHandler.navigate(HomeConfiguration)
                             },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 12.dp)
                         )
                     }
                 }

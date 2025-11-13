@@ -8,9 +8,11 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.navigation.contract.home.HomeWidget
 import mega.privacy.android.navigation.contract.qualifier.DefaultStartScreen
 import mega.privacy.mobile.home.navigation.HomeFeatureGraph
 import mega.privacy.mobile.home.navigation.HomeNavItem
+import mega.privacy.mobile.home.presentation.home.widget.HomeChipsWidget
 
 
 @Module
@@ -28,4 +30,8 @@ class HomeModule {
     @Provides
     @IntoSet
     fun provideHomeFeatureDestination(): FeatureDestination = HomeFeatureGraph()
+
+    @Provides
+    @IntoSet
+    fun provideHomeChipsWidget(provider: HomeChipsWidget): HomeWidget = provider
 }

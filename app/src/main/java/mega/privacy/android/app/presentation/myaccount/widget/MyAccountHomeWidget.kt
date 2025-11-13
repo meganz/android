@@ -25,7 +25,7 @@ internal fun MyAccountHomeWidget(
     onClick: () -> Unit,
 ) {
     CardSurface(
-        modifier = Modifier.clickable { onClick() },
+        modifier = Modifier.padding(horizontal = 16.dp).clickable { onClick() },
         surfaceColor = SurfaceColor.Surface1
     ) {
         Column(modifier = modifier.padding(8.dp)) {

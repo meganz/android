@@ -32,7 +32,10 @@ class ConsentInitialiser @Inject constructor(
             .firstOrNull()
 
         if (misFlagsLoaded == true) {
-            if (shouldShowGenericCookieDialogUseCase(getCookieSettingsUseCase())) {
+            val shouldShowConsentDialog = runCatching {
+                shouldShowGenericCookieDialogUseCase(getCookieSettingsUseCase())
+            }.getOrDefault(false)
+            if (shouldShowConsentDialog) {
                 appDialogEventQueue.emit(AppDialogEvent(CookieDialog))
             } else {
                 adConsentWrapper.refreshConsent()

@@ -17,7 +17,7 @@ import javax.inject.Inject
 class SingleCardExampleHomeWidget @Inject constructor(
 ) : HomeWidget {
     override val identifier: String = "AccountHomeWidgetProvider"
-    override val defaultOrder: Int = 0
+    override val defaultOrder: Int = 1
     override val canDelete: Boolean = false
 
     override suspend fun getWidgetName() = LocalizedText.Literal("My Account")
