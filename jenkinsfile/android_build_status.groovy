@@ -20,7 +20,8 @@ UNIT_TEST_RESULT_LINK_MAP = [:]
 
 JSON_LINT_REPORT_LINK = ""
 
-NODE_LABELS = 'mac-jenkins-slave-android || mac-jenkins-slave'
+//NODE_LABELS = 'mac-jenkins-slave-android || mac-jenkins-slave'
+NODE_LABELS = 'macmini2 || macmini3 || macmini5 || mac-jenkins-slave-android'
 
 /**
  * Folder to contain build outputs, including APK, AAG and symbol files

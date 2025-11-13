@@ -25,7 +25,8 @@ function download_webrtc {
     URL=$1
     echo "  WebRTC URL: $URL"
     echo "### downloading..."
-    mega-get $URL
+#    mega-get $URL
+    curl -O ${ARTIFACTORY_BASE_URL}:443/artifactory/android-mega/cicd/build-sdk/webrtc_android-NDKr27c_branch-heads_6778.zip
     echo
     echo "### unzipping..."
     unzip -q *.zip
