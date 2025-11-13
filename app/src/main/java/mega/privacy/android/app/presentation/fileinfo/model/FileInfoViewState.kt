@@ -52,7 +52,6 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @property isRemindersForContactVerificationEnabled checks if reminders for contact verification is enabled
  * @property tagsEnabled checks if tags are enabled
  * @property tags list of tags for the node
- * @property mapLocationEnabled checks if GIS location is enabled
  * @property longitude the longitude of the node
  * @property latitude the latitude of the node
  * @property isPhoto true if the node is a photo (Image or Video)
@@ -97,7 +96,6 @@ internal data class FileInfoViewState(
     val isRemindersForContactVerificationEnabled: Boolean = false,
     val tagsEnabled: Boolean = false,
     val tags: List<String> = emptyList(),
-    val mapLocationEnabled: Boolean = false,
     val longitude: Double = 0.0,
     val latitude: Double = 0.0,
     val isPhoto: Boolean = false,
@@ -142,7 +140,7 @@ internal data class FileInfoViewState(
     /**
      * Check Conditions to enable gis field
      */
-    fun canEnableMapLocation() = mapLocationEnabled && accessPermission == AccessPermission.OWNER
+    fun canEnableMapLocation() = accessPermission == AccessPermission.OWNER
 
     /**
      * Check Conditions to enable tags field

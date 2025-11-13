@@ -67,14 +67,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enables Map location
-     */
-    MapLocation(
-        "Enable map location feature",
-        true,
-    ),
-
-    /**
      * Enables prefetch timeline photos as soon initialization screen completed
      */
     PrefetchTimeline(
@@ -141,14 +133,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     CallSettingsNewComponents(
         "Call settings implemented with the new components library",
         false,
-    ),
-
-    /**
-     *  Onboarding Revamp with new components
-     */
-    OnboardingRevamp(
-        "Onboarding Revamp with new components",
-        true,
     ),
 
     /**

@@ -184,7 +184,6 @@ class FileInfoViewModel @Inject constructor(
     val nodeId get() = typedNode.id
 
     init {
-        checkMapLocationFeatureFlag()
         checkTagsFeatureFlag()
         monitorBusinessAccountExpiry()
         viewModelScope.launch {
@@ -234,14 +233,6 @@ class FileInfoViewModel @Inject constructor(
             _uiState.update { it.copy(tagsEnabled = flag) }
         }.onFailure {
             Timber.e("Get tag feature flag failed $it")
-        }
-    }
-
-    private fun checkMapLocationFeatureFlag() = viewModelScope.launch {
-        runCatching { getFeatureFlagValueUseCase(AppFeatures.MapLocation) }.onSuccess { flag ->
-            _uiState.update { it.copy(mapLocationEnabled = flag) }
-        }.onFailure {
-            Timber.e("Get gis feature flag failed $it")
         }
     }
 
