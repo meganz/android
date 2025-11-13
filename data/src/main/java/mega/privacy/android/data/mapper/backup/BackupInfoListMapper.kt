@@ -25,6 +25,8 @@ internal class BackupInfoListMapper @Inject constructor(
             else (0 until backupSize).mapNotNull { index ->
                 backupInfoMapper(backupInfoList.get(index))
             }
+                .sortedByDescending { it.timestamp }
+                .distinctBy { "${it.deviceId}:${it.rootHandle.longValue}" }
         } ?: emptyList()
     }
 }
