@@ -24,6 +24,7 @@ import mega.privacy.android.app.appstate.global.event.AppDialogsEventQueueReceiv
 import mega.privacy.android.app.appstate.global.event.NavigationEventQueueImpl
 import mega.privacy.android.app.appstate.global.event.NavigationEventQueueReceiver
 import mega.privacy.android.app.consent.ConsentDialogDestinations
+import mega.privacy.android.app.myAccount.navigation.MyAccountDeepLinkHandler
 import mega.privacy.android.app.nav.MegaActivityResultContractImpl
 import mega.privacy.android.app.nav.MegaNavigatorImpl
 import mega.privacy.android.app.presentation.chat.navigation.ChatsDeepLinkHandler
@@ -245,4 +246,8 @@ internal class AppModule {
     @Provides
     @IntoSet
     fun provideContactsDeepLinkHandler(handler: ContactsDeepLinkHandler): DeepLinkHandler = handler
+
+    @Provides
+    @IntoSet
+    fun provideMyAccountDeepLinkHandle(handler: MyAccountDeepLinkHandler): DeepLinkHandler = handler
 }

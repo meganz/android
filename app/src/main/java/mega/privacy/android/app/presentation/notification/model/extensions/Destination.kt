@@ -33,9 +33,9 @@ import mega.privacy.android.navigation.destination.RubbishBinNavKey
  */
 internal fun UserAlert.destination(): NavKey? {
     return when (this) {
-        is PaymentFailedAlert -> MyAccountNavKey
-        is PaymentReminderAlert -> MyAccountNavKey
-        is PaymentSucceededAlert -> MyAccountNavKey
+        is PaymentFailedAlert -> MyAccountNavKey()
+        is PaymentReminderAlert -> MyAccountNavKey()
+        is PaymentSucceededAlert -> MyAccountNavKey()
         is TakeDownAlert -> when (destination) {
             UserAlertDestination.CloudDrive -> rootNodeId?.let { CloudDriveNavKey(it) }
             UserAlertDestination.RubbishBin -> rootNodeId?.let { RubbishBinNavKey(it) }

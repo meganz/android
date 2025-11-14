@@ -1,6 +1,7 @@
 package mega.privacy.android.app.myAccount
 
 import android.app.NotificationManager
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -74,6 +75,7 @@ import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.CancelSubscriptionMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.ToolbarOverflowMenuItemEvent
 import nz.mega.sdk.MegaApiJava
@@ -81,7 +83,6 @@ import nz.mega.sdk.MegaError.API_OK
 import timber.log.Timber
 import java.util.Locale
 import javax.inject.Inject
-import mega.privacy.android.shared.resources.R as sharedResR
 
 @AndroidEntryPoint
 internal class MyAccountActivity : PasscodeActivity(),
@@ -96,6 +97,14 @@ internal class MyAccountActivity : PasscodeActivity(),
         private const val CONFIRM_RESET_PASSWORD_SHOWN = "CONFIRM_RESET_PASSWORD_SHOWN"
         private const val TYPE_CHANGE_EMAIL = 1
         private const val TYPE_CANCEL_ACCOUNT = 2
+
+        fun getIntent(context: Context, action: String?, link: Uri?): Intent {
+            val fileLinkIntent = Intent(context, MyAccountActivity::class.java)
+            fileLinkIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            fileLinkIntent.action = action
+            fileLinkIntent.data = link
+            return fileLinkIntent
+        }
     }
 
     private val viewModel: MyAccountViewModel by viewModels()

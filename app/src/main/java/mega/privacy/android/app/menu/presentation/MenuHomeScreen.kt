@@ -188,7 +188,7 @@ fun MenuHomeScreenUi(
                         )
                     },
                     onClickListener = {
-                        navigateToFeature(MyAccountNavKey)
+                        navigateToFeature(MyAccountNavKey())
                     }
                 )
             }

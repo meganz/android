@@ -28,7 +28,7 @@ object CurrentPlanItem : NavDrawerItem.Account(
 )
 
 object StorageItem : NavDrawerItem.Account(
-    destination = MyAccountNavKey,
+    destination = MyAccountNavKey(),
     icon = IconPack.Medium.Thin.Outline.HardDrive,
     title = sharedR.string.account_cancel_account_screen_plan_storage
 )

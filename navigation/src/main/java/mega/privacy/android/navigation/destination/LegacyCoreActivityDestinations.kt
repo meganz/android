@@ -17,7 +17,7 @@ import mega.privacy.android.navigation.payment.UpgradeAccountSource
 data object OverDiskQuotaPaywallWarningNavKey : NavKey
 
 @Serializable
-data object MyAccountNavKey : NavKey
+data class MyAccountNavKey(val action: String? = null, val link: String? = null) : NavKey
 
 @Serializable
 data object AchievementNavKey : NavKey

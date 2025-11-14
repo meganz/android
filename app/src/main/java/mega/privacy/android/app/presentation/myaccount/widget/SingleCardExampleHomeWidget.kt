@@ -59,7 +59,7 @@ class SingleCardExampleHomeWidget @Inject constructor(
         }.map { state ->
             HomeWidgetViewHolder(
                 widgetFunction = { modifier, onNavigate ->
-                    MyAccountHomeWidget(state, modifier, { onNavigate(MyAccountNavKey)})
+                    MyAccountHomeWidget(state, modifier, { onNavigate(MyAccountNavKey()) })
                 },
             )
         }
