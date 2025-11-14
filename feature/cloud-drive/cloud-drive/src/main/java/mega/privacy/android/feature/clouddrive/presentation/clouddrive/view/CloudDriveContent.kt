@@ -419,7 +419,8 @@ internal fun CloudDriveContent(
                 onActionHandled = { onAction(OpenedFileNodeHandled) },
                 nodeSourceType = NodeSourceType.CLOUD_DRIVE,
                 onDownloadEvent = onTransfer,
-                sortOrder = uiState.selectedSortOrder
+                sortOrder = uiState.selectedSortOrder,
+                navigationHandler = navigationHandler,
             )
         }
 

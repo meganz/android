@@ -61,6 +61,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.view.create
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.CONVERTED_FILE_NAME
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ANIMATION_DURATION
 import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
@@ -141,6 +142,35 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         private const val STATE = "STATE"
         private const val STATE_SHOWN = 0
         private const val STATE_HIDDEN = 1
+
+        /**
+         * Create intent for TextEditorActivity
+         *
+         * @param context Context
+         * @param nodeHandle Node handle
+         * @param mode Text editor mode (as String)
+         * @param nodeSourceType Node source type
+         * @param fileName Optional file name
+         * @return Intent for TextEditorActivity
+         */
+        fun createIntent(
+            context: android.content.Context,
+            nodeHandle: Long,
+            mode: String,
+            nodeSourceType: Int?,
+            fileName: String? = null,
+        ): Intent {
+            return Intent(context, TextEditorActivity::class.java).apply {
+                putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, nodeHandle)
+                putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, fileName)
+                putExtra(TextEditorViewModel.MODE, mode)
+                putExtra(
+                    Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
+                    nodeSourceType
+                        ?: mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.FILE_BROWSER_ADAPTER
+                )
+            }
+        }
     }
 
     private val viewModel by viewModels<TextEditorViewModel>()
@@ -769,7 +799,10 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             } else {
                 statusBarHeight
             }
-            animateScrollerViewTopPadding(topPadding, ANIMATION_DURATION / 2) // Faster animation for scroll
+            animateScrollerViewTopPadding(
+                topPadding,
+                ANIMATION_DURATION / 2
+            ) // Faster animation for scroll
             binding.fileEditorScrollView.let {
                 if ((it.getChildAt(0).bottom <= it.height + scrollY) || scrollY == 0) {
                     showUI()

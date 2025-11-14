@@ -24,10 +24,7 @@ import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
 import mega.privacy.android.app.presentation.filecontact.FileContactListComposeActivity
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
-import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
-import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImageNodeFetcher
-import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
@@ -42,7 +39,6 @@ import mega.privacy.android.app.presentation.settings.compose.navigation.Setting
 import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
-import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.uploadFolder.UploadFolderActivity
 import mega.privacy.android.app.uploadFolder.UploadFolderType
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -56,21 +52,9 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_FOLDER_LINK
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PLACEHOLDER
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
-import mega.privacy.android.app.utils.Constants.NODE_HANDLES
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.AccountType
@@ -96,7 +80,6 @@ import mega.privacy.android.feature.sync.ui.SyncHostActivity
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.navigation.settings.SettingsNavigator
-import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -112,6 +95,7 @@ internal class MegaNavigatorImpl @Inject constructor(
     private val getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase,
     private val settingsNavigator: SettingsNavigatorImpl,
     private val getDomainNameUseCase: GetDomainNameUseCase,
+    private val mediaPlayerIntentMapper: MediaPlayerIntentMapper,
 ) : MegaNavigator,
     AppNavigatorImpl, SettingsNavigator by settingsNavigator {
 
@@ -233,7 +217,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         collectionId: Long?,
         enableAddToAlbum: Boolean?,
     ) {
-        manageMediaIntent(
+        mediaPlayerIntentMapper(
             context = context,
             contentUri = contentUri,
             fileTypeInfo = fileNode.type,
@@ -255,73 +239,6 @@ internal class MegaNavigatorImpl @Inject constructor(
                 )
             },
         )
-    }
-
-    private suspend fun manageMediaIntent(
-        context: Context,
-        contentUri: NodeContentUri,
-        fileTypeInfo: FileTypeInfo,
-        sortOrder: SortOrder,
-        name: String,
-        handle: Long,
-        parentHandle: Long,
-        isFolderLink: Boolean,
-        isMediaQueueAvailable: Boolean,
-        viewType: Int? = null,
-        path: String? = null,
-        offlineParentId: Int? = null,
-        offlineParent: String? = null,
-        searchedItems: List<Long>? = null,
-        mediaQueueTitle: String? = null,
-        nodeHandles: List<Long>? = null,
-        collectionTitle: String? = null,
-        collectionId: Long? = null,
-        enableAddToAlbum: Boolean = false,
-    ) {
-        val intent = getIntent(context, fileTypeInfo).apply {
-            putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrder)
-            putExtra(INTENT_EXTRA_KEY_PLACEHOLDER, 0)
-            putExtra(INTENT_EXTRA_KEY_FILE_NAME, name)
-            putExtra(INTENT_EXTRA_KEY_HANDLE, handle)
-            putExtra(INTENT_EXTRA_KEY_IS_FOLDER_LINK, isFolderLink)
-            viewType?.let {
-                putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, viewType)
-            }
-            if (isMediaQueueAvailable) {
-                putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, parentHandle)
-            }
-            putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, isMediaQueueAvailable)
-            path?.let {
-                putExtra(INTENT_EXTRA_KEY_PATH, path)
-            }
-            offlineParentId?.let {
-                putExtra(INTENT_EXTRA_KEY_PARENT_ID, it)
-            }
-            offlineParent?.let {
-                putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, offlineParent)
-            }
-            searchedItems?.let {
-                putExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH, it.toLongArray())
-            }
-            mediaQueueTitle?.let {
-                putExtra(INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE, it)
-            }
-            nodeHandles?.let {
-                putExtra(NODE_HANDLES, it.toLongArray())
-            }
-            collectionTitle?.let {
-                putExtra(INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE, it)
-            }
-            collectionId?.let {
-                putExtra(INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID, it)
-            }
-            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            putExtra(INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM, enableAddToAlbum)
-        }
-        val mimeType =
-            if (fileTypeInfo.extension == "opus") "audio/*" else fileTypeInfo.mimeType
-        nodeContentUriIntentMapper(intent, contentUri, mimeType, fileTypeInfo.isSupported)
-        context.startActivity(intent)
     }
 
     private fun getIntent(context: Context, fileTypeInfo: FileTypeInfo) = when {
@@ -351,7 +268,7 @@ internal class MegaNavigatorImpl @Inject constructor(
     ) {
         val contentUri = NodeContentUri.LocalContentUri(localFile)
         val info = fileTypeInfo ?: getFileTypeInfoUseCase(localFile)
-        manageMediaIntent(
+        mediaPlayerIntentMapper(
             context = context,
             contentUri = contentUri,
             fileTypeInfo = info,
@@ -434,7 +351,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         enableAddToAlbum: Boolean,
     ) {
         val info = fileTypeInfo ?: getFileTypeInfoByNameUseCase(name)
-        manageMediaIntent(
+        mediaPlayerIntentMapper(
             context = context,
             contentUri = contentUri,
             fileTypeInfo = info,
@@ -539,16 +456,12 @@ internal class MegaNavigatorImpl @Inject constructor(
         type: Int?,
         currentFileNode: TypedFileNode,
     ) {
-        val pdfIntent = Intent(context, PdfViewerActivity::class.java)
+        val pdfIntent = PdfViewerActivity.createIntent(
+            context = context,
+            nodeHandle = currentFileNode.id.longValue,
+            nodeSourceType = type,
+        )
         val mimeType = currentFileNode.type.mimeType
-        pdfIntent.apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, currentFileNode.id.longValue)
-            putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
-            putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, type)
-            putExtra(Constants.INTENT_EXTRA_KEY_APP, true)
-        }
         nodeContentUriIntentMapper(
             intent = pdfIntent,
             content = content,
@@ -581,65 +494,20 @@ internal class MegaNavigatorImpl @Inject constructor(
         context.startActivity(pdfIntent)
     }
 
+
     override fun openImageViewerActivity(
         context: Context,
         currentFileNode: TypedFileNode,
         nodeSourceType: Int?,
     ) {
-        val currentFileNodeParentId = currentFileNode.parentId.longValue
-
-        val (imageSource, menuOptionsSource, paramKey) = when (nodeSourceType) {
-            NodeSourceTypeInt.FILE_BROWSER_ADAPTER -> Triple(
-                ImagePreviewFetcherSource.CLOUD_DRIVE,
-                ImagePreviewMenuSource.CLOUD_DRIVE,
-                CloudDriveImageNodeFetcher.PARENT_ID
-            )
-
-            NodeSourceTypeInt.RUBBISH_BIN_ADAPTER -> Triple(
-                ImagePreviewFetcherSource.RUBBISH_BIN,
-                ImagePreviewMenuSource.RUBBISH_BIN,
-                RubbishBinImageNodeFetcher.PARENT_ID
-            )
-
-            NodeSourceTypeInt.INCOMING_SHARES_ADAPTER,
-            NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER,
-                -> Triple(
-                ImagePreviewFetcherSource.SHARED_ITEMS,
-                ImagePreviewMenuSource.SHARED_ITEMS,
-                SharedItemsImageNodeFetcher.PARENT_ID
-            )
-
-            NodeSourceTypeInt.LINKS_ADAPTER -> Triple(
-                ImagePreviewFetcherSource.SHARED_ITEMS,
-                ImagePreviewMenuSource.LINKS,
-                SharedItemsImageNodeFetcher.PARENT_ID
-            )
-
-            NodeSourceTypeInt.BACKUPS_ADAPTER -> Triple(
-                ImagePreviewFetcherSource.CLOUD_DRIVE,
-                ImagePreviewMenuSource.CLOUD_DRIVE,
-                CloudDriveImageNodeFetcher.PARENT_ID
-            )
-
-            else -> {
-                Timber.e("Unknown node source type: $nodeSourceType")
-                return
-            }
+        ImagePreviewActivity.createIntent(
+            context,
+            currentFileNode.id.longValue,
+            currentFileNode.parentId.longValue,
+            nodeSourceType
+        )?.let { intent ->
+            context.startActivity(intent)
         }
-
-        val intent = ImagePreviewActivity.createIntent(
-            context = context,
-            imageSource = imageSource,
-            menuOptionsSource = menuOptionsSource,
-            anchorImageNodeId = currentFileNode.id,
-            params = mapOf(paramKey to currentFileNodeParentId),
-            enableAddToAlbum = nodeSourceType in listOf(
-                NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
-                NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER,
-            )
-        )
-
-        context.startActivity(intent)
     }
 
     override fun openImageViewerForOfflineNode(
@@ -665,14 +533,13 @@ internal class MegaNavigatorImpl @Inject constructor(
         mode: TextEditorMode,
         fileName: String?,
     ) {
-        val textFileIntent = Intent(context, TextEditorActivity::class.java)
-        textFileIntent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, currentNodeId.longValue)
-            .putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, fileName)
-            .putExtra(TextEditorViewModel.MODE, mode.value)
-            .putExtra(
-                Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
-                nodeSourceType ?: NodeSourceTypeInt.FILE_BROWSER_ADAPTER
-            )
+        val textFileIntent = TextEditorActivity.createIntent(
+            context = context,
+            nodeHandle = currentNodeId.longValue,
+            mode = mode.value,
+            nodeSourceType = nodeSourceType,
+            fileName = fileName,
+        )
         context.startActivity(textFileIntent)
     }
 

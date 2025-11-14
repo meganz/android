@@ -7,11 +7,13 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import mega.privacy.android.app.activities.destinations.LegacyCoreActivityFeatureGraph
 import mega.privacy.android.app.appstate.content.navigation.PermissionFeatureDestination
+import mega.privacy.android.app.nav.MediaPlayerIntentMapper
 import mega.privacy.android.app.presentation.filecontact.navigation.FileContactFeatureDestination
 import mega.privacy.android.app.presentation.filestorage.FileStorageFeatureDestination
 import mega.privacy.android.app.presentation.logout.LogoutFeatureDestination
 import mega.privacy.android.app.presentation.notification.navigation.NotificationsFeatureDestination
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserFeatureDestination
+import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.navigation.contract.FeatureDestination
 
 @Module
@@ -20,8 +22,11 @@ class FeatureDestinationModule {
 
     @Provides
     @IntoSet
-    fun provideLegacyCoreActivityFeatureDestination(): FeatureDestination =
-        LegacyCoreActivityFeatureGraph()
+    fun provideLegacyCoreActivityFeatureDestination(
+        nodeContentUriIntentMapper: NodeContentUriIntentMapper,
+        mediaPlayerIntentMapper: MediaPlayerIntentMapper,
+    ): FeatureDestination =
+        LegacyCoreActivityFeatureGraph(nodeContentUriIntentMapper, mediaPlayerIntentMapper)
 
     @Provides
     @IntoSet

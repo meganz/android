@@ -57,6 +57,9 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_IS_FOREIGN
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_MENU_OPTIONS
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
+import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewState
@@ -77,6 +80,7 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
 import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeActionsViewModel
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
@@ -95,6 +99,7 @@ import mega.privacy.mobile.analytics.event.PlaySlideshowMenuToolbarEvent
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -598,6 +603,65 @@ class ImagePreviewActivity : BaseActivity() {
                 putExtra(IMAGE_PREVIEW_IS_FOREIGN, isForeign)
                 putExtra(IMAGE_PREVIEW_ADD_TO_ALBUM, enableAddToAlbum)
             }
+        }
+
+        fun createIntent(
+            context: Context,
+            fileNodeId: Long,
+            parentNodeId: Long,
+            nodeSourceType: Int?,
+        ): Intent? {
+
+            val (imageSource, menuOptionsSource, paramKey) = when (nodeSourceType) {
+                NodeSourceTypeInt.FILE_BROWSER_ADAPTER -> Triple(
+                    ImagePreviewFetcherSource.CLOUD_DRIVE,
+                    ImagePreviewMenuSource.CLOUD_DRIVE,
+                    CloudDriveImageNodeFetcher.PARENT_ID
+                )
+
+                NodeSourceTypeInt.RUBBISH_BIN_ADAPTER -> Triple(
+                    ImagePreviewFetcherSource.RUBBISH_BIN,
+                    ImagePreviewMenuSource.RUBBISH_BIN,
+                    RubbishBinImageNodeFetcher.PARENT_ID
+                )
+
+                NodeSourceTypeInt.INCOMING_SHARES_ADAPTER,
+                NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER,
+                    -> Triple(
+                    ImagePreviewFetcherSource.SHARED_ITEMS,
+                    ImagePreviewMenuSource.SHARED_ITEMS,
+                    SharedItemsImageNodeFetcher.PARENT_ID
+                )
+
+                NodeSourceTypeInt.LINKS_ADAPTER -> Triple(
+                    ImagePreviewFetcherSource.SHARED_ITEMS,
+                    ImagePreviewMenuSource.LINKS,
+                    SharedItemsImageNodeFetcher.PARENT_ID
+                )
+
+                NodeSourceTypeInt.BACKUPS_ADAPTER -> Triple(
+                    ImagePreviewFetcherSource.CLOUD_DRIVE,
+                    ImagePreviewMenuSource.CLOUD_DRIVE,
+                    CloudDriveImageNodeFetcher.PARENT_ID
+                )
+
+                else -> {
+                    Timber.e("Unknown node source type: $nodeSourceType")
+                    return null
+                }
+            }
+
+            return createIntent(
+                context = context,
+                imageSource = imageSource,
+                menuOptionsSource = menuOptionsSource,
+                anchorImageNodeId = NodeId(fileNodeId),
+                params = mapOf(paramKey to parentNodeId),
+                enableAddToAlbum = nodeSourceType in listOf(
+                    NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
+                    NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER,
+                )
+            )
         }
 
         fun createSecondaryIntent(

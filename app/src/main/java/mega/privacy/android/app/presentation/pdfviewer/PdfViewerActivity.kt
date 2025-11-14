@@ -1873,6 +1873,29 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
          */
         @JvmField
         var loading = true
+
+        /**
+         * Create intent for PdfViewerActivity
+         *
+         * @param context Context
+         * @param nodeHandle Node handle
+         * @param nodeSourceType Node source type
+         * @return Intent for PdfViewerActivity
+         */
+        fun createIntent(
+            context: Context,
+            nodeHandle: Long,
+            nodeSourceType: Int?,
+        ): Intent {
+            return Intent(context, PdfViewerActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
+                putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, nodeHandle)
+                putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
+                putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, nodeSourceType)
+                putExtra(Constants.INTENT_EXTRA_KEY_APP, true)
+            }
+        }
     }
 
     override fun onPause() {

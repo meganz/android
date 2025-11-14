@@ -325,7 +325,8 @@ internal fun RubbishBinScreen(
                 viewModel.onOpenedFileNodeHandled()
             },
             onDownloadEvent = onTransfer,
-            coroutineScope = coroutineScope
+            coroutineScope = coroutineScope,
+            navigationHandler = navigationHandler,
         )
     }
 

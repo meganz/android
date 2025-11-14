@@ -144,7 +144,8 @@ fun LinksContent(
                 onAction(LinksAction.OpenedFileNodeHandled)
             },
             onDownloadEvent = onTransfer,
-            coroutineScope = coroutineScope
+            coroutineScope = coroutineScope,
+            navigationHandler = navigationHandler,
         )
     }
 }

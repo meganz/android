@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
@@ -12,27 +11,29 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.FileTypeInfo
-import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.io.File
 
 /**
- * Handle node action click
+ * Handle node action click with navigation lambdas
  *
  * @param typedFileNode [TypedFileNode]
- * @param nodeSourceType from where item click is performed
- * @param sortOrder [SortOrder]
  * @param showSnackbar callback to show snackbar messages
  * @param onActionHandled callback after file clicked
+ * @param onOpenPdf callback to open PDF activity
+ * @param onOpenImageViewer callback to open image viewer activity
+ * @param onOpenTextEditor callback to open text editor activity
+ * @param onOpenMediaPlayer callback to open media player activity
+ * @param onOpenZipBrowser callback to open zip browser activity
+ * @param coroutineScope [CoroutineScope]
  * @param onDownloadEvent callback for download event
  */
 @Composable
@@ -40,14 +41,16 @@ fun BaseHandleNodeAction(
     typedFileNode: TypedFileNode,
     showSnackbar: (String) -> Unit,
     onActionHandled: () -> Unit,
-    nodeSourceType: Int? = null,
+    onOpenPdf: (NodeContentUri) -> Unit,
+    onOpenImageViewer: () -> Unit,
+    onOpenTextEditor: (TextEditorMode) -> Unit,
+    onOpenMediaPlayer: suspend (NodeContentUri) -> Unit,
+    onOpenZipBrowser: (String, Long?, () -> Unit) -> Unit,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
-    sortOrder: SortOrder = SortOrder.ORDER_NONE,
     onDownloadEvent: (TransferTriggerEvent) -> Unit = {},
 ) {
     val nodeActionsViewModel: NodeActionHandlerViewModel = hiltViewModel()
     val context = LocalContext.current
-    val megaNavigator = remember { context.megaNavigator }
 
     if (!typedFileNode.isNodeKeyDecrypted) {
         showSnackbar(context.getString(sharedR.string.preview_not_available_undecrypted_files))
@@ -60,37 +63,16 @@ fun BaseHandleNodeAction(
             nodeActionsViewModel.handleFileNodeClicked(typedFileNode)
         }.onSuccess { content ->
             when (content) {
-                is FileNodeContent.Pdf -> megaNavigator.openPdfActivity(
-                    context = context,
-                    content = content.uri,
-                    type = nodeSourceType,
-                    currentFileNode = typedFileNode
-                )
-
-                is FileNodeContent.ImageForNode -> {
-                    megaNavigator.openImageViewerActivity(
-                        context = context,
-                        currentFileNode = typedFileNode,
-                        nodeSourceType = nodeSourceType,
-                    )
-                }
-
-                is FileNodeContent.TextContent -> megaNavigator.openTextEditorActivity(
-                    context = context,
-                    currentNodeId = typedFileNode.id,
-                    nodeSourceType = nodeSourceType,
-                    mode = TextEditorMode.View
-                )
-
+                is FileNodeContent.Pdf -> onOpenPdf(content.uri)
+                is FileNodeContent.ImageForNode -> onOpenImageViewer()
+                is FileNodeContent.TextContent -> onOpenTextEditor(TextEditorMode.View)
                 is FileNodeContent.AudioOrVideo -> {
                     openVideoOrAudioFile(
-                        megaNavigator = megaNavigator,
+                        onOpenMediaPlayer = onOpenMediaPlayer,
                         context = context,
                         content = content.uri,
                         fileNode = typedFileNode,
                         showSnackbar = showSnackbar,
-                        sortOrder = sortOrder,
-                        viewType = nodeSourceType,
                         coroutineScope = coroutineScope,
                     )
                 }
@@ -106,7 +88,7 @@ fun BaseHandleNodeAction(
                 is FileNodeContent.Other -> {
                     content.localFile?.let {
                         openOtherFile(
-                            megaNavigator = megaNavigator,
+                            onOpenZipBrowser = onOpenZipBrowser,
                             file = it,
                             typedFileNode = typedFileNode,
                             isOpenWith = false,
@@ -136,27 +118,17 @@ fun BaseHandleNodeAction(
     }
 }
 
-
 private fun openVideoOrAudioFile(
-    megaNavigator: MegaNavigator,
+    onOpenMediaPlayer: suspend (NodeContentUri) -> Unit,
     context: Context,
     fileNode: TypedFileNode,
     content: NodeContentUri,
     showSnackbar: (String) -> Unit,
-    sortOrder: SortOrder,
-    viewType: Int?,
     coroutineScope: CoroutineScope,
 ) {
     coroutineScope.launch {
         runCatching {
-            megaNavigator.openMediaPlayerActivityByFileNode(
-                context = context,
-                contentUri = content,
-                fileNode = fileNode,
-                sortOrder = sortOrder,
-                viewType = viewType,
-                isFolderLink = false,
-            )
+            onOpenMediaPlayer(content)
         }.onFailure {
             showSnackbar(context.getString(sharedR.string.intent_not_available))
         }
@@ -195,8 +167,11 @@ private fun safeLaunchActivity(
     }
 }
 
+/**
+ * Open other file type
+ */
 fun openOtherFile(
-    megaNavigator: MegaNavigator,
+    onOpenZipBrowser: (String, Long?, () -> Unit) -> Unit,
     file: File,
     typedFileNode: TypedFileNode?,
     isOpenWith: Boolean,
@@ -207,7 +182,7 @@ fun openOtherFile(
 ) {
     if (isOpenWith.not() && fileTypeInfo is ZipFileTypeInfo) {
         openZipFile(
-            megaNavigator = megaNavigator,
+            onOpenZipBrowser = onOpenZipBrowser,
             context = context,
             localFile = file,
             fileNode = typedFileNode,
@@ -225,17 +200,16 @@ fun openOtherFile(
 }
 
 private fun openZipFile(
-    megaNavigator: MegaNavigator,
+    onOpenZipBrowser: (String, Long?, () -> Unit) -> Unit,
     context: Context,
     localFile: File,
     fileNode: TypedFileNode?,
     showSnackbar: (String) -> Unit,
 ) {
     Timber.d("The file is zip, open in-app.")
-    megaNavigator.openZipBrowserActivity(
-        context = context,
-        zipFilePath = localFile.absolutePath,
-        nodeHandle = fileNode?.id?.longValue,
+    onOpenZipBrowser(
+        localFile.absolutePath,
+        fileNode?.id?.longValue,
     ) {
         showSnackbar(context.getString(sharedR.string.message_zip_format_error))
     }

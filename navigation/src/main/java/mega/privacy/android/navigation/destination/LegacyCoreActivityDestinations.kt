@@ -5,6 +5,9 @@ import androidx.annotation.Keep
 import androidx.navigation3.runtime.NavKey
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
+import mega.privacy.android.domain.entity.FileTypeInfo
+import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
@@ -138,5 +141,41 @@ data class LegacyAlbumCoverSelectionNavKey(val albumId: Long) : NavKey {
 @Serializable
 data class AlbumGetLinkNavKey(
     val albumId: Long,
-    val hasSensitiveContent: Boolean
+    val hasSensitiveContent: Boolean,
+) : NavKey
+
+@Serializable
+data class LegacyPdfViewerNavKey(
+    val nodeHandle: Long,
+    val nodeContentUri: NodeContentUri,
+    val nodeSourceType: Int? = null,
+    val mimeType: String,
+) : NavKey
+
+@Serializable
+data class LegacyImageViewerNavKey(
+    val nodeHandle: Long,
+    val parentNodeHandle: Long,
+    val nodeSourceType: Int? = null,
+) : NavKey
+
+@Serializable
+data class LegacyTextEditorNavKey(
+    val nodeHandle: Long,
+    val mode: String,
+    val nodeSourceType: Int? = null,
+    val fileName: String? = null,
+) : NavKey
+
+@Serializable
+data class LegacyMediaPlayerNavKey(
+    val nodeHandle: Long,
+    val nodeContentUri: NodeContentUri,
+    val nodeSourceType: Int? = null,
+    val sortOrder: SortOrder = SortOrder.ORDER_NONE,
+    val isFolderLink: Boolean = false,
+    val fileName: String,
+    val parentHandle: Long,
+    val fileHandle: Long,
+    val fileTypeInfo: FileTypeInfo
 ) : NavKey

@@ -43,6 +43,8 @@ fun HandleNodeAction(
     val snackbarHostStateWrapper = remember {
         SnackbarHostStateWrapper(snackBarHostStateM2 = snackBarHostState)
     }
+    val context = LocalContext.current
+    val megaNavigator = remember { context.megaNavigator }
     BaseHandleNodeAction(
         typedFileNode = typedFileNode,
         showSnackbar = { message ->
@@ -51,14 +53,56 @@ fun HandleNodeAction(
             }
         },
         onActionHandled = onActionHandled,
+        onOpenPdf = { content ->
+            megaNavigator.openPdfActivity(
+                context = context,
+                content = content,
+                type = nodeSourceType,
+                currentFileNode = typedFileNode
+            )
+        },
+        onOpenImageViewer = {
+            megaNavigator.openImageViewerActivity(
+                context = context,
+                currentFileNode = typedFileNode,
+                nodeSourceType = nodeSourceType
+            )
+        },
+        onOpenTextEditor = { mode ->
+            megaNavigator.openTextEditorActivity(
+                context = context,
+                currentNodeId = typedFileNode.id,
+                nodeSourceType = nodeSourceType,
+                mode = mode
+            )
+        },
+        onOpenMediaPlayer = { contentUri ->
+            megaNavigator.openMediaPlayerActivityByFileNode(
+                context = context,
+                contentUri = contentUri,
+                fileNode = typedFileNode,
+                viewType = nodeSourceType,
+                sortOrder = sortOrder,
+                isFolderLink = false
+            )
+        },
+        onOpenZipBrowser = { zipFilePath, nodeHandle, onError ->
+            megaNavigator.openZipBrowserActivity(
+                context = context,
+                zipFilePath = zipFilePath,
+                nodeHandle = nodeHandle,
+                onError = onError
+            )
+        },
         coroutineScope = coroutineScope,
-        nodeSourceType = nodeSourceType,
         onDownloadEvent = onDownloadEvent,
-        sortOrder = sortOrder
     )
 }
 
 
+/**
+ * Handle node action click
+ */
 @Composable
 fun HandleFileAction(
     file: File,
@@ -73,7 +117,14 @@ fun HandleFileAction(
 
     LaunchedEffect(file) {
         openOtherFile(
-            megaNavigator = megaNavigator,
+            onOpenZipBrowser = { zipFilePath, nodeHandle, onError ->
+                megaNavigator.openZipBrowserActivity(
+                    context = context,
+                    zipFilePath = zipFilePath,
+                    nodeHandle = nodeHandle,
+                    onError = onError
+                )
+            },
             file = file,
             typedFileNode = null,
             isOpenWith = isOpenWith,
