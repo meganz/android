@@ -3,10 +3,12 @@ package mega.privacy.android.domain.usecase.notifications
 import kotlinx.coroutines.flow.firstOrNull
 import mega.privacy.android.domain.qualifier.SystemTime
 import mega.privacy.android.domain.repository.PermissionRepository
+import mega.privacy.android.domain.usecase.permisison.HasNotificationPermissionUseCase
 import javax.inject.Inject
 
 class ShouldShowNotificationReminderUseCase @Inject constructor(
     private val permissionRepository: PermissionRepository,
+    private val hasNotificationPermissionUseCase: HasNotificationPermissionUseCase,
     @SystemTime private val currentTimeProvider: () -> Long
 ) {
     suspend operator fun invoke(): Boolean {
@@ -14,7 +16,9 @@ class ShouldShowNotificationReminderUseCase @Inject constructor(
             .monitorNotificationPermissionShownTimestamp()
             .firstOrNull()
 
-        return timestamp != null && isMoreThan2DaysAgo(timestamp)
+        val hasNotificationPermission = hasNotificationPermissionUseCase()
+
+        return !hasNotificationPermission && timestamp != null && isMoreThan2DaysAgo(timestamp)
     }
 
     private fun isMoreThan2DaysAgo(timestamp: Long): Boolean {

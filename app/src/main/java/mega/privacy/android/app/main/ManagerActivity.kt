@@ -2331,7 +2331,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             ) == true
 
         val needsToShowPermissions =
-            (!isNotificationPermissionGranted() && shouldShowNotificationPermission) || hasMissingPermission()
+            shouldShowNotificationPermission || hasMissingPermission()
 
         if (needsToShowPermissions) {
             val currentFragment =
