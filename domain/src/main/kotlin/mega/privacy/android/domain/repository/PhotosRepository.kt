@@ -226,4 +226,14 @@ interface PhotosRepository {
      * Save search queries
      */
     suspend fun saveRecentQueries(queries: List<String>)
+
+    /**
+     * Monitor whether the CU has been shown in timeline screen
+     */
+    val cameraUploadShownFlow: Flow<Boolean>
+
+    /**
+     * Set the CU has been shown in timeline screen.
+     */
+    suspend fun setCameraUploadShown()
 }

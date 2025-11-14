@@ -34,6 +34,7 @@ import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
+import mega.privacy.android.data.gateway.preferences.MediaTimelinePreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
@@ -119,6 +120,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val cancelTokenProvider: CancelTokenProvider,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     private val uiPreferencesGateway: UIPreferencesGateway,
+    private val mediaTimelinePreferencesGateway: MediaTimelinePreferencesGateway,
 ) : PhotosRepository {
     @Volatile
     private var isInitialized: Boolean = false
@@ -1114,6 +1116,16 @@ internal class DefaultPhotosRepository @Inject constructor(
         imageNodesFlow.value = null
 
         appScope.launch { uiPreferencesGateway.setPhotosRecentQueries(listOf()) }
+    }
+
+    override val cameraUploadShownFlow: Flow<Boolean> = mediaTimelinePreferencesGateway
+        .cameraUploadShownFlow
+        .flowOn(ioDispatcher)
+
+    override suspend fun setCameraUploadShown() {
+        withContext(ioDispatcher) {
+            mediaTimelinePreferencesGateway.setCameraUploadShown()
+        }
     }
 
     companion object {

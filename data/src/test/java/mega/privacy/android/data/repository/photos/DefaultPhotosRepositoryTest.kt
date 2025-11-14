@@ -14,6 +14,7 @@ import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
+import mega.privacy.android.data.gateway.preferences.MediaTimelinePreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
@@ -97,6 +98,7 @@ class DefaultPhotosRepositoryTest {
         onBlocking { invoke() }.thenReturn(emptyFlow())
     }
     private val uiPreferencesGateway = mock<UIPreferencesGateway>()
+    private val mediaTimelinePreferencesGateway = mock<MediaTimelinePreferencesGateway>()
 
     private val mockBase64Id = "mockBase64Id"
 
@@ -332,6 +334,7 @@ class DefaultPhotosRepositoryTest {
         megaSearchPageMapper = megaSearchPageMapper,
         monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
         uiPreferencesGateway = uiPreferencesGateway,
+        mediaTimelinePreferencesGateway = mediaTimelinePreferencesGateway
     )
 
     private fun createMegaNode(

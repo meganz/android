@@ -20,12 +20,14 @@ import mega.privacy.android.data.preferences.RequestPhoneNumberPreferencesDataSt
 import mega.privacy.android.data.preferences.base.createEncrypted
 import mega.privacy.android.data.preferences.cameraUploadsSettingsPreferenceDataStoreName
 import mega.privacy.android.data.preferences.credentialDataStoreName
+import mega.privacy.android.data.preferences.mediaTimelinePreferenceFileName
 import mega.privacy.android.data.preferences.migration.CameraUploadsSettingsPreferenceDataStoreMigration
 import mega.privacy.android.data.preferences.migration.CredentialsPreferencesMigration
 import mega.privacy.android.data.preferences.psa.psaPreferenceDataStoreName
 import mega.privacy.android.data.preferences.security.PasscodeDatastoreMigration
 import mega.privacy.android.data.preferences.security.passcodeDatastoreName
 import mega.privacy.android.data.preferences.transfersPreferencesDataStoreName
+import mega.privacy.android.data.qualifier.MediaTimelinePreferenceDataStore
 import mega.privacy.android.data.qualifier.RequestPhoneNumberPreference
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import javax.inject.Named
@@ -156,4 +158,18 @@ internal object DataStoreModule {
             scope = CoroutineScope(ioDispatcher),
             produceFile = { context.preferencesDataStoreFile(transfersPreferencesDataStoreName) }
         )
+
+    @Provides
+    @Singleton
+    @MediaTimelinePreferenceDataStore
+    internal fun provideMediaTimelinePreferenceDataStore(
+        @ApplicationContext context: Context,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+    ): DataStore<Preferences> = PreferenceDataStoreFactory.create(
+        corruptionHandler = ReplaceFileCorruptionHandler(
+            produceNewData = { emptyPreferences() }
+        ),
+        scope = CoroutineScope(ioDispatcher),
+        produceFile = { context.preferencesDataStoreFile(mediaTimelinePreferenceFileName) }
+    )
 }
