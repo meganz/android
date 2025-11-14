@@ -282,16 +282,6 @@ fun PhotosScreen(
                     }
 
                 },
-                onClickCameraUploadsSync = { /* TODO */ },
-                onClickCameraUploadsUploading = {
-                    timelineViewModel.setCameraUploadsMessage(
-                        message = context.resources.getQuantityString(
-                            R.plurals.photos_camera_uploads_pending,
-                            timelineViewState.pending,
-                            timelineViewState.pending,
-                        )
-                    )
-                },
                 clearCameraUploadsMessage = {
                     timelineViewModel.setCameraUploadsMessage("")
                 },

@@ -1,37 +1,28 @@
 package mega.privacy.android.app.presentation.photos.timeline.view
 
-import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.DateCard
@@ -64,8 +55,6 @@ fun TimelineView(
     enableCUView: @Composable () -> Unit = {},
     photosGridView: @Composable () -> Unit = {},
     emptyView: @Composable () -> Unit = {},
-    onClickCameraUploadsSync: () -> Unit = {},
-    onClickCameraUploadsUploading: () -> Unit = {},
     onChangeCameraUploadsPermissions: () -> Unit = {},
     clearCameraUploadsMessage: () -> Unit = {},
     clearCameraUploadsChangePermissionsMessage: () -> Unit = {},
@@ -79,12 +68,8 @@ fun TimelineView(
     val isScrolledToEnd by lazyGridState.isScrolledToEnd()
     val isScrolledToTop by lazyGridState.isScrolledToTop()
     val scaffoldState = rememberScaffoldState()
-    val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
     val showEnableCUPage = timelineViewState.enableCameraUploadPageShowing
             && timelineViewState.currentMediaSource != TimelinePhotosSource.CLOUD_DRIVE
-    val scrollNotInProgress by remember {
-        derivedStateOf { !lazyGridState.isScrollInProgress }
-    }
     var message by remember { mutableStateOf("") }
 
     LaunchedEffect(message) {
@@ -138,76 +123,7 @@ fun TimelineView(
     }
 
     MegaScaffold(
-        scaffoldState = scaffoldState,
-        floatingActionButton = {
-            Row(
-                modifier = Modifier.padding(
-                    bottom = if (isPortrait && timelineViewState.currentShowingPhotos.isNotEmpty())
-                        52.dp else 0.dp,
-                )
-            ) {
-                AnimatedVisibility(
-                    visible = scrollNotInProgress,
-                    exit = scaleOut(),
-                    enter = scaleIn()
-                ) {
-                    Column {
-                        Spacer(modifier = Modifier.size(if (isPortrait) 1.dp else 24.dp))
-
-                        when (timelineViewState.cameraUploadsStatus) {
-                            CameraUploadsStatus.Sync -> {
-                                CameraUploadsStatusSync(
-                                    onClick = onClickCameraUploadsSync,
-                                )
-                            }
-
-                            CameraUploadsStatus.Uploading -> {
-                                CameraUploadsStatusUploading(
-                                    progress = timelineViewState.cameraUploadsProgress,
-                                    onClick = onClickCameraUploadsUploading,
-                                )
-                            }
-
-                            CameraUploadsStatus.Complete -> {
-                                CameraUploadsStatusCompleted(
-                                    onClick = {},
-                                )
-                            }
-
-                            CameraUploadsStatus.Warning -> {
-                                CameraUploadsStatusWarning(
-                                    progress = timelineViewState.cameraUploadsProgress,
-                                    onClick = {
-                                        when (timelineViewState.cameraUploadsFinishedReason) {
-                                            CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET -> {
-                                                message = context.getString(
-                                                    R.string.photos_camera_uploads_no_internet
-                                                )
-                                            }
-
-                                            CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW -> {
-                                                message = context.getString(
-                                                    R.string.photos_camera_uploads_low_battery,
-                                                    20,
-                                                )
-                                            }
-
-                                            else -> {
-                                                message = context.getString(
-                                                    R.string.photos_camera_uploads_general_issue
-                                                )
-                                            }
-                                        }
-                                    },
-                                )
-                            }
-
-                            else -> {}
-                        }
-                    }
-                }
-            }
-        }
+        scaffoldState = scaffoldState
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             if (showEnableCUPage) {
