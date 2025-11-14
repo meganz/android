@@ -6,10 +6,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsBannerType
-import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsStatus
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.feature.photos.model.CameraUploadsStatus
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

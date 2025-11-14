@@ -41,7 +41,6 @@ import mega.privacy.android.app.presentation.extensions.transfers.getProgressSiz
 import mega.privacy.android.app.presentation.extensions.transfers.getSpeedString
 import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowMenuAction
 import mega.privacy.android.app.presentation.photos.model.CameraUploadsTransferType
-import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsStatus
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.CameraUploadsTransferViewModel
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
@@ -50,6 +49,7 @@ import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.feature.photos.model.CameraUploadsStatus
 import mega.privacy.android.feature.transfers.components.CameraUploadsActiveTransferItem
 import mega.privacy.android.feature.transfers.components.CameraUploadsInQueueTransferItem
 import mega.privacy.android.icon.pack.R as iconPackR

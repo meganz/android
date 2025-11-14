@@ -15,12 +15,12 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.presentation.photos.model.CameraUploadsTransferType
-import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsStatus
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.transfers.model.image.ActiveTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.model.image.TransferImageUiState
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.feature.photos.model.CameraUploadsStatus
 import mega.privacy.android.feature.transfers.components.TEST_TAG_CAMERA_UPLOADS_ACTIVE_TRANSFER_ITEM
 import mega.privacy.android.feature.transfers.components.TEST_TAG_CAMERA_UPLOADS_IN_QUEUE_TRANSFER_ITEM
 import mega.privacy.android.icon.pack.R as iconPackR

@@ -17,17 +17,14 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.presentation.mapper.TimelinePreferencesMapper
 import mega.privacy.android.app.presentation.photos.PhotosCache.updatePhotos
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.LocationPreference
 import mega.privacy.android.app.presentation.photos.model.MediaTypePreference
 import mega.privacy.android.app.presentation.photos.model.RememberPreferences
-import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.model.TimelineFilterPreferences
-import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsStatus
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.util.createDaysCardList
@@ -76,6 +73,9 @@ import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUs
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
+import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
+import mega.privacy.android.feature.photos.model.CameraUploadsStatus
+import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.feature.photos.model.ZoomLevel
 import mega.privacy.android.feature_flags.AppFeatures
 import nz.mega.sdk.MegaNode
