@@ -92,7 +92,6 @@ fun VideoPlaylistDetailView(
     onRenameDialogPositiveButtonClicked: (playlistID: NodeId, newTitle: String) -> Unit,
     onDeleteDialogPositiveButtonClicked: (List<VideoPlaylistUIEntity>) -> Unit,
     onDeleteVideosDialogPositiveButtonClicked: (VideoPlaylistUIEntity) -> Unit,
-    onAddElementsClicked: () -> Unit,
     onPlayAllClicked: () -> Unit,
     onClick: (item: VideoUIEntity, index: Int) -> Unit,
     onMenuClick: (VideoUIEntity) -> Unit,
@@ -127,10 +126,6 @@ fun VideoPlaylistDetailView(
     var showFavouritesBottomSheet by rememberSaveable { mutableStateOf(false) }
     val customizeSheetState = rememberModalBottomSheetState(true)
     val favouritesSheetState = rememberModalBottomSheetState(true)
-
-    val scrollNotInProgress by remember {
-        derivedStateOf { !lazyListState.isScrollInProgress }
-    }
 
     val resources = LocalResources.current
     LaunchedEffect(numberOfAddedVideos) {
@@ -210,12 +205,6 @@ fun VideoPlaylistDetailView(
                 },
                 onBackPressed = onBackPressed,
                 isSystemVideoPlaylist = isSystemVideoPlaylist
-            )
-        },
-        floatingActionButton = {
-            CreateVideoPlaylistFabButton(
-                showFabButton = scrollNotInProgress && playlist?.isSystemVideoPlayer == false,
-                onCreateVideoPlaylistClick = onAddElementsClicked,
             )
         }
     ) { paddingValue ->
@@ -627,7 +616,6 @@ private fun VideoPlaylistDetailViewPreview() {
             setInputValidity = {},
             onRenameDialogPositiveButtonClicked = { _, _ -> },
             onDeleteDialogPositiveButtonClicked = {},
-            onAddElementsClicked = {},
             addedMessageShown = {},
             numberOfAddedVideos = 0,
             onDeleteVideosDialogPositiveButtonClicked = {},
@@ -660,7 +648,6 @@ private fun VideoPlaylistDetailViewUnderActionModePreview() {
             setInputValidity = {},
             onRenameDialogPositiveButtonClicked = { _, _ -> },
             onDeleteDialogPositiveButtonClicked = {},
-            onAddElementsClicked = {},
             addedMessageShown = {},
             numberOfAddedVideos = 0,
             onDeleteVideosDialogPositiveButtonClicked = {},

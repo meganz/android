@@ -261,7 +261,6 @@ internal fun VideoSectionComposeView(
                     onSortOrderClick = onSortOrderClick,
                     onClick = onPlaylistItemClick,
                     onLongClick = onPlaylistItemLongClick,
-                    setDialogInputPlaceholder = videoSectionViewModel::setPlaceholderTitle,
                     isInputTitleValid = uiState.isInputTitleValid,
                     inputPlaceHolderText = uiState.createVideoPlaylistPlaceholderTitle,
                     setInputValidity = videoSectionViewModel::setNewPlaylistTitleValidity,
@@ -288,14 +287,15 @@ internal fun VideoSectionComposeView(
                         onDeleteDialogButtonClicked()
                     },
                     onDeleteDialogNegativeButtonClicked = videoSectionViewModel::clearAllSelectedVideoPlaylists,
-                    isStorageOverQuota = { getStorageState() == StorageState.PayWall },
                     updateShowRenameVideoPlaylist = { showRenameVideoPlaylistDialog = it },
                     onMenuClick = {
                         coroutineScope.launch {
                             showPlaylistBottomSheet = true
                             playlistModalSheetState.show()
                         }
-                    }
+                    },
+                    showCreateVideoPlaylistDialog = uiState.showCreatedDialog,
+                    updateShowCreateVideoPlaylist = videoSectionViewModel::updateShowCreateDialog
                 )
             },
             selectedTab = tabState.selectedTab,

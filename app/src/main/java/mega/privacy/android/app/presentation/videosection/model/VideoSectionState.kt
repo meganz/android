@@ -53,6 +53,8 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property addToPlaylistTitles the titles of the playlists to add the video to
  * @property searchDescriptionEnabled is search by description enabled via feature flag
  * @property searchTagsEnabled is search by tags enabled via feature flag
+ * @property showCreatedDialog whether to show the created dialog
+ * @property navigateToVideoSelected whether to navigate to video selected
  */
 data class VideoSectionState(
     val allVideos: List<VideoUIEntity> = emptyList(),
@@ -98,6 +100,8 @@ data class VideoSectionState(
     val addToPlaylistTitles: List<String>? = null,
     val searchDescriptionEnabled: Boolean? = null,
     val searchTagsEnabled: Boolean? = null,
+    val showCreatedDialog: Boolean = false,
+    val navigateToVideoSelected: Boolean = false,
 ) {
     /**
      * The highlight text for search by tags or description

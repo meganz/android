@@ -226,6 +226,7 @@ import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachme
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.presentation.transfers.widget.setTransfersWidgetContent
+import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
 import mega.privacy.android.app.psa.PsaViewHolder
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.service.push.MegaMessageService
@@ -371,6 +372,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     private val syncPromotionViewModel: SyncPromotionViewModel by viewModels()
     val sharesViewModel: SharesViewModel by viewModels()
     private val adsContainerViewModel: AdsContainerViewModel by viewModels()
+    private val videoSectionViewModel: VideoSectionViewModel by viewModels()
 
     /**
      * [MegaNavigator]
@@ -6562,6 +6564,11 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 else -> hideFabButton()
             }
 
+            DrawerItem.HOMEPAGE ->
+                if (homepageScreen == HomepageScreen.VIDEO_SECTION) {
+                    updateFabAndShow()
+                }
+
             else -> hideFabButton()
         }
     }
@@ -7239,6 +7246,12 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     }
 
     private fun isAdsVisible() = adsContainerViewModel.isAdsLoaded() && adsContainerView.isVisible
+
+    internal fun handleVideoSectionAddAction() {
+        if (homepageScreen == HomepageScreen.VIDEO_SECTION) {
+            videoSectionViewModel.addFabButtonClicked()
+        }
+    }
 
     companion object {
         private const val BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE =

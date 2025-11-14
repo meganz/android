@@ -51,6 +51,9 @@ internal class FabButtonListener(val context: Context) : View.OnClickListener {
                             context.showUploadPanel()
                         }
 
+                        DrawerItem.HOMEPAGE ->
+                            context.handleVideoSectionAddAction()
+
                         else -> {}
                     }
                 }

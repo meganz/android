@@ -162,13 +162,6 @@ class VideoSectionFragment : Fragment() {
                         onSortOrderClick = { showSortByPanel() },
                         videoSectionViewModel = videoSectionViewModel,
                         onMenuClick = ::showOptionsMenuForItem,
-                        onAddElementsClicked = {
-                            if (getStorageState() == StorageState.PayWall) {
-                                showOverDiskQuotaPaywallWarning()
-                            } else {
-                                navigateToVideoSelectedActivity()
-                            }
-                        },
                         onMenuAction = ::handleVideoSectionMenuAction,
                         retryActionCallback = {
                             videoSectionViewModel.state.value.addToPlaylistHandle?.let {
@@ -354,6 +347,40 @@ class VideoSectionFragment : Fragment() {
                 VideoSectionTab.All -> Analytics.tracker.trackEvent(AllVideosTabEvent)
                 VideoSectionTab.Playlists -> Analytics.tracker.trackEvent(PlaylistsTabEvent)
             }
+            updateFabButtonVisibility()
+        }
+
+        viewLifecycleOwner.collectFlow(
+            videoSectionViewModel.state.map { it.currentVideoPlaylist }.distinctUntilChanged()
+        ) {
+            updateFabButtonVisibility()
+        }
+
+        viewLifecycleOwner.collectFlow(
+            videoSectionViewModel.state.map { it.navigateToVideoSelected }.distinctUntilChanged()
+        ) {
+            if (it) {
+                if (getStorageState() == StorageState.PayWall) {
+                    showOverDiskQuotaPaywallWarning()
+                } else {
+                    navigateToVideoSelectedActivity()
+                }
+                videoSectionViewModel.updateNavigateToVideoSelected(false)
+            }
+        }
+    }
+
+    private fun updateFabButtonVisibility() {
+        val isPlaylistTab =
+            videoSectionViewModel.tabState.value.selectedTab == VideoSectionTab.Playlists
+        val currentPlaylist = videoSectionViewModel.state.value.currentVideoPlaylist
+        val shouldShowFab =
+            isPlaylistTab && (currentPlaylist == null || !currentPlaylist.isSystemVideoPlayer)
+
+        if (shouldShowFab) {
+            (activity as? ManagerActivity)?.showFabButton()
+        } else {
+            (activity as? ManagerActivity)?.hideFabButton()
         }
     }
 
@@ -500,5 +527,10 @@ class VideoSectionFragment : Fragment() {
                 tempNodeIds.size,
             )
         Util.showSnackbar(requireActivity(), message)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        (activity as? ManagerActivity)?.hideFabButton()
     }
 }

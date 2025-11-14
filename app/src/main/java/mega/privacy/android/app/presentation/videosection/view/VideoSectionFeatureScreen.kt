@@ -29,7 +29,6 @@ import mega.privacy.mobile.analytics.event.RecentlyWatchedOpenedButtonPressedEve
 internal fun VideoSectionFeatureScreen(
     modifier: Modifier,
     videoSectionViewModel: VideoSectionViewModel,
-    onAddElementsClicked: () -> Unit,
     onSortOrderClick: () -> Unit,
     onMenuClick: (VideoUIEntity, index: Int) -> Unit,
     onMenuAction: (VideoSectionMenuAction?) -> Unit,
@@ -43,7 +42,6 @@ internal fun VideoSectionFeatureScreen(
         viewModel = videoSectionViewModel,
         onSortOrderClick = onSortOrderClick,
         onMenuClick = onMenuClick,
-        onAddElementsClicked = onAddElementsClicked,
         onMenuAction = onMenuAction,
         retryActionCallback = retryActionCallback
     )
@@ -54,7 +52,6 @@ internal fun VideoSectionNavHost(
     navHostController: NavHostController,
     onSortOrderClick: () -> Unit,
     onMenuClick: (VideoUIEntity, index: Int) -> Unit,
-    onAddElementsClicked: () -> Unit,
     modifier: Modifier,
     onMenuAction: (VideoSectionMenuAction?) -> Unit,
     retryActionCallback: () -> Unit,
@@ -149,7 +146,6 @@ internal fun VideoSectionNavHost(
                 setInputValidity = viewModel::setNewPlaylistTitleValidity,
                 onRenameDialogPositiveButtonClicked = viewModel::updateVideoPlaylistTitle,
                 onDeleteDialogPositiveButtonClicked = viewModel::removeVideoPlaylists,
-                onAddElementsClicked = onAddElementsClicked,
                 errorMessage = state.createDialogErrorMessage,
                 onClick = { item, index ->
                     if (navHostController.currentDestination?.route == videoPlaylistDetailRoute) {

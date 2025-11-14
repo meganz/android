@@ -1908,6 +1908,68 @@ class VideoSectionViewModelTest {
         verify(removeFavouritesUseCase).invoke(testVideos.map { NodeId(it.elementID ?: 0) })
     }
 
+    @Test
+    fun `test that updateShowCreateDialog updates showCreatedDialog state correctly`() = runTest {
+        initUnderTest()
+        underTest.state.test {
+            val initialState = awaitItem()
+            assertThat(initialState.showCreatedDialog).isFalse()
+
+            underTest.updateShowCreateDialog(true)
+            val stateWithDialogShown = awaitItem()
+            assertThat(stateWithDialogShown.showCreatedDialog).isTrue()
+
+            underTest.updateShowCreateDialog(false)
+            val stateWithDialogHidden = awaitItem()
+            assertThat(stateWithDialogHidden.showCreatedDialog).isFalse()
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that updateNavigateToVideoSelected updates navigateToVideoSelected state correctly`() =
+        runTest {
+            initUnderTest()
+            underTest.state.test {
+                val initialState = awaitItem()
+                assertThat(initialState.navigateToVideoSelected).isFalse()
+
+                underTest.updateNavigateToVideoSelected(true)
+                val stateWithNavigationEnabled = awaitItem()
+                assertThat(stateWithNavigationEnabled.navigateToVideoSelected).isTrue()
+
+                underTest.updateNavigateToVideoSelected(false)
+                val stateWithNavigationDisabled = awaitItem()
+                assertThat(stateWithNavigationDisabled.navigateToVideoSelected).isFalse()
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that addFabButtonClicked navigates to video selected when currentVideoPlaylist is not null`() =
+        runTest {
+            val testPlaylist = mock<VideoPlaylistUIEntity> {
+                on { id }.thenReturn(NodeId(1L))
+                on { title }.thenReturn("test playlist")
+            }
+
+            initUnderTest()
+            underTest.updateCurrentVideoPlaylist(testPlaylist)
+
+            underTest.state.test {
+                awaitItem()
+
+                underTest.addFabButtonClicked()
+                val updatedState = awaitItem()
+                assertThat(updatedState.navigateToVideoSelected).isTrue()
+                assertThat(updatedState.showCreatedDialog).isFalse()
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     companion object {
         @JvmField
         @RegisterExtension

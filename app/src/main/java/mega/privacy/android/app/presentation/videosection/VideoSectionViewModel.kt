@@ -27,6 +27,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
@@ -38,6 +39,8 @@ import mega.privacy.android.app.presentation.videosection.model.VideoSectionTabS
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.playlist.videoPlaylistDetailRoute
 import mega.privacy.android.app.presentation.videosection.view.videoSectionRoute
+import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.FileNode
@@ -1285,6 +1288,28 @@ class VideoSectionViewModel @Inject constructor(
         }.onFailure {
             Timber.e(it)
         }
+    }
+
+    internal fun addFabButtonClicked() {
+        if (_state.value.currentVideoPlaylist != null) {
+            updateNavigateToVideoSelected(true)
+        } else {
+            if (getStorageState() == StorageState.PayWall) {
+                showOverDiskQuotaPaywallWarning()
+            } else {
+                updateShowCreateDialog(true)
+                val placeholderText = "New playlist"
+                setPlaceholderTitle(placeholderText)
+            }
+        }
+    }
+
+    internal fun updateShowCreateDialog(show: Boolean) {
+        _state.update { it.copy(showCreatedDialog = show) }
+    }
+
+    internal fun updateNavigateToVideoSelected(value: Boolean) {
+        _state.update { it.copy(navigateToVideoSelected = value) }
     }
 
     companion object {

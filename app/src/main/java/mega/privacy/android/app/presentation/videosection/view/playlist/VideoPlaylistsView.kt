@@ -1,26 +1,15 @@
 package mega.privacy.android.app.presentation.videosection.view.playlist
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -37,7 +26,6 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.view.VideoSectionLoadingView
-import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.icon.pack.R as iconPackR
@@ -48,7 +36,6 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollL
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.VideoPlaylistCreationButtonPressedEvent
@@ -63,11 +50,11 @@ internal fun VideoPlaylistsView(
     isInputTitleValid: Boolean,
     showDeleteVideoPlaylistDialog: Boolean,
     showRenameVideoPlaylistDialog: Boolean,
+    showCreateVideoPlaylistDialog: Boolean,
     inputPlaceHolderText: String,
     onMenuClick: () -> Unit,
     modifier: Modifier,
     updateShowDeleteVideoPlaylist: (Boolean) -> Unit,
-    setDialogInputPlaceholder: (String) -> Unit,
     onCreateDialogPositiveButtonClicked: (String) -> Unit,
     onRenameDialogPositiveButtonClicked: (playlistID: NodeId, newTitle: String) -> Unit,
     onDeleteDialogPositiveButtonClicked: (VideoPlaylistUIEntity) -> Unit,
@@ -80,11 +67,9 @@ internal fun VideoPlaylistsView(
     deletedVideoPlaylistTitles: List<String> = emptyList(),
     errorMessage: Int? = null,
     onLongClick: ((item: VideoPlaylistUIEntity, index: Int) -> Unit) = { _, _ -> },
-    isStorageOverQuota: () -> Boolean,
     updateShowRenameVideoPlaylist: (Boolean) -> Unit,
+    updateShowCreateVideoPlaylist: (Boolean) -> Unit,
 ) {
-    var showCreateVideoPlaylistDialog by rememberSaveable { mutableStateOf(false) }
-
     LaunchedEffect(items) {
         if (scrollToTop) {
             lazyListState.scrollToItem(0)
@@ -93,7 +78,7 @@ internal fun VideoPlaylistsView(
             updateShowRenameVideoPlaylist(false)
         }
         if (showCreateVideoPlaylistDialog) {
-            showCreateVideoPlaylistDialog = false
+            updateShowCreateVideoPlaylist(false)
         }
     }
 
@@ -125,24 +110,7 @@ internal fun VideoPlaylistsView(
 
     MegaScaffold(
         modifier = modifier,
-        scaffoldState = scaffoldState,
-        floatingActionButton = {
-            val placeholderText = "New playlist"
-            val scrollNotInProgress by remember {
-                derivedStateOf { !lazyListState.isScrollInProgress }
-            }
-            CreateVideoPlaylistFabButton(
-                showFabButton = scrollNotInProgress,
-                onCreateVideoPlaylistClick = {
-                    if (isStorageOverQuota()) {
-                        showOverDiskQuotaPaywallWarning()
-                    } else {
-                        showCreateVideoPlaylistDialog = true
-                        setDialogInputPlaceholder(placeholderText)
-                    }
-                }
-            )
-        }
+        scaffoldState = scaffoldState
     ) { paddingValue ->
         Box(
             modifier = Modifier
@@ -158,7 +126,7 @@ internal fun VideoPlaylistsView(
                     errorMessage = errorMessage,
                     onDialogInputChange = setInputValidity,
                     onDismissRequest = {
-                        showCreateVideoPlaylistDialog = false
+                        updateShowCreateVideoPlaylist(false)
                         setInputValidity(true)
                     },
                     onDialogPositiveButtonClicked = { titleOfNewVideoPlaylist ->
@@ -282,31 +250,6 @@ internal fun VideoPlaylistsView(
 }
 
 @Composable
-internal fun CreateVideoPlaylistFabButton(
-    onCreateVideoPlaylistClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    showFabButton: Boolean = true,
-) {
-    AnimatedVisibility(
-        visible = showFabButton,
-        enter = scaleIn(),
-        exit = scaleOut(),
-        modifier = modifier
-    ) {
-        FloatingActionButton(
-            modifier = modifier.testTag(FAB_BUTTON_TEST_TAG),
-            onClick = onCreateVideoPlaylistClick
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Add,
-                contentDescription = "Create new video playlist",
-                tint = MaterialTheme.colors.white_black
-            )
-        }
-    }
-}
-
-@Composable
 internal fun DeleteItemsDialog(
     title: String,
     text: String?,
@@ -367,11 +310,11 @@ private fun VideoPlaylistsViewPreview() {
             isInputTitleValid = true,
             showDeleteVideoPlaylistDialog = false,
             showRenameVideoPlaylistDialog = false,
+            showCreateVideoPlaylistDialog = false,
             modifier = Modifier.fillMaxSize(),
             onClick = { _, _ -> },
             onSortOrderClick = {},
             inputPlaceHolderText = "New playlist",
-            setDialogInputPlaceholder = {},
             updateShowDeleteVideoPlaylist = {},
             onCreateDialogPositiveButtonClicked = {},
             onRenameDialogPositiveButtonClicked = { _, _ -> },
@@ -380,9 +323,9 @@ private fun VideoPlaylistsViewPreview() {
             setInputValidity = {},
             onDeletePlaylistsDialogPositiveButtonClicked = {},
             onDeleteDialogNegativeButtonClicked = {},
-            isStorageOverQuota = { false },
             updateShowRenameVideoPlaylist = {},
-            onMenuClick = {}
+            onMenuClick = {},
+            updateShowCreateVideoPlaylist = {}
         )
     }
 }
@@ -400,11 +343,11 @@ private fun VideoPlaylistsViewCreateDialogShownPreview() {
             isInputTitleValid = true,
             showDeleteVideoPlaylistDialog = true,
             showRenameVideoPlaylistDialog = false,
+            showCreateVideoPlaylistDialog = true,
             modifier = Modifier.fillMaxSize(),
             onClick = { _, _ -> },
             onSortOrderClick = {},
             inputPlaceHolderText = "New playlist",
-            setDialogInputPlaceholder = {},
             updateShowDeleteVideoPlaylist = {},
             onCreateDialogPositiveButtonClicked = {},
             onRenameDialogPositiveButtonClicked = { _, _ -> },
@@ -413,25 +356,12 @@ private fun VideoPlaylistsViewCreateDialogShownPreview() {
             onDeletedMessageShown = {},
             onDeletePlaylistsDialogPositiveButtonClicked = {},
             onDeleteDialogNegativeButtonClicked = {},
-            isStorageOverQuota = { false },
             updateShowRenameVideoPlaylist = {},
-            onMenuClick = {}
+            onMenuClick = {},
+            updateShowCreateVideoPlaylist = {}
         )
     }
 }
-
-@CombinedThemePreviews
-@Composable
-private fun FabButtonPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
-        CreateVideoPlaylistFabButton(onCreateVideoPlaylistClick = {})
-    }
-}
-
-/**
- * Test tag for creating video playlist fab button
- */
-const val FAB_BUTTON_TEST_TAG = "video_playlists:fab_button_create_video_playlist"
 
 /**
  * Test tag for CreateVideoPlaylistDialog
