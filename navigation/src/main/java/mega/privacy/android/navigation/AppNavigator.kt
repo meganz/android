@@ -178,7 +178,7 @@ interface AppNavigator {
      * @param collectionTitle the title of the video collection
      * @param enableAddToAlbum the flag to show add to album in context menu
      */
-    suspend fun openMediaPlayerActivityByFileNode(
+    fun openMediaPlayerActivityByFileNode(
         context: Context,
         contentUri: NodeContentUri,
         fileNode: TypedFileNode,

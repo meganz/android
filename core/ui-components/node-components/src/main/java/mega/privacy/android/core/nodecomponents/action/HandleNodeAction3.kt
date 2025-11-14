@@ -6,19 +6,14 @@ import androidx.compose.runtime.remember
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
+import mega.privacy.android.core.nodecomponents.mapper.FileNodeContentToNavKeyMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.NodeContentUri
+import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.destination.LegacyImageViewerNavKey
-import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
-import mega.privacy.android.navigation.destination.LegacyPdfViewerNavKey
-import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
-import mega.privacy.android.navigation.destination.LegacyZipBrowserNavKey
 
 /**
  * Handle node action click for m3
@@ -34,10 +29,9 @@ fun HandleNodeAction3(
     onDownloadEvent: (TransferTriggerEvent) -> Unit = {},
     sortOrder: SortOrder = SortOrder.ORDER_NONE,
 ) {
-    val nodeSourceTypeToViewTypeMapper = remember {
-        NodeSourceTypeToViewTypeMapper()
+    val fileNodeContentToNavKeyMapper = remember {
+        FileNodeContentToNavKeyMapper(NodeSourceTypeToViewTypeMapper())
     }
-    val viewType = nodeSourceTypeToViewTypeMapper(nodeSourceType)
     BaseHandleNodeAction(
         typedFileNode = typedFileNode,
         showSnackbar = { message ->
@@ -46,57 +40,16 @@ fun HandleNodeAction3(
             }
         },
         onActionHandled = onActionHandled,
-        onOpenPdf = { nodeContentUri: NodeContentUri ->
-            navigationHandler.navigate(
-                LegacyPdfViewerNavKey(
-                    nodeHandle = typedFileNode.id.longValue,
-                    nodeContentUri = nodeContentUri,
-                    nodeSourceType = viewType,
-                    mimeType = typedFileNode.type.mimeType
-                )
-            )
+        onOpenFileContent = { content: FileNodeContent ->
+            fileNodeContentToNavKeyMapper(
+                content = content,
+                fileNode = typedFileNode,
+                nodeSourceType = nodeSourceType,
+                sortOrder = sortOrder
+            )?.let { navKey ->
+                navigationHandler.navigate(navKey)
+            }
         },
-        onOpenImageViewer = {
-            navigationHandler.navigate(
-                LegacyImageViewerNavKey(
-                    nodeHandle = typedFileNode.id.longValue,
-                    parentNodeHandle = typedFileNode.parentId.longValue,
-                    nodeSourceType = viewType
-                )
-            )
-        },
-        onOpenTextEditor = { mode: TextEditorMode ->
-            navigationHandler.navigate(
-                LegacyTextEditorNavKey(
-                    nodeHandle = typedFileNode.id.longValue,
-                    mode = mode.value,
-                    nodeSourceType = viewType
-                )
-            )
-        },
-        onOpenMediaPlayer = { nodeContentUri: NodeContentUri ->
-            navigationHandler.navigate(
-                LegacyMediaPlayerNavKey(
-                    nodeHandle = typedFileNode.id.longValue,
-                    nodeContentUri = nodeContentUri,
-                    nodeSourceType = viewType,
-                    sortOrder = sortOrder,
-                    isFolderLink = false,
-                    fileName = typedFileNode.name,
-                    parentHandle = typedFileNode.parentId.longValue,
-                    fileHandle = typedFileNode.id.longValue,
-                    fileTypeInfo = typedFileNode.type,
-                )
-            )
-        },
-        onOpenZipBrowser = { zipFilePath: String, _, _: () -> Unit ->
-            navigationHandler.navigate(
-                LegacyZipBrowserNavKey(
-                    zipFilePath = zipFilePath
-                )
-            )
-        },
-        coroutineScope = coroutineScope,
         onDownloadEvent = onDownloadEvent,
     )
 }

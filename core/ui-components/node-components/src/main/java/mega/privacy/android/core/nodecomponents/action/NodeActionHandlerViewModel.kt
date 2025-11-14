@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
+import mega.privacy.android.domain.usecase.node.GetFileNodeContentForFileNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import javax.inject.Inject
@@ -24,9 +25,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class NodeActionHandlerViewModel @Inject constructor(
-    private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
-    private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
-    private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase,
+    private val getFileNodeContentForFileNodeUseCase: GetFileNodeContentForFileNodeUseCase,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
 ) : ViewModel() {
 
@@ -37,34 +36,8 @@ class NodeActionHandlerViewModel @Inject constructor(
      * @param fileNode The file node to handle
      * @return FileNodeContent representing the type of content
      */
-    suspend fun handleFileNodeClicked(fileNode: TypedFileNode): FileNodeContent = when {
-        fileNode.type is PdfFileTypeInfo -> FileNodeContent.Pdf(
-            uri = getNodeContentUriUseCase(fileNode)
-        )
-
-        fileNode.type is ImageFileTypeInfo -> FileNodeContent.ImageForNode
-
-        fileNode.type is TextFileTypeInfo && fileNode.size <= TextFileTypeInfo.MAX_SIZE_OPENABLE_TEXT_FILE -> FileNodeContent.TextContent
-
-        fileNode.type is VideoFileTypeInfo || fileNode.type is AudioFileTypeInfo -> {
-            FileNodeContent.AudioOrVideo(
-                uri = getNodeContentUriUseCase(fileNode)
-            )
-        }
-
-        fileNode.type is UrlFileTypeInfo -> {
-            val content = getNodeContentUriUseCase(fileNode)
-            val path = getPathFromNodeContentUseCase(content)
-            FileNodeContent.UrlContent(
-                uri = content,
-                path = path
-            )
-        }
-
-        else -> FileNodeContent.Other(
-            localFile = getNodePreviewFileUseCase(fileNode)
-        )
-    }
+    suspend fun handleFileNodeClicked(fileNode: TypedFileNode) =
+        getFileNodeContentForFileNodeUseCase(fileNode)
 
     /**
      * Apply node content uri to intent

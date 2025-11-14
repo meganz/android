@@ -15,9 +15,12 @@ import mega.privacy.android.app.presentation.snackbar.showAutoDurationSnackbar
 import mega.privacy.android.core.nodecomponents.action.BaseHandleNodeAction
 import mega.privacy.android.core.nodecomponents.action.openOtherFile
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.megaNavigator
+import mega.privacy.android.shared.resources.R
 import java.io.File
 
 /**
@@ -53,48 +56,65 @@ fun HandleNodeAction(
             }
         },
         onActionHandled = onActionHandled,
-        onOpenPdf = { content ->
-            megaNavigator.openPdfActivity(
-                context = context,
-                content = content,
-                type = nodeSourceType,
-                currentFileNode = typedFileNode
-            )
+        onOpenFileContent = { content ->
+            when (content) {
+                is FileNodeContent.Pdf -> {
+                    megaNavigator.openPdfActivity(
+                        context = context,
+                        content = content.uri,
+                        type = nodeSourceType,
+                        currentFileNode = typedFileNode
+                    )
+                }
+
+                FileNodeContent.ImageForNode -> {
+                    megaNavigator.openImageViewerActivity(
+                        context = context,
+                        currentFileNode = typedFileNode,
+                        nodeSourceType = nodeSourceType
+                    )
+                }
+
+                FileNodeContent.TextContent -> {
+                    megaNavigator.openTextEditorActivity(
+                        context = context,
+                        currentNodeId = typedFileNode.id,
+                        nodeSourceType = nodeSourceType,
+                        mode = TextEditorMode.View
+                    )
+                }
+
+                is FileNodeContent.AudioOrVideo -> {
+                    megaNavigator.openMediaPlayerActivityByFileNode(
+                        context = context,
+                        contentUri = content.uri,
+                        fileNode = typedFileNode,
+                        viewType = nodeSourceType,
+                        sortOrder = sortOrder,
+                        isFolderLink = false
+                    )
+                }
+
+                is FileNodeContent.LocalZipFile -> {
+                    megaNavigator.openZipBrowserActivity(
+                        context = context,
+                        zipFilePath = content.localFile.absolutePath,
+                        nodeHandle = typedFileNode.id.longValue,
+                        onError = {
+                            coroutineScope.launch {
+                                snackbarHostStateWrapper.showAutoDurationSnackbar(
+                                    context.getString(R.string.message_zip_format_error)
+                                )
+                            }
+                        }
+                    )
+                }
+
+                is FileNodeContent.ImageForChat, is FileNodeContent.Other, is FileNodeContent.UrlContent -> {
+                    // no-opt here
+                }
+            }
         },
-        onOpenImageViewer = {
-            megaNavigator.openImageViewerActivity(
-                context = context,
-                currentFileNode = typedFileNode,
-                nodeSourceType = nodeSourceType
-            )
-        },
-        onOpenTextEditor = { mode ->
-            megaNavigator.openTextEditorActivity(
-                context = context,
-                currentNodeId = typedFileNode.id,
-                nodeSourceType = nodeSourceType,
-                mode = mode
-            )
-        },
-        onOpenMediaPlayer = { contentUri ->
-            megaNavigator.openMediaPlayerActivityByFileNode(
-                context = context,
-                contentUri = contentUri,
-                fileNode = typedFileNode,
-                viewType = nodeSourceType,
-                sortOrder = sortOrder,
-                isFolderLink = false
-            )
-        },
-        onOpenZipBrowser = { zipFilePath, nodeHandle, onError ->
-            megaNavigator.openZipBrowserActivity(
-                context = context,
-                zipFilePath = zipFilePath,
-                nodeHandle = nodeHandle,
-                onError = onError
-            )
-        },
-        coroutineScope = coroutineScope,
         onDownloadEvent = onDownloadEvent,
     )
 }

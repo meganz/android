@@ -203,7 +203,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         context.startActivity(TransfersActivity.getIntent(context))
     }
 
-    override suspend fun openMediaPlayerActivityByFileNode(
+    override fun openMediaPlayerActivityByFileNode(
         context: Context,
         contentUri: NodeContentUri,
         fileNode: TypedFileNode,
@@ -217,7 +217,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         collectionId: Long?,
         enableAddToAlbum: Boolean?,
     ) {
-        mediaPlayerIntentMapper(
+        val intent = mediaPlayerIntentMapper(
             context = context,
             contentUri = contentUri,
             fileTypeInfo = fileNode.type,
@@ -239,6 +239,7 @@ internal class MegaNavigatorImpl @Inject constructor(
                 )
             },
         )
+        context.startActivity(intent)
     }
 
     private fun getIntent(context: Context, fileTypeInfo: FileTypeInfo) = when {
@@ -268,7 +269,7 @@ internal class MegaNavigatorImpl @Inject constructor(
     ) {
         val contentUri = NodeContentUri.LocalContentUri(localFile)
         val info = fileTypeInfo ?: getFileTypeInfoUseCase(localFile)
-        mediaPlayerIntentMapper(
+        val intent = mediaPlayerIntentMapper(
             context = context,
             contentUri = contentUri,
             fileTypeInfo = info,
@@ -286,7 +287,7 @@ internal class MegaNavigatorImpl @Inject constructor(
             collectionTitle = collectionTitle,
             collectionId = collectionId
         )
-
+        context.startActivity(intent)
     }
 
     override suspend fun openMediaPlayerActivityFromChat(
@@ -351,7 +352,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         enableAddToAlbum: Boolean,
     ) {
         val info = fileTypeInfo ?: getFileTypeInfoByNameUseCase(name)
-        mediaPlayerIntentMapper(
+        val intent = mediaPlayerIntentMapper(
             context = context,
             contentUri = contentUri,
             fileTypeInfo = info,
@@ -367,6 +368,7 @@ internal class MegaNavigatorImpl @Inject constructor(
             nodeHandles = nodeHandles,
             enableAddToAlbum = enableAddToAlbum,
         )
+        context.startActivity(intent)
     }
 
     override fun openSyncs(context: Context) {
