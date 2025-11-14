@@ -3,9 +3,12 @@ package mega.privacy.android.core.nodecomponents.sheet.options
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -15,8 +18,10 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
@@ -24,6 +29,7 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
@@ -32,7 +38,6 @@ import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDi
 import mega.privacy.android.core.nodecomponents.list.NodeListViewItem
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
-import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
 import mega.privacy.android.core.nodecomponents.model.text
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -164,6 +169,12 @@ internal fun NodeOptionsBottomSheetContent(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+    val listState = rememberLazyListState()
+    val isScrolled by remember {
+        derivedStateOf {
+            listState.firstVisibleItemIndex > 0 || listState.firstVisibleItemScrollOffset > 0
+        }
+    }
 
     EventEffect(
         event = uiState.error,
@@ -189,24 +200,52 @@ internal fun NodeOptionsBottomSheetContent(
             onItemClicked = {},
             enableClick = false,
         )
-    }
 
-    LazyColumn(modifier = Modifier.semantics { testTagsAsResourceId = true }) {
-        items(uiState.actions) { item: NodeActionModeMenuItem ->
-            item.control(
-                BottomSheetClickHandler(
-                    onDismiss = onDismiss,
-                    actionHandler = actionHandler,
-                    navigationHandler = navigationHandler,
-                    coroutineScope = coroutineScope,
-                    context = context,
-                    snackbarHandler = {
-                        coroutineScope.launch {
-                            showSnackbar(it)
-                        }
-                    }
-                )
+        if (isScrolled) {
+            HorizontalDivider(
+                modifier = Modifier.testTag(NODE_OPTIONS_HEADER_DIVIDER_TEST_TAG),
+                color = DSTokens.colors.border.strong,
+                thickness = 0.3.dp
             )
         }
     }
+
+    LazyColumn(
+        modifier = Modifier
+            .semantics { testTagsAsResourceId = true }
+            .testTag(NODE_OPTIONS_LAZY_COLUMN_TEST_TAG),
+        state = listState
+    ) {
+        uiState.actions.forEachIndexed { index, actions ->
+            items(actions) { item ->
+                item.control(
+                    BottomSheetClickHandler(
+                        onDismiss = onDismiss,
+                        actionHandler = actionHandler,
+                        navigationHandler = navigationHandler,
+                        coroutineScope = coroutineScope,
+                        context = context,
+                        snackbarHandler = {
+                            coroutineScope.launch {
+                                showSnackbar(it)
+                            }
+                        }
+                    )
+                )
+            }
+
+            if (index < uiState.actions.size - 1) {
+                item {
+                    HorizontalDivider(
+                        modifier = Modifier.testTag(NODE_OPTIONS_GROUP_DIVIDER_TEST_TAG),
+                        color = DSTokens.colors.border.subtle
+                    )
+                }
+            }
+        }
+    }
 }
+
+const val NODE_OPTIONS_HEADER_DIVIDER_TEST_TAG = "node_options_bottom_sheet:header_divider"
+const val NODE_OPTIONS_LAZY_COLUMN_TEST_TAG = "node_options_bottom_sheet:lazy_column"
+const val NODE_OPTIONS_GROUP_DIVIDER_TEST_TAG = "node_options_bottom_sheet:group_divider"

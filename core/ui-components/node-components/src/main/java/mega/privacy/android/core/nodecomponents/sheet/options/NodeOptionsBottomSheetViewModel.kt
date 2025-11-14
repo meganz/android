@@ -5,8 +5,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -80,7 +78,7 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
 
             uiState.update {
                 it.copy(
-                    actions = persistentListOf(),
+                    actions = emptyList(),
                     node = null
                 )
             }
@@ -109,8 +107,13 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
                     accessPermission = permission,
                     isInBackUps = isInBackUps.await(),
                     isConnected = uiState.value.isOnline
-                ).sortedBy { it.orderInGroup }
-                    .toImmutableList()
+                )
+                    .groupBy { it.group }
+                    .toSortedMap()
+                    .mapValues { (_, list) ->
+                        list.sortedBy { it.orderInGroup }.toList()
+                    }
+                    .values.toList()
                 val nodeUiItem = nodeUiItemMapper(listOf(typedNode)).firstOrNull()
 
                 uiState.update {

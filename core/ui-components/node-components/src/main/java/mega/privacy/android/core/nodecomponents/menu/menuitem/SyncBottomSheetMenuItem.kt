@@ -1,9 +1,9 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.extension.isNotS4Container
 import mega.privacy.android.core.nodecomponents.menu.menuaction.SyncMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
-import mega.privacy.android.core.nodecomponents.extension.isNotS4Container
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -41,5 +41,5 @@ class SyncBottomSheetMenuItem @Inject constructor(
         return isCameraUploadsFolder || isMediaUploadsFolder || isMyChatFilesFolder
     }
 
-    override val groupId = 8
+    override val groupId = 4
 }

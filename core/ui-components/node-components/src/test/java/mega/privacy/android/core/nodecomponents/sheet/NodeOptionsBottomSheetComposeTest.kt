@@ -3,8 +3,11 @@ package mega.privacy.android.core.nodecomponents.sheet
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
@@ -19,6 +22,8 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AvailableOfflineMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.core.nodecomponents.sheet.options.NODE_OPTIONS_GROUP_DIVIDER_TEST_TAG
+import mega.privacy.android.core.nodecomponents.sheet.options.NODE_OPTIONS_HEADER_DIVIDER_TEST_TAG
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetContent
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -42,7 +47,7 @@ class NodeOptionsBottomSheetComposeTest {
         navigationHandler: NavigationHandler = mock(),
         onDismiss: () -> Unit = {},
         onConsumeErrorState: () -> Unit = {},
-        showSnackbar: suspend (SnackbarAttributes) -> Unit = { _ -> }
+        showSnackbar: suspend (SnackbarAttributes) -> Unit = { _ -> },
     ) {
         composeTestRule.setContent {
             val sheetState = rememberModalBottomSheetState(
@@ -109,7 +114,7 @@ class NodeOptionsBottomSheetComposeTest {
 
         val uiState = NodeBottomSheetState(
             node = null,
-            actions = persistentListOf(mockAction),
+            actions = listOf(listOf(mockAction)),
         )
 
         setContent(uiState = uiState)
@@ -172,5 +177,196 @@ class NodeOptionsBottomSheetComposeTest {
 
         // The component should handle error state gracefully
         assertThat(errorConsumed).isFalse()
+    }
+
+    @Test
+    fun `test that header divider is not shown initially when node is present`() {
+        val mockNode = mock<TypedFileNode>()
+        whenever(mockNode.name).thenReturn("test_file.txt")
+        whenever(mockNode.id).thenReturn(NodeId(123L))
+        whenever(mockNode.isTakenDown).thenReturn(false)
+        whenever(mockNode.hasVersion).thenReturn(true)
+        whenever(mockNode.tags).thenReturn(emptyList())
+
+        val nodeUiItem = NodeUiItem<TypedNode>(
+            node = mockNode,
+            isSelected = false,
+            title = LocalizedText.Literal("test_file.txt"),
+            iconRes = R.drawable.ic_send_horizontal,
+            thumbnailData = null
+        )
+
+        // Create many actions to make the list potentially scrollable
+        val actions = (0..20).map { index ->
+            mock<NodeActionModeMenuItem>().apply {
+                whenever(control).thenReturn { handler ->
+                    NodeActionListTile(
+                        menuAction = AvailableOfflineMenuAction(),
+                        isDestructive = false,
+                        onActionClicked = { handler.onDismiss() }
+                    )
+                }
+            }
+        }
+
+        val uiState = NodeBottomSheetState(
+            node = nodeUiItem,
+            actions = listOf(actions),
+        )
+
+        setContent(uiState = uiState)
+
+        // Wait for the content to be displayed
+        composeTestRule.waitForIdle()
+
+        // Initially, when the list is not scrolled, the divider should not be shown
+        composeTestRule.onNodeWithTag(NODE_OPTIONS_HEADER_DIVIDER_TEST_TAG)
+            .assertDoesNotExist()
+
+        // Verify the node is displayed
+        composeTestRule.onNodeWithText("test_file.txt")
+            .assertExists()
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that header divider is not shown when LazyColumn is not scrolled`() {
+        val mockNode = mock<TypedFileNode>()
+        whenever(mockNode.name).thenReturn("test_file.txt")
+        whenever(mockNode.id).thenReturn(NodeId(123L))
+        whenever(mockNode.isTakenDown).thenReturn(false)
+        whenever(mockNode.hasVersion).thenReturn(true)
+        whenever(mockNode.tags).thenReturn(emptyList())
+
+        val nodeUiItem = NodeUiItem<TypedNode>(
+            node = mockNode,
+            isSelected = false,
+            title = LocalizedText.Literal("test_file.txt"),
+            iconRes = R.drawable.ic_send_horizontal,
+            thumbnailData = null
+        )
+
+        // Create a few actions that don't require scrolling
+        val actions = (0..2).map { index ->
+            mock<NodeActionModeMenuItem>().apply {
+                whenever(control).thenReturn { handler ->
+                    NodeActionListTile(
+                        menuAction = AvailableOfflineMenuAction(),
+                        isDestructive = false,
+                        onActionClicked = { handler.onDismiss() }
+                    )
+                }
+            }
+        }
+
+        val uiState = NodeBottomSheetState(
+            node = nodeUiItem,
+            actions = listOf(actions),
+        )
+
+        setContent(uiState = uiState)
+
+        // Wait for the content to be displayed
+        composeTestRule.waitForIdle()
+
+        // The divider should not be shown when the list is not scrolled
+        composeTestRule.onNodeWithTag(NODE_OPTIONS_HEADER_DIVIDER_TEST_TAG)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that no group divider is shown when there is only one action group`() {
+        val mockAction = mock<NodeActionModeMenuItem>()
+
+        whenever(mockAction.control).thenReturn { handler ->
+            NodeActionListTile(
+                menuAction = AvailableOfflineMenuAction(),
+                isDestructive = false,
+                onActionClicked = { handler.onDismiss() }
+            )
+        }
+
+        val uiState = NodeBottomSheetState(
+            node = null,
+            actions = listOf(listOf(mockAction)),
+        )
+
+        setContent(uiState = uiState)
+
+        composeTestRule.waitForIdle()
+
+        // No divider should be shown when there's only one group
+        composeTestRule.onNodeWithTag(NODE_OPTIONS_GROUP_DIVIDER_TEST_TAG)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that one group divider is shown when there are two action groups`() {
+        val mockAction1 = mock<NodeActionModeMenuItem>()
+        val mockAction2 = mock<NodeActionModeMenuItem>()
+
+        whenever(mockAction1.control).thenReturn { handler ->
+            NodeActionListTile(
+                menuAction = AvailableOfflineMenuAction(),
+                isDestructive = false,
+                onActionClicked = { handler.onDismiss() }
+            )
+        }
+
+        whenever(mockAction2.control).thenReturn { handler ->
+            NodeActionListTile(
+                menuAction = AvailableOfflineMenuAction(),
+                isDestructive = false,
+                onActionClicked = { handler.onDismiss() }
+            )
+        }
+
+        val uiState = NodeBottomSheetState(
+            node = null,
+            actions = listOf(
+                listOf(mockAction1),
+                listOf(mockAction2)
+            ),
+        )
+
+        setContent(uiState = uiState)
+
+        composeTestRule.waitForIdle()
+
+        // One divider should be shown between two groups
+        composeTestRule.onAllNodesWithTag(NODE_OPTIONS_GROUP_DIVIDER_TEST_TAG)
+            .assertCountEquals(1)
+    }
+
+    @Test
+    fun `test that multiple group dividers are shown when there are multiple action groups`() {
+        val mockActions = (0..2).map { index ->
+            mock<NodeActionModeMenuItem>().apply {
+                whenever(control).thenReturn { handler ->
+                    NodeActionListTile(
+                        menuAction = AvailableOfflineMenuAction(),
+                        isDestructive = false,
+                        onActionClicked = { handler.onDismiss() }
+                    )
+                }
+            }
+        }
+
+        val uiState = NodeBottomSheetState(
+            node = null,
+            actions = listOf(
+                listOf(mockActions[0]),
+                listOf(mockActions[1]),
+                listOf(mockActions[2])
+            ),
+        )
+
+        setContent(uiState = uiState)
+
+        composeTestRule.waitForIdle()
+
+        // Two dividers should be shown between three groups (dividers between group 1-2 and 2-3)
+        composeTestRule.onAllNodesWithTag(NODE_OPTIONS_GROUP_DIVIDER_TEST_TAG)
+            .assertCountEquals(2)
     }
 }
