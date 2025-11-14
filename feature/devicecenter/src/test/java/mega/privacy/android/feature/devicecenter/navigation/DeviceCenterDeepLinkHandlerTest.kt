@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.clouddrive.presentation.drivesync
+package mega.privacy.android.feature.devicecenter.navigation
 
 import android.net.Uri
 import com.google.common.truth.Truth.assertThat
