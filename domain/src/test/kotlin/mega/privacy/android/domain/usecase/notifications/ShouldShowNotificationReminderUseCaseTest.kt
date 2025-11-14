@@ -10,7 +10,9 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -59,11 +61,21 @@ class ShouldShowNotificationReminderUseCaseTest {
 
             assertThat(underTest()).isFalse()
 
-            val timestamp2 = currentTime - (3 * 24 * 60 * 60 * 1000L) // 1 day ago
+            val timestamp2 = currentTime - (1 * 24 * 60 * 60 * 1000L) // 1 day ago
             whenever(permissionRepository.monitorNotificationPermissionShownTimestamp())
                 .thenReturn(flowOf(timestamp2))
 
             assertThat(underTest()).isFalse()
+        }
+
+    @Test
+    fun `test that monitorNotificationPermissionShownTimestamp is never called when user has notification permission`() =
+        runTest {
+            whenever(hasNotificationPermissionUseCase()).thenReturn(true)
+
+            assertThat(underTest()).isFalse()
+
+            verify(permissionRepository, never()).monitorNotificationPermissionShownTimestamp()
         }
 
     @Test

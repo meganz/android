@@ -9,16 +9,17 @@ import javax.inject.Inject
 class ShouldShowNotificationReminderUseCase @Inject constructor(
     private val permissionRepository: PermissionRepository,
     private val hasNotificationPermissionUseCase: HasNotificationPermissionUseCase,
-    @SystemTime private val currentTimeProvider: () -> Long
+    @SystemTime private val currentTimeProvider: () -> Long,
 ) {
     suspend operator fun invoke(): Boolean {
+        val hasNotificationPermission = hasNotificationPermissionUseCase()
+        if (hasNotificationPermission) {
+            return false
+        }
         val timestamp = permissionRepository
             .monitorNotificationPermissionShownTimestamp()
             .firstOrNull()
-
-        val hasNotificationPermission = hasNotificationPermissionUseCase()
-
-        return !hasNotificationPermission && timestamp != null && isMoreThan2DaysAgo(timestamp)
+        return timestamp != null && isMoreThan2DaysAgo(timestamp)
     }
 
     private fun isMoreThan2DaysAgo(timestamp: Long): Boolean {
