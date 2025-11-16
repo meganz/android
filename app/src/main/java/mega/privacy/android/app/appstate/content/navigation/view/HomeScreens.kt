@@ -22,14 +22,17 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import kotlinx.serialization.Serializable
 import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.content.navigation.MainNavigationStateViewModel
+import mega.privacy.android.app.appstate.content.navigation.TopLevelBackStackNavigationHandler
 import mega.privacy.android.app.appstate.content.navigation.model.MainNavState
+import mega.privacy.android.app.appstate.content.navigation.rememberTopLevelBackStack
 import mega.privacy.android.app.main.ads.NewAdsContainer
 import mega.privacy.android.app.presentation.login.view.MEGA_LOGO_TEST_TAG
 import mega.privacy.android.app.presentation.psa.PsaContainer
@@ -41,7 +44,7 @@ import mega.privacy.mobile.navigation.snowflake.MainNavigationScaffold
 @Composable
 fun HomeScreens(
     transferHandler: TransferHandler,
-    navigationHandler: NavigationHandler,
+    outerNavigationHandler: NavigationHandler,
     initialDestination: NavKey?,
     modifier: Modifier = Modifier,
 ) {
@@ -64,13 +67,9 @@ fun HomeScreens(
         }
 
         is MainNavState.Data -> {
-            val backStack = rememberNavBackStack(
-                *listOfNotNull(
-                    currentState.initialDestination,
-                    initialDestination
-                ).toTypedArray()
-            )
-            val currentDestination = backStack.lastOrNull()
+            val homeScreenStacks = rememberTopLevelBackStack(currentState.initialDestination)
+            initialDestination?.let { homeScreenStacks.switchTopLevel(it) }
+            val innerNavigationHandler = TopLevelBackStackNavigationHandler(homeScreenStacks)
             NewAdsContainer(
                 modifier = modifier.fillMaxSize(),
             ) { modifier ->
@@ -80,33 +79,31 @@ fun HomeScreens(
                         .weight(1f),
                     mainNavItems = currentState.mainNavItems,
                     onDestinationClick = { destination ->
-                        if (destination != currentDestination) {
-                            while (backStack.size > 1) {
-                                // keep only the first initial destination and remove others
-                                backStack.removeLastOrNull()
-                            }
-                            if (destination != backStack.firstOrNull()) {
-                                backStack.add(1, destination)
-                            }
-                        }
+                        homeScreenStacks.switchTopLevel(destination)
                     },
                     isSelected = { destination ->
-                        currentDestination == destination
+                        homeScreenStacks.topLevelKey == destination
                     },
                     navContent = { navigationUiController ->
                         PsaContainer {
                             NavDisplay(
                                 modifier = Modifier.fillMaxSize(),
-                                backStack = backStack,
-                                onBack = { backStack.removeLastOrNull() },
+                                backStack = homeScreenStacks.backStack,
+                                onBack = { homeScreenStacks.removeLast() },
                                 entryDecorators = listOf(
                                     rememberSaveableStateHolderNavEntryDecorator(),
                                     rememberViewModelStoreNavEntryDecorator()
                                 ),
-                                entryProvider = entryProvider {
+                                entryProvider = entryProvider({
+                                    fallback(
+                                        unknownKey = it,
+                                        outerNavigationHandler = outerNavigationHandler,
+                                        innerNavigationHandler = innerNavigationHandler
+                                    )
+                                }) {
                                     currentState.mainNavScreens.forEach { screenProvider ->
                                         screenProvider(
-                                            navigationHandler,
+                                            innerNavigationHandler,
                                             navigationUiController,
                                             transferHandler
                                         )
@@ -125,4 +122,18 @@ fun HomeScreens(
             }
         }
     }
+}
+
+@Serializable
+private data object FallbackKey : NavKey
+
+private fun fallback(
+    unknownKey: NavKey,
+    outerNavigationHandler: NavigationHandler,
+    innerNavigationHandler: NavigationHandler,
+) = NavEntry<NavKey>(
+    key = FallbackKey
+) {
+    outerNavigationHandler.navigate(unknownKey)
+    innerNavigationHandler.back()
 }

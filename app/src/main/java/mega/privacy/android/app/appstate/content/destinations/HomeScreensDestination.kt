@@ -19,7 +19,7 @@ fun EntryProviderScope<NavKey>.homeScreens(
     entry<HomeScreensNavKey> {
         HomeScreens(
             transferHandler = transferHandler,
-            navigationHandler = navigationHandler,
+            outerNavigationHandler = navigationHandler,
             initialDestination = it.initialDestination,
         )
     }
