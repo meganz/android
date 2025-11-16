@@ -43,6 +43,7 @@ import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.data.mapper.node.ImageNodeFileMapper
 import mega.privacy.android.data.mapper.node.ImageNodeMapper
+import mega.privacy.android.data.mapper.node.MegaNodeFromChatMessageMapper
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.photos.ContentConsumptionMegaStringMapMapper
 import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesMapper
@@ -112,6 +113,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val sensitivesMapper: MegaStringMapSensitivesMapper,
     private val sensitivesRetriever: MegaStringMapSensitivesRetriever,
     private val imageNodeMapper: ImageNodeMapper,
+    private val megaNodeFromChatMessageMapper: MegaNodeFromChatMessageMapper,
     private val cameraUploadsSettingsPreferenceGateway: CameraUploadsSettingsPreferenceGateway,
     private val sortOrderIntMapper: SortOrderIntMapper,
     private val megaNodeMapper: MegaNodeMapper,
@@ -760,19 +762,10 @@ internal class DefaultPhotosRepository @Inject constructor(
         messageId: Long,
     ): Photo? =
         withContext(ioDispatcher) {
-            getChatNode(chatId, messageId)?.let { mapMegaNodeToPhoto(it, filterSvg = false) }
+            megaNodeFromChatMessageMapper(chatId, messageId, 0)?.let {
+                mapMegaNodeToPhoto(it, filterSvg = false) 
+            }
         }
-
-    private fun getChatNode(chatId: Long, messageId: Long): MegaNode? {
-        val chatRoom = megaChatApiGateway.getChatRoom(chatId)
-        val chatMessage = megaChatApiGateway.getMessage(chatId, messageId)
-            ?: megaChatApiGateway.getMessageFromNodeHistory(chatId, messageId)
-        var node = chatMessage?.megaNodeList?.get(0)
-        if (chatRoom?.isPreview == true && node != null) {
-            node = megaApiFacade.authorizeChatNode(node, chatRoom.authorizationToken)
-        }
-        return node
-    }
 
     override suspend fun getPhotoByPublicLink(link: String): Photo? =
         withContext(ioDispatcher) {
@@ -1004,13 +997,16 @@ internal class DefaultPhotosRepository @Inject constructor(
 
     override suspend fun getImageNodeFromChatMessage(chatId: Long, messageId: Long): ImageNode? =
         withContext(ioDispatcher) {
-            getChatNode(chatId, messageId)?.let { megaNode ->
+            megaNodeFromChatMessageMapper(chatId, messageId)?.let { megaNode ->
                 if (isImageNodeValid(megaNode) || isVideoNodeValid(megaNode)) {
                     imageNodeMapper(
                         megaNode = megaNode,
                         requireSerializedData = true,
                         offline = offlineNodesCache[megaNode.handle.toString()],
-                        numVersion = megaApiFacade::getNumVersions
+                        numVersion = megaApiFacade::getNumVersions,
+                        // If image is from chat message, should use chatId+messageId instead of megaNode
+                        chatId = chatId,
+                        messageId = messageId
                     )
                 } else {
                     null

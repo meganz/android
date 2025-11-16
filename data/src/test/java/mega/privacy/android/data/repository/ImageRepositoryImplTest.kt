@@ -2,9 +2,12 @@ package mega.privacy.android.data.repository
 
 import android.content.Context
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
@@ -12,7 +15,9 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.mapper.node.ImageNodeMapper
+import mega.privacy.android.data.mapper.node.MegaNodeFromChatMessageMapper
 import mega.privacy.android.domain.entity.node.ImageNode
+import mega.privacy.android.domain.exception.FetchChatMegaNodeException
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.ImageRepository
 import nz.mega.sdk.MegaApiJava
@@ -49,6 +54,7 @@ class ImageRepositoryImplTest {
     private val fileManagementPreferencesGateway = mock<FileManagementPreferencesGateway>()
     private val fileGateway = mock<FileGateway>()
     private val imageNodeMapper = mock<ImageNodeMapper>()
+    private lateinit var megaNodeFromChatMessageMapper: MegaNodeFromChatMessageMapper
 
     private val chatRoomId = 1L
     private val chatMessageId = 1L
@@ -67,6 +73,11 @@ class ImageRepositoryImplTest {
 
     @BeforeAll
     fun setUp() {
+        Dispatchers.setMain(StandardTestDispatcher())
+        megaNodeFromChatMessageMapper = MegaNodeFromChatMessageMapper(
+            megaChatApiGateway = megaChatApiGateway,
+            megaApiGateway = megaApiGateway
+        )
         underTest = ImageRepositoryImpl(
             context = context,
             megaApiGateway = megaApiGateway,
@@ -77,6 +88,7 @@ class ImageRepositoryImplTest {
             fileManagementPreferencesGateway = fileManagementPreferencesGateway,
             fileGateway = fileGateway,
             imageNodeMapper = imageNodeMapper,
+            megaNodeFromChatMessageMapper = megaNodeFromChatMessageMapper,
             megaLocalRoomGateway = mock()
         )
     }
@@ -113,7 +125,7 @@ class ImageRepositoryImplTest {
             whenever(megaApiGateway.getMegaNodeByHandle(handle)).thenReturn(null)
             whenever(megaApiFolderGateway.getMegaNodeByHandle(handle)).thenReturn(megaNode)
             whenever(megaApiFolderGateway.authorizeNode(megaNode)).thenReturn(megaNode)
-            whenever(imageNodeMapper.invoke(any(), any(), any(), anyOrNull())).thenReturn(imageNode)
+            whenever(imageNodeMapper.invoke(any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(imageNode)
             val result = underTest.getImageNodeByHandle(
                 handle = handle
             )
@@ -129,7 +141,7 @@ class ImageRepositoryImplTest {
             underTest.getImageNodeByHandle(
                 handle = handle
             )
-            verify(imageNodeMapper).invoke(any(), any(), any(), anyOrNull())
+            verify(imageNodeMapper).invoke(any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
         }
     }
 
@@ -199,12 +211,12 @@ class ImageRepositoryImplTest {
                 )
             }
             underTest.getImageNodeForPublicLink(nodeFileLink)
-            verify(imageNodeMapper).invoke(any(), any(), any(), anyOrNull())
+            verify(imageNodeMapper).invoke(any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
         }
     }
 
     @Test
-    fun `test that getImageNodeForChatMessage throws IllegalArgumentException when ChatNode returned is null`() {
+    fun `test that getImageNodeForChatMessage throws FetchChatMegaNodeException when ChatNode returned is null`() {
         runTest {
             whenever(megaChatApiGateway.getMessage(chatRoomId, chatMessageId)).thenReturn(null)
             whenever(
@@ -213,7 +225,7 @@ class ImageRepositoryImplTest {
                     chatMessageId
                 )
             ).thenReturn(null)
-            assertThrows<IllegalArgumentException> {
+            assertThrows<FetchChatMegaNodeException> {
                 underTest.getImageNodeForChatMessage(
                     chatRoomId = chatRoomId,
                     chatMessageId = chatMessageId
@@ -321,7 +333,7 @@ class ImageRepositoryImplTest {
                 chatRoomId = chatRoomId,
                 chatMessageId = chatMessageId
             )
-            verify(imageNodeMapper).invoke(any(), any(), any(), anyOrNull())
+            verify(imageNodeMapper).invoke(any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
         }
     }
 }

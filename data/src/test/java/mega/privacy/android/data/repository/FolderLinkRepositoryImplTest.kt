@@ -319,7 +319,7 @@ class FolderLinkRepositoryImplTest {
                 )
             ).thenReturn(mock<RawFileTypeInfo>())
             whenever(nodeMapper(child, fromFolderLink = true, requireSerializedData = false, offline = null, syncedNodeIds = null)).thenReturn(untypedNode)
-            whenever(imageNodeMapper(any(), any(), any(), anyOrNull())).thenReturn(imageNode)
+            whenever(imageNodeMapper(any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(imageNode)
             val id = 1L
             val order = 0
             val actual = underTest.getFolderLinkImageNodes(id, order)

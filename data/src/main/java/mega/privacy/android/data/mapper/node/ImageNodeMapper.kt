@@ -30,6 +30,9 @@ internal class ImageNodeMapper @Inject constructor(
         numVersion: suspend (MegaNode) -> Int,
         requireSerializedData: Boolean = false,
         offline: Offline?,
+        // chatId and messageId is used for image from chat
+        chatId: Long? = null,
+        messageId: Long? = null,
     ) = if (megaNode.isFolder) {
         throw IllegalStateException("Node is a folder")
     } else {
@@ -66,9 +69,24 @@ internal class ImageNodeMapper @Inject constructor(
             override val isNodeKeyDecrypted = megaNode.isNodeKeyDecrypted
             override val hasThumbnail = megaNode.hasThumbnail()
             override val hasPreview = megaNode.hasPreview()
-            override val downloadThumbnail = thumbnailFromServerMapper(megaNode)
-            override val downloadPreview = previewFromServerMapper(megaNode)
-            override val downloadFullImage = fullImageFromServerMapper(megaNode)
+            // Use chatId and messageId to download image from chat message.
+            // MegaNode from the message will be released, so avoid using it in async requests.
+            // megaNode is used for non-chat images, for example: cloud drive
+            override val downloadThumbnail = if (chatId != null && messageId != null) {
+                thumbnailFromServerMapper(chatId, messageId)
+            } else {
+                thumbnailFromServerMapper(megaNode)
+            }
+            override val downloadPreview = if (chatId != null && messageId != null) {
+                previewFromServerMapper(chatId, messageId)
+            } else {
+                previewFromServerMapper(megaNode)
+            }
+            override val downloadFullImage = if (chatId != null && messageId != null) {
+                fullImageFromServerMapper(chatId, messageId)
+            } else {
+                fullImageFromServerMapper(megaNode)
+            }
             override val latitude = megaNode.latitude
             override val longitude = megaNode.longitude
             override val serializedData = if (requireSerializedData) megaNode.serialize() else null

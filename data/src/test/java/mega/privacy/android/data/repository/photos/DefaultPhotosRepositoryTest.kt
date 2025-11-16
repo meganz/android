@@ -21,6 +21,8 @@ import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.data.mapper.node.ImageNodeFileMapper
+import mega.privacy.android.data.mapper.node.ImageNodeMapper
+import mega.privacy.android.data.mapper.node.MegaNodeFromChatMessageMapper
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.photos.ContentConsumptionMegaStringMapMapper
 import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesMapper
@@ -35,6 +37,7 @@ import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.RawFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.search.SearchCategory
@@ -80,6 +83,8 @@ class DefaultPhotosRepositoryTest {
     private val videoMapper: VideoMapper = ::createVideo
     private val fileTypeInfoMapper: FileTypeInfoMapper = mock()
     private val imageNodeFileMapper: ImageNodeFileMapper = mock()
+    private val imageNodeMapper: ImageNodeMapper = mock()
+    private val megaNodeFromChatMessageMapper: MegaNodeFromChatMessageMapper = mock()
     private val megaNodeMapper: MegaNodeMapper = mock()
     private val timelineFilterPreferencesJSONMapper: TimelineFilterPreferencesJSONMapper = mock()
     private val contentConsumptionMegaStringMapMapper: ContentConsumptionMegaStringMapMapper =
@@ -323,7 +328,8 @@ class DefaultPhotosRepositoryTest {
         megaChatApiGateway = megaChatApiGateway,
         timelineFilterPreferencesJSONMapper = timelineFilterPreferencesJSONMapper,
         contentConsumptionMegaStringMapMapper = contentConsumptionMegaStringMapMapper,
-        imageNodeMapper = mock(),
+        imageNodeMapper = imageNodeMapper,
+        megaNodeFromChatMessageMapper = megaNodeFromChatMessageMapper,
         cameraUploadsSettingsPreferenceGateway = cameraUploadsSettingsPreferenceGateway,
         sortOrderIntMapper = mock(),
         megaNodeMapper = megaNodeMapper,
@@ -782,5 +788,38 @@ class DefaultPhotosRepositoryTest {
         underTest.monitorPaginatedPhotos().test {
             ensureAllEventsConsumed()
         }
+    }
+
+    @Test
+    fun `test that getImageNodeFromChatMessage returns ImageNode successfully`() = runTest {
+        val chatId = 123L
+        val messageId = 456L
+        val nodeHandle = 789L
+        val megaNode = createMegaNode(handle = nodeHandle, name = "image.jpg")
+        val expectedImageNode = mock<ImageNode>()
+
+        whenever(megaNodeFromChatMessageMapper(chatId, messageId, 0)).thenReturn(megaNode)
+        whenever(fileTypeInfoMapper(megaNode.name, megaNode.duration)).thenReturn(
+            StaticImageFileTypeInfo(mimeType = "image/jpeg", extension = "jpg")
+        )
+        whenever(nodeRepository.isNodeInRubbishBin(NodeId(nodeHandle))).thenReturn(false)
+        whenever(megaApiGateway.getNumVersions(any())).thenReturn(1)
+        whenever(
+            imageNodeMapper.invoke(
+                megaNode = any(),
+                numVersion = any(),
+                requireSerializedData = eq(true),
+                offline = anyOrNull(),
+                chatId = eq(chatId),
+                messageId = eq(messageId),
+            )
+        ).thenReturn(expectedImageNode)
+
+        underTest = createUnderTest(this)
+
+        val result = underTest.getImageNodeFromChatMessage(chatId, messageId)
+
+        assertThat(result).isNotNull()
+        assertThat(result).isEqualTo(expectedImageNode)
     }
 }

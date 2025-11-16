@@ -7,6 +7,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithException
 import mega.privacy.android.data.extensions.toException
+import mega.privacy.android.data.mapper.node.MegaNodeFromChatMessageMapper
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
@@ -17,6 +18,7 @@ import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGa
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.node.ImageNodeMapper
 import mega.privacy.android.domain.entity.node.ImageNode
+import mega.privacy.android.domain.exception.FetchChatMegaNodeException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ImageRepository
 import nz.mega.sdk.MegaError
@@ -46,6 +48,7 @@ internal class ImageRepositoryImpl @Inject constructor(
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway,
     private val fileGateway: FileGateway,
     private val imageNodeMapper: ImageNodeMapper,
+    private val megaNodeFromChatMessageMapper: MegaNodeFromChatMessageMapper,
     private val megaLocalRoomGateway: MegaLocalRoomGateway
 ) : ImageRepository {
     override suspend fun getImageNodeByHandle(handle: Long): ImageNode =
@@ -67,7 +70,18 @@ internal class ImageRepositoryImpl @Inject constructor(
         chatMessageId: Long,
     ): ImageNode =
         withContext(ioDispatcher) {
-            getImageNode { getChatMegaNode(chatRoomId, chatMessageId) }
+            // The node itself will not be stored in ImageNode to avoid memory safety issues
+            val megaNode = megaNodeFromChatMessageMapper(chatRoomId, chatMessageId)
+                ?: throw FetchChatMegaNodeException(chatId = chatRoomId, messageId = chatMessageId)
+            val offline = megaLocalRoomGateway.getOfflineInformation(megaNode.handle)
+            imageNodeMapper(
+                megaNode = megaNode,
+                offline = offline,
+                numVersion = megaApiGateway::getNumVersions,
+                // If image is from chat message, should use chatId+messageId instead of megaNode
+                chatId = chatRoomId,
+                messageId = chatMessageId,
+            )
         }
 
     private suspend fun getImageNode(getMegaNode: suspend () -> MegaNode?): ImageNode =
@@ -99,21 +113,4 @@ internal class ImageRepositoryImpl @Inject constructor(
             )
             megaApiGateway.getPublicNode(nodeFileLink, listener)
         }
-
-    private fun getChatMegaNode(chatRoomId: Long, chatMessageId: Long): MegaNode? {
-        val chatMessage = megaChatApiGateway.getMessage(chatRoomId, chatMessageId)
-            ?: megaChatApiGateway.getMessageFromNodeHistory(chatRoomId, chatMessageId)
-
-        val megaNode = chatMessage?.let {
-            val node = chatMessage.megaNodeList.get(0)
-            val chatRoom = megaChatApiGateway.getChatRoom(chatRoomId)
-
-            if (chatRoom?.isPreview == true) {
-                megaApiGateway.authorizeChatNode(node, chatRoom.authorizationToken) ?: node
-            } else {
-                node
-            }
-        }
-        return megaNode
-    }
 }
