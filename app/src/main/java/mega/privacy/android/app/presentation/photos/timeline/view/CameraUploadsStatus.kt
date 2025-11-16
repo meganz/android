@@ -36,6 +36,7 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.clouddrive.ui.StorageOverQuotaBanner
 import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
+import mega.privacy.android.feature.photos.R as featurePhotosR
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
@@ -58,7 +59,7 @@ fun CameraUploadsStatusSync(
         progress = 0f,
         statusIcon = {
             Icon(
-                painter = painterResource(id = R.drawable.ic_cu_status_sync),
+                painter = painterResource(id = featurePhotosR.drawable.ic_cu_status_sync),
                 contentDescription = "Camera uploads status sync",
                 modifier = Modifier.size(24.dp),
                 tint = Color.Unspecified,
@@ -80,7 +81,7 @@ fun CameraUploadsStatusUploading(
         progress = progress,
         statusIcon = {
             Icon(
-                painter = painterResource(id = R.drawable.ic_cu_status_uploading),
+                painter = painterResource(id = featurePhotosR.drawable.ic_cu_status_uploading),
                 contentDescription = "Camera uploads status uploading",
                 modifier = Modifier.size(24.dp),
                 tint = Color.Unspecified,
@@ -101,7 +102,7 @@ fun CameraUploadsStatusCompleted(
         progress = 1f,
         statusIcon = {
             Icon(
-                painter = painterResource(id = R.drawable.ic_cu_fab_status_completed),
+                painter = painterResource(id = featurePhotosR.drawable.ic_cu_fab_status_completed),
                 contentDescription = "Camera uploads status completed",
                 modifier = Modifier.size(24.dp),
                 tint = Color.Unspecified,
@@ -123,7 +124,7 @@ fun CameraUploadsStatusWarning(
         progress = progress,
         statusIcon = {
             Icon(
-                painter = painterResource(id = R.drawable.ic_cu_status_warning),
+                painter = painterResource(id = featurePhotosR.drawable.ic_cu_status_warning),
                 contentDescription = "Camera uploads status warning",
                 modifier = Modifier.size(24.dp),
                 tint = Color.Unspecified,
@@ -174,7 +175,7 @@ fun CameraUploadsNoFullAccessBanner(
         modifier = modifier
             .clickable { onClick() }
             .testTag(TIMELINE_CAMERA_UPLOADS_NO_FULL_ACCESS_BANNER_TEST_TAG),
-        statusIcon = R.drawable.ic_cu_status_warning,
+        statusIcon = featurePhotosR.drawable.ic_cu_status_warning,
         title = stringResource(sharedR.string.camera_uploads_banner_complete_title),
         description = description,
         endIcon = {
@@ -209,7 +210,7 @@ internal fun DeviceChargingNotMetPausedBanner(
 
     CameraUploadsBanner(
         modifier = modifier.testTag(TIMELINE_CAMERA_UPLOADS_DEVICE_CHARGING_NOT_MET_BANNER_TEST_TAG),
-        statusIcon = R.drawable.ic_cu_status_warning,
+        statusIcon = featurePhotosR.drawable.ic_cu_status_warning,
         title = stringResource(sharedR.string.camera_update_paused_warning_banner_title),
         description = stringResource(sharedR.string.camera_update_device_charging_not_met_banner_description),
         action = {
@@ -233,7 +234,7 @@ internal fun LowBatteryPausedBanner(
     CameraUploadsBanner(
         modifier = modifier
             .testTag(TIMELINE_CAMERA_UPLOADS_LOW_BATTERY_BANNER_TEST_TAG),
-        statusIcon = R.drawable.ic_cu_status_warning,
+        statusIcon = featurePhotosR.drawable.ic_cu_status_warning,
         title = stringResource(sharedR.string.camera_update_paused_warning_banner_title),
         description = stringResource(sharedR.string.camera_update_low_battery_banner_description),
     )
@@ -259,7 +260,7 @@ internal fun NetworkRequirementNotMetPausedBanner(
     CameraUploadsBanner(
         modifier = modifier
             .testTag(TIMELINE_CAMERA_UPLOADS_NETWORK_REQUIREMENT_NOT_MET_BANNER_TEST_TAG),
-        statusIcon = R.drawable.ic_cu_status_warning,
+        statusIcon = featurePhotosR.drawable.ic_cu_status_warning,
         title = stringResource(sharedR.string.camera_update_paused_warning_banner_title),
         description = stringResource(sharedR.string.camera_uploads_notification_content_no_wifi_connection),
         action = {
@@ -296,7 +297,7 @@ fun EnableCameraUploadsBanner(
         modifier = modifier
             .clickable { onClick() }
             .testTag(TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_TEST_TAG),
-        statusIcon = R.drawable.ic_cu_status,
+        statusIcon = featurePhotosR.drawable.ic_cu_status,
         title = stringResource(R.string.settings_camera_upload_on),
         description = stringResource(id = R.string.enable_cu_subtitle),
         endIcon = {
@@ -317,7 +318,7 @@ fun CameraUploadsCheckingUploadsBanner(
 ) {
     CameraUploadsBanner(
         modifier = modifier.testTag(TIMELINE_CAMERA_UPLOADS_CHECKING_UPLOADS_BANNER_TEST_TAG),
-        statusIcon = R.drawable.ic_cu_status_sync,
+        statusIcon = featurePhotosR.drawable.ic_cu_status_sync,
         title = stringResource(sharedR.string.camera_uploads_banner_checking_uploads_text),
         description = null
     )
@@ -334,7 +335,7 @@ fun CameraUploadsPendingCountBanner(
         modifier = modifier
             .clickable { onClick() }
             .testTag(TIMELINE_CAMERA_UPLOADS_PENDING_COUNT_BANNER_TEST_TAG),
-        statusIcon = R.drawable.ic_cu_status_uploading,
+        statusIcon = featurePhotosR.drawable.ic_cu_status_uploading,
         title = stringResource(
             sharedR.string.camera_uploads_banner_uploading_pending_count_text,
             count

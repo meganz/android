@@ -1850,4 +1850,8 @@
     <string name="general_decrypt">Decrypt</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="password_dialog_error">Invalid link password</string>
+    <!-- Message of the Camera Uploads no full access warning banner in Photos -->
+    <string name="camera_upload_no_full_access_banner_change_permissions_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library. [A]Tap to change permissions.[/A]</string>
+    <!-- Text to show as subtitle of Enable camera uploads screen -->
+    <string name="camera_upload_banner_enable_cu_subtitle">Automatically back up your photos and videos to your Cloud drive.</string>
 </resources>
