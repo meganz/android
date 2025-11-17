@@ -95,7 +95,6 @@ internal data class FileInfoViewState(
     val actions: List<FileInfoMenuAction> = emptyList(),
     val requiredExtraAction: FileInfoExtraAction? = null,
     val isRemindersForContactVerificationEnabled: Boolean = false,
-    val tagsEnabled: Boolean = false,
     val tags: List<String> = emptyList(),
     val longitude: Double = 0.0,
     val latitude: Double = 0.0,
@@ -146,10 +145,10 @@ internal data class FileInfoViewState(
     /**
      * Check Conditions to enable tags field
      */
-    fun canEditTags() = tagsEnabled && !isNodeInRubbish && !isNodeInBackups &&
+    fun canEditTags() = !isNodeInRubbish && !isNodeInBackups &&
             (accessPermission == AccessPermission.OWNER || accessPermission == AccessPermission.FULL)
 
-    fun canViewTags() = tagsEnabled && !isNodeInRubbish && !isNodeInBackups &&
+    fun canViewTags() = !isNodeInRubbish && !isNodeInBackups &&
             (accessPermission == AccessPermission.READ || accessPermission == AccessPermission.READWRITE)
 
     /**

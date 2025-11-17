@@ -16,6 +16,14 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
 
+    /**
+     * Single activity
+     */
+    SingleActivity(
+        "Enable single activity rewrite",
+        false,
+    ),
+
     CameraUploadsPausedWarningBanner(
         "Enable Camera Uploads paused warning banner",
         true
@@ -32,14 +40,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     UIDrivenPhotoMonitoring(
         "Enable UI-driven photo monitoring lifecycle to prevent race conditions",
         true
-    ),
-
-    /**
-     * Single activity
-     */
-    SingleActivity(
-        "Enable single activity rewrite",
-        false,
     ),
 
     /**
@@ -75,41 +75,9 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Shares compose
-     */
-    SharesCompose(
-        "Enable compose implementation of shares tabs",
-        false
-    ),
-
-    /**
      * App Test toggle
      */
     AppTest("This is a test toggle. It does nothing", false),
-
-    /**
-     * To enable search by node description
-     */
-    SearchWithDescription(
-        "Enable search with description",
-        true
-    ),
-
-    /**
-     * To enable search by node tags
-     */
-    SearchWithTags(
-        "Enable search with tags",
-        true
-    ),
-
-    /**
-     * To enable the new add and manage description feature to node
-     */
-    NodeWithTags(
-        "Enable node with tags",
-        true
-    ),
 
     /**
      * Enables Picture in Picture (Pip) in Meeting

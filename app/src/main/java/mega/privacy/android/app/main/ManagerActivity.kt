@@ -2256,12 +2256,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     }
 
     /**
-     * Checks if SharesCompose enabled from [AppFeatures.SharesCompose]
-     */
-    private suspend fun isSharesTabComposeEnabled() =
-        getFeatureFlagValueUseCase(AppFeatures.SharesCompose)
-
-    /**
      * Checks if some business warning has to be shown due to the status of the account.
      *
      * @return True if some warning has been shown, false otherwise.
@@ -4657,22 +4651,20 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
     private fun onSelectAllSharedItems() {
         lifecycleScope.launch {
-            if (!isSharesTabComposeEnabled()) {
-                when (tabItemShares) {
-                    SharesTab.INCOMING_TAB -> {
-                        incomingSharesViewModel.selectAllNodes()
-                    }
-
-                    SharesTab.OUTGOING_TAB -> {
-                        outgoingSharesViewModel.selectAllNodes()
-                    }
-
-                    SharesTab.LINKS_TAB -> {
-                        linksViewModel.selectAllNodes()
-                    }
-
-                    else -> {}
+            when (tabItemShares) {
+                SharesTab.INCOMING_TAB -> {
+                    incomingSharesViewModel.selectAllNodes()
                 }
+
+                SharesTab.OUTGOING_TAB -> {
+                    outgoingSharesViewModel.selectAllNodes()
+                }
+
+                SharesTab.LINKS_TAB -> {
+                    linksViewModel.selectAllNodes()
+                }
+
+                else -> {}
             }
         }
     }

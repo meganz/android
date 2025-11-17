@@ -121,7 +121,6 @@ class SearchViewModel @Inject constructor(
     private var showHiddenItems: Boolean = true
 
     init {
-        checkSearchFlags()
         initializeSearch()
         checkViewType()
         viewModelScope.launch {
@@ -137,22 +136,6 @@ class SearchViewModel @Inject constructor(
             getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
         }
         return result.getOrNull() ?: false
-    }
-
-    private fun checkSearchFlags() {
-        viewModelScope.launch {
-            runCatching {
-                val description = getFeatureFlagValueUseCase(AppFeatures.SearchWithDescription)
-                val tags = getFeatureFlagValueUseCase(AppFeatures.SearchWithTags)
-                description to tags
-            }.onSuccess { (description, tags) ->
-                _state.update {
-                    it.copy(searchDescriptionEnabled = description, searchTagsEnabled = tags)
-                }
-            }.onFailure {
-                Timber.e("Get feature flag failed $it")
-            }
-        }
     }
 
     private fun initializeSearch() {
@@ -232,13 +215,12 @@ class SearchViewModel @Inject constructor(
         ),
         modificationDate = state.value.dateModifiedSelectedFilterOption?.date,
         creationDate = state.value.dateAddedSelectedFilterOption?.date,
-        description = if (state.value.searchDescriptionEnabled == true) getCurrentSearchQuery() else null,
-        tag = if (state.value.searchTagsEnabled == true) getCurrentSearchQuery()
+        description = getCurrentSearchQuery(),
+        tag = getCurrentSearchQuery()
             .removePrefix("#")
             .takeIf {
                 nodeSourceType != NodeSourceType.RUBBISH_BIN
             }
-        else null
     )
 
     // If folder is opened from search screen we are setting query as empty

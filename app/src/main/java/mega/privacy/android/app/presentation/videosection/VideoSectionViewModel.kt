@@ -149,7 +149,6 @@ class VideoSectionViewModel @Inject constructor(
     private var searchQueryJob: Job? = null
 
     init {
-        checkSearchFlags()
         refreshNodesIfAnyUpdates()
         viewModelScope.launch {
             monitorVideoPlaylistSetsUpdateUseCase().conflate()
@@ -196,25 +195,6 @@ class VideoSectionViewModel @Inject constructor(
                     isPaid = _state.value.accountType?.isPaid,
                     isBusinessAccountExpired = _state.value.isBusinessAccountExpired
                 ).convertAndUpdateState()
-            }
-        }
-    }
-
-    /**
-     * Check if the search by tags and description flags are enabled
-     */
-    fun checkSearchFlags() {
-        viewModelScope.launch {
-            runCatching {
-                val description = getFeatureFlagValueUseCase(AppFeatures.SearchWithDescription)
-                val tags = getFeatureFlagValueUseCase(AppFeatures.SearchWithTags)
-                description to tags
-            }.onSuccess { (description, tags) ->
-                _state.update {
-                    it.copy(searchDescriptionEnabled = description, searchTagsEnabled = tags)
-                }
-            }.onFailure {
-                Timber.e("Get feature flag failed $it")
             }
         }
     }
@@ -372,8 +352,8 @@ class VideoSectionViewModel @Inject constructor(
     private suspend fun getVideoUIEntityList() =
         getAllVideosUseCase(
             searchQuery = getCurrentSearchQuery(),
-            tag = if (state.value.searchTagsEnabled == true) getCurrentSearchQuery().removePrefix("#") else null,
-            description = if (state.value.searchDescriptionEnabled == true) getCurrentSearchQuery() else null
+            tag = getCurrentSearchQuery().removePrefix("#"),
+            description = getCurrentSearchQuery()
         ).filterNonSensitiveItems(
             showHiddenItems = this@VideoSectionViewModel.showHiddenItems,
             isPaid = _state.value.accountType?.isPaid,

@@ -16,8 +16,6 @@ import mega.privacy.android.domain.entity.preference.ViewType
 
 /**
  * State for SearchActivity
- * @property searchDescriptionEnabled is search by description enabled via feature flag
- * @property searchTagsEnabled is search by tags enabled via feature flag
  * @property searchItemList list of search items in [TypedNode]
  * @property isSearching to show loading or not
  * @property sortOrder [SortOrder] to display nodes
@@ -41,8 +39,6 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property hiddenNodeEnabled if hidden nodes are enabled
  */
 data class SearchViewState(
-    val searchDescriptionEnabled: Boolean? = null,
-    val searchTagsEnabled: Boolean? = null,
     val searchItemList: List<NodeUIItem<TypedNode>> = emptyList(),
     val isSearching: Boolean = true,
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,

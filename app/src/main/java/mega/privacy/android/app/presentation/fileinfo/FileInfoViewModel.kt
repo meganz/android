@@ -184,7 +184,6 @@ class FileInfoViewModel @Inject constructor(
     val nodeId get() = typedNode.id
 
     init {
-        checkTagsFeatureFlag()
         monitorBusinessAccountExpiry()
         viewModelScope.launch {
             val isRemindersForContactVerificationEnabled =
@@ -225,14 +224,6 @@ class FileInfoViewModel @Inject constructor(
                         Timber.e("Monitor business account expiry failed $it")
                     }
                 }
-        }
-    }
-
-    private fun checkTagsFeatureFlag() = viewModelScope.launch {
-        runCatching { getFeatureFlagValueUseCase(AppFeatures.NodeWithTags) }.onSuccess { flag ->
-            _uiState.update { it.copy(tagsEnabled = flag) }
-        }.onFailure {
-            Timber.e("Get tag feature flag failed $it")
         }
     }
 

@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -35,7 +36,6 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.DateFilterOption
-import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.entity.search.TypeFilterOption
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
@@ -351,12 +351,10 @@ class SearchViewModelTest {
 
             whenever(
                 searchUseCase(
-                    parentHandle = NodeId(parentHandle),
-                    nodeSourceType = nodeSourceType,
-                    searchParameters = SearchParameters(
-                        query = query,
-                    ),
-                    isSingleActivityEnabled = false,
+                    parentHandle = any(),
+                    nodeSourceType = any(),
+                    searchParameters = any(),
+                    isSingleActivityEnabled = any(),
                 )
             ).thenReturn(nodeList)
             underTest.updateSearchQuery(query)
@@ -380,12 +378,10 @@ class SearchViewModelTest {
             nodeList.add(typedFolderNode)
             whenever(
                 searchUseCase(
-                    parentHandle = NodeId(123456L),
-                    nodeSourceType = nodeSourceType,
-                    searchParameters = SearchParameters(
-                        query = query,
-                    ),
-                    isSingleActivityEnabled = false,
+                    parentHandle = any(),
+                    nodeSourceType = any(),
+                    searchParameters = any(),
+                    isSingleActivityEnabled = any(),
                 )
             ).thenReturn(nodeList)
             whenever(getSortOrderByNodeSourceTypeUseCase(nodeSourceType, false)).thenReturn(
@@ -500,12 +496,10 @@ class SearchViewModelTest {
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
             whenever(
                 searchUseCase(
-                    parentHandle = NodeId(parentHandle),
-                    nodeSourceType = nodeSourceType,
-                    searchParameters = SearchParameters(
-                        query = query,
-                    ),
-                    isSingleActivityEnabled = false,
+                    parentHandle = any(),
+                    nodeSourceType = any(),
+                    searchParameters = any(),
+                    isSingleActivityEnabled = any(),
                 )
             ).thenReturn(listOf(typedFileNode, typedFolderNode))
             underTest.updateSearchQuery(query)
@@ -525,6 +519,7 @@ class SearchViewModelTest {
             }
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `test that sensitive nodes should be filtered with subscribed account`() = runTest {
         stubCommon()
@@ -560,12 +555,10 @@ class SearchViewModelTest {
         whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
         whenever(
             searchUseCase(
-                parentHandle = NodeId(parentHandle),
-                nodeSourceType = nodeSourceType,
-                searchParameters = SearchParameters(
-                    query = query,
-                ),
-                isSingleActivityEnabled = false,
+                parentHandle = any(),
+                nodeSourceType = any(),
+                searchParameters = any(),
+                isSingleActivityEnabled = any(),
             )
         ).thenReturn(listOf(typedFileNode, typedFolderNode))
 
@@ -616,11 +609,10 @@ class SearchViewModelTest {
         whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
         whenever(
             searchUseCase(
-                parentHandle = NodeId(parentHandle),
-                nodeSourceType = nodeSourceType,
-                searchParameters = SearchParameters(
-                    query = query,
-                ), isSingleActivityEnabled = false
+                parentHandle = any(),
+                nodeSourceType = any(),
+                searchParameters = any(),
+                isSingleActivityEnabled = any(),
             )
         ).thenReturn(listOf(typedFileNode, typedFolderNode))
 

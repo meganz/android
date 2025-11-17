@@ -66,7 +66,6 @@ import mega.privacy.android.domain.usecase.videosection.RemoveRecentlyWatchedIte
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideosFromPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.mobile.analytics.event.PlaylistCreatedSuccessfullyEvent
 import org.junit.jupiter.api.AfterEach
@@ -253,27 +252,9 @@ class VideoSectionViewModelTest {
             assertThat(initial.videoPlaylists).isEmpty()
             assertThat(initial.currentVideoPlaylist).isNull()
             assertThat(initial.isVideoPlaylistCreatedSuccessfully).isFalse()
-            assertThat(initial.searchTagsEnabled).isFalse()
-            assertThat(initial.searchDescriptionEnabled).isFalse()
             cancelAndIgnoreRemainingEvents()
         }
     }
-
-    @Test
-    fun `test that searchDescriptionEnabled and searchTagsEnabled are updated correctly`() =
-        runTest {
-            initVideosReturned()
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SearchWithDescription)).thenReturn(true)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SearchWithTags)).thenReturn(true)
-            underTest.checkSearchFlags()
-
-            underTest.state.drop(1).test {
-                val actual = awaitItem()
-                assertThat(actual.searchDescriptionEnabled).isTrue()
-                assertThat(actual.searchTagsEnabled).isTrue()
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
 
     @Test
     fun `test that the videos are retrieved when the nodes are refreshed`() = runTest {
@@ -537,7 +518,7 @@ class VideoSectionViewModelTest {
         whenever(videoUIEntityMapper(expectedTypedVideoNode)).thenReturn(expectedVideo)
         whenever(videoUIEntityMapper(videoNode)).thenReturn(video)
 
-        underTest.state.drop(3).test {
+        underTest.state.drop(2).test {
             underTest.searchQuery("video")
             assertThat(awaitItem().query).isEqualTo("video")
             assertThat(awaitItem().allVideos.size).isEqualTo(1)
@@ -551,7 +532,7 @@ class VideoSectionViewModelTest {
             initVideosReturned()
             initUnderTest()
 
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allVideos).isNotEmpty()
 
@@ -567,7 +548,7 @@ class VideoSectionViewModelTest {
             initVideosReturned()
             initUnderTest()
 
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allVideos.size).isEqualTo(2)
 
@@ -621,7 +602,7 @@ class VideoSectionViewModelTest {
 
         underTest.onTabSelected(VideoSectionTab.Playlists)
 
-        underTest.state.drop(2).test {
+        underTest.state.drop(1).test {
             val actual = awaitItem()
             assertThat(actual.videoPlaylists.size).isEqualTo(2)
             assertThat(actual.isPlaylistProgressBarShown).isFalse()
@@ -654,7 +635,7 @@ class VideoSectionViewModelTest {
 
             underTest.onTabSelected(VideoSectionTab.Playlists)
 
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 assertThat(awaitItem().videoPlaylists).isNotEmpty()
 
                 underTest.onVideoPlaylistItemClicked(videoPlaylistUIEntity, 0)
@@ -671,7 +652,7 @@ class VideoSectionViewModelTest {
 
             underTest.onTabSelected(VideoSectionTab.Playlists)
 
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 assertThat(awaitItem().videoPlaylists.size).isEqualTo(2)
 
                 underTest.onVideoPlaylistItemClicked(videoPlaylistUIEntity, 0)
@@ -691,7 +672,7 @@ class VideoSectionViewModelTest {
 
             underTest.onTabSelected(VideoSectionTab.Playlists)
 
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 assertThat(awaitItem().videoPlaylists.size).isEqualTo(2)
 
                 underTest.selectAllVideoPlaylists()
@@ -875,7 +856,7 @@ class VideoSectionViewModelTest {
             initUnderTest()
             underTest.updateCurrentVideoPlaylist(videoPlaylistUIEntity)
             underTest.addVideosToPlaylist(testPlaylistID, testVideoIDs)
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 val actual = awaitItem()
                 assertThat(actual.numberOfAddedVideos).isEqualTo(testVideoIDs.size)
                 val updated = awaitItem()
@@ -917,7 +898,7 @@ class VideoSectionViewModelTest {
             initUnderTest()
             underTest.updateCurrentVideoPlaylist(videoPlaylistUIEntity)
             underTest.removeVideosFromPlaylist(testPlaylistID, testVideoElementIDs)
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 val actual = awaitItem()
                 assertThat(actual.numberOfRemovedItems).isEqualTo(testVideoElementIDs.size)
                 val updated = awaitItem()
@@ -1411,7 +1392,7 @@ class VideoSectionViewModelTest {
             )
             initUnderTest()
 
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allVideos.size).isEqualTo(2)
 
@@ -1449,7 +1430,7 @@ class VideoSectionViewModelTest {
             underTest.onTabSelected(VideoSectionTab.Playlists)
             underTest.updateCurrentVideoPlaylist(videoPlaylistUIEntity)
 
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 assertThat(awaitItem().videoPlaylists).isNotEmpty()
                 underTest.onVideoItemOfPlaylistClicked(videoUIEntity, 0)
                 assertThat(awaitItem().clickedPlaylistDetailItem).isEqualTo(expectedVideoNode)
@@ -1485,7 +1466,7 @@ class VideoSectionViewModelTest {
             underTest.onTabSelected(VideoSectionTab.Playlists)
             underTest.updateCurrentVideoPlaylist(videoPlaylistUIEntity)
 
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 assertThat(awaitItem().videoPlaylists).isNotEmpty()
                 underTest.playAllButtonClicked()
                 assertThat(awaitItem().clickedPlaylistDetailItem).isEqualTo(expectedVideoNode)
@@ -1517,7 +1498,7 @@ class VideoSectionViewModelTest {
             whenever(getNodeByIdUseCase(expectedId)).thenReturn(mockTypedNode)
             initUnderTest()
 
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allVideos).isNotEmpty()
 
@@ -1617,7 +1598,7 @@ class VideoSectionViewModelTest {
             initUnderTest()
             underTest.setCurrentDestinationRoute(videoSectionRoute)
 
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allVideos).isNotEmpty()
 
@@ -1640,7 +1621,7 @@ class VideoSectionViewModelTest {
             whenever(getNodeByIdUseCase(expectedId)).thenReturn(mockTypedNode)
             initUnderTest()
 
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allVideos).isNotEmpty()
 
@@ -1665,7 +1646,7 @@ class VideoSectionViewModelTest {
             whenever(getNodeByIdUseCase(expectedId)).thenReturn(mockTypedNode)
             initUnderTest()
 
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allVideos).isNotEmpty()
 
@@ -1726,7 +1707,7 @@ class VideoSectionViewModelTest {
 
             initUnderTest()
             underTest.refreshRecentlyWatchedVideos()
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 assertThat(awaitItem().groupedVideoRecentlyWatchedItems).isEqualTo(
                     expectedRecentlyWatchedItems
                 )
@@ -1779,7 +1760,7 @@ class VideoSectionViewModelTest {
             initUnderTest()
             underTest.clearRecentlyWatchedVideos()
 
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 val actual = awaitItem()
                 assertThat(actual.groupedVideoRecentlyWatchedItems).isEmpty()
                 assertThat(actual.clearRecentlyWatchedVideosSuccess).isEqualTo(triggered)
@@ -1793,7 +1774,7 @@ class VideoSectionViewModelTest {
             initUnderTest()
             underTest.removeRecentlyWatchedItem(12345L)
 
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 val actual = awaitItem()
                 assertThat(actual.removeRecentlyWatchedItemSuccess).isEqualTo(triggered)
                 cancelAndIgnoreRemainingEvents()
@@ -1806,7 +1787,7 @@ class VideoSectionViewModelTest {
             initUnderTest()
             underTest.clearRecentlyWatchedVideos()
 
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 assertThat(awaitItem().clearRecentlyWatchedVideosSuccess).isEqualTo(triggered)
                 underTest.resetClearRecentlyWatchedVideosSuccess()
                 assertThat(awaitItem().clearRecentlyWatchedVideosSuccess).isEqualTo(consumed)
@@ -1820,7 +1801,7 @@ class VideoSectionViewModelTest {
             initUnderTest()
             underTest.removeRecentlyWatchedItem(12345L)
 
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 assertThat(awaitItem().removeRecentlyWatchedItemSuccess).isEqualTo(triggered)
                 underTest.resetRemoveRecentlyWatchedItemSuccess()
                 assertThat(awaitItem().removeRecentlyWatchedItemSuccess).isEqualTo(consumed)
