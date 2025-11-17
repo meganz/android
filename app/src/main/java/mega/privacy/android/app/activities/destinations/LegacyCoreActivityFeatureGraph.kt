@@ -48,6 +48,7 @@ class LegacyCoreActivityFeatureGraph(
             chatListLegacyDestination(navigationHandler::back)
             legacyAlbumCoverSelection(navigationHandler::returnResult)
             legacyAlbumGetLink(navigationHandler::back)
+            legacyAlbumImport(navigationHandler::back)
             legacyPdfViewerScreen(navigationHandler::back, nodeContentUriIntentMapper)
             legacyImageViewerScreen(navigationHandler::back)
             legacyTextEditorScreen(navigationHandler::back)

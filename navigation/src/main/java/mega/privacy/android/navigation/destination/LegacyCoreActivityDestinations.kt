@@ -147,6 +147,9 @@ data class AlbumGetLinkNavKey(
 ) : NavKey
 
 @Serializable
+data class LegacyAlbumImportNavKey(val link: String?) : NoSessionNavKey.Optional
+
+@Serializable
 data class LegacyPdfViewerNavKey(
     val nodeHandle: Long,
     val nodeContentUri: NodeContentUri,
