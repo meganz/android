@@ -67,6 +67,27 @@ enum class ApiFeatures(
         "aepay",
         "Enables US external billing for eligible users",
         false
+    ),
+
+    /**
+     * Controls whether Android 16+ orientation migration is enabled.
+     *
+     * When enabled (true):
+     * - Uses adaptive orientation handling for Android 16+ devices
+     * - Ignores fixed orientation settings on large screen devices
+     * - Allows system to handle orientation changes automatically
+     *
+     * When disabled (false):
+     * - Uses legacy orientation behavior
+     * - Maintains existing fixed orientation settings
+     * - Preserves backward compatibility with older Android versions
+     *
+     * Default: false (gradual rollout for safety)
+     */
+    Android16OrientationMigrationEnabled(
+        experimentName = "aome",
+        description = "Enable Android 16+ orientation migration for large screen devices",
+        defaultValue = false
     );
 
     companion object : FeatureFlagValueProvider {

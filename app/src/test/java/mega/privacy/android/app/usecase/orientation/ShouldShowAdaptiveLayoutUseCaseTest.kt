@@ -4,7 +4,8 @@ import android.os.Build
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.features.OrientationMigrationFeature
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.junit.jupiter.api.AfterEach
@@ -15,7 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
-import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
@@ -46,7 +46,7 @@ class ShouldShowAdaptiveLayoutUseCaseTest {
             // Given
             val android16SdkVersion = Build.VERSION_CODES.VANILLA_ICE_CREAM
             whenever(environmentRepository.getDeviceSdkVersionInt()).thenReturn(android16SdkVersion)
-            whenever(getFeatureFlagValueUseCase(OrientationMigrationFeature.Android16OrientationMigrationEnabled))
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.Android16OrientationMigrationEnabled))
                 .thenReturn(true)
 
             // When
@@ -62,7 +62,7 @@ class ShouldShowAdaptiveLayoutUseCaseTest {
             // Given
             val android16SdkVersion = Build.VERSION_CODES.VANILLA_ICE_CREAM
             whenever(environmentRepository.getDeviceSdkVersionInt()).thenReturn(android16SdkVersion)
-            whenever(getFeatureFlagValueUseCase(OrientationMigrationFeature.Android16OrientationMigrationEnabled))
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.Android16OrientationMigrationEnabled))
                 .thenReturn(false)
 
             // When
@@ -78,7 +78,7 @@ class ShouldShowAdaptiveLayoutUseCaseTest {
             // Given
             val android15SdkVersion = Build.VERSION_CODES.VANILLA_ICE_CREAM - 1
             whenever(environmentRepository.getDeviceSdkVersionInt()).thenReturn(android15SdkVersion)
-            whenever(getFeatureFlagValueUseCase(OrientationMigrationFeature.Android16OrientationMigrationEnabled))
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.Android16OrientationMigrationEnabled))
                 .thenReturn(true)
 
             // When
@@ -94,7 +94,7 @@ class ShouldShowAdaptiveLayoutUseCaseTest {
             // Given
             val android15SdkVersion = Build.VERSION_CODES.VANILLA_ICE_CREAM - 1
             whenever(environmentRepository.getDeviceSdkVersionInt()).thenReturn(android15SdkVersion)
-            whenever(getFeatureFlagValueUseCase(OrientationMigrationFeature.Android16OrientationMigrationEnabled))
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.Android16OrientationMigrationEnabled))
                 .thenReturn(false)
 
             // When
@@ -110,7 +110,7 @@ class ShouldShowAdaptiveLayoutUseCaseTest {
             // Given
             val android17SdkVersion = Build.VERSION_CODES.VANILLA_ICE_CREAM + 1
             whenever(environmentRepository.getDeviceSdkVersionInt()).thenReturn(android17SdkVersion)
-            whenever(getFeatureFlagValueUseCase(OrientationMigrationFeature.Android16OrientationMigrationEnabled))
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.Android16OrientationMigrationEnabled))
                 .thenReturn(true)
 
             // When
@@ -126,7 +126,7 @@ class ShouldShowAdaptiveLayoutUseCaseTest {
             // Given
             val android17SdkVersion = Build.VERSION_CODES.VANILLA_ICE_CREAM + 1
             whenever(environmentRepository.getDeviceSdkVersionInt()).thenReturn(android17SdkVersion)
-            whenever(getFeatureFlagValueUseCase(OrientationMigrationFeature.Android16OrientationMigrationEnabled))
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.Android16OrientationMigrationEnabled))
                 .thenReturn(false)
 
             // When
@@ -142,7 +142,7 @@ class ShouldShowAdaptiveLayoutUseCaseTest {
             // Given
             val android14SdkVersion = Build.VERSION_CODES.VANILLA_ICE_CREAM - 2
             whenever(environmentRepository.getDeviceSdkVersionInt()).thenReturn(android14SdkVersion)
-            whenever(getFeatureFlagValueUseCase(OrientationMigrationFeature.Android16OrientationMigrationEnabled))
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.Android16OrientationMigrationEnabled))
                 .thenReturn(true)
 
             // When
@@ -158,7 +158,7 @@ class ShouldShowAdaptiveLayoutUseCaseTest {
             // Given
             val android13SdkVersion = Build.VERSION_CODES.VANILLA_ICE_CREAM - 3
             whenever(environmentRepository.getDeviceSdkVersionInt()).thenReturn(android13SdkVersion)
-            whenever(getFeatureFlagValueUseCase(OrientationMigrationFeature.Android16OrientationMigrationEnabled))
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.Android16OrientationMigrationEnabled))
                 .thenReturn(true)
 
             // When
@@ -176,7 +176,7 @@ class ShouldShowAdaptiveLayoutUseCaseTest {
             whenever(environmentRepository.getDeviceSdkVersionInt()).thenReturn(
                 exactAndroid16SdkVersion
             )
-            whenever(getFeatureFlagValueUseCase(OrientationMigrationFeature.Android16OrientationMigrationEnabled))
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.Android16OrientationMigrationEnabled))
                 .thenReturn(true)
 
             // When
@@ -194,7 +194,7 @@ class ShouldShowAdaptiveLayoutUseCaseTest {
             whenever(environmentRepository.getDeviceSdkVersionInt()).thenReturn(
                 exactAndroid16SdkVersion
             )
-            whenever(getFeatureFlagValueUseCase(OrientationMigrationFeature.Android16OrientationMigrationEnabled))
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.Android16OrientationMigrationEnabled))
                 .thenReturn(false)
 
             // When
