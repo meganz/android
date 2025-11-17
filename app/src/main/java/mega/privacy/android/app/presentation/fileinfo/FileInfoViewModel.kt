@@ -894,7 +894,7 @@ class FileInfoViewModel @Inject constructor(
                 runCatching {
                     getFolderTreeInfo(folder).let { folderTreeInfo ->
                         _uiState.update {
-                            it.copyWithFolderTreeInfo(folderTreeInfo)
+                            it.copyWithFolderTreeInfo(folder, folderTreeInfo)
                         }
                     }
                 }.onFailure {

@@ -71,7 +71,7 @@ class LabelBottomSheetMenuItem @Inject constructor(
     ) = node.isTakenDown.not()
             && isNodeInRubbish.not()
             && accessPermission in listOf(AccessPermission.FULL, AccessPermission.OWNER)
-            && isInBackups.not()
+            && isInBackups.not() && node.isNodeKeyDecrypted
 
     override fun getOnClickFunction(
         node: TypedNode,

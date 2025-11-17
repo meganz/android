@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -101,7 +102,7 @@ internal data class FileInfoViewState(
     val isPhoto: Boolean = false,
     val accountDeactivatedStatus: AccountDeactivatedStatus? = null,
     val leaveFolderNodeIds: List<Long>? = null,
-    val isDecrypted: Boolean = true
+    val isDecrypted: Boolean = true,
 ) {
 
     /**
@@ -154,11 +155,12 @@ internal data class FileInfoViewState(
     /**
      * Creates a copy of this view state with the info that can be extracted directly from folderTreeInfo
      */
-    fun copyWithFolderTreeInfo(folderTreeInfo: FolderTreeInfo) = this.copy(
-        folderTreeInfo = folderTreeInfo,
-        sizeInBytes = folderTreeInfo.totalCurrentSizeInBytes + folderTreeInfo.sizeOfPreviousVersionsInBytes,
-        isAvailableOfflineAvailable = folderTreeInfo.numberOfFiles > 0,
-    )
+    fun copyWithFolderTreeInfo(typedFolderNode: TypedFolderNode, folderTreeInfo: FolderTreeInfo) =
+        this.copy(
+            folderTreeInfo = folderTreeInfo,
+            sizeInBytes = folderTreeInfo.totalCurrentSizeInBytes + folderTreeInfo.sizeOfPreviousVersionsInBytes,
+            isAvailableOfflineAvailable = typedFolderNode.isNodeKeyDecrypted && folderTreeInfo.numberOfFiles > 0,
+        )
 
     /**
      * determines if the file history versions should be shown
