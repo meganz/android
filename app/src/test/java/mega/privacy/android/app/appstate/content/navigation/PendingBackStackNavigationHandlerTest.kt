@@ -18,6 +18,7 @@ class PendingBackStackNavigationHandlerTest {
     private val backStack = PendingBackStack(NavBackStack())
 
     private data object DefaultLoginDestination : NoSessionNavKey.Mandatory
+    private data object InitialLoginDestination : NoSessionNavKey.Mandatory
 
     private data object NoSessionDestination1 : NoSessionNavKey.Mandatory
     private data object NoSessionDestination2 : NoSessionNavKey.Mandatory
@@ -52,6 +53,7 @@ class PendingBackStackNavigationHandlerTest {
             hasRootNode = true,
             defaultLandingScreen = DefaultLandingScreen,
             defaultLoginDestination = DefaultLoginDestination,
+            initialLoginDestination = InitialLoginDestination,
             fetchRootNodeDestination = getFetchNodeDestinationFunction,
             isPasscodeLocked = false,
             passcodeDestination = PasscodeDestination,
@@ -222,6 +224,7 @@ class PendingBackStackNavigationHandlerTest {
                 hasRootNode = true,
                 defaultLandingScreen = DefaultLandingScreen,
                 defaultLoginDestination = DefaultLoginDestination,
+                initialLoginDestination = InitialLoginDestination,
                 fetchRootNodeDestination = getFetchNodeDestinationFunction,
                 isPasscodeLocked = false,
                 passcodeDestination = PasscodeDestination,
@@ -240,12 +243,13 @@ class PendingBackStackNavigationHandlerTest {
             hasRootNode = true,
             defaultLandingScreen = DefaultLandingScreen,
             defaultLoginDestination = DefaultLoginDestination,
+            initialLoginDestination = InitialLoginDestination,
             fetchRootNodeDestination = getFetchNodeDestinationFunction,
             isPasscodeLocked = false,
             passcodeDestination = PasscodeDestination,
         )
 
-        assertThat(tempBackStack).containsExactly(DefaultLoginDestination)
+        assertThat(tempBackStack).containsExactly(InitialLoginDestination)
         assertThat(tempBackStack.pending).containsExactly(Destination1)
     }
 
@@ -260,12 +264,13 @@ class PendingBackStackNavigationHandlerTest {
                 hasRootNode = true,
                 defaultLandingScreen = DefaultLandingScreen,
                 defaultLoginDestination = DefaultLoginDestination,
+                initialLoginDestination = InitialLoginDestination,
                 fetchRootNodeDestination = getFetchNodeDestinationFunction,
                 isPasscodeLocked = false,
                 passcodeDestination = PasscodeDestination,
             )
 
-            assertThat(tempBackStack).containsExactly(DefaultLoginDestination)
+            assertThat(tempBackStack).containsExactly(InitialLoginDestination)
             assertThat(tempBackStack.pending).containsExactly(
                 Destination1, Destination3, Destination2
             )
@@ -336,6 +341,7 @@ class PendingBackStackNavigationHandlerTest {
                 hasRootNode = false,
                 defaultLandingScreen = DefaultLandingScreen,
                 defaultLoginDestination = DefaultLoginDestination,
+                initialLoginDestination = InitialLoginDestination,
                 fetchRootNodeDestination = getFetchNodeDestinationFunction,
                 isPasscodeLocked = false,
                 passcodeDestination = PasscodeDestination,
@@ -359,6 +365,7 @@ class PendingBackStackNavigationHandlerTest {
                 hasRootNode = false,
                 defaultLandingScreen = DefaultLandingScreen,
                 defaultLoginDestination = DefaultLoginDestination,
+                initialLoginDestination = InitialLoginDestination,
                 fetchRootNodeDestination = getFetchNodeDestinationFunction,
                 isPasscodeLocked = false,
                 passcodeDestination = PasscodeDestination,
@@ -381,6 +388,7 @@ class PendingBackStackNavigationHandlerTest {
                 hasRootNode = false,
                 defaultLandingScreen = DefaultLandingScreen,
                 defaultLoginDestination = DefaultLoginDestination,
+                initialLoginDestination = InitialLoginDestination,
                 fetchRootNodeDestination = getFetchNodeDestinationFunction,
                 isPasscodeLocked = false,
                 passcodeDestination = PasscodeDestination,
@@ -475,6 +483,7 @@ class PendingBackStackNavigationHandlerTest {
             hasRootNode = false,
             defaultLandingScreen = DefaultLandingScreen,
             defaultLoginDestination = DefaultLoginDestination,
+            initialLoginDestination = InitialLoginDestination,
             fetchRootNodeDestination = getFetchNodeDestinationFunction,
             isPasscodeLocked = false,
             passcodeDestination = PasscodeDestination,
@@ -503,6 +512,7 @@ class PendingBackStackNavigationHandlerTest {
                 hasRootNode = true,
                 defaultLandingScreen = DefaultLandingScreen,
                 defaultLoginDestination = DefaultLoginDestination,
+                initialLoginDestination = InitialLoginDestination,
                 fetchRootNodeDestination = getFetchNodeDestinationFunction,
                 isPasscodeLocked = true,
                 passcodeDestination = PasscodeDestination,
@@ -527,6 +537,7 @@ class PendingBackStackNavigationHandlerTest {
             hasRootNode = false,
             defaultLandingScreen = DefaultLandingScreen,
             defaultLoginDestination = DefaultLoginDestination,
+            initialLoginDestination = InitialLoginDestination,
             fetchRootNodeDestination = getFetchNodeDestinationFunction,
             isPasscodeLocked = true,
             passcodeDestination = PasscodeDestination,

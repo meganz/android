@@ -44,6 +44,7 @@ import de.palm.composestateevents.NavigationEventEffect
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.appstate.content.NavigationGraphViewModel
+import mega.privacy.android.app.appstate.content.destinations.FetchingContentNavKey
 import mega.privacy.android.app.appstate.content.destinations.HomeScreensNavKey
 import mega.privacy.android.app.appstate.content.model.NavigationGraphState
 import mega.privacy.android.app.appstate.content.navigation.PendingBackStack
@@ -139,207 +140,208 @@ class MegaActivity : ComponentActivity() {
             keepSplashScreen =
                 globalState is GlobalState.Loading || navGraphState is NavigationGraphState.Loading
 
-            val backStack: PendingBackStack<NavKey> =
-                rememberPendingBackStack(HomeScreensNavKey(null))
+            if (!keepSplashScreen) {
+                val backStack: PendingBackStack<NavKey> =
+                    rememberPendingBackStack(HomeScreensNavKey(null))
 
-            val passcodeState by passcodeViewModel.state.collectAsStateWithLifecycle()
-            val rootNodeState by globalStateViewModel.rootNodeExistsFlow.collectAsStateWithLifecycle()
+                val passcodeState by passcodeViewModel.state.collectAsStateWithLifecycle()
+                val rootNodeState by globalStateViewModel.rootNodeExistsFlow.collectAsStateWithLifecycle()
 
-            LaunchedEffect(Unit) {
-                //consume intent extras
-                consumeWarningMessage()
-                consumeIntentDestinations()
-            }
+                LaunchedEffect(Unit) {
+                    //consume intent extras
+                    consumeWarningMessage()
+                    consumeIntentDestinations()
+                }
 
-            val navigationHandler = remember {
-                val authStatus = (globalState as? GlobalState.LoggedIn)?.session?.let {
-                    PendingBackStackNavigationHandler.AuthStatus.LoggedIn(it)
-                } ?: PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn
-                PendingBackStackNavigationHandler(
-                    backstack = backStack,
-                    currentAuthStatus = authStatus,
-                    defaultLandingScreen = HomeScreensNavKey(null),
-                    hasRootNode = rootNodeState,
-                    isPasscodeLocked = passcodeState is PasscodeCheckState.Locked,
-                    passcodeDestination = PasscodeNavKey,
-                )
-            }
-
-            LaunchedEffect(globalState) {
-                val authStatus =
-                    (globalState as? GlobalState.LoggedIn)?.session?.let {
+                val navigationHandler = remember {
+                    val authStatus = (globalState as? GlobalState.LoggedIn)?.session?.let {
                         PendingBackStackNavigationHandler.AuthStatus.LoggedIn(it)
                     } ?: PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn
+                    PendingBackStackNavigationHandler(
+                        backstack = backStack,
+                        currentAuthStatus = authStatus,
+                        defaultLandingScreen = HomeScreensNavKey(null),
+                        defaultLoginDestination = LoginNavKey(true),
+                        initialLoginDestination = TourNavKey,
+                        hasRootNode = rootNodeState,
+                        isPasscodeLocked = passcodeState is PasscodeCheckState.Locked,
+                        passcodeDestination = PasscodeNavKey,
+                        fetchRootNodeDestination = ::FetchingContentNavKey,
+                    )
+                }
 
-                navigationHandler.onLoginChange(authStatus)
-            }
+                LaunchedEffect(globalState) {
+                    val authStatus =
+                        (globalState as? GlobalState.LoggedIn)?.session?.let {
+                            PendingBackStackNavigationHandler.AuthStatus.LoggedIn(it)
+                        } ?: PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn
 
-            LaunchedEffect(rootNodeState) {
-                navigationHandler.onRootNodeChange(rootNodeState)
-            }
+                    navigationHandler.onLoginChange(authStatus)
+                }
 
-            LaunchedEffect(passcodeState) {
-                navigationHandler.onPasscodeStateChanged(passcodeState is PasscodeCheckState.Locked)
-            }
+                LaunchedEffect(rootNodeState) {
+                    navigationHandler.onRootNodeChange(rootNodeState)
+                }
 
-
-            val transferHandler = remember { TransferHandlerImpl(appTransferViewModel) }
-            val transparentStrategy = remember { TransparentSceneStrategy<NavKey>() }
-            val dialogStrategy = remember { DialogSceneStrategy<NavKey>() }
-            val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
-
-            AndroidTheme(isDark = globalState.themeMode.isDarkMode()) {
-
-
-                Box(modifier = Modifier.pointerInput(Unit) {
-                    awaitEachGesture {
-                        do {
-                            val event = awaitPointerEvent()
-                            if (event.type == PointerEventType.Press) {
-                                presenceViewModel.signalPresence()
-                            }
-                        } while (event.changes.any { it.pressed })
-                    }
-                }) {
-                    when (val graphstate = navGraphState) {
-                        is NavigationGraphState.Loading -> {}
-                        is NavigationGraphState.Data -> {
-                            val snackbarEventsState by snackbarEventsViewModel.snackbarEventState.collectAsStateWithLifecycle()
-                            val dialogEvents by appDialogViewModel.dialogEvents.collectAsStateWithLifecycle()
-                            val transferState by appTransferViewModel.state.collectAsStateWithLifecycle()
-                            val loginState by loginViewModel.state.collectAsStateWithLifecycle()
-                            val navigationEvents by navigationEventViewModel.navigationEvents.collectAsStateWithLifecycle()
+                LaunchedEffect(passcodeState) {
+                    navigationHandler.onPasscodeStateChanged(passcodeState is PasscodeCheckState.Locked)
+                }
 
 
-                            LaunchedEffect(loginState.isPendingToFinishActivity) {
-                                if (loginState.isPendingToFinishActivity) {
-                                    finish()
+                val transferHandler = remember { TransferHandlerImpl(appTransferViewModel) }
+                val transparentStrategy = remember { TransparentSceneStrategy<NavKey>() }
+                val dialogStrategy = remember { DialogSceneStrategy<NavKey>() }
+                val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
+
+                AndroidTheme(isDark = globalState.themeMode.isDarkMode()) {
+                    Box(modifier = Modifier.pointerInput(Unit) {
+                        awaitEachGesture {
+                            do {
+                                val event = awaitPointerEvent()
+                                if (event.type == PointerEventType.Press) {
+                                    presenceViewModel.signalPresence()
                                 }
-                            }
+                            } while (event.changes.any { it.pressed })
+                        }
+                    }) {
+                        when (val graphstate = navGraphState) {
+                            is NavigationGraphState.Loading -> {}
+                            is NavigationGraphState.Data -> {
+                                val snackbarEventsState by snackbarEventsViewModel.snackbarEventState.collectAsStateWithLifecycle()
+                                val dialogEvents by appDialogViewModel.dialogEvents.collectAsStateWithLifecycle()
+                                val transferState by appTransferViewModel.state.collectAsStateWithLifecycle()
+                                val loginState by loginViewModel.state.collectAsStateWithLifecycle()
+                                val navigationEvents by navigationEventViewModel.navigationEvents.collectAsStateWithLifecycle()
 
-                            EventEffect(
-                                event = snackbarEventsState,
-                                onConsumed = snackbarEventsViewModel::consumeEvent,
-                                action = { snackbarHostState.show(it) }
-                            )
+
+                                LaunchedEffect(loginState.isPendingToFinishActivity) {
+                                    if (loginState.isPendingToFinishActivity) {
+                                        finish()
+                                    }
+                                }
+
+                                EventEffect(
+                                    event = snackbarEventsState,
+                                    onConsumed = snackbarEventsViewModel::consumeEvent,
+                                    action = { snackbarHostState.show(it) }
+                                )
 
 
-                            CompositionLocalProvider(
-                                LocalSnackBarHostState provides snackbarHostState
-                            ) {
-                                NavDisplay(
-                                    backStack = backStack,
-                                    onBack = { navigationHandler.back() },
-                                    sceneStrategy = transparentStrategy.chain(dialogStrategy)
-                                        .chain(bottomSheetStrategy),
-                                    entryDecorators = listOf(
-                                        rememberSaveableStateHolderNavEntryDecorator(),
-                                        rememberViewModelStoreNavEntryDecorator()
-                                    ),
-                                    entryProvider = entryProvider {
-                                        graphstate.featureDestinations
-                                            .forEach { destination ->
+                                CompositionLocalProvider(
+                                    LocalSnackBarHostState provides snackbarHostState
+                                ) {
+                                    NavDisplay(
+                                        backStack = backStack,
+                                        onBack = { navigationHandler.back() },
+                                        sceneStrategy = transparentStrategy.chain(dialogStrategy)
+                                            .chain(bottomSheetStrategy),
+                                        entryDecorators = listOf(
+                                            rememberSaveableStateHolderNavEntryDecorator(),
+                                            rememberViewModelStoreNavEntryDecorator()
+                                        ),
+                                        entryProvider = entryProvider {
+                                            graphstate.featureDestinations
+                                                .forEach { destination ->
+                                                    destination.navigationGraph(
+                                                        this,
+                                                        navigationHandler,
+                                                        transferHandler
+                                                    )
+                                                }
+
+                                            graphstate.appDialogDestinations.forEach { destination ->
                                                 destination.navigationGraph(
                                                     this,
                                                     navigationHandler,
-                                                    transferHandler
+                                                    appDialogViewModel::eventHandled
                                                 )
                                             }
 
-                                        graphstate.appDialogDestinations.forEach { destination ->
-                                            destination.navigationGraph(
-                                                this,
-                                                navigationHandler,
-                                                appDialogViewModel::eventHandled
+                                            loginEntryProvider(
+                                                navigationHandler = navigationHandler,
+                                                loginViewModel = loginViewModel,
+                                                onFinish = ::finish
+                                            )
+
+                                            passcodeView(passcodeCryptObjectFactory)
+                                        },
+                                        transitionSpec = {
+                                            // Slide in from right when navigating forward
+                                            slideInHorizontally(
+                                                initialOffsetX = { it },
+                                            ) togetherWith slideOutHorizontally(
+                                                targetOffsetX = { -it },
+                                            )
+                                        },
+                                        popTransitionSpec = {
+                                            // Slide in from left when navigating back
+                                            slideInHorizontally(
+                                                initialOffsetX = { -it },
+                                            ) togetherWith slideOutHorizontally(
+                                                targetOffsetX = { it },
+                                            )
+                                        },
+                                        predictivePopTransitionSpec = {
+                                            // Slide in from left when navigating back
+                                            slideInHorizontally(
+                                                initialOffsetX = { -it },
+                                            ) togetherWith slideOutHorizontally(
+                                                targetOffsetX = { it },
                                             )
                                         }
-
-                                        loginEntryProvider(
-                                            navigationHandler = navigationHandler,
-                                            loginViewModel = loginViewModel,
-                                            onFinish = ::finish
-                                        )
-
-                                        passcodeView(passcodeCryptObjectFactory)
-                                    },
-                                    transitionSpec = {
-                                        // Slide in from right when navigating forward
-                                        slideInHorizontally(
-                                            initialOffsetX = { it },
-                                        ) togetherWith slideOutHorizontally(
-                                            targetOffsetX = { -it },
-                                        )
-                                    },
-                                    popTransitionSpec = {
-                                        // Slide in from left when navigating back
-                                        slideInHorizontally(
-                                            initialOffsetX = { -it },
-                                        ) togetherWith slideOutHorizontally(
-                                            targetOffsetX = { it },
-                                        )
-                                    },
-                                    predictivePopTransitionSpec = {
-                                        // Slide in from left when navigating back
-                                        slideInHorizontally(
-                                            initialOffsetX = { -it },
-                                        ) togetherWith slideOutHorizontally(
-                                            targetOffsetX = { it },
-                                        )
-                                    }
-                                )
-
-                                StartTransferComponent(
-                                    event = transferState.transferEvent,
-                                    onConsumeEvent = appTransferViewModel::consumedTransferEvent,
-                                )
-                            }
-
-                            NavigationEventEffect(
-                                event = dialogEvents,
-                                onConsumed = appDialogViewModel::dialogDisplayed
-                            ) {
-                                navigationHandler.displayDialog(it.dialogDestination)
-                            }
-
-                            NavigationEventEffect(
-                                event = navigationEvents,
-                                onConsumed = navigationEventViewModel::eventHandled
-                            ) {
-                                navigationHandler.navigate(it)
-                            }
-
-                            val focusManager = LocalFocusManager.current
-                            NavigationEventEffect(
-                                loginState.isPendingToShowFragment,
-                                loginViewModel::isPendingToShowFragmentConsumed
-                            ) {
-                                if (it != LoginScreen.LoginScreen) {
-                                    keepSplashScreen = false
-                                }
-
-                                when (it) {
-                                    LoginScreen.LoginScreen -> navigationHandler.navigate(
-                                        LoginNavKey()
                                     )
 
-                                    LoginScreen.CreateAccount -> navigationHandler.navigate(
-                                        CreateAccountNavKey()
-                                    )
-
-                                    LoginScreen.Tour -> {
-                                        focusManager.clearFocus()
-                                        navigationHandler.navigate(TourNavKey)
-                                    }
-
-                                    LoginScreen.ConfirmEmail -> navigationHandler.navigate(
-                                        ConfirmationEmailNavKey
+                                    StartTransferComponent(
+                                        event = transferState.transferEvent,
+                                        onConsumeEvent = appTransferViewModel::consumedTransferEvent,
                                     )
                                 }
-                            }
 
+                                NavigationEventEffect(
+                                    event = dialogEvents,
+                                    onConsumed = appDialogViewModel::dialogDisplayed
+                                ) {
+                                    navigationHandler.displayDialog(it.dialogDestination)
+                                }
+
+                                NavigationEventEffect(
+                                    event = navigationEvents,
+                                    onConsumed = navigationEventViewModel::eventHandled
+                                ) {
+                                    navigationHandler.navigate(it)
+                                }
+
+                                val focusManager = LocalFocusManager.current
+                                NavigationEventEffect(
+                                    loginState.isPendingToShowFragment,
+                                    loginViewModel::isPendingToShowFragmentConsumed
+                                ) {
+                                    if (it != LoginScreen.LoginScreen) {
+                                        keepSplashScreen = false
+                                    }
+
+                                    when (it) {
+                                        LoginScreen.LoginScreen -> navigationHandler.navigate(
+                                            LoginNavKey()
+                                        )
+
+                                        LoginScreen.CreateAccount -> navigationHandler.navigate(
+                                            CreateAccountNavKey()
+                                        )
+
+                                        LoginScreen.Tour -> {
+                                            focusManager.clearFocus()
+                                            navigationHandler.navigate(TourNavKey)
+                                        }
+
+                                        LoginScreen.ConfirmEmail -> navigationHandler.navigate(
+                                            ConfirmationEmailNavKey
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
-
                 }
             }
         }

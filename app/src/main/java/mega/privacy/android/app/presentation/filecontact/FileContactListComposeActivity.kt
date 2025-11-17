@@ -17,12 +17,15 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.appstate.content.destinations.FetchingContentNavKey
 import mega.privacy.android.app.appstate.content.navigation.PendingBackStackNavigationHandler
 import mega.privacy.android.app.appstate.content.navigation.rememberPendingBackStack
 import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
 import mega.privacy.android.app.appstate.content.transfer.TransferHandlerImpl
 import mega.privacy.android.app.presentation.container.SharedAppContainer
 import mega.privacy.android.app.presentation.filecontact.navigation.FileContactFeatureDestination
+import mega.privacy.android.app.presentation.login.LoginNavKey
+import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.passcode.navigation.PasscodeNavKey
 import mega.privacy.android.domain.entity.ThemeMode
@@ -69,6 +72,9 @@ internal class FileContactListComposeActivity : AppCompatActivity() {
                 defaultLandingScreen = navKey,
                 isPasscodeLocked = false,
                 passcodeDestination = PasscodeNavKey,
+                defaultLoginDestination = LoginNavKey(true),
+                initialLoginDestination = TourNavKey,
+                fetchRootNodeDestination = ::FetchingContentNavKey,
             )
 
             SharedAppContainer(

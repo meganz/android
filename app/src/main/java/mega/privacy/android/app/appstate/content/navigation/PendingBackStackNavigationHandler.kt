@@ -5,8 +5,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import mega.privacy.android.app.appstate.content.destinations.FetchingContentNavKey
-import mega.privacy.android.app.presentation.login.LoginNavKey
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
@@ -22,8 +20,9 @@ class PendingBackStackNavigationHandler(
     private val defaultLandingScreen: NavKey,
     private var isPasscodeLocked: Boolean,
     private val passcodeDestination: NavKey,
-    private val defaultLoginDestination: NavKey = LoginNavKey(true),
-    private val fetchRootNodeDestination: (session: String, fromLogin: Boolean) -> NavKey = ::FetchingContentNavKey,
+    private val defaultLoginDestination: NavKey,
+    initialLoginDestination: NavKey,
+    private val fetchRootNodeDestination: (session: String, fromLogin: Boolean) -> NavKey,
 ) : NavigationHandler {
     private val resultFlows = mutableMapOf<String, MutableStateFlow<Any?>>()
     private var fromLogin = false
@@ -37,7 +36,7 @@ class PendingBackStackNavigationHandler(
         if (currentAuthStatus.isLoggedIn.not()) {
             val authRequiredDestinations = removeAuthRequiredDestinations()
             backstack.pending = authRequiredDestinations + backstack.pending
-            if (backstack.isEmpty()) backstack.add(defaultLoginDestination)
+            if (backstack.isEmpty()) backstack.add(initialLoginDestination)
         }
         if (backstack.isEmpty()) backstack.add(defaultLandingScreen)
         onPasscodeStateChanged(isPasscodeLocked)
