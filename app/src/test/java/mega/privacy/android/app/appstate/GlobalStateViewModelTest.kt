@@ -27,8 +27,8 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.HandleBlockedStateSessionUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
-import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
+import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
@@ -181,8 +181,8 @@ class GlobalStateViewModelTest {
             assertThat(state.themeMode).isEqualTo(themeMode)
             assertThat(state.session).isEqualTo(credentials.session)
 
-            // Verify post-login initializers were called with the session
-            verify(globalInitialiser).onPostLogin("test-session")
+            // Verify post-login initializers were called with the session and isFastLogin = true (initial login)
+            verify(globalInitialiser).onPostLogin("test-session", true)
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -206,7 +206,7 @@ class GlobalStateViewModelTest {
             assertThat(state).isInstanceOf(GlobalState.RequireLogin::class.java)
 
             // Verify post-login initializers were NOT called
-            verify(globalInitialiser, never()).onPostLogin(any())
+            verify(globalInitialiser, never()).onPostLogin(any(), any())
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -330,6 +330,9 @@ class GlobalStateViewModelTest {
 
             cancelAndIgnoreRemainingEvents()
         }
+
+        // Verify post-login initializers were called with isFastLogin = false (transition from RequireLogin)
+        verify(globalInitialiser).onPostLogin("test-session", false)
     }
 
     @Test
@@ -667,6 +670,9 @@ class GlobalStateViewModelTest {
 
                 cancelAndIgnoreRemainingEvents()
             }
+
+            // Verify post-login initializers were called with isFastLogin = false (transition from RequireLogin)
+            verify(globalInitialiser).onPostLogin("test-session", false)
         }
 
     @Test
@@ -844,7 +850,7 @@ class GlobalStateViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
-            verify(globalInitialiser, times(1)).onPostLogin(session)
+            verify(globalInitialiser, times(1)).onPostLogin(session, true)
         }
 
     @Test
@@ -870,7 +876,7 @@ class GlobalStateViewModelTest {
             underTest.state.test { cancelAndIgnoreRemainingEvents() }
             advanceTimeBy(6_000) // Advance time past ui state flow timeout
             underTest.state.test { cancelAndIgnoreRemainingEvents() }
-            verify(globalInitialiser, times(1)).onPostLogin(session)
+            verify(globalInitialiser, times(1)).onPostLogin(session, true)
         }
 
     @Test

@@ -60,7 +60,7 @@ class ConsentInitialiserTest {
         getCookieSettingsUseCase.stub { onBlocking { invoke() } doReturn emptySet() }
         shouldShowGenericCookieDialogUseCase.stub { onBlocking { invoke(any()) } doReturn true }
 
-        underTest.invoke("test-session")
+        underTest.invoke("test-session", true)
 
         verify(appDialogsEventQueue).emit(AppDialogEvent(CookieDialog))
     }
@@ -79,7 +79,7 @@ class ConsentInitialiserTest {
             getCookieSettingsUseCase.stub { onBlocking { invoke() } doReturn emptySet() }
             shouldShowGenericCookieDialogUseCase.stub { onBlocking { invoke(any()) } doReturn false }
 
-            underTest.invoke("test-session")
+            underTest.invoke("test-session", true)
 
             verify(adConsentWrapper).refreshConsent()
         }
@@ -97,7 +97,7 @@ class ConsentInitialiserTest {
             }
         }
 
-        underTest.invoke("test-session")
+        underTest.invoke("test-session", true)
 
         verifyNoInteractions(
             appDialogsEventQueue,

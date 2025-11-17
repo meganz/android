@@ -62,7 +62,6 @@ import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitR
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
-import mega.privacy.android.domain.usecase.login.ClearLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.login.FastLoginUseCase
 import mega.privacy.android.domain.usecase.login.FetchNodesUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
@@ -147,7 +146,6 @@ internal class LoginViewModelTest {
     private val establishCameraUploadsSyncHandlesUseCase =
         mock<EstablishCameraUploadsSyncHandlesUseCase>()
     private val getLastRegisteredEmailUseCase = mock<GetLastRegisteredEmailUseCase>()
-    private val clearLastRegisteredEmailUseCase = mock<ClearLastRegisteredEmailUseCase>()
     private val installReferrerHandler = mock<InstallReferrerHandler>()
     private val clearUserCredentialsUseCase = mock<ClearUserCredentialsUseCase>()
     private val getHistoricalProcessExitReasonsUseCase =
@@ -223,7 +221,6 @@ internal class LoginViewModelTest {
             getTimelinePhotosUseCase = getTimelinePhotosUseCase,
             loginMutex = mock(),
             getLastRegisteredEmailUseCase = getLastRegisteredEmailUseCase,
-            clearLastRegisteredEmailUseCase = clearLastRegisteredEmailUseCase,
             installReferrerHandler = installReferrerHandler,
             clearUserCredentialsUseCase = clearUserCredentialsUseCase,
             getHistoricalProcessExitReasonsUseCase = getHistoricalProcessExitReasonsUseCase,
@@ -485,7 +482,6 @@ internal class LoginViewModelTest {
 
             assertThat(analyticsExtension.events).hasSize(1)
             verify(installReferrerHandler).getDetails()
-            verify(clearLastRegisteredEmailUseCase).invoke()
         }
 
     @Test
@@ -500,7 +496,6 @@ internal class LoginViewModelTest {
             advanceUntilIdle()
 
             assertThat(analyticsExtension.events).isEmpty()
-            verifyNoInteractions(installReferrerHandler, clearLastRegisteredEmailUseCase)
         }
 
     @Test

@@ -16,7 +16,7 @@ class PurchaseReviewInitialiser @Inject constructor(
     monitorSuccessfulPurchasesUseCase: MonitorSuccessfulPurchasesUseCase,
     ratingHandlerImpl: RatingHandlerImpl,
 ) : PostLoginInitialiser(
-    action = { _ ->
+    action = { _, _ ->
         monitorSuccessfulPurchasesUseCase()
             .collect {
                 ratingHandlerImpl.updateTransactionFlag(true)

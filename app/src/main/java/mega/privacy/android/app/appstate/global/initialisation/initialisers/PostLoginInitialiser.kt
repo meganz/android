@@ -7,8 +7,8 @@ package mega.privacy.android.app.appstate.initialisation.initialisers
  *
  * @property action The suspend function to be executed during pre-login initialisation. It takes the non nullable session string as a parameter.
  */
-open class PostLoginInitialiser(private val action: suspend (String) -> Unit) {
-    suspend operator fun invoke(session: String) {
-        action(session)
+open class PostLoginInitialiser(private val action: suspend (String, Boolean) -> Unit) {
+    suspend operator fun invoke(session: String, isFastLogin: Boolean) {
+        action(session, isFastLogin)
     }
 }

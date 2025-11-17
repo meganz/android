@@ -25,7 +25,7 @@ class ConsentInitialiser @Inject constructor(
     private val monitorMiscLoadedUseCase: MonitorMiscLoadedUseCase,
     private val adConsentWrapper: AdConsentWrapper,
 ) : PostLoginInitialiser(
-    action = { _ ->
+    action = { _, _ ->
         val misFlagsLoaded = monitorMiscLoadedUseCase().filter { it }
             .timeout(20.seconds)
             .catch { Timber.e(it) }

@@ -102,6 +102,8 @@ data class SyncSelectStopBackupDestinationNavKey(
 
 @Serializable
 data class UpgradeAccountNavKey(
+    val isUpgrade: Boolean = true,
+    val isNewAccount: Boolean = false,
     val source: UpgradeAccountSource = UpgradeAccountSource.UNKNOWN,
 ) : NavKey
 

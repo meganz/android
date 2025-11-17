@@ -40,7 +40,7 @@ class PurchaseReviewInitialiserTest {
 
         whenever(monitorSuccessfulPurchasesUseCase()).thenReturn(flowOf(billingEvent))
 
-        underTest.invoke("test-session")
+        underTest.invoke("test-session", true)
 
         verify(ratingHandlerImpl).updateTransactionFlag(true)
     }
@@ -58,7 +58,7 @@ class PurchaseReviewInitialiserTest {
                 )
             )
 
-            underTest.invoke("test-session")
+            underTest.invoke("test-session", true)
 
             verify(ratingHandlerImpl, times(2)).updateTransactionFlag(true)
         }

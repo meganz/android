@@ -10,6 +10,7 @@ import mega.privacy.android.app.appstate.initialisation.initialisers.PreLoginIni
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
@@ -106,8 +107,8 @@ class AuthInitialiserTest {
         val postLoginInitialiser2 = mock<PostLoginInitialiser>()
 
         // Setup initializers to return Unit
-        postLoginInitialiser1.stub { onBlocking { invoke(any()) }.thenReturn(Unit) }
-        postLoginInitialiser2.stub { onBlocking { invoke(any()) }.thenReturn(Unit) }
+        postLoginInitialiser1.stub { onBlocking { invoke(any(), eq(true)) }.thenReturn(Unit) }
+        postLoginInitialiser2.stub { onBlocking { invoke(any(), eq(true)) }.thenReturn(Unit) }
 
         // Create ViewModel with initializers
         initUnderTest(
@@ -116,13 +117,13 @@ class AuthInitialiserTest {
         )
 
         // Call onPostLogin
-        underTest.onPostLogin("Session")
+        underTest.onPostLogin("Session", true)
 
         advanceUntilIdle()
 
         // Verify initializers were called
-        verify(postLoginInitialiser1).invoke("Session")
-        verify(postLoginInitialiser2).invoke("Session")
+        verify(postLoginInitialiser1).invoke("Session", true)
+        verify(postLoginInitialiser2).invoke("Session", true)
     }
 
     @Test
@@ -135,7 +136,7 @@ class AuthInitialiserTest {
         // Setup initializers to throw exceptions
         appStartInitialiser1.stub { onBlocking { invoke() }.thenThrow(RuntimeException("App start error")) }
         preLoginInitialiser1.stub { onBlocking { invoke(any()) }.thenThrow(RuntimeException("Pre login error")) }
-        postLoginInitialiser1.stub { onBlocking { invoke(any()) }.thenThrow(RuntimeException("Post login error")) }
+        postLoginInitialiser1.stub { onBlocking { invoke(any(), eq(true)) }.thenThrow(RuntimeException("Post login error")) }
 
         // Create ViewModel with initializers
         initUnderTest(
@@ -154,7 +155,7 @@ class AuthInitialiserTest {
             advanceUntilIdle()
         }
         assertDoesNotThrow {
-            underTest.onPostLogin("Session")
+            underTest.onPostLogin("Session", true)
             advanceUntilIdle()
         }
 

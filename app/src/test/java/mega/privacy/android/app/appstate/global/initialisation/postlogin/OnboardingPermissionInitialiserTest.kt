@@ -48,7 +48,7 @@ class OnboardingPermissionInitialiserTest {
                 onBlocking { invoke() }.thenReturn(expectedPermissionsResult)
             }
 
-            underTest("session")
+            underTest("session", true)
             verify(navigationEventQueue).emit(PermissionScreensNavKey(false))
         }
 
@@ -67,7 +67,7 @@ class OnboardingPermissionInitialiserTest {
                 onBlocking { invoke() }.thenReturn(expectedPermissionsResult)
             }
 
-            underTest("session")
+            underTest("session", true)
             verifyNoInteractions(navigationEventQueue)
         }
 
@@ -81,7 +81,7 @@ class OnboardingPermissionInitialiserTest {
                 onBlocking { invoke() }.thenReturn(true)
             }
 
-            underTest("session")
+            underTest("session", true)
             verify(navigationEventQueue).emit(PermissionScreensNavKey(onlyShowNotificationPermission = true))
         }
 
@@ -95,7 +95,7 @@ class OnboardingPermissionInitialiserTest {
                 onBlocking { invoke() }.thenReturn(false)
             }
 
-            underTest("session")
+            underTest("session", true)
             verifyNoInteractions(navigationEventQueue)
         }
 

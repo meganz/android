@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import dagger.multibindings.IntoSet
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPaymentInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPermissionInitialiser
 import mega.privacy.android.app.appstate.initialisation.initialisers.AppStartInitialiser
 import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
@@ -46,7 +47,7 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun provideChatPostLoginInitialisers(useCase: InitialiseMegaChatUseCase): PostLoginInitialiser =
-        PostLoginInitialiser { session ->
+        PostLoginInitialiser { session, isFastLogin ->
             useCase(session)
         }
 
@@ -73,5 +74,10 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun provideOnboardingPermissionInitialiser(initialiser: OnboardingPermissionInitialiser): PostLoginInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
+    fun provideOnboardingPaymentInitialiser(initialiser: OnboardingPaymentInitialiser): PostLoginInitialiser =
         initialiser
 }

@@ -16,7 +16,7 @@ class OnboardingPermissionInitialiser @Inject constructor(
     private val isFirstLaunchUseCase: IsFirstLaunchUseCase,
     private val navigationEventQueue: NavigationEventQueue,
 ) : PostLoginInitialiser(
-    action = { _ ->
+    action = { _, _ ->
         runCatching {
             val isFirstLaunch = isFirstLaunchUseCase()
 

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.appstate.initialisation
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.appstate.initialisation.initialisers.AppStartInitialiser
 import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
@@ -24,6 +25,8 @@ class GlobalInitialiser @Inject constructor(
     private val preLoginInitialisers: Set<@JvmSuppressWildcards PreLoginInitialiser>,
     private val postLoginInitialisers: Set<@JvmSuppressWildcards PostLoginInitialiser>,
 ) {
+    private var onPreLoginJob: Job? = null
+    private var onPostLoginJob: Job? = null
 
     fun onAppStart() {
         appStartInitialisers.forEach {
@@ -38,24 +41,30 @@ class GlobalInitialiser @Inject constructor(
     }
 
     fun onPreLogin(session: String?) {
-        preLoginInitialisers.forEach { initialiser ->
-            coroutineScope.launch {
-                try {
-                    initialiser(session)
-                } catch (e: Exception) {
-                    Timber.e(e, "Error during pre-login initialisation")
+        onPreLoginJob?.cancel()
+        onPreLoginJob = coroutineScope.launch {
+            preLoginInitialisers.forEach { initialiser ->
+                launch {
+                    try {
+                        initialiser(session)
+                    } catch (e: Exception) {
+                        Timber.e(e, "Error during pre-login initialisation")
+                    }
                 }
             }
         }
     }
 
-    fun onPostLogin(session: String) {
-        postLoginInitialisers.forEach { initialiser ->
-            coroutineScope.launch {
-                try {
-                    initialiser(session)
-                } catch (e: Exception) {
-                    Timber.e(e, "Error during post-login initialisation")
+    fun onPostLogin(session: String, isFastLogin: Boolean) {
+        onPostLoginJob?.cancel()
+        onPostLoginJob = coroutineScope.launch {
+            postLoginInitialisers.forEach { initialiser ->
+                launch {
+                    try {
+                        initialiser(session, isFastLogin)
+                    } catch (e: Exception) {
+                        Timber.e(e, "Error during post-login initialisation")
+                    }
                 }
             }
         }

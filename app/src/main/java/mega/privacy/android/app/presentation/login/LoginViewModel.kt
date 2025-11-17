@@ -157,7 +157,6 @@ class LoginViewModel @Inject constructor(
     private val monitorAccountBlockedUseCase: MonitorAccountBlockedUseCase,
     private val getTimelinePhotosUseCase: GetTimelinePhotosUseCase,
     private val getLastRegisteredEmailUseCase: GetLastRegisteredEmailUseCase,
-    private val clearLastRegisteredEmailUseCase: ClearLastRegisteredEmailUseCase,
     private val installReferrerHandler: InstallReferrerHandler,
     @LoginMutex val loginMutex: Mutex,
     private val clearUserCredentialsUseCase: ClearUserCredentialsUseCase,
@@ -1170,11 +1169,6 @@ class LoginViewModel @Inject constructor(
                             appInstallTime = details.appInstallTime
                         )
                     )
-                }.onFailure {
-                    Timber.e(it)
-                }
-                runCatching {
-                    clearLastRegisteredEmailUseCase()
                 }.onFailure {
                     Timber.e(it)
                 }

@@ -27,8 +27,8 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.HandleBlockedStateSessionUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
-import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
+import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
@@ -51,14 +51,18 @@ class GlobalStateViewModel @Inject constructor(
     }
 
     private var lastLoggedInSession: String? = null
+    private var isFastLogin = true
 
     val state: StateFlow<GlobalState> by lazy {
         getStateValues().onEach { state ->
             if (state is GlobalState.LoggedIn) {
                 if (lastLoggedInSession != state.session) {
                     lastLoggedInSession = state.session
-                    globalInitialiser.onPostLogin(state.session)
+                    globalInitialiser.onPostLogin(state.session, isFastLogin)
                 }
+                isFastLogin = true
+            } else if (state is GlobalState.RequireLogin) {
+                isFastLogin = false
             }
         }.catch {
             Timber.e(it, "Error while building auth state")

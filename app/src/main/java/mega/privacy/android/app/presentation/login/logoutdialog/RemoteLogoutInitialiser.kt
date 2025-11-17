@@ -15,7 +15,7 @@ class RemoteLogoutInitialiser @Inject constructor(
     private val setLoggedOutFromAnotherLocationUseCase: SetLoggedOutFromAnotherLocationUseCase,
     private val appDialogEventQueue: AppDialogsEventQueue,
 ) : PostLoginInitialiser(
-    action = { _ ->
+    action = { _, _ ->
         monitorLoggedOutFromAnotherLocationUseCase()
             .catch { Timber.e(it) }
             .collectLatest { loggedOut ->
