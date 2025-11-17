@@ -1,7 +1,7 @@
 package mega.privacy.android.app.usecase.orientation
 
 import android.os.Build
-import mega.privacy.android.app.features.OrientationMigrationFeature
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
@@ -26,7 +26,7 @@ class ShouldShowAdaptiveLayoutUseCase @Inject constructor(
      * @return true if both Android 16+ is supported and the feature flag is enabled, false otherwise
      */
     suspend operator fun invoke(): Boolean =
-        isAndroid16OrHigher() && getFeatureFlagValueUseCase(OrientationMigrationFeature.Android16OrientationMigrationEnabled)
+        isAndroid16OrHigher() && getFeatureFlagValueUseCase(ApiFeatures.Android16OrientationMigrationEnabled)
 
     /**
      * Checks if the device is running Android 16 or higher.
