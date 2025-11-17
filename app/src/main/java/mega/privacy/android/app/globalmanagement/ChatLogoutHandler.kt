@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -50,6 +51,10 @@ class ChatLogoutHandler @Inject constructor(
                 }.getOrDefault(false)
                 if (isSingleActivityEnable) {
                     localLogoutUseCase(disableChatApiUseCase)
+                    context.startActivity(Intent(context, MegaActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+                    })
                 } else {
                     //Need to finish ManagerActivity to avoid unexpected behaviours after forced logouts.
                     broadcastFinishActivityUseCase()
