@@ -22,8 +22,8 @@ import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEv
 import mega.privacy.android.app.presentation.fileinfo.model.mapper.NodeActionMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
-import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.FolderTreeInfo
@@ -92,6 +92,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -992,8 +993,11 @@ internal class FileInfoViewModelTest {
         }
     }
 
-    @Test
-    fun `test that when folder tree info is received then total size, folder content and available offline is updated correctly`() =
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that when folder tree info is received then total size, folder content and available offline is updated correctly`(
+        isKeyDecrypted: Boolean,
+    ) =
         runTest {
             val actualSize = 1024L
             val versionsSize = 512L
@@ -1001,6 +1005,7 @@ internal class FileInfoViewModelTest {
             val folderNode = mock<TypedFolderNode> {
                 on { id }.thenReturn(nodeId)
                 on { name }.thenReturn("Folder name")
+                on { isNodeKeyDecrypted }.thenReturn(isKeyDecrypted)
             }.also { folderNode ->
                 whenever(getNodeByIdUseCase.invoke(nodeId)).thenReturn(folderNode)
                 whenever(getFolderTreeInfo.invoke(folderNode))
@@ -1011,7 +1016,7 @@ internal class FileInfoViewModelTest {
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.folderTreeInfo).isEqualTo(folderTreeInfo)
-                assertThat(actual.isAvailableOfflineAvailable).isTrue()
+                assertThat(actual.isAvailableOfflineAvailable).isEqualTo(isKeyDecrypted)
                 assertThat(actual.sizeInBytes)
                     .isEqualTo(actualSize + versionsSize)
             }

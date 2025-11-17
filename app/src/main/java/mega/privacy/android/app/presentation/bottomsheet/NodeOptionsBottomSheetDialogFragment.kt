@@ -1363,6 +1363,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 contentView.findViewById<LinearLayout>(R.id.option_versions_layout)
             val optionOpenWith = contentView.findViewById<TextView>(R.id.open_with_option)
             val optionSendChat = contentView.findViewById<TextView>(R.id.send_chat_option)
+            val optionLabel = contentView.findViewById<LinearLayout>(R.id.option_label_layout)
 
             val separatorInfo = contentView.findViewById<View>(R.id.separator_info_option)
             val separatorSync = contentView.findViewById<View>(R.id.separator_sync)
@@ -1428,6 +1429,9 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 if (optionSendChat.isVisible) {
                     optionSendChat.visibility = View.GONE
                     decrementShares()
+                }
+                if (optionLabel.isVisible) {
+                    optionLabel.visibility = View.GONE
                 }
             }
             optionSync.visibility = View.GONE

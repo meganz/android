@@ -66,7 +66,8 @@ class FileInfoViewStateTest {
     @Test
     fun `test that when folder tree info is updated then size is updated to totalCurrentSizeInBytes plus sizeOfPreviousVersionsInBytes`() {
         underTest = FileInfoViewState()
-        val result = underTest.copyWithFolderTreeInfo(mockFolderTreeInfo())
+        val folderNode = mockFolder()
+        val result = underTest.copyWithFolderTreeInfo(folderNode, mockFolderTreeInfo())
         assertThat(result.sizeInBytes).isEqualTo(CURRENT_SIZE + PREVIOUS_SIZE)
     }
 
@@ -76,10 +77,24 @@ class FileInfoViewStateTest {
         empty: Boolean,
     ) {
         underTest = FileInfoViewState()
-        val result = underTest.copyWithFolderTreeInfo(mockFolderTreeInfo(empty))
+        val folderNode = mock<TypedFolderNode> {
+            on { name }.thenReturn("Node")
+            on { isNodeKeyDecrypted }.thenReturn(true)
+        }
+        val result = underTest.copyWithFolderTreeInfo(folderNode, mockFolderTreeInfo(empty))
         assertThat(result.isAvailableOfflineAvailable).isEqualTo(!empty)
     }
 
+    @Test
+    fun `test that when folder tree info is updated and node key is not decrypted then isAvailableOfflineAvailable is false`() {
+        underTest = FileInfoViewState()
+        val folderNode = mock<TypedFolderNode> {
+            on { name }.thenReturn("Node")
+            on { isNodeKeyDecrypted }.thenReturn(false)
+        }
+        val result = underTest.copyWithFolderTreeInfo(folderNode, mockFolderTreeInfo(empty = false))
+        assertThat(result.isAvailableOfflineAvailable).isFalse()
+    }
 
     @Test
     fun `test that isDecrypted defaults to true`() {
