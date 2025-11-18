@@ -28,23 +28,30 @@ import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.feature.photos.model.MediaAppBarAction
 import mega.privacy.android.feature.photos.model.MediaAppBarAction.CameraUpload.CameraUploadStatus
 import mega.privacy.android.feature.photos.model.MediaScreen
-import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabRoute
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabRoute
+import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
 fun MediaMainRoute(
     navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
+    mediaFilterViewModel: MediaFilterViewModel = hiltViewModel(),
 ) {
-    MediaMainScreen(navigateToAlbumContent = navigateToAlbumContent)
+    val mediaFilterUiState by mediaFilterViewModel.uiState.collectAsStateWithLifecycle()
+
+    MediaMainScreen(
+        mediaFilterUiState = mediaFilterUiState,
+        navigateToAlbumContent = navigateToAlbumContent
+    )
 }
 
 @Composable
 fun MediaMainScreen(
+    mediaFilterUiState: MediaFilterUiState,
     modifier: Modifier = Modifier,
     viewModel: MediaMainViewModel = hiltViewModel(),
-    navigateToAlbumContent: (AlbumContentNavKey) -> Unit
+    navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
 ) {
     var currentTabIndex by rememberSaveable { mutableIntStateOf(0) }
 
@@ -159,6 +166,9 @@ private fun MediaScreen.MediaContent(
 @Composable
 fun PhotosMainScreenPreview() {
     AndroidThemeForPreviews {
-        MediaMainScreen(navigateToAlbumContent = {})
+        MediaMainScreen(
+            mediaFilterUiState = MediaFilterUiState(),
+            navigateToAlbumContent = {}
+        )
     }
 }
