@@ -73,19 +73,28 @@ import mega.privacy.android.app.presentation.passcode.navigation.passcodeView
 import mega.privacy.android.app.presentation.security.check.PasscodeCheckViewModel
 import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.transparent.TransparentSceneStrategy
+import mega.privacy.android.navigation.destination.SnackbarNavKey
 import timber.log.Timber
 import javax.inject.Inject
 
+/**
+ * Single Activity for Mega App
+ */
 @AndroidEntryPoint
 class MegaActivity : ComponentActivity() {
 
+    /**
+     * Passcode crypt object factory
+     */
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
 
+    /**
+     * Navigation event queue
+     */
     @Inject
     lateinit var navigationEventQueue: NavigationEventQueue
 
@@ -96,19 +105,12 @@ class MegaActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         this.intent = intent
-        consumeWarningMessage()
         consumeIntentDestinations()
-    }
-
-    private fun consumeWarningMessage() {
-        intent.getStringExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE)?.let { warningMessage ->
-            globalStateViewModel.queueMessage(warningMessage)
-            intent.removeExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE)
-        }
     }
 
     private fun consumeIntentDestinations() {
         intent.getDestinations()?.let { navKeys ->
+            println("PAU-C consume $navKeys")
             //Add nav keys to navigation queue
             navKeys.forEach {
                 Timber.d("NavKey from intent: $it")
@@ -148,8 +150,7 @@ class MegaActivity : ComponentActivity() {
                 val rootNodeState by globalStateViewModel.rootNodeExistsFlow.collectAsStateWithLifecycle()
 
                 LaunchedEffect(Unit) {
-                    //consume intent extras
-                    consumeWarningMessage()
+                    //consume intent destinations
                     consumeIntentDestinations()
                 }
 
@@ -365,23 +366,10 @@ class MegaActivity : ComponentActivity() {
         fun getPendingIntentForWarningMessage(
             context: Context,
             warningMessage: String,
-            requestCode: Int = warningMessage.hashCode(), //unique request code per warning message
-        ): PendingIntent {
-            val intent = Intent(
-                context,
-                MegaActivity::class.java
-            ).apply {
-                putExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE, warningMessage)
-                flags =
-                    Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            }
-            return PendingIntent.getActivity(
-                context,
-                requestCode,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-        }
+        ) = getPendingIntentWithExtraDestinations(
+            context,
+            listOf(SnackbarNavKey(warningMessage))
+        )
 
         /**
          * Get a pending intent to open this activity with the specified nav key
@@ -429,7 +417,7 @@ class MegaActivity : ComponentActivity() {
 }
 
 
-infix fun <T : Any> SceneStrategy<T>.chain(sceneStrategy: SceneStrategy<T>): SceneStrategy<T> =
+private infix fun <T : Any> SceneStrategy<T>.chain(sceneStrategy: SceneStrategy<T>): SceneStrategy<T> =
     object : SceneStrategy<T> {
         override fun SceneStrategyScope<T>.calculateScene(
             entries: List<NavEntry<T>>,
