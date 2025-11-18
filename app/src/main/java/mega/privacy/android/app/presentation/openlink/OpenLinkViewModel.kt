@@ -56,7 +56,7 @@ class OpenLinkViewModel @Inject constructor(
 
     /**
      * decodes the url and updates the state
-     * @param url url to decode
+     * @param uri uri to decode
      */
     fun decodeUri(uri: Uri) {
         viewModelScope.launch {
@@ -185,9 +185,9 @@ class OpenLinkViewModel @Inject constructor(
         deepLinkHandlers.firstNotNullOfOrNull { deepLinkHandler ->
             deepLinkHandler.getNavKeysFromUri(uri)?.takeIf { it.isNotEmpty() }
         }?.let { navKeys ->
+            navigationEventQueue.emit(navKeys)
             navKeys.forEach {
                 Timber.d("Adding NavKey from deep link: $it")
-                navigationEventQueue.emit(it)
             }
             _uiState.update {
                 it.copy(deepLinkDestinationsAddedEvent = true)

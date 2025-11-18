@@ -158,8 +158,8 @@ class OpenLinkViewModelTest {
                 on { toString() } doReturn url
             }
             whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn true
-            val expected = mock<NavKey>()
-            whenever(deepLinkHandler.getNavKeysFromUri(uri)) doReturn listOf(expected)
+            val expected = listOf(mock<NavKey>())
+            whenever(deepLinkHandler.getNavKeysFromUri(uri)) doReturn expected
 
             underTest.decodeUri(uri)
 
