@@ -7,17 +7,14 @@ import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.RegexPatternType.CANCEL_ACCOUNT_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.RESET_PASSWORD_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.VERIFY_CHANGE_MAIL_LINK
-import mega.privacy.android.domain.usecase.link.GetDecodedUrlRegexPatternTypeUseCase
-import mega.privacy.android.navigation.contract.deeplinks.AbstractDeepLinkHandlerRegexPatternType
+import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import javax.inject.Inject
 
-class MyAccountDeepLinkHandler @Inject constructor(
-    getDecodedUrlRegexPatternTypeUseCase: GetDecodedUrlRegexPatternTypeUseCase,
-) : AbstractDeepLinkHandlerRegexPatternType(getDecodedUrlRegexPatternTypeUseCase) {
-    override suspend fun getNavKeysFromRegexPatternType(
-        regexPatternType: RegexPatternType,
+class MyAccountDeepLinkHandler @Inject constructor() : DeepLinkHandler {
+    override suspend fun getNavKeys(
         uri: Uri,
+        regexPatternType: RegexPatternType?,
     ): List<NavKey>? {
         return when (regexPatternType) {
             CANCEL_ACCOUNT_LINK -> {

@@ -4,17 +4,14 @@ import android.net.Uri
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.core.nodecomponents.mapper.FileNodeContentToNavKeyMapper
 import mega.privacy.android.domain.entity.RegexPatternType
-import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.link.GetDecodedUrlRegexPatternTypeUseCase
 import mega.privacy.android.domain.usecase.node.GetAncestorsIdsUseCase
 import mega.privacy.android.domain.usecase.node.GetFileNodeContentForFileNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeIdFromBase64UseCase
 import mega.privacy.android.feature.clouddrive.presentation.shares.links.OpenPasswordLinkDialogNavKey
-import mega.privacy.android.navigation.contract.deeplinks.AbstractDeepLinkHandlerRegexPatternType
+import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import javax.inject.Inject
 
@@ -22,16 +19,15 @@ import javax.inject.Inject
  * Cloud drive deep link handler
  */
 class CloudDriveDeepLinkHandler @Inject constructor(
-    getDecodedUrlRegexPatternTypeUseCase: GetDecodedUrlRegexPatternTypeUseCase,
     private val getNodeIdFromBase64UseCase: GetNodeIdFromBase64UseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getFileNodeContentForFileNodeUseCase: GetFileNodeContentForFileNodeUseCase,
     private val fileNodeContentToNavKeyMapper: FileNodeContentToNavKeyMapper,
     private val getAncestorsIdsUseCase: GetAncestorsIdsUseCase,
-) : AbstractDeepLinkHandlerRegexPatternType(getDecodedUrlRegexPatternTypeUseCase) {
-    override suspend fun getNavKeysFromRegexPatternType(
-        regexPatternType: RegexPatternType,
+) : DeepLinkHandler {
+    override suspend fun getNavKeys(
         uri: Uri,
+        regexPatternType: RegexPatternType?,
     ): List<NavKey>? = when (regexPatternType) {
         RegexPatternType.PASSWORD_LINK -> {
             listOf(OpenPasswordLinkDialogNavKey(uri.toString()))

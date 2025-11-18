@@ -16,6 +16,7 @@ import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.QueryResetPasswordLinkUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.link.DecodeLinkUseCase
+import mega.privacy.android.domain.usecase.link.GetDecodedUrlRegexPatternTypeUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
@@ -44,6 +45,7 @@ class OpenLinkViewModel @Inject constructor(
     private val deepLinkHandlers: List<@JvmSuppressWildcards DeepLinkHandler>,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val navigationEventQueue: NavigationEventQueue,
+    private val getDecodedUrlRegexPatternTypeUseCase: GetDecodedUrlRegexPatternTypeUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OpenLinkUiState())
@@ -182,8 +184,9 @@ class OpenLinkViewModel @Inject constructor(
      * @param uri
      */
     private suspend fun consumeDestination(uri: Uri) {
+        val regexPatternType = getDecodedUrlRegexPatternTypeUseCase(uri.toString())
         deepLinkHandlers.firstNotNullOfOrNull { deepLinkHandler ->
-            deepLinkHandler.getNavKeysFromUri(uri)?.takeIf { it.isNotEmpty() }
+            deepLinkHandler.getNavKeys(uri, regexPatternType)?.takeIf { it.isNotEmpty() }
         }?.let { navKeys ->
             navigationEventQueue.emit(navKeys)
             navKeys.forEach {
@@ -192,6 +195,9 @@ class OpenLinkViewModel @Inject constructor(
             _uiState.update {
                 it.copy(deepLinkDestinationsAddedEvent = true)
             }
+        } ?: run {
+            // This should not happen because WebViewDeepLinkHandler should handle all deep links defined in the manifest
+            Timber.e("Deep link not handled: $uri")
         }
     }
 }

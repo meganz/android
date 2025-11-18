@@ -8,12 +8,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.resetpassword.ResetPasswordLinkInfo
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.QueryResetPasswordLinkUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.link.DecodeLinkUseCase
+import mega.privacy.android.domain.usecase.link.GetDecodedUrlRegexPatternTypeUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
@@ -54,7 +56,9 @@ class OpenLinkViewModelTest {
     private val queryResetPasswordLinkUseCase: QueryResetPasswordLinkUseCase = mock()
     private val applicationScope = CoroutineScope(extension.testDispatcher)
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val getDecodedUrlRegexPatternTypeUseCase = mock<GetDecodedUrlRegexPatternTypeUseCase>()
     private val deepLinkHandler = mock<DeepLinkHandler>()
+    private val deepLinkHandler2 = mock<DeepLinkHandler>()
     private val navigationEventQueue = mock<NavigationEventQueue>()
 
     @BeforeEach
@@ -69,9 +73,10 @@ class OpenLinkViewModelTest {
             decodeLinkUseCase = decodeLinkUseCase,
             queryResetPasswordLinkUseCase = queryResetPasswordLinkUseCase,
             applicationScope = applicationScope,
-            deepLinkHandlers = listOf(deepLinkHandler),
+            deepLinkHandlers = listOf(deepLinkHandler, deepLinkHandler2),
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             navigationEventQueue = navigationEventQueue,
+            getDecodedUrlRegexPatternTypeUseCase = getDecodedUrlRegexPatternTypeUseCase,
         )
         wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) } doReturn false
     }
@@ -157,9 +162,15 @@ class OpenLinkViewModelTest {
             val uri = mock<Uri> {
                 on { toString() } doReturn url
             }
+            val regexPatternType = RegexPatternType.FILE_LINK
             whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn true
-            val expected = listOf(mock<NavKey>())
-            whenever(deepLinkHandler.getNavKeysFromUri(uri)) doReturn expected
+            whenever(getDecodedUrlRegexPatternTypeUseCase(url)) doReturn regexPatternType
+            val navKey = mock<NavKey>()
+            val expected = listOf(navKey)
+            whenever(deepLinkHandler.getNavKeys(uri, regexPatternType)) doReturn null
+            whenever(
+                deepLinkHandler2.getNavKeys(uri, regexPatternType)
+            ) doReturn expected
 
             underTest.decodeUri(uri)
 
@@ -332,7 +343,8 @@ class OpenLinkViewModelTest {
             querySignupLinkUseCase,
             getAccountCredentialsUseCase,
             getRootNodeUseCase,
-            decodeLinkUseCase
+            decodeLinkUseCase,
+            getDecodedUrlRegexPatternTypeUseCase
         )
     }
 

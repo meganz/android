@@ -6,16 +6,12 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.RegexPatternType
-import mega.privacy.android.domain.usecase.link.GetDecodedUrlRegexPatternTypeUseCase
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.reset
-import org.mockito.kotlin.whenever
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -23,17 +19,10 @@ class MyAccountDeepLinkHandlerTest {
 
     private lateinit var underTest: MyAccountDeepLinkHandler
 
-    private val getDecodedUrlRegexPatternTypeUseCase = mock<GetDecodedUrlRegexPatternTypeUseCase>()
-
 
     @BeforeAll
     fun setup() {
-        underTest = MyAccountDeepLinkHandler(getDecodedUrlRegexPatternTypeUseCase)
-    }
-
-    @BeforeEach
-    fun cleanUp() {
-        reset(getDecodedUrlRegexPatternTypeUseCase)
+        underTest = MyAccountDeepLinkHandler()
     }
 
     @Test
@@ -47,9 +36,8 @@ class MyAccountDeepLinkHandlerTest {
             val uri = mock<Uri> {
                 on { this.toString() } doReturn uriString
             }
-            whenever(getDecodedUrlRegexPatternTypeUseCase(uriString)) doReturn RegexPatternType.CANCEL_ACCOUNT_LINK
 
-            val actual = underTest.getNavKeysFromUri(uri)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.CANCEL_ACCOUNT_LINK)
 
             assertThat(actual).containsExactly(expected)
         }
@@ -65,9 +53,8 @@ class MyAccountDeepLinkHandlerTest {
             val uri = mock<Uri> {
                 on { this.toString() } doReturn uriString
             }
-            whenever(getDecodedUrlRegexPatternTypeUseCase(uriString)) doReturn RegexPatternType.VERIFY_CHANGE_MAIL_LINK
 
-            val actual = underTest.getNavKeysFromUri(uri)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.VERIFY_CHANGE_MAIL_LINK)
 
             assertThat(actual).containsExactly(expected)
         }
@@ -83,9 +70,8 @@ class MyAccountDeepLinkHandlerTest {
             val uri = mock<Uri> {
                 on { this.toString() } doReturn uriString
             }
-            whenever(getDecodedUrlRegexPatternTypeUseCase(uriString)) doReturn RegexPatternType.RESET_PASSWORD_LINK
 
-            val actual = underTest.getNavKeysFromUri(uri)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.RESET_PASSWORD_LINK)
 
             assertThat(actual).containsExactly(expected)
         }
@@ -97,9 +83,8 @@ class MyAccountDeepLinkHandlerTest {
             val uri = mock<Uri> {
                 on { this.toString() } doReturn uriString
             }
-            whenever(getDecodedUrlRegexPatternTypeUseCase(uriString)) doReturn RegexPatternType.FILE_LINK
 
-            val actual = underTest.getNavKeysFromUri(uri)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK)
 
             assertThat(actual).isNull()
         }

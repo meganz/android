@@ -4,7 +4,6 @@ import android.net.Uri
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.RegexPatternType
-import mega.privacy.android.domain.usecase.link.GetDecodedUrlRegexPatternTypeUseCase
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -20,20 +19,18 @@ import org.mockito.kotlin.whenever
 class AccountInvitationDeepLinkHandlerTest {
     private lateinit var underTest: AccountInvitationDeepLinkHandler
 
-    private val getDecodedUrlRegexPatternTypeUseCase = mock<GetDecodedUrlRegexPatternTypeUseCase>()
     private val querySignupLinkUseCase = mock<QuerySignupLinkUseCase>()
 
     @BeforeAll
     fun setup() {
         underTest = AccountInvitationDeepLinkHandler(
-            getDecodedUrlRegexPatternTypeUseCase = getDecodedUrlRegexPatternTypeUseCase,
             querySignupLinkUseCase = querySignupLinkUseCase,
         )
     }
 
     @BeforeEach
     fun cleanUp() {
-        reset(getDecodedUrlRegexPatternTypeUseCase, querySignupLinkUseCase)
+        reset(querySignupLinkUseCase)
     }
 
     @Test
@@ -47,7 +44,7 @@ class AccountInvitationDeepLinkHandlerTest {
             }
             whenever(querySignupLinkUseCase(uriString)) doReturn expectedEmail
 
-            val actual = underTest.getNavKeysFromRegexPatternType(
+            val actual = underTest.getNavKeys(
                 regexPatternType = RegexPatternType.ACCOUNT_INVITATION_LINK,
                 uri = uri,
             )
@@ -63,7 +60,7 @@ class AccountInvitationDeepLinkHandlerTest {
                 on { this.toString() } doReturn uriString
             }
 
-            val actual = underTest.getNavKeysFromRegexPatternType(
+            val actual = underTest.getNavKeys(
                 regexPatternType = RegexPatternType.LOGIN_LINK,
                 uri = uri,
             )
@@ -80,7 +77,7 @@ class AccountInvitationDeepLinkHandlerTest {
             }
             whenever(querySignupLinkUseCase(uriString)) doThrow RuntimeException("something bad")
 
-            val actual = underTest.getNavKeysFromRegexPatternType(
+            val actual = underTest.getNavKeys(
                 regexPatternType = RegexPatternType.ACCOUNT_INVITATION_LINK,
                 uri = uri,
             )

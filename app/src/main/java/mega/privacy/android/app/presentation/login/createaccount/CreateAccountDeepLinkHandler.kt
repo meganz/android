@@ -3,16 +3,13 @@ package mega.privacy.android.app.presentation.login.createaccount
 import android.net.Uri
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.domain.entity.RegexPatternType
-import mega.privacy.android.domain.usecase.link.GetDecodedUrlRegexPatternTypeUseCase
-import mega.privacy.android.navigation.contract.deeplinks.AbstractDeepLinkHandlerRegexPatternType
+import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import javax.inject.Inject
 
-class CreateAccountDeepLinkHandler @Inject constructor(
-    getDecodedUrlRegexPatternTypeUseCase: GetDecodedUrlRegexPatternTypeUseCase,
-) : AbstractDeepLinkHandlerRegexPatternType(getDecodedUrlRegexPatternTypeUseCase) {
-    override suspend fun getNavKeysFromRegexPatternType(
-        regexPatternType: RegexPatternType,
+class CreateAccountDeepLinkHandler @Inject constructor() : DeepLinkHandler {
+    override suspend fun getNavKeys(
         uri: Uri,
+        regexPatternType: RegexPatternType?,
     ): List<NavKey>? =
         if (regexPatternType == RegexPatternType.REGISTRATION_LINK) {
             listOf(CreateAccountNavKey())

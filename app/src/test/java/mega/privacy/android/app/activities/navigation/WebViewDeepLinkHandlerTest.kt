@@ -4,7 +4,6 @@ import android.net.Uri
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.RegexPatternType
-import mega.privacy.android.domain.usecase.link.GetDecodedUrlRegexPatternTypeUseCase
 import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase
 import mega.privacy.android.navigation.destination.WebSiteNavKey
 import org.junit.jupiter.api.BeforeAll
@@ -24,20 +23,18 @@ class WebViewDeepLinkHandlerTest {
 
     private lateinit var underTest: WebViewDeepLinkHandler
 
-    private val getDecodedUrlRegexPatternTypeUseCase = mock<GetDecodedUrlRegexPatternTypeUseCase>()
     private val getSessionLinkUseCase = mock<GetSessionLinkUseCase>()
 
     @BeforeAll
     fun setup() {
         underTest = WebViewDeepLinkHandler(
-            getDecodedUrlRegexPatternTypeUseCase = getDecodedUrlRegexPatternTypeUseCase,
             getSessionLinkUseCase = getSessionLinkUseCase
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(getDecodedUrlRegexPatternTypeUseCase, getSessionLinkUseCase)
+        reset(getSessionLinkUseCase)
     }
 
     @ParameterizedTest
@@ -48,7 +45,7 @@ class WebViewDeepLinkHandlerTest {
             "MEGA_BLOG_LINK", "PURCHASE_LINK"]
     )
     fun `test that correct nav key is returned when the uri matches regex pattern type`(
-        regexPatternType: RegexPatternType,
+        regexPatternType: RegexPatternType?,
     ) = runTest {
         val uriString = "https://mega.app/whatever"
         val expected = WebSiteNavKey(uriString)
@@ -56,9 +53,7 @@ class WebViewDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        whenever(getDecodedUrlRegexPatternTypeUseCase(uriString)) doReturn regexPatternType
-
-        assertThat(underTest.getNavKeysFromUri(uri)).containsExactly(expected)
+        assertThat(underTest.getNavKeys(uri, regexPatternType)).containsExactly(expected)
     }
 
     @Test
@@ -69,9 +64,7 @@ class WebViewDeepLinkHandlerTest {
                 on { this.toString() } doReturn uriString
             }
 
-            whenever(getDecodedUrlRegexPatternTypeUseCase(uriString)) doReturn RegexPatternType.FOLDER_LINK
-
-            assertThat(underTest.getNavKeysFromUri(uri)).isNull()
+            assertThat(underTest.getNavKeys(uri, RegexPatternType.FOLDER_LINK)).isNull()
         }
 
     @Test
@@ -83,10 +76,9 @@ class WebViewDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        whenever(getDecodedUrlRegexPatternTypeUseCase(uriString)) doReturn RegexPatternType.MEGA_LINK
         whenever(getSessionLinkUseCase(uriString)) doReturn sessionUriString
 
-        assertThat(underTest.getNavKeysFromUri(uri)).containsExactly(expected)
+        assertThat(underTest.getNavKeys(uri, RegexPatternType.MEGA_LINK)).containsExactly(expected)
     }
 
     @Test
@@ -98,9 +90,9 @@ class WebViewDeepLinkHandlerTest {
                 on { this.toString() } doReturn uriString
             }
 
-            whenever(getDecodedUrlRegexPatternTypeUseCase(uriString)) doReturn RegexPatternType.MEGA_LINK
             whenever(getSessionLinkUseCase(uriString)) doReturn null
 
-            assertThat(underTest.getNavKeysFromUri(uri)).containsExactly(expected)
+            assertThat(underTest.getNavKeys(uri, RegexPatternType.MEGA_LINK))
+                .containsExactly(expected)
         }
 }
