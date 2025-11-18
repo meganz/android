@@ -20,10 +20,10 @@ class TrackAudioPlaybackInfoUseCase @Inject constructor(
     suspend operator fun invoke(getCurrentPlaybackInfo: () -> MediaPlaybackInfo) {
         getTickerUseCase(TimeUnit.SECONDS.toMillis(1)).map { getCurrentPlaybackInfo() }
             .filter {
-                // Start update the playback information when the video position is more than 15 seconds
-                it.currentPosition > TimeUnit.MINUTES.toMillis(15)
+                // Start update the playback information when the audio position is more than 15 seconds
+                it.currentPosition > TimeUnit.SECONDS.toMillis(15)
             }.collect {
-                // When the video is playing until last 2 seconds, remove playback information
+                // When the audio is playing until last 2 seconds, remove playback information
                 if (it.totalDuration - it.currentPosition < TimeUnit.SECONDS.toMillis(2)) {
                     mediaPlayerRepository.deleteMediaPlaybackInfo(it.mediaHandle)
                 } else {

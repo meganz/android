@@ -48,13 +48,13 @@ class TrackAudioPlaybackInfoUseCaseTest {
     }
 
     @Test
-    fun `test that invoke with current position of the audio is less than 15 minutes`() =
+    fun `test that invoke with current position of the audio is less than 15 seconds`() =
         runTest {
             whenever(getTicker.invoke(any())).thenReturn(flowOf(Unit))
             val currentPlaybackInfo = MediaPlaybackInfo(
                 mediaHandle = mediaHandle,
                 totalDuration = TimeUnit.MINUTES.toMillis(20),
-                currentPosition = TimeUnit.MINUTES.toMillis(15),
+                currentPosition = TimeUnit.SECONDS.toMillis(15),
                 mediaType = MediaType.Audio
             )
 
@@ -68,13 +68,13 @@ class TrackAudioPlaybackInfoUseCaseTest {
         }
 
     @Test
-    fun `test that update playback info when the audio position is more than 15 minutes`() =
+    fun `test that update playback info when the audio position is more than 15 seconds`() =
         runTest {
             whenever(getTicker.invoke(any())).thenReturn(flowOf(Unit, Unit))
             val currentPlaybackInfo = MediaPlaybackInfo(
                 mediaHandle = mediaHandle,
                 totalDuration = TimeUnit.MINUTES.toMillis(20),
-                currentPosition = TimeUnit.MINUTES.toMillis(15),
+                currentPosition = TimeUnit.SECONDS.toMillis(15),
                 mediaType = MediaType.Audio
             )
 
@@ -101,7 +101,7 @@ class TrackAudioPlaybackInfoUseCaseTest {
         val currentPlaybackInfo = MediaPlaybackInfo(
             mediaHandle = mediaHandle,
             totalDuration = TimeUnit.MINUTES.toMillis(20),
-            currentPosition = TimeUnit.MINUTES.toMillis(15),
+            currentPosition = TimeUnit.SECONDS.toMillis(15),
             mediaType = MediaType.Audio
         )
 
