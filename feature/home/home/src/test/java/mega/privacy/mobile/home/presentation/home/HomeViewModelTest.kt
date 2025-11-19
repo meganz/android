@@ -10,7 +10,6 @@ import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
 import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUseCase
 import mega.privacy.android.navigation.contract.home.HomeWidget
 import mega.privacy.android.navigation.contract.home.HomeWidgetProvider
-import mega.privacy.android.navigation.contract.home.HomeWidgetViewHolder
 import mega.privacy.mobile.home.presentation.home.model.HomeUiState
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -174,15 +173,9 @@ class HomeViewModelTest {
         identifier: String,
         defaultOrder: Int,
     ): HomeWidget {
-        val viewHolder = mock<HomeWidgetViewHolder> {
-            on { widgetFunction } doReturn { _, _ -> }
-        }
         return mock<HomeWidget> {
             on { this.identifier } doReturn identifier
             on { this.defaultOrder } doReturn defaultOrder
-            on { getWidget() } doReturn flow {
-                emit(viewHolder)
-            }
         }
     }
 }

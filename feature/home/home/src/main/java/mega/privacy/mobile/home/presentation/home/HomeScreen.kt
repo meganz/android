@@ -28,6 +28,7 @@ import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.SearchNodeNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.home.presentation.configuration.HomeConfiguration
@@ -39,6 +40,7 @@ import mega.privacy.mobile.home.presentation.home.model.HomeUiState
 internal fun HomeScreen(
     state: HomeUiState,
     navigationHandler: NavigationHandler,
+    transferHandler: TransferHandler,
 ) {
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
@@ -72,7 +74,7 @@ internal fun HomeScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     items(state.widgets, key = { it.identifier }) { it ->
-                        it.content(Modifier, navigationHandler::navigate)
+                        it.content(Modifier, navigationHandler::navigate, transferHandler)
                         Spacer(modifier = Modifier.height(8.dp))
                     }
 

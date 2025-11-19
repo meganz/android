@@ -23,7 +23,7 @@ class HomeNavItem : MainNavItem {
         { navigationHandler, navigationController, transferHandler ->
             homeScreen(
                 navigationHandler = navigationHandler,
-                onTransfer = transferHandler::setTransferEvent,
+                transferHandler = transferHandler,
             )
         }
     override val icon: ImageVector = IconPack.Medium.Thin.Outline.Home

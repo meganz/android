@@ -13,7 +13,6 @@ import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUs
 import mega.privacy.android.domain.usecase.home.UpdateWidgetConfigurationsUseCase
 import mega.privacy.android.navigation.contract.home.HomeWidget
 import mega.privacy.android.navigation.contract.home.HomeWidgetProvider
-import mega.privacy.android.navigation.contract.home.HomeWidgetViewHolder
 import mega.privacy.mobile.home.presentation.configuration.mapper.WidgetConfigurationItemMapper
 import mega.privacy.mobile.home.presentation.configuration.model.HomeConfigurationUiState
 import org.junit.jupiter.api.AfterEach
@@ -234,15 +233,12 @@ class HomeConfigurationViewModelTest {
         identifier: String,
         defaultOrder: Int,
     ): HomeWidget {
-        val viewHolder = mock<HomeWidgetViewHolder>()
         return mock<HomeWidget> {
             on { this.identifier } doReturn identifier
             on { this.defaultOrder } doReturn defaultOrder
             on { canDelete } doReturn true
             onBlocking { getWidgetName() } doReturn LocalizedText.Literal("Test")
-            on { getWidget() } doReturn flow {
-                emit(viewHolder)
-            }
+
         }
     }
 }

@@ -1,4 +1,4 @@
-package mega.privacy.mobile.home.presentation.home.widget
+package mega.privacy.mobile.home.presentation.home.widget.chips
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -20,8 +20,8 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.feature.home.R
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.home.HomeWidget
-import mega.privacy.android.navigation.contract.home.HomeWidgetViewHolder
 import mega.privacy.android.navigation.destination.ChatsNavKey
 import mega.privacy.android.navigation.destination.FavouritesNavKey
 import mega.privacy.android.navigation.destination.OfflineNavKey
@@ -37,14 +37,13 @@ class HomeChipsWidget @Inject constructor(
 
     override suspend fun getWidgetName() = LocalizedText.Literal("Home Chips")
 
-    override fun getWidget(): Flow<HomeWidgetViewHolder> {
-        return flowOf(
-            HomeWidgetViewHolder(
-                widgetFunction = { modifier, onNavigate ->
-                    HomeChips(modifier = modifier, onNavigate = onNavigate)
-                }
-            )
-        )
+    @Composable
+    override fun DisplayWidget(
+        modifier: Modifier,
+        onNavigate: (NavKey) -> Unit,
+        transferHandler: TransferHandler,
+    ) {
+        HomeChips(modifier = modifier, onNavigate = onNavigate)
     }
 }
 

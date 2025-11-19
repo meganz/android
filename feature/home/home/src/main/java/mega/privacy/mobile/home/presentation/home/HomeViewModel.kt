@@ -5,9 +5,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUseCase
 import mega.privacy.android.navigation.contract.home.HomeWidgetProvider
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
@@ -25,20 +24,26 @@ class HomeViewModel @Inject constructor(
     val state: StateFlow<HomeUiState> by lazy {
         monitorHomeWidgetConfigurationUseCase()
             .map { it.associateBy { config -> config.widgetIdentifier } }
-            .flatMapLatest { configuration ->
-                combine(widgetProviders.map { it.getWidgets() }.flatten().filter { widget ->
-                    configuration[widget.identifier]?.enabled
-                        ?: true
-                }.sortedBy { widget ->
-                    configuration[widget.identifier]?.widgetOrder
-                        ?: widget.defaultOrder
-                }.map { widget ->
-                    widget.getWidget().map { viewHolder -> widget.identifier to viewHolder }
-                }) { it }
-            }.map { list ->
-                HomeUiState.Data(list.map {
-                    HomeWidgetItem(it.first, it.second.widgetFunction)
-                })
+            .mapLatest { configuration ->
+                val list: List<HomeWidgetItem> =
+                    widgetProviders.map { it.getWidgets() }.flatten().filter { widget ->
+                        configuration[widget.identifier]?.enabled
+                            ?: true
+                    }.sortedBy { widget ->
+                        configuration[widget.identifier]?.widgetOrder
+                            ?: widget.defaultOrder
+                    }.map {
+                        HomeWidgetItem(
+                            it.identifier,
+                            { modifier, onNavigate, transferHandler ->
+                                it.DisplayWidget(
+                                    modifier = modifier,
+                                    onNavigate = onNavigate,
+                                    transferHandler = transferHandler
+                                )
+                            })
+                    }
+                HomeUiState.Data(list)
             }.asUiStateFlow(
                 viewModelScope,
                 HomeUiState.Loading,
