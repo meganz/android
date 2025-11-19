@@ -41,7 +41,7 @@ class PendingBackStackNavigationHandler(
         if (backstack.isEmpty()) backstack.add(defaultLandingScreen)
         onPasscodeStateChanged(isPasscodeLocked)
 
-        logBackStack()
+        logBackStack("init isLoggedIn: ${currentAuthStatus.isLoggedIn} hasRootNode: $hasRootNode")
     }
 
     private fun removeAuthRequiredDestinations(): List<NavKey> {
@@ -51,7 +51,7 @@ class PendingBackStackNavigationHandler(
         repeat(authRequiredDestinations.size) {
             backstack.removeLastOrNull()
         }
-        logBackStack()
+        logBackStack("removeAuthRequiredDestinations")
         return authRequiredDestinations
     }
 
@@ -67,7 +67,7 @@ class PendingBackStackNavigationHandler(
             val fetchDestination = fetchRootNodeDestination(it, fromLogin)
             if (backstack.lastOrNull() != fetchDestination) backstack.add(fetchDestination)
         }
-        logBackStack()
+        logBackStack("removeRootNodeRequiredDestinations")
         return rootNodeRequiredDestinations
     }
 
@@ -79,10 +79,15 @@ class PendingBackStackNavigationHandler(
         } else {
             backstack.removeLastOrNull()
         }
-        logBackStack()
+        logBackStack("back")
     }
 
     override fun navigate(destination: NavKey) {
+        Timber.d("PendingBackStackNavigationHandler::navigate $destination")
+        if (destination === backstack.lastOrNull()) {
+            Timber.d("Destination is already on the backstack")
+            return
+        }
         navigate(listOf(destination))
     }
 
@@ -124,7 +129,7 @@ class PendingBackStackNavigationHandler(
                 backstack.addAll(destinations)
             }
         }
-        logBackStack()
+        logBackStack("navigate : $destinations")
     }
 
     private fun currentFetchNodesDestinationOrNull(currentAuthStatus: AuthStatus) =
@@ -264,13 +269,18 @@ class PendingBackStackNavigationHandler(
         }
     }
 
-    private fun logBackStack() {
+    private fun logBackStack(callingFunction: String) {
         Timber.d(
-            "Pending backstack: \n BackStack: \n ${backstack.joinToString("\n") { it.toString() }} \n Pending: \n ${
-                backstack.pending.joinToString(
-                    "\n"
-                ) { it.toString() }
-            }"
+            """
+                Pending backstack :: $callingFunction
+                *******************
+                BackStack:
+                ${backstack.joinToString("\n", prefix = "\t") { it.toString() }}
+                *******************
+                Pending items:
+                ${backstack.pending.joinToString("\n", prefix = "\t") { it.toString() }}
+                *******************
+            """.trimIndent()
         )
     }
 

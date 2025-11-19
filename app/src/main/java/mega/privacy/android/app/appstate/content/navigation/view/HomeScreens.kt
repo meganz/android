@@ -152,6 +152,8 @@ private fun fallback(
 ) = NavEntry<NavKey>(
     key = FallbackKey
 ) {
-    outerNavigationHandler.navigate(unknownKey)
-    innerNavigationHandler.back()
+    LaunchedEffect(unknownKey) {
+        outerNavigationHandler.navigate(unknownKey)
+        innerNavigationHandler.back()
+    }
 }
