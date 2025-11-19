@@ -221,7 +221,6 @@ pipeline {
             }
             parallel {
                 stage('Build APK (GMS+QA)') {
-                    agent { label NODE_LABELS }
                     when {
                         expression { (!shouldSkipBuild()) }
                     }
@@ -263,9 +262,6 @@ pipeline {
                             script {
                                 BUILD_STEP = "Build APK (GMS+QA)"
                             }
-                        }
-                        cleanup {
-                            cleanWs(cleanWhenFailure: true)
                         }
                     }
                 } //stage('Build APK (GMS+QA)')
