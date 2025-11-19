@@ -312,7 +312,6 @@ import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
 import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetView
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionBottomSheet
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionViewModel
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.settings.arguments.TargetPreference
@@ -2424,7 +2423,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         if (isCameraUploadsEnabled) {
             showSnackbar(
                 SNACKBAR_TYPE,
-                getString(R.string.onboarding_camera_upload_permission_enabled_success_message),
+                getString(sharedR.string.onboarding_camera_upload_permission_enabled_message),
                 -1
             )
         }
