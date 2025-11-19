@@ -7,7 +7,6 @@ import androidx.appcompat.view.ActionMode
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
@@ -25,7 +24,7 @@ import timber.log.Timber
 /**
  * A action mode callback class for [RecentActionBucketFragment]
  */
-class RecentActionBucketActionModeCallback constructor(
+class RecentActionBucketActionModeCallback(
     private val managerActivity: ManagerActivity,
     private val recentActionBucketFragment: RecentActionBucketFragment,
     private val viewModel: RecentActionBucketViewModel,
@@ -78,11 +77,10 @@ class RecentActionBucketActionModeCallback constructor(
 
     private fun handleHiddenNodes(menu: Menu) {
         managerActivity.lifecycleScope.launch {
-            val isHiddenNodesEnabled = isHiddenNodesActive()
             val selectedNodes = viewModel.getSelectedNodes()
             val includeSensitiveInheritedNode = selectedNodes.any { it.isSensitiveInherited }
 
-            if (isHiddenNodesEnabled && !isInShareBucket) {
+            if (!isInShareBucket) {
                 val accountType = viewModel.state.value.accountType
                 val isPaid = accountType?.isPaid ?: false
                 val isBusinessAccountExpired = viewModel.state.value.isBusinessAccountExpired
@@ -233,12 +231,5 @@ class RecentActionBucketActionModeCallback constructor(
         Timber.d("ActionBarCallBack::onDestroyActionMode")
 
         viewModel.clearSelection()
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            managerActivity.getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 }

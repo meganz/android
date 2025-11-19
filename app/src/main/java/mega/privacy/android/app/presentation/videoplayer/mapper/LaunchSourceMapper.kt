@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.videoplayer.mapper
 
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerAddToAction
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerChatImportAction
@@ -23,19 +22,18 @@ import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetRootParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveInheritedUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
@@ -47,7 +45,6 @@ import javax.inject.Inject
 class LaunchSourceMapper @Inject constructor(
     private val getNodeAccessUseCase: GetNodeAccessUseCase,
     private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val hasSensitiveInheritedUseCase: HasSensitiveInheritedUseCase,
     private val getRootParentNodeUseCase: GetRootParentNodeUseCase,
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
@@ -191,9 +188,6 @@ class LaunchSourceMapper @Inject constructor(
 
     private fun isOwner(permission: AccessPermission?) = permission == AccessPermission.OWNER
 
-    private suspend fun hiddenNodesEnabled() =
-        getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-
     private suspend fun isSharedNode(source: Int, videoNode: TypedVideoNode): Boolean {
         val isSharedSource = source in listOf(
             INCOMING_SHARES_ADAPTER,
@@ -214,7 +208,6 @@ class LaunchSourceMapper @Inject constructor(
         isPaidUser: Boolean,
         isExpiredBusinessUser: Boolean,
     ): VideoPlayerMenuAction? {
-        if (!hiddenNodesEnabled()) return null
         if (isSharedNode(launchSource, videoNode)) return null
         if (isNodeInBackup(videoNode)) return null
 

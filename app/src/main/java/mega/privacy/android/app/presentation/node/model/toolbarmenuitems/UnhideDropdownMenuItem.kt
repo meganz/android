@@ -9,10 +9,8 @@ import mega.privacy.android.app.presentation.node.model.menuaction.UnhideDropdow
 import mega.privacy.android.app.presentation.node.model.menuaction.UnhideMenuAction
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import javax.inject.Inject
 
@@ -23,7 +21,6 @@ import javax.inject.Inject
  */
 class UnhideDropdownMenuItem @Inject constructor(
     override val menuAction: UnhideDropdownMenuAction,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
@@ -39,9 +36,6 @@ class UnhideDropdownMenuItem @Inject constructor(
         resultCount: Int,
     ): Boolean {
         if (!hasNodeAccessPermission || !noNodeTakenDown) return false
-
-        val isHiddenNodesEnabled = isHiddenNodesActive()
-        if (!isHiddenNodesEnabled) return false
 
         val isPaid = runCatching {
             monitorAccountDetailUseCase().first().levelDetail?.accountType?.isPaid ?: false
@@ -75,12 +69,5 @@ class UnhideDropdownMenuItem @Inject constructor(
             actionHandler(menuAction, selectedNodes)
         }
         onDismiss()
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 }

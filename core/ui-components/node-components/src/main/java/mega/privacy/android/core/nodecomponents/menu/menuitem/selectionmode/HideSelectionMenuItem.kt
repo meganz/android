@@ -6,16 +6,13 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import javax.inject.Inject
 
 class HideSelectionMenuItem @Inject constructor(
     override val menuAction: HideMenuAction,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
@@ -27,9 +24,7 @@ class HideSelectionMenuItem @Inject constructor(
         noNodeInBackups: Boolean,
         noNodeTakenDown: Boolean,
     ): Boolean {
-        val isHiddenNodesEnabled = isHiddenNodesActive()
-
-        if (!isHiddenNodesEnabled || !hasNodeAccessPermission || !noNodeTakenDown || !noNodeInBackups) {
+        if (!hasNodeAccessPermission || !noNodeTakenDown || !noNodeInBackups) {
             return false
         }
 
@@ -54,12 +49,5 @@ class HideSelectionMenuItem @Inject constructor(
         }
 
         return selectedNodes.any { !it.isMarkedSensitive } && selectedNodes.none { it.isSensitiveInherited }
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 }

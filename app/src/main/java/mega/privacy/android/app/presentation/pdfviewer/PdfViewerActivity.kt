@@ -89,7 +89,6 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.navigation.ExtraConstant
@@ -192,7 +191,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     private val startDownloadViewModel by viewModels<StartDownloadViewModel>()
     private val nodeAttachmentViewModel by viewModels<NodeAttachmentViewModel>()
 
-    private var isHiddenNodesEnabled: Boolean = false
     private var tempNodeId: NodeId? = null
 
     private val nameCollisionActivityContract = registerForActivityResult(
@@ -215,13 +213,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         super.attachBaseContext(newBase)
     }
 
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
-    }
-
     public override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate")
         enableEdgeToEdgeAndConsumeInsets()
@@ -239,12 +230,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
 
         binding = ActivityPdfviewerBinding.inflate(layoutInflater)
 
-        lifecycleScope.launch {
-            runCatching {
-                isHiddenNodesEnabled = isHiddenNodesActive()
-                invalidateOptionsMenu()
-            }.onFailure { Timber.e(it) }
-        }
+        invalidateOptionsMenu()
 
         with(window) {
             addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -426,7 +412,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                             .password(password)
                             .load()
                     } catch (e: Exception) {
-                        Timber.w("Exception loading PDF as stream", e)
+                        Timber.w(e, "Exception loading PDF as stream")
                     }
                     viewModel.resetPdfStreamData()
                     if (loading) {
@@ -1236,18 +1222,16 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         val isInShare = rootParentNode?.isInShare == true
         val isPaidAccount = viewModel.uiState.value.accountType?.isPaid == true
         val isBusinessAccountExpired = viewModel.uiState.value.isBusinessAccountExpired
-        val isNotInShare =
-            !isInSharedItems && !isInShare
+        val isNotInShare = !isInSharedItems && !isInShare
         val isNodeInBackups = viewModel.uiState.value.isNodeInBackups
 
         val shouldShowHideNode = when {
-            !isHiddenNodesEnabled || isInShare || isInSharedItems || isNodeInBackups -> false
+            isInShare || isInSharedItems || isNodeInBackups -> false
             isPaidAccount && !isBusinessAccountExpired && ((node != null && node.isMarkedSensitive) || isSensitiveInherited) -> false
             else -> true
         }
 
         val shouldShowUnhideNode = node != null
-                && isHiddenNodesEnabled
                 && isNotInShare
                 && node.isMarkedSensitive
                 && !isSensitiveInherited
@@ -1516,7 +1500,12 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                     val localPath = FileUtil.getLocalFile(file)
                     if (localPath != null) {
                         val mediaFile = File(localPath)
-                        uri = runCatching { FileUtil.getUriForFile(this@PdfViewerActivity, mediaFile) }.getOrNull()
+                        uri = runCatching {
+                            FileUtil.getUriForFile(
+                                this@PdfViewerActivity,
+                                mediaFile
+                            )
+                        }.getOrNull()
 
                         if (uri == null) {
                             initStreaming(file)

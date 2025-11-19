@@ -101,7 +101,6 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.TextEditorCloseMenuToolbarEvent
@@ -183,7 +182,6 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     private var currentUIState = STATE_SHOWN
     private var animator: ViewPropertyAnimator? = null
     private var countDownTimer: CountDownTimer? = null
-    private var isHiddenNodesEnabled: Boolean = false
     private var tempNodeId: NodeId? = null
     private var originalContentTextSize: Float = 0f
     private var originalNameTextSize: Float = 0f
@@ -227,12 +225,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         setContentView(binding.root)
         Analytics.tracker.trackEvent(TextEditorScreenEvent)
 
-        lifecycleScope.launch {
-            runCatching {
-                isHiddenNodesEnabled = isHiddenNodesActive()
-                invalidateOptionsMenu()
-            }.onFailure { Timber.e(it) }
-        }
+        invalidateOptionsMenu()
 
         binding.fileEditorToolbar.post {
             appBarHeight = binding.fileEditorToolbar.height
@@ -296,13 +289,6 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             }
             WindowInsetsCompat.CONSUMED
         }
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() == true
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -649,16 +635,15 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                     val isBusinessAccountExpired = viewModel.uiState.value.isBusinessAccountExpired
 
                     // Hide share menu for incoming shared items
-                    val shouldShowShare = !isIncomingSharedItems && !isInShare;
+                    val shouldShowShare = !isIncomingSharedItems && !isInShare
 
                     val shouldShowHideNode = when {
-                        !isHiddenNodesEnabled || isInShare || isInSharedItems || isNodeInBackups -> false
+                        isInShare || isInSharedItems || isNodeInBackups -> false
                         isPaidAccount && !isBusinessAccountExpired && ((node != null && node.isMarkedSensitive) || isSensitiveInherited) -> false
                         else -> true
                     }
 
                     val shouldShowUnhideNode = node != null
-                            && isHiddenNodesEnabled
                             && isNotInShare
                             && node.isMarkedSensitive
                             && !isSensitiveInherited

@@ -13,7 +13,6 @@ import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.TimelineHideNodeMenuItemEvent
 
@@ -31,7 +30,6 @@ class TimelineActionModeCallback(
 
     override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
         fragment.lifecycleScope.launch {
-            val isHiddenNodesEnabled = isHiddenNodesActive()
             val selectedNodes = fragment.timelineViewModel.getSelectedTypedNodes()
             val includeSensitiveInheritedNode = selectedNodes.any { it.isSensitiveInherited }
             menu?.findItem(R.id.cab_menu_share_link)?.let {
@@ -47,25 +45,20 @@ class TimelineActionModeCallback(
                         .firstOrNull()?.isExported ?: false
             }
 
-            if (isHiddenNodesEnabled) {
-                val hasNonSensitiveNode = selectedNodes.any { !it.isMarkedSensitive }
+            val hasNonSensitiveNode = selectedNodes.any { !it.isMarkedSensitive }
 
-                val isPaid =
-                    fragment.timelineViewModel.state.value.accountType?.isPaid
-                        ?: false
+            val isPaid =
+                fragment.timelineViewModel.state.value.accountType?.isPaid
+                    ?: false
 
-                val isBusinessAccountExpired =
-                    fragment.timelineViewModel.state.value.isBusinessAccountExpired
+            val isBusinessAccountExpired =
+                fragment.timelineViewModel.state.value.isBusinessAccountExpired
 
-                menu?.findItem(R.id.cab_menu_hide)?.isVisible =
-                    !isPaid || isBusinessAccountExpired || hasNonSensitiveNode && !includeSensitiveInheritedNode
+            menu?.findItem(R.id.cab_menu_hide)?.isVisible =
+                !isPaid || isBusinessAccountExpired || hasNonSensitiveNode && !includeSensitiveInheritedNode
 
-                menu?.findItem(R.id.cab_menu_unhide)?.isVisible =
-                    isPaid && !isBusinessAccountExpired && !hasNonSensitiveNode && !includeSensitiveInheritedNode
-            } else {
-                menu?.findItem(R.id.cab_menu_hide)?.isVisible = false
-                menu?.findItem(R.id.cab_menu_unhide)?.isVisible = false
-            }
+            menu?.findItem(R.id.cab_menu_unhide)?.isVisible =
+                isPaid && !isBusinessAccountExpired && !hasNonSensitiveNode && !includeSensitiveInheritedNode
 
             menu?.findItem(R.id.cab_menu_add_to_album)?.let {
                 it.isVisible = selectedNodes
@@ -161,12 +154,5 @@ class TimelineActionModeCallback(
 
     override fun onDestroyActionMode(mode: ActionMode?) {
         fragment.destroyActionMode()
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            fragment.getFeatureFlagUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 }

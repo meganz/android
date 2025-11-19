@@ -59,7 +59,6 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -183,20 +182,11 @@ class FileBrowserViewModel @Inject constructor(
         monitorNodeUpdates()
         monitorAccountDetail()
         viewModelScope.launch {
-            if (isHiddenNodesActive()) {
-                monitorIsHiddenNodesOnboarded()
-                monitorShowHiddenItems()
-            }
+            monitorIsHiddenNodesOnboarded()
+            monitorShowHiddenItems()
         }
         monitorColoredFoldersOnboarding()
         monitorStorageOverQuotaCapacity()
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 
     /**
@@ -943,12 +933,7 @@ class FileBrowserViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getHiddenNodeActionModifierItem(selectedNodes: List<NodeUIItem<TypedNode>>): CloudDriveSyncsHiddenNodeActionModifierItem {
-        val isHiddenNodesEnabled = isHiddenNodesEnabled()
-        if (!isHiddenNodesEnabled) {
-            return CloudDriveSyncsHiddenNodeActionModifierItem(isEnabled = false)
-        }
-
+    private fun getHiddenNodeActionModifierItem(selectedNodes: List<NodeUIItem<TypedNode>>): CloudDriveSyncsHiddenNodeActionModifierItem {
         val includeSensitiveInheritedNode = selectedNodes.any { it.isSensitiveInherited }
         val hasNonSensitiveNode = selectedNodes.any { !it.isMarkedSensitive }
         val isPaid = _state.value.accountType?.isPaid ?: false
@@ -959,10 +944,6 @@ class FileBrowserViewModel @Inject constructor(
             canBeHidden = canBeHidden
         )
     }
-
-    private suspend fun isHiddenNodesEnabled() = runCatching {
-        getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-    }.getOrElse { false }
 
     private suspend fun getFavouritesActionModifierItem(selectedNodes: List<NodeUIItem<TypedNode>>): CloudDriveSyncsFavouritesActionModifierItem {
         // Check if the bugfix for allowing favorite in multiple selection is enabled
@@ -1168,25 +1149,23 @@ class FileBrowserViewModel @Inject constructor(
     private fun monitorAccountDetail() {
         monitorAccountDetailUseCase()
             .onEach { accountDetail ->
-                if (isHiddenNodesActive()) {
-                    val accountType = accountDetail.levelDetail?.accountType
-                    val businessStatus =
-                        if (accountType?.isBusinessAccount == true) {
-                            getBusinessStatusUseCase()
-                        } else null
+                val accountType = accountDetail.levelDetail?.accountType
+                val businessStatus =
+                    if (accountType?.isBusinessAccount == true) {
+                        getBusinessStatusUseCase()
+                    } else null
 
-                    _state.update {
-                        it.copy(
-                            accountType = accountType,
-                            isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired,
-                            hiddenNodeEnabled = true
-                        )
-                    }
-                    if (_state.value.isLoading) return@onEach
-
-                    val nodes = filterNonSensitiveNodes(nodes = _state.value.sourceNodesList)
-                    _state.update { it.copy(nodesList = nodes) }
+                _state.update {
+                    it.copy(
+                        accountType = accountType,
+                        isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired,
+                        hiddenNodeEnabled = true
+                    )
                 }
+                if (_state.value.isLoading) return@onEach
+
+                val nodes = filterNonSensitiveNodes(nodes = _state.value.sourceNodesList)
+                _state.update { it.copy(nodesList = nodes) }
             }
             .launchIn(viewModelScope)
     }

@@ -21,10 +21,8 @@ import mega.privacy.android.app.presentation.node.model.menuaction.HideMenuActio
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
@@ -41,7 +39,6 @@ import javax.inject.Inject
  */
 class HideBottomSheetMenuItem @Inject constructor(
     override val menuAction: HideMenuAction,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
@@ -94,9 +91,6 @@ class HideBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         isConnected: Boolean,
     ): Boolean {
-        val isHiddenNodesEnabled = isHiddenNodesActive()
-        if (!isHiddenNodesEnabled) return false
-
         if (isNodeInRubbish || accessPermission != AccessPermission.OWNER || node.isTakenDown || isInBackups)
             return false
 
@@ -133,13 +127,6 @@ class HideBottomSheetMenuItem @Inject constructor(
             actionHandler(menuAction, node)
         }
         onDismiss()
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 
     override

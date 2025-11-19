@@ -38,7 +38,6 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.entity.search.TypeFilterOption
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -523,7 +522,6 @@ class SearchViewModelTest {
     @Test
     fun `test that sensitive nodes should be filtered with subscribed account`() = runTest {
         stubCommon()
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
         initViewModel()
         // given
         val accountDetail = AccountDetail(
@@ -575,7 +573,6 @@ class SearchViewModelTest {
     @Test
     fun `test that sensitive nodes should not be filtered with non-subscribed account`() = runTest {
         stubCommon()
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
         initViewModel()
         // given
         val accountDetail = AccountDetail(

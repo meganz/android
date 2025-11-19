@@ -91,7 +91,6 @@ internal fun ImagePreviewBottomSheet(
     isAvailableOffline: Boolean = false,
     accountType: AccountType? = null,
     isBusinessAccountExpired: Boolean = false,
-    isHiddenNodesEnabled: Boolean = false,
     isHiddenNodesOnboarded: Boolean? = null,
     onClickInfo: () -> Unit = {},
     onClickFavourite: () -> Unit = {},
@@ -419,7 +418,7 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                if (isHiddenNodesEnabled && !forceHideHiddenMenus() && accountType != null && (!accountType.isPaid || isBusinessAccountExpired || (isHideMenuVisible && isHiddenNodesOnboarded != null))) {
+                if (!forceHideHiddenMenus() && accountType != null && (!accountType.isPaid || isBusinessAccountExpired || (isHideMenuVisible && isHiddenNodesOnboarded != null))) {
                     MenuActionListTile(
                         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.EyeOff),
                         text = stringResource(id = R.string.general_hide_node),
@@ -449,7 +448,7 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                if (isHiddenNodesEnabled && !forceHideHiddenMenus() && accountType?.isPaid == true && !isBusinessAccountExpired && isUnhideMenuVisible) {
+                if (!forceHideHiddenMenus() && accountType?.isPaid == true && !isBusinessAccountExpired && isUnhideMenuVisible) {
                     MenuActionListTile(
                         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Eye),
                         text = stringResource(id = R.string.general_unhide_node),

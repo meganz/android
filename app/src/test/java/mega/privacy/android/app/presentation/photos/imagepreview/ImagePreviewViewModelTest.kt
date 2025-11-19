@@ -9,6 +9,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -27,8 +28,11 @@ import mega.privacy.android.app.triggeredContent
 import mega.privacy.android.core.nodecomponents.mapper.RemovePublicLinkResultMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
@@ -43,7 +47,6 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.AddFavouritesUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileUriUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
@@ -63,6 +66,7 @@ import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.shared.resources.R as sharedResR
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -78,6 +82,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 import kotlin.time.Duration
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -106,7 +111,6 @@ class ImagePreviewViewModelTest {
     private val checkUri: CheckFileUriUseCase = mock()
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase = mock()
     private val nodeMoveRequestMessageMapper: NodeMoveRequestMessageMapper = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase = mock()
     private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase =
         mock()
@@ -123,13 +127,21 @@ class ImagePreviewViewModelTest {
         mock()
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
 
-    @BeforeAll
-    fun setup() {
-        commonStub()
-        initViewModel()
+    private val accountLevelDetail = mock<AccountLevelDetail> {
+        on { accountType }.thenReturn(AccountType.PRO_III)
+    }
+    private val accountDetail = mock<AccountDetail> {
+        on { levelDetail }.thenReturn(accountLevelDetail)
     }
 
     @BeforeEach
+    fun setup() {
+        wheneverBlocking { monitorShowHiddenItemsUseCase() }.thenReturn(flowOf(false))
+        wheneverBlocking { monitorAccountDetailUseCase() }.thenReturn(flowOf(accountDetail))
+        initViewModel()
+    }
+
+    @AfterEach
     fun resetMocks() = reset(
         savedStateHandle,
         addImageTypeUseCase,
@@ -147,7 +159,6 @@ class ImagePreviewViewModelTest {
         checkUri,
         moveNodesToRubbishUseCase,
         nodeMoveRequestMessageMapper,
-        getFeatureFlagValueUseCase,
         getPublicChildNodeFromIdUseCase,
         getPublicNodeFromSerializedDataUseCase,
         deleteNodesUseCase,
@@ -185,7 +196,6 @@ class ImagePreviewViewModelTest {
             checkUri = checkUri,
             moveNodesToRubbishUseCase = moveNodesToRubbishUseCase,
             nodeMoveRequestMessageMapper = nodeMoveRequestMessageMapper,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getPublicChildNodeFromIdUseCase = getPublicChildNodeFromIdUseCase,
             getPublicNodeFromSerializedDataUseCase = getPublicNodeFromSerializedDataUseCase,
             deleteNodesUseCase = deleteNodesUseCase,
@@ -202,10 +212,6 @@ class ImagePreviewViewModelTest {
             getNodeAccessPermission = getNodeAccessPermission,
             context = mock()
         )
-    }
-
-    private fun commonStub() = runTest {
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
     }
 
     @ParameterizedTest
@@ -239,7 +245,6 @@ class ImagePreviewViewModelTest {
     @Test
     fun `test that filterNonSensitiveNodes return nodes when from Rubbish Bin regardless of params`() =
         runTest {
-            commonStub()
             whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
                 .thenReturn(ImagePreviewFetcherSource.RUBBISH_BIN)
             initViewModel()
@@ -759,10 +764,11 @@ class ImagePreviewViewModelTest {
                 listOf(imageNode)
             )
             initViewModel()
-
-            underTest.executeTransfer(false)
+            underTest.setCurrentImageNode(imageNode)
+            advanceUntilIdle()
 
             underTest.state.test {
+                underTest.executeTransfer(false)
                 val state = expectMostRecentItem()
                 assertThat(state.transferEvent.triggeredContent()).isInstanceOf(TransferTriggerEvent.CopyOfflineNode::class.java)
             }

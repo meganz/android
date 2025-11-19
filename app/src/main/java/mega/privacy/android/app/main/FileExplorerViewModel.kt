@@ -39,7 +39,6 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetFolderTypeByHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -49,7 +48,6 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetDocumentsFromSharedUrisUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -67,7 +65,6 @@ class FileExplorerViewModel @Inject constructor(
     private val getCopyLatestTargetPathUseCase: GetCopyLatestTargetPathUseCase,
     private val getMoveLatestTargetPathUseCase: GetMoveLatestTargetPathUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val attachNodeUseCase: AttachNodeUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val sendChatAttachmentsUseCase: SendChatAttachmentsUseCase,
@@ -154,17 +151,8 @@ class FileExplorerViewModel @Inject constructor(
      * Sets up the Cloud Drive Explorer content
      */
     fun initCloudDriveExplorerContent() = viewModelScope.launch {
-        if (isHiddenNodesActive()) {
-            _accountDetail = monitorAccountDetailUseCase().firstOrNull()
-            _showHiddenItems = monitorShowHiddenItemsUseCase().firstOrNull() ?: true
-        }
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
+        _accountDetail = monitorAccountDetailUseCase().firstOrNull()
+        _showHiddenItems = monitorShowHiddenItemsUseCase().firstOrNull() ?: true
     }
 
     /**

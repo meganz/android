@@ -18,7 +18,6 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoResult
 import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
 import mega.privacy.android.domain.entity.photos.TimelineSortedPhotosResult
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelinePhotosUseCase
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
@@ -52,15 +51,14 @@ class TimelineTabViewModel @Inject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun timelineTabUiState() = combine(
-        flow = flow { emit(isPaginationEnabled()) },
-        flow2 = flow { emit(isHiddenNodesActive()) }
-    ) { isPaginationEnabled, isHiddenNodesActive ->
-        TimelinePhotosRequest(
-            isPaginationEnabled = isPaginationEnabled,
-            isHiddenNodesActive = isHiddenNodesActive
-        )
-    }.flatMapLatest(::monitorPhotos)
+    private fun timelineTabUiState() =
+        flow { emit(isPaginationEnabled()) }
+            .map { isPaginationEnabled ->
+                TimelinePhotosRequest(
+                    isPaginationEnabled = isPaginationEnabled
+                )
+            }
+            .flatMapLatest(::monitorPhotos)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun monitorPhotos(request: TimelinePhotosRequest) = combine(
@@ -98,10 +96,6 @@ class TimelineTabViewModel @Inject constructor(
             isPaginationEnabled = isPaginationEnabled
         )
     }
-
-    private suspend fun isHiddenNodesActive(): Boolean = runCatching {
-        getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-    }.getOrElse { false }
 
     private fun buildTimelineTabUiState(
         allPhotos: List<PhotoResult>,

@@ -90,7 +90,6 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AudioPlayerHideNodeMenuItemEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -111,8 +110,6 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     private var viewingTrackInfo: TrackInfoFragmentArgs? = null
 
     private var serviceBound = false
-
-    private var isHiddenNodesEnabled: Boolean = false
 
     private var takenDownDialog: AlertDialog? = null
 
@@ -235,12 +232,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
         binding = ActivityAudioPlayerBinding.inflate(layoutInflater)
 
-        lifecycleScope.launch {
-            runCatching {
-                isHiddenNodesEnabled = isHiddenNodesActive()
-                invalidateOptionsMenu()
-            }.onFailure { Timber.e(it) }
-        }
+        invalidateOptionsMenu()
 
         setContentView(binding.root)
         addStartDownloadTransferView(binding.root)
@@ -272,13 +264,6 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         if (CallUtil.participatingInACall()) {
             showNotAllowPlayAlert()
         }
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 
     @OptIn(FlowPreview::class)
@@ -1000,13 +985,12 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
 
                                     val shouldShowHideNode = when {
-                                        !isHiddenNodesEnabled || isInSharedItems || isRootParentInShare || isNodeInBackup -> false
+                                        isInSharedItems || isRootParentInShare || isNodeInBackup -> false
                                         isPaidAccount && !isBusinessAccountExpired && (node.isMarkedSensitive || isSensitiveInherited) -> false
                                         else -> true
                                     }
 
-                                    val shouldShowUnhideNode = isHiddenNodesEnabled
-                                            && !isInSharedItems
+                                    val shouldShowUnhideNode = !isInSharedItems
                                             && !isRootParentInShare
                                             && node.isMarkedSensitive
                                             && isPaidAccount

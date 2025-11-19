@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.favourites
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import android.view.Menu
 import android.view.MenuItem
@@ -9,7 +8,6 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.launchUrl
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
@@ -19,6 +17,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 
 /**
@@ -57,14 +56,13 @@ class FavouriteActionModeCallback(
     private fun handleHiddenNodes(menu: Menu) {
         mainActivity.lifecycleScope.launch {
             runCatching {
-                val isHiddenNodesEnabled = isHiddenNodesActive()
                 val selectedNodes =
                     viewModel.getItemsSelected().mapNotNull { it.value.typedNode }
                 val isHidingActionAllowed = selectedNodes.all {
                     viewModel.isHidingActionAllowed(it.id)
                 }
 
-                if (isHiddenNodesEnabled && isHidingActionAllowed) {
+                if (isHidingActionAllowed) {
                     val includeSensitiveInheritedNode =
                         selectedNodes.any { it.isSensitiveInherited }
                     val isPaid = viewModel.getIsPaidAccount()
@@ -198,12 +196,5 @@ class FavouriteActionModeCallback(
     override fun onDestroyActionMode(mode: ActionMode?) {
         // When the action mode is finished, clear the selections
         viewModel.clearSelections()
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            mainActivity.getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 }

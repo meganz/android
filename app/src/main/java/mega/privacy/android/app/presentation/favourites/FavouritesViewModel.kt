@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.app.presentation.favourites.model.FavouriteItem
@@ -44,7 +43,6 @@ import mega.privacy.android.domain.usecase.favourites.GetFavouriteSortOrderUseCa
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.favourites.MapFavouriteSortOrderUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
@@ -83,7 +81,6 @@ class FavouritesViewModel @Inject constructor(
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
     private val getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase,
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
@@ -113,13 +110,6 @@ class FavouritesViewModel @Inject constructor(
         }
     }
 
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
-    }
-
     @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun combineFavouriteLoadStateFlow(): Flow<FavouriteLoadState> {
         order = MutableStateFlow(getFavouriteSortOrderUseCase())
@@ -136,47 +126,43 @@ class FavouritesViewModel @Inject constructor(
 
     private suspend fun getFavouriteLoadStateFlow(): Flow<FavouriteLoadState> {
         val favouritesFlow = combineFavouriteLoadStateFlow()
-        return if (isHiddenNodesActive()) {
-            val accountDetailFlow = monitorAccountDetailUseCase()
-            val isHiddenNodesOnboardedFlow = flowOf(isHiddenNodesOnboardedUseCase())
-            combine(
-                accountDetailFlow,
-                isHiddenNodesOnboardedFlow,
-                favouritesFlow,
-                monitorShowHiddenItemsUseCase(),
-            ) { accountDetail, isHiddenNodesOnboarded, favouritesState, showHiddenItems ->
-                if (favouritesState is FavouriteLoadState.Success) {
-                    val accountType = accountDetail.levelDetail?.accountType
-                    val businessStatus =
-                        if (accountType?.isBusinessAccount == true) {
-                            getBusinessStatusUseCase()
-                        } else null
+        val accountDetailFlow = monitorAccountDetailUseCase()
+        val isHiddenNodesOnboardedFlow = flowOf(isHiddenNodesOnboardedUseCase())
+        return combine(
+            accountDetailFlow,
+            isHiddenNodesOnboardedFlow,
+            favouritesFlow,
+            monitorShowHiddenItemsUseCase(),
+        ) { accountDetail, isHiddenNodesOnboarded, favouritesState, showHiddenItems ->
+            if (favouritesState is FavouriteLoadState.Success) {
+                val accountType = accountDetail.levelDetail?.accountType
+                val businessStatus =
+                    if (accountType?.isBusinessAccount == true) {
+                        getBusinessStatusUseCase()
+                    } else null
 
-                    val isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
+                val isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
 
-                    val filteredItems = filterNonSensitiveItems(
-                        items = favouritesState.favourites,
-                        showHiddenItems = showHiddenItems,
-                        isPaid = accountType?.isPaid,
+                val filteredItems = filterNonSensitiveItems(
+                    items = favouritesState.favourites,
+                    showHiddenItems = showHiddenItems,
+                    isPaid = accountType?.isPaid,
+                    isBusinessAccountExpired = isBusinessAccountExpired,
+                )
+                if (filteredItems.any { it is FavouriteListItem }) {
+                    favouritesState.copy(
+                        favourites = filteredItems,
+                        accountType = accountType,
                         isBusinessAccountExpired = isBusinessAccountExpired,
+                        isHiddenNodesOnboarded = isHiddenNodesOnboarded,
+                        hiddenNodeEnabled = true,
                     )
-                    if (filteredItems.any { it is FavouriteListItem }) {
-                        favouritesState.copy(
-                            favourites = filteredItems,
-                            accountType = accountType,
-                            isBusinessAccountExpired = isBusinessAccountExpired,
-                            isHiddenNodesOnboarded = isHiddenNodesOnboarded,
-                            hiddenNodeEnabled = true,
-                        )
-                    } else {
-                        FavouriteLoadState.Empty(isConnected)
-                    }
                 } else {
-                    favouritesState
+                    FavouriteLoadState.Empty(isConnected)
                 }
+            } else {
+                favouritesState
             }
-        } else {
-            favouritesFlow
         }
     }
 
@@ -316,7 +302,7 @@ class FavouritesViewModel @Inject constructor(
             async {
                 runCatching {
                     updateNodeSensitiveUseCase(nodeId = nodeId, isSensitive = hide)
-                }.onFailure { Timber.e("Update sensitivity failed: ", it) }
+                }.onFailure { Timber.e(it, "Update sensitivity failed: ") }
             }
         }
     }

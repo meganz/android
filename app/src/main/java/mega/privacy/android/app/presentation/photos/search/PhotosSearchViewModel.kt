@@ -12,9 +12,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.photos.albums.AlbumTitleStringMapper
-import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.photos.Photo
@@ -23,8 +21,8 @@ import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.RetrievePhotosRecentQueriesUseCase
 import mega.privacy.android.domain.usecase.SavePhotosRecentQueriesUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -34,7 +32,6 @@ internal class PhotosSearchViewModel @Inject constructor(
     private val albumTitleStringMapper: AlbumTitleStringMapper,
     private val retrievePhotosRecentQueriesUseCase: RetrievePhotosRecentQueriesUseCase,
     private val savePhotosRecentQueriesUseCase: SavePhotosRecentQueriesUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
@@ -59,20 +56,13 @@ internal class PhotosSearchViewModel @Inject constructor(
 
         retrieveQueries()
 
-        viewModelScope.launch {
-            if (!getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) {
-                showHiddenItems = true
-                return@launch
-            }
+        monitorAccountDetailUseCase()
+            .onEach(::handleAccountDetails)
+            .launchIn(viewModelScope)
 
-            monitorAccountDetailUseCase()
-                .onEach(::handleAccountDetails)
-                .launchIn(viewModelScope)
-
-            monitorShowHiddenItemsUseCase()
-                .onEach(::handleHiddenItemsVisibility)
-                .launchIn(viewModelScope)
-        }
+        monitorShowHiddenItemsUseCase()
+            .onEach(::handleHiddenItemsVisibility)
+            .launchIn(viewModelScope)
     }
 
     private fun updateAlbums(albums: List<UIAlbum>) {

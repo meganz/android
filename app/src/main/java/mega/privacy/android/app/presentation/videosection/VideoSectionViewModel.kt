@@ -53,7 +53,6 @@ import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.videosection.FavouritesVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -166,10 +165,8 @@ class VideoSectionViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            if (isHiddenNodesActive()) {
-                handleHiddenNodesUIFlow()
-                monitorIsHiddenNodesOnboarded()
-            }
+            handleHiddenNodesUIFlow()
+            monitorIsHiddenNodesOnboarded()
         }
 
         viewModelScope.launch {
@@ -200,13 +197,6 @@ class VideoSectionViewModel @Inject constructor(
     }
 
     private fun getCurrentSearchQuery() = state.value.query.orEmpty()
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
-    }
 
     private fun handleHiddenNodesUIFlow() {
         combine(
@@ -1107,20 +1097,17 @@ class VideoSectionViewModel @Inject constructor(
 
         if (_tabState.value.selectedTab == VideoSectionTab.All) {
             val selectedNodes = getSelectedNodes()
-            val isHiddenNodesEnabled = isHiddenNodesActive()
             val includeSensitiveInheritedNode = selectedNodes.any { it.isSensitiveInherited }
 
-            if (isHiddenNodesEnabled) {
-                val hasNonSensitiveNode =
-                    getSelectedNodes().any { !it.isMarkedSensitive }
-                val isPaid = _state.value.accountType?.isPaid ?: false
-                val isBusinessAccountExpired = _state.value.isBusinessAccountExpired
+            val hasNonSensitiveNode =
+                getSelectedNodes().any { !it.isMarkedSensitive }
+            val isPaid = _state.value.accountType?.isPaid ?: false
+            val isBusinessAccountExpired = _state.value.isBusinessAccountExpired
 
-                isHideMenuActionVisible =
-                    !isPaid || isBusinessAccountExpired || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
-                isUnhideMenuActionVisible =
-                    isPaid && !isBusinessAccountExpired && !hasNonSensitiveNode && !includeSensitiveInheritedNode
-            }
+            isHideMenuActionVisible =
+                !isPaid || isBusinessAccountExpired || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
+            isUnhideMenuActionVisible =
+                isPaid && !isBusinessAccountExpired && !hasNonSensitiveNode && !includeSensitiveInheritedNode
 
             isRemoveLinkMenuActionVisible = if (selectedNodes.size == 1) {
                 selectedNodes.firstOrNull()?.let {
@@ -1140,7 +1127,7 @@ class VideoSectionViewModel @Inject constructor(
         }
     }
 
-    private suspend fun checkPlaylistDetailActionsVisible() {
+    private fun checkPlaylistDetailActionsVisible() {
         var isHideMenuActionVisible = false
         var isUnhideMenuActionVisible = false
         _state.value.currentVideoPlaylist?.let { playlist ->
@@ -1149,20 +1136,17 @@ class VideoSectionViewModel @Inject constructor(
             val selectedVideos = selectedVideoElementIDs.mapNotNull { elementId ->
                 videos.find { video -> video.elementID == elementId }
             }
-            val isHiddenNodesEnabled = isHiddenNodesActive()
             val includeSensitiveInheritedNode = selectedVideos.any { it.isSensitiveInherited }
 
-            if (isHiddenNodesEnabled) {
-                val hasNonSensitiveNode =
-                    selectedVideos.any { !it.isMarkedSensitive }
-                val isPaid = _state.value.accountType?.isPaid ?: false
-                val isBusinessAccountExpired = _state.value.isBusinessAccountExpired
+            val hasNonSensitiveNode =
+                selectedVideos.any { !it.isMarkedSensitive }
+            val isPaid = _state.value.accountType?.isPaid ?: false
+            val isBusinessAccountExpired = _state.value.isBusinessAccountExpired
 
-                isHideMenuActionVisible =
-                    !isPaid || isBusinessAccountExpired || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
-                isUnhideMenuActionVisible =
-                    isPaid && !isBusinessAccountExpired && !hasNonSensitiveNode && !includeSensitiveInheritedNode
-            }
+            isHideMenuActionVisible =
+                !isPaid || isBusinessAccountExpired || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
+            isUnhideMenuActionVisible =
+                isPaid && !isBusinessAccountExpired && !hasNonSensitiveNode && !includeSensitiveInheritedNode
         }
         _state.update {
             it.copy(

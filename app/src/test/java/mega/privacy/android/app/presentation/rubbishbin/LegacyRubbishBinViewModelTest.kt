@@ -28,12 +28,10 @@ import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
@@ -74,7 +72,6 @@ class LegacyRubbishBinViewModelTest {
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val accountDetailFakeFlow = MutableSharedFlow<AccountDetail>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -98,7 +95,6 @@ class LegacyRubbishBinViewModelTest {
             durationInSecondsTextMapper = durationInSecondsTextMapper,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -456,7 +452,6 @@ class LegacyRubbishBinViewModelTest {
     @Test
     fun `test that account type is updated when monitorAccountDetailUseCase emits`() = runTest {
         stubCommon()
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
         initViewModel()
         val newAccountDetail = AccountDetail(
             levelDetail = AccountLevelDetail(
@@ -481,7 +476,7 @@ class LegacyRubbishBinViewModelTest {
     fun `test that resetScrollPosition sets resetScrollPositionEvent to triggered`() = runTest {
         underTest.resetScrollPosition()
         underTest.state.test {
-            Truth.assertThat(awaitItem().resetScrollPositionEvent).isEqualTo(triggered)
+            assertThat(awaitItem().resetScrollPositionEvent).isEqualTo(triggered)
         }
     }
 
@@ -490,7 +485,7 @@ class LegacyRubbishBinViewModelTest {
         runTest {
             underTest.onResetScrollPositionEventConsumed()
             underTest.state.test {
-                Truth.assertThat(awaitItem().resetScrollPositionEvent).isEqualTo(consumed)
+                assertThat(awaitItem().resetScrollPositionEvent).isEqualTo(consumed)
             }
         }
 
@@ -503,7 +498,6 @@ class LegacyRubbishBinViewModelTest {
         whenever(getRubbishBinFolderUseCase()).thenReturn(null)
         whenever(fileDurationMapper(any())).thenReturn(1.seconds)
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFakeFlow)
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
     }
 
     @AfterEach

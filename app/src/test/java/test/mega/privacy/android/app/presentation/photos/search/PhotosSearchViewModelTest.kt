@@ -11,23 +11,25 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.photos.albums.AlbumTitleStringMapper
-import mega.privacy.android.feature.photos.presentation.albums.model.AlbumTitle
-import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.search.PhotosSearchViewModel
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.RetrievePhotosRecentQueriesUseCase
 import mega.privacy.android.domain.usecase.SavePhotosRecentQueriesUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.feature.photos.presentation.albums.model.AlbumTitle
+import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 import java.time.LocalDateTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -40,8 +42,6 @@ internal class PhotosSearchViewModelTest {
 
     private val savePhotosRecentQueriesUseCase: SavePhotosRecentQueriesUseCase = mock()
 
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
-
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
 
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase = mock()
@@ -50,16 +50,25 @@ internal class PhotosSearchViewModelTest {
 
     private lateinit var photosSearchViewModel: PhotosSearchViewModel
 
+    private val accountLevelDetail = mock<AccountLevelDetail> {
+        on { accountType }.thenReturn(AccountType.PRO_III)
+    }
+    private val accountDetail = mock<AccountDetail> {
+        on { levelDetail }.thenReturn(accountLevelDetail)
+    }
+
     @Before
     fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
+
+        wheneverBlocking { monitorShowHiddenItemsUseCase() }.thenReturn(flowOf(false))
+        wheneverBlocking { monitorAccountDetailUseCase() }.thenReturn(flowOf(accountDetail))
 
         photosSearchViewModel = PhotosSearchViewModel(
             defaultDispatcher = defaultDispatcher,
             albumTitleStringMapper = albumTitleStringMapper,
             retrievePhotosRecentQueriesUseCase = retrievePhotosRecentQueriesUseCase,
             savePhotosRecentQueriesUseCase = savePhotosRecentQueriesUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
@@ -108,8 +117,6 @@ internal class PhotosSearchViewModelTest {
         )
 
         whenever(retrievePhotosRecentQueriesUseCase()).thenReturn(listOf())
-
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
 
         // when
         photosSearchViewModel.initialize(albumsFlow, photosFlow)

@@ -136,7 +136,6 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
@@ -157,7 +156,6 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.message.delete.DeleteNodeAttachmentMessageByIdsUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
@@ -204,6 +202,7 @@ import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatched
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.navigation.ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.LockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OffOptionForHideSubtitlePressedEvent
 import mega.privacy.mobile.analytics.event.UnlockButtonPressedEvent
@@ -225,7 +224,6 @@ import java.util.Date
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
-import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * ViewModel for video player.
@@ -271,7 +269,6 @@ class VideoPlayerViewModel @Inject constructor(
     private val monitorVideoRepeatModeUseCase: MonitorVideoRepeatModeUseCase,
     private val saveVideoRecentlyWatchedUseCase: SaveVideoRecentlyWatchedUseCase,
     private val setVideoRepeatModeUseCase: SetVideoRepeatModeUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
@@ -368,12 +365,8 @@ class VideoPlayerViewModel @Inject constructor(
     init {
         setupTransferListener()
 
-        viewModelScope.launch {
-            if (isHiddenNodesActive()) {
-                handleHiddenNodesUIFlow()
-                monitorIsHiddenNodesOnboarded()
-            }
-        }
+        handleHiddenNodesUIFlow()
+        monitorIsHiddenNodesOnboarded()
 
         refreshMenuActionsWhenNodeUpdates()
     }
@@ -1307,12 +1300,6 @@ class VideoPlayerViewModel @Inject constructor(
             isPaidUser = isPaidUser,
             isExpiredBusinessUser = isExpiredBusinessUser,
         )
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        return runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }.getOrNull() == true
     }
 
     internal fun updateClickedMenuAction(action: VideoPlayerMenuAction?) {

@@ -16,8 +16,11 @@ import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhoto
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CLOUD_DRIVE
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
@@ -28,9 +31,11 @@ import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbum
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorPaginatedTimelinePhotosUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.BeforeEach
@@ -39,11 +44,12 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 import java.time.LocalDateTime
 
 @ExperimentalCoroutinesApi
 class AlbumPhotosSelectionViewModelTest {
-    private var underTest: AlbumPhotosSelectionViewModel? = null
+    private lateinit var underTest: AlbumPhotosSelectionViewModel
 
     private val savedStateHandle = SavedStateHandle()
     private val getUserAlbum = mock<GetUserAlbum>()
@@ -55,11 +61,22 @@ class AlbumPhotosSelectionViewModelTest {
     private val addPhotosToAlbum = mock<AddPhotosToAlbum>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
+    private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val monitorPaginatedTimelinePhotosUseCase =
         mock<MonitorPaginatedTimelinePhotosUseCase>()
 
+    private val accountLevelDetail = mock<AccountLevelDetail> {
+        on { accountType }.thenReturn(AccountType.PRO_III)
+    }
+    private val accountDetail = mock<AccountDetail> {
+        on { levelDetail }.thenReturn(accountLevelDetail)
+    }
+
     @BeforeEach
     fun setUp() {
+        wheneverBlocking { monitorShowHiddenItemsUseCase() }.thenReturn(flowOf(false))
+        wheneverBlocking { monitorAccountDetailUseCase() }.thenReturn(flowOf(accountDetail))
         underTest = createSUT()
     }
 
@@ -73,8 +90,10 @@ class AlbumPhotosSelectionViewModelTest {
 
         savedStateHandle[ALBUM_ID] = id
         whenever(getUserAlbum(expectedAlbum.id)).thenReturn(flowOf(expectedAlbum))
+        createSUT()
+        advanceUntilIdle()
 
-        underTest?.state?.drop(1)?.test {
+        underTest.state.test {
             val actualAlbum = awaitItem().album
             assertThat(expectedAlbum).isEqualTo(actualAlbum)
         }
@@ -94,7 +113,7 @@ class AlbumPhotosSelectionViewModelTest {
         underTest = createSUT()
         advanceUntilIdle()
 
-        underTest?.state?.test {
+        underTest.state.test {
             val actualPhotos = awaitItem().photos
             assertThat(actualPhotos.size).isEqualTo(3)
         }
@@ -102,14 +121,14 @@ class AlbumPhotosSelectionViewModelTest {
 
     @Test
     fun `test that selected location is updated correctly`() = runTest {
-        underTest?.state?.test {
-            underTest?.updateLocation(ALL_PHOTOS)
+        underTest.state.test {
+            underTest.updateLocation(ALL_PHOTOS)
             assertThat(awaitItem().selectedLocation).isEqualTo(ALL_PHOTOS)
 
-            underTest?.updateLocation(CLOUD_DRIVE)
+            underTest.updateLocation(CLOUD_DRIVE)
             assertThat(awaitItem().selectedLocation).isEqualTo(CLOUD_DRIVE)
 
-            underTest?.updateLocation(CAMERA_UPLOAD)
+            underTest.updateLocation(CAMERA_UPLOAD)
             assertThat(awaitItem().selectedLocation).isEqualTo(CAMERA_UPLOAD)
         }
     }
@@ -128,9 +147,9 @@ class AlbumPhotosSelectionViewModelTest {
         underTest = createSUT()
         advanceUntilIdle()
 
-        underTest?.selectAllPhotos()
+        underTest.selectAllPhotos()
 
-        underTest?.state?.drop(1)?.test {
+        underTest.state.drop(1).test {
             val actualSelectedPhotoIds = awaitItem().selectedPhotoIds
             assertThat(actualSelectedPhotoIds).isEqualTo(setOf(1L, 2L, 3L))
         }
@@ -138,9 +157,9 @@ class AlbumPhotosSelectionViewModelTest {
 
     @Test
     fun `test that clear selection behaves correctly`() = runTest {
-        underTest?.clearSelection()
+        underTest.clearSelection()
 
-        underTest?.state?.test {
+        underTest.state.test {
             assertThat(awaitItem().selectedPhotoIds.isEmpty()).isTrue()
         }
     }
@@ -149,9 +168,9 @@ class AlbumPhotosSelectionViewModelTest {
     fun `test that select photo behaves correctly`() = runTest {
         val image = createImage(id = 1L)
 
-        underTest?.selectPhoto(image)
+        underTest.selectPhoto(image)
 
-        underTest?.state?.test {
+        underTest.state.test {
             assertThat(awaitItem().selectedPhotoIds).isEqualTo(setOf(image.id))
         }
     }
@@ -160,10 +179,10 @@ class AlbumPhotosSelectionViewModelTest {
     fun `test that unselect photo behaves correctly`() = runTest {
         val image = createImage(id = 1L)
 
-        underTest?.selectPhoto(image)
-        underTest?.unselectPhoto(image)
+        underTest.selectPhoto(image)
+        underTest.unselectPhoto(image)
 
-        underTest?.state?.test {
+        underTest.state.test {
             assertThat(!awaitItem().selectedPhotoIds.contains(1L)).isTrue()
         }
     }
@@ -178,9 +197,11 @@ class AlbumPhotosSelectionViewModelTest {
         )
         whenever(addPhotosToAlbum(album.id, photoIds, false)).thenReturn(Unit)
 
-        underTest?.addPhotos(album, photoIds.map { it.longValue }.toSet())
+        createSUT()
+        underTest.addPhotos(album, photoIds.map { it.longValue }.toSet())
+        advanceUntilIdle()
 
-        underTest?.state?.drop(1)?.test {
+        underTest.state.test {
             val state = awaitItem()
             assertThat(state.isSelectionCompleted).isTrue()
         }
@@ -201,7 +222,7 @@ class AlbumPhotosSelectionViewModelTest {
         underTest = createSUT()
         advanceUntilIdle()
 
-        underTest?.state?.test {
+        underTest.state.test {
             val actualPhotos = awaitItem().photos
             assertThat(actualPhotos.size).isEqualTo(3)
         }
@@ -217,8 +238,8 @@ class AlbumPhotosSelectionViewModelTest {
         filterCameraUploadPhotos = filterCameraUploadPhotos,
         addPhotosToAlbum = addPhotosToAlbum,
         defaultDispatcher = UnconfinedTestDispatcher(),
-        monitorShowHiddenItemsUseCase = mock(),
-        monitorAccountDetailUseCase = mock(),
+        monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+        monitorAccountDetailUseCase = monitorAccountDetailUseCase,
         getBusinessStatusUseCase = getBusinessStatusUseCase,
         durationInSecondsTextMapper = DurationInSecondsTextMapper(),
         getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,

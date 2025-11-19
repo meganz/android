@@ -16,10 +16,13 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.recentactions.mapper.RecentActionBucketUiEntityMapper
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionBucketUiEntity
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.RecentActionBucket
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -55,13 +58,16 @@ class RecentActionsComposeViewModelTest {
     private val megaRecentActionBucket = mock<RecentActionBucket>()
     private val megaRecentActionBucket2 = mock<RecentActionBucket>()
     private val megaRecentActionBucket3 = mock<RecentActionBucket>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
-        onBlocking { invoke(any()) }.thenReturn(false)
-    }
-    private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase> {
-        on { invoke() }.thenReturn(flowOf(false))
-    }
+    private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
+
+    private val accountLevelDetail = mock<AccountLevelDetail> {
+        on { accountType }.thenReturn(AccountType.PRO_III)
+    }
+    private val accountDetail = mock<AccountDetail> {
+        on { levelDetail }.thenReturn(accountLevelDetail)
+    }
 
     @BeforeEach
     fun resetMocks() {
@@ -72,7 +78,8 @@ class RecentActionsComposeViewModelTest {
             monitorNodeUpdatesUseCase,
             recentActionBucketUiEntityMapper,
             monitorConnectivityUseCase,
-            monitorFetchNodesFinishUseCase
+            monitorFetchNodesFinishUseCase,
+            monitorAccountDetailUseCase
         )
         runBlocking {
             stubCommon()
@@ -84,8 +91,7 @@ class RecentActionsComposeViewModelTest {
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             recentActionBucketUiEntityMapper = recentActionBucketUiEntityMapper,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            monitorAccountDetailUseCase = mock(),
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase
@@ -101,6 +107,8 @@ class RecentActionsComposeViewModelTest {
         whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
         whenever(monitorFetchNodesFinishUseCase()).thenReturn(monitorFetchNodesFinishFakeFlow)
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
 
         val recentActionBucketUiEntity1 = mock<RecentActionBucketUiEntity> {
             on { this.date }.thenReturn("Today")

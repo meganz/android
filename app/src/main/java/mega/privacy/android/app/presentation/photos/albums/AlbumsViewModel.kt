@@ -20,15 +20,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.PhotosCache.updateAlbums
-import mega.privacy.android.feature.photos.presentation.albums.model.AlbumTitle
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
-import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
-import mega.privacy.android.feature.photos.mapper.UIAlbumMapper
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -43,6 +39,9 @@ import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.feature.photos.mapper.UIAlbumMapper
+import mega.privacy.android.feature.photos.presentation.albums.model.AlbumTitle
+import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 import java.util.concurrent.ConcurrentHashMap
@@ -94,24 +93,13 @@ class AlbumsViewModel @Inject constructor(
     init {
         loadAlbums()
 
-        viewModelScope.launch {
-            if (isHiddenNodesActive()) {
-                monitorShowHiddenItems()
-                monitorAccountDetail()
-            }
-        }
+        monitorShowHiddenItems()
+        monitorAccountDetail()
 
         updateAlbums(listOf())
         viewModelScope.launch {
             _state.collectLatest { updateAlbums(it.albums) }
         }
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 
     private fun loadAlbums() {

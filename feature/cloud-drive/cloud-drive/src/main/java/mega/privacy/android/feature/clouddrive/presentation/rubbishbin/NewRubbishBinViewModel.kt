@@ -32,14 +32,12 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CleanRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
@@ -83,7 +81,6 @@ class NewRubbishBinViewModel @AssistedInject constructor(
     private val getRubbishBinFolderUseCase: GetRubbishBinFolderUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val cleanRubbishBinUseCase: CleanRubbishBinUseCase,
@@ -115,11 +112,7 @@ class NewRubbishBinViewModel @AssistedInject constructor(
         nodeUpdates()
         monitorViewTypeChanges()
         getCloudSortOrderAndRefresh()
-        viewModelScope.launch {
-            if (isHiddenNodesActive()) {
-                monitorAccountDetail()
-            }
-        }
+        monitorAccountDetail()
     }
 
     private fun setRubbishBinFolderHandle() {
@@ -145,8 +138,8 @@ class NewRubbishBinViewModel @AssistedInject constructor(
                 folderId
             }
             getNodesByIdInChunkUseCase(folderOrRootNodeId)
-                .catch {
-                    Timber.e(it)
+                .catch { error ->
+                    Timber.e(error)
                     _uiState.update {
                         it.copy(
                             nodesLoadingState = NodesLoadingState.Failed
@@ -172,13 +165,6 @@ class NewRubbishBinViewModel @AssistedInject constructor(
                     }
                 }
         }
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 
     /**

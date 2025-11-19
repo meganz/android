@@ -29,12 +29,10 @@ import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
@@ -74,7 +72,6 @@ class LegacyRubbishBinViewModel @Inject constructor(
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     /**
@@ -91,11 +88,7 @@ class LegacyRubbishBinViewModel @Inject constructor(
         setRubbishBinFolderHandle()
         nodeUpdates()
         checkViewType()
-        viewModelScope.launch {
-            if (isHiddenNodesActive()) {
-                monitorAccountDetail()
-            }
-        }
+        monitorAccountDetail()
     }
 
     private fun setRubbishBinFolderHandle() {
@@ -110,13 +103,6 @@ class LegacyRubbishBinViewModel @Inject constructor(
                 Timber.e(it)
             }
         }
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 
     /**

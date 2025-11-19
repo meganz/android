@@ -1,8 +1,7 @@
 package mega.privacy.android.domain.entity.photos
 
 data class TimelinePhotosRequest(
-    val isPaginationEnabled: Boolean,
-    val isHiddenNodesActive: Boolean,
+    val isPaginationEnabled: Boolean
 )
 
 data class TimelinePhotosResult(

@@ -17,8 +17,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.features.CloudDriveFeature
-import mega.privacy.android.core.nodecomponents.components.banners.StorageCapacityMapper
-import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
@@ -27,6 +25,8 @@ import mega.privacy.android.app.presentation.validator.toolbaractions.model.modi
 import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.CloudDriveSyncsFavouritesActionModifierItem
 import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.CloudDriveSyncsHiddenNodeActionModifierItem
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.nodecomponents.components.banners.StorageCapacityMapper
+import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
@@ -49,7 +49,6 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -1136,52 +1135,7 @@ class FileBrowserViewModelTest {
     }
 
     @Test
-    fun `test that the hidden node toolbar item is disabled when a selection is made and hidden nodes feature is disabled`() =
-        runTest {
-            val node = mock<TypedFileNode>()
-            whenever(node.id.longValue).thenReturn(1L)
-            whenever(
-                getFileBrowserNodeChildrenUseCase(
-                    underTest.state.value.fileBrowserHandle
-                )
-            ) doReturn listOf(node)
-            whenever(getRubbishBinFolderUseCase()) doReturn null
-            whenever(
-                getNodeAccessUseCase(nodeId = node.id)
-            ) doReturn AccessPermission.UNKNOWN
-            whenever(
-                getFeatureFlagValueUseCase(
-                    ApiFeatures.HiddenNodesInternalRelease
-                )
-            ) doReturn false
-
-            underTest.refreshNodes()
-            underTest.onLongItemClicked(
-                NodeUIItem(
-                    node = node,
-                    isSelected = false,
-                    isInvisible = false
-                )
-            )
-            underTest.onItemClicked(
-                NodeUIItem(
-                    node = node,
-                    isSelected = false,
-                    isInvisible = false
-                )
-            )
-
-            underTest.state.test {
-                assertThat(
-                    expectMostRecentItem().toolbarActionsModifierItem!!.item.hiddenNodeItem
-                ).isEqualTo(
-                    CloudDriveSyncsHiddenNodeActionModifierItem(isEnabled = false)
-                )
-            }
-        }
-
-    @Test
-    fun `test that the hidden node toolbar item can be hidden when a selection is made for free account and hidden nodes feature is enabled`() =
+    fun `test that the hidden node toolbar item can be hidden when a selection is made for free account`() =
         runTest {
             val accountDetail = AccountDetail(
                 levelDetail = AccountLevelDetail(
@@ -1206,11 +1160,6 @@ class FileBrowserViewModelTest {
             whenever(
                 getNodeAccessUseCase(nodeId = node.id)
             ) doReturn AccessPermission.UNKNOWN
-            whenever(
-                getFeatureFlagValueUseCase(
-                    ApiFeatures.HiddenNodesInternalRelease
-                )
-            ) doReturn true
 
             underTest.refreshNodes()
             underTest.onLongItemClicked(
@@ -1241,7 +1190,7 @@ class FileBrowserViewModelTest {
         }
 
     @Test
-    fun `test that the hidden node toolbar item can be hidden when a selection is made for an expired business account and hidden nodes feature is enabled`() =
+    fun `test that the hidden node toolbar item can be hidden when a selection is made for an expired business account`() =
         runTest {
             val accountDetail = AccountDetail(
                 levelDetail = AccountLevelDetail(
@@ -1267,11 +1216,6 @@ class FileBrowserViewModelTest {
             whenever(
                 getNodeAccessUseCase(nodeId = node.id)
             ) doReturn AccessPermission.UNKNOWN
-            whenever(
-                getFeatureFlagValueUseCase(
-                    ApiFeatures.HiddenNodesInternalRelease
-                )
-            ) doReturn true
 
             underTest.refreshNodes()
             underTest.onLongItemClicked(
@@ -1302,7 +1246,7 @@ class FileBrowserViewModelTest {
         }
 
     @Test
-    fun `test that the hidden node toolbar item can be hidden when a selection is made for a not sensitive node and hidden nodes feature is enabled`() =
+    fun `test that the hidden node toolbar item can be hidden when a selection is made for a not sensitive node`() =
         runTest {
             val node = mock<TypedFileNode> {
                 on { isSensitiveInherited } doReturn false
@@ -1318,11 +1262,6 @@ class FileBrowserViewModelTest {
             whenever(
                 getNodeAccessUseCase(nodeId = node.id)
             ) doReturn AccessPermission.UNKNOWN
-            whenever(
-                getFeatureFlagValueUseCase(
-                    ApiFeatures.HiddenNodesInternalRelease
-                )
-            ) doReturn true
 
             underTest.refreshNodes()
             underTest.onLongItemClicked(
@@ -1382,11 +1321,6 @@ class FileBrowserViewModelTest {
             whenever(
                 getNodeAccessUseCase(nodeId = sensitiveNode.id)
             ) doReturn AccessPermission.UNKNOWN
-            whenever(
-                getFeatureFlagValueUseCase(
-                    ApiFeatures.HiddenNodesInternalRelease
-                )
-            ) doReturn true
 
             underTest.refreshNodes()
             underTest.onLongItemClicked(
@@ -1895,7 +1829,6 @@ class FileBrowserViewModelTest {
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(showHiddenItemsFlow)
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFakeFlow)
         whenever(shouldEnterMediaDiscoveryModeUseCase(any(), any())).thenReturn(false)
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
         whenever(monitorStorageStateUseCase()).thenReturn(
             StorageState.Green.asHotFlow()
         )

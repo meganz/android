@@ -34,7 +34,6 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -44,7 +43,6 @@ import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.audiosection.GetAllAudioUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -76,7 +74,6 @@ class AudioSectionViewModel @Inject constructor(
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode,
@@ -98,27 +95,9 @@ class AudioSectionViewModel @Inject constructor(
     init {
         checkViewType()
         viewModelScope.launch {
-            if (isHiddenNodesActive()) {
-                handleHiddenNodesUIFlow()
-                monitorIsHiddenNodesOnboarded()
-            } else {
-                merge(
-                    monitorNodeUpdatesUseCase(),
-                    monitorOfflineNodeUpdatesUseCase()
-                ).conflate()
-                    .catch { Timber.e(it) }
-                    .collect {
-                        setPendingRefreshNodes()
-                    }
-            }
+            handleHiddenNodesUIFlow()
+            monitorIsHiddenNodesOnboarded()
         }
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 
     private fun handleHiddenNodesUIFlow() {
@@ -172,8 +151,6 @@ class AudioSectionViewModel @Inject constructor(
             items.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }
         }
     }
-
-    private fun setPendingRefreshNodes() = _state.update { it.copy(isPendingRefresh = true) }
 
     internal fun refreshNodes() = viewModelScope.launch {
         val audioList = filterNonSensitiveItems(
@@ -349,12 +326,7 @@ class AudioSectionViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getHiddenNodeActionModifierItem(selectedNodes: List<AudioUiEntity>): AudioHiddenNodeActionModifierItem {
-        val isHiddenNodesEnabled = isHiddenNodesActive()
-        if (!isHiddenNodesEnabled) {
-            return AudioHiddenNodeActionModifierItem(isEnabled = false)
-        }
-
+    private fun getHiddenNodeActionModifierItem(selectedNodes: List<AudioUiEntity>): AudioHiddenNodeActionModifierItem {
         val includeSensitiveInheritedNode = selectedNodes.any { it.isSensitiveInherited }
         val hasNonSensitiveNode = selectedNodes.any { !it.isMarkedSensitive }
         val isPaid = _state.value.accountType?.isPaid ?: false

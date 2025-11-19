@@ -24,14 +24,16 @@ import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMe
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Progress
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -149,6 +151,13 @@ internal class TimelineViewModelTest {
 
     private val loadNextPageOfPhotosUseCase = mock<LoadNextPageOfPhotosUseCase>()
 
+    private val accountLevelDetail = mock<AccountLevelDetail> {
+        on { accountType }.thenReturn(AccountType.PRO_III)
+    }
+    private val accountDetail = mock<AccountDetail> {
+        on { levelDetail }.thenReturn(accountLevelDetail)
+    }
+
     @BeforeEach
     fun setUp() {
         getTimelinePhotosUseCase.stub {
@@ -156,6 +165,15 @@ internal class TimelineViewModelTest {
         }
         monitorCameraUploadsStatusInfoUseCase.stub {
             onBlocking { invoke() }.thenReturn(cameraUploadsStatusInfoFlow)
+        }
+        monitorShowHiddenItemsUseCase.stub {
+            onBlocking { invoke() }.thenReturn(flowOf(false))
+        }
+        monitorAccountDetailUseCase.stub {
+            onBlocking { invoke() }.thenReturn(flowOf(accountDetail))
+        }
+        isHiddenNodesOnboardedUseCase.stub {
+            onBlocking { invoke() }.thenReturn(false)
         }
         reset(
             enableCameraUploadsInPhotosUseCase
@@ -204,7 +222,6 @@ internal class TimelineViewModelTest {
     private fun initViewModelWithDefaultFlags() {
         // Set up default feature flags (legacy behavior)
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
             onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
         }
         initViewModel()
@@ -212,7 +229,6 @@ internal class TimelineViewModelTest {
 
     private fun setupUIDrivenPhotoMonitoring(enabled: Boolean) {
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
             onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(enabled)
         }
         whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf()))
@@ -222,7 +238,6 @@ internal class TimelineViewModelTest {
         val mockPhoto =
             mock<Photo.Image> { on { modificationTime }.thenReturn(LocalDateTime.now()) }
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
             onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(enabled)
         }
         whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf(mockPhoto)))
@@ -309,7 +324,6 @@ internal class TimelineViewModelTest {
 
         // Set up default feature flags
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
             onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
         }
 
@@ -776,7 +790,6 @@ internal class TimelineViewModelTest {
 
         // Set up default feature flags
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
             onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
         }
 
@@ -824,7 +837,6 @@ internal class TimelineViewModelTest {
         isEnabled: Boolean,
     ) = runTest {
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
             onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
         }
         whenever(getFeatureFlagValueUseCase(AppFeatures.CameraUploadsTransferScreen))
@@ -845,7 +857,6 @@ internal class TimelineViewModelTest {
         isEnabled: Boolean,
     ) = runTest {
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
             onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
         }
         whenever(getFeatureFlagValueUseCase(AppFeatures.CameraUploadsPausedWarningBanner))
@@ -1013,7 +1024,6 @@ internal class TimelineViewModelTest {
     fun `test that feature flag exception defaults to enabled behavior`() = runTest {
         // Given: Feature flag throws exception (simulating network/API error)
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
             onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenThrow(RuntimeException("Network error"))
         }
         whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf()))
@@ -1038,7 +1048,6 @@ internal class TimelineViewModelTest {
     fun `test that feature flag null result defaults to enabled behavior`() = runTest {
         // Given: Feature flag returns null (simulating missing config)
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(false)
             onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(null)
         }
         whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf()))

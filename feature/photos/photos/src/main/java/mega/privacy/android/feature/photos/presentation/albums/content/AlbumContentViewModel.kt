@@ -42,7 +42,6 @@ import mega.privacy.android.domain.entity.photos.AlbumPhotosAddingProgress
 import mega.privacy.android.domain.entity.photos.AlbumPhotosRemovingProgress
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.exception.account.AlbumNameValidationException
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetAlbumPhotosUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -71,10 +70,10 @@ import mega.privacy.android.feature.photos.mapper.AlbumNameValidationExceptionMe
 import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
 import mega.privacy.android.feature.photos.mapper.LegacyMediaSystemAlbumMapper
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
-import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
 import mega.privacy.android.feature.photos.model.AlbumSortConfiguration
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
+import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
@@ -147,12 +146,8 @@ class AlbumContentViewModel @AssistedInject constructor(
         fetchPhotos()
         fetchIsHiddenNodesOnboarded()
 
-        viewModelScope.launch {
-            if (isHiddenNodesActive()) {
-                monitorShowHiddenItems()
-                monitorAccountDetail()
-            }
-        }
+        monitorShowHiddenItems()
+        monitorAccountDetail()
     }
 
     private fun monitorThemeMode() {
@@ -161,13 +156,6 @@ class AlbumContentViewModel @AssistedInject constructor(
                 _state.update { it.copy(themeMode = mode) }
             }
             .launchIn(viewModelScope)
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 
     private fun fetchPhotos() {

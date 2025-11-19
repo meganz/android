@@ -28,13 +28,11 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbum
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumCoverUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
@@ -51,7 +49,6 @@ class AlbumCoverSelectionViewModel @Inject constructor(
     private val downloadThumbnailUseCase: DownloadThumbnailUseCase,
     private val updateAlbumCoverUseCase: UpdateAlbumCoverUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
@@ -67,20 +64,11 @@ class AlbumCoverSelectionViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            if (isHiddenNodesActive()) {
-                fetchShowHiddenItems()
-                fetchAccountDetail()
-            }
+            fetchShowHiddenItems()
+            fetchAccountDetail()
 
             fetchAlbum()
         }
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 
     private fun fetchAlbum() = savedStateHandle.getStateFlow<Long?>(ALBUM_ID, null)

@@ -7,7 +7,6 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -142,30 +141,24 @@ class AlbumContentActionModeCallback(
             menu.findItem(R.id.cab_menu_select_all)?.isVisible = !isSelectAll()
 
             fragment.lifecycleScope.launch {
-                val isHiddenNodesEnabled = isHiddenNodesActive()
                 val selectedPhotos = fragment.albumContentViewModel.getSelectedPhotos()
                 val includeSensitiveInheritedNode = selectedPhotos.any { it.isSensitiveInherited }
 
-                if (isHiddenNodesEnabled) {
-                    val hasNonSensitiveNode = selectedPhotos.any { !it.isSensitive }
-                    val isPaid =
-                        fragment.albumContentViewModel.state.value.accountType?.isPaid
-                            ?: false
+                val hasNonSensitiveNode = selectedPhotos.any { !it.isSensitive }
+                val isPaid =
+                    fragment.albumContentViewModel.state.value.accountType?.isPaid
+                        ?: false
 
-                    val isBusinessAccountExpired =
-                        fragment.albumContentViewModel.state.value.isBusinessAccountExpired
-                    val isHiddenNodesOnboarded =
-                        fragment.albumContentViewModel.state.value.isHiddenNodesOnboarded
+                val isBusinessAccountExpired =
+                    fragment.albumContentViewModel.state.value.isBusinessAccountExpired
+                val isHiddenNodesOnboarded =
+                    fragment.albumContentViewModel.state.value.isHiddenNodesOnboarded
 
-                    menu.findItem(R.id.cab_menu_hide)?.isVisible =
-                        !isPaid || isBusinessAccountExpired || (hasNonSensitiveNode && isHiddenNodesOnboarded != null && !includeSensitiveInheritedNode)
+                menu.findItem(R.id.cab_menu_hide)?.isVisible =
+                    !isPaid || isBusinessAccountExpired || (hasNonSensitiveNode && isHiddenNodesOnboarded != null && !includeSensitiveInheritedNode)
 
-                    menu.findItem(R.id.cab_menu_unhide)?.isVisible =
-                        isPaid && !isBusinessAccountExpired && !hasNonSensitiveNode && !includeSensitiveInheritedNode
-                } else {
-                    menu.findItem(R.id.cab_menu_hide)?.isVisible = false
-                    menu.findItem(R.id.cab_menu_unhide)?.isVisible = false
-                }
+                menu.findItem(R.id.cab_menu_unhide)?.isVisible =
+                    isPaid && !isBusinessAccountExpired && !hasNonSensitiveNode && !includeSensitiveInheritedNode
             }
         }
     }
@@ -222,12 +215,5 @@ class AlbumContentActionModeCallback(
         val photos = fragment.albumContentViewModel.state.value.photos
 
         return selectedPhotos.size == photos.size
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            fragment.getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 }

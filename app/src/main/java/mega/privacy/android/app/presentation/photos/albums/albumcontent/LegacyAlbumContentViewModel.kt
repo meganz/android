@@ -27,7 +27,6 @@ import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.AlbumPhotosAddingProgress
 import mega.privacy.android.domain.entity.photos.AlbumPhotosRemovingProgress
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetAlbumPhotosUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
@@ -112,19 +111,8 @@ class LegacyAlbumContentViewModel @Inject constructor(
         fetchPhotos()
         fetchIsHiddenNodesOnboarded()
 
-        viewModelScope.launch {
-            if (isHiddenNodesActive()) {
-                monitorShowHiddenItems()
-                monitorAccountDetail()
-            }
-        }
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
+        monitorShowHiddenItems()
+        monitorAccountDetail()
     }
 
     private fun fetchPhotos() {

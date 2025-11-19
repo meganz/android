@@ -47,7 +47,6 @@ import mega.privacy.android.domain.entity.node.chat.ChatImageFile
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
@@ -56,7 +55,6 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.AddFavouritesUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileUriUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
@@ -103,7 +101,6 @@ class ImagePreviewViewModel @Inject constructor(
     private val checkUri: CheckFileUriUseCase,
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase,
     private val nodeMoveRequestMessageMapper: NodeMoveRequestMessageMapper,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase,
     private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase,
     private val deleteNodesUseCase: DeleteNodesUseCase,
@@ -146,11 +143,7 @@ class ImagePreviewViewModel @Inject constructor(
     init {
         monitorConnectivity()
         viewModelScope.launch {
-            if (isHiddenNodesActive()) {
-                handleInitFlow()
-            } else {
-                monitorImageNodes()
-            }
+            handleInitFlow()
             monitorOfflineNodeUpdates()
         }
     }
@@ -161,13 +154,6 @@ class ImagePreviewViewModel @Inject constructor(
                 .catch { Timber.e(it) }
                 .collectLatest { isOnline -> _state.update { it.copy(isOnline = isOnline) } }
         }
-    }
-
-    suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 
     private suspend fun handleInitFlow() {
@@ -232,33 +218,6 @@ class ImagePreviewViewModel @Inject constructor(
                             isCurrentImageNodeAvailableOffline = isAvailableOffline
                         )
                     }
-                }
-            }
-            .launchIn(viewModelScope)
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private fun monitorImageNodes() {
-        val imageFetcher = imageNodeFetchers[imagePreviewFetcherSource] ?: return
-        imageFetcher.monitorImageNodes(params)
-            .catch { Timber.e(it) }
-            .mapLatest { imageNodes ->
-                val (currentImageNodeIndex, currentImageNode) = findCurrentImageNode(
-                    imageNodes
-                )
-                val isCurrentImageNodeAvailableOffline =
-                    currentImageNode?.isAvailableOffline ?: false
-
-                Timber.d("ImagePreview VM imageNodes: ${imageNodes.size}")
-
-                _state.update {
-                    it.copy(
-                        isInitialized = true,
-                        imageNodes = imageNodes,
-                        currentImageNodeIndex = currentImageNodeIndex,
-                        currentImageNode = currentImageNode,
-                        isCurrentImageNodeAvailableOffline = isCurrentImageNodeAvailableOffline
-                    )
                 }
             }
             .launchIn(viewModelScope)

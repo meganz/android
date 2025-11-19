@@ -15,9 +15,9 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
+import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
-import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.NodeId
@@ -26,7 +26,6 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.exception.account.AlbumNameValidationException
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetAlbumPhotosUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
@@ -58,7 +57,6 @@ import mega.privacy.android.feature.photos.model.AlbumSortConfiguration
 import mega.privacy.android.feature.photos.model.AlbumSortOption
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
-import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
@@ -459,9 +457,6 @@ class AlbumContentViewModelTest {
             on { cover }.thenReturn(null)
         }
         whenever(disableExportAlbumsUseCase(listOf(albumId))).thenReturn(1)
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
-            false
-        )
         whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
         whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
         whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf())
@@ -686,9 +681,6 @@ class AlbumContentViewModelTest {
             on { title }.thenReturn("Album")
             on { cover }.thenReturn(null)
         }
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
-            false
-        )
         whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
         whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
         whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf())
@@ -718,9 +710,6 @@ class AlbumContentViewModelTest {
                 on { cover }.thenReturn(null)
             }
             val expectedMessage = "expectedMessage"
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
-                false
-            )
             whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
             whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
             whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf())
@@ -783,9 +772,6 @@ class AlbumContentViewModelTest {
                 on { title }.thenReturn("Album")
                 on { cover }.thenReturn(null)
             }
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
-                false
-            )
             whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
             whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
             whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf())
@@ -826,9 +812,6 @@ class AlbumContentViewModelTest {
             on { title }.thenReturn("Album")
             on { cover }.thenReturn(null)
         }
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
-            false
-        )
         whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
         whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
         whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf())
@@ -893,9 +876,6 @@ class AlbumContentViewModelTest {
                 on { id }.thenReturn(1L)
             }
             whenever(photo.id).thenReturn(1L)
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
-                false
-            )
             whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
             whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
             whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf(listOf(legacyPhoto)))
@@ -924,9 +904,6 @@ class AlbumContentViewModelTest {
             on { title }.thenReturn("Album")
             on { cover }.thenReturn(null)
         }
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
-            false
-        )
         whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
         whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
         whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf())
@@ -1089,9 +1066,6 @@ class AlbumContentViewModelTest {
                 isSensitive = photo3.isSensitive,
                 isSensitiveInherited = photo3.isSensitiveInherited,
             )
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
-                false
-            )
             whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
             whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
             whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf(photos))
@@ -1244,9 +1218,6 @@ class AlbumContentViewModelTest {
                 isTakenDown = photo3.isTakenDown,
                 isSensitive = photo3.isSensitive,
                 isSensitiveInherited = photo3.isSensitiveInherited,
-            )
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
-                false
             )
             whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
             whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)

@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.favourites
 
 import android.content.Context
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,7 +18,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.ChildrenNodesLoadState
@@ -41,7 +39,6 @@ import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.GetFavouriteFolderInfoUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import timber.log.Timber
@@ -69,11 +66,9 @@ class FavouriteFolderViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase,
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
-    savedStateHandle: SavedStateHandle,
 ) :
     ViewModel() {
 
@@ -166,28 +161,7 @@ class FavouriteFolderViewModel @Inject constructor(
         // Cancel the previous job avoid to repeatedly observed
         currentNodeJob?.cancel()
         currentNodeJob = viewModelScope.launch {
-            if (isHiddenNodesActive()) {
-                handleHiddenNodes(parentHandle = parentHandle)
-            } else {
-                getFavouriteFolderInfoUseCase(parentHandle).collectLatest { folderInfo ->
-                    currentFavouriteFolderInfo = folderInfo
-                    _childrenNodesState.update {
-                        folderInfo.run {
-                            when {
-                                children.isEmpty() -> {
-                                    ChildrenNodesLoadState.Empty(folderInfo.name)
-                                }
-
-                                else -> getData(
-                                    name = name,
-                                    children = children,
-                                    currentHandle = folderInfo.currentHandle
-                                )
-                            }
-                        }
-                    }
-                }
-            }
+            handleHiddenNodes(parentHandle = parentHandle)
         }
     }
 
@@ -296,13 +270,6 @@ class FavouriteFolderViewModel @Inject constructor(
 
     internal suspend fun getNodeContentUri(fileNode: TypedFileNode) =
         getNodeContentUriUseCase(fileNode)
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
-    }
 
     companion object {
 

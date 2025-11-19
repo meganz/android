@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
@@ -33,7 +32,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
@@ -50,7 +48,6 @@ import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.GetCurrentStorageStateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -63,6 +60,7 @@ import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.feature.photos.model.ZoomLevel
@@ -113,7 +111,6 @@ class MediaDiscoveryViewModelTest {
     private val setViewType = mock<SetViewType>()
     private val monitorSubFolderMediaDiscoverySettingsUseCase =
         mock<MonitorSubFolderMediaDiscoverySettingsUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getPublicChildNodeFromIdUseCase = mock<GetPublicChildNodeFromIdUseCase>()
@@ -173,7 +170,6 @@ class MediaDiscoveryViewModelTest {
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             getNodeContentUriByHandleUseCase = getNodeContentUriByHandleUseCase,
@@ -192,7 +188,6 @@ class MediaDiscoveryViewModelTest {
         whenever(monitorMediaDiscoveryView()).thenReturn(flow { awaitCancellation() })
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flow { awaitCancellation() })
         whenever(monitorAccountDetailUseCase()).thenReturn(flow { awaitCancellation() })
-        getFeatureFlagValueUseCase.stub { onBlocking { invoke(any()) }.thenReturn(false) }
         whenever(monitorStorageStateUseCase()).thenReturn(
             StorageState.Green.asHotFlow()
         )
@@ -234,7 +229,6 @@ class MediaDiscoveryViewModelTest {
             getPublicNodeListByIds,
             setViewType,
             monitorSubFolderMediaDiscoverySettingsUseCase,
-            getFeatureFlagValueUseCase,
             isNodeInRubbishBinUseCase,
             getNodeByIdUseCase,
             getPublicChildNodeFromIdUseCase,
@@ -303,10 +297,9 @@ class MediaDiscoveryViewModelTest {
         }
 
     @Test
-    fun `test that turn on flag HiddenNodes and it is not from folder link then the flow is correct`() =
+    fun `test that it is not from folder link then the flow is correct`() =
         runTest {
             commonStub()
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) doReturn true
             initViewModel()
             underTest.initialize(null, null, false)
             verify(monitorShowHiddenItemsUseCase, times(1)).invoke()
@@ -314,32 +307,9 @@ class MediaDiscoveryViewModelTest {
         }
 
     @Test
-    fun `test that turn off flag HiddenNodes and it is not from folder link then the flow is correct`() =
+    fun `test that it is from folder link then the flow is correct`() =
         runTest {
             commonStub()
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) doReturn false
-            initViewModel()
-            underTest.initialize(null, null, false)
-            verifyNoInteractions(monitorShowHiddenItemsUseCase)
-            verifyNoInteractions(monitorAccountDetailUseCase)
-        }
-
-    @Test
-    fun `test that turn on flag HiddenNodes and it is from folder link then the flow is correct`() =
-        runTest {
-            commonStub()
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) doReturn true
-            initViewModel()
-            underTest.initialize(null, null, true)
-            verifyNoInteractions(monitorShowHiddenItemsUseCase)
-            verifyNoInteractions(monitorAccountDetailUseCase)
-        }
-
-    @Test
-    fun `test that turn off flag HiddenNodes and it is from folder link then the flow is correct`() =
-        runTest {
-            commonStub()
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) doReturn false
             initViewModel()
             underTest.initialize(null, null, true)
             verifyNoInteractions(monitorShowHiddenItemsUseCase)
@@ -406,11 +376,6 @@ class MediaDiscoveryViewModelTest {
     fun `test that filterNonSensitivePhotos return non-sensitive photos when showHiddenItems is false and isPaid`() =
         runTest {
             commonStub()
-            getFeatureFlagValueUseCase.stub {
-                onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(
-                    true
-                )
-            }
             whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
             initViewModel()
             underTest.initialize(null, null, null)

@@ -47,7 +47,6 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.entity.search.TypeFilterOption
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -123,19 +122,8 @@ class SearchViewModel @Inject constructor(
     init {
         initializeSearch()
         checkViewType()
-        viewModelScope.launch {
-            if (isHiddenNodesActive()) {
-                monitorAccountDetail()
-                monitorShowHiddenItems()
-            }
-        }
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
+        monitorAccountDetail()
+        monitorShowHiddenItems()
     }
 
     private fun initializeSearch() {

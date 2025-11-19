@@ -62,7 +62,6 @@ import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.chat.SendToChatResult
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.resources.R as sharedR
@@ -126,7 +125,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
 
     private fun initialize() {
         viewLifecycleOwner.lifecycleScope.launch {
-            if (isHiddenNodesActive() && !viewModel.isInitialized()) {
+            if (!viewModel.isInitialized()) {
                 checkSensitiveItems()
             } else {
                 initNode()
@@ -135,13 +134,6 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
                 setupObservers()
             }
         }
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 
     private fun initNode() {

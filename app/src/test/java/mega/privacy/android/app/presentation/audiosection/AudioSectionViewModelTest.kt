@@ -33,7 +33,6 @@ import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -42,7 +41,6 @@ import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.audiosection.GetAllAudioUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -93,13 +91,8 @@ class AudioSectionViewModelTest {
     private val getNodeContentUriUseCase = mock<GetNodeContentUriUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private var accountDetailFlow = MutableSharedFlow<AccountDetail>()
-    private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
-        onBlocking {
-            invoke()
-        }.thenReturn(false)
-    }
+    private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     private val firstDefaultId = NodeId(123L)
     private val firstDefaultAudioFileNode = mock<FileNode> {
@@ -138,9 +131,7 @@ class AudioSectionViewModelTest {
         wheneverBlocking { monitorViewType() }.thenReturn(fakeMonitorViewTypeFlow)
         wheneverBlocking { monitorAccountDetailUseCase() }.thenReturn(accountDetailFlow)
         wheneverBlocking { monitorShowHiddenItemsUseCase() }.thenReturn(showHiddenItemsFlow)
-        wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(
-            false
-        )
+        wheneverBlocking { isHiddenNodesOnboardedUseCase() }.thenReturn(false)
         initUnderTest()
     }
 
@@ -160,7 +151,6 @@ class AudioSectionViewModelTest {
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getNodeContentUriUseCase = getNodeContentUriUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
@@ -191,7 +181,6 @@ class AudioSectionViewModelTest {
             getNodeAccessUseCase,
             isHiddenNodesOnboardedUseCase,
             monitorShowHiddenItemsUseCase,
-            getFeatureFlagValueUseCase,
             getBusinessStatusUseCase
         )
     }
@@ -527,31 +516,7 @@ class AudioSectionViewModelTest {
     }
 
     @Test
-    fun `test that the hidden node toolbar item is disabled when a selection is made and hidden nodes feature is disabled`() =
-        runTest {
-            initAudiosReturned()
-            whenever(getRubbishBinFolderUseCase()) doReturn null
-            whenever(
-                getFeatureFlagValueUseCase(
-                    ApiFeatures.HiddenNodesInternalRelease
-                )
-            ) doReturn false
-
-            underTest.refreshNodes()
-            underTest.onItemLongClicked(expectedFirstAudioUiEntity, 0)
-            advanceUntilIdle()
-
-            underTest.state.test {
-                assertThat(
-                    expectMostRecentItem().toolbarActionsModifierItem!!.item.hiddenNodeItem
-                ).isEqualTo(
-                    AudioHiddenNodeActionModifierItem(isEnabled = false)
-                )
-            }
-        }
-
-    @Test
-    fun `test that the hidden node toolbar item can be hidden when a selection is made for free account and hidden nodes feature is enabled`() =
+    fun `test that the hidden node toolbar item can be hidden when a selection is made for free account`() =
         runTest {
             val accountDetail = AccountDetail(
                 levelDetail = AccountLevelDetail(
@@ -567,11 +532,6 @@ class AudioSectionViewModelTest {
             accountDetailFlow.emit(accountDetail)
             initAudiosReturned()
             whenever(getRubbishBinFolderUseCase()) doReturn null
-            whenever(
-                getFeatureFlagValueUseCase(
-                    ApiFeatures.HiddenNodesInternalRelease
-                )
-            ) doReturn true
 
             underTest.refreshNodes()
             advanceUntilIdle()
@@ -591,7 +551,7 @@ class AudioSectionViewModelTest {
         }
 
     @Test
-    fun `test that the hidden node toolbar item can be hidden when a selection is made for an expired business account and hidden nodes feature is enabled`() =
+    fun `test that the hidden node toolbar item can be hidden when a selection is made for an expired business account`() =
         runTest {
             val accountDetail = AccountDetail(
                 levelDetail = AccountLevelDetail(
@@ -608,11 +568,6 @@ class AudioSectionViewModelTest {
             accountDetailFlow.emit(accountDetail)
             initAudiosReturned()
             whenever(getRubbishBinFolderUseCase()) doReturn null
-            whenever(
-                getFeatureFlagValueUseCase(
-                    ApiFeatures.HiddenNodesInternalRelease
-                )
-            ) doReturn true
 
             underTest.refreshNodes()
             underTest.onItemLongClicked(expectedSecondAudioUiEntity, 1)
@@ -632,7 +587,7 @@ class AudioSectionViewModelTest {
         }
 
     @Test
-    fun `test that the hidden node toolbar item can be hidden when a selection is made for a not sensitive node and hidden nodes feature is enabled`() =
+    fun `test that the hidden node toolbar item can be hidden when a selection is made for a not sensitive node`() =
         runTest {
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
             whenever(getRubbishBinFolderUseCase()) doReturn null
@@ -658,11 +613,6 @@ class AudioSectionViewModelTest {
             whenever(
                 getNodeAccessUseCase(nodeId = nodeId)
             ) doReturn AccessPermission.UNKNOWN
-            whenever(
-                getFeatureFlagValueUseCase(
-                    ApiFeatures.HiddenNodesInternalRelease
-                )
-            ) doReturn true
 
             underTest.refreshNodes()
             underTest.onItemLongClicked(uiEntity, 0)
@@ -726,11 +676,6 @@ class AudioSectionViewModelTest {
             whenever(
                 getNodeAccessUseCase(nodeId = nodeId)
             ) doReturn AccessPermission.UNKNOWN
-            whenever(
-                getFeatureFlagValueUseCase(
-                    ApiFeatures.HiddenNodesInternalRelease
-                )
-            ) doReturn true
 
             initUnderTest()
             advanceUntilIdle()

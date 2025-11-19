@@ -32,7 +32,6 @@ import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -42,7 +41,6 @@ import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.documentsection.GetAllDocumentsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
@@ -83,7 +81,6 @@ class DocumentSectionViewModel @Inject constructor(
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode,
     private val getRubbishBinFolderUseCase: GetRubbishBinFolderUseCase,
@@ -105,28 +102,9 @@ class DocumentSectionViewModel @Inject constructor(
     init {
         checkViewType()
         viewModelScope.launch {
-            if (isHiddenNodesActive()) {
-                handleHiddenNodeUIFlow()
-                monitorIsHiddenNodesOnboarded()
-            } else {
-                merge(
-                    monitorNodeUpdatesUseCase(),
-                    monitorOfflineNodeUpdatesUseCase()
-                ).conflate()
-                    .catch {
-                        Timber.e(it)
-                    }.collect {
-                        refreshDocumentNodes()
-                    }
-            }
+            handleHiddenNodeUIFlow()
+            monitorIsHiddenNodesOnboarded()
         }
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 
     private fun handleHiddenNodeUIFlow() {
@@ -418,12 +396,7 @@ class DocumentSectionViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getHiddenNodeActionModifierItem(selectedNodes: List<DocumentUiEntity>): DocumentSectionHiddenNodeActionModifierItem {
-        val isHiddenNodesEnabled = isHiddenNodesActive()
-        if (!isHiddenNodesEnabled) {
-            return DocumentSectionHiddenNodeActionModifierItem(isEnabled = false)
-        }
-
+    private fun getHiddenNodeActionModifierItem(selectedNodes: List<DocumentUiEntity>): DocumentSectionHiddenNodeActionModifierItem {
         val isPaid = _uiState.value.accountType?.isPaid ?: false
         if (!isPaid || _uiState.value.isBusinessAccountExpired) {
             return DocumentSectionHiddenNodeActionModifierItem(

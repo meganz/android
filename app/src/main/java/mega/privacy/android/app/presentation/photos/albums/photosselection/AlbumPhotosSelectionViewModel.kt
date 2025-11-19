@@ -82,21 +82,12 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
         extractAlbumFlow()
 
         viewModelScope.launch {
-            if (isHiddenNodesActive()) {
-                monitorShowHiddenItems()
-                monitorAccountDetail()
-            }
+            monitorShowHiddenItems()
+            monitorAccountDetail()
 
             fetchAlbum()
             fetchPhotos()
         }
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() == true
     }
 
     private fun extractAlbumFlow() = savedStateHandle.getStateFlow(ALBUM_FLOW, 0)

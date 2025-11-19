@@ -29,7 +29,6 @@ import coil3.transform.RoundedCornersTransformation
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
@@ -102,7 +101,6 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.sync.SyncType
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature_flags.AppFeatures
@@ -128,7 +126,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private var nodeInfoText: TextView? = null
     private var drawerItem: DrawerItem? = null
     private var cannotOpenFileDialog: AlertDialog? = null
-    private var isHiddenNodesEnabled: Boolean = false
 
     private val nodeOptionsViewModel: NodeOptionsViewModel by viewModels()
     private val startDownloadViewModel: StartDownloadViewModel by activityViewModels()
@@ -191,10 +188,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         nodeController = NodeController(requireActivity())
         return contentView
     }
-
-    private suspend fun isHiddenNodesActive() = runCatching {
-        getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-    }.getOrNull() == true
 
     /**
      * onViewCreated
@@ -270,9 +263,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         viewLifecycleOwner.collectFlow(
-            nodeOptionsViewModel.state.onStart {
-                isHiddenNodesEnabled = isHiddenNodesActive()
-            }, Lifecycle.State.STARTED
+            nodeOptionsViewModel.state, Lifecycle.State.STARTED
         ) { state: NodeBottomSheetUIState ->
 
             var counterOpen = 2
@@ -482,8 +473,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionLabel.visibility = if (isTakenDown) View.GONE else View.VISIBLE
                 optionFavourite.visibility = if (isTakenDown) View.GONE else View.VISIBLE
                 optionHideLayout.visibility =
-                    if (isHiddenNodesEnabled
-                        && !hideHiddenActions
+                    if (!hideHiddenActions
                         && mode != SHARED_ITEMS_MODE
                         && accountType != null
                         && isHiddenNodesOnboarded != null

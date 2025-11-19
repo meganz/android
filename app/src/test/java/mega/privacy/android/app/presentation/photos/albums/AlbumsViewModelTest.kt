@@ -10,7 +10,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
-import mega.privacy.android.feature.photos.mapper.UIAlbumMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
@@ -22,7 +21,6 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
@@ -36,6 +34,7 @@ import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.feature.photos.mapper.UIAlbumMapper
 import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -43,6 +42,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -93,10 +93,19 @@ class AlbumsViewModelTest {
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
 
+    private val accountLevelDetail = mock<AccountLevelDetail> {
+        on { accountType }.thenReturn(AccountType.PRO_III)
+    }
+    private val accountDetail = mock<AccountDetail> {
+        on { levelDetail }.thenReturn(accountLevelDetail)
+    }
+
     @BeforeEach
     fun setUp() {
         whenever(getDefaultAlbumPhotos(any(), any())).thenReturn(flowOf(listOf()))
         wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+        wheneverBlocking { monitorShowHiddenItemsUseCase() }.thenReturn(flowOf(false))
+        wheneverBlocking { monitorAccountDetailUseCase() }.thenReturn(flowOf(accountDetail))
         initUnderTest()
     }
 
@@ -168,8 +177,9 @@ class AlbumsViewModelTest {
             whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
             whenever(getDefaultAlbumPhotos(any(), any())).thenReturn(flowOf(listOf(createImage())))
             initUnderTest()
+            advanceUntilIdle()
 
-            underTest.state.drop(1).test {
+            underTest.state.test {
                 assertThat(awaitItem().albums.map { it.id }).containsExactlyElementsIn(defaultAlbums.keys)
             }
         }
@@ -186,8 +196,9 @@ class AlbumsViewModelTest {
         whenever(getDefaultAlbumPhotos(any(), any())).thenReturn(flowOf(listOf(createImage())))
 
         initUnderTest()
+        advanceUntilIdle()
 
-        underTest.state.drop(1).test {
+        underTest.state.test {
             assertThat(awaitItem().albums.map { it.id })
                 .containsExactlyElementsIn(defaultAlbums.keys.filterNot { it == Album.RawAlbum })
         }
@@ -205,8 +216,9 @@ class AlbumsViewModelTest {
         whenever(getDefaultAlbumPhotos(any(), any())).thenReturn(flowOf(emptyList()))
 
         initUnderTest()
+        advanceUntilIdle()
 
-        underTest.state.drop(1).test {
+        underTest.state.test {
             assertThat(awaitItem().albums.map { it.id })
                 .containsExactlyElementsIn(defaultAlbums.keys.filter { it == Album.FavouriteAlbum })
         }
@@ -223,7 +235,8 @@ class AlbumsViewModelTest {
         whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
         whenever(getDefaultAlbumPhotos(any(), any())).thenReturn(flowOf(emptyList()))
         initUnderTest()
-        underTest.state.drop(1).test {
+        advanceUntilIdle()
+        underTest.state.test {
             val albums = awaitItem().albums
             assertEquals(albums.size, 1)
             assertThat(albums.first().id).isEqualTo(Album.FavouriteAlbum)
@@ -248,7 +261,8 @@ class AlbumsViewModelTest {
         whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
         whenever(getDefaultAlbumPhotos(any(), any())).thenReturn(flowOf(testPhotosList))
         initUnderTest()
-        underTest.state.drop(1).test {
+        advanceUntilIdle()
+        underTest.state.test {
             assertThat(awaitItem().albums.map { it.coverPhoto?.id }.firstOrNull()).isEqualTo(1L)
             cancelAndIgnoreRemainingEvents()
         }
@@ -666,18 +680,14 @@ class AlbumsViewModelTest {
 
     @Test
     fun `test that showHiddenItems and accountDetail are fetched properly`() = runTest {
-        // given
-        wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(
-            true
-        )
         initUnderTest()
         advanceUntilIdle()
 
         // then
         underTest.state.test {
             val accountType = awaitItem().accountType
-            assertThat(accountType).isEqualTo(AccountType.FREE)
-            assertThat(underTest.showHiddenItems).isTrue()
+            assertThat(accountType).isEqualTo(AccountType.PRO_III)
+            assertThat(underTest.showHiddenItems).isFalse()
         }
     }
 

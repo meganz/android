@@ -22,7 +22,6 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -75,7 +74,6 @@ class VideoSelectedViewModelTest {
         on { id }.thenReturn(nodeId)
     }
 
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
@@ -85,7 +83,6 @@ class VideoSelectedViewModelTest {
         wheneverBlocking { monitorViewType() }.thenReturn(fakeMonitorViewTypeFlow)
         wheneverBlocking { getFileBrowserNodeChildrenUseCase(any()) }.thenReturn(emptyList())
         wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_NONE)
-        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
         initUnderTest()
     }
 
@@ -97,7 +94,6 @@ class VideoSelectedViewModelTest {
             getFileBrowserNodeChildrenUseCase = getFileBrowserNodeChildrenUseCase,
             setViewType = setViewType,
             monitorViewType = monitorViewType,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,

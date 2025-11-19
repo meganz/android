@@ -24,7 +24,6 @@ import mega.privacy.android.domain.entity.account.AccountDetail
  * @property passcodeLock
  * @property subFolderMediaDiscoveryChecked
  * Uploads should be shown
- * @property isHiddenNodesEnabled
  * @property showHiddenItems
  * @property accountDetail
  */
@@ -47,7 +46,6 @@ data class SettingsState(
     val accountType: String,
     val passcodeLock: Boolean,
     val subFolderMediaDiscoveryChecked: Boolean,
-    val isHiddenNodesEnabled: Boolean?,
     val showHiddenItems: Boolean,
     val accountDetail: AccountDetail?,
 )

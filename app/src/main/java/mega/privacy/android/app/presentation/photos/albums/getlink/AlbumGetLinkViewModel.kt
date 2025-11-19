@@ -21,13 +21,11 @@ import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperAct
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbum
 import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import timber.log.Timber
@@ -43,19 +41,14 @@ class AlbumGetLinkViewModel @Inject constructor(
     private val exportAlbumsUseCase: ExportAlbumsUseCase,
     private val shouldShowCopyrightUseCase: ShouldShowCopyrightUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
     private val state = MutableStateFlow(value = AlbumGetLinkState())
     val stateFlow = state.asStateFlow()
 
     fun initialize() = viewModelScope.launch {
         val showCopyright = shouldShowCopyrightUseCase()
-        val hasSensitiveElement = if (isHiddenNodesActive()) {
-            savedStateHandle.get<Boolean>(HAS_SENSITIVE_ELEMENT) ?: false
-        } else {
-            false
-        }
+        val hasSensitiveElement = savedStateHandle.get<Boolean>(HAS_SENSITIVE_ELEMENT) ?: false
         if (!showCopyright && !hasSensitiveElement) {
             fetchAlbum()
         }
@@ -67,13 +60,6 @@ class AlbumGetLinkViewModel @Inject constructor(
                 showSharingSensitiveWarning = hasSensitiveElement,
             )
         }
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 
     fun hideCopyright() {

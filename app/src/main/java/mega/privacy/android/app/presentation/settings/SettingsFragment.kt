@@ -161,8 +161,7 @@ class SettingsFragment :
                     updateSubFolderMediaDiscovery(state.subFolderMediaDiscoveryChecked)
                     findPreference<SwitchPreferenceCompat>(KEY_HIDDEN_ITEMS)?.apply {
                         val accountType = state.accountDetail?.levelDetail?.accountType
-                        val isHiddenNodesEnabled = state.isHiddenNodesEnabled == true
-                        isVisible = if (isHiddenNodesEnabled && accountType?.isPaid == true) {
+                        isVisible = if (accountType?.isPaid == true) {
                             if (accountType.isBusinessAccount) {
                                 viewModel.getBusinessStatus() != BusinessAccountStatus.Expired
                             } else {

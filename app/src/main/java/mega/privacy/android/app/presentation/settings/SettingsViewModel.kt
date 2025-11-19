@@ -124,7 +124,6 @@ class SettingsViewModel @Inject constructor(
             accountType = "",
             passcodeLock = false,
             subFolderMediaDiscoveryChecked = true,
-            isHiddenNodesEnabled = null,
             showHiddenItems = false,
             accountDetail = null,
         )
@@ -198,10 +197,6 @@ class SettingsViewModel @Inject constructor(
                             )
                         }
                     },
-                flow { emit(isHiddenNodesActive()) }
-                    .map { enabled ->
-                        { state: SettingsState -> state.copy(isHiddenNodesEnabled = enabled) }
-                    },
                 monitorShowHiddenItemsUseCase()
                     .map { isEnabled ->
                         { state: SettingsState -> state.copy(showHiddenItems = isEnabled) }
@@ -246,16 +241,7 @@ class SettingsViewModel @Inject constructor(
                             { state: SettingsState -> state.copy(startScreenSummary = screenName) }
                         }
                 }
-
             }
-
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 
     /**

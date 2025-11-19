@@ -10,14 +10,12 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.recentactions.mapper.RecentActionBucketUiEntityMapper
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionsUiState
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -39,7 +37,6 @@ class RecentActionsComposeViewModel @Inject constructor(
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     monitorHideRecentActivityUseCase: MonitorHideRecentActivityUseCase,
     monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     getBusinessStatusUseCase: GetBusinessStatusUseCase,
@@ -91,26 +88,24 @@ class RecentActionsComposeViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            if (isHiddenNodesActive()) {
-                monitorAccountDetailUseCase()
-                    .collectLatest { accountDetail ->
-                        val accountType = accountDetail.levelDetail?.accountType
-                        val businessStatus =
-                            if (accountType?.isBusinessAccount == true) {
-                                getBusinessStatusUseCase()
-                            } else null
+            monitorAccountDetailUseCase()
+                .collectLatest { accountDetail ->
+                    val accountType = accountDetail.levelDetail?.accountType
+                    val businessStatus =
+                        if (accountType?.isBusinessAccount == true) {
+                            getBusinessStatusUseCase()
+                        } else null
 
-                        val isBusinessAccountExpired =
-                            businessStatus == BusinessAccountStatus.Expired
-                        _uiState.update {
-                            it.copy(
-                                accountType = accountDetail.levelDetail?.accountType,
-                                hiddenNodeEnabled = true,
-                                isBusinessAccountExpired = isBusinessAccountExpired,
-                            )
-                        }
+                    val isBusinessAccountExpired =
+                        businessStatus == BusinessAccountStatus.Expired
+                    _uiState.update {
+                        it.copy(
+                            accountType = accountDetail.levelDetail?.accountType,
+                            hiddenNodeEnabled = true,
+                            isBusinessAccountExpired = isBusinessAccountExpired,
+                        )
                     }
-            }
+                }
         }
 
         viewModelScope.launch {
@@ -139,13 +134,6 @@ class RecentActionsComposeViewModel @Inject constructor(
                 excludeSensitives = !showHiddenItems,
             )
         }
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
     }
 
     /**

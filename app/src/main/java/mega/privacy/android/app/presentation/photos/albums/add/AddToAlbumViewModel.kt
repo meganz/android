@@ -32,7 +32,6 @@ import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.AddPhotosToAlbum
@@ -114,15 +113,11 @@ internal class AddToAlbumViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) {
-                isHiddenNodesVisible = monitorShowHiddenItemsUseCase().firstOrNull() ?: false
+            isHiddenNodesVisible = monitorShowHiddenItemsUseCase().firstOrNull() ?: false
 
-                monitorAccountDetailUseCase()
-                    .onEach(::handleAccountDetail)
-                    .launchIn(viewModelScope)
-            } else {
-                isHiddenNodesVisible = true
-            }
+            monitorAccountDetailUseCase()
+                .onEach(::handleAccountDetail)
+                .launchIn(viewModelScope)
 
             getPhotos()
                 .onEach { handlePhotos() }

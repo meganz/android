@@ -24,7 +24,6 @@ import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetPathUseCas
 import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetDocumentsFromSharedUrisUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import org.junit.jupiter.api.BeforeEach
@@ -54,7 +53,6 @@ internal class FileExplorerViewModelTest {
     private val getCopyLatestTargetPathUseCase = mock<GetCopyLatestTargetPathUseCase>()
     private val getMoveLatestTargetPathUseCase = mock<GetMoveLatestTargetPathUseCase>()
     private val getNodeAccessPermission = mock<GetNodeAccessPermission>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val attachNodeUseCase = mock<AttachNodeUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val sendChatAttachmentsUseCase = mock<SendChatAttachmentsUseCase>()
@@ -69,7 +67,6 @@ internal class FileExplorerViewModelTest {
             getCopyLatestTargetPathUseCase = getCopyLatestTargetPathUseCase,
             getMoveLatestTargetPathUseCase = getMoveLatestTargetPathUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             attachNodeUseCase = attachNodeUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             sendChatAttachmentsUseCase = sendChatAttachmentsUseCase,
@@ -88,7 +85,6 @@ internal class FileExplorerViewModelTest {
             getCopyLatestTargetPathUseCase,
             getMoveLatestTargetPathUseCase,
             getNodeAccessPermission,
-            getFeatureFlagValueUseCase,
             attachNodeUseCase,
             getNodeByIdUseCase,
             sendChatAttachmentsUseCase,

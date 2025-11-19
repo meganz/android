@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.TimberJUnit5Extension
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
@@ -32,7 +33,6 @@ import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -41,7 +41,6 @@ import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.documentsection.GetAllDocumentsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
@@ -97,7 +96,6 @@ class DocumentSectionViewModelTest {
     private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
     private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private var accountDetailFlow = MutableSharedFlow<AccountDetail>()
@@ -129,6 +127,13 @@ class DocumentSectionViewModelTest {
     private val getNodeAccessUseCase = mock<GetNodeAccessUseCase>()
     private var showHiddenItemsFlow = MutableSharedFlow<Boolean>()
 
+    private val accountLevelDetail = mock<AccountLevelDetail> {
+        on { accountType }.thenReturn(AccountType.PRO_III)
+    }
+    private val accountDetail = mock<AccountDetail> {
+        on { levelDetail }.thenReturn(accountLevelDetail)
+    }
+
     @BeforeEach
     fun setUp() {
         wheneverBlocking { monitorNodeUpdatesUseCase() }.thenReturn(fakeMonitorNodeUpdatesFlow)
@@ -139,9 +144,6 @@ class DocumentSectionViewModelTest {
         wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_NONE)
         wheneverBlocking { monitorAccountDetailUseCase() }.thenReturn(accountDetailFlow)
         wheneverBlocking { monitorShowHiddenItemsUseCase() }.thenReturn(showHiddenItemsFlow)
-        wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(
-            false
-        )
         initUnderTest()
     }
 
@@ -165,7 +167,6 @@ class DocumentSectionViewModelTest {
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
             getRubbishBinFolderUseCase = getRubbishBinFolderUseCase,
@@ -276,9 +277,12 @@ class DocumentSectionViewModelTest {
             initDocumentNodeListReturned()
 
             initUnderTest()
+            accountDetailFlow.emit(accountDetail)
+            showHiddenItemsFlow.emit(false)
+            fakeMonitorNodeUpdatesFlow.emit(NodeUpdate(emptyMap()))
+            advanceUntilIdle()
 
-            underTest.uiState.drop(1).test {
-                fakeMonitorNodeUpdatesFlow.emit(NodeUpdate(emptyMap()))
+            underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
                 assertThat(actual.allDocuments.size).isEqualTo(2)
@@ -293,9 +297,12 @@ class DocumentSectionViewModelTest {
             initDocumentNodeListReturned()
 
             initUnderTest()
+            accountDetailFlow.emit(accountDetail)
+            showHiddenItemsFlow.emit(false)
+            fakeMonitorOfflineNodeUpdatesFlow.emit(emptyList())
+            advanceUntilIdle()
 
-            underTest.uiState.drop(1).test {
-                fakeMonitorOfflineNodeUpdatesFlow.emit(emptyList())
+            underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
                 assertThat(actual.allDocuments.size).isEqualTo(2)
@@ -571,30 +578,7 @@ class DocumentSectionViewModelTest {
     }
 
     @Test
-    fun `test that the hidden node toolbar item is disabled when a selection is made and hidden nodes feature is disabled`() =
-        runTest {
-            initDocumentReturnWithSpecificDocument()
-            whenever(getRubbishBinFolderUseCase()) doReturn null
-            whenever(
-                getFeatureFlagValueUseCase(
-                    ApiFeatures.HiddenNodesInternalRelease
-                )
-            ) doReturn false
-
-            underTest.refreshDocumentNodes()
-            underTest.onItemSelected(documentList[0], 0)
-
-            underTest.uiState.test {
-                assertThat(
-                    expectMostRecentItem().toolbarActionsModifierItem!!.item.hiddenNodeItem
-                ).isEqualTo(
-                    DocumentSectionHiddenNodeActionModifierItem(isEnabled = false)
-                )
-            }
-        }
-
-    @Test
-    fun `test that the hidden node toolbar item can be hidden when a selection is made for free account and hidden nodes feature is enabled`() =
+    fun `test that the hidden node toolbar item can be hidden when a selection is made for free account`() =
         runTest {
             val accountDetail = AccountDetail(
                 levelDetail = AccountLevelDetail(
@@ -610,11 +594,6 @@ class DocumentSectionViewModelTest {
             accountDetailFlow.emit(accountDetail)
             initDocumentReturnWithSpecificDocument()
             whenever(getRubbishBinFolderUseCase()) doReturn null
-            whenever(
-                getFeatureFlagValueUseCase(
-                    ApiFeatures.HiddenNodesInternalRelease
-                )
-            ) doReturn true
 
             underTest.refreshDocumentNodes()
             underTest.onItemSelected(documentList[0], 0)
@@ -632,7 +611,7 @@ class DocumentSectionViewModelTest {
         }
 
     @Test
-    fun `test that the hidden node toolbar item can be hidden when a selection is made for an expired business account and hidden nodes feature is enabled`() =
+    fun `test that the hidden node toolbar item can be hidden when a selection is made for an expired business account`() =
         runTest {
             val accountDetail = AccountDetail(
                 levelDetail = AccountLevelDetail(
@@ -649,11 +628,6 @@ class DocumentSectionViewModelTest {
             accountDetailFlow.emit(accountDetail)
             initDocumentReturnWithSpecificDocument()
             whenever(getRubbishBinFolderUseCase()) doReturn null
-            whenever(
-                getFeatureFlagValueUseCase(
-                    ApiFeatures.HiddenNodesInternalRelease
-                )
-            ) doReturn true
 
             underTest.refreshDocumentNodes()
             underTest.onItemSelected(documentList[1], 1)
@@ -671,7 +645,7 @@ class DocumentSectionViewModelTest {
         }
 
     @Test
-    fun `test that the hidden node toolbar item can be hidden when a selection is made for a not sensitive node and hidden nodes feature is enabled`() =
+    fun `test that the hidden node toolbar item can be hidden when a selection is made for a not sensitive node`() =
         runTest {
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
             whenever(getRubbishBinFolderUseCase()) doReturn null
@@ -693,11 +667,6 @@ class DocumentSectionViewModelTest {
             whenever(
                 getNodeAccessUseCase(nodeId = nodeId)
             ) doReturn AccessPermission.UNKNOWN
-            whenever(
-                getFeatureFlagValueUseCase(
-                    ApiFeatures.HiddenNodesInternalRelease
-                )
-            ) doReturn true
 
             underTest.refreshDocumentNodes()
             underTest.onItemSelected(uiEntity, 0)
@@ -756,11 +725,6 @@ class DocumentSectionViewModelTest {
             whenever(
                 getNodeAccessUseCase(nodeId = nodeId)
             ) doReturn AccessPermission.UNKNOWN
-            whenever(
-                getFeatureFlagValueUseCase(
-                    ApiFeatures.HiddenNodesInternalRelease
-                )
-            ) doReturn true
 
             initUnderTest()
             underTest.refreshDocumentNodes()

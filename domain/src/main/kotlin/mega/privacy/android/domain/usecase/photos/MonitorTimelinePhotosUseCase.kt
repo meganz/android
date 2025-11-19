@@ -4,7 +4,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
@@ -66,12 +65,8 @@ class MonitorTimelinePhotosUseCase @Inject constructor(
     operator fun invoke(request: TimelinePhotosRequest): Flow<TimelinePhotosResult> {
         val timelinePhotoSource =
             getTimelinePhotoSource(isPaginationEnabled = request.isPaginationEnabled)
-        val showHiddenItemsSource = if (request.isHiddenNodesActive) {
-            monitorShowHiddenItemsUseCase()
-        } else flowOf(null)
-        val accountDetailSource = if (request.isHiddenNodesActive) {
-            monitorAccountDetailUseCase()
-        } else flowOf(null)
+        val showHiddenItemsSource = monitorShowHiddenItemsUseCase()
+        val accountDetailSource = monitorAccountDetailUseCase()
 
         return combine(
             flow = timelinePhotoSource,

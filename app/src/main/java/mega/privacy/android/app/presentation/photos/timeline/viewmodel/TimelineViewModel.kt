@@ -46,7 +46,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
@@ -187,15 +186,14 @@ class TimelineViewModel @Inject constructor(
      * Private method to start all monitoring tasks
      * Used by both legacy behavior (init) and UI-driven behavior (startPhotoMonitoring)
      */
-    private suspend fun startMonitoring() {
+    private fun startMonitoring() {
         monitorPhotos()
         monitorCameraUploadsStatus()
 
-        if (isHiddenNodesActive()) {
-            monitorShowHiddenItems()
-            monitorAccountDetail()
-            monitorIsHiddenNodesOnboarded()
-        }
+        monitorShowHiddenItems()
+        monitorAccountDetail()
+        monitorIsHiddenNodesOnboarded()
+
         checkCameraUploadsTransferScreenEnabled()
         checkCameraUploadsPausedWarningBannerEnabled()
     }
@@ -213,13 +211,6 @@ class TimelineViewModel @Inject constructor(
             getFeatureFlagValueUseCase(AppFeatures.TimelinePhotosPagination)
         }
 
-        return result.getOrNull() ?: false
-    }
-
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
         return result.getOrNull() ?: false
     }
 

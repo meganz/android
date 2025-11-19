@@ -120,7 +120,6 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.DownloadTriggerEvent
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
@@ -138,7 +137,6 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.message.delete.DeleteNodeAttachmentMessageByIdsUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
@@ -183,6 +181,7 @@ import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCas
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.LockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OffOptionForHideSubtitlePressedEvent
 import mega.privacy.mobile.analytics.event.UnlockButtonPressedEvent
@@ -218,7 +217,6 @@ import java.io.File
 import java.time.Instant
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
-import mega.privacy.android.shared.resources.R as sharedResR
 
 @ExtendWith(
     value = [
@@ -272,7 +270,6 @@ class VideoPlayerViewModelTest {
     private val monitorVideoRepeatModeUseCase = mock<MonitorVideoRepeatModeUseCase>()
     private val saveVideoRecentlyWatchedUseCase = mock<SaveVideoRecentlyWatchedUseCase>()
     private val setVideoRepeatModeUseCase = mock<SetVideoRepeatModeUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val fakeMonitorAccountDetailFlow = MutableSharedFlow<AccountDetail>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase>()
@@ -365,7 +362,6 @@ class VideoPlayerViewModelTest {
             monitorVideoRepeatModeUseCase = monitorVideoRepeatModeUseCase,
             saveVideoRecentlyWatchedUseCase = saveVideoRecentlyWatchedUseCase,
             setVideoRepeatModeUseCase = setVideoRepeatModeUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
@@ -418,9 +414,6 @@ class VideoPlayerViewModelTest {
         wheneverBlocking {
             monitorVideoRepeatModeUseCase()
         }.thenReturn(flowOf(RepeatToggleMode.REPEAT_NONE))
-        wheneverBlocking {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }.thenReturn(true)
         whenever(monitorPlaybackTimesUseCase()).thenReturn(flowOf(null))
         initViewModel()
     }
@@ -464,7 +457,6 @@ class VideoPlayerViewModelTest {
             monitorVideoRepeatModeUseCase,
             saveVideoRecentlyWatchedUseCase,
             setVideoRepeatModeUseCase,
-            getFeatureFlagValueUseCase,
             monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase,
             monitorShowHiddenItemsUseCase,

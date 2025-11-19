@@ -36,16 +36,6 @@ enum class ApiFeatures(
     ),
 
     /**
-     * Enable hidden nodes for internal release
-     */
-    HiddenNodesInternalRelease(
-        experimentName = "hnir",
-        description = "Enable hidden nodes for internal release",
-        defaultValue = false,
-        checkRemote = true,
-    ),
-
-    /**
      * Note to yourself feature flag
      */
     NoteToYourselfFlag(

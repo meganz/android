@@ -10,7 +10,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -23,17 +22,29 @@ import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumCoverUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 
 @ExperimentalCoroutinesApi
 class AlbumCoverSelectionViewModelTest {
 
     private val updateAlbumCoverUseCase: UpdateAlbumCoverUseCase = mock<UpdateAlbumCoverUseCase>()
+    private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
+
+    private val accountLevelDetail = mock<AccountLevelDetail> {
+        on { accountType }.thenReturn(AccountType.PRO_III)
+    }
+    private val accountDetail = mock<AccountDetail> {
+        on { levelDetail }.thenReturn(accountLevelDetail)
+    }
 
     @Test
     fun `test that fetch album and photos returns correct result`() = runTest {
@@ -49,6 +60,9 @@ class AlbumCoverSelectionViewModelTest {
             createImage(id = 3L),
         )
 
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+
         // when
         val underTest = AlbumCoverSelectionViewModel(
             savedStateHandle = SavedStateHandle(mapOf(ALBUM_ID to 1L)),
@@ -57,28 +71,27 @@ class AlbumCoverSelectionViewModelTest {
             downloadThumbnailUseCase = mock(),
             updateAlbumCoverUseCase = updateAlbumCoverUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
-            getFeatureFlagValueUseCase = mock {
-                onBlocking { invoke(any()) }.thenReturn(false)
-            },
-            monitorShowHiddenItemsUseCase = mock(),
-            monitorAccountDetailUseCase = mock(),
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getBusinessStatusUseCase = mock(),
             durationInSecondsTextMapper = DurationInSecondsTextMapper(),
         )
 
-        // then
-        underTest.state.drop(1).test {
-            val actualAlbum = awaitItem().album
-            assertThat(expectedAlbum).isEqualTo(actualAlbum)
+        advanceUntilIdle()
 
-            val actualPhotos = awaitItem().photos
+        // then
+        underTest.state.test {
+            val actual = awaitItem()
+            assertThat(expectedAlbum).isEqualTo(actual.album)
             assertThat(expectedPhotos.sortedByDescending { it.modificationTime })
-                .isEqualTo(actualPhotos)
+                .isEqualTo(actual.photos)
         }
     }
 
     @Test
     fun `test that select photo returns correct result`() = runTest {
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
         // given
         val underTest = AlbumCoverSelectionViewModel(
             savedStateHandle = SavedStateHandle(),
@@ -87,11 +100,8 @@ class AlbumCoverSelectionViewModelTest {
             downloadThumbnailUseCase = mock(),
             updateAlbumCoverUseCase = updateAlbumCoverUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
-            getFeatureFlagValueUseCase = mock {
-                onBlocking { invoke(any()) }.thenReturn(false)
-            },
-            monitorShowHiddenItemsUseCase = mock(),
-            monitorAccountDetailUseCase = mock(),
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getBusinessStatusUseCase = mock(),
             durationInSecondsTextMapper = DurationInSecondsTextMapper(),
         )
@@ -110,6 +120,8 @@ class AlbumCoverSelectionViewModelTest {
 
     @Test
     fun `test that update cover returns correct result`() = runTest {
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
         // given
         val underTest = AlbumCoverSelectionViewModel(
             savedStateHandle = SavedStateHandle(),
@@ -118,11 +130,8 @@ class AlbumCoverSelectionViewModelTest {
             downloadThumbnailUseCase = mock(),
             updateAlbumCoverUseCase = updateAlbumCoverUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
-            getFeatureFlagValueUseCase = mock {
-                onBlocking { invoke(any()) }.thenReturn(false)
-            },
-            monitorShowHiddenItemsUseCase = mock(),
-            monitorAccountDetailUseCase = mock(),
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getBusinessStatusUseCase = mock(),
             durationInSecondsTextMapper = DurationInSecondsTextMapper(),
         )
@@ -132,9 +141,10 @@ class AlbumCoverSelectionViewModelTest {
 
         // when
         underTest.updateCover(album, photo)
+        advanceUntilIdle()
 
         // then
-        underTest.state.drop(1).test {
+        underTest.state.test {
             val isCompleted = awaitItem().isSelectionCompleted
             assertThat(isCompleted).isTrue()
         }
@@ -150,9 +160,6 @@ class AlbumCoverSelectionViewModelTest {
             downloadThumbnailUseCase = mock(),
             updateAlbumCoverUseCase = updateAlbumCoverUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
-            getFeatureFlagValueUseCase = mock {
-                onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(true)
-            },
             monitorShowHiddenItemsUseCase = mock {
                 on { invoke() }.thenReturn(flowOf(true))
             },

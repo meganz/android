@@ -19,23 +19,22 @@ import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAc
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerSendToChatAction
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerShareAction
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerUnhideAction
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.FILE_BROWSER_ADAPTER
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.FILE_BROWSER_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetRootParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveInheritedUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
@@ -58,7 +57,6 @@ class LaunchSourceMapperTest {
 
     private val getNodeAccessUseCase = mock<GetNodeAccessUseCase>()
     private val getRubbishNodeUseCase = mock<GetRubbishNodeUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val hasSensitiveInheritedUseCase = mock<HasSensitiveInheritedUseCase>()
     private val getRootParentNodeUseCase = mock<GetRootParentNodeUseCase>()
     private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>()
@@ -69,7 +67,6 @@ class LaunchSourceMapperTest {
         underTest = LaunchSourceMapper(
             getNodeAccessUseCase = getNodeAccessUseCase,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             hasSensitiveInheritedUseCase = hasSensitiveInheritedUseCase,
             getRootParentNodeUseCase = getRootParentNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
@@ -82,7 +79,6 @@ class LaunchSourceMapperTest {
         reset(
             getNodeAccessUseCase,
             getRubbishNodeUseCase,
-            getFeatureFlagValueUseCase,
             hasSensitiveInheritedUseCase,
             getRootParentNodeUseCase,
             isNodeInBackupsUseCase,
@@ -289,7 +285,6 @@ class LaunchSourceMapperTest {
     fun `test that image viewer source return correct actions`(
         showAdd: Boolean,
     ) = runTest {
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
         val actual: List<VideoPlayerMenuAction> = underTest(
             launchSource = FROM_IMAGE_VIEWER,
             videoNode = mock<TypedVideoNode>(),
@@ -299,7 +294,7 @@ class LaunchSourceMapperTest {
             isExpiredBusinessUser = false,
         )
 
-        val expected = listOf(VideoPlayerDownloadAction)
+        val expected = listOf(VideoPlayerDownloadAction, VideoPlayerHideAction)
 
         assertThat(actual).containsExactlyElementsIn(
             if (showAdd)
@@ -314,7 +309,6 @@ class LaunchSourceMapperTest {
         val testRootNode = mock<FolderNode> {
             on { isIncomingShare }.thenReturn(false)
         }
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
         whenever(getRootParentNodeUseCase(any())).thenReturn(testRootNode)
         whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
         val actual: List<VideoPlayerMenuAction> = underTest(
@@ -336,7 +330,6 @@ class LaunchSourceMapperTest {
         val testRootNode = mock<FolderNode> {
             on { isIncomingShare }.thenReturn(false)
         }
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
         whenever(getRootParentNodeUseCase(any())).thenReturn(testRootNode)
         whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
         whenever(hasSensitiveInheritedUseCase(any())).thenReturn(false)
@@ -361,7 +354,6 @@ class LaunchSourceMapperTest {
     fun `test that default source return correct actions`(
         showAdd: Boolean,
     ) = runTest {
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
         val actual: List<VideoPlayerMenuAction> = underTest(
             launchSource = FILE_BROWSER_ADAPTER,
             videoNode = mock<TypedVideoNode>(),
@@ -375,7 +367,8 @@ class LaunchSourceMapperTest {
             VideoPlayerDownloadAction,
             VideoPlayerFileInfoAction,
             VideoPlayerSendToChatAction,
-            VideoPlayerCopyAction
+            VideoPlayerCopyAction,
+            VideoPlayerHideAction
         )
 
         assertThat(actual).containsExactlyElementsIn(
@@ -391,7 +384,6 @@ class LaunchSourceMapperTest {
     fun `test that default source return correct actions regarding Owner permission`(
         isOwnerPermission: Boolean,
     ) = runTest {
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
         whenever(getNodeAccessUseCase(any())).thenReturn(
             if (isOwnerPermission) AccessPermission.OWNER else AccessPermission.FULL
         )
@@ -408,7 +400,8 @@ class LaunchSourceMapperTest {
             VideoPlayerDownloadAction,
             VideoPlayerFileInfoAction,
             VideoPlayerSendToChatAction,
-            VideoPlayerCopyAction
+            VideoPlayerCopyAction,
+            VideoPlayerHideAction
         )
 
         val ownerExpected = listOf(
@@ -433,7 +426,6 @@ class LaunchSourceMapperTest {
     @Test
     fun `test that default source return correct actions with remove link action`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
             whenever(getNodeAccessUseCase(any())).thenReturn(AccessPermission.OWNER)
             val actual: List<VideoPlayerMenuAction> = underTest(
                 launchSource = FILE_BROWSER_ADAPTER,
@@ -455,6 +447,7 @@ class LaunchSourceMapperTest {
                 VideoPlayerRenameAction,
                 VideoPlayerMoveAction,
                 VideoPlayerRubbishBinAction,
+                VideoPlayerHideAction
             )
 
             assertThat(actual).containsExactlyElementsIn(expected + VideoPlayerRemoveLinkAction)
@@ -466,7 +459,6 @@ class LaunchSourceMapperTest {
             val testRootNode = mock<FolderNode> {
                 on { isIncomingShare }.thenReturn(false)
             }
-            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
             whenever(getRootParentNodeUseCase(any())).thenReturn(testRootNode)
             whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
             val actual: List<VideoPlayerMenuAction> = underTest(
@@ -494,7 +486,6 @@ class LaunchSourceMapperTest {
             val testRootNode = mock<FolderNode> {
                 on { isIncomingShare }.thenReturn(false)
             }
-            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
             whenever(getRootParentNodeUseCase(any())).thenReturn(testRootNode)
             whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
             whenever(hasSensitiveInheritedUseCase(any())).thenReturn(false)

@@ -38,14 +38,12 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetNodeNameByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
@@ -68,7 +66,6 @@ class CloudDriveViewModel @AssistedInject constructor(
     private val getFileBrowserNodeChildrenUseCase: GetFileBrowserNodeChildrenUseCase,
     private val setViewTypeUseCase: SetViewType,
     private val monitorViewTypeUseCase: MonitorViewType,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase,
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
@@ -161,28 +158,21 @@ class CloudDriveViewModel @AssistedInject constructor(
         }
         checkCurrentFolderContactVerification()
         viewModelScope.launch {
-            if (isHiddenNodeFeatureFlagEnabled()) {
-                combine(
-                    monitorHiddenNodesEnabledUseCase()
-                        .catch { Timber.e(it) },
-                    monitorShowHiddenItemsUseCase()
-                        .catch { Timber.e(it) },
-                    ::Pair
-                ).collectLatest { pair ->
-                    val isHiddenNodesEnabled = pair.first
-                    val showHiddenItems = pair.second
-                    _uiState.update { state ->
-                        state.copy(
-                            isHiddenNodeSettingsLoading = false,
-                            isHiddenNodesEnabled = isHiddenNodesEnabled,
-                            showHiddenNodes = showHiddenItems
-                        )
-                    }
-                }
-            } else {
-                // Hidden nodes disabled, set loading state to false
+            combine(
+                monitorHiddenNodesEnabledUseCase()
+                    .catch { Timber.e(it) },
+                monitorShowHiddenItemsUseCase()
+                    .catch { Timber.e(it) },
+                ::Pair
+            ).collectLatest { pair ->
+                val isHiddenNodesEnabled = pair.first
+                val showHiddenItems = pair.second
                 _uiState.update { state ->
-                    state.copy(isHiddenNodeSettingsLoading = false)
+                    state.copy(
+                        isHiddenNodeSettingsLoading = false,
+                        isHiddenNodesEnabled = isHiddenNodesEnabled,
+                        showHiddenNodes = showHiddenItems
+                    )
                 }
             }
         }
@@ -264,10 +254,6 @@ class CloudDriveViewModel @AssistedInject constructor(
             }
         }
     }
-
-    private suspend fun isHiddenNodeFeatureFlagEnabled(): Boolean = runCatching {
-        getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-    }.getOrDefault(false)
 
     private suspend fun updateTitle() {
         runCatching {

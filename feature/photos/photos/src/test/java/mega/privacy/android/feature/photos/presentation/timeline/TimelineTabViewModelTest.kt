@@ -14,7 +14,6 @@ import mega.privacy.android.domain.entity.photos.PhotoResult
 import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
 import mega.privacy.android.domain.entity.photos.TimelinePhotosResult
 import mega.privacy.android.domain.entity.photos.TimelineSortedPhotosResult
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelinePhotosUseCase
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
@@ -75,9 +74,6 @@ class TimelineTabViewModelTest {
         whenever(
             getFeatureFlagValueUseCase(AppFeatures.TimelinePhotosPagination)
         ) doReturn true
-        whenever(
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        ) doReturn false
         val now = LocalDateTime.now()
         val mockFileTypeInfo = mock<VideoFileTypeInfo>()
         val photo1 = mock<Photo.Image> {
@@ -126,10 +122,7 @@ class TimelineTabViewModelTest {
             assertThat(item.allPhotos.size).isEqualTo(2)
             assertThat(item.isPaginationEnabled).isTrue()
         }
-        val expectedRequest = TimelinePhotosRequest(
-            isPaginationEnabled = true,
-            isHiddenNodesActive = false
-        )
+        val expectedRequest = TimelinePhotosRequest(isPaginationEnabled = true)
         verify(monitorTimelinePhotosUseCase).invoke(expectedRequest)
         verify(monitorTimelinePhotosUseCase).sortPhotos(
             isPaginationEnabled = true,
@@ -144,9 +137,6 @@ class TimelineTabViewModelTest {
         whenever(
             getFeatureFlagValueUseCase(AppFeatures.TimelinePhotosPagination)
         ) doReturn isPaginationEnabled
-        whenever(
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        ) doReturn false
         val photosResult = mock<TimelinePhotosResult> {
             on { allPhotos } doReturn emptyList()
             on { nonSensitivePhotos } doReturn emptyList()
@@ -179,9 +169,6 @@ class TimelineTabViewModelTest {
         whenever(
             getFeatureFlagValueUseCase(AppFeatures.TimelinePhotosPagination)
         ) doReturn isPaginationEnabled
-        whenever(
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        ) doReturn false
         val photosResult = mock<TimelinePhotosResult> {
             on { allPhotos } doReturn emptyList()
             on { nonSensitivePhotos } doReturn emptyList()
