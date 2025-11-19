@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
@@ -41,12 +42,22 @@ internal class SendCameraUploadsBackupHeartBeatUseCaseTest {
     @Test
     internal fun `test that camera uploads backup heart beat is sent when sync is enabled and backup id exists`() =
         runTest {
+            val backupId = 69L
+            val heartbeatStatus = HeartbeatStatus.UP_TO_DATE
+            val lastNodeHandle = 1L
+
             whenever(cameraUploadsRepository.isCameraUploadsEnabled()).thenReturn(true)
-            whenever(cameraUploadsRepository.getCuBackUpId()).thenReturn(69L)
-            underTest(HeartbeatStatus.values().random(), 1L)
+            whenever(cameraUploadsRepository.getCuBackUpId()).thenReturn(backupId)
+
+            underTest(heartbeatStatus, lastNodeHandle)
+
             verify(cameraUploadsRepository, times(1)).sendBackupHeartbeat(
-                any(), any(), any(),
-                any(), any(), any()
+                eq(backupId),
+                eq(heartbeatStatus),
+                eq(-1),
+                eq(-1),
+                any(),
+                eq(lastNodeHandle)
             )
         }
 
@@ -55,7 +66,9 @@ internal class SendCameraUploadsBackupHeartBeatUseCaseTest {
         runTest {
             whenever(cameraUploadsRepository.isCameraUploadsEnabled()).thenReturn(true)
             whenever(cameraUploadsRepository.getCuBackUpId()).thenReturn(null)
-            underTest(HeartbeatStatus.values().random(), 1L)
+
+            underTest(HeartbeatStatus.UP_TO_DATE, 1L)
+
             verify(cameraUploadsRepository, times(0)).sendBackupHeartbeat(
                 any(), any(), any(),
                 any(), any(), any()
@@ -67,7 +80,9 @@ internal class SendCameraUploadsBackupHeartBeatUseCaseTest {
         runTest {
             whenever(cameraUploadsRepository.isCameraUploadsEnabled()).thenReturn(false)
             whenever(cameraUploadsRepository.getCuBackUpId()).thenReturn(69L)
-            underTest(HeartbeatStatus.values().random(), 1L)
+
+            underTest(HeartbeatStatus.UP_TO_DATE, 1L)
+
             verify(cameraUploadsRepository, times(0)).sendBackupHeartbeat(
                 any(), any(), any(),
                 any(), any(), any()

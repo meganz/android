@@ -65,7 +65,7 @@ class SendBackupHeartBeatSyncUseCase @Inject constructor(
                     backupId = backup.backupId,
                     progress = progress,
                     ups = pendingCount,
-                    downs = 0,
+                    downs = -1,
                     timeStamp = lastTimestamp,
                     lastNode = lastHandle,
                 )

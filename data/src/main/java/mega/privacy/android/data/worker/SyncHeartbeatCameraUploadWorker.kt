@@ -31,7 +31,6 @@ class SyncHeartbeatCameraUploadWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
-        if (isStopped) return Result.failure()
         Timber.d("SyncHeartbeatCameraUploadWorker: doWork()")
         return try {
             // arbitrary retry value
