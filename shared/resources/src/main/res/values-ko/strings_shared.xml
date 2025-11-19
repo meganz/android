@@ -1794,4 +1794,28 @@
     </plurals>
     <!-- External checkout button text -->
     <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
+    <!-- Title for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_title">
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Explanation text for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_description">
+        <item quantity="other">이 링크를 공유 받은 사람들이 사진첩에 접근하지 못 하게 됩니다.</item>
+    </plurals>
+    <!-- Remove button for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_positive_button">
+        <item quantity="other">링크 제거</item>
+    </plurals>
+    <!-- Hint for password dialog -->
+    <string name="password_dialog_hint">암호 입력</string>
+    <!-- Text for decrypt button -->
+    <string name="general_decrypt">복호화</string>
+    <!-- error message shown on the link password dialog if the password typed in was wrong -->
+    <string name="password_dialog_error">잘못된 링크 암호</string>
+    <!-- Message of the Camera Uploads no full access warning banner in Photos -->
+    <string name="camera_upload_no_full_access_banner_change_permissions_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library. [A]Tap to change permissions.[/A]</string>
+    <!-- Text to show as subtitle of Enable camera uploads screen -->
+    <string name="camera_upload_banner_enable_cu_subtitle">자동으로 당신의 사진과 동영상을 클라우드 드라이브에 백업합니다.</string>
+    <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
+    <string name="onboarding_camera_upload_permission_enabled_message">카메라 업로드 활성화됨</string>
 </resources>

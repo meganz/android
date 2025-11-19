@@ -1787,4 +1787,28 @@
     </plurals>
     <!-- External checkout button text -->
     <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
+    <!-- Title for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_title">
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Explanation text for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_description">
+        <item quantity="other">Tất&#160;cả những người bạn đã chia&#160;sẻ các đường liên&#160;kết này sẽ không&#160;thể truy&#160;cập vào album được nữa</item>
+    </plurals>
+    <!-- Remove button for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_positive_button">
+        <item quantity="other">Loại bỏ đường liên kết</item>
+    </plurals>
+    <!-- Hint for password dialog -->
+    <string name="password_dialog_hint">Nhập mật khẩu</string>
+    <!-- Text for decrypt button -->
+    <string name="general_decrypt">Giải mã</string>
+    <!-- error message shown on the link password dialog if the password typed in was wrong -->
+    <string name="password_dialog_error">Mật khẩu cho liên kết này không đúng</string>
+    <!-- Message of the Camera Uploads no full access warning banner in Photos -->
+    <string name="camera_upload_no_full_access_banner_change_permissions_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library. [A]Tap to change permissions.[/A]</string>
+    <!-- Text to show as subtitle of Enable camera uploads screen -->
+    <string name="camera_upload_banner_enable_cu_subtitle">Tự động sao lưu dự phòng hình ảnh và videos của bạn lên Ổ&#160;Mây.</string>
+    <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
+    <string name="onboarding_camera_upload_permission_enabled_message">Đăng tải camêra đang được bật</string>
 </resources>

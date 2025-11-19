@@ -1997,4 +1997,43 @@
     </plurals>
     <!-- External checkout button text -->
     <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
+    <!-- Title for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_title">
+        <item quantity="zero"></item>
+        <item quantity="one"></item>
+        <item quantity="two"></item>
+        <item quantity="few"></item>
+        <item quantity="many"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Explanation text for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_description">
+        <item quantity="zero">سيفقد الأشخاص الذين شاركت معهم هذه الروابط إمكانية الوصول إلى الألبومات.</item>
+        <item quantity="one">سيفقد الأشخاص الذين شاركت معهم هذا الرابط إمكانية الوصول إلى الألبومات.</item>
+        <item quantity="two">سيفقد الأشخاص الذين شاركت معهم هذه الروابط إمكانية الوصول إلى الألبومات.</item>
+        <item quantity="few">سيفقد الأشخاص الذين شاركت معهم هذه الروابط إمكانية الوصول إلى الألبومات.</item>
+        <item quantity="many">سيفقد الأشخاص الذين شاركت معهم هذه الروابط إمكانية الوصول إلى الألبومات.</item>
+        <item quantity="other">سيفقد الأشخاص الذين شاركت معهم هذه الروابط إمكانية الوصول إلى الألبومات.</item>
+    </plurals>
+    <!-- Remove button for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_positive_button">
+        <item quantity="zero">إزالة الرابط</item>
+        <item quantity="one">إزالة الرابط</item>
+        <item quantity="two">إزالة الروابط</item>
+        <item quantity="few">إزالة الروابط</item>
+        <item quantity="many">إزالة الروابط</item>
+        <item quantity="other">إزالة الروابط</item>
+    </plurals>
+    <!-- Hint for password dialog -->
+    <string name="password_dialog_hint">أدخل كلمة المرور</string>
+    <!-- Text for decrypt button -->
+    <string name="general_decrypt">فك التشفير</string>
+    <!-- error message shown on the link password dialog if the password typed in was wrong -->
+    <string name="password_dialog_error">كلمة مرور الرابط غير صالحة</string>
+    <!-- Message of the Camera Uploads no full access warning banner in Photos -->
+    <string name="camera_upload_no_full_access_banner_change_permissions_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library. [A]Tap to change permissions.[/A]</string>
+    <!-- Text to show as subtitle of Enable camera uploads screen -->
+    <string name="camera_upload_banner_enable_cu_subtitle">نسخ احتياطي للصور ومقاطع الفيديو تلقائياً إلى سواقتك السحابية.</string>
+    <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
+    <string name="onboarding_camera_upload_permission_enabled_message">تم تمكين ترفيعات الكاميرا</string>
 </resources>
