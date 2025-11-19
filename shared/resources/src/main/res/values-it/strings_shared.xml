@@ -1021,15 +1021,15 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">Nascondi file e cartelle importanti</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy in one easy step.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">Puoi nascondere file e cartelle sensibili per la privacy in un semplice passaggio.</string>
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">Fuori dalla vista</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
+    <string name="hidden_nodes_description_control_visibility">Solo tu puoi rivelare i file nascosti, singolarmente o visualizzando temporaneamente tutti gli oggetti nascosti dalle impostazioni.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Blur for privacy</string>
+    <string name="hidden_nodes_title_visible_shared_files">Sfoca per la privacy</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
+    <string name="hidden_nodes_description_visible_shared_files">Mostra gli oggetti nascosti con le miniature sfocate, in modo da poterli identificare senza esporne il contenuto.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Mantieni le tue foto al sicuro, sempre</string>
     <!--Camera backup permission screen description-->
@@ -1255,7 +1255,7 @@
     <!-- The camera uploads notification title to reminder the camera uploads paused-->
     <string name="camera_uploads_notification_title_paused_warning">Caricamenti da fotocamera sospesi</string>
     <!-- The camera uploads notification content to reminder there is no wifi connection-->
-    <string name="camera_uploads_notification_content_no_wifi_connection">Connettiti al WIFI o attiva la connessione dati</string>
+    <string name="camera_uploads_notification_content_no_wifi_connection">Connettiti al Wi-Fi o attiva la connessione dati</string>
     <!-- The camera uploads notification action text to allow mobile data-->
     <string name="camera_uploads_notification_action_allow_mobile_data">Attiva connessione dati</string>
     <!-- Alert title before download a big file for preview. -->
@@ -1721,7 +1721,7 @@
     <!--header for the Camera Uploads transfer in progress items -->
     <string name="camera_uploads_tranfer_header_in_progress">In corso</string>
     <!--header for the Camera Uploads transfer in queue items -->
-    <string name="camera_uploads_tranfer_header_in_queue">Fare la coda</string>
+    <string name="camera_uploads_tranfer_header_in_queue">In coda</string>
     <!--Title for the Camera Uploads transfer empty view -->
     <string name="camera_uploads_tranfer_empty_view_title">Tutto aggiornato</string>
     <!--description for the Camera Uploads transfer empty view -->
@@ -1840,7 +1840,7 @@
     <!-- Discount label for first month singular -->
     <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
     <!-- Discount label for first year singular -->
-    <string name="label_first_time_in_years_full_singular">%1$s for the first year</string>
+    <string name="label_first_time_in_years_full_singular">%1$s per il primo anno</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the [A]settings[/A].</string>
     <!-- Dialog confirmation text for removing photos in an album -->
@@ -1871,4 +1871,34 @@
     </plurals>
     <!-- External checkout button text -->
     <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
+    <!-- Title for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_title">
+        <item quantity="one"></item>
+        <item quantity="many"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Explanation text for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_description">
+        <item quantity="one">Le persone con cui hai condiviso questo link perderanno accesso all\’album.</item>
+        <item quantity="many">Le persone con cui hai condiviso questi link perderanno accesso agli album.</item>
+        <item quantity="other">Le persone con cui hai condiviso questi link perderanno accesso agli album.</item>
+    </plurals>
+    <!-- Remove button for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_positive_button">
+        <item quantity="one">Rimuovi il link</item>
+        <item quantity="many">Rimuovi i link</item>
+        <item quantity="other">Rimuovi i link</item>
+    </plurals>
+    <!-- Hint for password dialog -->
+    <string name="password_dialog_hint">Inserisci la password</string>
+    <!-- Text for decrypt button -->
+    <string name="general_decrypt">Decripta</string>
+    <!-- error message shown on the link password dialog if the password typed in was wrong -->
+    <string name="password_dialog_error">Password del link non valida</string>
+    <!-- Message of the Camera Uploads no full access warning banner in Photos -->
+    <string name="camera_upload_no_full_access_banner_change_permissions_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library. [A]Tap to change permissions.[/A]</string>
+    <!-- Text to show as subtitle of Enable camera uploads screen -->
+    <string name="camera_upload_banner_enable_cu_subtitle">Effettua automaticamente il backup delle tue foto e dei tuoi video sul tuo Cloud drive.</string>
+    <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
+    <string name="onboarding_camera_upload_permission_enabled_message">Caricamenti da fotocamera attivati</string>
 </resources>

@@ -1919,4 +1919,37 @@
     </plurals>
     <!-- External checkout button text -->
     <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
+    <!-- Title for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_title">
+        <item quantity="one"></item>
+        <item quantity="few"></item>
+        <item quantity="many"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Explanation text for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_description">
+        <item quantity="one">Osoby, którym udostępniłeś ten link, utracą dostęp do albumu.</item>
+        <item quantity="few">Osoby, którym udostępniłeś te linki, stracą dostęp do albumów.</item>
+        <item quantity="many">Osoby, którym udostępniłeś te linki, stracą dostęp do albumów.</item>
+        <item quantity="other">Osoby, którym udostępniłeś te linki, stracą dostęp do albumów.</item>
+    </plurals>
+    <!-- Remove button for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_positive_button">
+        <item quantity="one">Usuń link</item>
+        <item quantity="few">Usuń&#160;linki</item>
+        <item quantity="many">Usuń&#160;linki</item>
+        <item quantity="other">Usuń linki</item>
+    </plurals>
+    <!-- Hint for password dialog -->
+    <string name="password_dialog_hint">Wprowadź&#160;hasło</string>
+    <!-- Text for decrypt button -->
+    <string name="general_decrypt">Odszyfruj</string>
+    <!-- error message shown on the link password dialog if the password typed in was wrong -->
+    <string name="password_dialog_error">Nieprawidłowe hasło do łącza</string>
+    <!-- Message of the Camera Uploads no full access warning banner in Photos -->
+    <string name="camera_upload_no_full_access_banner_change_permissions_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library. [A]Tap to change permissions.[/A]</string>
+    <!-- Text to show as subtitle of Enable camera uploads screen -->
+    <string name="camera_upload_banner_enable_cu_subtitle">Automatyczne tworzenie kopii zapasowych zdjęć i filmów na dysku Cloud.</string>
+    <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
+    <string name="onboarding_camera_upload_permission_enabled_message">Przesyłanie z kamery odblokowane</string>
 </resources>

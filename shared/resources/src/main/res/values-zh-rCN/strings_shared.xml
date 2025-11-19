@@ -1784,4 +1784,28 @@
     </plurals>
     <!-- External checkout button text -->
     <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
+    <!-- Title for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_title">
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Explanation text for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_description">
+        <item quantity="other">您与之共享这些链接的人将失去对相册的访问权限。</item>
+    </plurals>
+    <!-- Remove button for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_positive_button">
+        <item quantity="other">移除链接</item>
+    </plurals>
+    <!-- Hint for password dialog -->
+    <string name="password_dialog_hint">输入密码</string>
+    <!-- Text for decrypt button -->
+    <string name="general_decrypt">解密</string>
+    <!-- error message shown on the link password dialog if the password typed in was wrong -->
+    <string name="password_dialog_error">链接密码无效</string>
+    <!-- Message of the Camera Uploads no full access warning banner in Photos -->
+    <string name="camera_upload_no_full_access_banner_change_permissions_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library. [A]Tap to change permissions.[/A]</string>
+    <!-- Text to show as subtitle of Enable camera uploads screen -->
+    <string name="camera_upload_banner_enable_cu_subtitle">自动备份您的照片和视频到您的云盘。</string>
+    <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
+    <string name="onboarding_camera_upload_permission_enabled_message">相机上传已启用</string>
 </resources>

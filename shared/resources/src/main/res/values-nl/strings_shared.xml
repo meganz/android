@@ -1829,4 +1829,31 @@
     </plurals>
     <!-- External checkout button text -->
     <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
+    <!-- Title for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_title">
+        <item quantity="one"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Explanation text for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_description">
+        <item quantity="one">Mensen met wie u deze link hebt gedeeld, raken de toegang tot het album kwijt.</item>
+        <item quantity="other">Mensen met wie u deze links hebt gedeeld, raken de toegang tot de albums kwijt.</item>
+    </plurals>
+    <!-- Remove button for the album remove link(s) confirmation dialog -->
+    <plurals name="album_content_remove_links_dialog_positive_button">
+        <item quantity="one">Link verwijderen</item>
+        <item quantity="other">Links verwijderen</item>
+    </plurals>
+    <!-- Hint for password dialog -->
+    <string name="password_dialog_hint">Wachtwoord invoeren</string>
+    <!-- Text for decrypt button -->
+    <string name="general_decrypt">Decoderen</string>
+    <!-- error message shown on the link password dialog if the password typed in was wrong -->
+    <string name="password_dialog_error">Ongeldig link wachtwoord</string>
+    <!-- Message of the Camera Uploads no full access warning banner in Photos -->
+    <string name="camera_upload_no_full_access_banner_change_permissions_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library. [A]Tap to change permissions.[/A]</string>
+    <!-- Text to show as subtitle of Enable camera uploads screen -->
+    <string name="camera_upload_banner_enable_cu_subtitle">Automatisch een backup van uw foto\’s en video\’s maken naar uw Cloud schijf.</string>
+    <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
+    <string name="onboarding_camera_upload_permission_enabled_message">Camera Uploads ingeschakeld</string>
 </resources>
