@@ -1919,37 +1919,4 @@
     </plurals>
     <!-- External checkout button text -->
     <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
-    <!-- Title for the album remove link(s) confirmation dialog -->
-    <plurals name="album_content_remove_links_dialog_title">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
-    </plurals>
-    <!-- Explanation text for the album remove link(s) confirmation dialog -->
-    <plurals name="album_content_remove_links_dialog_description">
-        <item quantity="one">Люди, с которыми вы поделились этой ссылкой, потеряют доступ к альбому.</item>
-        <item quantity="few">Люди, с которыми вы поделились этими ссылками, потеряют доступ к альбомам.</item>
-        <item quantity="many">Люди, с которыми вы поделились этими ссылками, потеряют доступ к альбомам.</item>
-        <item quantity="other">Люди, с которыми вы поделились этими ссылками, потеряют доступ к альбомам.</item>
-    </plurals>
-    <!-- Remove button for the album remove link(s) confirmation dialog -->
-    <plurals name="album_content_remove_links_dialog_positive_button">
-        <item quantity="one">Удалить ссылку</item>
-        <item quantity="few">Удалить ссылки</item>
-        <item quantity="many">Удалить ссылки</item>
-        <item quantity="other">Удалить ссылки</item>
-    </plurals>
-    <!-- Hint for password dialog -->
-    <string name="password_dialog_hint">Введите пароль</string>
-    <!-- Text for decrypt button -->
-    <string name="general_decrypt">Дешифрировать</string>
-    <!-- error message shown on the link password dialog if the password typed in was wrong -->
-    <string name="password_dialog_error">Неверный пароль ссылки</string>
-    <!-- Message of the Camera Uploads no full access warning banner in Photos -->
-    <string name="camera_upload_no_full_access_banner_change_permissions_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library. [A]Tap to change permissions.[/A]</string>
-    <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="camera_upload_banner_enable_cu_subtitle">Автоматически загружать фото и видео на Облачный диск.</string>
-    <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
-    <string name="onboarding_camera_upload_permission_enabled_message">Загрузки из камеры включены</string>
 </resources>

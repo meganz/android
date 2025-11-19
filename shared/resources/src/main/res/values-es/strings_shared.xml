@@ -1871,34 +1871,4 @@
     </plurals>
     <!-- External checkout button text -->
     <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
-    <!-- Title for the album remove link(s) confirmation dialog -->
-    <plurals name="album_content_remove_links_dialog_title">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
-    </plurals>
-    <!-- Explanation text for the album remove link(s) confirmation dialog -->
-    <plurals name="album_content_remove_links_dialog_description">
-        <item quantity="one">Las personas con quien hayas compartido este enlace perderán acceso al álbum.</item>
-        <item quantity="many">Las personas con quien hayas compartido estos enlaces perderán acceso a los álbumes.</item>
-        <item quantity="other">Las personas con quien hayas compartido estos enlaces perderán acceso a los álbumes.</item>
-    </plurals>
-    <!-- Remove button for the album remove link(s) confirmation dialog -->
-    <plurals name="album_content_remove_links_dialog_positive_button">
-        <item quantity="one">Eliminar enlace</item>
-        <item quantity="many">Eliminar enlaces</item>
-        <item quantity="other">Eliminar enlaces</item>
-    </plurals>
-    <!-- Hint for password dialog -->
-    <string name="password_dialog_hint">Introduce la contraseña</string>
-    <!-- Text for decrypt button -->
-    <string name="general_decrypt">Descifrar</string>
-    <!-- error message shown on the link password dialog if the password typed in was wrong -->
-    <string name="password_dialog_error">Contraseña del enlace inválida</string>
-    <!-- Message of the Camera Uploads no full access warning banner in Photos -->
-    <string name="camera_upload_no_full_access_banner_change_permissions_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library. [A]Tap to change permissions.[/A]</string>
-    <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="camera_upload_banner_enable_cu_subtitle">Realizar backups automáticos de fotos y vídeos en la Nube.</string>
-    <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
-    <string name="onboarding_camera_upload_permission_enabled_message">Subidas de la cámara activadas</string>
 </resources>
