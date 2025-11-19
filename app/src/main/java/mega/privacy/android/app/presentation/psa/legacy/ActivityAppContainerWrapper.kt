@@ -3,10 +3,18 @@ package mega.privacy.android.app.presentation.psa.legacy
 import android.app.Activity
 import android.content.Context
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -15,16 +23,21 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.qualifiers.ActivityContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.dialog.businessgrace.BusinessAccountContainer
+import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.app.presentation.container.AppContainerWrapper
-import mega.privacy.android.app.presentation.container.LegacyMegaAppContainer
+import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.app.presentation.psa.PsaContentView
 import mega.privacy.android.app.presentation.psa.PsaViewModel
 import mega.privacy.android.app.presentation.psa.model.PsaState
 import mega.privacy.android.app.presentation.security.PasscodeCheck
+import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.psa.Psa
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import java.security.InvalidParameterException
 import javax.inject.Inject
@@ -79,56 +92,110 @@ class ActivityAppContainerWrapper @Inject constructor(
                         val themeMode by monitorThemeModeUseCase()
                             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
-                        val viewModel: PsaViewModel = hiltViewModel()
-                        val psaState by psaGlobalState.state.collectAsStateWithLifecycle((context as LifecycleOwner))
+                        if (!isLoginActivity) {
+                            val viewModel: PsaViewModel = hiltViewModel()
+                            val psaState by psaGlobalState.state.collectAsStateWithLifecycle((context as LifecycleOwner))
 
-                        LaunchedEffect(psaState) {
-                            if (isLoginActivity) return@LaunchedEffect
-                            when (val current = psaState) {
-                                is PsaState.InfoPsa -> {
-                                    psaViewHolder?.bind(fromInfoPsa(current))
-                                    psaViewHolder?.toggleVisible(true)
-                                }
+                            LaunchedEffect(psaState) {
+                                when (val current = psaState) {
+                                    is PsaState.InfoPsa -> {
+                                        psaViewHolder?.bind(fromInfoPsa(current))
+                                        psaViewHolder?.toggleVisible(true)
+                                    }
 
-                                PsaState.NoPsa -> {
-                                    psaViewHolder?.toggleVisible(false)
-                                }
+                                    PsaState.NoPsa -> {
+                                        psaViewHolder?.toggleVisible(false)
+                                    }
 
-                                is PsaState.StandardPsa -> {
-                                    psaViewHolder?.bind(
-                                        fromStandardPsa(
-                                            current
+                                    is PsaState.StandardPsa -> {
+                                        psaViewHolder?.bind(
+                                            fromStandardPsa(
+                                                current
+                                            )
                                         )
-                                    )
-                                    psaViewHolder?.toggleVisible(true)
-                                }
+                                        psaViewHolder?.toggleVisible(true)
+                                    }
 
-                                is PsaState.WebPsa -> {
-                                    psaViewHolder?.toggleVisible(false)
+                                    is PsaState.WebPsa -> {
+                                        psaViewHolder?.toggleVisible(false)
+                                    }
                                 }
                             }
-                        }
 
-                        val hasPsaViewHolder = psaViewHolder != null
-                        val handledPsaState = when (psaState) {
-                            is PsaState.InfoPsa -> if (hasPsaViewHolder.not() && isLoginActivity.not()) psaState else PsaState.NoPsa
-                            PsaState.NoPsa -> psaState
-                            is PsaState.StandardPsa -> if (hasPsaViewHolder.not() && isLoginActivity.not()) psaState else PsaState.NoPsa
-                            is PsaState.WebPsa -> psaState
-                        }
+                            val hasPsaViewHolder = psaViewHolder != null
+                            val handledPsaState = when (psaState) {
+                                is PsaState.InfoPsa -> if (hasPsaViewHolder.not() && isLoginActivity.not()) psaState else PsaState.NoPsa
+                                PsaState.NoPsa -> psaState
+                                is PsaState.StandardPsa -> if (hasPsaViewHolder.not() && isLoginActivity.not()) psaState else PsaState.NoPsa
+                                is PsaState.WebPsa -> psaState
+                            }
+                            val containers: List<(@Composable (@Composable () -> Unit) -> Unit)?> =
+                                listOf(
+                                    {
+                                        BusinessAccountContainer(content = it)
+                                    },
+                                    {
+                                        PsaContentView(
+                                            context = context,
+                                            coroutineScope = rememberCoroutineScope(),
+                                            markAsSeen = {
+                                                viewModel.markAsSeen(it)
+                                                psaGlobalState.clearPsa()
+                                            },
+                                            state = handledPsaState,
+                                            content = it,
+                                            containerModifier = Modifier
+                                                .navigationBarsPadding(),
+                                            innerModifier = { it.padding(bottom = 16.dp) }
+                                        )
+                                    },
+                                    {
+                                        PasscodeContainer(
+                                            passcodeCryptObjectFactory = passcodeCryptObjectFactory,
+                                            canLock = { passcodeCheck?.canLock() != false },
+                                            content = it,
+                                        )
+                                    },
+                                    {
+                                        OriginalTheme(
+                                            isDark = themeMode.isDarkMode(),
+                                            content = it
+                                        )
+                                    },
+                                )
 
-                        LegacyMegaAppContainer(
-                            context = context,
-                            psaState = handledPsaState,
-                            markPsaAsSeen = {
-                                viewModel.markAsSeen(it)
-                                psaGlobalState.clearPsa()
-                            },
-                            themeMode = themeMode,
-                            passcodeCryptObjectFactory = passcodeCryptObjectFactory,
-                            canLock = { passcodeCheck?.canLock() != false },
-                        )
+                            AppContainer(
+                                containers = containers.filterNotNull(),
+                                content = { Box(Modifier.fillMaxSize()) }
+                            )
+                        } else {
+                            val containers: List<(@Composable (@Composable () -> Unit) -> Unit)?> =
+                                listOf(
+                                    {
+                                        BusinessAccountContainer(content = it)
+                                    },
+                                    {
+                                        PasscodeContainer(
+                                            passcodeCryptObjectFactory = passcodeCryptObjectFactory,
+                                            canLock = { passcodeCheck?.canLock() != false },
+                                            content = it,
+                                        )
+                                    },
+                                    {
+                                        OriginalTheme(
+                                            isDark = themeMode.isDarkMode(),
+                                            content = it
+                                        )
+                                    },
+                                )
+
+                            AppContainer(
+                                containers = containers.filterNotNull(),
+                                content = { Box(Modifier.fillMaxSize()) }
+                            )
+                        }
                     }
+
                 }.apply {
                     id = R.id.legacy_container
                 }
