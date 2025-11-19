@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.appstate.initialisation.GlobalInitialiser
 import mega.privacy.android.app.presentation.extensions.error
 import mega.privacy.android.app.presentation.extensions.newError
 import mega.privacy.android.app.presentation.login.model.FetchNodesUiState
@@ -63,6 +64,7 @@ class FetchNodesViewModel @AssistedInject constructor(
     private val monitorAccountBlockedUseCase: MonitorAccountBlockedUseCase,
     private val isMegaApiLoggedInUseCase: IsMegaApiLoggedInUseCase,
     private val getUserDataUseCase: GetUserDataUseCase,
+    private val globalInitialiser: GlobalInitialiser,
     @Assisted val session: String,
     @Assisted val isFromLogin: Boolean,
     @ApplicationScope private val applicationScope: CoroutineScope,
@@ -109,6 +111,7 @@ class FetchNodesViewModel @AssistedInject constructor(
             if (isMegaApiLoggedInUseCase()) {
                 // this case mean user just logged in by account so we only need to fetch nodes
                 Timber.d("User is logged in, fetch nodes")
+                handlePostLogin(isFastLogin = false)
                 fetchNodes(isRefreshSession = false)
             } else {
                 // this case mean user logged in and open app again, so we need to fast login
@@ -226,6 +229,7 @@ class FetchNodesViewModel @AssistedInject constructor(
                     )
                 }
             }
+            handlePostLogin(true)
             getUserData()
             fetchNodes()
         }
@@ -314,6 +318,10 @@ class FetchNodesViewModel @AssistedInject constructor(
                 }
             }
         }
+    }
+
+    private fun handlePostLogin(isFastLogin: Boolean) {
+        globalInitialiser.onPostLogin(session = session, isFastLogin)
     }
 
     private fun stopFetchingNodes() {

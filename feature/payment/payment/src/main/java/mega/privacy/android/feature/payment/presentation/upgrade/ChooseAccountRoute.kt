@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.payment.presentation.upgrade
 
 import android.app.Activity
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.LocalActivity
@@ -22,7 +21,6 @@ import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AdFreeDialogUpgradeAccountPlanPageBuyButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AdsUpgradeAccountPlanPageBuyButtonPressedEvent
 import mega.privacy.mobile.analytics.event.BuyProIEvent
@@ -62,7 +60,8 @@ fun ChooseAccountRoute(
                         megaNavigator = megaNavigator,
                         activity = activity,
                         isUpgradeAccount = isUpgradeAccount,
-                        openFromSource = openFromSource
+                        openFromSource = openFromSource,
+                        isSingleActivityEnabled = uiState.isSingleActivityEnabled
                     )
                 }
                 billingViewModel.markHandleBillingEvent()
@@ -94,13 +93,25 @@ fun ChooseAccountRoute(
             Analytics.tracker.trackEvent(
                 GetStartedForFreeUpgradePlanButtonPressedEvent
             )
-            activity?.let { onFreeClick(it, megaNavigator) }
+            activity?.let {
+                onFreeClick(
+                    activity = it,
+                    megaNavigator = megaNavigator,
+                    isSingleActivityEnabled = uiState.isSingleActivityEnabled
+                )
+            }
         },
         maybeLaterClicked = {
             Analytics.tracker.trackEvent(
                 MaybeLaterUpgradeAccountButtonPressedEvent
             )
-            activity?.let { onFreeClick(it, megaNavigator) }
+            activity?.let {
+                onFreeClick(
+                    activity = it,
+                    megaNavigator = megaNavigator,
+                    isSingleActivityEnabled = uiState.isSingleActivityEnabled
+                )
+            }
         },
         onInAppCheckoutClick = { subscription ->
             sendAccountTypeAnalytics(
@@ -159,9 +170,17 @@ private fun sendAccountTypeAnalytics(
     }
 }
 
-private fun onFreeClick(activity: Activity, megaNavigator: MegaNavigator) {
-    val bundle = createNavigationBundle(activity, AccountType.FREE)
-    navigateToManagerActivity(megaNavigator, activity, bundle)
+private fun onFreeClick(
+    activity: Activity,
+    megaNavigator: MegaNavigator,
+    isSingleActivityEnabled: Boolean,
+) {
+    if (isSingleActivityEnabled) {
+        activity.finish()
+    } else {
+        val bundle = createNavigationBundle(activity, AccountType.FREE)
+        navigateToManagerActivity(megaNavigator, activity, bundle)
+    }
 }
 
 private fun convertAccountTypeToInt(accountType: AccountType): Int {
@@ -199,6 +218,7 @@ private fun onPurchasesUpdated(
     activity: Activity,
     isUpgradeAccount: Boolean,
     openFromSource: UpgradeAccountSource,
+    isSingleActivityEnabled: Boolean,
 ) {
     if (isUpgradeAccount) {
         if (openFromSource == UpgradeAccountSource.MY_ACCOUNT_SCREEN) {
@@ -209,10 +229,12 @@ private fun onPurchasesUpdated(
             activity.finish()
         }
         // other cases stay in the same activity
-    } else {
+    } else if (!isSingleActivityEnabled) {
         // Reuse the common navigation logic for non-upgrade account cases
         val bundle = createNavigationBundle(activity)
         navigateToManagerActivity(megaNavigator, activity, bundle)
+    } else {
+        activity.finish()
     }
 }
 

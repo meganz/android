@@ -37,9 +37,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
@@ -181,9 +179,6 @@ class GlobalStateViewModelTest {
             assertThat(state.themeMode).isEqualTo(themeMode)
             assertThat(state.session).isEqualTo(credentials.session)
 
-            // Verify post-login initializers were called with the session and isFastLogin = true (initial login)
-            verify(globalInitialiser).onPostLogin("test-session", true)
-
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -204,9 +199,6 @@ class GlobalStateViewModelTest {
         underTest.state.test {
             val state = awaitItem()
             assertThat(state).isInstanceOf(GlobalState.RequireLogin::class.java)
-
-            // Verify post-login initializers were NOT called
-            verify(globalInitialiser, never()).onPostLogin(any(), any())
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -330,9 +322,6 @@ class GlobalStateViewModelTest {
 
             cancelAndIgnoreRemainingEvents()
         }
-
-        // Verify post-login initializers were called with isFastLogin = false (transition from RequireLogin)
-        verify(globalInitialiser).onPostLogin("test-session", false)
     }
 
     @Test
@@ -670,9 +659,6 @@ class GlobalStateViewModelTest {
 
                 cancelAndIgnoreRemainingEvents()
             }
-
-            // Verify post-login initializers were called with isFastLogin = false (transition from RequireLogin)
-            verify(globalInitialiser).onPostLogin("test-session", false)
         }
 
     @Test
@@ -849,8 +835,6 @@ class GlobalStateViewModelTest {
 
                 cancelAndIgnoreRemainingEvents()
             }
-
-            verify(globalInitialiser, times(1)).onPostLogin(session, true)
         }
 
     @Test
@@ -876,7 +860,6 @@ class GlobalStateViewModelTest {
             underTest.state.test { cancelAndIgnoreRemainingEvents() }
             advanceTimeBy(6_000) // Advance time past ui state flow timeout
             underTest.state.test { cancelAndIgnoreRemainingEvents() }
-            verify(globalInitialiser, times(1)).onPostLogin(session, true)
         }
 
     @Test

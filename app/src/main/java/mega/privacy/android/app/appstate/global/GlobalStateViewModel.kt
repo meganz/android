@@ -50,21 +50,8 @@ class GlobalStateViewModel @Inject constructor(
         globalInitialiser.onAppStart()
     }
 
-    private var lastLoggedInSession: String? = null
-    private var isFastLogin = true
-
     val state: StateFlow<GlobalState> by lazy {
-        getStateValues().onEach { state ->
-            if (state is GlobalState.LoggedIn) {
-                if (lastLoggedInSession != state.session) {
-                    lastLoggedInSession = state.session
-                    globalInitialiser.onPostLogin(state.session, isFastLogin)
-                }
-                isFastLogin = true
-            } else if (state is GlobalState.RequireLogin) {
-                isFastLogin = false
-            }
-        }.catch {
+        getStateValues().catch {
             Timber.e(it, "Error while building auth state")
         }.distinctUntilChanged()
             .onEach {

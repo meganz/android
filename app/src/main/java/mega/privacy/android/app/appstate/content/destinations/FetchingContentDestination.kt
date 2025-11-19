@@ -23,13 +23,11 @@ fun EntryProviderScope<NavKey>.fetchingContentDestination() {
             EnterTransition.None togetherWith ExitTransition.None
         }
     ) {
-        val viewModel =
-            hiltViewModel<FetchNodesViewModel, FetchNodesViewModel.Factory>(
-                key = "FetchNodesViewModel ${it.session}",
-                creationCallback = { factory ->
-                    factory.create(session = it.session, isFromLogin = it.isFromLogin)
-                }
-            )
+        val viewModel = hiltViewModel<FetchNodesViewModel, FetchNodesViewModel.Factory>(
+            creationCallback = { factory ->
+                factory.create(session = it.session, isFromLogin = it.isFromLogin)
+            }
+        )
         val state by viewModel.state.collectAsStateWithLifecycle()
 
         FetchNodesContent(

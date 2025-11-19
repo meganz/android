@@ -173,12 +173,12 @@ class MegaActivity : ComponentActivity() {
 
                 LaunchedEffect(globalState) {
                     val authStatus =
-                        (globalState as? GlobalState.LoggedIn)?.session?.let {
-                            PendingBackStackNavigationHandler.AuthStatus.LoggedIn(it)
-                        } ?: PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn
+                    (globalState as? GlobalState.LoggedIn)?.session?.let {
+                        PendingBackStackNavigationHandler.AuthStatus.LoggedIn(it)
+                    } ?: PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn
 
-                    navigationHandler.onLoginChange(authStatus)
-                }
+                navigationHandler.onLoginChange(authStatus)
+            }
 
                 LaunchedEffect(rootNodeState) {
                     navigationHandler.onRootNodeChange(rootNodeState)

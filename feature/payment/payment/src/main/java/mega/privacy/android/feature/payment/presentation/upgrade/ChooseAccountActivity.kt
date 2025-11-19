@@ -38,7 +38,10 @@ open class ChooseAccountActivity : AppCompatActivity() {
                 useLegacyStatusBarColor = false
             ) {
                 ChooseAccountRoute(
-                    isNewCreationAccount = intent.getBooleanExtra(ExtraConstant.NEW_CREATION_ACCOUNT, false),
+                    isNewCreationAccount = intent.getBooleanExtra(
+                        ExtraConstant.NEW_CREATION_ACCOUNT,
+                        false
+                    ),
                     isUpgradeAccount = isUpgradeAccount,
                     openFromSource = openFromSource,
                     onBack = ::finish
@@ -52,6 +55,21 @@ open class ChooseAccountActivity : AppCompatActivity() {
          * Extra key to indicate the source of the upgrade account action.
          */
         const val EXTRA_SOURCE = "EXTRA_SOURCE"
+
+        /**
+         * Navigates to the Choose Account screen.
+         */
+        fun navigateToChooseAccount(
+            context: Context,
+            isNewCreationAccount: Boolean,
+        ) {
+            val intent = Intent(context, ChooseAccountActivity::class.java).apply {
+                putExtra(EXTRA_IS_UPGRADE_ACCOUNT, false)
+                putExtra(ExtraConstant.EXTRA_NEW_ACCOUNT, isNewCreationAccount)
+                putExtra(ExtraConstant.NEW_CREATION_ACCOUNT, isNewCreationAccount)
+            }
+            context.startActivity(intent)
+        }
 
         /**
          * Navigates to the Upgrade Account screen.

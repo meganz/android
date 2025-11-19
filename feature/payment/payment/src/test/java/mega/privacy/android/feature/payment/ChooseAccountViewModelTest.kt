@@ -26,11 +26,12 @@ import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUse
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
-import mega.privacy.android.feature_flags.ABTestFeatures
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountViewModel
+import mega.privacy.android.feature_flags.ABTestFeatures
+import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -183,6 +184,7 @@ class ChooseAccountViewModelTest {
         whenever(getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers))
             .thenReturn(true)
         whenever(getFeatureFlagValueUseCase(ABTestFeatures.ande)).thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
 
         initViewModel()
 
@@ -203,6 +205,7 @@ class ChooseAccountViewModelTest {
         wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers) }
             .thenReturn(false)
         wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
 
         initViewModel()
 
@@ -223,6 +226,7 @@ class ChooseAccountViewModelTest {
         wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers) }
             .thenReturn(true)
         wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(true)
+        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
 
         initViewModel()
 
@@ -243,6 +247,7 @@ class ChooseAccountViewModelTest {
         whenever(getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers))
             .thenReturn(true)
         whenever(getFeatureFlagValueUseCase(ABTestFeatures.ande)).thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
 
         initViewModel()
 
@@ -263,6 +268,7 @@ class ChooseAccountViewModelTest {
         wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers) }
             .thenReturn(true)
         wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(true)
+        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
 
         initViewModel()
 

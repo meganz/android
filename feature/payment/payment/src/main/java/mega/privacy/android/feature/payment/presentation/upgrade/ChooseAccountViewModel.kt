@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.billing.Pricing
-import mega.privacy.android.domain.entity.featureflag.ABTestFeature
 import mega.privacy.android.domain.entity.payment.Subscriptions
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetPricing
@@ -24,6 +23,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.feature.payment.model.ChooseAccountState
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.feature_flags.ABTestFeatures
+import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -88,6 +88,14 @@ class ChooseAccountViewModel @Inject constructor(
                             cheapestSubscriptionAvailable
                         )
                     }
+                )
+            }
+        }
+        viewModelScope.launch {
+            val isSingleActivityEnabled = getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
+            _state.update {
+                it.copy(
+                    isSingleActivityEnabled = isSingleActivityEnabled
                 )
             }
         }

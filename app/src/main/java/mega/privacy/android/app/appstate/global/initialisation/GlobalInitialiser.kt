@@ -9,6 +9,7 @@ import mega.privacy.android.app.appstate.initialisation.initialisers.PreLoginIni
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Auth initialiser handles initialisation tasks during user auth.
@@ -19,6 +20,7 @@ import javax.inject.Inject
  * @property preLoginInitialisers
  * @property postLoginInitialisers
  */
+@Singleton
 class GlobalInitialiser @Inject constructor(
     @ApplicationScope private val coroutineScope: CoroutineScope,
     private val appStartInitialisers: Set<@JvmSuppressWildcards AppStartInitialiser>,
@@ -42,6 +44,7 @@ class GlobalInitialiser @Inject constructor(
 
     fun onPreLogin(session: String?) {
         onPreLoginJob?.cancel()
+        Timber.d("Starting pre-login initialisation")
         onPreLoginJob = coroutineScope.launch {
             preLoginInitialisers.forEach { initialiser ->
                 launch {
@@ -56,6 +59,7 @@ class GlobalInitialiser @Inject constructor(
     }
 
     fun onPostLogin(session: String, isFastLogin: Boolean) {
+        Timber.d("Starting post-login initialisation")
         onPostLoginJob?.cancel()
         onPostLoginJob = coroutineScope.launch {
             postLoginInitialisers.forEach { initialiser ->

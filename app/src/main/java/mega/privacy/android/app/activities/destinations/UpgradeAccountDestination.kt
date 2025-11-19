@@ -4,6 +4,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountActivity
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.megaNavigator
@@ -14,10 +15,17 @@ fun EntryProviderScope<NavKey>.upgradeAccount(removeDestination: () -> Unit) {
     ) { key ->
         val context = LocalContext.current
         LaunchedEffect(Unit) {
-            context.megaNavigator.openUpgradeAccount(
-                context = context,
-                source = key.source
-            )
+            if (key.isUpgrade) {
+                context.megaNavigator.openUpgradeAccount(
+                    context = context,
+                    source = key.source
+                )
+            } else {
+                ChooseAccountActivity.navigateToChooseAccount(
+                    context = context,
+                    isNewCreationAccount = key.isNewAccount,
+                )
+            }
 
             // Immediately pop this destination from the back stack
             removeDestination()

@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.appstate.initialisation.GlobalInitialiser
 import mega.privacy.android.app.triggeredContent
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.Progress
@@ -75,6 +76,7 @@ class FetchNodesViewModelTest {
             )
     }
     private val getUserDataUseCase: GetUserDataUseCase = mock()
+    private val globalInitialiser = mock<GlobalInitialiser>()
     private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
 
     @BeforeAll
@@ -102,7 +104,8 @@ class FetchNodesViewModelTest {
             resetChatSettingsUseCase,
             monitorAccountBlockedUseCase,
             isMegaApiLoggedInUseCase,
-            getUserDataUseCase
+            getUserDataUseCase,
+            globalInitialiser
         )
     }
 
@@ -120,6 +123,7 @@ class FetchNodesViewModelTest {
             monitorAccountBlockedUseCase = monitorAccountBlockedUseCase,
             isMegaApiLoggedInUseCase = isMegaApiLoggedInUseCase,
             getUserDataUseCase = getUserDataUseCase,
+            globalInitialiser = globalInitialiser,
             isFromLogin = false,
             session = "test-session",
             applicationScope = applicationScope,
@@ -151,7 +155,9 @@ class FetchNodesViewModelTest {
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
         whenever(isMegaApiLoggedInUseCase()).thenReturn(false)
-        whenever(fastLoginUseCase.invoke(any(), any(), any())).thenReturn(emptyFlow())
+        val loginStatusFlow = MutableStateFlow<LoginStatus>(LoginStatus.LoginStarted)
+        whenever(fastLoginUseCase.invoke(any(), any(), any())).thenReturn(loginStatusFlow)
+        whenever(fetchNodesUseCase()).thenReturn(emptyFlow())
 
         initViewModel()
 
@@ -161,6 +167,12 @@ class FetchNodesViewModelTest {
             assertThat(state.isFastLogin).isTrue()
 
             verify(fastLoginUseCase).invoke(any(), any(), any())
+            
+            // Emit login success to trigger onPostLogin
+            loginStatusFlow.emit(LoginStatus.LoginSucceed)
+            advanceUntilIdle()
+            
+            verify(globalInitialiser).onPostLogin("test-session", true)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -176,6 +188,7 @@ class FetchNodesViewModelTest {
         whenever(fetchNodesUseCase()).thenReturn(emptyFlow())
 
         initViewModel()
+        advanceUntilIdle()
 
         underTest.state.test {
             val state = awaitItem()
@@ -184,6 +197,7 @@ class FetchNodesViewModelTest {
 
             verify(fetchNodesUseCase).invoke()
             verify(fastLoginUseCase, never()).invoke(any(), any(), any())
+            verify(globalInitialiser).onPostLogin("test-session", false)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -415,4 +429,5 @@ class FetchNodesViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
 } 
