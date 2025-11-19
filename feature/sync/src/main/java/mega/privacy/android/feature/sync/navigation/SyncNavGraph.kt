@@ -54,7 +54,7 @@ internal fun NavGraphBuilder.syncNavGraph(
         shouldNavigateToSyncList = shouldNavigateToSyncList,
         openUpgradeAccountPage = openUpgradeAccountPage,
         popToSyncListView = {
-            navController.navFromNewFolderRouteToListRoute()
+            navController.navFromNewFolderRouteToListRoute(it)
         },
         megaDomainName = megaDomainName,
     )
@@ -101,9 +101,9 @@ internal fun NavGraphBuilder.syncNavGraph(
  * Method to specifically navigate from syncNewFolderRoute to syncListRoute
  * It avoids duplicated navigation due the use of shortcuts, deep links, etc.
  */
-private fun NavController.navFromNewFolderRouteToListRoute() {
+private fun NavController.navFromNewFolderRouteToListRoute(syncType: SyncType) {
     navigate(SyncList()) {
-        popUpTo(SyncNewFolder()) { inclusive = true }
+        popUpTo(SyncNewFolder(syncType = syncType)) { inclusive = true }
     }
     if (previousBackStackEntry?.destination?.route == currentBackStackEntry?.destination?.route) {
         popBackStack()

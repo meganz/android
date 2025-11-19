@@ -76,7 +76,7 @@ internal class SyncFragment : Fragment() {
                         megaNavigator = megaNavigator,
                         fileTypeIconMapper = fileTypeIconMapper,
                         syncPermissionsManager = syncPermissionsManager,
-                        onBackPressed = { requireActivity().onBackPressed() },
+                        onBackPressed = { requireActivity().onBackPressedDispatcher.onBackPressed() },
                         shouldNavigateToSyncList = activity?.intent?.getBooleanExtra(
                             SyncHostActivity.EXTRA_IS_FROM_CLOUD_DRIVE, false
                         ) == false,

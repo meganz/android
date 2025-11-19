@@ -40,7 +40,7 @@ internal fun NavGraphBuilder.syncNewFolderDestination(
     navController: NavController,
     shouldNavigateToSyncList: Boolean,
     openUpgradeAccountPage: () -> Unit,
-    popToSyncListView: () -> Unit,
+    popToSyncListView: (syncType: SyncType) -> Unit,
     megaDomainName: String,
 ) {
     composable<SyncNewFolder>(
@@ -84,7 +84,7 @@ internal fun NavGraphBuilder.syncNewFolderDestination(
                         )
                     }
                 }.onFailure {
-                    Timber.Forest.e(it)
+                    Timber.e(it)
                 }
             },
         )
@@ -97,7 +97,7 @@ internal fun NavGraphBuilder.syncNewFolderDestination(
             },
             openNextScreen = {
                 if (shouldNavigateToSyncList) {
-                    popToSyncListView()
+                    popToSyncListView(syncType)
                 } else {
                     if (!navController.popBackStack()) {
                         context.findFragmentActivity()?.finish()
@@ -109,7 +109,7 @@ internal fun NavGraphBuilder.syncNewFolderDestination(
             },
             onBackClicked = {
                 if (shouldNavigateToSyncList && isFromManagerActivity.not()) {
-                    popToSyncListView()
+                    popToSyncListView(syncType)
                 } else {
                     if (!navController.popBackStack()) {
                         context.findFragmentActivity()?.finish()
