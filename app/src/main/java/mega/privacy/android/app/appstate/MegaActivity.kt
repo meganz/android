@@ -144,7 +144,7 @@ class MegaActivity : ComponentActivity() {
 
             if (!keepSplashScreen) {
                 val backStack: PendingBackStack<NavKey> =
-                    rememberPendingBackStack(HomeScreensNavKey(null))
+                    rememberPendingBackStack(HomeScreensNavKey())
 
                 val passcodeState by passcodeViewModel.state.collectAsStateWithLifecycle()
                 val rootNodeState by globalStateViewModel.rootNodeExistsFlow.collectAsStateWithLifecycle()
@@ -161,7 +161,7 @@ class MegaActivity : ComponentActivity() {
                     PendingBackStackNavigationHandler(
                         backstack = backStack,
                         currentAuthStatus = authStatus,
-                        defaultLandingScreen = HomeScreensNavKey(null),
+                        defaultLandingScreen = HomeScreensNavKey(),
                         defaultLoginDestination = LoginNavKey(true),
                         initialLoginDestination = TourNavKey,
                         hasRootNode = rootNodeState,

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,7 +49,7 @@ import mega.privacy.mobile.navigation.snowflake.MainNavigationScaffold
 fun HomeScreens(
     transferHandler: TransferHandler,
     outerNavigationHandler: NavigationHandler,
-    initialDestination: NavKey?,
+    initialDestination: Pair<NavKey, List<NavKey>?>?,
     modifier: Modifier = Modifier,
 ) {
     val viewModel = hiltViewModel<MainNavigationStateViewModel>()
@@ -71,7 +72,13 @@ fun HomeScreens(
 
         is MainNavState.Data -> {
             val homeScreenStacks = rememberTopLevelBackStack(currentState.initialDestination)
-            initialDestination?.let { homeScreenStacks.switchTopLevel(it) }
+            LaunchedEffect(initialDestination) {
+                initialDestination?.let {
+                    homeScreenStacks.switchTopLevel(it.first)
+                    it.second?.let { destinations -> homeScreenStacks.addAll(destinations) }
+                }
+            }
+
             val innerNavigationHandler = TopLevelBackStackNavigationHandler(homeScreenStacks)
             NewAdsContainer(
                 modifier = modifier.fillMaxSize(),
