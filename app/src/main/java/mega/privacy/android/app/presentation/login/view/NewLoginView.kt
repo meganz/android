@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaSnackbar
 import mega.android.core.ui.components.image.MegaIcon
@@ -94,7 +95,7 @@ fun NewLoginView(
     onLoginExceptionConsumed: () -> Unit = {},
 ) {
     val focusManager = LocalFocusManager.current
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarHostState = LocalSnackBarHostState.current ?: remember { SnackbarHostState() }
     var showChangeApiServerDialog by rememberSaveable { mutableStateOf(false) }
     val showLoginInProgress =
         state.isLoginInProgress || state.fetchNodesUpdate != null || state.isRequestStatusInProgress

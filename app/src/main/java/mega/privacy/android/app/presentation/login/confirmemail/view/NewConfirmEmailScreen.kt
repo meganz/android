@@ -40,6 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.LinkSpannedText
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaSnackbar
 import mega.android.core.ui.components.MegaText
@@ -87,7 +88,7 @@ fun NewConfirmEmailRoute(
     viewModel: ConfirmEmailViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
-    val snackBarHostState = remember { SnackbarHostState() }
+    val snackBarHostState = LocalSnackBarHostState.current ?: remember { SnackbarHostState() }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

@@ -58,6 +58,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
 import mega.android.core.ui.components.LinkSpannedText
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaSnackbar
 import mega.android.core.ui.components.button.PrimaryFilledButton
@@ -123,7 +124,7 @@ internal fun NewCreateAccountRoute(
             activityViewModel.setPendingFragmentToShow(LoginScreen.Tour)
         },
     )
-    val snackBarHostState = remember { SnackbarHostState() }
+    val snackBarHostState = LocalSnackBarHostState.current ?: remember { SnackbarHostState() }
     NewCreateAccountScreen(
         uiState = uiState,
         snackBarHostState = snackBarHostState,
