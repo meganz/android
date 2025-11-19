@@ -496,7 +496,6 @@ internal class MegaNavigatorImpl @Inject constructor(
         context.startActivity(pdfIntent)
     }
 
-
     override fun openImageViewerActivity(
         context: Context,
         currentFileNode: TypedFileNode,

@@ -58,6 +58,7 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_MENU_OPTIONS
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
 import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.FavouriteImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -611,7 +612,6 @@ class ImagePreviewActivity : BaseActivity() {
             parentNodeId: Long,
             nodeSourceType: Int?,
         ): Intent? {
-
             val (imageSource, menuOptionsSource, paramKey) = when (nodeSourceType) {
                 NodeSourceTypeInt.FILE_BROWSER_ADAPTER -> Triple(
                     ImagePreviewFetcherSource.CLOUD_DRIVE,
@@ -645,10 +645,22 @@ class ImagePreviewActivity : BaseActivity() {
                     CloudDriveImageNodeFetcher.PARENT_ID
                 )
 
+                NodeSourceTypeInt.FAVOURITES_ADAPTER -> Triple(
+                    ImagePreviewFetcherSource.FAVOURITE,
+                    ImagePreviewMenuSource.FAVOURITE,
+                    FavouriteImageNodeFetcher.NODE_ID
+                )
+
                 else -> {
                     Timber.e("Unknown node source type: $nodeSourceType")
                     return null
                 }
+            }
+
+            val params = if (nodeSourceType == NodeSourceTypeInt.FAVOURITES_ADAPTER) {
+                mapOf(paramKey to fileNodeId)
+            } else {
+                mapOf(paramKey to parentNodeId)
             }
 
             return createIntent(
@@ -656,7 +668,7 @@ class ImagePreviewActivity : BaseActivity() {
                 imageSource = imageSource,
                 menuOptionsSource = menuOptionsSource,
                 anchorImageNodeId = NodeId(fileNodeId),
-                params = mapOf(paramKey to parentNodeId),
+                params = params,
                 enableAddToAlbum = nodeSourceType in listOf(
                     NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
                     NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER,

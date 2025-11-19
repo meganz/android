@@ -2,18 +2,19 @@ package mega.privacy.android.core.nodecomponents.di
 
 import dagger.Binds
 import dagger.Module
-import dagger.multibindings.IntoSet
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.IntoSet
 import mega.privacy.android.core.nodecomponents.menu.provider.BackupsMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.CloudDriveMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.FavouritesMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.IncomingSharesMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.LinksMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.NodeMenuOptionsProvider
-import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
-import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistryImpl
 import mega.privacy.android.core.nodecomponents.menu.provider.OutgoingSharesMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.RubbishBinMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
+import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistryImpl
 
 /**
  * Hilt module that binds all NodeOptionsProvider implementations and the registry.
@@ -33,6 +34,12 @@ abstract class NodeOptionsModule {
     @IntoSet
     abstract fun bindCloudDriveOptionsProvider(
         cloudDriveOptionsProvider: CloudDriveMenuOptionsProvider,
+    ): NodeMenuOptionsProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindFavouritesOptionsProvider(
+        optionsProvider: FavouritesMenuOptionsProvider,
     ): NodeMenuOptionsProvider
 
     @Binds

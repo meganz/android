@@ -48,6 +48,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.BackupsImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.FavouriteImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -532,10 +533,22 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                     BackupsImageNodeFetcher.PARENT_ID
                 )
 
+            NodeSourceType.FAVOURITES -> Triple(
+                ImagePreviewFetcherSource.FAVOURITE,
+                ImagePreviewMenuSource.FAVOURITE,
+                FavouriteImageNodeFetcher.NODE_ID
+            )
+
             else -> {
                 Timber.e("Unsupported node source type")
                 return
             }
+        }
+
+        val params = if (nodeSourceType == NodeSourceType.FAVOURITES) {
+            mapOf(paramKey to currentFileNode.id.longValue)
+        } else {
+            mapOf(paramKey to currentFileNodeParentId)
         }
 
         val intent = ImagePreviewActivity.createIntent(
@@ -543,7 +556,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
             imageSource = imageSource,
             menuOptionsSource = menuOptionsSource,
             anchorImageNodeId = currentFileNode.id,
-            params = mapOf(paramKey to currentFileNodeParentId),
+            params = params,
         )
         startActivity(intent)
     }

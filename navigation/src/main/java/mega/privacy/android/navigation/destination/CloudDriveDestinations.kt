@@ -47,3 +47,9 @@ data class OfflineNavKey(
 data class DriveSyncNavKey(
     val initialTabIndex: Int = 0,
 ) : NavKey
+
+/**
+ * Favourites route args
+ */
+@Serializable
+data object FavouritesNavKey : NavKey
