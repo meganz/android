@@ -142,3 +142,11 @@ fun Activity.windowSizeClassFlow(): Flow<WindowSizeClass> =
             emit(getCurrentWindowSize())
         }
         .distinctUntilChanged()
+
+/**
+ * Extension function to determine if the screen is considered "compact" in either width or height.
+ *
+ * @return true if either the width or height size class is Compact, false otherwise.
+ */
+fun WindowSizeClass.compactScreen(): Boolean =
+    widthSizeClass == WindowWidthSizeClass.Compact || heightSizeClass == WindowHeightSizeClass.Compact

@@ -731,8 +731,7 @@
             android:launchMode="singleTop" />
         <activity
             android:name=".camera.CameraActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
+            android:launchMode="singleTop" />
         <activity
             android:name=".presentation.tags.TagsActivity"
             android:launchMode="singleTop" />
