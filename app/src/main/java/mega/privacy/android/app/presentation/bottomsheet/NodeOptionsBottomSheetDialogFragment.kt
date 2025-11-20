@@ -954,8 +954,9 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         if (nodeDeviceCenterInformation != null) {
             setImageResource(nodeDeviceCenterInformation.icon)
         } else {
+            val originShares = drawerItem == DrawerItem.SHARED_ITEMS
             val iconResource = typedNode.getIcon(
-                originShares = drawerItem == DrawerItem.SHARED_ITEMS,
+                originShares = originShares,
                 fileTypeIconMapper = FileTypeIconMapper(),
             )
             val isBusinessAccountExpired =
@@ -964,7 +965,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 load(
                     iconResource
                 ) {
-                    if ((typedNode.isMarkedSensitive || typedNode.isSensitiveInherited) && !isBusinessAccountExpired) {
+                    if (!originShares && (typedNode.isMarkedSensitive || typedNode.isSensitiveInherited) && !isBusinessAccountExpired) {
                         transformations(
                             BlurTransformation(
                                 requireContext(),
