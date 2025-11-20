@@ -8,11 +8,11 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import mega.privacy.android.domain.entity.changepassword.PasswordStrength
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 
 @RunWith(AndroidJUnit4::class)
 internal class PasswordHintTest {
@@ -46,7 +46,7 @@ internal class PasswordHintTest {
             )
 
             val text =
-                context.getString(sharedR.string.sign_up_password_weak_password_error_message)
+                context.getString(sharedR.string.sign_up_password_medium_password_warning_message)
             onNodeWithText(text).assertIsDisplayed()
         }
     }
@@ -76,7 +76,7 @@ internal class PasswordHintTest {
             )
 
             val text =
-                context.getString(sharedR.string.sign_up_password_medium_password_warning_message)
+                context.getString(sharedR.string.sign_up_password_min_character_error_message)
             onNodeWithText(text).assertIsDisplayed()
         }
     }

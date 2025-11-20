@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import mega.android.authentication.domain.usecase.regex.DoesTextContainMixedCaseUseCase
 import mega.android.authentication.domain.usecase.regex.DoesTextContainNumericUseCase
 import mega.android.authentication.domain.usecase.regex.DoesTextContainSpecialCharacterUseCase
+import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.NAME_CHAR_LIMIT
 import mega.privacy.android.app.presentation.login.createaccount.model.CreateAccountStatus
 import mega.privacy.android.app.presentation.login.createaccount.model.CreateAccountUIState
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
@@ -227,8 +228,7 @@ class CreateAccountViewModel @Inject constructor(
 
         return isPasswordLengthSufficient && passwordStrength !in listOf(
             PasswordStrength.INVALID,
-            PasswordStrength.VERY_WEAK,
-            PasswordStrength.WEAK
+            PasswordStrength.VERY_WEAK
         )
     }
 

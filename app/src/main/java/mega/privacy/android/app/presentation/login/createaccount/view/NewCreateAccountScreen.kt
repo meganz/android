@@ -200,7 +200,7 @@ internal fun NewCreateAccountScreen(
     val fieldOffsets = remember { mutableMapOf<String, Int>() }
     val isMinimumCharacterError = uiState.isPasswordLengthSufficient == false
     val isWeakPassword =
-        uiState.passwordStrength == PasswordStrength.WEAK || uiState.passwordStrength == PasswordStrength.VERY_WEAK
+        uiState.passwordStrength == PasswordStrength.VERY_WEAK
     var showAccountExistsMessage by rememberSaveable { mutableStateOf(false) }
     val softKeyboard = LocalSoftwareKeyboardController.current
 
