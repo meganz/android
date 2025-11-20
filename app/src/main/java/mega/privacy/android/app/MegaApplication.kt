@@ -58,7 +58,6 @@ import mega.privacy.android.app.meeting.listeners.MeetingListener
 import mega.privacy.android.app.presentation.theme.ThemeModeState
 import mega.privacy.android.app.receivers.GlobalNetworkStateHandler
 import mega.privacy.android.app.usecase.call.MonitorCallSoundsUseCase
-import mega.privacy.android.app.usecase.orientation.InitializeAdaptiveLayoutUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.greeter.Greeter
 import mega.privacy.android.data.qualifier.MegaApi
@@ -228,9 +227,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     @Inject
     lateinit var fcmManager: FcmManager
 
-    @Inject
-    lateinit var initializeAdaptiveLayoutUseCase: InitializeAdaptiveLayoutUseCase
-
     var localIpAddress: String? = ""
 
     private val meetingListener = MeetingListener()
@@ -313,15 +309,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
 
         // Subscribe to all users FCM topic
         fcmManager.subscribeToAllUsersTopic()
-
-        // Initialize adaptive layout state in memory
-        applicationScope.launch {
-            runCatching {
-                initializeAdaptiveLayoutUseCase()
-            }.onFailure {
-                Timber.e("Failed to initialize adaptive layout state: $it")
-            }
-        }
     }
 
     // Image loader for coil3

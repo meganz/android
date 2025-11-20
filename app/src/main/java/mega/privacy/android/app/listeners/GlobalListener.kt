@@ -28,6 +28,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.login.LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
+import mega.privacy.android.app.usecase.orientation.InitializeAdaptiveLayoutUseCase
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
@@ -100,6 +101,7 @@ class GlobalListener @Inject constructor(
     private val checkIfShouldDeleteLastPageViewedInPdfUseCase: CheckIfShouldDeleteLastPageViewedInPdfUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val updateDomainNameUseCase: UpdateDomainNameUseCase,
+    private val initializeAdaptiveLayoutUseCase: InitializeAdaptiveLayoutUseCase,
 ) : MegaGlobalListenerInterface {
     private val isMobileAdsInitializeCalled = AtomicBoolean(false)
     private val globalSyncUpdates = MutableSharedFlow<Unit>()
@@ -298,6 +300,7 @@ class GlobalListener @Inject constructor(
                 applicationScope.launch {
                     broadcastMiscStateUseCase(MiscLoadedState.FlagsReady)
                     updateDomainName()
+                    updateAdaptiveLayoutFeatureFlag()
                 }
                 getInstance().checkEnabledCookies()
                 initialiseAdsIfNeeded()
@@ -474,5 +477,11 @@ class GlobalListener @Inject constructor(
     private suspend fun updateDomainName() {
         runCatching { updateDomainNameUseCase() }
             .onFailure { Timber.e(it, "UpdateDomainNameUseCase failed") }
+    }
+
+    private suspend fun updateAdaptiveLayoutFeatureFlag() {
+        runCatching {
+            initializeAdaptiveLayoutUseCase()
+        }.onFailure { Timber.e(it, "Update the adaptive layout feature flag failed") }
     }
 }
