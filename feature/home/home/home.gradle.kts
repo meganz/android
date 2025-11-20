@@ -12,6 +12,11 @@ android {
         abortOnError = true
     }
     namespace = "mega.privacy.android.feature.home"
+    testOptions {
+        unitTests {
+            targetSdk = 34
+        }
+    }
 }
 
 dependencies {
@@ -35,8 +40,10 @@ dependencies {
     implementation(lib.logging.timber)
 
     testImplementation(project(":core-test"))
+    testImplementation(project(":core-ui-test"))
     testImplementation(platform(testlib.junit5.bom))
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.bundles.junit5.api)
+    testImplementation(testlib.bundles.ui.test)
     testRuntimeOnly(testlib.junit.jupiter.engine)
 }

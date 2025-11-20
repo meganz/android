@@ -145,6 +145,8 @@ import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineArrowDownIma
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineArrowUpImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineCheckImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineChevronDownImageVector
+import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineChevronUpImageVector
+import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineClockRotateImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineFilmImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineGrid4ImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineHeartImageVector
@@ -562,6 +564,12 @@ public object IconPack : IconPackInterface {
 
                 override val ChevronDown: ImageVector by lazy {
                         createSmallThinOutlineChevronDownImageVector() }
+
+                override val ChevronUp: ImageVector by lazy {
+                        createSmallThinOutlineChevronUpImageVector() }
+
+                override val ClockRotate: ImageVector by lazy {
+                        createSmallThinOutlineClockRotateImageVector() }
 
                 override val Film: ImageVector by lazy { createSmallThinOutlineFilmImageVector() }
 

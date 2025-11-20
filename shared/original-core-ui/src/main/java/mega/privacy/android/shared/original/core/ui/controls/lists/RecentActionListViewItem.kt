@@ -51,6 +51,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSe
 /**
  * Composable for the recent actions list item
  */
+@Deprecated("Use revamped version")
 @Composable
 fun RecentActionListViewItem(
     firstLineText: String,
