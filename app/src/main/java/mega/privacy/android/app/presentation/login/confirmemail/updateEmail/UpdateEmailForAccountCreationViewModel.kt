@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.login.confirmemail.changeemail
+package mega.privacy.android.app.presentation.login.confirmemail.updateEmail
 
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.SavedStateHandle
@@ -18,18 +18,18 @@ import mega.privacy.android.domain.usecase.login.confirmemail.ResendSignUpLinkUs
 import javax.inject.Inject
 
 @HiltViewModel
-internal class ChangeEmailAddressViewModel @Inject constructor(
+internal class UpdateEmailForAccountCreationViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val isEmailValidUseCase: IsEmailValidUseCase,
     private val resendSignUpLinkUseCase: ResendSignUpLinkUseCase,
     private val resendSignUpLinkErrorMapper: ResendSignUpLinkErrorMapper,
 ) : ViewModel() {
-    private val route = savedStateHandle.toRoute<ChangeEmailAddressScreen>()
-    private val _uiState = MutableStateFlow(ChangeEmailAddressUIState())
+    private val route = savedStateHandle.toRoute<UpdateEmailForAccountCreationScreen>()
+    private val _uiState = MutableStateFlow(UpdateEmailForAccountCreationUIState())
 
     /**
-     * UI State for [ChangeEmailAddressScreen]
-     * Flow of [ChangeEmailAddressUIState]
+     * UI State for [UpdateEmailForAccountCreationScreen]
+     * Flow of [UpdateEmailForAccountCreationUIState]
      */
     val uiState = _uiState.asStateFlow()
 

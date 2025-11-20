@@ -14,9 +14,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.login.LOGGED_OUT_DIALOG
 import mega.privacy.android.navigation.contract.AppDialogDestinations
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 
 @Serializable
-data object RemoteLogoutDialogNavKey : NavKey
+data object RemoteLogoutDialogNavKey : NoSessionNavKey.Mandatory
 
 data object RemoteLogoutDialogDestinations : AppDialogDestinations {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, () -> Unit) -> Unit =

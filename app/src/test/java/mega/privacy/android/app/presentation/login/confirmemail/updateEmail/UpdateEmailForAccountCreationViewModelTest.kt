@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.login.confirmemail.changeemail
+package mega.privacy.android.app.presentation.login.confirmemail.updateEmail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.testing.invoke
@@ -29,8 +29,8 @@ import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalCoroutinesApi::class)
-internal class ChangeEmailAddressViewModelTest {
-    private lateinit var underTest: ChangeEmailAddressViewModel
+internal class UpdateEmailForAccountCreationViewModelTest {
+    private lateinit var underTest: UpdateEmailForAccountCreationViewModel
     private var savedStateHandle = SavedStateHandle()
 
     private val resendSignUpLinkUseCase: ResendSignUpLinkUseCase = mock()
@@ -53,13 +53,13 @@ internal class ChangeEmailAddressViewModelTest {
         fullName: String? = null,
     ) {
         savedStateHandle = SavedStateHandle.Companion.invoke(
-            route = ChangeEmailAddressScreen(
+            route = UpdateEmailForAccountCreationScreen(
                 email = email,
                 fullName = fullName
             )
         )
 
-        underTest = ChangeEmailAddressViewModel(
+        underTest = UpdateEmailForAccountCreationViewModel(
             savedStateHandle = savedStateHandle,
             isEmailValidUseCase = isEmailValidUseCase,
             resendSignUpLinkUseCase = resendSignUpLinkUseCase,

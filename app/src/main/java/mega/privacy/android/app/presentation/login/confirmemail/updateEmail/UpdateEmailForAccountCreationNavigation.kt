@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.login.confirmemail.changeemail
+package mega.privacy.android.app.presentation.login.confirmemail.updateEmail
 
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -24,14 +24,14 @@ import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 /**
  * function to build the ChangeEmailAddress screen.
  */
-fun NavGraphBuilder.changeEmailAddress(
+fun NavGraphBuilder.updateEmailForAccountCreation(
     navController: NavController,
     activityViewModel: LoginViewModel?,
     onFinish: () -> Unit,
     stopShowingSplashScreen: () -> Unit,
     onChangeEmailSuccess: (String) -> Unit,
 ) {
-    composable<ChangeEmailAddressScreen> { backStackEntry ->
+    composable<UpdateEmailForAccountCreationScreen> { backStackEntry ->
         val sharedViewModel = activityViewModel ?: run {
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry<LoginGraph>()
@@ -53,7 +53,7 @@ fun NavGraphBuilder.changeEmailAddress(
             onFinish = onFinish,
             stopShowingSplashScreen = stopShowingSplashScreen,
         ) {
-            ChangeEmailAddressRoute(
+            UpdateEmailForAccountCreationRoute(
                 onChangeEmailSuccess = onChangeEmailSuccess
             )
         }
@@ -61,18 +61,18 @@ fun NavGraphBuilder.changeEmailAddress(
 }
 
 @Serializable
-data class ChangeEmailAddressScreen(
+data class UpdateEmailForAccountCreationScreen(
     val email: String?,
     val fullName: String?,
-) : NoSessionNavKey.Optional
+) : NoSessionNavKey.Mandatory
 
 
-internal fun EntryProviderScope<NavKey>.changeEmailAddress(
+internal fun EntryProviderScope<NavKey>.updateEmailForAccountCreation(
     navigationHandler: NavigationHandler,
     onChangeEmailSuccess: (String) -> Unit,
 ) {
-    entry<ChangeEmailAddressScreen> { key ->
-        ChangeEmailAddressRoute(
+    entry<UpdateEmailForAccountCreationScreen> { key ->
+        UpdateEmailForAccountCreationRoute(
             onChangeEmailSuccess = { newEmail ->
                 onChangeEmailSuccess(newEmail)
                 navigationHandler.back()
@@ -82,15 +82,15 @@ internal fun EntryProviderScope<NavKey>.changeEmailAddress(
 }
 
 /**
- * Navigation for [ChangeEmailAddressRoute]
+ * Navigation for [UpdateEmailForAccountCreationRoute]
  */
-fun NavController.navigateToChangeEmailAddress(
+fun NavController.navigateToUpdateEmailForAccountCreation(
     email: String?,
     fullName: String?,
     navOptions: NavOptions? = null,
 ) {
     this.navigate(
-        ChangeEmailAddressScreen(
+        UpdateEmailForAccountCreationScreen(
             email = email,
             fullName = fullName,
         ),

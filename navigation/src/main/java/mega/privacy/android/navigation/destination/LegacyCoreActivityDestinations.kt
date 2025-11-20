@@ -23,7 +23,7 @@ data class MyAccountNavKey(val action: String? = null, val link: String? = null)
 data object AchievementNavKey : NavKey
 
 @Serializable
-data class WebSiteNavKey(val url: String) : NavKey
+data class WebSiteNavKey(val url: String) : NoSessionNavKey.Optional
 
 @Serializable
 data class ContactsNavKey(val navType: NavType = NavType.List) : NavKey {
@@ -36,7 +36,7 @@ data class ContactsNavKey(val navType: NavType = NavType.List) : NavKey {
 }
 
 @Serializable
-data class ChatNavKey(val chatId: Long, val action: String?) : NavKey
+data class ChatNavKey(val chatId: Long, val action: String?) : NoSessionNavKey.Optional
 
 @Serializable
 data object ChatsNavKey : NavKey
@@ -112,13 +112,13 @@ data class UpgradeAccountNavKey(
 data class LegacyFileExplorerNavKey(
     val uriPath: String?,
     val highlightedFiles: List<String> = emptyList(),
-) : NavKey, Parcelable
+) : NoSessionNavKey.Optional, Parcelable
 
 @Serializable
 @Parcelize
 data class LegacyZipBrowserNavKey(
     val zipFilePath: String?,
-) : NavKey, Parcelable
+) : NoSessionNavKey.Optional, Parcelable
 
 @Serializable
 data class LegacyFileLinkNavKey(
@@ -155,14 +155,14 @@ data class LegacyPdfViewerNavKey(
     val nodeContentUri: NodeContentUri,
     val nodeSourceType: Int? = null,
     val mimeType: String,
-) : NavKey
+) : NoSessionNavKey.Optional
 
 @Serializable
 data class LegacyImageViewerNavKey(
     val nodeHandle: Long,
     val parentNodeHandle: Long,
     val nodeSourceType: Int? = null,
-) : NavKey
+) : NoSessionNavKey.Optional
 
 @Serializable
 data class LegacyTextEditorNavKey(
@@ -170,7 +170,7 @@ data class LegacyTextEditorNavKey(
     val mode: String,
     val nodeSourceType: Int? = null,
     val fileName: String? = null,
-) : NavKey
+) : NoSessionNavKey.Optional
 
 @Serializable
 data class LegacyMediaPlayerNavKey(
@@ -183,4 +183,4 @@ data class LegacyMediaPlayerNavKey(
     val parentHandle: Long,
     val fileHandle: Long,
     val fileTypeInfo: FileTypeInfo
-) : NavKey
+) : NoSessionNavKey.Optional

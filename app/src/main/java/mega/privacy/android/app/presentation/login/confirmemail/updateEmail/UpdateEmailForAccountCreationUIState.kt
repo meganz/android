@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.login.confirmemail.changeemail
+package mega.privacy.android.app.presentation.login.confirmemail.updateEmail
 
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
@@ -8,7 +8,7 @@ import mega.privacy.android.app.presentation.login.confirmemail.model.ResendSign
 /**
  * UI State for ChangeEmailAddressScreen
  */
-internal data class ChangeEmailAddressUIState(
+internal data class UpdateEmailForAccountCreationUIState(
     val email: String = "",
     val isLoading: Boolean = false,
     val isEmailValid: Boolean? = null,

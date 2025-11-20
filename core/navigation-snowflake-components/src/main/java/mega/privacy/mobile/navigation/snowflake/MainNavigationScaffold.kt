@@ -43,6 +43,7 @@ import mega.privacy.android.navigation.contract.DefaultNumberBadge
 import mega.privacy.android.navigation.contract.MainNavItemBadge
 import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.android.navigation.contract.PreferredSlot
+import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.navigation.snowflake.item.MainNavigationIcon
 import mega.privacy.mobile.navigation.snowflake.model.NavigationAnimationConfig
@@ -333,4 +334,4 @@ private fun MainNavigationScaffoldPreview(modifier: Modifier = Modifier) {
     }
 }
 
-private data class NavKeyForPreview(val index: Int) : NavKey
+private data class NavKeyForPreview(val index: Int) : NoSessionNavKey.Optional

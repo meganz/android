@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.login.confirmemail.changeemail
+package mega.privacy.android.app.presentation.login.confirmemail.updateEmail
 
 import android.content.res.Configuration
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -56,14 +56,14 @@ import mega.privacy.android.app.presentation.login.view.tabletScreenWidth
 import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
-internal fun ChangeEmailAddressRoute(
+internal fun UpdateEmailForAccountCreationRoute(
     onChangeEmailSuccess: (String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ChangeEmailAddressViewModel = hiltViewModel(),
+    viewModel: UpdateEmailForAccountCreationViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    ChangeEmailAddressScreen(
+    UpdateEmailForAccountCreationScreen(
         modifier = modifier,
         uiState = uiState,
         onChangeEmailPressed = viewModel::changeEmailAddress,
@@ -76,8 +76,8 @@ internal fun ChangeEmailAddressRoute(
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-internal fun ChangeEmailAddressScreen(
-    uiState: ChangeEmailAddressUIState,
+internal fun UpdateEmailForAccountCreationScreen(
+    uiState: UpdateEmailForAccountCreationUIState,
     onEmailInputChanged: (String?) -> Unit,
     onChangeEmailPressed: () -> Unit,
     onResendSignUpLinkErrorConsumed: () -> Unit,
@@ -220,10 +220,10 @@ internal fun ChangeEmailAddressScreen(
 
 @CombinedThemePreviews
 @Composable
-private fun ChangeEmailAddressPreview() {
+private fun UpdateEmailForAccountCreationPreview() {
     AndroidThemeForPreviews {
-        ChangeEmailAddressScreen(
-            uiState = ChangeEmailAddressUIState(),
+        UpdateEmailForAccountCreationScreen(
+            uiState = UpdateEmailForAccountCreationUIState(),
             onEmailInputChanged = {},
             onChangeEmailPressed = { String.toString() },
             onResendSignUpLinkErrorConsumed = {},
@@ -235,10 +235,10 @@ private fun ChangeEmailAddressPreview() {
 
 @CombinedThemePreviewsTablet
 @Composable
-private fun ChangeEmailAddressTabletPreview() {
+private fun UpdateEmailForAccountCreationTabletPreview() {
     AndroidThemeForPreviews {
-        ChangeEmailAddressScreen(
-            uiState = ChangeEmailAddressUIState(),
+        UpdateEmailForAccountCreationScreen(
+            uiState = UpdateEmailForAccountCreationUIState(),
             onEmailInputChanged = {},
             onChangeEmailPressed = { String.toString() },
             onResendSignUpLinkErrorConsumed = {},

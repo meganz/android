@@ -11,12 +11,13 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.bottomsheet.bottomSheetMetadata
 import mega.privacy.android.navigation.contract.bottomsheet.megaBottomSheet
+import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 
 @Serializable
 data class NodeOptionsBottomSheetNavKey(
     val nodeHandle: Long = -1L,
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
-) : NavKey
+) : NoSessionNavKey.Optional
 
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun NavGraphBuilder.nodeOptionsBottomSheet(

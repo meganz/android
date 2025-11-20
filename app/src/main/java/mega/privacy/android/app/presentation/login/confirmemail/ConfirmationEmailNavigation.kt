@@ -19,9 +19,9 @@ import mega.privacy.android.app.presentation.login.LoginNavKey
 import mega.privacy.android.app.presentation.login.LoginNavigationHandler
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.StartRoute
-import mega.privacy.android.app.presentation.login.confirmemail.changeemail.ChangeEmailAddressScreen
-import mega.privacy.android.app.presentation.login.confirmemail.changeemail.ChangeEmailAddressViewModel
-import mega.privacy.android.app.presentation.login.confirmemail.changeemail.navigateToChangeEmailAddress
+import mega.privacy.android.app.presentation.login.confirmemail.updateEmail.UpdateEmailForAccountCreationScreen
+import mega.privacy.android.app.presentation.login.confirmemail.updateEmail.UpdateEmailForAccountCreationViewModel
+import mega.privacy.android.app.presentation.login.confirmemail.updateEmail.navigateToUpdateEmailForAccountCreation
 import mega.privacy.android.app.presentation.login.confirmemail.view.NewConfirmEmailRoute
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountNavKey
 import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
@@ -40,7 +40,7 @@ internal fun NavGraphBuilder.confirmationEmailScreen(
 ) {
     composable<ConfirmationEmailNavKey> { backStackEntry ->
         val newEmail =
-            backStackEntry.savedStateHandle.get<String>(ChangeEmailAddressViewModel.EMAIL)
+            backStackEntry.savedStateHandle.get<String>(UpdateEmailForAccountCreationViewModel.EMAIL)
         val context = LocalContext.current
         val sharedViewModel = activityViewModel ?: run {
             val parentEntry = remember(backStackEntry) {
@@ -68,7 +68,7 @@ internal fun NavGraphBuilder.confirmationEmailScreen(
                 newEmail = newEmail,
                 onShowPendingFragment = sharedViewModel::setPendingFragmentToShow,
                 onNavigateToChangeEmailAddress = { email, fullName ->
-                    navController.navigateToChangeEmailAddress(
+                    navController.navigateToUpdateEmailForAccountCreation(
                         email = email,
                         fullName = fullName,
                     )
@@ -92,14 +92,14 @@ internal fun EntryProviderScope<NavKey>.confirmationEmailScreen(
 ) {
     entry<ConfirmationEmailNavKey> { key ->
         val context = LocalContext.current
-        val result by navigationHandler.monitorResult<String>(ChangeEmailAddressViewModel.EMAIL)
+        val result by navigationHandler.monitorResult<String>(UpdateEmailForAccountCreationViewModel.EMAIL)
             .collectAsStateWithLifecycle("")
         NewConfirmEmailRoute(
             newEmail = result,
             onShowPendingFragment = sharedViewModel::setPendingFragmentToShow,
             onNavigateToChangeEmailAddress = { email, fullName ->
                 navigationHandler.navigate(
-                    ChangeEmailAddressScreen(
+                    UpdateEmailForAccountCreationScreen(
                         email = email,
                         fullName = fullName
                     )

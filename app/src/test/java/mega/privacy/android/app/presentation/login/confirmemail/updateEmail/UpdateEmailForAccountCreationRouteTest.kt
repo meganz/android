@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.login.confirmemail.changeemail
+package mega.privacy.android.app.presentation.login.confirmemail.updateEmail
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasSetTextAction
@@ -20,7 +20,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
-class ChangeEmailAddressRouteTest {
+class UpdateEmailForAccountCreationRouteTest {
 
     @get:Rule
     val composeRule = createComposeRule()
@@ -33,7 +33,7 @@ class ChangeEmailAddressRouteTest {
         with(composeRule) {
             val onChangeEmailSuccess = mock<(String) -> Unit>()
             setScreen(
-                uiState = ChangeEmailAddressUIState(
+                uiState = UpdateEmailForAccountCreationUIState(
                     email = email,
                     changeEmailAddressSuccessEvent = triggered
                 ),
@@ -81,7 +81,7 @@ class ChangeEmailAddressRouteTest {
     fun `test that the correct error message for an invalid email is displayed`() {
         with(composeRule) {
             setScreen(
-                uiState = ChangeEmailAddressUIState(isEmailValid = false)
+                uiState = UpdateEmailForAccountCreationUIState(isEmailValid = false)
             )
 
             val text = context.getString(R.string.login_invalid_email_error_message)
@@ -93,7 +93,7 @@ class ChangeEmailAddressRouteTest {
     fun `test that the correct error message for account exists is displayed`() {
         with(composeRule) {
             setScreen(
-                uiState = ChangeEmailAddressUIState(
+                uiState = UpdateEmailForAccountCreationUIState(
                     resendSignUpLinkError = triggered(
                         ResendSignUpLinkError.AccountExists
                     )
@@ -120,7 +120,7 @@ class ChangeEmailAddressRouteTest {
     @Test
     fun `test that the loading indicator is displayed when content is loading`() {
         with(composeRule) {
-            setScreen(uiState = ChangeEmailAddressUIState(isLoading = true))
+            setScreen(uiState = UpdateEmailForAccountCreationUIState(isLoading = true))
 
             onNodeWithTag(CHANGE_EMAIL_ADDRESS_SCREEN_LOADING_INDICATOR_TAG).assertIsDisplayed()
         }
@@ -129,7 +129,7 @@ class ChangeEmailAddressRouteTest {
     @Test
     fun `test that the loading indicator doesn't exist when content is not loading`() {
         with(composeRule) {
-            setScreen(uiState = ChangeEmailAddressUIState(isLoading = false))
+            setScreen(uiState = UpdateEmailForAccountCreationUIState(isLoading = false))
 
             onNodeWithTag(CHANGE_EMAIL_ADDRESS_SCREEN_LOADING_INDICATOR_TAG).assertDoesNotExist()
         }
@@ -139,7 +139,7 @@ class ChangeEmailAddressRouteTest {
     fun `test that the correct error message for too many attempts is displayed`() {
         with(composeRule) {
             setScreen(
-                uiState = ChangeEmailAddressUIState(
+                uiState = UpdateEmailForAccountCreationUIState(
                     resendSignUpLinkError = triggered(
                         ResendSignUpLinkError.TooManyAttempts
                     )
@@ -155,7 +155,7 @@ class ChangeEmailAddressRouteTest {
     fun `test that the correct error message for an unknown error is displayed`() {
         with(composeRule) {
             setScreen(
-                uiState = ChangeEmailAddressUIState(
+                uiState = UpdateEmailForAccountCreationUIState(
                     resendSignUpLinkError = triggered(
                         ResendSignUpLinkError.Unknown
                     )
@@ -168,7 +168,7 @@ class ChangeEmailAddressRouteTest {
     }
 
     private fun ComposeContentTestRule.setScreen(
-        uiState: ChangeEmailAddressUIState = ChangeEmailAddressUIState(),
+        uiState: UpdateEmailForAccountCreationUIState = UpdateEmailForAccountCreationUIState(),
         onEmailInputChanged: (String?) -> Unit = {},
         onChangeEmailPressed: () -> Unit = {},
         onResendSignUpLinkErrorConsumed: () -> Unit = {},
@@ -176,7 +176,7 @@ class ChangeEmailAddressRouteTest {
         onChangeEmailSuccess: (String) -> Unit = {},
     ) {
         setContent {
-            ChangeEmailAddressScreen(
+            UpdateEmailForAccountCreationScreen(
                 uiState = uiState,
                 onEmailInputChanged = onEmailInputChanged,
                 onChangeEmailPressed = onChangeEmailPressed,

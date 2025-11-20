@@ -15,10 +15,10 @@ import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import mega.privacy.android.app.presentation.login.confirmemail.changeemail.ChangeEmailAddressViewModel
-import mega.privacy.android.app.presentation.login.confirmemail.changeemail.changeEmailAddress
 import mega.privacy.android.app.presentation.login.confirmemail.confirmationEmailScreen
 import mega.privacy.android.app.presentation.login.confirmemail.openConfirmationEmailScreen
+import mega.privacy.android.app.presentation.login.confirmemail.updateEmail.UpdateEmailForAccountCreationViewModel
+import mega.privacy.android.app.presentation.login.confirmemail.updateEmail.updateEmailForAccountCreation
 import mega.privacy.android.app.presentation.login.createaccount.createAccountScreen
 import mega.privacy.android.app.presentation.login.createaccount.openCreateAccountScreen
 import mega.privacy.android.app.presentation.login.model.LoginScreen
@@ -111,14 +111,14 @@ fun NavGraphBuilder.loginNavigationGraph(
             stopShowingSplashScreen = stopShowingSplashScreen,
             activityViewModel = activityViewModel,
         )
-        changeEmailAddress(
+        updateEmailForAccountCreation(
             navController = navController,
             onFinish = onFinish,
             stopShowingSplashScreen = stopShowingSplashScreen,
             onChangeEmailSuccess = { newEmail ->
                 navController.previousBackStackEntry
                     ?.savedStateHandle
-                    ?.set(ChangeEmailAddressViewModel.EMAIL, newEmail)
+                    ?.set(UpdateEmailForAccountCreationViewModel.EMAIL, newEmail)
                 navController.popBackStack()
             },
             activityViewModel = activityViewModel
@@ -150,11 +150,11 @@ internal fun EntryProviderScope<NavKey>.loginEntryProvider(
         sharedViewModel = loginViewModel
     )
 
-    changeEmailAddress(
+    updateEmailForAccountCreation(
         navigationHandler = navigationHandler,
         onChangeEmailSuccess = { newEmail ->
             navigationHandler.returnResult(
-                key = ChangeEmailAddressViewModel.EMAIL,
+                key = UpdateEmailForAccountCreationViewModel.EMAIL,
                 value = newEmail
             )
         },
