@@ -31,7 +31,7 @@ class ChatsDeepLinkHandlerTest {
                 on { this.toString() } doReturn uriString
             }
 
-            val actual = underTest.getNavKeys(uri, NEW_MESSAGE_CHAT_LINK)
+            val actual = underTest.getNavKeys(uri, NEW_MESSAGE_CHAT_LINK, true)
 
             assertThat(actual).containsExactly(expected)
         }
@@ -44,7 +44,7 @@ class ChatsDeepLinkHandlerTest {
                 on { this.toString() } doReturn uriString
             }
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK, true)
 
             assertThat(actual).isNull()
         }

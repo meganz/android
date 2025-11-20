@@ -14,11 +14,16 @@ import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailNavKey
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountNavKey
 import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
+import mega.privacy.android.app.utils.Constants.ACTION_CONFIRM
 import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 
 @Serializable
-data class LoginNavKey(val resetLoginFlow: Boolean = false) : NoSessionNavKey.Mandatory
+data class LoginNavKey(
+    val resetLoginFlow: Boolean = false,
+    val action: String? = null,
+    val link: String? = null,
+) : NoSessionNavKey.Mandatory
 
 internal fun NavGraphBuilder.loginScreen(
     navController: NavController,
@@ -64,10 +69,22 @@ internal fun EntryProviderScope<NavKey>.loginScreen(
             if (key.resetLoginFlow) sharedViewModel.resetLoginState()
         }
 
+        checkActions(sharedViewModel = sharedViewModel, action = key.action, link = key.link)
+
         LoginScreen(
             viewModel = sharedViewModel,
             billingViewModel = billingViewModel
         )
+    }
+}
+
+private fun checkActions(
+    sharedViewModel: LoginViewModel,
+    action: String?,
+    link: String?,
+) {
+    when (action) {
+        ACTION_CONFIRM -> link?.let { sharedViewModel.checkSignupLink(it) }
     }
 }
 

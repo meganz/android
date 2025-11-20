@@ -15,6 +15,7 @@ class WebViewDeepLinkHandler @Inject constructor(
     override suspend fun getNavKeys(
         uri: Uri,
         regexPatternType: RegexPatternType?,
+        isLoggedIn: Boolean,
     ): List<NavKey>? = if (regexPatternType == RegexPatternType.EMAIL_VERIFY_LINK ||
         regexPatternType == RegexPatternType.WEB_SESSION_LINK ||
         regexPatternType == RegexPatternType.BUSINESS_INVITE_LINK ||

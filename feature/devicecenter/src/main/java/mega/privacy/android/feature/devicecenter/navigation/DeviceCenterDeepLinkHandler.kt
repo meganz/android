@@ -11,6 +11,7 @@ class DeviceCenterDeepLinkHandler @Inject constructor() : DeepLinkHandler {
     override suspend fun getNavKeys(
         uri: Uri,
         regexPatternType: RegexPatternType?,
+        isLoggedIn: Boolean,
     ): List<NavKey>? =
         if (regexPatternType == RegexPatternType.OPEN_DEVICE_CENTER_LINK) {
             listOf(DeviceCenterNavKey)

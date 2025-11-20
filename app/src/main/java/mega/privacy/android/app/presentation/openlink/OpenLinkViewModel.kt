@@ -185,13 +185,18 @@ class OpenLinkViewModel @Inject constructor(
      */
     private suspend fun consumeDestination(uri: Uri) {
         val regexPatternType = getDecodedUrlRegexPatternTypeUseCase(uri.toString())
+        val isLoggedIn = getAccountCredentials() != null
+
         deepLinkHandlers.firstNotNullOfOrNull { deepLinkHandler ->
-            deepLinkHandler.getNavKeys(uri, regexPatternType)?.takeIf { it.isNotEmpty() }
+            deepLinkHandler.getNavKeys(uri, regexPatternType, isLoggedIn)
         }?.let { navKeys ->
-            navigationEventQueue.emit(navKeys)
-            navKeys.forEach {
-                Timber.d("Adding NavKey from deep link: $it")
+            if (navKeys.isNotEmpty()) {
+                navigationEventQueue.emit(navKeys)
+                navKeys.forEach {
+                    Timber.d("Adding NavKey from deep link: $it")
+                }
             }
+
             _uiState.update {
                 it.copy(deepLinkDestinationsAddedEvent = true)
             }

@@ -12,6 +12,7 @@ class AlbumsDeepLinkHandler @Inject constructor() : DeepLinkHandler {
     override suspend fun getNavKeys(
         uri: Uri,
         regexPatternType: RegexPatternType?,
+        isLoggedIn: Boolean,
     ): List<NavKey>? = when (regexPatternType) {
         ALBUM_LINK -> {
             listOf(LegacyAlbumImportNavKey(uri.toString()))

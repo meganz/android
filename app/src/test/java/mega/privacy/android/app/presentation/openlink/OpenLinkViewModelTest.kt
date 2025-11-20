@@ -165,11 +165,12 @@ class OpenLinkViewModelTest {
             val regexPatternType = RegexPatternType.FILE_LINK
             whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn true
             whenever(getDecodedUrlRegexPatternTypeUseCase(url)) doReturn regexPatternType
+            whenever(getAccountCredentialsUseCase()) doReturn null
             val navKey = mock<NavKey>()
             val expected = listOf(navKey)
-            whenever(deepLinkHandler.getNavKeys(uri, regexPatternType)) doReturn null
+            whenever(deepLinkHandler.getNavKeys(uri, regexPatternType, false)) doReturn null
             whenever(
-                deepLinkHandler2.getNavKeys(uri, regexPatternType)
+                deepLinkHandler2.getNavKeys(uri, regexPatternType, false)
             ) doReturn expected
 
             underTest.decodeUri(uri)

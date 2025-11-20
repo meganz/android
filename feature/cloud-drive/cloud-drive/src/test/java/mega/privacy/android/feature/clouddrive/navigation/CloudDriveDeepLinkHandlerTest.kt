@@ -68,7 +68,7 @@ class CloudDriveDeepLinkHandlerTest {
                 on { this.toString() } doReturn uriString
             }
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.PASSWORD_LINK)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.PASSWORD_LINK, true)
 
             assertThat(actual).containsExactly(expected)
         }
@@ -81,7 +81,7 @@ class CloudDriveDeepLinkHandlerTest {
                 on { this.toString() } doReturn uriString
             }
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK, true)
 
             assertThat(actual).isNull()
         }
@@ -97,7 +97,7 @@ class CloudDriveDeepLinkHandlerTest {
             }
             whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn null
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, true)
 
             assertThat(actual).containsExactly(CloudDriveNavKey())
         }
@@ -115,7 +115,7 @@ class CloudDriveDeepLinkHandlerTest {
             whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
             whenever(getNodeByIdUseCase(nodeId)) doReturn null
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, true)
 
             assertThat(actual).containsExactly(CloudDriveNavKey())
         }
@@ -139,7 +139,7 @@ class CloudDriveDeepLinkHandlerTest {
             whenever(getNodeByIdUseCase(nodeId)) doReturn folderNode
             whenever(getAncestorsIdsUseCase(folderNode)) doReturn listOf(parentId)
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, true)
 
             assertThat(actual).containsExactly(
                 CloudDriveNavKey(nodeHandle = parentId.longValue),
@@ -169,7 +169,7 @@ class CloudDriveDeepLinkHandlerTest {
             whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
             whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(parentId)
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, true)
 
             assertThat(actual).containsExactly(
                 CloudDriveNavKey(
@@ -202,7 +202,7 @@ class CloudDriveDeepLinkHandlerTest {
             whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
             whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(parentId, grandParentId)
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, true)
 
             assertThat(actual).containsExactly(
                 CloudDriveNavKey(nodeHandle = grandParentId.longValue),
@@ -232,7 +232,7 @@ class CloudDriveDeepLinkHandlerTest {
             whenever(getNodeByIdUseCase(nodeId)) doReturn folderNode
             whenever(getAncestorsIdsUseCase(folderNode)) doReturn emptyList()
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, true)
 
             assertThat(actual).containsExactly(
                 CloudDriveNavKey(nodeHandle = 123L)
@@ -274,7 +274,7 @@ class CloudDriveDeepLinkHandlerTest {
             ) doReturn previewNavKey
             whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(parentId)
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, true)
 
             assertThat(actual).containsExactly(
                 CloudDriveNavKey(nodeHandle = parentId.longValue),

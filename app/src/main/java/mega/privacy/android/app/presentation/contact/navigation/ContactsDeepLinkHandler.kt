@@ -16,6 +16,7 @@ class ContactsDeepLinkHandler @Inject constructor() : DeepLinkHandler {
     override suspend fun getNavKeys(
         uri: Uri,
         regexPatternType: RegexPatternType?,
+        isLoggedIn: Boolean,
     ): List<NavKey>? {
         return when (regexPatternType) {
             PENDING_CONTACTS_LINK -> {

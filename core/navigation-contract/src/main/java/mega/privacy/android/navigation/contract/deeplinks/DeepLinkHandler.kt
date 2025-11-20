@@ -14,11 +14,13 @@ interface DeepLinkHandler {
      *
      * @param uri The Uri to check
      * @param regexPatternType
+     * @param isLoggedIn
      * @return The NavKeys if the Uri is valid, null otherwise
      */
     suspend fun getNavKeys(
         uri: Uri,
         regexPatternType: RegexPatternType?,
+        isLoggedIn: Boolean,
     ): List<NavKey>?
 
     /**

@@ -15,6 +15,7 @@ class MyAccountDeepLinkHandler @Inject constructor() : DeepLinkHandler {
     override suspend fun getNavKeys(
         uri: Uri,
         regexPatternType: RegexPatternType?,
+        isLoggedIn: Boolean,
     ): List<NavKey>? {
         return when (regexPatternType) {
             CANCEL_ACCOUNT_LINK -> {

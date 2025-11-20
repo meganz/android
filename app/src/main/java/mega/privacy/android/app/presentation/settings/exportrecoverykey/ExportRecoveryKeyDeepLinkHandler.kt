@@ -14,6 +14,7 @@ class ExportRecoveryKeyDeepLinkHandler @Inject constructor() : DeepLinkHandler {
     override suspend fun getNavKeys(
         uri: Uri,
         regexPatternType: RegexPatternType?,
+        isLoggedIn: Boolean,
     ): List<NavKey>? {
         return if (regexPatternType == RegexPatternType.EXPORT_MASTER_KEY_LINK) {
             listOf(LegacyExportRecoveryKeyNavKey)

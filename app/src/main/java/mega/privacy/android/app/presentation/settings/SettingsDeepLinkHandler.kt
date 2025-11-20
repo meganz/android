@@ -14,6 +14,7 @@ class SettingsDeepLinkHandler @Inject constructor() : DeepLinkHandler {
     override suspend fun getNavKeys(
         uri: Uri,
         regexPatternType: RegexPatternType?,
+        isLoggedIn: Boolean,
     ): List<NavKey>? {
         return when (regexPatternType) {
             RegexPatternType.ENABLE_CAMERA_UPLOADS_LINK -> {

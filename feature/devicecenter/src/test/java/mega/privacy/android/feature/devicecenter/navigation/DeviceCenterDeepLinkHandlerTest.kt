@@ -29,7 +29,7 @@ class DeviceCenterDeepLinkHandlerTest {
                 on { this.toString() } doReturn uriString
             }
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.OPEN_DEVICE_CENTER_LINK)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.OPEN_DEVICE_CENTER_LINK, true)
 
             assertThat(actual).containsExactly(expected)
         }
@@ -42,7 +42,7 @@ class DeviceCenterDeepLinkHandlerTest {
                 on { this.toString() } doReturn uriString
             }
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK, true)
 
             assertThat(actual).isNull()
         }
@@ -55,7 +55,7 @@ class DeviceCenterDeepLinkHandlerTest {
                 on { this.toString() } doReturn uriString
             }
 
-            val actual = underTest.getNavKeys(uri, null)
+            val actual = underTest.getNavKeys(uri, null, true)
 
             assertThat(actual).isNull()
         }

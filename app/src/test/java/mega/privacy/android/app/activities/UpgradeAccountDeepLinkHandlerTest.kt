@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UpgradeAccountDeepLinkHandlerTest {
@@ -31,7 +30,7 @@ class UpgradeAccountDeepLinkHandlerTest {
                 on { this.toString() } doReturn uriString
             }
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.UPGRADE_PAGE_LINK)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.UPGRADE_PAGE_LINK, true)
 
             assertThat(actual).containsExactly(expected)
         }
@@ -45,7 +44,7 @@ class UpgradeAccountDeepLinkHandlerTest {
                 on { this.toString() } doReturn uriString
             }
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.UPGRADE_LINK)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.UPGRADE_LINK, true)
 
             assertThat(actual).containsExactly(expected)
         }
@@ -58,7 +57,7 @@ class UpgradeAccountDeepLinkHandlerTest {
                 on { this.toString() } doReturn uriString
             }
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK, true)
 
             assertThat(actual).isNull()
         }

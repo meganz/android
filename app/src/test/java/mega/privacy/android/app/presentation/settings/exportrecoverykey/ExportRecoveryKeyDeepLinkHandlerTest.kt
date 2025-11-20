@@ -29,7 +29,7 @@ class ExportRecoveryKeyDeepLinkHandlerTest {
                 on { this.toString() } doReturn uriString
             }
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.EXPORT_MASTER_KEY_LINK)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.EXPORT_MASTER_KEY_LINK, true)
 
             assertThat(actual).containsExactly(expected)
         }
@@ -42,7 +42,7 @@ class ExportRecoveryKeyDeepLinkHandlerTest {
                 on { this.toString() } doReturn uriString
             }
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK, true)
 
             assertThat(actual).isNull()
         }

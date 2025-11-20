@@ -14,6 +14,7 @@ class FolderLinkDeepLinkHandler @Inject constructor() : DeepLinkHandler {
     override suspend fun getNavKeys(
         uri: Uri,
         regexPatternType: RegexPatternType?,
+        isLoggedIn: Boolean,
     ): List<NavKey>? {
         return if (regexPatternType == RegexPatternType.FOLDER_LINK) {
             listOf(LegacyFolderLinkNavKey(uri.toString()))

@@ -5,7 +5,7 @@ package mega.privacy.android.navigation.contract.navkey
  *
  * Use this interface for all destinations that do not require a user to be logged in.
  */
-sealed interface NoSessionNavKey: NoNodeNavKey {
+sealed interface NoSessionNavKey : NoNodeNavKey {
 
     /**
      * We can still navigate to this screen if the user is logged in

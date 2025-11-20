@@ -37,7 +37,7 @@ class MyAccountDeepLinkHandlerTest {
                 on { this.toString() } doReturn uriString
             }
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.CANCEL_ACCOUNT_LINK)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.CANCEL_ACCOUNT_LINK, true)
 
             assertThat(actual).containsExactly(expected)
         }
@@ -54,7 +54,7 @@ class MyAccountDeepLinkHandlerTest {
                 on { this.toString() } doReturn uriString
             }
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.VERIFY_CHANGE_MAIL_LINK)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.VERIFY_CHANGE_MAIL_LINK, true)
 
             assertThat(actual).containsExactly(expected)
         }
@@ -71,7 +71,7 @@ class MyAccountDeepLinkHandlerTest {
                 on { this.toString() } doReturn uriString
             }
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.RESET_PASSWORD_LINK)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.RESET_PASSWORD_LINK, true)
 
             assertThat(actual).containsExactly(expected)
         }
@@ -84,7 +84,7 @@ class MyAccountDeepLinkHandlerTest {
                 on { this.toString() } doReturn uriString
             }
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK)
+            val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK, true)
 
             assertThat(actual).isNull()
         }

@@ -14,6 +14,7 @@ class UpgradeAccountDeepLinkHandler @Inject constructor() : DeepLinkHandler {
     override suspend fun getNavKeys(
         uri: Uri,
         regexPatternType: RegexPatternType?,
+        isLoggedIn: Boolean,
     ): List<NavKey>? =
         when (regexPatternType) {
             RegexPatternType.UPGRADE_PAGE_LINK, RegexPatternType.UPGRADE_LINK -> {

@@ -15,6 +15,7 @@ class ChatsDeepLinkHandler @Inject constructor() : DeepLinkHandler {
     override suspend fun getNavKeys(
         uri: Uri,
         regexPatternType: RegexPatternType?,
+        isLoggedIn: Boolean,
     ): List<NavKey>? =
         if (regexPatternType == NEW_MESSAGE_CHAT_LINK) {
             listOf(ChatsNavKey)

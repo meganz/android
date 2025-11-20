@@ -28,6 +28,7 @@ class CloudDriveDeepLinkHandler @Inject constructor(
     override suspend fun getNavKeys(
         uri: Uri,
         regexPatternType: RegexPatternType?,
+        isLoggedIn: Boolean,
     ): List<NavKey>? = when (regexPatternType) {
         RegexPatternType.PASSWORD_LINK -> {
             listOf(OpenPasswordLinkDialogNavKey(uri.toString()))

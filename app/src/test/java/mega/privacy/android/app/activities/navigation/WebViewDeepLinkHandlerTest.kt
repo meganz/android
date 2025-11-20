@@ -53,7 +53,7 @@ class WebViewDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        assertThat(underTest.getNavKeys(uri, regexPatternType)).containsExactly(expected)
+        assertThat(underTest.getNavKeys(uri, regexPatternType, true)).containsExactly(expected)
     }
 
     @Test
@@ -64,7 +64,7 @@ class WebViewDeepLinkHandlerTest {
                 on { this.toString() } doReturn uriString
             }
 
-            assertThat(underTest.getNavKeys(uri, RegexPatternType.FOLDER_LINK)).isNull()
+            assertThat(underTest.getNavKeys(uri, RegexPatternType.FOLDER_LINK, true)).isNull()
         }
 
     @Test
@@ -78,7 +78,7 @@ class WebViewDeepLinkHandlerTest {
 
         whenever(getSessionLinkUseCase(uriString)) doReturn sessionUriString
 
-        assertThat(underTest.getNavKeys(uri, RegexPatternType.MEGA_LINK)).containsExactly(expected)
+        assertThat(underTest.getNavKeys(uri, RegexPatternType.MEGA_LINK, true)).containsExactly(expected)
     }
 
     @Test
@@ -92,7 +92,7 @@ class WebViewDeepLinkHandlerTest {
 
             whenever(getSessionLinkUseCase(uriString)) doReturn null
 
-            assertThat(underTest.getNavKeys(uri, RegexPatternType.MEGA_LINK))
+            assertThat(underTest.getNavKeys(uri, RegexPatternType.MEGA_LINK, true))
                 .containsExactly(expected)
         }
 }
