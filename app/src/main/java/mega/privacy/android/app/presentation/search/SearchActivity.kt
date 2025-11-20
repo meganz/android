@@ -89,6 +89,7 @@ import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -264,11 +265,24 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                 handleClick = {
                                     coroutineScope.launch {
                                         when (it) {
-                                            is TypedFileNode -> openFileClicked(it)
-                                            is TypedFolderNode -> viewModel.openFolder(
-                                                folderHandle = it.id.longValue,
-                                                name = it.name
-                                            )
+                                            is TypedFileNode -> {
+                                                if (!it.isNodeKeyDecrypted) {
+                                                    scaffoldState.snackbarHostState.showAutoDurationSnackbar(
+                                                        getString(sharedR.string.preview_not_available_undecrypted_files)
+                                                    )
+                                                } else {
+                                                    openFileClicked(it)
+                                                }
+                                            }
+
+                                            is TypedFolderNode -> {
+                                                val name = if (!it.isNodeKeyDecrypted)
+                                                    getString(R.string.shared_items_verify_credentials_undecrypted_folder) else it.name
+                                                viewModel.openFolder(
+                                                    folderHandle = it.id.longValue,
+                                                    name = name
+                                                )
+                                            }
 
                                             else -> Timber.e("Unsupported click")
                                         }
