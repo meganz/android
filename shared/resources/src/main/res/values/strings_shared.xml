@@ -1856,4 +1856,6 @@
     <string name="camera_upload_banner_enable_cu_subtitle">Automatically back up your photos and videos to your Cloud drive.</string>
     <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
     <string name="onboarding_camera_upload_permission_enabled_message">Camera uploads enabled</string>
+    <!-- Alert to inform the user that have to be logged in to perform the action -->
+    <string name="general_alert_not_logged_in">You must be logged in to perform this action.</string>
 </resources>

@@ -12,7 +12,9 @@ import mega.privacy.android.domain.usecase.node.GetFileNodeContentForFileNodeUse
 import mega.privacy.android.domain.usecase.node.GetNodeIdFromBase64UseCase
 import mega.privacy.android.feature.clouddrive.presentation.shares.links.OpenPasswordLinkDialogNavKey
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
+import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 
 /**
@@ -24,6 +26,7 @@ class CloudDriveDeepLinkHandler @Inject constructor(
     private val getFileNodeContentForFileNodeUseCase: GetFileNodeContentForFileNodeUseCase,
     private val fileNodeContentToNavKeyMapper: FileNodeContentToNavKeyMapper,
     private val getAncestorsIdsUseCase: GetAncestorsIdsUseCase,
+    private val snackbarEventQueue: SnackbarEventQueue,
 ) : DeepLinkHandler {
     override suspend fun getNavKeys(
         uri: Uri,
@@ -34,7 +37,7 @@ class CloudDriveDeepLinkHandler @Inject constructor(
             listOf(OpenPasswordLinkDialogNavKey(uri.toString()))
         }
 
-        RegexPatternType.HANDLE_LINK -> {
+        RegexPatternType.HANDLE_LINK -> if (isLoggedIn) {
             val node = uri.extractNodeHandleBase64FromUri()
                 ?.let { getNodeIdFromBase64UseCase(it) }?.longValue?.let { handle ->
                     getNodeByIdUseCase(NodeId(handle))
@@ -71,6 +74,9 @@ class CloudDriveDeepLinkHandler @Inject constructor(
                     add(CloudDriveNavKey())
                 }
             }.reversed()
+        } else {
+            snackbarEventQueue.queueMessage(sharedR.string.general_alert_not_logged_in)
+            emptyList()
         }
 
         else -> null

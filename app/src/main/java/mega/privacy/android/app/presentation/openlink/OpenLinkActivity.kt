@@ -97,6 +97,7 @@ import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.DeeplinkHandler
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -384,7 +385,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                     finish()
                 } else {
                     Timber.d("Not logged")
-                    setError(getString(R.string.alert_not_logged_in))
+                    setError(getString(sharedR.string.general_alert_not_logged_in))
                 }
             }
             // New message chat- user must be logged IN
@@ -399,7 +400,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                     finish()
                 } else {
                     Timber.d("Not logged")
-                    setError(getString(R.string.alert_not_logged_in))
+                    setError(getString(sharedR.string.general_alert_not_logged_in))
                 }
             }
             // Cancel account  - user must be logged IN
@@ -425,7 +426,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                     finish()
                 } else {
                     Timber.d("Not logged")
-                    setError(getString(R.string.alert_not_logged_in))
+                    setError(getString(sharedR.string.general_alert_not_logged_in))
                 }
             }
             // Verify change mail - user must be logged IN
@@ -478,7 +479,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                     finish()
                 } else {
                     Timber.w("Not logged")
-                    setError(getString(R.string.alert_not_logged_in))
+                    setError(getString(sharedR.string.general_alert_not_logged_in))
                 }
             }
 
@@ -516,7 +517,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                     }
                 } else {
                     Timber.w("Not logged")
-                    setError(getString(R.string.alert_not_logged_in))
+                    setError(getString(sharedR.string.general_alert_not_logged_in))
                 }
             }
 
@@ -545,7 +546,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                     finish()
                 } else {
                     Timber.w("Not logged in")
-                    setError(getString(R.string.alert_not_logged_in))
+                    setError(getString(sharedR.string.general_alert_not_logged_in))
                 }
             }
 
@@ -561,7 +562,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                     finish()
                 } else {
                     Timber.w("Not logged in")
-                    setError(getString(R.string.alert_not_logged_in))
+                    setError(getString(sharedR.string.general_alert_not_logged_in))
                 }
             }
 
@@ -629,7 +630,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                     finish()
                 } else {
                     Timber.w("Not logged in")
-                    setError(getString(R.string.alert_not_logged_in))
+                    setError(getString(sharedR.string.general_alert_not_logged_in))
                 }
             }
 

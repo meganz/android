@@ -6,8 +6,9 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.navigation.destination.LegacyFolderLinkNavKey
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 
@@ -20,31 +21,35 @@ class FolderLinkDeepLinkHandlerTest {
         underTest = FolderLinkDeepLinkHandler()
     }
 
-    @Test
-    fun `test that correct nav key is returned when the uri matches regex pattern type`() =
-        runTest {
-            val uriString = "https://mega.co/folder"
-            val expected = LegacyFolderLinkNavKey(uriString)
-            val uri = mock<Uri> {
-                on { this.toString() } doReturn uriString
-            }
-
-            val actual = underTest.getNavKeys(uri, RegexPatternType.FOLDER_LINK, true)
-
-            assertThat(actual).containsExactly(expected)
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that correct nav key is returned when the uri matches regex pattern type`(
+        isLoggedIn: Boolean,
+    ) = runTest {
+        val uriString = "https://mega.co/folder"
+        val expected = LegacyFolderLinkNavKey(uriString)
+        val uri = mock<Uri> {
+            on { this.toString() } doReturn uriString
         }
 
-    @Test
-    fun `test that null is returned when the uri does not match regex pattern type`() =
-        runTest {
-            val uriString = "https://mega.co/folder"
-            val uri = mock<Uri> {
-                on { this.toString() } doReturn uriString
-            }
+        val actual = underTest.getNavKeys(uri, RegexPatternType.FOLDER_LINK, isLoggedIn)
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK, true)
+        assertThat(actual).containsExactly(expected)
+    }
 
-            assertThat(actual).isNull()
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that null is returned when the uri does not match regex pattern type`(
+        isLoggedIn: Boolean,
+    ) = runTest {
+        val uriString = "https://mega.co/folder"
+        val uri = mock<Uri> {
+            on { this.toString() } doReturn uriString
         }
+
+        val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK, isLoggedIn)
+
+        assertThat(actual).isNull()
+    }
 }
 

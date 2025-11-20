@@ -16,20 +16,27 @@ import mega.privacy.android.domain.usecase.node.GetAncestorsIdsUseCase
 import mega.privacy.android.domain.usecase.node.GetFileNodeContentForFileNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeIdFromBase64UseCase
 import mega.privacy.android.feature.clouddrive.presentation.shares.links.OpenPasswordLinkDialogNavKey
+import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.LegacyPdfViewerNavKey
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CloudDriveDeepLinkHandlerTest {
     private lateinit var underTest: CloudDriveDeepLinkHandler
+
+    private val snackbarEventQueue = mock<SnackbarEventQueue>()
 
     private val getNodeIdFromBase64UseCase = mock<GetNodeIdFromBase64UseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
@@ -45,6 +52,7 @@ class CloudDriveDeepLinkHandlerTest {
             getFileNodeContentForFileNodeUseCase = getFileNodeContentForFileNodeUseCase,
             fileNodeContentToNavKeyMapper = fileNodeContentToNavKeyMapper,
             getAncestorsIdsUseCase = getAncestorsIdsUseCase,
+            snackbarEventQueue = snackbarEventQueue,
         )
     }
 
@@ -56,154 +64,195 @@ class CloudDriveDeepLinkHandlerTest {
             getFileNodeContentForFileNodeUseCase,
             fileNodeContentToNavKeyMapper,
             getAncestorsIdsUseCase,
+            snackbarEventQueue,
         )
     }
 
-    @Test
-    fun `test that correct nav key is returned when uri matches PASSWORD_LINK pattern type`() =
-        runTest {
-            val uriString = "https://mega.nz/encryptedLink"
-            val expected = OpenPasswordLinkDialogNavKey(uriString)
-            val uri = mock<Uri> {
-                on { this.toString() } doReturn uriString
-            }
-
-            val actual = underTest.getNavKeys(uri, RegexPatternType.PASSWORD_LINK, true)
-
-            assertThat(actual).containsExactly(expected)
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that correct nav key is returned when uri matches PASSWORD_LINK pattern type`(
+        isLoggedIn: Boolean,
+    ) = runTest {
+        val uriString = "https://mega.nz/encryptedLink"
+        val expected = OpenPasswordLinkDialogNavKey(uriString)
+        val uri = mock<Uri> {
+            on { this.toString() } doReturn uriString
         }
 
-    @Test
-    fun `test that null is returned when regex pattern type is not HANDLE_LINK or PASSWORD_LINK`() =
-        runTest {
-            val uriString = "https://other-link"
-            val uri = mock<Uri> {
-                on { this.toString() } doReturn uriString
-            }
+        val actual = underTest.getNavKeys(uri, RegexPatternType.PASSWORD_LINK, isLoggedIn)
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK, true)
+        assertThat(actual).containsExactly(expected)
+    }
 
-            assertThat(actual).isNull()
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that null is returned when regex pattern type is not HANDLE_LINK or PASSWORD_LINK`(
+        isLoggedIn: Boolean,
+    ) = runTest {
+        val uriString = "https://other-link"
+        val uri = mock<Uri> {
+            on { this.toString() } doReturn uriString
         }
 
-    @Test
-    fun `test that root cloud drive is returned when base64 handle cannot be converted to node id`() =
-        runTest {
-            val base64Handle = "invalidBase64"
-            val uriString = "https://mega.nz/#$base64Handle"
-            val uri = mock<Uri> {
-                on { this.toString() } doReturn uriString
-                on { this.fragment } doReturn base64Handle
-            }
-            whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn null
+        val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK, isLoggedIn)
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, true)
+        assertThat(actual).isNull()
+        verifyNoInteractions(snackbarEventQueue)
+    }
 
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that root cloud drive is returned when base64 handle cannot be converted to node id`(
+        isLoggedIn: Boolean,
+    ) = runTest {
+        val base64Handle = "invalidBase64"
+        val uriString = "https://mega.nz/#$base64Handle"
+        val uri = mock<Uri> {
+            on { this.toString() } doReturn uriString
+            on { this.fragment } doReturn base64Handle
+        }
+        whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn null
+
+        val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
+
+        if (isLoggedIn) {
             assertThat(actual).containsExactly(CloudDriveNavKey())
+            verifyNoInteractions(snackbarEventQueue)
+        } else {
+            assertThat(actual).isEmpty()
+            verify(snackbarEventQueue).queueMessage(sharedR.string.general_alert_not_logged_in)
         }
+    }
 
-    @Test
-    fun `test that root cloud drive is returned when node is not found`() =
-        runTest {
-            val base64Handle = "validBase64"
-            val nodeId = NodeId(123L)
-            val uriString = "https://mega.nz/#$base64Handle"
-            val uri = mock<Uri> {
-                on { this.toString() } doReturn uriString
-                on { this.fragment } doReturn base64Handle
-            }
-            whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
-            whenever(getNodeByIdUseCase(nodeId)) doReturn null
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that root cloud drive is returned when node is not found`(
+        isLoggedIn: Boolean,
+    ) = runTest {
+        val base64Handle = "validBase64"
+        val nodeId = NodeId(123L)
+        val uriString = "https://mega.nz/#$base64Handle"
+        val uri = mock<Uri> {
+            on { this.toString() } doReturn uriString
+            on { this.fragment } doReturn base64Handle
+        }
+        whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
+        whenever(getNodeByIdUseCase(nodeId)) doReturn null
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, true)
+        val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
+        if (isLoggedIn) {
             assertThat(actual).containsExactly(CloudDriveNavKey())
+            verifyNoInteractions(snackbarEventQueue)
+        } else {
+            assertThat(actual).isEmpty()
+            verify(snackbarEventQueue).queueMessage(sharedR.string.general_alert_not_logged_in)
         }
+    }
 
-    @Test
-    fun `test that correct nav keys are returned for folder node`() =
-        runTest {
-            val base64Handle = "validBase64"
-            val nodeId = NodeId(123L)
-            val parentId = NodeId(456L)
-            val uriString = "https://mega.nz/#$base64Handle"
-            val uri = mock<Uri> {
-                on { this.toString() } doReturn uriString
-                on { this.fragment } doReturn base64Handle
-            }
-            val folderNode = createMockFolderNode(
-                id = nodeId.longValue,
-                parentId = parentId,
-            )
-            whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
-            whenever(getNodeByIdUseCase(nodeId)) doReturn folderNode
-            whenever(getAncestorsIdsUseCase(folderNode)) doReturn listOf(parentId)
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that correct nav keys are returned for folder node`(
+        isLoggedIn: Boolean,
+    ) = runTest {
+        val base64Handle = "validBase64"
+        val nodeId = NodeId(123L)
+        val parentId = NodeId(456L)
+        val uriString = "https://mega.nz/#$base64Handle"
+        val uri = mock<Uri> {
+            on { this.toString() } doReturn uriString
+            on { this.fragment } doReturn base64Handle
+        }
+        val folderNode = createMockFolderNode(
+            id = nodeId.longValue,
+            parentId = parentId,
+        )
+        whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
+        whenever(getNodeByIdUseCase(nodeId)) doReturn folderNode
+        whenever(getAncestorsIdsUseCase(folderNode)) doReturn listOf(parentId)
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, true)
+        val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
+        if (isLoggedIn) {
             assertThat(actual).containsExactly(
                 CloudDriveNavKey(nodeHandle = parentId.longValue),
                 CloudDriveNavKey(nodeHandle = nodeId.longValue),
             ).inOrder()
+            verifyNoInteractions(snackbarEventQueue)
+        } else {
+            assertThat(actual).isEmpty()
+            verify(snackbarEventQueue).queueMessage(sharedR.string.general_alert_not_logged_in)
         }
+    }
 
-    @Test
-    fun `test that correct nav key is returned for file node without preview`() =
-        runTest {
-            val base64Handle = "validBase64"
-            val nodeId = NodeId(123L)
-            val parentId = NodeId(456L)
-            val uriString = "https://mega.nz/#$base64Handle"
-            val uri = mock<Uri> {
-                on { this.toString() } doReturn uriString
-                on { this.fragment } doReturn base64Handle
-            }
-            val fileNode = createMockFileNode(
-                id = nodeId.longValue,
-                parentId = parentId
-            )
-            val fileNodeContent = FileNodeContent.Other(localFile = null)
-            whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
-            whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
-            whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
-            whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
-            whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(parentId)
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that correct nav key is returned for file node without preview`(
+        isLoggedIn: Boolean,
+    ) = runTest {
+        val base64Handle = "validBase64"
+        val nodeId = NodeId(123L)
+        val parentId = NodeId(456L)
+        val uriString = "https://mega.nz/#$base64Handle"
+        val uri = mock<Uri> {
+            on { this.toString() } doReturn uriString
+            on { this.fragment } doReturn base64Handle
+        }
+        val fileNode = createMockFileNode(
+            id = nodeId.longValue,
+            parentId = parentId
+        )
+        val fileNodeContent = FileNodeContent.Other(localFile = null)
+        whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
+        whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
+        whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
+        whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
+        whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(parentId)
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, true)
+        val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
+        if (isLoggedIn) {
             assertThat(actual).containsExactly(
                 CloudDriveNavKey(
                     nodeHandle = parentId.longValue,
                     highlightedNodeHandle = nodeId.longValue
                 )
             )
+            verifyNoInteractions(snackbarEventQueue)
+        } else {
+            assertThat(actual).isEmpty()
+            verify(snackbarEventQueue).queueMessage(sharedR.string.general_alert_not_logged_in)
         }
+    }
 
-    @Test
-    fun `test that correct nav keys are returned for file node with parent chain`() =
-        runTest {
-            val base64Handle = "validBase64"
-            val nodeId = NodeId(123L)
-            val parentId = NodeId(456L)
-            val grandParentId = NodeId(789L)
-            val uriString = "https://mega.nz/#$base64Handle"
-            val uri = mock<Uri> {
-                on { this.toString() } doReturn uriString
-                on { this.fragment } doReturn base64Handle
-            }
-            val fileNode = createMockFileNode(
-                id = nodeId.longValue,
-                parentId = parentId,
-            )
-            val fileNodeContent = FileNodeContent.Other(localFile = null)
-            whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
-            whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
-            whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
-            whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
-            whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(parentId, grandParentId)
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that correct nav keys are returned for file node with parent chain`(
+        isLoggedIn: Boolean,
+    ) = runTest {
+        val base64Handle = "validBase64"
+        val nodeId = NodeId(123L)
+        val parentId = NodeId(456L)
+        val grandParentId = NodeId(789L)
+        val uriString = "https://mega.nz/#$base64Handle"
+        val uri = mock<Uri> {
+            on { this.toString() } doReturn uriString
+            on { this.fragment } doReturn base64Handle
+        }
+        val fileNode = createMockFileNode(
+            id = nodeId.longValue,
+            parentId = parentId,
+        )
+        val fileNodeContent = FileNodeContent.Other(localFile = null)
+        whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
+        whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
+        whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
+        whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
+        whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(parentId, grandParentId)
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, true)
+        val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
+        if (isLoggedIn) {
             assertThat(actual).containsExactly(
                 CloudDriveNavKey(nodeHandle = grandParentId.longValue),
                 CloudDriveNavKey(
@@ -211,76 +260,97 @@ class CloudDriveDeepLinkHandlerTest {
                     highlightedNodeHandle = nodeId.longValue
                 )
             ).inOrder()
+            verifyNoInteractions(snackbarEventQueue)
+        } else {
+            assertThat(actual).isEmpty()
+            verify(snackbarEventQueue).queueMessage(sharedR.string.general_alert_not_logged_in)
         }
+    }
 
-    @Test
-    fun `test that fragment with slash is handled correctly`() =
-        runTest {
-            val base64Handle = "validBase64"
-            val extraPath = "/some/path"
-            val nodeId = NodeId(123L)
-            val uriString = "https://mega.nz/#$base64Handle$extraPath"
-            val uri = mock<Uri> {
-                on { this.toString() } doReturn uriString
-                on { this.fragment } doReturn "$base64Handle$extraPath"
-            }
-            val folderNode = createMockFolderNode(
-                id = nodeId.longValue,
-                parentId = NodeId(-1L),
-            )
-            whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
-            whenever(getNodeByIdUseCase(nodeId)) doReturn folderNode
-            whenever(getAncestorsIdsUseCase(folderNode)) doReturn emptyList()
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that fragment with slash is handled correctly`(
+        isLoggedIn: Boolean,
+    ) = runTest {
+        val base64Handle = "validBase64"
+        val extraPath = "/some/path"
+        val nodeId = NodeId(123L)
+        val uriString = "https://mega.nz/#$base64Handle$extraPath"
+        val uri = mock<Uri> {
+            on { this.toString() } doReturn uriString
+            on { this.fragment } doReturn "$base64Handle$extraPath"
+        }
+        val folderNode = createMockFolderNode(
+            id = nodeId.longValue,
+            parentId = NodeId(-1L),
+        )
+        whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
+        whenever(getNodeByIdUseCase(nodeId)) doReturn folderNode
+        whenever(getAncestorsIdsUseCase(folderNode)) doReturn emptyList()
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, true)
+        val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
+        if (isLoggedIn) {
             assertThat(actual).containsExactly(
                 CloudDriveNavKey(nodeHandle = 123L)
             )
+            verifyNoInteractions(snackbarEventQueue)
+        } else {
+            assertThat(actual).isEmpty()
+            verify(snackbarEventQueue).queueMessage(sharedR.string.general_alert_not_logged_in)
         }
+    }
 
-    @Test
-    fun `test that preview nav key is returned for file node with preview`() =
-        runTest {
-            val base64Handle = "validBase64"
-            val nodeId = NodeId(123L)
-            val parentId = NodeId(456L)
-            val uriString = "https://mega.nz/#$base64Handle"
-            val uri = mock<Uri> {
-                on { this.toString() } doReturn uriString
-                on { this.fragment } doReturn base64Handle
-            }
-            val fileNode = createMockFileNode(
-                id = nodeId.longValue,
-                parentId = parentId
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that preview nav key is returned for file node with preview`(
+        isLoggedIn: Boolean,
+    ) = runTest {
+        val base64Handle = "validBase64"
+        val nodeId = NodeId(123L)
+        val parentId = NodeId(456L)
+        val uriString = "https://mega.nz/#$base64Handle"
+        val uri = mock<Uri> {
+            on { this.toString() } doReturn uriString
+            on { this.fragment } doReturn base64Handle
+        }
+        val fileNode = createMockFileNode(
+            id = nodeId.longValue,
+            parentId = parentId
+        )
+        val fileNodeContent = FileNodeContent.Pdf(
+            uri = mega.privacy.android.domain.entity.node.NodeContentUri.RemoteContentUri(
+                "http://example.com/file.pdf",
+                false
             )
-            val fileNodeContent = FileNodeContent.Pdf(
-                uri = mega.privacy.android.domain.entity.node.NodeContentUri.RemoteContentUri(
-                    "http://example.com/file.pdf",
-                    false
-                )
-            )
-            val previewNavKey = LegacyPdfViewerNavKey(
-                nodeHandle = nodeId.longValue,
-                nodeContentUri = fileNodeContent.uri,
-                nodeSourceType = null,
-                mimeType = "application/pdf"
-            )
-            whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
-            whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
-            whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
-            whenever(
-                fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)
-            ) doReturn previewNavKey
-            whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(parentId)
+        )
+        val previewNavKey = LegacyPdfViewerNavKey(
+            nodeHandle = nodeId.longValue,
+            nodeContentUri = fileNodeContent.uri,
+            nodeSourceType = null,
+            mimeType = "application/pdf"
+        )
+        whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
+        whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
+        whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
+        whenever(
+            fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)
+        ) doReturn previewNavKey
+        whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(parentId)
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, true)
+        val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
+        if (isLoggedIn) {
             assertThat(actual).containsExactly(
                 CloudDriveNavKey(nodeHandle = parentId.longValue),
                 previewNavKey
             ).inOrder()
+            verifyNoInteractions(snackbarEventQueue)
+        } else {
+            assertThat(actual).isEmpty()
+            verify(snackbarEventQueue).queueMessage(sharedR.string.general_alert_not_logged_in)
         }
+    }
 
     private fun createMockFileNode(
         id: Long,

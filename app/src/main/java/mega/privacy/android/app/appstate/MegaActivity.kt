@@ -110,7 +110,6 @@ class MegaActivity : ComponentActivity() {
 
     private fun consumeIntentDestinations() {
         intent.getDestinations()?.let { navKeys ->
-            println("PAU-C consume $navKeys")
             //Add nav keys to navigation queue
             navKeys.forEach {
                 Timber.d("NavKey from intent: $it")
@@ -150,7 +149,6 @@ class MegaActivity : ComponentActivity() {
                 val rootNodeState by globalStateViewModel.rootNodeExistsFlow.collectAsStateWithLifecycle()
 
                 LaunchedEffect(Unit) {
-                    //consume intent destinations
                     consumeIntentDestinations()
                 }
 

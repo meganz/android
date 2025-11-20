@@ -6,12 +6,19 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.RegexPatternType
+import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.MyAccountNavKey
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -19,73 +26,103 @@ class MyAccountDeepLinkHandlerTest {
 
     private lateinit var underTest: MyAccountDeepLinkHandler
 
+    private val snackbarEventQueue = mock<SnackbarEventQueue>()
 
     @BeforeAll
     fun setup() {
-        underTest = MyAccountDeepLinkHandler()
+        underTest = MyAccountDeepLinkHandler(snackbarEventQueue)
     }
 
-    @Test
-    fun `test that correct nav key is returned when uri matches ACTION_CANCEL_ACCOUNT pattern type`() =
-        runTest {
-            val uriString = "mega://cancelAccount"
-            val expected = MyAccountNavKey(
-                action = Constants.ACTION_CANCEL_ACCOUNT,
-                link = uriString
-            )
-            val uri = mock<Uri> {
-                on { this.toString() } doReturn uriString
-            }
+    @BeforeEach
+    fun resetMocks() {
+        reset(snackbarEventQueue)
+    }
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.CANCEL_ACCOUNT_LINK, true)
-
-            assertThat(actual).containsExactly(expected)
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that correct nav key is returned when uri matches ACTION_CANCEL_ACCOUNT pattern type`(
+        isLoggedIn: Boolean,
+    ) = runTest {
+        val uriString = "mega://cancelAccount"
+        val uri = mock<Uri> {
+            on { this.toString() } doReturn uriString
         }
 
-    @Test
-    fun `test that correct nav key is returned when uri matches VERIFY_CHANGE_MAIL_LINK pattern type`() =
-        runTest {
-            val uriString = "mega://verifyEmail"
-            val expected = MyAccountNavKey(
-                action = Constants.ACTION_CHANGE_MAIL,
-                link = uriString
+        val actual = underTest.getNavKeys(uri, RegexPatternType.CANCEL_ACCOUNT_LINK, isLoggedIn)
+
+        if (isLoggedIn) {
+            assertThat(actual).containsExactly(
+                MyAccountNavKey(
+                    action = Constants.ACTION_CANCEL_ACCOUNT,
+                    link = uriString
+                )
             )
-            val uri = mock<Uri> {
-                on { this.toString() } doReturn uriString
-            }
+            verifyNoInteractions(snackbarEventQueue)
+        } else {
+            assertThat(actual).isEmpty()
+            verify(snackbarEventQueue).queueMessage(sharedR.string.general_alert_not_logged_in)
+        }
+    }
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.VERIFY_CHANGE_MAIL_LINK, true)
-
-            assertThat(actual).containsExactly(expected)
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that correct nav key is returned when uri matches VERIFY_CHANGE_MAIL_LINK pattern type`(
+        isLoggedIn: Boolean,
+    ) = runTest {
+        val uriString = "mega://verifyEmail"
+        val uri = mock<Uri> {
+            on { this.toString() } doReturn uriString
         }
 
-    @Test
-    fun `test that correct nav key is returned when uri matches RESET_PASSWORD_LINK pattern type`() =
-        runTest {
-            val uriString = "mega://resetPassword"
-            val expected = MyAccountNavKey(
+        val actual = underTest.getNavKeys(uri, RegexPatternType.VERIFY_CHANGE_MAIL_LINK, isLoggedIn)
+
+        if (isLoggedIn) {
+            assertThat(actual).containsExactly(
+                MyAccountNavKey(
+                    action = Constants.ACTION_CHANGE_MAIL,
+                    link = uriString
+                )
+            )
+        } else {
+            assertThat(actual).isEmpty()
+            verify(snackbarEventQueue).queueMessage(sharedR.string.general_alert_not_logged_in)
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that correct nav key is returned when uri matches RESET_PASSWORD_LINK pattern type`(
+        isLoggedIn: Boolean,
+    ) = runTest {
+        val uriString = "mega://resetPassword"
+        val uri = mock<Uri> {
+            on { this.toString() } doReturn uriString
+        }
+
+        val actual = underTest.getNavKeys(uri, RegexPatternType.RESET_PASSWORD_LINK, isLoggedIn)
+
+        assertThat(actual).containsExactly(
+            MyAccountNavKey(
                 action = Constants.ACTION_RESET_PASS,
                 link = uriString
             )
-            val uri = mock<Uri> {
-                on { this.toString() } doReturn uriString
-            }
+        )
+        verifyNoInteractions(snackbarEventQueue)
+    }
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.RESET_PASSWORD_LINK, true)
-
-            assertThat(actual).containsExactly(expected)
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that null is returned when uri does not match ACTION_CANCEL_ACCOUNT, VERIFY_CHANGE_MAIL_LINK or RESET_PASSWORD_LINK pattern type`(
+        isLoggedIn: Boolean,
+    ) = runTest {
+        val uriString = "mega://other-link"
+        val uri = mock<Uri> {
+            on { this.toString() } doReturn uriString
         }
 
-    @Test
-    fun `test that null is returned when uri does not match ACTION_CANCEL_ACCOUNT, VERIFY_CHANGE_MAIL_LINK or RESET_PASSWORD_LINK pattern type`() =
-        runTest {
-            val uriString = "mega://other-link"
-            val uri = mock<Uri> {
-                on { this.toString() } doReturn uriString
-            }
+        val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK, isLoggedIn)
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK, true)
-
-            assertThat(actual).isNull()
-        }
+        assertThat(actual).isNull()
+        verifyNoInteractions(snackbarEventQueue)
+    }
 }
