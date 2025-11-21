@@ -73,10 +73,10 @@ import mega.privacy.android.app.presentation.passcode.navigation.passcodeView
 import mega.privacy.android.app.presentation.security.check.PasscodeCheckViewModel
 import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.transparent.TransparentSceneStrategy
-import mega.privacy.android.navigation.destination.SnackbarNavKey
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -105,7 +105,19 @@ class MegaActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         this.intent = intent
+        consumeIntentExtras()
+    }
+
+    private fun consumeIntentExtras() {
+        consumeWarningMessage()
         consumeIntentDestinations()
+    }
+
+    private fun consumeWarningMessage() {
+        intent.getStringExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE)?.let { warningMessage ->
+            globalStateViewModel.queueMessage(warningMessage)
+            intent.removeExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE)
+        }
     }
 
     private fun consumeIntentDestinations() {
@@ -124,6 +136,7 @@ class MegaActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         splashScreen.setKeepOnScreenCondition { keepSplashScreen }
         enableEdgeToEdge()
+        consumeIntentExtras()
         setContent {
             val navGraphViewModel = hiltViewModel<NavigationGraphViewModel>() // nav graph content
             val presenceViewModel = hiltViewModel<SignalPresenceViewModel>()
@@ -148,10 +161,6 @@ class MegaActivity : ComponentActivity() {
                 val passcodeState by passcodeViewModel.state.collectAsStateWithLifecycle()
                 val rootNodeState by globalStateViewModel.rootNodeExistsFlow.collectAsStateWithLifecycle()
 
-                LaunchedEffect(Unit) {
-                    consumeIntentDestinations()
-                }
-
                 val navigationHandler = remember {
                     val authStatus = (globalState as? GlobalState.LoggedIn)?.session?.let {
                         PendingBackStackNavigationHandler.AuthStatus.LoggedIn(it)
@@ -171,12 +180,12 @@ class MegaActivity : ComponentActivity() {
 
                 LaunchedEffect(globalState) {
                     val authStatus =
-                    (globalState as? GlobalState.LoggedIn)?.session?.let {
-                        PendingBackStackNavigationHandler.AuthStatus.LoggedIn(it)
-                    } ?: PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn
+                        (globalState as? GlobalState.LoggedIn)?.session?.let {
+                            PendingBackStackNavigationHandler.AuthStatus.LoggedIn(it)
+                        } ?: PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn
 
-                navigationHandler.onLoginChange(authStatus)
-            }
+                    navigationHandler.onLoginChange(authStatus)
+                }
 
                 LaunchedEffect(rootNodeState) {
                     navigationHandler.onRootNodeChange(rootNodeState)
@@ -364,10 +373,23 @@ class MegaActivity : ComponentActivity() {
         fun getPendingIntentForWarningMessage(
             context: Context,
             warningMessage: String,
-        ) = getPendingIntentWithExtraDestinations(
-            context,
-            listOf(SnackbarNavKey(warningMessage))
-        )
+            requestCode: Int = warningMessage.hashCode(), //unique request code per warning message
+        ): PendingIntent {
+            val intent = Intent(
+                context,
+                MegaActivity::class.java
+            ).apply {
+                putExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE, warningMessage)
+                flags =
+                    Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+            return PendingIntent.getActivity(
+                context,
+                requestCode,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        }
 
         /**
          * Get a pending intent to open this activity with the specified nav key

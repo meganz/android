@@ -6,7 +6,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import mega.privacy.android.app.activities.destinations.LegacyCoreActivityFeatureGraph
-import mega.privacy.android.app.activities.destinations.SnackbarDestination
 import mega.privacy.android.app.appstate.content.navigation.PermissionFeatureDestination
 import mega.privacy.android.app.nav.MediaPlayerIntentMapper
 import mega.privacy.android.app.presentation.filecontact.navigation.FileContactFeatureDestination
@@ -16,7 +15,6 @@ import mega.privacy.android.app.presentation.notification.navigation.Notificatio
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserFeatureDestination
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.navigation.contract.FeatureDestination
-import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -57,9 +55,4 @@ class FeatureDestinationModule {
     @Provides
     @IntoSet
     fun provideZipBrowserFeatureDestination(): FeatureDestination = ZipBrowserFeatureDestination()
-
-    @Provides
-    @IntoSet
-    fun provideSnackbarDestination(snackbarEventQueue: SnackbarEventQueue): FeatureDestination =
-        SnackbarDestination(snackbarEventQueue)
 }

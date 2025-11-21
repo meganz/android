@@ -7,7 +7,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants.ACTION_CONFIRM
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
-import mega.privacy.android.navigation.destination.SnackbarNavKey
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -58,12 +57,7 @@ class LoginDeepLinkHandlerTest {
         isLoggedIn: Boolean,
     ) = runTest {
         val uriString = "mega://confirmLink"
-        val expected = if (isLoggedIn) {
-            // TODO: Replace with AND string once created
-            SnackbarNavKey(R.string.log_out_warning)
-        } else {
-            LoginNavKey(action = ACTION_CONFIRM, link = uriString)
-        }
+        val expected = LoginNavKey(action = ACTION_CONFIRM, link = uriString)
         val uri = mock<Uri> {
             on { this.toString() } doReturn uriString
         }
