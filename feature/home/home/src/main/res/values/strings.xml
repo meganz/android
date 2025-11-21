@@ -4,4 +4,39 @@
 
     <string name="favourites_category_title">Favourites</string>
     <string name="section_saved_for_offline_new">Offline</string>
+
+    <!-- Recent Actions strings -->
+    <string name="section_cloud_drive">Cloud drive</string>
+    <string name="title_bucket">%1$s and %2$d more</string>
+    <string name="create_action_bucket">[A]created by [/A]%s</string>
+    <string name="update_action_bucket">[A]updated by [/A]%s</string>
+    <string name="label_today">Today</string>
+    <string name="label_yesterday">Yesterday</string>
+    <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
+
+    <!-- Title of a media recents bucket that only contains some images -->
+    <plurals name="title_media_bucket_only_images">
+        <item quantity="one">%d image</item>
+        <item quantity="other">%d images</item>
+    </plurals>
+    <!-- Title of a media recents bucket that only contains some videos -->
+    <plurals name="title_media_bucket_only_videos">
+        <item quantity="one">%d video</item>
+        <item quantity="other">%d videos</item>
+    </plurals>
+    <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
+    <plurals name="title_media_bucket_images_and_videos">
+        <item quantity="one">%1$d image&#160;</item>
+        <item quantity="other">%1$d images&#160;</item>
+    </plurals>
+    <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
+    <plurals name="title_media_bucket_images_and_videos_2">
+        <item quantity="one">and %1$d video</item>
+        <item quantity="other">and %1$d videos</item>
+    </plurals>
+    <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
+    <plurals name="cloud_drive_undecrypted_file">
+        <item quantity="one">[Undecrypted file]</item>
+        <item quantity="other">[Undecrypted files]</item>
+    </plurals>
 </resources>

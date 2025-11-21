@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.RecentActionBucket
  * @property labelColorId The color of the label
  * @property bucket The recent action bucket
  */
+@Deprecated("Use revamp version")
 data class RecentActionBucketUiEntity(
     val firstLineText: String,
     @DrawableRes val icon: Int,

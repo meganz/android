@@ -1,0 +1,123 @@
+package mega.privacy.mobile.home.presentation.home.widget.recents.mapper
+
+import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.RecentActionBucket
+import mega.privacy.android.domain.entity.RecentActionsSharesType
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.feature.home.R
+import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentActionTimestampText
+import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentActionTitleText
+import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentActionUiItem
+import javax.inject.Inject
+
+/**
+ * The mapper class to convert the RecentActionBucket to RecentActionUiItem
+ */
+class RecentActionUiItemMapper @Inject constructor(
+    private val fileTypeIconMapper: FileTypeIconMapper,
+) {
+
+    /**
+     * Convert RecentActionBucket to RecentActionUiItem
+     */
+    operator fun invoke(
+        item: RecentActionBucket,
+    ): RecentActionUiItem {
+        val node = item.nodes.first()
+        val isSingleNode = item.nodes.size == 1
+        val isMediaBucket = !isSingleNode && item.isMedia
+        val title = getTitle(
+            item = item,
+            node = node,
+            isSingleNode = isSingleNode,
+            isMediaBucket = isMediaBucket
+        )
+        val parentFolderName = getParentFolderName(item)
+        val updatedByText = getUpdatedByText(item)
+
+        return RecentActionUiItem(
+            title = title,
+            icon = if (isMediaBucket) {
+                IconPackR.drawable.ic_image_stack_medium_solid
+            } else {
+                fileTypeIconMapper(node.type.extension)
+            },
+            shareIcon = when (item.parentFolderSharesType) {
+                RecentActionsSharesType.NONE -> null
+                RecentActionsSharesType.INCOMING_SHARES -> IconPackR.drawable.ic_folder_incoming_medium_solid
+                RecentActionsSharesType.OUTGOING_SHARES, RecentActionsSharesType.PENDING_OUTGOING_SHARES -> IconPackR.drawable.ic_folder_outgoing_medium_solid
+            },
+            parentFolderName = parentFolderName,
+            timestampText = RecentActionTimestampText(item.timestamp),
+            isMediaBucket = isMediaBucket,
+            isUpdate = item.isUpdate,
+            updatedByText = updatedByText,
+            userName = if (!item.currentUserIsOwner) item.userName else null,
+            isFavourite = isSingleNode && node.isFavourite,
+            nodeLabel = if (isSingleNode) node.nodeLabel else null,
+            bucket = item
+        )
+    }
+
+    private fun getTitle(
+        item: RecentActionBucket,
+        node: TypedFileNode,
+        isSingleNode: Boolean,
+        isMediaBucket: Boolean,
+    ) = if (item.isNodeKeyDecrypted) {
+        when {
+            isSingleNode -> RecentActionTitleText.SingleNode(node.name)
+            isMediaBucket -> {
+                val numImages = item.nodes.count { it.type.mimeType.startsWith("image/") }
+                val numVideos = item.nodes.size - numImages
+                when {
+                    numImages > 0 && numVideos == 0 -> {
+                        RecentActionTitleText.MediaBucketImagesOnly(numImages)
+                    }
+
+                    numImages == 0 && numVideos > 0 -> {
+                        RecentActionTitleText.MediaBucketVideosOnly(numVideos)
+                    }
+
+                    else -> {
+                        RecentActionTitleText.MediaBucketMixed(numImages, numVideos)
+                    }
+                }
+            }
+
+            else -> {
+                RecentActionTitleText.RegularBucket(
+                    nodeName = node.name,
+                    additionalCount = item.nodes.size - 1
+                )
+            }
+        }
+    } else {
+        RecentActionTitleText.UndecryptedFiles(item.nodes.size)
+    }
+
+
+    private fun getParentFolderName(item: RecentActionBucket) = if (item.isNodeKeyDecrypted) {
+        when (item.parentFolderName) {
+            CLOUD_DRIVE_FOLDER_NAME -> LocalizedText.StringRes(R.string.section_cloud_drive)
+            else -> LocalizedText.Literal(item.parentFolderName)
+        }
+    } else {
+        LocalizedText.StringRes(R.string.shared_items_verify_credentials_undecrypted_folder)
+    }
+
+    private fun getUpdatedByText(item: RecentActionBucket) = if (!item.currentUserIsOwner) {
+        val stringResId = if (item.isUpdate) {
+            R.string.update_action_bucket
+        } else {
+            R.string.create_action_bucket
+        }
+        LocalizedText.StringRes(stringResId, listOf(item.userName))
+    } else {
+        null
+    }
+}
+
+private const val CLOUD_DRIVE_FOLDER_NAME = "Cloud Drive"

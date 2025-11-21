@@ -17,6 +17,7 @@ import javax.inject.Inject
 /**
  * The mapper class to convert the RecentActionBucket to RecentActionBucketUiEntity
  */
+@Deprecated("Use revamp version")
 class RecentActionBucketUiEntityMapper @Inject constructor(
     @ApplicationContext private val context: Context,
     private val fileTypeIconMapper: FileTypeIconMapper,

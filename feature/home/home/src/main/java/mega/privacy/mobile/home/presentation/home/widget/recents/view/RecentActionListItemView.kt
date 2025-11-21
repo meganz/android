@@ -36,10 +36,48 @@ import mega.privacy.android.core.nodecomponents.list.NodeLabelCircle
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentActionUiItem
+import mega.privacy.mobile.home.presentation.home.widget.recents.model.text
 
 
 /**
  * Composable for the recent actions list item
+ *
+ * @param item The RecentActionUiItem to display
+ * @param isExpanded Whether the media bucket is expanded in the list
+ * @param onMenuClicked Callback when the menu button is clicked
+ * @param onItemClicked Callback when the item is clicked
+ */
+@Composable
+fun RecentActionListItemView(
+    item: RecentActionUiItem,
+    isExpanded: Boolean = false,
+    onMenuClicked: () -> Unit,
+    onItemClicked: () -> Unit,
+) {
+    val titleText = item.title.text()
+    val parentFolderNameText = item.parentFolderName.text
+    val timeText = item.timestampText.formatTime()
+
+    RecentActionListItemView(
+        title = titleText,
+        parentFolderName = parentFolderNameText,
+        time = timeText,
+        icon = item.icon,
+        shareIcon = item.shareIcon,
+        updatedByText = item.updatedByText?.text,
+        label = item.nodeLabel,
+        showFavourite = item.isFavourite,
+        showVersion = item.isUpdate,
+        isMediaBucket = item.isMediaBucket,
+        isExpanded = isExpanded,
+        onMenuClicked = onMenuClicked,
+        onItemClicked = onItemClicked,
+    )
+}
+
+/**
+ * Composable for the recent actions list item (backward compatibility)
  *
  * @param title The title of the item
  * @param icon The icon resource ID of the item
