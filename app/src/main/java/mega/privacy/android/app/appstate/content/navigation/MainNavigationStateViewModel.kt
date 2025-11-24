@@ -40,6 +40,7 @@ class MainNavigationStateViewModel @Inject constructor(
     private val monitorStartScreenPreferenceDestinationUseCase: MonitorStartScreenPreferenceDestinationUseCase,
     private val screenPreferenceDestinationMapper: ScreenPreferenceDestinationMapper,
     @DefaultStartScreen private val defaultStartScreen: NavKey,
+    val navigationResultManager: NavigationResultManager,
 ) : ViewModel() {
 
     val state: StateFlow<MainNavState> by lazy {

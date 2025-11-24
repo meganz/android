@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test
 
 class PendingBackStackNavigationHandlerTest {
     private lateinit var underTest: PendingBackStackNavigationHandler
+    private val navigationResultManager = NavigationResultManager()
 
     private val backStack = PendingBackStack(NavBackStack())
 
@@ -57,6 +58,7 @@ class PendingBackStackNavigationHandlerTest {
             fetchRootNodeDestination = getFetchNodeDestinationFunction,
             isPasscodeLocked = false,
             passcodeDestination = PasscodeDestination,
+            navigationResultManager = navigationResultManager,
         )
     }
 
@@ -228,6 +230,7 @@ class PendingBackStackNavigationHandlerTest {
                 fetchRootNodeDestination = getFetchNodeDestinationFunction,
                 isPasscodeLocked = false,
                 passcodeDestination = PasscodeDestination,
+                navigationResultManager = navigationResultManager,
             )
 
             assertThat(tempBackStack).containsExactly(NoSessionDestination1, NoSessionDestination2)
@@ -247,6 +250,7 @@ class PendingBackStackNavigationHandlerTest {
             fetchRootNodeDestination = getFetchNodeDestinationFunction,
             isPasscodeLocked = false,
             passcodeDestination = PasscodeDestination,
+            navigationResultManager = navigationResultManager,
         )
 
         assertThat(tempBackStack).containsExactly(InitialLoginDestination)
@@ -268,6 +272,7 @@ class PendingBackStackNavigationHandlerTest {
                 fetchRootNodeDestination = getFetchNodeDestinationFunction,
                 isPasscodeLocked = false,
                 passcodeDestination = PasscodeDestination,
+                navigationResultManager = navigationResultManager,
             )
 
             assertThat(tempBackStack).containsExactly(InitialLoginDestination)
@@ -345,6 +350,7 @@ class PendingBackStackNavigationHandlerTest {
                 fetchRootNodeDestination = getFetchNodeDestinationFunction,
                 isPasscodeLocked = false,
                 passcodeDestination = PasscodeDestination,
+                navigationResultManager = navigationResultManager,
             )
 
             assertThat(tempBackStack).containsExactly(
@@ -369,6 +375,7 @@ class PendingBackStackNavigationHandlerTest {
                 fetchRootNodeDestination = getFetchNodeDestinationFunction,
                 isPasscodeLocked = false,
                 passcodeDestination = PasscodeDestination,
+                navigationResultManager = navigationResultManager,
             )
 
             assertThat(tempBackStack).containsExactly(FetchingContentNavKey(initialSession, false))
@@ -392,6 +399,7 @@ class PendingBackStackNavigationHandlerTest {
                 fetchRootNodeDestination = getFetchNodeDestinationFunction,
                 isPasscodeLocked = false,
                 passcodeDestination = PasscodeDestination,
+                navigationResultManager = navigationResultManager,
             )
 
             assertThat(tempBackStack).containsExactly(FetchingContentNavKey(initialSession, false))
@@ -487,6 +495,7 @@ class PendingBackStackNavigationHandlerTest {
             fetchRootNodeDestination = getFetchNodeDestinationFunction,
             isPasscodeLocked = false,
             passcodeDestination = PasscodeDestination,
+            navigationResultManager = navigationResultManager,
         )
         val session = "newSession"
 
@@ -516,6 +525,7 @@ class PendingBackStackNavigationHandlerTest {
                 fetchRootNodeDestination = getFetchNodeDestinationFunction,
                 isPasscodeLocked = true,
                 passcodeDestination = PasscodeDestination,
+                navigationResultManager = navigationResultManager,
             )
             assertThat(tempBackStack).containsExactly(PasscodeDestination)
             assertThat(tempBackStack.pending).containsExactlyElementsIn(navTree)
@@ -541,6 +551,7 @@ class PendingBackStackNavigationHandlerTest {
             fetchRootNodeDestination = getFetchNodeDestinationFunction,
             isPasscodeLocked = true,
             passcodeDestination = PasscodeDestination,
+            navigationResultManager = navigationResultManager,
         )
         tempHandler.onLoginChange(PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn)
 

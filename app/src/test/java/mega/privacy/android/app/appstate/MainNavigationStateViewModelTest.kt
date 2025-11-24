@@ -17,6 +17,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.appstate.content.mapper.ScreenPreferenceDestinationMapper
 import mega.privacy.android.app.appstate.content.navigation.MainNavigationStateViewModel
+import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.appstate.content.navigation.model.MainNavState
 import mega.privacy.android.app.presentation.settings.compose.home.view.SettingsHomeViewKtTest
 import mega.privacy.android.domain.entity.Feature
@@ -49,6 +50,7 @@ class MainNavigationStateViewModelTest {
         mock<MonitorStartScreenPreferenceDestinationUseCase>()
     private val screenPreferenceDestinationMapper = mock<ScreenPreferenceDestinationMapper>()
     private val defaultStartScreen = mock<NavKey>()
+    private val navigationResultManager = mock<NavigationResultManager>()
 
     @BeforeAll
     fun initialisation() {
@@ -67,6 +69,7 @@ class MainNavigationStateViewModelTest {
             monitorConnectivityUseCase,
             monitorStartScreenPreferenceDestinationUseCase,
             screenPreferenceDestinationMapper,
+            navigationResultManager
         )
     }
 
@@ -347,6 +350,7 @@ class MainNavigationStateViewModelTest {
             monitorStartScreenPreferenceDestinationUseCase = monitorStartScreenPreferenceDestinationUseCase,
             screenPreferenceDestinationMapper = screenPreferenceDestinationMapper,
             defaultStartScreen = defaultStartScreen,
+            navigationResultManager = navigationResultManager
         )
     }
 

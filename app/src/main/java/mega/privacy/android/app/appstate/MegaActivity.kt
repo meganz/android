@@ -47,6 +47,7 @@ import mega.privacy.android.app.appstate.content.NavigationGraphViewModel
 import mega.privacy.android.app.appstate.content.destinations.FetchingContentNavKey
 import mega.privacy.android.app.appstate.content.destinations.HomeScreensNavKey
 import mega.privacy.android.app.appstate.content.model.NavigationGraphState
+import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.appstate.content.navigation.PendingBackStack
 import mega.privacy.android.app.appstate.content.navigation.PendingBackStackNavigationHandler
 import mega.privacy.android.app.appstate.content.navigation.rememberPendingBackStack
@@ -97,6 +98,9 @@ class MegaActivity : ComponentActivity() {
      */
     @Inject
     lateinit var navigationEventQueue: NavigationEventQueue
+
+    @Inject
+    lateinit var navigationResultManager: NavigationResultManager
 
     private val passcodeViewModel: PasscodeCheckViewModel by viewModels()
 
@@ -175,6 +179,7 @@ class MegaActivity : ComponentActivity() {
                         isPasscodeLocked = passcodeState is PasscodeCheckState.Locked,
                         passcodeDestination = PasscodeNavKey,
                         fetchRootNodeDestination = ::FetchingContentNavKey,
+                        navigationResultManager = navigationResultManager,
                     )
                 }
 

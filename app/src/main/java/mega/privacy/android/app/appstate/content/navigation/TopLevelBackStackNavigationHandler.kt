@@ -2,9 +2,6 @@ package mega.privacy.android.app.appstate.content.navigation
 
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import mega.privacy.android.navigation.contract.NavigationHandler
 
 /**
@@ -12,8 +9,8 @@ import mega.privacy.android.navigation.contract.NavigationHandler
  */
 class TopLevelBackStackNavigationHandler(
     private val backStack: TopLevelBackStack<NavKey>,
+    private val navigationResultManager: NavigationResultManager,
 ) : NavigationHandler {
-    private val resultFlows = mutableMapOf<String, MutableStateFlow<Any?>>()
 
     override fun back() {
         backStack.removeLast()
@@ -41,18 +38,15 @@ class TopLevelBackStackNavigationHandler(
     }
 
     override fun <T> returnResult(key: String, value: T) {
-        // Store the result in the appropriate StateFlow
-        val resultFlow = resultFlows.getOrPut(key) { MutableStateFlow(null) }
-        resultFlow.value = value
+        // Store the result in the NavigationResultManager
+        navigationResultManager.setResult(key, value)
 
         // Navigate back after setting the result
         backStack.removeLast()
     }
 
     override fun <T> monitorResult(key: String): Flow<T?> {
-        // Get or create the StateFlow for this key
-        val resultFlow = resultFlows.getOrPut(key) { MutableStateFlow(null) }
-        return resultFlow.asStateFlow() as StateFlow<T?>
+        return navigationResultManager.monitorResult(key)
     }
 
     /**
@@ -62,15 +56,14 @@ class TopLevelBackStackNavigationHandler(
      * @param key The key to clear the result for
      */
     override fun clearResult(key: String) {
-        resultFlows[key]?.value = null
+        navigationResultManager.clearResult(key)
     }
 
     /**
      * Clears all stored results. Useful for cleanup or when starting fresh.
      */
     fun clearAllResults() {
-        resultFlows.values.forEach { it.value = null }
-        resultFlows.clear()
+        navigationResultManager.clearAllResults()
     }
 
     /**

@@ -12,18 +12,24 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.button.MegaOutlinedButton
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
+import mega.privacy.android.core.nodecomponents.components.AddContentFab
+import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOption
+import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -42,6 +48,17 @@ internal fun HomeScreen(
     navigationHandler: NavigationHandler,
     transferHandler: TransferHandler,
 ) {
+    val fabOption by
+    navigationHandler.monitorResult<HomeFabOption>(HomeFabOptionsBottomSheetNavKey.KEY)
+        .collectAsStateWithLifecycle(null)
+
+    LaunchedEffect(fabOption) {
+        if (fabOption != null) {
+            // Handle action and call
+            navigationHandler.clearResult(HomeFabOptionsBottomSheetNavKey.KEY)
+        }
+    }
+
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
             .fillMaxSize()
@@ -61,6 +78,14 @@ internal fun HomeScreen(
                         )
                     }
                 )
+            )
+        },
+        floatingActionButton = {
+            AddContentFab(
+                visible = true,
+                onClick = {
+                    navigationHandler.navigate(HomeFabOptionsBottomSheetNavKey)
+                }
             )
         }
     ) { paddingValues ->

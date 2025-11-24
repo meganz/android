@@ -37,7 +37,6 @@ class HomeFabOptionsBottomSheetTest {
     private val onAddNewSyncClicked = mock<() -> Unit>()
     private val onAddNewBackupClicked = mock<() -> Unit>()
     private val onNewChatClicked = mock<() -> Unit>()
-    private val onDismissSheet = mock<() -> Unit>()
 
     @Test
     fun `test that sheet shows correctly`() {
@@ -94,7 +93,6 @@ class HomeFabOptionsBottomSheetTest {
             .performSemanticsAction(SemanticsActions.OnClick)
 
         verify(onUploadFilesClicked).invoke()
-        verify(onDismissSheet).invoke()
     }
 
     @Test
@@ -105,7 +103,6 @@ class HomeFabOptionsBottomSheetTest {
             .performSemanticsAction(SemanticsActions.OnClick)
 
         verify(onUploadFolderClicked).invoke()
-        verify(onDismissSheet).invoke()
     }
 
     @Test
@@ -116,7 +113,6 @@ class HomeFabOptionsBottomSheetTest {
             .performSemanticsAction(SemanticsActions.OnClick)
 
         verify(onScanDocumentClicked).invoke()
-        verify(onDismissSheet).invoke()
     }
 
     @Test
@@ -127,7 +123,6 @@ class HomeFabOptionsBottomSheetTest {
             .performSemanticsAction(SemanticsActions.OnClick)
 
         verify(onCaptureClicked).invoke()
-        verify(onDismissSheet).invoke()
     }
 
     @Test
@@ -138,7 +133,6 @@ class HomeFabOptionsBottomSheetTest {
             .performSemanticsAction(SemanticsActions.OnClick)
 
         verify(onCreateNewTextFileClicked).invoke()
-        verify(onDismissSheet).invoke()
     }
 
     @Test
@@ -149,7 +143,6 @@ class HomeFabOptionsBottomSheetTest {
             .performSemanticsAction(SemanticsActions.OnClick)
 
         verify(onAddNewSyncClicked).invoke()
-        verify(onDismissSheet).invoke()
     }
 
     @Test
@@ -160,7 +153,6 @@ class HomeFabOptionsBottomSheetTest {
             .performSemanticsAction(SemanticsActions.OnClick)
 
         verify(onAddNewBackupClicked).invoke()
-        verify(onDismissSheet).invoke()
     }
 
     @Test
@@ -171,7 +163,6 @@ class HomeFabOptionsBottomSheetTest {
             .performSemanticsAction(SemanticsActions.OnClick)
 
         verify(onNewChatClicked).invoke()
-        verify(onDismissSheet).invoke()
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -186,7 +177,6 @@ class HomeFabOptionsBottomSheetTest {
                 onAddNewSyncClicked = onAddNewSyncClicked,
                 onAddNewBackupClicked = onAddNewBackupClicked,
                 onNewChatClicked = onNewChatClicked,
-                onDismissSheet = onDismissSheet,
             )
         }
     }

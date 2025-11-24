@@ -34,7 +34,6 @@ fun HomeFabOptionsBottomSheet(
     onAddNewSyncClicked: () -> Unit,
     onAddNewBackupClicked: () -> Unit,
     onNewChatClicked: () -> Unit,
-    onDismissSheet: () -> Unit,
 ) {
     Column(
         modifier = modifier.testTag(TEST_TAG_HOME_FAB_OPTIONS_SHEET)
@@ -53,7 +52,6 @@ fun HomeFabOptionsBottomSheet(
             onClick = {
                 Analytics.tracker.trackEvent(HomeUploadFilesMenuToolbarEvent)
                 onUploadFilesClicked()
-                onDismissSheet()
             },
         )
         UploadOptionItem(
@@ -63,7 +61,6 @@ fun HomeFabOptionsBottomSheet(
             onClick = {
                 Analytics.tracker.trackEvent(HomeUploadFolderMenuToolbarEvent)
                 onUploadFolderClicked()
-                onDismissSheet()
             },
         )
         UploadOptionItem(
@@ -72,7 +69,6 @@ fun HomeFabOptionsBottomSheet(
             testTag = TEST_TAG_SCAN_DOCUMENT_ACTION,
             onClick = {
                 onScanDocumentClicked()
-                onDismissSheet()
             },
         )
         UploadOptionItem(
@@ -81,7 +77,6 @@ fun HomeFabOptionsBottomSheet(
             testTag = TEST_TAG_CAPTURE_ACTION,
             onClick = {
                 onCaptureClicked()
-                onDismissSheet()
             },
         )
         UploadOptionItem(
@@ -91,7 +86,6 @@ fun HomeFabOptionsBottomSheet(
             onClick = {
                 Analytics.tracker.trackEvent(HomeNewTextFileMenuToolbarEvent)
                 onCreateNewTextFileClicked()
-                onDismissSheet()
             },
         )
 
@@ -108,7 +102,6 @@ fun HomeFabOptionsBottomSheet(
             testTag = TEST_TAG_ADD_NEW_SYNC_ACTION,
             onClick = {
                 onAddNewSyncClicked()
-                onDismissSheet()
             },
         )
         UploadOptionItem(
@@ -117,7 +110,6 @@ fun HomeFabOptionsBottomSheet(
             testTag = TEST_TAG_ADD_NEW_BACKUP_ACTION,
             onClick = {
                 onAddNewBackupClicked()
-                onDismissSheet()
             },
         )
 
@@ -134,7 +126,6 @@ fun HomeFabOptionsBottomSheet(
             testTag = TEST_TAG_NEW_CHAT_ACTION,
             onClick = {
                 onNewChatClicked()
-                onDismissSheet()
             },
         )
     }
@@ -154,7 +145,6 @@ private fun HomeFabOptionsBottomSheetPreview() {
             onAddNewSyncClicked = {},
             onAddNewBackupClicked = {},
             onNewChatClicked = {},
-            onDismissSheet = {},
         )
     }
 }

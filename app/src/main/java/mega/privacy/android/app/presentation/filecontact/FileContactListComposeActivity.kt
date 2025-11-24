@@ -18,6 +18,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.appstate.content.destinations.FetchingContentNavKey
+import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.appstate.content.navigation.PendingBackStackNavigationHandler
 import mega.privacy.android.app.appstate.content.navigation.rememberPendingBackStack
 import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
@@ -43,6 +44,8 @@ internal class FileContactListComposeActivity : AppCompatActivity() {
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
 
+    @Inject
+    lateinit var navigationResultManager: NavigationResultManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -75,6 +78,7 @@ internal class FileContactListComposeActivity : AppCompatActivity() {
                 defaultLoginDestination = LoginNavKey(true),
                 initialLoginDestination = TourNavKey,
                 fetchRootNodeDestination = ::FetchingContentNavKey,
+                navigationResultManager = navigationResultManager,
             )
 
             SharedAppContainer(

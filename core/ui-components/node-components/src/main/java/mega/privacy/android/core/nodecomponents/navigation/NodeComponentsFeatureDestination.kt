@@ -10,6 +10,7 @@ import mega.privacy.android.core.nodecomponents.dialog.removeshare.removeShareFo
 import mega.privacy.android.core.nodecomponents.dialog.rename.renameNodeDialogM3
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.shareFolderAccessDialogM3
 import mega.privacy.android.core.nodecomponents.sheet.changelabel.changeLabelBottomSheetNavigation
+import mega.privacy.android.core.nodecomponents.sheet.home.homeFabOptionsBottomSheetNavigation
 import mega.privacy.android.core.nodecomponents.sheet.options.nodeOptionsBottomSheet
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -27,5 +28,8 @@ class NodeComponentsFeatureDestination : FeatureDestination {
             shareFolderAccessDialogM3(navigationHandler::back)
             nodeOptionsBottomSheet(navigationHandler, transferHandler::setTransferEvent)
             changeLabelBottomSheetNavigation(navigationHandler::back)
+            homeFabOptionsBottomSheetNavigation(
+                returnResult = navigationHandler::returnResult
+            )
         }
 }
