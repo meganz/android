@@ -15,6 +15,7 @@ import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmai
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountNavKey
 import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
 import mega.privacy.android.app.utils.Constants.ACTION_CONFIRM
+import mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS
 import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 
@@ -85,6 +86,10 @@ private fun checkActions(
 ) {
     when (action) {
         ACTION_CONFIRM -> link?.let { sharedViewModel.checkSignupLink(it) }
+        ACTION_RESET_PASS -> link?.let {
+            sharedViewModel.onRequestRecoveryKey(it)
+            sharedViewModel.intentSet()
+        }
     }
 }
 

@@ -6,15 +6,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.resetpassword.ResetPasswordLinkInfo
-import mega.privacy.android.domain.exception.ResetPasswordLinkException
 import mega.privacy.android.domain.repository.AccountRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -25,7 +22,6 @@ import org.mockito.kotlin.whenever
 class QueryResetPasswordLinkUseCaseTest {
     private lateinit var underTest: QueryResetPasswordLinkUseCase
     private val accountRepository: AccountRepository = mock()
-    private val getUrlRegexPatternTypeUseCase: GetUrlRegexPatternTypeUseCase = mock()
 
     @BeforeAll
     internal fun init() {
@@ -34,11 +30,11 @@ class QueryResetPasswordLinkUseCaseTest {
 
     @BeforeEach
     internal fun setup() {
-        reset(accountRepository, getUrlRegexPatternTypeUseCase)
+        reset(accountRepository)
     }
 
     private fun initTestClass() {
-        underTest = QueryResetPasswordLinkUseCase(accountRepository, getUrlRegexPatternTypeUseCase)
+        underTest = QueryResetPasswordLinkUseCase(accountRepository)
     }
 
     @Test
@@ -47,26 +43,15 @@ class QueryResetPasswordLinkUseCaseTest {
             val link = "qhwuehqwuhajsdhsjakdhasjhd"
             val email = "lh@mega.co.nz"
             val flag = true
-            val resetPasswordLinkInfo = ResetPasswordLinkInfo(email = email, isRequiredRecoveryKey = flag)
-            whenever(getUrlRegexPatternTypeUseCase(link)).thenReturn(RegexPatternType.RESET_PASSWORD_LINK)
-            whenever(accountRepository.queryResetPasswordLink(link)).thenReturn(resetPasswordLinkInfo)
+            val resetPasswordLinkInfo =
+                ResetPasswordLinkInfo(email = email, isRequiredRecoveryKey = flag)
+            whenever(accountRepository.queryResetPasswordLink(link)).thenReturn(
+                resetPasswordLinkInfo
+            )
 
             initTestClass()
 
             assertThat(underTest(link)).isEqualTo(resetPasswordLinkInfo)
             verify(accountRepository).queryResetPasswordLink(link)
-        }
-
-    @Test
-    internal fun `test that use case should throw exception when invoked and url type is not RESET_PASSWORD_LINK`() =
-        runTest {
-            val link = "qhwuehqwuhajsdhsjakdhasjhd"
-            whenever(getUrlRegexPatternTypeUseCase(link)).thenReturn(RegexPatternType.CHAT_LINK)
-
-            initTestClass()
-
-            assertThrows<ResetPasswordLinkException.LinkInvalid> {
-                underTest(link)
-            }
         }
 }

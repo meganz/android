@@ -523,6 +523,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
             intentAction?.let { action ->
                 Timber.d("action is: %s", action)
                 when (action) {
+                    //Already managed in LoginNavigation.checkActions for deep links and new navigation.
                     Constants.ACTION_CONFIRM -> {
                         Timber.d("querySignupLink")
                         intent.getStringExtra(Constants.EXTRA_CONFIRMATION)
@@ -530,6 +531,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                         return@LaunchedEffect
                     }
 
+                    //Already managed in LoginNavigation.checkActions for deep links and new navigation.
                     Constants.ACTION_RESET_PASS -> {
                         val link = intent.dataString
                         val isLoggedIn =
