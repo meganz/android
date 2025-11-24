@@ -45,7 +45,7 @@ import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.appstate.content.NavigationGraphViewModel
 import mega.privacy.android.app.appstate.content.destinations.FetchingContentNavKey
-import mega.privacy.android.app.appstate.content.destinations.HomeScreensNavKey
+import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.app.appstate.content.model.NavigationGraphState
 import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.appstate.content.navigation.PendingBackStack

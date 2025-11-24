@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.shared.resources.R as sharedR
+import timber.log.Timber
 
 /**
  * Deep link handler interface to be implemented by feature modules.
@@ -98,4 +99,12 @@ abstract class DeepLinkHandler(
      *
      */
     open val priority get() = 10
+
+    /**
+     * Runs the [block] code to get a [List<NavKey>)] in a runCatching block. In case any throwable is cached an empty list is returned and the exception logged.
+     * @param block to produce the expected [List<NavKey>)]
+     * @return the [List<NavKey>)] produced by [block] if no exceptions are captured, or an empty list otherwise
+     */
+    protected suspend fun catchWithEmptyListAndLog(block: suspend (() -> List<NavKey>)): List<NavKey> =
+        runCatching { block() }.onFailure { Timber.e(it) }.getOrDefault(emptyList())
 }

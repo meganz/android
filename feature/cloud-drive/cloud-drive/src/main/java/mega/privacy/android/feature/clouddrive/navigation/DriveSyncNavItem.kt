@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.cloudDriveScreen
 import mega.privacy.android.feature.clouddrive.presentation.drivesync.driveSyncScreen
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.MainNavItem
@@ -26,6 +27,20 @@ class DriveSyncNavItem : MainNavItem {
             driveSyncScreen(
                 navigationHandler = navigationHandler,
                 setNavigationVisibility = navigationController::showNavigation,
+                onTransfer = transferHandler::setTransferEvent,
+                openSearch = { parentHandle, nodeSourceType ->
+                    navigationHandler.navigate(
+                        SearchNodeNavKey(
+                            nodeSourceType = nodeSourceType,
+                            parentHandle = parentHandle
+                        )
+                    )
+                }
+            )
+
+            cloudDriveScreen(
+                navigationHandler = navigationHandler,
+                onBack = navigationHandler::back,
                 onTransfer = transferHandler::setTransferEvent,
                 openSearch = { parentHandle, nodeSourceType ->
                     navigationHandler.navigate(
