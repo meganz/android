@@ -36,9 +36,7 @@ fun RemoveShareFolderDialogM3(
             viewModel.removeShare(nodes)
             onDismiss()
         },
-        // onDismiss is empty here to avoid multiple calls. We don't need this since action must be
-        // taken in order to dismiss the dialog
-        onDismiss = {}
+        onDismiss = onDismiss
     )
 }
 
@@ -64,7 +62,6 @@ private fun RemoveShareFolderDialogBodyM3(
         negativeButtonText = cancelButtonText,
         onPositiveButtonClicked = {
             onConfirm()
-            onDismiss()
         },
         onNegativeButtonClicked = onDismiss,
         onDismiss = onDismiss
