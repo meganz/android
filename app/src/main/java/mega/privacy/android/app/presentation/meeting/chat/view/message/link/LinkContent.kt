@@ -14,7 +14,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openFi
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openFolderLinkActivity
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.FolderInfo
-import mega.privacy.android.domain.entity.contacts.ContactLink
+import mega.privacy.android.domain.entity.contacts.ContactLinkQueryResult
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.ContactMessageContentView
 
@@ -47,7 +47,7 @@ sealed interface LinkContent {
  * @property onClick On click
  */
 data class ContactLinkContent(
-    val content: ContactLink,
+    val content: ContactLinkQueryResult,
     override val link: String,
     val onClick: () -> Unit,
 ) : LinkContent {

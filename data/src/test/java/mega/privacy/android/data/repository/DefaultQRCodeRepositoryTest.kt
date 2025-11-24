@@ -84,7 +84,7 @@ class DefaultQRCodeRepositoryTest {
         whenever(megaApiGateway.base64ToHandle(base64Handle)).thenReturn(handle)
         whenever(megaApiGateway.getContact(contactEmail)).thenReturn(null)
 
-        whenever(megaApiGateway.getContactLink(any(), any())).thenAnswer {
+        whenever(megaApiGateway.contactLinkQuery(any(), any())).thenAnswer {
             ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
                 mock(),
                 megaRequest,

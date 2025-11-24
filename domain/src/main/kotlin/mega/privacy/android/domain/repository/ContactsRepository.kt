@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.chat.ChatConnectionState
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.ContactLink
+import mega.privacy.android.domain.entity.contacts.ContactLinkQueryResult
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestAction
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
@@ -403,12 +403,12 @@ interface ContactsRepository {
     )
 
     /**
-     * Get contact link
+     * Gets a contact link query result.
      *
      * @param userHandle
-     * @return
+     * @return [ContactLinkQueryResult]
      */
-    suspend fun getContactLink(userHandle: Long): ContactLink
+    suspend fun contactLinkQuery(userHandle: Long): ContactLinkQueryResult
 
     /**
      * Is contact request sent

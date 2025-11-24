@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.entity.contacts
 
 /**
- * Contact link
+ * Contact link query result
  *
  * @property isContact
  * @property email
@@ -10,7 +10,7 @@ package mega.privacy.android.domain.entity.contacts
  * @property fullName
  * @property status
  */
-data class ContactLink(
+data class ContactLinkQueryResult(
     val isContact: Boolean = false,
     val email: String? = null,
     val contactHandle: Long = -1L,

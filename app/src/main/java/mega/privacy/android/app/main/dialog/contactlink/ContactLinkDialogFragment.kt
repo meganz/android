@@ -46,7 +46,7 @@ internal class ContactLinkDialogFragment : DialogFragment() {
                 val state by viewModel.state.collectAsStateWithLifecycle()
                 val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
-                state.contactLinkResult?.let { result ->
+                state.contactLinkQueryResult?.let { result ->
                     if (result.isSuccess) {
                         val contactLink = result.getOrThrow()
                         val contactLinkHandle = contactLink.contactLinkHandle
@@ -100,7 +100,7 @@ internal class ContactLinkDialogFragment : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         viewLifecycleOwner.collectFlow(viewModel.state) {
             val sentInviteResult = it.sentInviteResult
-            val contactLinkResult = it.contactLinkResult
+            val contactLinkResult = it.contactLinkQueryResult
             if (sentInviteResult != null) {
                 if (sentInviteResult.isSuccess) {
                     showMessage(

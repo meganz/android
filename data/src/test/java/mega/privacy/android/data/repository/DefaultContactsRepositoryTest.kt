@@ -41,7 +41,7 @@ import mega.privacy.android.data.wrapper.ContactWrapper
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.ContactLink
+import mega.privacy.android.domain.entity.contacts.ContactLinkQueryResult
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
@@ -1185,13 +1185,13 @@ class DefaultContactsRepositoryTest {
                 on { email }.thenReturn(myEmail)
                 on { visibility }.thenReturn(MegaUser.VISIBILITY_VISIBLE)
             }
-            whenever(megaApiGateway.getContactLink(any(), any())).thenAnswer {
+            whenever(megaApiGateway.contactLinkQuery(any(), any())).thenAnswer {
                 ((it.arguments[1]) as OptionalMegaRequestListenerInterface)
                     .onRequestFinish(mock(), request, success)
             }
             whenever(megaApiGateway.getContacts()).thenReturn(listOf(user))
-            assertThat(underTest.getContactLink(1L)).isEqualTo(
-                ContactLink(
+            assertThat(underTest.contactLinkQuery(1L)).isEqualTo(
+                ContactLinkQueryResult(
                     isContact = true,
                     email = request.email,
                     contactHandle = request.parentHandle,
@@ -1220,13 +1220,13 @@ class DefaultContactsRepositoryTest {
                 on { email }.thenReturn(myEmail)
                 on { visibility }.thenReturn(MegaUser.VISIBILITY_INACTIVE)
             }
-            whenever(megaApiGateway.getContactLink(any(), any())).thenAnswer {
+            whenever(megaApiGateway.contactLinkQuery(any(), any())).thenAnswer {
                 ((it.arguments[1]) as OptionalMegaRequestListenerInterface)
                     .onRequestFinish(mock(), request, success)
             }
             whenever(megaApiGateway.getContacts()).thenReturn(listOf(user))
-            assertThat(underTest.getContactLink(1L)).isEqualTo(
-                ContactLink(
+            assertThat(underTest.contactLinkQuery(1L)).isEqualTo(
+                ContactLinkQueryResult(
                     isContact = false,
                     email = request.email,
                     contactHandle = request.parentHandle,
@@ -1251,13 +1251,13 @@ class DefaultContactsRepositoryTest {
                 on { name }.thenReturn(myName)
                 on { text }.thenReturn(myText)
             }
-            whenever(megaApiGateway.getContactLink(any(), any())).thenAnswer {
+            whenever(megaApiGateway.contactLinkQuery(any(), any())).thenAnswer {
                 ((it.arguments[1]) as OptionalMegaRequestListenerInterface)
                     .onRequestFinish(mock(), request, success)
             }
             whenever(megaApiGateway.getContacts()).thenReturn(emptyList())
-            assertThat(underTest.getContactLink(1L)).isEqualTo(
-                ContactLink(
+            assertThat(underTest.contactLinkQuery(1L)).isEqualTo(
+                ContactLinkQueryResult(
                     isContact = false,
                     email = request.email,
                     contactHandle = request.parentHandle,
@@ -1272,23 +1272,23 @@ class DefaultContactsRepositoryTest {
         runTest {
             val request = mock<MegaRequest>()
             val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EEXIST) }
-            whenever(megaApiGateway.getContactLink(any(), any())).thenAnswer {
+            whenever(megaApiGateway.contactLinkQuery(any(), any())).thenAnswer {
                 ((it.arguments[1]) as OptionalMegaRequestListenerInterface)
                     .onRequestFinish(mock(), request, error)
             }
-            assertThat(underTest.getContactLink(1L))
-                .isEqualTo(ContactLink(isContact = false))
+            assertThat(underTest.contactLinkQuery(1L))
+                .isEqualTo(ContactLinkQueryResult(isContact = false))
         }
 
     @Test(expected = MegaException::class)
     fun `test that getContactLink throws MegaException when calling api gateway returns failed`() =
         runTest {
             val request = mock<MegaRequest>()
-            whenever(megaApiGateway.getContactLink(any(), any())).thenAnswer {
+            whenever(megaApiGateway.contactLinkQuery(any(), any())).thenAnswer {
                 ((it.arguments[1]) as OptionalMegaRequestListenerInterface)
                     .onRequestFinish(mock(), request, error)
             }
-            underTest.getContactLink(1L)
+            underTest.contactLinkQuery(1L)
         }
 
     @Test

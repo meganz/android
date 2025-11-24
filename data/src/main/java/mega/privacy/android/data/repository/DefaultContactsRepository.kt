@@ -57,7 +57,7 @@ import mega.privacy.android.data.wrapper.ContactWrapper
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.ContactLink
+import mega.privacy.android.domain.entity.contacts.ContactLinkQueryResult
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestAction
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
@@ -887,7 +887,7 @@ internal class DefaultContactsRepository @Inject constructor(
     ) = megaApiGateway.getContactRequestByHandle(requestHandle)
         ?.takeIf { it.isOutgoing == isOutgoing }
 
-    override suspend fun getContactLink(userHandle: Long) = withContext(ioDispatcher) {
+    override suspend fun contactLinkQuery(userHandle: Long) = withContext(ioDispatcher) {
         val result = suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request: MegaRequest, error: MegaError ->
@@ -900,7 +900,7 @@ internal class DefaultContactsRepository @Inject constructor(
                             }
                             continuation.resumeWith(
                                 Result.success(
-                                    ContactLink(
+                                    ContactLinkQueryResult(
                                         email = request.email,
                                         contactHandle = request.parentHandle,
                                         contactLinkHandle = request.nodeHandle,
@@ -916,7 +916,7 @@ internal class DefaultContactsRepository @Inject constructor(
                         }
 
                         MegaError.API_EEXIST -> continuation.resumeWith(
-                            Result.success(ContactLink(isContact = false))
+                            Result.success(ContactLinkQueryResult(isContact = false))
                         )
 
                         else -> continuation.failWithError(error, "getContactLink")
@@ -924,7 +924,7 @@ internal class DefaultContactsRepository @Inject constructor(
                     }
                 },
             )
-            megaApiGateway.getContactLink(userHandle, listener)
+            megaApiGateway.contactLinkQuery(userHandle, listener)
         }
         val isContact = !result.email.isNullOrBlank() && megaApiGateway.getContacts()
             .any { contact -> result.email == contact.email && contact.visibility == MegaUser.VISIBILITY_VISIBLE }

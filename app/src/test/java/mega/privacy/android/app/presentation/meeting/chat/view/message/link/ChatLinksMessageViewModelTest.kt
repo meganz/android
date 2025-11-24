@@ -2,14 +2,14 @@ package mega.privacy.android.app.presentation.meeting.chat.view.message.link
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.FolderInfo
-import mega.privacy.android.domain.entity.contacts.ContactLink
+import mega.privacy.android.domain.entity.contacts.ContactLinkQueryResult
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
-import mega.privacy.android.domain.usecase.contact.GetContactFromLinkUseCase
+import mega.privacy.android.domain.usecase.contact.ContactLinkQueryFromLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicLinkInformationUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import org.junit.jupiter.api.BeforeEach
@@ -25,7 +25,7 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class ChatLinksMessageViewModelTest {
     private lateinit var underTest: ChatLinksMessageViewModel
-    private val getContactFromLinkUseCase: GetContactFromLinkUseCase = mock()
+    private val contactLinkQueryFromLinkUseCase: ContactLinkQueryFromLinkUseCase = mock()
     private val checkChatLinkUseCase: CheckChatLinkUseCase = mock()
     private val getPublicLinkInformationUseCase: GetPublicLinkInformationUseCase = mock()
     private val getPublicNodeUseCase: GetPublicNodeUseCase = mock()
@@ -34,7 +34,7 @@ internal class ChatLinksMessageViewModelTest {
     @BeforeEach
     fun resetMocks() {
         underTest = ChatLinksMessageViewModel(
-            getContactFromLinkUseCase,
+            contactLinkQueryFromLinkUseCase,
             checkChatLinkUseCase,
             getPublicLinkInformationUseCase,
             getPublicNodeUseCase,
@@ -49,7 +49,7 @@ internal class ChatLinksMessageViewModelTest {
         val email = "email"
         val fullName = "fullName"
         val isContact = false
-        val contactLink = mock<ContactLink> {
+        val contactLinkQueryResult = mock<ContactLinkQueryResult> {
             on { this.contactHandle } doReturn contactHandle
             on { this.email } doReturn email
             on { this.fullName } doReturn fullName
@@ -57,7 +57,7 @@ internal class ChatLinksMessageViewModelTest {
         }
         val click = mock<(Long, String?, String?, Boolean) -> Unit>()
         val expectedResult = ContactLinkContent(
-            content = contactLink,
+            content = contactLinkQueryResult,
             link = link,
             onClick = {
                 click(
@@ -68,10 +68,10 @@ internal class ChatLinksMessageViewModelTest {
                 )
             }
         )
-        whenever(getContactFromLinkUseCase(link)).thenReturn(contactLink)
+        whenever(contactLinkQueryFromLinkUseCase(link)).thenReturn(contactLinkQueryResult)
         underTest.loadContactInfo(link, click)
         // make sure it is called only once because the other call we load from cache
-        verify(getContactFromLinkUseCase).invoke(link)
+        verify(contactLinkQueryFromLinkUseCase).invoke(link)
         val actual = underTest.loadContactInfo(link, click) as ContactLinkContent
         Truth.assertThat(actual.content).isEqualTo(expectedResult.content)
         Truth.assertThat(actual.link).isEqualTo(expectedResult.link)

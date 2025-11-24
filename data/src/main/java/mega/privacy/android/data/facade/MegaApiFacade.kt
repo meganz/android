@@ -1065,7 +1065,7 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.cancelTransferByTag(transferTag, listener)
     }
 
-    override fun getContactLink(handle: Long, listener: MegaRequestListenerInterface) {
+    override fun contactLinkQuery(handle: Long, listener: MegaRequestListenerInterface) {
         megaApi.contactLinkQuery(handle, listener)
     }
 

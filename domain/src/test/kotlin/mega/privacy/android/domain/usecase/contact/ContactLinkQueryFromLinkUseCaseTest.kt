@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.contact
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.contacts.ContactLink
+import mega.privacy.android.domain.entity.contacts.ContactLinkQueryResult
 import mega.privacy.android.domain.usecase.chat.GetHandleFromContactLinkUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -13,16 +13,16 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class GetContactFromLinkUseCaseTest {
-    private lateinit var underTest: GetContactFromLinkUseCase
+internal class ContactLinkQueryFromLinkUseCaseTest {
+    private lateinit var underTest: ContactLinkQueryFromLinkUseCase
     private val getHandleFromContactLinkUseCase: GetHandleFromContactLinkUseCase = mock()
-    private val getContactLinkUseCase: GetContactLinkUseCase = mock()
+    private val contactLinkQueryUseCase: ContactLinkQueryUseCase = mock()
 
     @BeforeAll
     fun setup() {
-        underTest = GetContactFromLinkUseCase(
+        underTest = ContactLinkQueryFromLinkUseCase(
             getHandleFromContactLinkUseCase = getHandleFromContactLinkUseCase,
-            getContactLinkUseCase = getContactLinkUseCase,
+            contactLinkQueryUseCase = contactLinkQueryUseCase,
         )
     }
 
@@ -30,19 +30,19 @@ internal class GetContactFromLinkUseCaseTest {
     fun resetMocks() {
         reset(
             getHandleFromContactLinkUseCase,
-            getContactLinkUseCase,
+            contactLinkQueryUseCase,
         )
     }
 
     @Test
     fun `test that get contact from link returns contact link`() = runTest {
         val handle = 123L
-        val contactLink = mock<ContactLink> {
+        val contactLinkQueryResult = mock<ContactLinkQueryResult> {
 
         }
         whenever(getHandleFromContactLinkUseCase("link")).thenReturn(handle)
-        whenever(getContactLinkUseCase(handle)).thenReturn(contactLink)
-        Truth.assertThat(underTest("link")).isEqualTo(contactLink)
+        whenever(contactLinkQueryUseCase(handle)).thenReturn(contactLinkQueryResult)
+        Truth.assertThat(underTest("link")).isEqualTo(contactLinkQueryResult)
     }
 
     @Test

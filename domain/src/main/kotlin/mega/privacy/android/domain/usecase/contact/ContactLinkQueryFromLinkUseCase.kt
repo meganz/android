@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.contact
 
-import mega.privacy.android.domain.entity.contacts.ContactLink
+import mega.privacy.android.domain.entity.contacts.ContactLinkQueryResult
 import mega.privacy.android.domain.usecase.chat.GetHandleFromContactLinkUseCase
 import javax.inject.Inject
 
@@ -8,18 +8,18 @@ import javax.inject.Inject
  * Get Contact From Link Use Case
  *
  */
-class GetContactFromLinkUseCase @Inject constructor(
+class ContactLinkQueryFromLinkUseCase @Inject constructor(
     private val getHandleFromContactLinkUseCase: GetHandleFromContactLinkUseCase,
-    private val getContactLinkUseCase: GetContactLinkUseCase,
+    private val contactLinkQueryUseCase: ContactLinkQueryUseCase,
 ) {
     /**
      * Invoke
      *
      */
-    suspend operator fun invoke(link: String): ContactLink? =
+    suspend operator fun invoke(link: String): ContactLinkQueryResult? =
         getHandleFromContactLinkUseCase(link)
             .takeIf { it != -1L }
             ?.let { handle ->
-                getContactLinkUseCase(handle)
+                contactLinkQueryUseCase(handle)
             }
 }

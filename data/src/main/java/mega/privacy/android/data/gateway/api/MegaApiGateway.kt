@@ -1994,12 +1994,25 @@ interface MegaApiGateway {
     fun cancelTransferByTag(transferTag: Int, listener: MegaRequestListenerInterface?)
 
     /**
-     * Get contact details
+     * Get information about a contact link
      *
-     * @param handle Handle of the contact
+     * The associated request type with this request is MegaRequest::TYPE_CONTACT_LINK_QUERY.
+     *
+     * Valid data in the MegaRequest object received on all callbacks:
+     * - MegaRequest::getNodeHandle - Returns the handle of the contact link
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getParentHandle - Returns the userhandle of the contact
+     * - MegaRequest::getEmail - Returns the email of the contact
+     * - MegaRequest::getName - Returns the first name of the contact
+     * - MegaRequest::getText - Returns the last name of the contact
+     * - MegaRequest::getFile - Returns the avatar of the contact (JPG with Base64 encoding)
+     *
+     * @param handle   Handle of the contact link to check
      * @param listener MegaRequestListener to track this request
      */
-    fun getContactLink(handle: Long, listener: MegaRequestListenerInterface)
+    fun contactLinkQuery(handle: Long, listener: MegaRequestListenerInterface)
 
     /**
      * Initialize the change of the email address associated to the account.
