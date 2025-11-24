@@ -52,7 +52,6 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.domain.entity.banner.Banner
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.mobile.analytics.event.HomeFABPressedEvent
 import mega.privacy.mobile.analytics.event.HomeScreenAudioTilePressedEvent
@@ -78,9 +77,6 @@ class HomepageFragment : Fragment() {
         private const val KEY_IS_BOTTOM_SHEET_EXPANDED = "isBottomSheetExpanded"
         private const val START_SCREEN_DIALOG_SHOWN = "START_SCREEN_DIALOG_SHOWN"
     }
-
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     @Inject
     lateinit var userChatStatusIconMapper: UserChatStatusIconMapper

@@ -61,7 +61,6 @@ import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
@@ -79,7 +78,6 @@ import mega.privacy.android.domain.usecase.videosection.RemoveRecentlyWatchedIte
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideosFromPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.mobile.analytics.event.PlaylistCreatedSuccessfullyEvent
 import nz.mega.sdk.MegaNode
@@ -114,7 +112,6 @@ class VideoSectionViewModel @Inject constructor(
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
     private val monitorVideoRecentlyWatchedUseCase: MonitorVideoRecentlyWatchedUseCase,
     private val clearRecentlyWatchedVideosUseCase: ClearRecentlyWatchedVideosUseCase,

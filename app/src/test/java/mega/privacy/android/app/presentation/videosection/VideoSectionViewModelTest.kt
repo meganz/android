@@ -48,7 +48,6 @@ import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
@@ -133,7 +132,6 @@ class VideoSectionViewModelTest {
             invoke()
         }.thenReturn(flowOf(false))
     }
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val removeFavouritesUseCase = mock<RemoveFavouritesUseCase>()
 
     private val expectedId = NodeId(1)
@@ -178,7 +176,6 @@ class VideoSectionViewModelTest {
             fakeMonitorVideoRecentlyWatchedFlow
         )
         wheneverBlocking { getVideoPlaylistsUseCase() }.thenReturn(listOf())
-        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
         initUnderTest()
     }
 
@@ -205,7 +202,6 @@ class VideoSectionViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             defaultDispatcher = StandardTestDispatcher(),
             getNodeContentUriUseCase = getNodeContentUriUseCase,
             monitorVideoRecentlyWatchedUseCase = monitorVideoRecentlyWatchedUseCase,
@@ -1494,7 +1490,6 @@ class VideoSectionViewModelTest {
                 on { isMarkedSensitive }.thenReturn(false)
             }
             initVideosReturned()
-            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
             whenever(getNodeByIdUseCase(expectedId)).thenReturn(mockTypedNode)
             initUnderTest()
 
@@ -1521,7 +1516,6 @@ class VideoSectionViewModelTest {
             val testAccountDetail = mockAccountDetail(false)
             initVideosReturned()
 
-            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
             whenever(getNodeByIdUseCase(expectedId)).thenReturn(mockTypedNode)
             initUnderTest()
             testScheduler.advanceUntilIdle()
@@ -1550,7 +1544,6 @@ class VideoSectionViewModelTest {
             val testAccountDetail = mockAccountDetail(true)
             initVideosReturned()
 
-            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
             whenever(getNodeByIdUseCase(expectedId)).thenReturn(mockTypedNode)
             initUnderTest()
             testScheduler.advanceUntilIdle()
@@ -1572,7 +1565,6 @@ class VideoSectionViewModelTest {
     fun `test that the state is updated correctly when feature flag is disabled`() =
         runTest {
             initVideosReturned()
-            whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
             initUnderTest()
             underTest.refreshNodes()
 
@@ -1593,7 +1585,6 @@ class VideoSectionViewModelTest {
             }
             initVideosReturned()
 
-            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
             whenever(getNodeByIdUseCase(expectedId)).thenReturn(mockTypedNode)
             initUnderTest()
             underTest.setCurrentDestinationRoute(videoSectionRoute)
@@ -1617,7 +1608,6 @@ class VideoSectionViewModelTest {
         runTest {
             val mockTypedNode = mock<TypedNode>()
             initVideosReturned()
-            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
             whenever(getNodeByIdUseCase(expectedId)).thenReturn(mockTypedNode)
             initUnderTest()
 
@@ -1642,7 +1632,6 @@ class VideoSectionViewModelTest {
                 on { exportedData }.thenReturn(ExportedData("", 0))
             }
             initVideosReturned()
-            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
             whenever(getNodeByIdUseCase(expectedId)).thenReturn(mockTypedNode)
             initUnderTest()
 
@@ -1671,7 +1660,6 @@ class VideoSectionViewModelTest {
                 on { exportedData }.thenReturn(ExportedData("", 0))
             }
             initVideosReturned()
-            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
             whenever(getNodeByIdUseCase(expectedId)).thenReturn(mockTypedNode)
             initUnderTest()
 
