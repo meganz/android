@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.AccountType
  * @param isBusinessAccountExpired true if business account is expired
  * @param showHiddenItems
  */
+@Deprecated("Use revamp version")
 data class RecentActionsUiState(
     val groupedRecentActionItems: Map<String, List<RecentActionBucketUiEntity>> = emptyMap(),
     val hideRecentActivity: Boolean = false,

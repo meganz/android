@@ -7,9 +7,9 @@ import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.feature.home.R
 import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentActionTimestampText
 import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentActionTitleText
-import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentActionUiItem
+import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsTimestampText
+import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsUiItem
 import javax.inject.Inject
 
 /**
@@ -24,7 +24,7 @@ class RecentActionUiItemMapper @Inject constructor(
      */
     operator fun invoke(
         item: RecentActionBucket,
-    ): RecentActionUiItem {
+    ): RecentsUiItem {
         val node = item.nodes.first()
         val isSingleNode = item.nodes.size == 1
         val isMediaBucket = !isSingleNode && item.isMedia
@@ -37,7 +37,7 @@ class RecentActionUiItemMapper @Inject constructor(
         val parentFolderName = getParentFolderName(item)
         val updatedByText = getUpdatedByText(item)
 
-        return RecentActionUiItem(
+        return RecentsUiItem(
             title = title,
             icon = if (isMediaBucket) {
                 IconPackR.drawable.ic_image_stack_medium_solid
@@ -50,7 +50,7 @@ class RecentActionUiItemMapper @Inject constructor(
                 RecentActionsSharesType.OUTGOING_SHARES, RecentActionsSharesType.PENDING_OUTGOING_SHARES -> IconPackR.drawable.ic_folder_outgoing_medium_solid
             },
             parentFolderName = parentFolderName,
-            timestampText = RecentActionTimestampText(item.timestamp),
+            timestampText = RecentsTimestampText(item.timestamp),
             isMediaBucket = isMediaBucket,
             isUpdate = item.isUpdate,
             updatedByText = updatedByText,

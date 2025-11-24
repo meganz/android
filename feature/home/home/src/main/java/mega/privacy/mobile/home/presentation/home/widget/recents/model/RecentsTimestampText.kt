@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter
  * Represents timestamp that can be formatted to time and date strings in Composable
  * @param timestamp timestamp
  */
-data class RecentActionTimestampText(
+data class RecentsTimestampText(
     val timestamp: Long,
 ) {
     /**

@@ -20,7 +20,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class RecentActionUiItemMapperTest {
+class RecentsUiItemMapperTest {
 
     private val fileTypeIconMapper: FileTypeIconMapper = mock()
     private lateinit var underTest: RecentActionUiItemMapper

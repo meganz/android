@@ -21,12 +21,12 @@ import mega.privacy.android.domain.entity.RecentActionBucket
  * @property nodeLabel The node label
  * @property bucket The recent action bucket
  */
-data class RecentActionUiItem(
+data class RecentsUiItem(
     val title: RecentActionTitleText,
     @DrawableRes val icon: Int,
     @DrawableRes val shareIcon: Int?,
     val parentFolderName: LocalizedText,
-    val timestampText: RecentActionTimestampText,
+    val timestampText: RecentsTimestampText,
     val isMediaBucket: Boolean,
     val isUpdate: Boolean,
     val updatedByText: LocalizedText?,

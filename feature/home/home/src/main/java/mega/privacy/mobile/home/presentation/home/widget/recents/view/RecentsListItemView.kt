@@ -36,7 +36,7 @@ import mega.privacy.android.core.nodecomponents.list.NodeLabelCircle
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentActionUiItem
+import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsUiItem
 import mega.privacy.mobile.home.presentation.home.widget.recents.model.text
 
 
@@ -49,8 +49,8 @@ import mega.privacy.mobile.home.presentation.home.widget.recents.model.text
  * @param onItemClicked Callback when the item is clicked
  */
 @Composable
-fun RecentActionListItemView(
-    item: RecentActionUiItem,
+fun RecentsListItemView(
+    item: RecentsUiItem,
     isExpanded: Boolean = false,
     onMenuClicked: () -> Unit,
     onItemClicked: () -> Unit,
@@ -59,7 +59,7 @@ fun RecentActionListItemView(
     val parentFolderNameText = item.parentFolderName.text
     val timeText = item.timestampText.formatTime()
 
-    RecentActionListItemView(
+    RecentsListItemView(
         title = titleText,
         parentFolderName = parentFolderNameText,
         time = timeText,
@@ -95,7 +95,7 @@ fun RecentActionListItemView(
  * @param onItemClicked Callback when the item is clicked
  */
 @Composable
-fun RecentActionListItemView(
+fun RecentsListItemView(
     title: String,
     parentFolderName: String,
     time: String,
@@ -150,6 +150,8 @@ fun RecentActionListItemView(
                 MegaText(
                     text = title,
                     textColor = TextColor.Primary,
+                    overflow = TextOverflow.MiddleEllipsis,
+                    maxLines = 1,
                     modifier = Modifier.testTag(FIRST_LINE_TEST_TAG),
                     style = AppTheme.typography.bodyMedium,
                 )
@@ -291,9 +293,9 @@ internal const val MEDIA_BUCKET_MENU_TEST_TAG = "recent_action_list_item_view:me
 
 @CombinedThemePreviews
 @Composable
-private fun RecentActionListItemViewPreview() {
+private fun RecentsListItemViewPreview() {
     AndroidThemeForPreviews {
-        RecentActionListItemView(
+        RecentsListItemView(
             title = "Invoice_October_reviewed.xlsx",
             icon = IconPackR.drawable.ic_spreadsheet_medium_solid,
             time = "12:00 PM",
@@ -306,9 +308,9 @@ private fun RecentActionListItemViewPreview() {
 
 @CombinedThemePreviews
 @Composable
-private fun RecentActionListItemView2Preview() {
+private fun RecentsListItemView2Preview() {
     AndroidThemeForPreviews {
-        RecentActionListItemView(
+        RecentsListItemView(
             title = "Screen recording.mp4",
             updatedByText = "[A]added by[/A] [B]John Doe[/B]",
             icon = IconPackR.drawable.ic_video_medium_solid,
@@ -323,9 +325,9 @@ private fun RecentActionListItemView2Preview() {
 
 @CombinedThemePreviews
 @Composable
-private fun RecentActionListItemViewUpdatePreview() {
+private fun RecentsListItemViewUpdatePreview() {
     AndroidThemeForPreviews {
-        RecentActionListItemView(
+        RecentsListItemView(
             title = "First line text",
             updatedByText = "[A]updated by[/A] [B]John Doe[/B]",
             showFavourite = true,
@@ -341,9 +343,9 @@ private fun RecentActionListItemViewUpdatePreview() {
 
 @CombinedThemePreviews
 @Composable
-private fun RecentActionListItemViewMultiFilePreview() {
+private fun RecentsListItemViewMultiFilePreview() {
     AndroidThemeForPreviews {
-        RecentActionListItemView(
+        RecentsListItemView(
             title = "14 images",
             updatedByText = "[A]added by[/A] [B]John Doe[/B]",
             icon = IconPackR.drawable.ic_image_stack_medium_solid,
