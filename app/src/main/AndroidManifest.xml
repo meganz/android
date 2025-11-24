@@ -178,7 +178,8 @@
             android:configChanges="screenSize"
             android:exported="true"
             android:theme="@style/Theme.Mega.Starting"
-            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
+            android:launchMode="singleTask"/>
         <activity
             android:name=".presentation.login.LoginActivity"
             android:configChanges="screenSize"

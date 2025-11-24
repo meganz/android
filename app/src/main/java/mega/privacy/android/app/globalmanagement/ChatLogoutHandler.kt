@@ -51,10 +51,15 @@ class ChatLogoutHandler @Inject constructor(
                 }.getOrDefault(false)
                 if (isSingleActivityEnable) {
                     localLogoutUseCase(disableChatApiUseCase)
-                    context.startActivity(Intent(context, MegaActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                    })
+                    activityLifecycleHandler.getCurrentActivity()?.let { activity ->
+                        if (activity !is MegaActivity) {
+                            activity.startActivity(Intent(context, MegaActivity::class.java).apply {
+                                flags =
+                                    Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                                putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+                            })
+                        }
+                    }
                 } else {
                     //Need to finish ManagerActivity to avoid unexpected behaviours after forced logouts.
                     broadcastFinishActivityUseCase()

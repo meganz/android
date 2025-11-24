@@ -199,7 +199,8 @@ internal class MyAccountActivity : PasscodeActivity(),
                     OriginalTheme(isDark = themeMode.isDarkMode()) {
                         LogoutConfirmationDialog(
                             onDismissed = { viewModel.dismissLogoutConfirmationDialog() },
-                            logoutViewModel = logoutViewModel
+                            logoutViewModel = logoutViewModel,
+                            onLogoutSuccess = { finish() },
                         )
                     }
                 }

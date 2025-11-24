@@ -5,13 +5,17 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.dropWhile
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
@@ -80,14 +84,27 @@ class GlobalStateViewModel @Inject constructor(
     }
 
     val rootNodeExistsFlow: StateFlow<Boolean> by lazy {
-        monitorFetchNodesFinishUseCase()
-            .onStart { emit(rootNodeExistsUseCase()) }
-            .catch { Timber.e(it, "Error monitoring fetch nodes finish") }
+        merge(
+            monitorFetchNodesFinishUseCase()
+                .onStart { emit(doesRootNodeExist()) }
+                .catch { Timber.e(it, "Error monitoring fetch nodes finish") },
+            getPostLoginSessionFlow()
+                .catch { Timber.e(it, "Error monitoring post login session") }
+                .emitFalseOnLogout()
+        ).catch { Timber.e(it, "Error monitoring fetch nodes finish") }
             .asUiStateFlow(
                 scope = viewModelScope,
                 initialValue = false
             )
     }
+
+    private suspend fun doesRootNodeExist(): Boolean =
+        runCatching { rootNodeExistsUseCase() }.onFailure { Timber.e(it) }.getOrDefault(false)
+
+    private fun getPostLoginSessionFlow(): Flow<String?> = sessionFlow.dropWhile { it != null }
+
+    private fun Flow<String?>.emitFalseOnLogout() = this.filter { it == null }
+        .map { false }
 
 
     private fun monitorBlockedState() =
@@ -110,7 +127,7 @@ class GlobalStateViewModel @Inject constructor(
     }
 
 
-    private val sessionFlow: Flow<String?> by lazy {
+    private val sessionFlow: SharedFlow<String?> by lazy {
         monitorUserCredentialsUseCase()
             .catch { Timber.e(it, "Error monitoring user credentials") }
             .map { it?.session }

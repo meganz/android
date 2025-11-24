@@ -67,7 +67,11 @@ internal fun EntryProviderScope<NavKey>.loginScreen(
     entry<LoginNavKey> { key ->
         val billingViewModel = hiltViewModel<BillingViewModel>()
         LaunchedEffect(key.resetLoginFlow) {
-            if (key.resetLoginFlow) sharedViewModel.resetLoginState()
+            if (key.resetLoginFlow) {
+                sharedViewModel.onPasswordChanged("")
+                sharedViewModel.onEmailChanged("")
+                sharedViewModel.resetLoginState()
+            }
         }
 
         checkActions(sharedViewModel = sharedViewModel, action = key.action, link = key.link)

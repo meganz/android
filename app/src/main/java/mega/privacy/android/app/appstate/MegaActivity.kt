@@ -19,7 +19,9 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
@@ -136,7 +138,7 @@ class MegaActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
-        var keepSplashScreen = true
+        var keepSplashScreen by mutableStateOf(true)
         super.onCreate(savedInstanceState)
         splashScreen.setKeepOnScreenCondition { keepSplashScreen }
         enableEdgeToEdge()
@@ -152,18 +154,20 @@ class MegaActivity : ComponentActivity() {
 
             val navGraphState by navGraphViewModel.state.collectAsStateWithLifecycle()
             val globalState by globalStateViewModel.state.collectAsStateWithLifecycle()
-
+            val rootNodeState by globalStateViewModel.rootNodeExistsFlow.collectAsStateWithLifecycle()
             val snackbarHostState = remember { SnackbarHostState() }
 
-            keepSplashScreen =
-                globalState is GlobalState.Loading || navGraphState is NavigationGraphState.Loading
+            LaunchedEffect(globalState, navGraphState) {
+                if (globalState !is GlobalState.Loading && navGraphState !is NavigationGraphState.Loading) {
+                    keepSplashScreen = false
+                }
+            }
 
             if (!keepSplashScreen) {
                 val backStack: PendingBackStack<NavKey> =
                     rememberPendingBackStack(HomeScreensNavKey())
 
                 val passcodeState by passcodeViewModel.state.collectAsStateWithLifecycle()
-                val rootNodeState by globalStateViewModel.rootNodeExistsFlow.collectAsStateWithLifecycle()
 
                 val navigationHandler = remember {
                     val authStatus = (globalState as? GlobalState.LoggedIn)?.session?.let {

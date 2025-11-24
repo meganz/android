@@ -17,8 +17,8 @@ class PendingBackStackNavigationHandler(
     private val defaultLandingScreen: NavKey,
     private var isPasscodeLocked: Boolean,
     private val passcodeDestination: NavKey,
-    private val defaultLoginDestination: NavKey,
-    initialLoginDestination: NavKey,
+    private val defaultLoginDestination: NoSessionNavKey,
+    initialLoginDestination: NoSessionNavKey,
     private val fetchRootNodeDestination: (session: String, fromLogin: Boolean) -> NavKey,
     private val navigationResultManager: NavigationResultManager,
 ) : NavigationHandler {
@@ -31,9 +31,8 @@ class PendingBackStackNavigationHandler(
             backstack.pending = rootNodeDestinations + backstack.pending
         }
         if (currentAuthStatus.isLoggedIn.not()) {
-            val authRequiredDestinations = removeAuthRequiredDestinations()
+            val authRequiredDestinations = replaceAuthRequiredDestinations(initialLoginDestination)
             backstack.pending = authRequiredDestinations + backstack.pending
-            if (backstack.isEmpty()) backstack.add(initialLoginDestination)
         }
         if (backstack.isEmpty()) backstack.add(defaultLandingScreen)
         onPasscodeStateChanged(isPasscodeLocked)
@@ -41,13 +40,14 @@ class PendingBackStackNavigationHandler(
         logBackStack("init isLoggedIn: ${currentAuthStatus.isLoggedIn} hasRootNode: $hasRootNode")
     }
 
-    private fun removeAuthRequiredDestinations(): List<NavKey> {
+    private fun replaceAuthRequiredDestinations(newDestination: NoSessionNavKey): List<NavKey> {
         Timber.d("PendingBackStackNavigationHandler::removeAuthRequiredDestinations")
         val authRequiredDestinations = backstack.takeLastWhile { it !is NoSessionNavKey }
 
         repeat(authRequiredDestinations.size) {
             backstack.removeLastOrNull()
         }
+        if (backstack.isEmpty()) backstack.add(newDestination)
         logBackStack("removeAuthRequiredDestinations")
         return authRequiredDestinations
     }
@@ -214,8 +214,7 @@ class PendingBackStackNavigationHandler(
                 currentFetchNodesDestinationOrNull(currentAuthStatus) ?: defaultLoginDestination
             navigate(listOf(fetchNodeOrLoginDestination))
         } else {
-            removeAuthRequiredDestinations()
-            if (backstack.isEmpty()) backstack.add(defaultLoginDestination)
+            replaceAuthRequiredDestinations(defaultLoginDestination)
         }
     }
 
@@ -262,19 +261,15 @@ class PendingBackStackNavigationHandler(
     }
 
     private fun logBackStack(callingFunction: String) {
+        val line = "\n*******************\n"
         Timber.d(
-            """
-                Pending backstack :: $callingFunction
-                *******************
-                BackStack:
-                ${backstack.joinToString("\n", prefix = "\t") { it.toString() }}
-                *******************
-                Pending items:
-                ${backstack.pending.joinToString("\n", prefix = "\t") { it.toString() }}
-                *******************
-            """.trimIndent()
+            "Pending backstack :: $callingFunction${line}BackStack:\n\t${printBackStack()}${line}Pending items:\n\t${printPendingItems()}${line}"
         )
     }
+
+    private fun printBackStack(): String = backstack.joinToString("\n\t") { it.toString() }
+
+    private fun printPendingItems(): String = backstack.pending.joinToString("\n\t") { it.toString() }
 
     sealed interface AuthStatus {
         val isLoggedIn: Boolean
