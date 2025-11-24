@@ -15,9 +15,10 @@ import mega.privacy.android.domain.entity.search.SearchCategory.PDF
 import mega.privacy.android.domain.entity.search.SearchCategory.PRESENTATION
 import mega.privacy.android.domain.entity.search.SearchCategory.SPREADSHEET
 import mega.privacy.android.domain.entity.search.SearchCategory.VIDEO
+import mega.privacy.android.feature.photos.R as featurePhotosR
+import mega.privacy.android.icon.pack.R as iconPackR
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import javax.inject.Inject
-import mega.privacy.android.icon.pack.R as iconPackR
 
 /**
  * Empty search view mapper
@@ -66,7 +67,7 @@ class EmptySearchViewMapper @Inject constructor(
                 }
 
                 category == IMAGES -> Pair(
-                    R.drawable.ic_no_images,
+                    featurePhotosR.drawable.ic_no_images,
                     context.getString(R.string.search_empty_screen_no_images)
                 )
 

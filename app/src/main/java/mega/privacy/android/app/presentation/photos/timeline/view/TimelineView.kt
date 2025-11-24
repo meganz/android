@@ -38,6 +38,7 @@ import mega.privacy.android.app.presentation.photos.view.isScrolledToTop
 import mega.privacy.android.app.presentation.photos.view.isScrollingDown
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.feature.photos.model.CameraUploadsStatus
+import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosSkeletonView
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 

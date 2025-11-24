@@ -1858,4 +1858,17 @@
     <string name="onboarding_camera_upload_permission_enabled_message">Camera uploads enabled</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="general_alert_not_logged_in">You must be logged in to perform this action.</string>
+    <!-- camera uploads limited access -->
+    <string name="timeline_tab_camera_uploads_limited_access">MEGA has limited access to your photo library and cannot back up all your photos.</string>
+    <!-- menu item -->
+    <string name="timeline_tab_file_properties_shared_folder_change_permissions">Change permissions</string>
+    <!-- Timeline tab screen: Empty state no media found -->
+    <string name="timeline_tab_empty_body_no_media_found">No media found</string>
+    <!-- Timeline tab screen: Camera uploads disabled banner description. We show this banner when there is no photo available in timeline tab screen. -->
+    <string name="timeline_tab_enable_camera_uploads_banner_description">Automatic camera uploads requires [A]Full Access[/A] to your device photo library</string>
+    <!-- Camera uploads completed info in TimelineTab screen. -->
+    <plurals name="timeline_tab_camera_uploads_completed">
+        <item quantity="one">Camera uploads complete, %1$d file uploaded</item>
+        <item quantity="other">Camera uploads complete, %1$d files uploaded</item>
+    </plurals>
 </resources>

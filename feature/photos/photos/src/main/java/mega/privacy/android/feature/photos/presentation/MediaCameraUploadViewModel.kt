@@ -24,6 +24,7 @@ import mega.privacy.android.domain.usecase.photos.SetCameraUploadShownUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.feature.photos.model.CameraUploadsStatus
+import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
@@ -393,5 +394,11 @@ class MediaCameraUploadViewModel @Inject constructor(
 
     internal fun updatePopBackFromCameraUploadsTransferScreenEvent(value: StateEvent) {
         _uiState.update { it.copy(popBackFromCameraUploadsTransferScreenEvent = value) }
+    }
+
+    internal fun shouldEnableCUPage(mediaSource: FilterMediaSource, show: Boolean) {
+        val isShown = show && mediaSource != FilterMediaSource.CloudDrive
+        _uiState.update { it.copy(enableCameraUploadPageShowing = isShown) }
+        // VAP: handle zoom later. See TimelineViewModel.shouldEnableCUPage. AND-21803
     }
 }

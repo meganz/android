@@ -9,6 +9,7 @@ import mega.privacy.android.feature.photos.model.ZoomLevel
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
 
 data class TimelineTabUiState(
+    val isLoading: Boolean = true,
     val allPhotos: ImmutableList<PhotoUiState> = persistentListOf(),
     val displayedPhotos: ImmutableList<PhotosNodeContentType> = persistentListOf(),
     val daysCardPhotos: ImmutableList<PhotosNodeListCard> = persistentListOf(),

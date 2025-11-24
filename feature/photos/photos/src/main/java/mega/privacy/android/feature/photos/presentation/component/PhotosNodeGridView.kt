@@ -76,6 +76,7 @@ fun PhotosNodeGridView(
     onLongClick: (node: PhotoNodeUiState) -> Unit,
     modifier: Modifier = Modifier,
     lazyGridState: LazyGridState = rememberLazyGridState(),
+    header: (@Composable () -> Unit)? = null,
 ) {
     val scope = rememberCoroutineScope()
     var userScrollEnabled by remember { mutableStateOf(true) }
@@ -129,6 +130,15 @@ fun PhotosNodeGridView(
         horizontalArrangement = Arrangement.spacedBy(1.dp),
         verticalArrangement = Arrangement.spacedBy(1.dp)
     ) {
+        header?.let {
+            item(
+                span = { GridItemSpan(maxLineSpan) },
+                key = "PhotosNodeGridView:Header"
+            ) {
+                it()
+            }
+        }
+
         items(
             items = items,
             key = { it.key },

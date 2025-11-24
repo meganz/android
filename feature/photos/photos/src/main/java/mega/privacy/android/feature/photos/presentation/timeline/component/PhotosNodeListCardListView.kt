@@ -53,6 +53,7 @@ internal fun PhotosNodeListCardListView(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     state: LazyListState = rememberLazyListState(),
+    header: (@Composable () -> Unit)? = null,
 ) {
     FastScrollLazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -63,6 +64,12 @@ internal fun PhotosNodeListCardListView(
             photos.getOrNull(index)?.date.orEmpty()
         }
     ) {
+        header?.let {
+            item(key = "PhotosNodeListCardListView:Header") {
+                it()
+            }
+        }
+
         items(
             items = photos,
             key = { it.key }

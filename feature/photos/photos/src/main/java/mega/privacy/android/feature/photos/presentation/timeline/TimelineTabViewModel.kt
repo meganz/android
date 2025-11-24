@@ -128,6 +128,7 @@ class TimelineTabViewModel @Inject constructor(
         }.toImmutableList()
 
         return TimelineTabUiState(
+            isLoading = false,
             allPhotos = allPhotos
                 .map { photoUiStateMapper(photo = it.photo) }
                 .toImmutableList(),

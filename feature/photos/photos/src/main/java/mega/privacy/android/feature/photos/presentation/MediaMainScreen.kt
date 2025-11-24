@@ -30,25 +30,42 @@ import mega.privacy.android.feature.photos.model.MediaAppBarAction.CameraUpload.
 import mega.privacy.android.feature.photos.model.MediaScreen
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabRoute
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabRoute
+import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabUiState
+import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabViewModel
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
 fun MediaMainRoute(
     navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
+    timelineViewModel: TimelineTabViewModel = hiltViewModel(),
+    mediaCameraUploadViewModel: MediaCameraUploadViewModel = hiltViewModel(),
     mediaFilterViewModel: MediaFilterViewModel = hiltViewModel(),
 ) {
+    val timelineTabUiState by timelineViewModel.uiState.collectAsStateWithLifecycle()
+    val mediaCameraUploadUiState by mediaCameraUploadViewModel.uiState.collectAsStateWithLifecycle()
     val mediaFilterUiState by mediaFilterViewModel.uiState.collectAsStateWithLifecycle()
 
     MediaMainScreen(
+        timelineTabUiState = timelineTabUiState,
+        mediaCameraUploadUiState = mediaCameraUploadUiState,
         mediaFilterUiState = mediaFilterUiState,
-        navigateToAlbumContent = navigateToAlbumContent
+        navigateToAlbumContent = navigateToAlbumContent,
+        setEnableCUPage = { shouldShow ->
+            mediaCameraUploadViewModel.shouldEnableCUPage(
+                mediaSource = mediaFilterUiState.mediaSource,
+                show = shouldShow
+            )
+        }
     )
 }
 
 @Composable
 fun MediaMainScreen(
+    timelineTabUiState: TimelineTabUiState,
+    mediaCameraUploadUiState: MediaCameraUploadUiState,
     mediaFilterUiState: MediaFilterUiState,
+    setEnableCUPage: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MediaMainViewModel = hiltViewModel(),
     navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
@@ -110,9 +127,13 @@ fun MediaMainScreen(
                             tabItem = getTabItem(),
                             content = { _, modifier ->
                                 MediaContent(
-                                    mainViewModel = viewModel,
                                     modifier = Modifier.fillMaxSize(),
-                                    navigateToAlbumContent = navigateToAlbumContent
+                                    mainViewModel = viewModel,
+                                    timelineTabUiState = timelineTabUiState,
+                                    mediaFilterUiState = mediaFilterUiState,
+                                    mediaCameraUploadUiState = mediaCameraUploadUiState,
+                                    navigateToAlbumContent = navigateToAlbumContent,
+                                    setEnableCUPage = setEnableCUPage,
                                 )
                             }
                         )
@@ -134,14 +155,30 @@ private fun MediaScreen.getTabItem() = when (this) {
 @Composable
 private fun MediaScreen.MediaContent(
     mainViewModel: MediaMainViewModel,
+    timelineTabUiState: TimelineTabUiState,
+    mediaCameraUploadUiState: MediaCameraUploadUiState,
+    mediaFilterUiState: MediaFilterUiState,
     navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
+    setEnableCUPage: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
 
     when (this) {
         MediaScreen.Timeline -> {
-            TimelineTabRoute(modifier = Modifier.fillMaxSize())
+            TimelineTabRoute(
+                modifier = Modifier.fillMaxSize(),
+                uiState = timelineTabUiState,
+                mediaCameraUploadUiState = mediaCameraUploadUiState,
+                mediaFilterUiState = mediaFilterUiState,
+                clearCameraUploadsMessage = {},
+                clearCameraUploadsCompletedMessage = {},
+                onChangeCameraUploadsPermissions = {},
+                clearCameraUploadsChangePermissionsMessage = {},
+                loadNextPage = {},
+                onNavigateCameraUploadsSettings = {},
+                setEnableCUPage = setEnableCUPage,
+            )
         }
 
         MediaScreen.Albums -> {
@@ -167,8 +204,11 @@ private fun MediaScreen.MediaContent(
 fun PhotosMainScreenPreview() {
     AndroidThemeForPreviews {
         MediaMainScreen(
+            timelineTabUiState = TimelineTabUiState(),
+            mediaCameraUploadUiState = MediaCameraUploadUiState(),
             mediaFilterUiState = MediaFilterUiState(),
-            navigateToAlbumContent = {}
+            navigateToAlbumContent = {},
+            setEnableCUPage = {},
         )
     }
 }

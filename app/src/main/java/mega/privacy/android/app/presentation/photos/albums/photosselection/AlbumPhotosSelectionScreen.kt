@@ -65,6 +65,7 @@ import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.feature.photos.R as featurePhotosR
 import mega.privacy.android.feature.photos.model.ZoomLevel
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
@@ -514,7 +515,7 @@ private fun EmptyStateContent(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
-            imageVector = ImageVector.vectorResource(id = R.drawable.ic_no_images),
+            imageVector = ImageVector.vectorResource(id = featurePhotosR.drawable.ic_no_images),
             contentDescription = "Empty",
             colorFilter = ColorFilter.tint(
                 color = if (MaterialTheme.colors.isLight) {

@@ -1,7 +1,6 @@
-package mega.privacy.android.app.presentation.photos.timeline.view
+package mega.privacy.android.feature.photos.presentation.timeline.component
 
 import android.content.res.Configuration
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,12 +28,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.utils.shimmerEffect
+import mega.android.core.ui.modifiers.shimmerEffect
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 
 @Composable
-internal fun PhotosSkeletonView() {
+fun PhotosSkeletonView(modifier: Modifier = Modifier) {
     val columns =
         if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
             3
@@ -43,8 +42,7 @@ internal fun PhotosSkeletonView() {
         }
     LazyVerticalGrid(
         columns = GridCells.Fixed(columns),
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         userScrollEnabled = false,
     ) {
         items(
@@ -85,7 +83,7 @@ internal fun PhotosSkeletonView() {
 }
 
 @Composable
-internal fun AlbumListSkeletonView() {
+fun AlbumListSkeletonView(modifier: Modifier = Modifier) {
     val columns =
         if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
             3
@@ -94,8 +92,7 @@ internal fun AlbumListSkeletonView() {
         }
     LazyVerticalGrid(
         columns = GridCells.Fixed(columns),
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         userScrollEnabled = false,
         contentPadding = PaddingValues(top = 8.dp, start = 8.dp, end = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -137,10 +134,12 @@ internal fun AlbumListSkeletonView() {
 }
 
 @Composable
-internal fun AlbumContentSkeletonView(
+fun AlbumContentSkeletonView(
     smallWidth: Dp,
+    modifier: Modifier = Modifier,
 ) {
     LazyColumn(
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(1.dp),
         userScrollEnabled = false,
     ) {
@@ -282,7 +281,7 @@ private fun Modifier.shimmerEffectSquare(): Modifier {
 @CombinedThemePreviews
 @Composable
 private fun PhotosSkeletonViewPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         PhotosSkeletonView()
     }
 }
@@ -290,7 +289,7 @@ private fun PhotosSkeletonViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun AlbumListSkeletonViewPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         AlbumListSkeletonView()
     }
 }
@@ -298,7 +297,7 @@ private fun AlbumListSkeletonViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun AlbumContentSkeletonViewPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         val configuration = LocalConfiguration.current
         val smallWidth = remember(configuration) {
             (configuration.screenWidthDp.dp - 1.dp) / 3
@@ -310,7 +309,7 @@ private fun AlbumContentSkeletonViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun AlbumBig2SmallSkeletonViewPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         val configuration = LocalConfiguration.current
         val smallWidth = remember(configuration) {
             (configuration.screenWidthDp.dp - 1.dp) / 3
@@ -322,7 +321,7 @@ private fun AlbumBig2SmallSkeletonViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun AlbumSmall3ItemSkeletonViewPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         val configuration = LocalConfiguration.current
         val smallWidth = remember(configuration) {
             (configuration.screenWidthDp.dp - 1.dp) / 3
@@ -335,7 +334,7 @@ private fun AlbumSmall3ItemSkeletonViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun AlbumSmall2BigSkeletonViewPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         val configuration = LocalConfiguration.current
         val smallWidth = remember(configuration) {
             (configuration.screenWidthDp.dp - 1.dp) / 3

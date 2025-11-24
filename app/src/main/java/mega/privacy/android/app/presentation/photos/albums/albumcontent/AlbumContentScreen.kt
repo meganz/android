@@ -44,9 +44,6 @@ import mega.privacy.android.app.presentation.photos.albums.view.CreateNewAlbumDi
 import mega.privacy.android.app.presentation.photos.albums.view.DeleteAlbumsConfirmationDialog
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
 import mega.privacy.android.app.presentation.photos.albums.view.RemoveLinksConfirmationDialog
-import mega.privacy.android.feature.photos.model.FilterMediaType
-import mega.privacy.android.feature.photos.model.Sort
-import mega.privacy.android.app.presentation.photos.timeline.view.AlbumContentSkeletonView
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.app.presentation.photos.view.FilterDialog
 import mega.privacy.android.app.presentation.photos.view.RemovePhotosFromAlbumDialog
@@ -56,16 +53,18 @@ import mega.privacy.android.domain.entity.photos.Album.GifAlbum
 import mega.privacy.android.domain.entity.photos.Album.RawAlbum
 import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.feature.photos.presentation.albums.content.AlbumContentViewModel
+import mega.privacy.android.feature.photos.model.FilterMediaType
+import mega.privacy.android.feature.photos.model.Sort
+import mega.privacy.android.feature.photos.presentation.timeline.component.AlbumContentSkeletonView
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.dark_grey
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import mega.privacy.android.shared.original.core.ui.theme.white
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.AlbumAddPhotosFABEvent
 import mega.privacy.mobile.analytics.event.RemoveItemsFromAlbumDialogButtonEvent
-import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
 internal fun AlbumContentScreen(
