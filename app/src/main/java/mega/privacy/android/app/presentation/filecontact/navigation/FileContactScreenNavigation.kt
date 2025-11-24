@@ -23,7 +23,12 @@ internal fun EntryProviderScope<NavKey>.fileContacts(
     onNavigate: (NavKey) -> Unit,
     resultFlow: (String) -> Flow<List<String>?>,
 ) {
-    entry<FileContactInfoNavKey> {
+    entry<FileContactInfoNavKey> { key ->
+        val viewModel = hiltViewModel<ShareRecipientsViewModel, ShareRecipientsViewModel.Factory>(
+            creationCallback = { factory ->
+                factory.create(key)
+            }
+        )
         LaunchedEffect(Unit) {
             Analytics.tracker.trackEvent(FileContactListScreenViewEvent)
         }
@@ -46,7 +51,6 @@ internal fun EntryProviderScope<NavKey>.fileContacts(
             )
         }
 
-        val viewModel = hiltViewModel<ShareRecipientsViewModel>()
         val state by viewModel.state.collectAsStateWithLifecycle()
         FileContactHomeScreen(
             state = state,

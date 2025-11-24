@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.filecontact
 
-import androidx.lifecycle.SavedStateHandle
-import androidx.navigation.testing.invoke
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -62,11 +60,9 @@ class ShareRecipientsViewModelTest {
 
     private fun initUnderTest() {
         underTest = ShareRecipientsViewModel(
-            savedStateHandle = SavedStateHandle.Companion.invoke(
-                route = FileContactInfoNavKey(
-                    folderName = TestValues.FOLDER_NAME,
-                    folderHandle = TestValues.NODE_HANDLE,
-                ),
+            navKey = FileContactInfoNavKey(
+                folderName = TestValues.FOLDER_NAME,
+                folderHandle = TestValues.NODE_HANDLE,
             ),
             monitorShareRecipientsUseCase = monitorShareRecipientsUseCase,
             shareFolderUseCase = shareFolderUseCase,

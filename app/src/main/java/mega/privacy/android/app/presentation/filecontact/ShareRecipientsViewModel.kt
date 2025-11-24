@@ -1,9 +1,10 @@
 package mega.privacy.android.app.presentation.filecontact
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
@@ -30,11 +31,10 @@ import mega.privacy.android.domain.usecase.shares.GetAllowedSharingPermissionsUs
 import mega.privacy.android.domain.usecase.shares.MonitorShareRecipientsUseCase
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import timber.log.Timber
-import javax.inject.Inject
 
-@HiltViewModel
-internal class ShareRecipientsViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+@HiltViewModel(assistedFactory = ShareRecipientsViewModel.Factory::class)
+internal class ShareRecipientsViewModel @AssistedInject constructor(
+    @Assisted private val navKey: FileContactInfoNavKey,
     private val monitorShareRecipientsUseCase: MonitorShareRecipientsUseCase,
     private val shareFolderUseCase: ShareFolderUseCase,
     private val removeShareResultMapper: RemoveShareResultMapper,
@@ -42,7 +42,7 @@ internal class ShareRecipientsViewModel @Inject constructor(
     private val getAllowedSharingPermissionsUseCase: GetAllowedSharingPermissionsUseCase,
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
 ) : ViewModel() {
-    private val folderInfo = savedStateHandle.toRoute<FileContactInfoNavKey>()
+    private val folderInfo = navKey
 
     val state: StateFlow<FileContactListState>
         field: MutableStateFlow<FileContactListState> = MutableStateFlow(
@@ -204,6 +204,12 @@ internal class ShareRecipientsViewModel @Inject constructor(
                 Timber.e(error)
             }
         }
+    }
+
+
+    @AssistedFactory
+    interface Factory {
+        fun create(navKey: FileContactInfoNavKey): ShareRecipientsViewModel
     }
 
 }
