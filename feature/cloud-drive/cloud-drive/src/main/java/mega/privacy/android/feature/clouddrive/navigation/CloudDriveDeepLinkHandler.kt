@@ -51,14 +51,6 @@ class CloudDriveDeepLinkHandler @Inject constructor(
                 ?.let { getNodeIdFromBase64UseCase(it) }?.longValue?.let { handle ->
                     getNodeByIdUseCase(NodeId(handle))
                 }
-            val previewDestination = (node as? TypedFileNode)?.let { fileNode ->
-                runCatching {
-                    fileNodeContentToNavKeyMapper(
-                        getFileNodeContentForFileNodeUseCase(fileNode), fileNode
-                    )
-                }.getOrNull()
-            }
-            val highlightedNode = node?.id.takeIf { node is FileNode && previewDestination == null }
             val nodeSourceType: NodeSourceType
             val rootDestination: NavKey
             when {
@@ -77,6 +69,16 @@ class CloudDriveDeepLinkHandler @Inject constructor(
                     rootDestination = SharesNavKey
                 }
             }
+            val previewDestination = (node as? TypedFileNode)?.let { fileNode ->
+                runCatching {
+                    fileNodeContentToNavKeyMapper(
+                        content = getFileNodeContentForFileNodeUseCase(fileNode),
+                        fileNode = fileNode,
+                        nodeSourceType = nodeSourceType,
+                    )
+                }.getOrNull()
+            }
+            val highlightedNode = node?.id.takeIf { node is FileNode && previewDestination == null }
             val childDestinations = runCatching {
                 buildList {
                     if (node != null) {

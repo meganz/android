@@ -130,7 +130,7 @@ class CloudDriveDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
             on { this.fragment } doReturn base64Handle
         }
-        whenever(getNodeIdFromBase64UseCase(base64Handle)) doThrow(RuntimeException())
+        whenever(getNodeIdFromBase64UseCase(base64Handle)) doThrow (RuntimeException())
 
         val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
@@ -496,7 +496,6 @@ class CloudDriveDeepLinkHandlerTest {
         whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
         whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
         whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
-        whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
         whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(parentId, grandParentId, rootId)
         val previewNavKey = LegacyPdfViewerNavKey(
             nodeHandle = nodeId.longValue,
@@ -505,7 +504,7 @@ class CloudDriveDeepLinkHandlerTest {
             mimeType = "application/pdf"
         )
         whenever(
-            fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)
+            fileNodeContentToNavKeyMapper(fileNodeContent, fileNode, NodeSourceType.RUBBISH_BIN)
         ) doReturn previewNavKey
 
         val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
@@ -608,7 +607,6 @@ class CloudDriveDeepLinkHandlerTest {
         whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
         whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
         whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
-        whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
         whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(parentId, grandParentId)
         val previewNavKey = LegacyPdfViewerNavKey(
             nodeHandle = nodeId.longValue,
@@ -617,7 +615,7 @@ class CloudDriveDeepLinkHandlerTest {
             mimeType = "application/pdf"
         )
         whenever(
-            fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)
+            fileNodeContentToNavKeyMapper(fileNodeContent, fileNode, NodeSourceType.INCOMING_SHARES)
         ) doReturn previewNavKey
 
         val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
