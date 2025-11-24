@@ -4,7 +4,8 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.orientation.AdaptiveLayoutMemoryManager
-import mega.privacy.android.app.usecase.orientation.ShouldShowAdaptiveLayoutUseCase
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,7 +21,7 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 class InitializeAdaptiveLayoutUseCaseTest {
 
-    private val shouldShowAdaptiveLayoutUseCase: ShouldShowAdaptiveLayoutUseCase = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val adaptiveLayoutMemoryManager: AdaptiveLayoutMemoryManager = mock()
 
     private lateinit var underTest: InitializeAdaptiveLayoutUseCase
@@ -28,58 +29,62 @@ class InitializeAdaptiveLayoutUseCaseTest {
     @Before
     fun setUp() {
         underTest = InitializeAdaptiveLayoutUseCase(
-            shouldShowAdaptiveLayoutUseCase = shouldShowAdaptiveLayoutUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             adaptiveLayoutMemoryManager = adaptiveLayoutMemoryManager
         )
     }
 
     @Test
-    fun `test that invoke calls shouldShowAdaptiveLayoutUseCase and stores result`() = runTest {
+    fun `test that invoke calls getFeatureFlagValueUseCase and stores result`() = runTest {
         // Given
         val expectedResult = true
-        whenever(shouldShowAdaptiveLayoutUseCase()).thenReturn(expectedResult)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.Android16OrientationMigrationEnabled))
+            .thenReturn(expectedResult)
 
         // When
         underTest()
 
         // Then
-        verify(shouldShowAdaptiveLayoutUseCase).invoke()
+        verify(getFeatureFlagValueUseCase).invoke(ApiFeatures.Android16OrientationMigrationEnabled)
         verify(adaptiveLayoutMemoryManager).setAdaptiveLayoutEnabled(expectedResult)
     }
 
     @Test
-    fun `test that invoke stores false when shouldShowAdaptiveLayoutUseCase returns false`() = runTest {
+    fun `test that invoke stores false when getFeatureFlagValueUseCase returns false`() = runTest {
         // Given
         val expectedResult = false
-        whenever(shouldShowAdaptiveLayoutUseCase()).thenReturn(expectedResult)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.Android16OrientationMigrationEnabled))
+            .thenReturn(expectedResult)
 
         // When
         underTest()
 
         // Then
-        verify(shouldShowAdaptiveLayoutUseCase).invoke()
+        verify(getFeatureFlagValueUseCase).invoke(ApiFeatures.Android16OrientationMigrationEnabled)
         verify(adaptiveLayoutMemoryManager).setAdaptiveLayoutEnabled(expectedResult)
     }
 
     @Test
-    fun `test that invoke stores true when shouldShowAdaptiveLayoutUseCase returns true`() = runTest {
+    fun `test that invoke stores true when getFeatureFlagValueUseCase returns true`() = runTest {
         // Given
         val expectedResult = true
-        whenever(shouldShowAdaptiveLayoutUseCase()).thenReturn(expectedResult)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.Android16OrientationMigrationEnabled))
+            .thenReturn(expectedResult)
 
         // When
         underTest()
 
         // Then
-        verify(shouldShowAdaptiveLayoutUseCase).invoke()
+        verify(getFeatureFlagValueUseCase).invoke(ApiFeatures.Android16OrientationMigrationEnabled)
         verify(adaptiveLayoutMemoryManager).setAdaptiveLayoutEnabled(expectedResult)
     }
 
     @Test
-    fun `test that invoke propagates exception from shouldShowAdaptiveLayoutUseCase`() = runTest {
+    fun `test that invoke propagates exception from getFeatureFlagValueUseCase`() = runTest {
         // Given
         val exception = RuntimeException("Test exception")
-        whenever(shouldShowAdaptiveLayoutUseCase()).thenThrow(exception)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.Android16OrientationMigrationEnabled))
+            .thenThrow(exception)
 
         // When & Then
         try {
@@ -94,15 +99,16 @@ class InitializeAdaptiveLayoutUseCaseTest {
     }
 
     @Test
-    fun `test that invoke calls shouldShowAdaptiveLayoutUseCase only once`() = runTest {
+    fun `test that invoke calls getFeatureFlagValueUseCase only once`() = runTest {
         // Given
-        whenever(shouldShowAdaptiveLayoutUseCase()).thenReturn(true)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.Android16OrientationMigrationEnabled))
+            .thenReturn(true)
 
         // When
         underTest()
 
         // Then
-        verify(shouldShowAdaptiveLayoutUseCase).invoke()
+        verify(getFeatureFlagValueUseCase).invoke(ApiFeatures.Android16OrientationMigrationEnabled)
         verify(adaptiveLayoutMemoryManager).setAdaptiveLayoutEnabled(true)
     }
 }

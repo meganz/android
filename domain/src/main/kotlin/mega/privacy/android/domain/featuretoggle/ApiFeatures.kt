@@ -75,7 +75,7 @@ enum class ApiFeatures(
      * Default: false (gradual rollout for safety)
      */
     Android16OrientationMigrationEnabled(
-        experimentName = "aome",
+        experimentName = "aome2",
         description = "Enable Android 16+ orientation migration for large screen devices",
         defaultValue = false
     );

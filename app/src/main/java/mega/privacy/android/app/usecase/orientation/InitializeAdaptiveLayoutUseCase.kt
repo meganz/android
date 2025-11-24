@@ -1,6 +1,8 @@
 package mega.privacy.android.app.usecase.orientation
 
 import mega.privacy.android.app.presentation.orientation.AdaptiveLayoutMemoryManager
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
 
 /**
@@ -10,7 +12,7 @@ import javax.inject.Inject
  * in memory for fast access throughout the application lifecycle.
  */
 class InitializeAdaptiveLayoutUseCase @Inject constructor(
-    private val shouldShowAdaptiveLayoutUseCase: ShouldShowAdaptiveLayoutUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val adaptiveLayoutMemoryManager: AdaptiveLayoutMemoryManager,
 ) {
     /**
@@ -21,7 +23,8 @@ class InitializeAdaptiveLayoutUseCase @Inject constructor(
      * is available for all activities that need it.
      */
     suspend operator fun invoke() {
-        val adaptiveLayoutEnabled = shouldShowAdaptiveLayoutUseCase()
+        val adaptiveLayoutEnabled =
+            getFeatureFlagValueUseCase(ApiFeatures.Android16OrientationMigrationEnabled)
         adaptiveLayoutMemoryManager.setAdaptiveLayoutEnabled(adaptiveLayoutEnabled)
     }
 }
