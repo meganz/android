@@ -8,8 +8,11 @@
         android:id="@+id/artwork_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="start|center_vertical"
-        android:layout_margin="@dimen/standard_margin_double"
+        android:layout_gravity="start|center"
+        android:layout_marginLeft="@dimen/standard_margin_double"
+        android:layout_marginRight="@dimen/standard_margin_double"
+        android:layout_marginBottom="@dimen/standard_margin_double"
+        android:layout_marginTop="@dimen/standard_margin_double"
         android:padding="@dimen/image_artwork_thumbnail_padding"
         android:visibility="invisible">
 
