@@ -9,12 +9,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityGuestLeaveMeetingBinding
+import mega.privacy.android.app.di.fetchIsAdaptiveLayoutEnabled
 import mega.privacy.android.app.di.isAdaptiveLayoutEnabled
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.presentation.login.LoginActivity
@@ -34,15 +37,17 @@ class LeftMeetingActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdgeAndConsumeInsets()
 
-        // Set orientation before super.onCreate() to ensure it takes effect
-        if (isAdaptiveLayoutEnabled) {
-            // Adaptive layout is enabled, let the system handle orientation
-            enableAdaptiveLayout { old, new ->
-                Timber.d("On size change in LeftMeetingActivity from $old to $new")
+        lifecycleScope.launch {
+            // We have to handle this by using the fetchIsAdaptiveLayoutEnabled()
+            if (fetchIsAdaptiveLayoutEnabled()) {
+                // Adaptive layout is enabled, let the system handle orientation
+                enableAdaptiveLayout { old, new ->
+                    Timber.d("On size change in LeftMeetingActivity from $old to $new")
+                }
+            } else {
+                // Force portrait orientation when adaptive layout is disabled
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             }
-        } else {
-            // Force portrait orientation when adaptive layout is disabled
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         }
 
         super.onCreate(savedInstanceState)
