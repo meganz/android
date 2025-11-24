@@ -18,7 +18,7 @@ class FolderLinkDeepLinkHandlerTest {
 
     @BeforeAll
     fun setup() {
-        underTest = FolderLinkDeepLinkHandler()
+        underTest = FolderLinkDeepLinkHandler(mock())
     }
 
     @ParameterizedTest

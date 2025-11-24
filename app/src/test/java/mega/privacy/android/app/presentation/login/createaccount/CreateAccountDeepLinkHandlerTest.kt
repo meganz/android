@@ -17,7 +17,7 @@ class CreateAccountDeepLinkHandlerTest {
 
     @BeforeAll
     fun setup() {
-        underTest = CreateAccountDeepLinkHandler()
+        underTest = CreateAccountDeepLinkHandler(mock())
     }
 
     @ParameterizedTest

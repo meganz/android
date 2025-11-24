@@ -18,7 +18,7 @@ class FileLinkDeepLinkHandlerTest {
 
     @BeforeAll
     fun setup() {
-        underTest = FileLinkDeepLinkHandler()
+        underTest = FileLinkDeepLinkHandler(mock())
     }
 
     @ParameterizedTest

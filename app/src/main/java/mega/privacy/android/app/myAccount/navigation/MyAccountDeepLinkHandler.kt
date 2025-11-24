@@ -10,40 +10,32 @@ import mega.privacy.android.domain.entity.RegexPatternType.VERIFY_CHANGE_MAIL_LI
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.MyAccountNavKey
-import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 
 class MyAccountDeepLinkHandler @Inject constructor(
-    private val snackbarEventQueue: SnackbarEventQueue,
-) : DeepLinkHandler {
+    snackbarEventQueue: SnackbarEventQueue,
+) : DeepLinkHandler(snackbarEventQueue) {
     override suspend fun getNavKeys(
         uri: Uri,
         regexPatternType: RegexPatternType?,
-        isLoggedIn: Boolean,
     ): List<NavKey>? {
         return when (regexPatternType) {
-            CANCEL_ACCOUNT_LINK -> if (isLoggedIn) {
+            CANCEL_ACCOUNT_LINK -> {
                 listOf(
                     MyAccountNavKey(
                         action = Constants.ACTION_CANCEL_ACCOUNT,
                         link = uri.toString()
                     )
                 )
-            } else {
-                snackbarEventQueue.queueMessage(sharedR.string.general_alert_not_logged_in)
-                emptyList()
             }
 
-            VERIFY_CHANGE_MAIL_LINK -> if (isLoggedIn) {
+            VERIFY_CHANGE_MAIL_LINK -> {
                 listOf(
                     MyAccountNavKey(
                         action = Constants.ACTION_CHANGE_MAIL,
                         link = uri.toString()
                     )
                 )
-            } else {
-                snackbarEventQueue.queueMessage(sharedR.string.general_alert_not_logged_in)
-                emptyList()
             }
 
             RESET_PASSWORD_LINK -> listOf(
@@ -57,4 +49,12 @@ class MyAccountDeepLinkHandler @Inject constructor(
         }
     }
 
+    override fun loggedInRequiredMessage(
+        navKeys: List<NavKey>,
+        regexPatternType: RegexPatternType?,
+    ) = if (regexPatternType == RESET_PASSWORD_LINK) {
+        null
+    } else {
+        super.loggedInRequiredMessage(navKeys, regexPatternType)
+    }
 }

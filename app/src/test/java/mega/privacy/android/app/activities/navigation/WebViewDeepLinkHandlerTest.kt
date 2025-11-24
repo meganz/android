@@ -28,7 +28,8 @@ class WebViewDeepLinkHandlerTest {
     @BeforeAll
     fun setup() {
         underTest = WebViewDeepLinkHandler(
-            getSessionLinkUseCase = getSessionLinkUseCase
+            getSessionLinkUseCase = getSessionLinkUseCase,
+            mock()
         )
     }
 

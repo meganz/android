@@ -5,17 +5,18 @@ import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
+import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.WebSiteNavKey
 import javax.inject.Inject
 
 class WebViewDeepLinkHandler @Inject constructor(
     private val getSessionLinkUseCase: GetSessionLinkUseCase,
-) : DeepLinkHandler {
+    snackbarEventQueue: SnackbarEventQueue,
+) : DeepLinkHandler(snackbarEventQueue) {
 
     override suspend fun getNavKeys(
         uri: Uri,
         regexPatternType: RegexPatternType?,
-        isLoggedIn: Boolean,
     ): List<NavKey>? = if (regexPatternType == RegexPatternType.EMAIL_VERIFY_LINK ||
         regexPatternType == RegexPatternType.WEB_SESSION_LINK ||
         regexPatternType == RegexPatternType.BUSINESS_INVITE_LINK ||

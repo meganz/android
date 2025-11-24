@@ -14,23 +14,21 @@ import javax.inject.Inject
  */
 class AccountInvitationDeepLinkHandler @Inject constructor(
     private val querySignupLinkUseCase: QuerySignupLinkUseCase,
-    private val snackbarEventQueue: SnackbarEventQueue,
-) : DeepLinkHandler {
+    snackbarEventQueue: SnackbarEventQueue,
+) : DeepLinkHandler(snackbarEventQueue) {
     override suspend fun getNavKeys(
         uri: Uri,
         regexPatternType: RegexPatternType?,
-        isLoggedIn: Boolean,
     ): List<NavKey>? =
         if (regexPatternType == RegexPatternType.ACCOUNT_INVITATION_LINK) {
             val email = runCatching { querySignupLinkUseCase(uri.toString()) }.getOrNull()
-
-            if (isLoggedIn) {
-                snackbarEventQueue.queueMessage(R.string.log_out_warning)
-                emptyList()
-            } else {
-                listOf(CreateAccountNavKey(initialEmail = email))
-            }
+            listOf(CreateAccountNavKey(initialEmail = email))
         } else {
             null
         }
+
+    override fun loggedOutRequiredMessage(
+        navKeys: List<NavKey>,
+        regexPatternType: RegexPatternType?,
+    ) = R.string.log_out_warning
 }

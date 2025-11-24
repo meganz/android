@@ -22,7 +22,7 @@ class AlbumsDeepLinkHandlerTest {
 
     @BeforeAll
     fun setup() {
-        underTest = AlbumsDeepLinkHandler()
+        underTest = AlbumsDeepLinkHandler(mock())
     }
 
     @ParameterizedTest
