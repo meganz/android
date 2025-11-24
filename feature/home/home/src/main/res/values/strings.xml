@@ -39,4 +39,7 @@
         <item quantity="one">[Undecrypted file]</item>
         <item quantity="other">[Undecrypted files]</item>
     </plurals>
+
+    <!-- Label to reference a recents section -->
+    <string name="section_recents">Recents</string>
 </resources>

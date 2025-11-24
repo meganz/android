@@ -3,11 +3,13 @@ package mega.privacy.mobile.home.presentation.home
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,6 +32,7 @@ import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOption
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
+import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -87,20 +90,22 @@ internal fun HomeScreen(
                     navigationHandler.navigate(HomeFabOptionsBottomSheetNavKey)
                 }
             )
-        }
+        },
+        contentWindowInsets = WindowInsets.systemBars.only(
+            WindowInsetsSides.Top + WindowInsetsSides.Horizontal
+        ),
     ) { paddingValues ->
         when (state) {
             is HomeUiState.Data -> {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues),
-                    contentPadding = PaddingValues(top = 12.dp, bottom = 50.dp),
+                        .padding(paddingValues.excludingBottomPadding()),
+                    contentPadding = PaddingValues(top = 12.dp, bottom = 80.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     items(state.widgets, key = { it.identifier }) { it ->
                         it.content(Modifier, navigationHandler::navigate, transferHandler)
-                        Spacer(modifier = Modifier.height(8.dp))
                     }
 
                     item {

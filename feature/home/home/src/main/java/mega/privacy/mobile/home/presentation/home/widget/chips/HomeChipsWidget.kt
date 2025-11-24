@@ -12,8 +12,6 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import mega.android.core.ui.components.chip.MegaChip
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.preview.CombinedThemePreviews

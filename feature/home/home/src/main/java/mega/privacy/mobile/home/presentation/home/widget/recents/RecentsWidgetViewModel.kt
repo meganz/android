@@ -19,10 +19,7 @@ class RecentsWidgetViewModel @Inject constructor(
     private val recentActionUiItemMapper: RecentActionUiItemMapper,
 ) : ViewModel() {
 
-    /** private mutable UI state */
     private val _uiState = MutableStateFlow(RecentsWidgetUiState())
-
-    /** public UI state */
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -35,14 +32,13 @@ class RecentsWidgetViewModel @Inject constructor(
     private fun loadRecentActions() {
         viewModelScope.launch {
             runCatching {
-                getRecentActionsUseCase(excludeSensitives = false)
-            }.onSuccess { buckets ->
-                val recentActionItems = buckets
+                getRecentActionsUseCase(excludeSensitives = false) // TODO: Handle hidden nodes
                     .map { recentActionUiItemMapper(it) }
+            }.onSuccess { buckets ->
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        recentActionItems = recentActionItems,
+                        recentActionItems = buckets,
                     )
                 }
             }.onFailure {
