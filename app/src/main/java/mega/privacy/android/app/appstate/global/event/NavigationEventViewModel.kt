@@ -10,6 +10,7 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
+import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import javax.inject.Inject
 
@@ -22,10 +23,10 @@ class NavigationEventViewModel @Inject constructor(
     val navigationEvents: StateFlow<StateEventWithContent<List<NavKey>>> by lazy {
         flow {
             for (event in navigationEventQueueReceiver.events) {
-                val items = event()
-                if (items != null) {
+                val queueEvent = event() as? NavigationQueueEvent
+                if (queueEvent != null) {
                     acknowledged = CompletableDeferred()
-                    emit(triggered(items))
+                    emit(triggered(queueEvent.keys))
                     acknowledged?.await()
                     emit(consumed())
                 }

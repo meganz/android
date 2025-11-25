@@ -1,8 +1,8 @@
 package mega.privacy.android.app.appstate.global.event
 
-import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.channels.ReceiveChannel
+import mega.privacy.android.navigation.contract.queue.QueueEvent
 
 interface NavigationEventQueueReceiver {
-    val events: ReceiveChannel<() -> List<NavKey>?>
+    val events: ReceiveChannel<() -> QueueEvent?>
 }

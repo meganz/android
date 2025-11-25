@@ -4,6 +4,8 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.channels.ReceiveChannel
 import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
+import mega.privacy.android.navigation.contract.queue.QueueEvent
 import java.util.PriorityQueue
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -22,24 +24,23 @@ class NavigationEventQueueImpl(
             compareByDescending<QueuedEvent> { it.priority }
                 .thenBy { it.timestamp }
         ),
-        mapper = { it?.navKeys }
+        mapper = { it?.event }
     )
 
-    override val events: ReceiveChannel<() -> List<NavKey>?>
+    override val events: ReceiveChannel<() -> QueueEvent?>
         get() = queueChannel.events
 
     private data class QueuedEvent(
-        val navKeys: List<NavKey>,
+        val event: QueueEvent,
         val priority: NavPriority,
         val timestamp: Long,
     )
 
     override suspend fun emit(navKeys: List<NavKey>, priority: NavPriority) {
-        queueChannel.add(QueuedEvent(navKeys, priority, getTime()))
+        queueChannel.add(QueuedEvent(NavigationQueueEvent(navKeys), priority, getTime()))
     }
 
     override suspend fun emit(navKey: NavKey, priority: NavPriority) =
         emit(listOf(navKey), priority)
-
 
 }
