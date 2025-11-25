@@ -30,12 +30,6 @@ class NavigationEventQueueImpl(
     override val events: ReceiveChannel<() -> QueueEvent?>
         get() = queueChannel.events
 
-    private data class QueuedEvent(
-        val event: QueueEvent,
-        val priority: NavPriority,
-        val timestamp: Long,
-    )
-
     override suspend fun emit(navKeys: List<NavKey>, priority: NavPriority) {
         queueChannel.add(QueuedEvent(NavigationQueueEvent(navKeys), priority, getTime()))
     }

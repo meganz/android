@@ -6,7 +6,6 @@ import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.navigation.contract.dialog.AppDialogEvent
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -36,7 +35,7 @@ class AppDialogViewModelTest {
 
     @Test
     fun `test that triggered event is received when new event enters the queue`() = runTest {
-        appDialogsEventQueue.emit(mock<AppDialogEvent>())
+        appDialogsEventQueue.emit(mock())
 
         underTest.dialogEvents.test {
             assertThat(awaitItem()).isInstanceOf(StateEventWithContentTriggered::class.java)
@@ -45,7 +44,7 @@ class AppDialogViewModelTest {
 
     @Test
     fun `test that event is updated to consumed when dialogDisplayed is called`() = runTest {
-        appDialogsEventQueue.emit(mock<AppDialogEvent>())
+        appDialogsEventQueue.emit(mock())
 
         underTest.dialogEvents.test {
             assertThat(awaitItem()).isInstanceOf(StateEventWithContentTriggered::class.java)
@@ -56,8 +55,8 @@ class AppDialogViewModelTest {
 
     @Test
     fun `test that new event is not emitted if previous event is not yet handled`() = runTest {
-        appDialogsEventQueue.emit(mock<AppDialogEvent>())
-        appDialogsEventQueue.emit(mock<AppDialogEvent>())
+        appDialogsEventQueue.emit(mock())
+        appDialogsEventQueue.emit(mock())
 
         underTest.dialogEvents.test {
             assertThat(awaitItem()).isInstanceOf(StateEventWithContentTriggered::class.java)
@@ -69,8 +68,8 @@ class AppDialogViewModelTest {
 
     @Test
     fun `test that new event is emitted after previous event is handled`() = runTest {
-        appDialogsEventQueue.emit(mock<AppDialogEvent>())
-        appDialogsEventQueue.emit(mock<AppDialogEvent>())
+        appDialogsEventQueue.emit(mock())
+        appDialogsEventQueue.emit(mock())
 
         underTest.dialogEvents.test {
             assertThat(awaitItem()).isInstanceOf(StateEventWithContentTriggered::class.java)

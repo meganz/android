@@ -54,8 +54,8 @@ import mega.privacy.android.navigation.contract.AppDialogDestinations
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
-import mega.privacy.android.navigation.contract.dialog.AppDialogsEventQueue
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import javax.inject.Singleton

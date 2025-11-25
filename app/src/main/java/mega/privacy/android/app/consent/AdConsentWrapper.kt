@@ -11,8 +11,8 @@ import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.advertisements.SetGoogleConsentLoadedUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.navigation.contract.dialog.AppDialogEvent
-import mega.privacy.android.navigation.contract.dialog.AppDialogsEventQueue
+import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
+import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
 import timber.log.Timber
 import javax.inject.Inject
 

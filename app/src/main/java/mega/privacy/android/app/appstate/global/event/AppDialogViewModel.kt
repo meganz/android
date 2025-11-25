@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
-import mega.privacy.android.navigation.contract.dialog.AppDialogEvent
+import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import javax.inject.Inject
 
@@ -27,8 +27,11 @@ class AppDialogViewModel @Inject constructor(
         merge(
             flow {
                 for (event in appDialogsEventQueueReceiver.events) {
-                    emit(triggered(event))
-                    awaitHandledEvent()
+                    val queueEvent = event() as? AppDialogEvent
+                    if (queueEvent != null) {
+                        emit(triggered(queueEvent))
+                        awaitHandledEvent()
+                    }
                 }
             },
             dialogDisplayedSignal

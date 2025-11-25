@@ -9,8 +9,8 @@ import mega.privacy.android.app.consent.initialiser.ConsentInitialiser
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import mega.privacy.android.domain.usecase.setting.ShouldShowGenericCookieDialogUseCase
-import mega.privacy.android.navigation.contract.dialog.AppDialogEvent
-import mega.privacy.android.navigation.contract.dialog.AppDialogsEventQueue
+import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
+import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
