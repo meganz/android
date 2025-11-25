@@ -7,6 +7,7 @@ import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.WebSiteNavKey
+import timber.log.Timber
 import javax.inject.Inject
 
 class WebViewDeepLinkHandler @Inject constructor(
@@ -29,9 +30,10 @@ class WebViewDeepLinkHandler @Inject constructor(
     ) {
         listOf(WebSiteNavKey(uri.toString()))
     } else {
-        getSessionLinkUseCase(uri.toString())?.let { sessionLink ->
-            listOf(WebSiteNavKey(sessionLink))
-        } ?: if (regexPatternType == RegexPatternType.MEGA_LINK) {
+        runCatching { getSessionLinkUseCase(uri.toString()) }
+            .onFailure { Timber.w(it) }.getOrNull()?.let { sessionLink ->
+                listOf(WebSiteNavKey(sessionLink))
+            } ?: if (regexPatternType == RegexPatternType.MEGA_LINK) {
             listOf(WebSiteNavKey(uri.toString()))
         } else {
             null

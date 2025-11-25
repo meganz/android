@@ -13,6 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -102,6 +103,23 @@ class WebViewDeepLinkHandlerTest {
         }
 
         whenever(getSessionLinkUseCase(uriString)) doReturn sessionUriString
+
+        assertThat(underTest.getNavKeys(uri, RegexPatternType.MEGA_LINK, isLoggedIn))
+            .containsExactly(expected)
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that correct nav key is returned if getSessionLinkUseCase throws exception`(
+        isLoggedIn: Boolean,
+    ) = runTest {
+        val uriString = "https://mega.app/whatever"
+        val expected = WebSiteNavKey(uriString)
+        val uri = mock<Uri> {
+            on { this.toString() } doReturn uriString
+        }
+
+        whenever(getSessionLinkUseCase(uriString)) doThrow RuntimeException()
 
         assertThat(underTest.getNavKeys(uri, RegexPatternType.MEGA_LINK, isLoggedIn))
             .containsExactly(expected)
