@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.chat.navigation
+package mega.privacy.android.feature.chat.navigation
 
 import android.net.Uri
 import com.google.common.truth.Truth.assertThat

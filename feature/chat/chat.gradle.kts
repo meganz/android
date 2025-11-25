@@ -20,6 +20,8 @@ dependencies {
     implementation(project(":icon-pack"))
     implementation(project(":shared:resources"))
     implementation(project(":domain"))
+    implementation(project(":navigation"))
+    implementation(project(":core:navigation-contract"))
     implementation(lib.mega.core.ui)
     implementation(androidx.material3.window)
     implementation(androidx.bundles.compose.bom)
@@ -27,6 +29,7 @@ dependencies {
     implementation(androidx.hilt.navigation)
     implementation(lib.kotlin.serialisation)
     implementation(androidx.navigation.compose)
+    implementation(androidx.navigation3.runtime)
 
     //test
     testImplementation(project(":core-test"))
