@@ -22,10 +22,13 @@ class NavigationEventViewModel @Inject constructor(
     val navigationEvents: StateFlow<StateEventWithContent<List<NavKey>>> by lazy {
         flow {
             for (event in navigationEventQueueReceiver.events) {
-                acknowledged = CompletableDeferred()
-                emit(triggered(event))
-                acknowledged?.await()
-                emit(consumed())
+                val items = event()
+                if (items != null) {
+                    acknowledged = CompletableDeferred()
+                    emit(triggered(items))
+                    acknowledged?.await()
+                    emit(consumed())
+                }
             }
         }.asUiStateFlow(
             viewModelScope,

@@ -26,4 +26,11 @@ dependencies {
     implementation(lib.logging.timber)
 
     implementation(lib.javax.inject)
+
+    testImplementation(platform(testlib.junit5.bom))
+    testImplementation(testlib.bundles.junit5.api)
+    testRuntimeOnly(testlib.junit.jupiter.engine)
+    testImplementation(testlib.bundles.unit.test)
+    testImplementation(testlib.truth)
+    testImplementation(testlib.truth.ext)
 }

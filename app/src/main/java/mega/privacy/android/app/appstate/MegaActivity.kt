@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
@@ -43,11 +44,11 @@ import androidx.navigation3.ui.NavDisplay
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.NavigationEventEffect
+import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.appstate.content.NavigationGraphViewModel
 import mega.privacy.android.app.appstate.content.destinations.FetchingContentNavKey
-import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.app.appstate.content.model.NavigationGraphState
 import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.appstate.content.navigation.PendingBackStack
@@ -80,6 +81,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.transparent.TransparentSceneStrategy
+import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -111,10 +113,12 @@ class MegaActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         this.intent = intent
-        consumeIntentExtras()
+        lifecycleScope.launch {
+            consumeIntentExtras()
+        }
     }
 
-    private fun consumeIntentExtras() {
+    private suspend fun consumeIntentExtras() {
         consumeWarningMessage()
         consumeIntentDestinations()
     }
@@ -126,13 +130,13 @@ class MegaActivity : ComponentActivity() {
         }
     }
 
-    private fun consumeIntentDestinations() {
+    private suspend fun consumeIntentDestinations() {
         intent.getDestinations()?.let { navKeys ->
             //Add nav keys to navigation queue
             navKeys.forEach {
                 Timber.d("NavKey from intent: $it")
             }
-            navigationEventQueue.tryEmit(navKeys)
+            navigationEventQueue.emit(navKeys)
         }
     }
 
@@ -142,7 +146,9 @@ class MegaActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         splashScreen.setKeepOnScreenCondition { keepSplashScreen }
         enableEdgeToEdge()
-        consumeIntentExtras()
+        lifecycleScope.launch {
+            consumeIntentExtras()
+        }
         setContent {
             val navGraphViewModel = hiltViewModel<NavigationGraphViewModel>() // nav graph content
             val presenceViewModel = hiltViewModel<SignalPresenceViewModel>()
