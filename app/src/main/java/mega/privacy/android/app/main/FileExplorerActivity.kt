@@ -120,6 +120,7 @@ import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToCloudDriveEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingPDFToChatEvent
@@ -148,7 +149,6 @@ import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
-import mega.privacy.android.shared.resources.R as sharedR
 
 
 /**
@@ -1216,11 +1216,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     setCreateFolderVisibility()
                     newChatMenuItem?.isVisible = false
 
-                    if (isMultiselect) {
-                        cDriveExplorer = cloudExplorerFragment
-                        searchMenuItem?.isVisible =
-                            cDriveExplorer != null && cDriveExplorer?.isFolderEmpty() == false
-                    }
+                    cDriveExplorer = cloudExplorerFragment
+                    // Show search menu if folder is not empty, regardless of mode
+                    // Previously this was only checked in multiselect mode, causing search to be hidden in MOVE/COPY modes
+                    searchMenuItem?.isVisible =
+                        cDriveExplorer != null && cDriveExplorer?.isFolderEmpty() == false
                 }
 
                 INCOMING_TAB -> {
@@ -1246,9 +1246,8 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
                     newChatMenuItem?.isVisible = false
 
-                    if (isMultiselect) {
-                        searchMenuItem?.isVisible = iSharesExplorer?.isFolderEmpty() == false
-                    }
+                    // Show search menu if folder is not empty, regardless of mode
+                    searchMenuItem?.isVisible = iSharesExplorer?.isFolderEmpty() == false
                 }
 
                 CHAT_TAB -> {
@@ -2488,15 +2487,13 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 return supportFragmentManager.findFragmentByTag("chatExplorer") as ChatExplorerFragment?
             }
             mTabsAdapterExplorer?.getFragment(2)?.let {
-                val c = it as ChatExplorerFragment
-                return if (c.isAdded) c else null
+                return it as ChatExplorerFragment
             } ?: return null
         }
     private val incomingExplorerFragment: IncomingSharesExplorerFragment?
         get() {
             mTabsAdapterExplorer?.getFragment(1)?.let {
-                val iS = it as IncomingSharesExplorerFragment
-                return if (iS.isAdded) iS else null
+                return it as IncomingSharesExplorerFragment
             } ?: return null
         }
     private val cloudExplorerFragment: CloudDriveExplorerFragment?
@@ -2505,8 +2502,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 return supportFragmentManager.findFragmentByTag("cDriveExplorer") as CloudDriveExplorerFragment?
             }
             mTabsAdapterExplorer?.getFragment(0)?.let {
-                val cD = it as CloudDriveExplorerFragment
-                return if (cD.isAdded) cD else null
+                return it as CloudDriveExplorerFragment
             } ?: return null
         }
 

@@ -780,10 +780,11 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             adapter.setNodes(it)
             nodes.addAll(it)
             updateView()
+            // Always invalidate options menu after data is loaded to ensure search menu visibility is correct
+            // This fixes the race condition where changeTitle() -> invalidateOptionsMenu() is called
+            // BEFORE data is loaded (e.g., in setParentHandle() -> changeTitle())
             if (context is FileExplorerActivity) {
-                if (isMultiselect()) {
-                    (context as FileExplorerActivity).showOrHideSearchMenu(isFolderEmpty().not())
-                }
+                (context as FileExplorerActivity).invalidateOptionsMenu()
             }
         }
     }

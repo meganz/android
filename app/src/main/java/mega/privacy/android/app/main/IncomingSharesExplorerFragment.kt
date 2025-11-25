@@ -1,7 +1,5 @@
 package mega.privacy.android.app.main
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Bundle
 import android.text.Spanned
 import android.view.LayoutInflater
@@ -47,6 +45,8 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -782,6 +782,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
             adapter.setNodes(it)
             nodes.addAll(it)
             updateView()
+            fileExplorerActivity.invalidateOptionsMenu()
         }
         checkWritePermissions()
     }

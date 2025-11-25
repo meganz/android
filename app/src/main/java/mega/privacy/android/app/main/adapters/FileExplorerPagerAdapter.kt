@@ -36,7 +36,7 @@ class FileExplorerPagerAdapter(private val fm: FragmentManager, lifeCycle: Lifec
 
     override fun getItemCount(): Int = if (!tabRemoved) PAGE_COUNT else PAGE_COUNT - 1
 
-    fun getFragment(position: Int): Fragment? = fm.findFragmentByTag("f${getItemId(position)}")
+    fun getFragment(position: Int): Fragment? = fragments[position] as Fragment?
 
     companion object {
         private const val PAGE_COUNT = 3
