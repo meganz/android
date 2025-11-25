@@ -51,6 +51,7 @@ import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.model.NewRubbishBinUiState
 import mega.privacy.android.navigation.destination.RubbishBinNavKey
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 
@@ -107,7 +108,6 @@ class NewRubbishBinViewModel @AssistedInject constructor(
     private var loadNodeChunksJob: Job? = null
 
     init {
-        setRubbishBinFolderHandle()
         setupNodesLoading()
         nodeUpdates()
         monitorViewTypeChanges()
@@ -115,28 +115,21 @@ class NewRubbishBinViewModel @AssistedInject constructor(
         monitorAccountDetail()
     }
 
-    private fun setRubbishBinFolderHandle() {
-        viewModelScope.launch {
-            Timber.d("Rubbish bin handle: ${args.handle}")
-            runCatching {
-                args.handle ?: getRubbishBinFolderUseCase()?.id?.longValue
-                ?: MegaApiJava.INVALID_HANDLE
-            }.onSuccess { handle ->
-                _uiState.update { it.copy(currentFolderId = NodeId(handle)) }
-            }.onFailure {
-                Timber.e(it)
-            }
-        }
-    }
-
     private fun setupNodesLoading() {
         loadNodeChunksJob = viewModelScope.launch {
-            val folderId = uiState.value.currentFolderId
-            val folderOrRootNodeId = if (folderId.longValue == -1L) {
-                getRubbishBinFolderUseCase()?.let { NodeId(it.id.longValue) } ?: folderId
+            val handle = args.handle
+            val folderOrRootNodeId = if (handle == null) {
+                getRubbishBinFolderUseCase()?.let { NodeId(it.id.longValue) } ?: NodeId(-1L)
             } else {
-                folderId
+                NodeId(handle)
             }
+            val title = if (handle == null) {
+                LocalizedText.StringRes(sharedR.string.general_section_rubbish_bin)
+            } else {
+                val currentNode = getNodeByIdUseCase(folderOrRootNodeId)
+                LocalizedText.Literal(currentNode?.name.orEmpty())
+            }
+            _uiState.update { it.copy(title = title, currentFolderId = folderOrRootNodeId) }
             getNodesByIdInChunkUseCase(folderOrRootNodeId)
                 .catch { error ->
                     Timber.e(error)

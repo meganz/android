@@ -34,7 +34,6 @@ import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
-import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
@@ -51,6 +50,7 @@ import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomS
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
+import mega.privacy.android.core.sharedcomponents.node.rememberNodeId
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -97,7 +97,7 @@ internal fun RubbishBinScreen(
     )
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
 
-    var visibleNodeOptionId by remember { mutableStateOf<NodeId?>(null) }
+    var visibleNodeOptionId by rememberNodeId(null)
     val nodeOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showClearRubbishBinDialog by remember { mutableStateOf(false) }
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -195,31 +195,30 @@ internal fun RubbishBinScreen(
                             onBackPressedDispatcher?.onBackPressed()
                         }
                     ),
-                    title = when (uiState.title) {
-                        is LocalizedText.Literal -> uiState.title.text
-                        else -> stringResource(sharedR.string.general_section_rubbish_bin)
-                    },
+                    title = uiState.title.text,
                     maxActionsToShow = if (isRootDirectory) 1 else 2,
-                    actions = buildList {
-                        add(MenuActionWithClick(RubbishBinAppBarAction.Search) {
-                            openSearch(
-                                uiState.currentFolderId.longValue,
-                            )
-                        })
-                        if (isRootDirectory) {
-                            add(
-                                MenuActionWithClick(RubbishBinAppBarAction.Empty) {
-                                    showClearRubbishBinDialog = true
-                                },
-                            )
-                        } else {
-                            add(
-                                MenuActionWithClick(RubbishBinAppBarAction.More) {
-                                    visibleNodeOptionId = uiState.currentFolderId
-                                },
-                            )
+                    actions = if (uiState.items.isNotEmpty()) {
+                        buildList {
+                            add(MenuActionWithClick(RubbishBinAppBarAction.Search) {
+                                openSearch(
+                                    uiState.currentFolderId.longValue,
+                                )
+                            })
+                            if (isRootDirectory) {
+                                add(
+                                    MenuActionWithClick(RubbishBinAppBarAction.Empty) {
+                                        showClearRubbishBinDialog = true
+                                    },
+                                )
+                            } else {
+                                add(
+                                    MenuActionWithClick(RubbishBinAppBarAction.More) {
+                                        visibleNodeOptionId = uiState.currentFolderId
+                                    },
+                                )
+                            }
                         }
-                    },
+                    } else emptyList(),
                 )
             }
         },

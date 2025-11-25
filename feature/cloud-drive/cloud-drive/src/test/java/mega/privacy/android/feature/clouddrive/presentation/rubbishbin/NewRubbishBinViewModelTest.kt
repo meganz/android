@@ -161,6 +161,7 @@ class NewRubbishBinViewModelTest {
                 assertThat(awaitItem()).isEqualTo(-1L)
                 underTest.setRubbishBinHandle(newValue)
                 assertThat(awaitItem()).isEqualTo(newValue)
+                cancelAndIgnoreRemainingEvents()
             }
     }
 
