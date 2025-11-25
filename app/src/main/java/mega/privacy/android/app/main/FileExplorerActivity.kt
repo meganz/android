@@ -1897,13 +1897,19 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     if (isSelectFile) {
                         val intent = Intent()
                         intent.putExtra(EXTRA_SELECTED_FOLDER, handle)
-                        intent.putStringArrayListExtra(Constants.SELECTED_CONTACTS, selectedContacts)
+                        intent.putStringArrayListExtra(
+                            Constants.SELECTED_CONTACTS,
+                            selectedContacts
+                        )
                         setResult(RESULT_OK, intent)
                         finishAndRemoveTask()
                     } else {
                         val intent = Intent()
                         intent.putExtra(EXTRA_SELECTED_FOLDER, parentNode.handle)
-                        intent.putStringArrayListExtra(Constants.SELECTED_CONTACTS, selectedContacts)
+                        intent.putStringArrayListExtra(
+                            Constants.SELECTED_CONTACTS,
+                            selectedContacts
+                        )
                         setResult(RESULT_OK, intent)
                         finishAndRemoveTask()
                     }
@@ -1917,6 +1923,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     }
                     val intent = Intent()
                     intent.putExtra(EXTRA_MEGA_SELECTED_FOLDER, parentNode.handle)
+                    intent.putExtra(EXTRA_IS_FOLDER_FROM_INCOMING, tabShown == INCOMING_TAB)
                     setResult(RESULT_OK, intent)
                     finishAndRemoveTask()
                 }
@@ -2775,6 +2782,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
          * Intent extra for the selected MEGA Folder
          */
         const val EXTRA_MEGA_SELECTED_FOLDER = "EXTRA_MEGA_SELECTED_FOLDER"
+
+        /**
+         * Intent extra for the folder whether it is selected from incoming share.
+         */
+        const val EXTRA_IS_FOLDER_FROM_INCOMING = "EXTRA_IS_FOLDER_FROM_INCOMING"
 
         /**
          * Intent extra for the scan file type

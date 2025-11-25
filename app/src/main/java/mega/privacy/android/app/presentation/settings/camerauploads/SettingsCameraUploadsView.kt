@@ -33,6 +33,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEvent
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.business.BusinessAccountPromptHandler
@@ -71,6 +72,7 @@ import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicke
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.mobile.analytics.event.CameraUploadsTargetFolderIncomingShareSelectedEvent
 
 /**
  * A Composable that holds views displaying the main Settings Camera Uploads screen
@@ -179,6 +181,13 @@ internal fun SettingsCameraUploadsView(
             val primaryFolderNodeId = NodeId(
                 it.data?.getLongExtra(FileExplorerActivity.EXTRA_MEGA_SELECTED_FOLDER, -1L) ?: -1L
             )
+            val isTargetFolderFromIncoming = it.data?.getBooleanExtra(
+                FileExplorerActivity.EXTRA_IS_FOLDER_FROM_INCOMING,
+                false
+            ) ?: false
+            if (isTargetFolderFromIncoming) {
+                Analytics.tracker.trackEvent(CameraUploadsTargetFolderIncomingShareSelectedEvent)
+            }
             onPrimaryFolderNodeSelected.invoke(primaryFolderNodeId)
         }
     }
