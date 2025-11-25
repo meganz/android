@@ -8,6 +8,7 @@ import dagger.multibindings.IntoSet
 import mega.privacy.android.feature.clouddrive.navigation.CloudDriveDeepLinkHandler
 import mega.privacy.android.feature.clouddrive.navigation.CloudDriveFeatureDestination
 import mega.privacy.android.feature.clouddrive.navigation.DriveSyncNavItem
+import mega.privacy.android.feature.clouddrive.presentation.shares.links.navigation.PasswordLinkDeepLinkHandler
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
@@ -28,5 +29,10 @@ class CloudDriveModule {
     @Provides
     @IntoSet
     fun provideCloudDriveDeepLinkHandler(handler: CloudDriveDeepLinkHandler): DeepLinkHandler =
+        handler
+
+    @Provides
+    @IntoSet
+    fun providePasswordLinkDeepLinkHandler(handler: PasswordLinkDeepLinkHandler): DeepLinkHandler =
         handler
 }

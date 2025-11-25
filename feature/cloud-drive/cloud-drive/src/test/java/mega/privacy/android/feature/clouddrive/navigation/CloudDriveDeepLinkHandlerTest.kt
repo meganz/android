@@ -18,7 +18,6 @@ import mega.privacy.android.domain.usecase.node.GetFileNodeContentForFileNodeUse
 import mega.privacy.android.domain.usecase.node.GetNodeIdFromBase64UseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
-import mega.privacy.android.feature.clouddrive.presentation.shares.links.OpenPasswordLinkDialogNavKey
 import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
@@ -89,23 +88,7 @@ class CloudDriveDeepLinkHandlerTest {
 
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
-    fun `test that correct nav key is returned when uri matches PASSWORD_LINK pattern type`(
-        isLoggedIn: Boolean,
-    ) = runTest {
-        val uriString = "https://mega.nz/encryptedLink"
-        val expected = OpenPasswordLinkDialogNavKey(uriString)
-        val uri = mock<Uri> {
-            on { this.toString() } doReturn uriString
-        }
-
-        val actual = underTest.getNavKeys(uri, RegexPatternType.PASSWORD_LINK, isLoggedIn)
-
-        assertThat(actual).containsExactly(expected)
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that null is returned when regex pattern type is not HANDLE_LINK or PASSWORD_LINK`(
+    fun `test that null is returned when regex pattern type is not HANDLE_LINK`(
         isLoggedIn: Boolean,
     ) = runTest {
         val uriString = "https://other-link"

@@ -15,7 +15,6 @@ import mega.privacy.android.domain.usecase.node.GetFileNodeContentForFileNodeUse
 import mega.privacy.android.domain.usecase.node.GetNodeIdFromBase64UseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
-import mega.privacy.android.feature.clouddrive.presentation.shares.links.OpenPasswordLinkDialogNavKey
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
@@ -42,10 +41,6 @@ class CloudDriveDeepLinkHandler @Inject constructor(
         uri: Uri,
         regexPatternType: RegexPatternType?,
     ): List<NavKey>? = when (regexPatternType) {
-        RegexPatternType.PASSWORD_LINK -> {
-            listOf(OpenPasswordLinkDialogNavKey(uri.toString()))
-        }
-
         RegexPatternType.HANDLE_LINK -> catchWithEmptyListAndLog {
             val node = uri.extractNodeHandleBase64FromUri()
                 ?.let { getNodeIdFromBase64UseCase(it) }?.longValue?.let { handle ->
