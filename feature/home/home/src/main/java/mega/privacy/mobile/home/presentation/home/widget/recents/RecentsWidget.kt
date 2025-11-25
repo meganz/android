@@ -1,15 +1,20 @@
 package mega.privacy.mobile.home.presentation.home.widget.recents
 
+import android.text.format.DateFormat
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -20,6 +25,7 @@ import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.node.NodeId
@@ -32,6 +38,10 @@ import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsTi
 import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsUiItem
 import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsWidgetUiState
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentsListItemView
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 class RecentsWidget @Inject constructor() : HomeWidget {
@@ -50,7 +60,7 @@ class RecentsWidget @Inject constructor() : HomeWidget {
     ) {
         val viewModel = hiltViewModel<RecentsWidgetViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-        Recents(
+        RecentsView(
             uiState = uiState,
             modifier = modifier,
             onNavigate = onNavigate
@@ -60,7 +70,7 @@ class RecentsWidget @Inject constructor() : HomeWidget {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun Recents(
+fun RecentsView(
     uiState: RecentsWidgetUiState,
     onNavigate: (NavKey) -> Unit,
     modifier: Modifier = Modifier,
@@ -78,30 +88,88 @@ private fun Recents(
                 stringResource(R.string.section_recents),
                 style = AppTheme.typography.titleMedium.copy(
                     fontSize = 18.sp
-                )
+                ),
+                modifier = Modifier.testTag(TITLE_TEST_TAG)
             )
             // TODO Implement option button
         }
 
-        uiState.recentActionItems.forEachIndexed { index, item ->
-            RecentsListItemView(
-                item = item,
-                onItemClicked = {
-                    // TODO: Handle item click navigation
-                },
-                onMenuClicked = {
-                    // TODO: Handle menu click
-                }
+        val grouped = remember(uiState.recentActionItems) {
+            uiState.recentActionItems.groupBy { it.timestampText.dateOnlyTimestamp }
+        }
+
+        grouped.forEach { (dateTimestamp, itemsForDate) ->
+            RecentDateHeader(dateTimestamp)
+
+            itemsForDate.forEach { item ->
+                RecentsListItemView(
+                    item = item,
+                    onItemClicked = {
+                        // TODO: Handle item click navigation
+                    },
+                    onMenuClicked = {
+                        // TODO: Handle menu click
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun RecentDateHeader(timestamp: Long) {
+    MegaText(
+        text = FormatRecentsDate(timestamp),
+        textColor = TextColor.Secondary,
+        style = MaterialTheme.typography.labelMedium,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .testTag(DATE_HEADER_TEST_TAG)
+    )
+}
+
+/**
+ * Format date from timestamp for header
+ */
+@Composable
+fun FormatRecentsDate(timestamp: Long): String {
+    val locale = Locale.current.platformLocale
+    val zoneId = remember { ZoneId.systemDefault() }
+    val timestampInstant = Instant.ofEpochSecond(timestamp)
+    val timestampDate = timestampInstant.atZone(zoneId).toLocalDate()
+    val todayDate = LocalDate.now(zoneId)
+    val yesterdayDate = todayDate.minusDays(1)
+
+    val dateTimeFormatter = remember(locale) {
+        DateTimeFormatter.ofPattern(
+            DateFormat.getBestDateTimePattern(
+                locale,
+                "EEEE, d MMM yyyy"
             )
+        ).withLocale(locale)
+    }
+
+    return when (timestampDate) {
+        todayDate -> {
+            stringResource(R.string.label_today)
+        }
+
+        yesterdayDate -> {
+            stringResource(R.string.label_yesterday)
+        }
+
+        else -> {
+            timestampInstant.atZone(zoneId).format(dateTimeFormatter)
         }
     }
 }
 
 @CombinedThemePreviews
 @Composable
-private fun RecentsPreview() {
+private fun RecentsViewPreview() {
     AndroidThemeForPreviews {
-        Recents(
+        RecentsView(
             uiState = RecentsWidgetUiState(
                 recentActionItems = listOf(
                     createMockRecentsUiItem(
@@ -115,7 +183,7 @@ private fun RecentsPreview() {
                     createMockRecentsUiItem(
                         title = RecentActionTitleText.SingleNode("Document.pdf"),
                         parentFolderName = LocalizedText.Literal("Cloud Drive"),
-                        timestamp = System.currentTimeMillis() / 1000,
+                        timestamp = System.currentTimeMillis() / 1000 - 207200,
                         icon = IconPackR.drawable.ic_pdf_medium_solid,
                         isFavourite = true,
                         nodeLabel = NodeLabel.RED,
@@ -123,7 +191,7 @@ private fun RecentsPreview() {
                     createMockRecentsUiItem(
                         title = RecentActionTitleText.RegularBucket("Presentation.pptx", 3),
                         parentFolderName = LocalizedText.Literal("Work"),
-                        timestamp = System.currentTimeMillis() / 1000 - 7200,
+                        timestamp = System.currentTimeMillis() / 1000 - 207200,
                         icon = IconPackR.drawable.ic_generic_medium_solid,
                         isUpdate = true,
                         updatedByText = LocalizedText.StringRes(
@@ -142,9 +210,9 @@ private fun RecentsPreview() {
 
 @CombinedThemePreviews
 @Composable
-private fun RecentsEmptyPreview() {
+private fun RecentsViewEmptyPreview() {
     AndroidThemeForPreviews {
-        Recents(
+        RecentsView(
             uiState = RecentsWidgetUiState(
                 recentActionItems = emptyList(),
                 isLoading = false,
@@ -156,9 +224,9 @@ private fun RecentsEmptyPreview() {
 
 @CombinedThemePreviews
 @Composable
-private fun RecentsLoadingPreview() {
+private fun RecentsViewLoadingPreview() {
     AndroidThemeForPreviews {
-        Recents(
+        RecentsView(
             uiState = RecentsWidgetUiState(
                 recentActionItems = emptyList(),
                 isLoading = true,
@@ -204,3 +272,6 @@ private fun createMockRecentsUiItem(
         bucket = mockBucket,
     )
 }
+
+internal const val TITLE_TEST_TAG = "recents_widget:title"
+internal const val DATE_HEADER_TEST_TAG = "recents_widget:date_header"
