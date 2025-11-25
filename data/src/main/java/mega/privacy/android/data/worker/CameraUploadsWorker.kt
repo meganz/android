@@ -368,9 +368,12 @@ class CameraUploadsWorker @AssistedInject constructor(
             withContext(NonCancellable) {
                 Timber.e(
                     t = throwable,
-                    message = "Camera Uploads process aborted".apply {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-                            "$this, worker stopReason is $stopReason"
+                    message = "Camera Uploads process aborted".let {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            "$it, worker stopReason is $stopReason"
+                        } else {
+                            it
+                        }
                     }
                 )
 
@@ -1390,7 +1393,16 @@ class CameraUploadsWorker @AssistedInject constructor(
         if (!isConnectedToInternetUseCase()) return
 
         // Update both Primary and Secondary Folder Backup States to TEMPORARILY_DISABLED
-        updateBackupState(BackupState.TEMPORARILY_DISABLED)
+        updateBackupState(BackupState.TEMPORARILY_DISABLED).apply {
+            val stopReasonString = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                stopReason
+            } else {
+                "N/A (API < 31)"
+            }
+            Timber.d(
+                "updateBackupState(BackupState.TEMPORARILY_DISABLED) called with finishedReason: $finishedReason, stopReason: $stopReasonString"
+            )
+        }
 
         // Send an INACTIVE Heartbeat Status for both Primary and Secondary Folders
         updateBackupHeartbeatStatus(HeartbeatStatus.INACTIVE)
