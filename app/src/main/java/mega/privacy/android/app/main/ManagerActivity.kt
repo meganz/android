@@ -76,6 +76,7 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.withStarted
 import androidx.navigation.NavController
@@ -2018,21 +2019,23 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             syncMonitorViewModel.state,
             Lifecycle.State.CREATED
         ) { state: SyncMonitorState ->
-            state.displayNotification?.let { notification ->
-                if (ActivityCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.POST_NOTIFICATIONS
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    var notificationId: Int? = null
-                    if (!syncNotificationManager.isSyncNotificationDisplayed()) {
-                        notificationId =
-                            syncNotificationManager.show(this@ManagerActivity, notification)
+            lifecycle.coroutineScope.launch {
+                state.displayNotification?.let { notification ->
+                    if (ActivityCompat.checkSelfPermission(
+                            this@ManagerActivity,
+                            Manifest.permission.POST_NOTIFICATIONS
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        var notificationId: Int? = null
+                        if (!syncNotificationManager.isSyncNotificationDisplayed()) {
+                            notificationId =
+                                syncNotificationManager.show(this@ManagerActivity, notification)
+                        }
+                        syncMonitorViewModel.onNotificationShown(
+                            syncNotificationMessage = notification,
+                            notificationId = notificationId,
+                        )
                     }
-                    syncMonitorViewModel.onNotificationShown(
-                        syncNotificationMessage = notification,
-                        notificationId = notificationId,
-                    )
                 }
             }
         }

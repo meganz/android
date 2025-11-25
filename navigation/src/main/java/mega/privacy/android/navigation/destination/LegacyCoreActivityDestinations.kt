@@ -84,7 +84,8 @@ data class TestPasswordNavKey(
 data class OfflineInfoNavKey(val handle: String) : NavKey
 
 @Serializable
-data object SyncListNavKey : NavKey
+@Parcelize
+data object SyncListNavKey : NavKey, Parcelable
 
 @Serializable
 data class SyncNewFolderNavKey(
@@ -182,5 +183,5 @@ data class LegacyMediaPlayerNavKey(
     val fileName: String,
     val parentHandle: Long,
     val fileHandle: Long,
-    val fileTypeInfo: FileTypeInfo
+    val fileTypeInfo: FileTypeInfo,
 ) : NoSessionNavKey.Optional

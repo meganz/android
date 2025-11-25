@@ -46,6 +46,18 @@
             </intent-filter>
         </activity>
 
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge"
+            tools:replace="android:authorities">
+
+            <meta-data
+                android:name="mega.privacy.android.app.initializer.SyncMonitorInitializer"
+                android:value="androidx.startup" />
+        </provider>
+
     </application>
 
 </manifest>
