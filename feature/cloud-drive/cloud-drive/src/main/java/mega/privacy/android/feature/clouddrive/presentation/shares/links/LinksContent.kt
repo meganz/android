@@ -145,7 +145,7 @@ fun LinksContent(
             },
             onDownloadEvent = onTransfer,
             coroutineScope = coroutineScope,
-            navigationHandler = navigationHandler,
+            onNavigate = navigationHandler::navigate,
         )
     }
 }

@@ -325,7 +325,7 @@ internal fun RubbishBinScreen(
             },
             onDownloadEvent = onTransfer,
             coroutineScope = coroutineScope,
-            navigationHandler = navigationHandler,
+            onNavigate = navigationHandler::navigate,
         )
     }
 

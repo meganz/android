@@ -197,7 +197,7 @@ internal fun FavouritesContent(
             HandleNodeAction3(
                 typedFileNode = openedFileNode,
                 snackBarHostState = snackbarHostState,
-                navigationHandler = navigationHandler,
+                onNavigate = navigationHandler::navigate,
                 coroutineScope = coroutineScope,
                 onActionHandled = { onAction(OpenedFileNodeHandled) },
                 nodeSourceType = NodeSourceType.FAVOURITES,

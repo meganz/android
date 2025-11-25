@@ -57,6 +57,7 @@ class RecentActionUiItemMapper @Inject constructor(
             userName = if (!item.currentUserIsOwner) item.userName else null,
             isFavourite = isSingleNode && node.isFavourite,
             nodeLabel = if (isSingleNode) node.nodeLabel else null,
+            isSingleNode = isSingleNode,
             bucket = item
         )
     }

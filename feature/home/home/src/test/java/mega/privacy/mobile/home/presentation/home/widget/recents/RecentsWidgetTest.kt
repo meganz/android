@@ -4,12 +4,18 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.RecentActionBucket
+import mega.privacy.android.domain.entity.RecentActionsSharesType
+import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentActionTitleText
 import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsTimestampText
@@ -19,6 +25,7 @@ import mega.privacy.mobile.home.presentation.home.widget.recents.view.FIRST_LINE
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
 class RecentsWidgetTest {
@@ -35,7 +42,7 @@ class RecentsWidgetTest {
                         recentActionItems = emptyList(),
                         isLoading = false,
                     ),
-                    onNavigate = {}
+                    onFileClicked = { _, _ -> },
                 )
             }
         }
@@ -65,7 +72,7 @@ class RecentsWidgetTest {
                         recentActionItems = listOf(item1, item2),
                         isLoading = false,
                     ),
-                    onNavigate = {}
+                    onFileClicked = { _, _ -> },
                 )
             }
         }
@@ -102,7 +109,7 @@ class RecentsWidgetTest {
                         recentActionItems = listOf(item1, item2),
                         isLoading = false,
                     ),
-                    onNavigate = {}
+                    onFileClicked = { _, _ -> },
                 )
             }
         }
@@ -133,7 +140,7 @@ class RecentsWidgetTest {
                         recentActionItems = listOf(item),
                         isLoading = false,
                     ),
-                    onNavigate = {}
+                    onFileClicked = { _, _ -> },
                 )
             }
         }
@@ -174,7 +181,7 @@ class RecentsWidgetTest {
                         recentActionItems = listOf(item1, item2, item3),
                         isLoading = false,
                     ),
-                    onNavigate = {}
+                    onFileClicked = { _, _ -> },
                 )
             }
         }
@@ -221,7 +228,7 @@ class RecentsWidgetTest {
                         recentActionItems = listOf(item1, item2, item3),
                         isLoading = false,
                     ),
-                    onNavigate = {}
+                    onFileClicked = { _, _ -> },
                 )
             }
         }
@@ -236,6 +243,129 @@ class RecentsWidgetTest {
             .assertCountEquals(3)
     }
 
+    @Test
+    fun `test that onFileClicked is called with correct node and INCOMING_SHARES source type when item from incoming shares is clicked`() {
+        val mockNode = createMockTypedFileNode(name = "SharedDocument.pdf")
+        var clickedNode: TypedFileNode? = null
+        var clickedSourceType: NodeSourceType? = null
+
+        val item = createMockRecentsUiItem(
+            title = RecentActionTitleText.SingleNode("SharedDocument.pdf"),
+            parentFolderName = LocalizedText.Literal("Incoming Shares"),
+            timestamp = System.currentTimeMillis() / 1000,
+            icon = IconPackR.drawable.ic_generic_medium_solid,
+            nodes = listOf(mockNode),
+            parentFolderSharesType = RecentActionsSharesType.INCOMING_SHARES,
+        )
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsView(
+                    uiState = RecentsWidgetUiState(
+                        recentActionItems = listOf(item),
+                        isLoading = false,
+                    ),
+                    onFileClicked = { node, sourceType ->
+                        clickedNode = node
+                        clickedSourceType = sourceType
+                    },
+                )
+            }
+        }
+
+        composeRule.waitForIdle()
+        composeRule.onAllNodesWithTag(FIRST_LINE_TEST_TAG, true)[0]
+            .performClick()
+
+        assertThat(clickedNode).isEqualTo(mockNode)
+        assertThat(clickedSourceType).isEqualTo(NodeSourceType.INCOMING_SHARES)
+    }
+
+    @Test
+    fun `test that onFileClicked is called with CLOUD_DRIVE source type for OUTGOING_SHARES parent folder`() {
+        val mockNode = createMockTypedFileNode(name = "OutgoingDocument.pdf")
+        var clickedNode: TypedFileNode? = null
+        var clickedSourceType: NodeSourceType? = null
+
+        val item = createMockRecentsUiItem(
+            title = RecentActionTitleText.SingleNode("OutgoingDocument.pdf"),
+            parentFolderName = LocalizedText.Literal("Outgoing Shares"),
+            timestamp = System.currentTimeMillis() / 1000,
+            icon = IconPackR.drawable.ic_generic_medium_solid,
+            nodes = listOf(mockNode),
+            parentFolderSharesType = RecentActionsSharesType.OUTGOING_SHARES,
+        )
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsView(
+                    uiState = RecentsWidgetUiState(
+                        recentActionItems = listOf(item),
+                        isLoading = false,
+                    ),
+                    onFileClicked = { node, sourceType ->
+                        clickedNode = node
+                        clickedSourceType = sourceType
+                    },
+                )
+            }
+        }
+
+        composeRule.waitForIdle()
+        composeRule.onAllNodesWithTag(FIRST_LINE_TEST_TAG, true)[0]
+            .performClick()
+
+        assertThat(clickedNode).isEqualTo(mockNode)
+        assertThat(clickedSourceType).isEqualTo(NodeSourceType.CLOUD_DRIVE)
+    }
+
+    @Test
+    fun `test that onFileClicked is not called when media bucket item is clicked`() {
+        val mockNode = createMockTypedFileNode(name = "Image.jpg")
+        var clickedNode: TypedFileNode? = null
+        var clickedSourceType: NodeSourceType? = null
+
+        val item = createMockRecentsUiItem(
+            title = RecentActionTitleText.MediaBucketImagesOnly(5),
+            parentFolderName = LocalizedText.Literal("Photos"),
+            timestamp = System.currentTimeMillis() / 1000,
+            icon = IconPackR.drawable.ic_image_stack_medium_solid,
+            isMediaBucket = true,
+            nodes = listOf(mockNode),
+            parentFolderSharesType = RecentActionsSharesType.NONE,
+        )
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsView(
+                    uiState = RecentsWidgetUiState(
+                        recentActionItems = listOf(item),
+                        isLoading = false,
+                    ),
+                    onFileClicked = { node, sourceType ->
+                        clickedNode = node
+                        clickedSourceType = sourceType
+                    },
+                )
+            }
+        }
+
+        composeRule.waitForIdle()
+        composeRule.onAllNodesWithTag(FIRST_LINE_TEST_TAG, true)[0]
+            .performClick()
+
+        assertThat(clickedNode).isNull()
+        assertThat(clickedSourceType).isNull()
+    }
+
+    private fun createMockTypedFileNode(
+        name: String = "testFile.txt",
+    ): TypedFileNode = mock {
+        on { it.name }.thenReturn(name)
+        on { it.id }.thenReturn(NodeId(1L))
+        on { it.type }.thenReturn(TextFileTypeInfo("text/plain", "txt"))
+    }
+
     private fun createMockRecentsUiItem(
         title: RecentActionTitleText,
         parentFolderName: LocalizedText,
@@ -248,6 +378,8 @@ class RecentsWidgetTest {
         userName: String? = null,
         isFavourite: Boolean = false,
         nodeLabel: NodeLabel? = null,
+        nodes: List<TypedFileNode> = emptyList(),
+        parentFolderSharesType: RecentActionsSharesType = RecentActionsSharesType.NONE,
     ): RecentsUiItem {
         val mockBucket = RecentActionBucket(
             timestamp = timestamp,
@@ -255,7 +387,8 @@ class RecentsWidgetTest {
             parentNodeId = NodeId(1L),
             isUpdate = isUpdate,
             isMedia = isMediaBucket,
-            nodes = emptyList(),
+            nodes = nodes,
+            parentFolderSharesType = parentFolderSharesType,
         )
         return RecentsUiItem(
             title = title,
@@ -270,6 +403,7 @@ class RecentsWidgetTest {
             isFavourite = isFavourite,
             nodeLabel = nodeLabel,
             bucket = mockBucket,
+            isSingleNode = !isMediaBucket
         )
     }
 }

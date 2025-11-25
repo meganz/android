@@ -420,7 +420,7 @@ internal fun CloudDriveContent(
                 nodeSourceType = NodeSourceType.CLOUD_DRIVE,
                 onDownloadEvent = onTransfer,
                 sortOrder = uiState.selectedSortOrder,
-                navigationHandler = navigationHandler,
+                onNavigate = navigationHandler::navigate,
             )
         }
 

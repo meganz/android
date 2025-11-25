@@ -3,6 +3,7 @@ package mega.privacy.android.core.nodecomponents.action
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
@@ -13,7 +14,6 @@ import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.navigation.contract.NavigationHandler
 
 /**
  * Handle node action click for m3
@@ -22,7 +22,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 fun HandleNodeAction3(
     typedFileNode: TypedFileNode,
     snackBarHostState: SnackbarHostState?,
-    navigationHandler: NavigationHandler,
+    onNavigate: (NavKey) -> Unit,
     onActionHandled: () -> Unit,
     coroutineScope: CoroutineScope,
     nodeSourceType: NodeSourceType,
@@ -47,7 +47,7 @@ fun HandleNodeAction3(
                 nodeSourceType = nodeSourceType,
                 sortOrder = sortOrder
             )?.let { navKey ->
-                navigationHandler.navigate(navKey)
+                onNavigate(navKey)
             }
         },
         onDownloadEvent = onDownloadEvent,

@@ -9,7 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -20,15 +23,20 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.RecentActionBucket
+import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.feature.home.R
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.contract.TransferHandler
@@ -60,11 +68,29 @@ class RecentsWidget @Inject constructor() : HomeWidget {
     ) {
         val viewModel = hiltViewModel<RecentsWidgetViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        val coroutineScope = rememberCoroutineScope()
+        val snackbarHostState = LocalSnackBarHostState.current
+        var openedFileNode by remember { mutableStateOf<Pair<TypedFileNode, NodeSourceType>?>(null) }
+
         RecentsView(
             uiState = uiState,
             modifier = modifier,
-            onNavigate = onNavigate
+            onFileClicked = { node, source ->
+                openedFileNode = node to source
+            },
         )
+
+        openedFileNode?.let { (node, source) ->
+            HandleNodeAction3(
+                typedFileNode = node,
+                snackBarHostState = snackbarHostState,
+                coroutineScope = coroutineScope,
+                onActionHandled = { openedFileNode = null },
+                nodeSourceType = source,
+                onDownloadEvent = transferHandler::setTransferEvent,
+                onNavigate = onNavigate,
+            )
+        }
     }
 }
 
@@ -72,7 +98,7 @@ class RecentsWidget @Inject constructor() : HomeWidget {
 @Composable
 fun RecentsView(
     uiState: RecentsWidgetUiState,
-    onNavigate: (NavKey) -> Unit,
+    onFileClicked: (TypedFileNode, NodeSourceType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     // TODO: Loading, empty states
@@ -105,7 +131,17 @@ fun RecentsView(
                 RecentsListItemView(
                     item = item,
                     onItemClicked = {
-                        // TODO: Handle item click navigation
+                        if (item.isSingleNode) {
+                            val nodeSourceType =
+                                if (item.bucket.parentFolderSharesType == RecentActionsSharesType.INCOMING_SHARES) {
+                                    NodeSourceType.INCOMING_SHARES
+                                } else {
+                                    NodeSourceType.CLOUD_DRIVE
+                                }
+                            onFileClicked(item.bucket.nodes.first(), nodeSourceType)
+                        } else {
+                            // TODO: Handle bucket click
+                        }
                     },
                     onMenuClicked = {
                         // TODO: Handle menu click
@@ -203,7 +239,7 @@ private fun RecentsViewPreview() {
                 ),
                 isLoading = false,
             ),
-            onNavigate = {}
+            onFileClicked = { _, _ -> }
         )
     }
 }
@@ -217,7 +253,7 @@ private fun RecentsViewEmptyPreview() {
                 recentActionItems = emptyList(),
                 isLoading = false,
             ),
-            onNavigate = {}
+            onFileClicked = { _, _ -> }
         )
     }
 }
@@ -231,7 +267,7 @@ private fun RecentsViewLoadingPreview() {
                 recentActionItems = emptyList(),
                 isLoading = true,
             ),
-            onNavigate = {}
+            onFileClicked = { _, _ -> }
         )
     }
 }
@@ -270,6 +306,7 @@ private fun createMockRecentsUiItem(
         isFavourite = isFavourite,
         nodeLabel = nodeLabel,
         bucket = mockBucket,
+        isSingleNode = !isMediaBucket
     )
 }
 
