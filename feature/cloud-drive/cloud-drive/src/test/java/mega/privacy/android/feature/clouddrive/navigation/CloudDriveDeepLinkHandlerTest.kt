@@ -27,6 +27,7 @@ import mega.privacy.android.navigation.destination.RubbishBinNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -399,6 +400,63 @@ class CloudDriveDeepLinkHandlerTest {
             assertThat(actual).isEmpty()
             verify(snackbarEventQueue).queueMessage(sharedR.string.general_alert_not_logged_in)
         }
+    }
+
+    @Test
+    fun `test that node is highlighted if it's in root cloud drive and has no preview`() = runTest {
+        val base64Handle = "validBase64"
+        val nodeId = NodeId(123L)
+        val uriString = "https://mega.nz/#$base64Handle"
+        val uri = mock<Uri> {
+            on { this.toString() } doReturn uriString
+            on { this.fragment } doReturn base64Handle
+        }
+        val fileNode = createMockFileNode(
+            id = nodeId.longValue,
+        )
+        val fileNodeContent = FileNodeContent.Other(localFile = null)
+        whenever(isNodeInCloudDriveUseCase(nodeId.longValue)) doReturn true
+        whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
+        whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
+        whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
+        whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
+        whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(rootId)
+
+        val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, true)
+
+        assertThat(actual).containsExactly(
+            HomeScreensNavKey(DriveSyncNavKey(highlightedNodeHandle = nodeId.longValue))
+        )
+        verifyNoInteractions(snackbarEventQueue)
+    }
+
+    @Test
+    fun `test that node is highlighted if it's in root rubbish bin and has no preview`() = runTest {
+        val base64Handle = "validBase64"
+        val nodeId = NodeId(123L)
+        val uriString = "https://mega.nz/#$base64Handle"
+        val uri = mock<Uri> {
+            on { this.toString() } doReturn uriString
+            on { this.fragment } doReturn base64Handle
+        }
+        val fileNode = createMockFileNode(
+            id = nodeId.longValue,
+        )
+        val fileNodeContent = FileNodeContent.Other(localFile = null)
+        whenever(isNodeInCloudDriveUseCase(nodeId.longValue)) doReturn false
+        whenever(isNodeInRubbishBinUseCase(nodeId)) doReturn true
+        whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
+        whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
+        whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
+        whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
+        whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(rootId)
+
+        val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, true)
+
+        assertThat(actual).containsExactly(
+            RubbishBinNavKey(highlightedNodeHandle = nodeId.longValue),
+        )
+        verifyNoInteractions(snackbarEventQueue)
     }
 
     @ParameterizedTest

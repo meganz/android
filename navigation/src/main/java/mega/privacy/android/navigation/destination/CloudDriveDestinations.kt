@@ -46,6 +46,7 @@ data class OfflineNavKey(
 @Serializable
 data class DriveSyncNavKey(
     val initialTabIndex: Int = 0,
+    val highlightedNodeHandle: Long? = null,
 ) : NavKey
 
 /**

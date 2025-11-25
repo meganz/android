@@ -21,7 +21,7 @@ fun EntryProviderScope<NavKey>.driveSyncScreen(
         val viewModel = hiltViewModel<DriveSyncViewModel>()
         val cloudDriveViewModel = hiltViewModel<CloudDriveViewModel, CloudDriveViewModel.Factory>(
             creationCallback = { factory ->
-                factory.create(CloudDriveNavKey())
+                factory.create(CloudDriveNavKey(highlightedNodeHandle = key.highlightedNodeHandle))
             }
         )
         DriveSyncScreen(

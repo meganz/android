@@ -90,6 +90,7 @@ class NewRubbishBinViewModel @AssistedInject constructor(
     @Assisted private val navKey: RubbishBinNavKey,
 ) : ViewModel() {
     private val args = navKey
+    private val highlightedNodeId = navKey.highlightedNodeHandle?.let { NodeId(it) }
 
     /**
      * The RubbishBin UI State
@@ -144,6 +145,7 @@ class NewRubbishBinViewModel @AssistedInject constructor(
                         nodeList = nodes,
                         nodeSourceType = NodeSourceType.RUBBISH_BIN,
                         existingItems = uiState.value.items,
+                        highlightedNodeId = highlightedNodeId,
                     )
                     _uiState.update { state ->
                         state.copy(
@@ -271,6 +273,7 @@ class NewRubbishBinViewModel @AssistedInject constructor(
                     nodeList = nodeList,
                     existingItems = _uiState.value.items,
                     nodeSourceType = NodeSourceType.RUBBISH_BIN,
+                    highlightedNodeId = highlightedNodeId,
                 )
 
                 // Update title

@@ -46,23 +46,10 @@ class CloudDriveDeepLinkHandler @Inject constructor(
                 ?.let { getNodeIdFromBase64UseCase(it) }?.longValue?.let { handle ->
                     getNodeByIdUseCase(NodeId(handle))
                 }
-            val nodeSourceType: NodeSourceType
-            val rootDestination: NavKey
-            when {
-                node == null || isNodeInCloudDriveUseCase(node.id.longValue) -> {
-                    nodeSourceType = NodeSourceType.CLOUD_DRIVE
-                    rootDestination = DriveSyncNavKey()
-                }
-
-                isNodeInRubbishBinUseCase(node.id) -> {
-                    nodeSourceType = NodeSourceType.RUBBISH_BIN
-                    rootDestination = RubbishBinNavKey()
-                }
-
-                else -> {
-                    nodeSourceType = NodeSourceType.INCOMING_SHARES
-                    rootDestination = SharesNavKey
-                }
+            val nodeSourceType = when {
+                node == null || isNodeInCloudDriveUseCase(node.id.longValue) -> NodeSourceType.CLOUD_DRIVE
+                isNodeInRubbishBinUseCase(node.id) -> NodeSourceType.RUBBISH_BIN
+                else -> NodeSourceType.INCOMING_SHARES
             }
             val previewDestination = (node as? TypedFileNode)?.let { fileNode ->
                 runCatching {
@@ -74,16 +61,24 @@ class CloudDriveDeepLinkHandler @Inject constructor(
                 }.getOrNull()
             }
             val highlightedNode = node?.id.takeIf { node is FileNode && previewDestination == null }
+            val ancestorIds = node?.let {
+                getAncestorsIdsUseCase(it)
+                    .dropLast(if (nodeSourceType == NodeSourceType.INCOMING_SHARES) 0 else 1)
+            } ?: emptyList()
+            val highlightedInRoot = if (ancestorIds.isEmpty()) highlightedNode else null
+            val rootDestination: NavKey = when (nodeSourceType) {
+                NodeSourceType.CLOUD_DRIVE -> DriveSyncNavKey(highlightedNodeHandle = highlightedInRoot?.longValue)
+                NodeSourceType.RUBBISH_BIN -> RubbishBinNavKey(highlightedNodeHandle = highlightedInRoot?.longValue)
+                else -> SharesNavKey
+            }
+
             val childDestinations = runCatching {
                 buildList {
                     if (node != null) {
                         // Add the node itself as destination if it's a folder
                         if (node is FolderNode) add(CloudDriveNavKey(nodeHandle = node.id.longValue))
                         addAll(
-                            getAncestorsIdsUseCase(node)
-                                .dropLast(
-                                    if (nodeSourceType == NodeSourceType.INCOMING_SHARES) 0 else 1
-                                )
+                            ancestorIds
                                 .mapIndexed { index, parentId ->
                                     CloudDriveNavKey(
                                         nodeHandle = parentId.longValue,

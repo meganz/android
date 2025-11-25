@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RubbishBinNavKey(
     val handle: Long? = null,
+    val highlightedNodeHandle: Long? = null,
 ) : NavKey
 
 @Serializable
