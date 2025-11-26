@@ -399,6 +399,5 @@ class MediaCameraUploadViewModel @Inject constructor(
     internal fun shouldEnableCUPage(mediaSource: FilterMediaSource, show: Boolean) {
         val isShown = show && mediaSource != FilterMediaSource.CloudDrive
         _uiState.update { it.copy(enableCameraUploadPageShowing = isShown) }
-        // VAP: handle zoom later. See TimelineViewModel.shouldEnableCUPage. AND-21803
     }
 }

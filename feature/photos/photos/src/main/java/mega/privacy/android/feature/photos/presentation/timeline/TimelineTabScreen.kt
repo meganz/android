@@ -56,6 +56,7 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.model.FilterMediaSource
+import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
 import mega.privacy.android.feature.photos.presentation.MediaFilterUiState
 import mega.privacy.android.feature.photos.presentation.component.PhotosNodeGridView
@@ -77,6 +78,7 @@ internal fun TimelineTabRoute(
     loadNextPage: () -> Unit,
     onNavigateCameraUploadsSettings: () -> Unit,
     setEnableCUPage: (Boolean) -> Unit,
+    onGridSizeChange: (value: TimelineGridSize) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     TimelineTabScreen(
@@ -91,6 +93,7 @@ internal fun TimelineTabRoute(
         loadNextPage = loadNextPage,
         onNavigateCameraUploadsSettings = onNavigateCameraUploadsSettings,
         setEnableCUPage = setEnableCUPage,
+        onGridSizeChange = onGridSizeChange,
     )
 }
 
@@ -106,6 +109,7 @@ internal fun TimelineTabScreen(
     loadNextPage: () -> Unit,
     onNavigateCameraUploadsSettings: () -> Unit,
     setEnableCUPage: (Boolean) -> Unit,
+    onGridSizeChange: (value: TimelineGridSize) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -215,6 +219,7 @@ internal fun TimelineTabScreen(
                 selectedTimePeriod = selectedTimePeriod,
                 shouldShowTimePeriodSelector = shouldShowTimePeriodSelector,
                 onPhotoTimePeriodSelected = { selectedTimePeriod = it },
+                onGridSizeChange = onGridSizeChange,
             )
         }
     }
@@ -272,6 +277,7 @@ private fun TimelineTabContent(
     selectedTimePeriod: PhotoModificationTimePeriod,
     shouldShowTimePeriodSelector: Boolean,
     onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
+    onGridSizeChange: (value: TimelineGridSize) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier) {
@@ -281,9 +287,8 @@ private fun TimelineTabContent(
                     modifier = Modifier.fillMaxSize(),
                     lazyGridState = lazyGridState,
                     items = uiState.displayedPhotos,
-                    zoomLevel = uiState.zoomLevel,
-                    onZoomIn = { },
-                    onZoomOut = { },
+                    gridSize = uiState.gridSize,
+                    onGridSizeChange = onGridSizeChange,
                     onClick = { },
                     onLongClick = { },
                 )
@@ -434,6 +439,7 @@ private fun TimelineTabScreenPreview() {
             loadNextPage = {},
             setEnableCUPage = {},
             onNavigateCameraUploadsSettings = {},
+            onGridSizeChange = {},
         )
     }
 }

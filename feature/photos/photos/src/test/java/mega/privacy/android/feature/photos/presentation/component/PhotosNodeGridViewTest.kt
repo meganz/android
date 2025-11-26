@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -13,7 +14,7 @@ import mega.privacy.android.feature.photos.extensions.LocalDownloadPhotoResultMo
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
-import mega.privacy.android.feature.photos.model.ZoomLevel
+import mega.privacy.android.feature.photos.model.TimelineGridSize
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,13 +30,18 @@ class PhotosNodeGridViewTest {
     val composeRule = createComposeRule()
 
     @Test
-    fun `test that date item is successfully displayed`() {
+    fun `test that header item is successfully displayed`() {
         val time = LocalDateTime.now()
-        val items = persistentListOf(PhotosNodeContentType.DateItem(time = time))
+        val items = persistentListOf(
+            PhotosNodeContentType.HeaderItem(
+                time = time,
+                shouldShowGridSizeSettings = true
+            )
+        )
         composeRuleScope {
             setView(items = items)
 
-            onNodeWithTag(PHOTOS_NODE_GRID_VIEW_DATE_BODY_TAG).assertIsDisplayed()
+            onNodeWithTag(PHOTOS_NODE_GRID_VIEW_HEADER_BODY_TAG).assertIsDisplayed()
         }
     }
 
@@ -59,6 +65,40 @@ class PhotosNodeGridViewTest {
         }
     }
 
+    @Test
+    fun `test that the grid size settings icon is displayed`() {
+        val time = LocalDateTime.now()
+        val items = persistentListOf(
+            PhotosNodeContentType.HeaderItem(
+                time = time,
+                shouldShowGridSizeSettings = true
+            )
+        )
+        composeRuleScope {
+            setView(items = items)
+
+            onNodeWithTag(PHOTOS_NODE_HEADER_BODY_GRID_SIZE_SETTINGS_ICON_TAG).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that the grid size settings menu is displayed`() {
+        val time = LocalDateTime.now()
+        val items = persistentListOf(
+            PhotosNodeContentType.HeaderItem(
+                time = time,
+                shouldShowGridSizeSettings = true
+            )
+        )
+        composeRuleScope {
+            setView(items = items)
+
+            onNodeWithTag(PHOTOS_NODE_HEADER_BODY_GRID_SIZE_SETTINGS_ICON_TAG).performClick()
+
+            onNodeWithTag(PHOTOS_NODE_HEADER_BODY_GRID_SIZE_SETTINGS_MENU_TAG).assertIsDisplayed()
+        }
+    }
+
     private fun composeRuleScope(block: ComposeContentTestRule.() -> Unit) {
         with(composeRule) {
             block()
@@ -67,9 +107,8 @@ class PhotosNodeGridViewTest {
 
     private fun ComposeContentTestRule.setView(
         items: ImmutableList<PhotosNodeContentType> = persistentListOf(),
-        zoomLevel: ZoomLevel = ZoomLevel.Grid_1,
-        onZoomIn: () -> Unit = {},
-        onZoomOut: () -> Unit = {},
+        gridSize: TimelineGridSize = TimelineGridSize.Large,
+        onGridSizeChange: (value: TimelineGridSize) -> Unit = {},
         onClick: (node: PhotoNodeUiState) -> Unit = {},
         onLongClick: (node: PhotoNodeUiState) -> Unit = {},
         downloadPhotoResult: DownloadPhotoResult = DownloadPhotoResult.Idle,
@@ -78,9 +117,8 @@ class PhotosNodeGridViewTest {
             CompositionLocalProvider(LocalDownloadPhotoResultMock provides downloadPhotoResult) {
                 PhotosNodeGridView(
                     items = items,
-                    zoomLevel = zoomLevel,
-                    onZoomIn = onZoomIn,
-                    onZoomOut = onZoomOut,
+                    gridSize = gridSize,
+                    onGridSizeChange = onGridSizeChange,
                     onClick = onClick,
                     onLongClick = onLongClick
                 )

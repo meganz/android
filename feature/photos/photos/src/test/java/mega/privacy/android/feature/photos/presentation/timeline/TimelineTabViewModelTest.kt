@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoResult
@@ -18,6 +19,8 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.photos.MonitorTimelinePhotosUseCase
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.model.PhotoUiState
+import mega.privacy.android.feature.photos.model.PhotosNodeContentType
+import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotosNodeListCardMapper
 import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.AfterEach
@@ -25,6 +28,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
@@ -231,5 +236,104 @@ class TimelineTabViewModelTest {
             photos = any(),
             sortOrder = eq(SortOrder.ORDER_MODIFICATION_ASC)
         )
+    }
+
+    @ParameterizedTest
+    @EnumSource(TimelineGridSize::class)
+    fun `test that the correct grid size is set`(gridSize: TimelineGridSize) =
+        runTest {
+            whenever(
+                getFeatureFlagValueUseCase(any())
+            ) doReturn false
+            val photosResult = mock<TimelinePhotosResult> {
+                on { allPhotos } doReturn emptyList()
+                on { nonSensitivePhotos } doReturn emptyList()
+            }
+            whenever(monitorTimelinePhotosUseCase(request = any())) doReturn flowOf(photosResult)
+            val sortResult = mock<TimelineSortedPhotosResult> {
+                on { sortedPhotos } doReturn emptyList()
+            }
+            whenever(
+                monitorTimelinePhotosUseCase.sortPhotos(
+                    isPaginationEnabled = eq(false),
+                    photos = eq(emptyList()),
+                    sortOrder = any()
+                )
+            ) doReturn sortResult
+            whenever(
+                photosNodeListCardMapper.invoke(photosDateResults = any())
+            ) doReturn persistentListOf()
+
+            underTest.onGridSizeChange(size = gridSize)
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().gridSize).isEqualTo(gridSize)
+            }
+        }
+
+    @Test
+    fun `test that the first displayed header item shows the grid size settings`() = runTest {
+        whenever(
+            getFeatureFlagValueUseCase(any())
+        ) doReturn true
+        val photosResult = mock<TimelinePhotosResult> {
+            on { allPhotos } doReturn emptyList()
+            on { nonSensitivePhotos } doReturn emptyList()
+        }
+        whenever(
+            monitorTimelinePhotosUseCase.invoke(request = any())
+        ) doReturn flowOf(photosResult)
+        val now = LocalDateTime.now()
+        val mockFileTypeInfo = mock<VideoFileTypeInfo>()
+        val photo1 = mock<Photo.Image> {
+            on { id } doReturn 1L
+            on { modificationTime } doReturn now
+            on { fileTypeInfo } doReturn mockFileTypeInfo
+        }
+        val photoResult1 = PhotoResult(photo = photo1, isMarkedSensitive = false)
+        val photo1UiState = mock<PhotoUiState.Image>()
+        whenever(
+            photoUiStateMapper.invoke(photo = photo1)
+        ) doReturn photo1UiState
+        val mockTextFileTypeInfo = mock<TextFileTypeInfo>()
+        val photo2 = mock<Photo.Image> {
+            on { id } doReturn 2L
+            on { modificationTime } doReturn now.plusMonths(2)
+            on { fileTypeInfo } doReturn mockTextFileTypeInfo
+        }
+        val photoResult2 = PhotoResult(photo = photo2, isMarkedSensitive = false)
+        val photo2UiState = mock<PhotoUiState.Image>()
+        whenever(
+            photoUiStateMapper.invoke(photo = photo2)
+        ) doReturn photo2UiState
+        val sortResult = mock<TimelineSortedPhotosResult> {
+            on { sortedPhotos } doReturn listOf(photoResult1, photoResult2)
+        }
+        whenever(
+            monitorTimelinePhotosUseCase.sortPhotos(
+                isPaginationEnabled = eq(true),
+                photos = eq(emptyList()),
+                sortOrder = any()
+            )
+        ) doReturn sortResult
+        whenever(
+            photosNodeListCardMapper.invoke(photosDateResults = any())
+        ) doReturn persistentListOf()
+
+        underTest.uiState.test {
+            val item = expectMostRecentItem()
+            assertThat(item.displayedPhotos[0]).isEqualTo(
+                PhotosNodeContentType.HeaderItem(
+                    time = photoResult1.photo.modificationTime,
+                    shouldShowGridSizeSettings = true
+                )
+            )
+            assertThat(item.displayedPhotos[2]).isEqualTo(
+                PhotosNodeContentType.HeaderItem(
+                    time = photoResult2.photo.modificationTime,
+                    shouldShowGridSizeSettings = false
+                )
+            )
+        }
     }
 }

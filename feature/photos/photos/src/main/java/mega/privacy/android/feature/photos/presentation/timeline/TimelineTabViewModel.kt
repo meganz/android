@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.SortOrder
@@ -23,7 +24,7 @@ import mega.privacy.android.domain.usecase.photos.MonitorTimelinePhotosUseCase
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
-import mega.privacy.android.feature.photos.model.ZoomLevel
+import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotosNodeListCardMapper
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
@@ -39,7 +40,7 @@ class TimelineTabViewModel @Inject constructor(
     private val photosNodeListCardMapper: PhotosNodeListCardMapper,
 ) : ViewModel() {
 
-    private val zoomLevelFlow = MutableStateFlow(ZoomLevel.Grid_3)
+    private val gridSizeFlow = MutableStateFlow(TimelineGridSize.Default)
     private val sortOrderFlow = MutableStateFlow(SortOrder.ORDER_MODIFICATION_DESC)
     private val selectedPhotoIdsFlow = MutableStateFlow<List<Long>>(emptyList())
 
@@ -84,14 +85,14 @@ class TimelineTabViewModel @Inject constructor(
         allPhotos: List<PhotoResult>,
         sortResult: TimelineSortedPhotosResult,
     ) = combine(
-        flow = zoomLevelFlow,
+        flow = gridSizeFlow,
         flow2 = selectedPhotoIdsFlow,
         transform = ::Pair
-    ).map { (zoomLevel, selectedPhotoIds) ->
+    ).map { (gridSize, selectedPhotoIds) ->
         buildTimelineTabUiState(
             allPhotos = allPhotos,
             sortResult = sortResult,
-            zoomLevel = zoomLevel,
+            gridSize = gridSize,
             selectedPhotoIds = selectedPhotoIds,
             isPaginationEnabled = isPaginationEnabled
         )
@@ -100,7 +101,7 @@ class TimelineTabViewModel @Inject constructor(
     private fun buildTimelineTabUiState(
         allPhotos: List<PhotoResult>,
         sortResult: TimelineSortedPhotosResult,
-        zoomLevel: ZoomLevel,
+        gridSize: TimelineGridSize,
         selectedPhotoIds: List<Long>,
         isPaginationEnabled: Boolean,
     ): TimelineTabUiState {
@@ -109,10 +110,15 @@ class TimelineTabViewModel @Inject constructor(
                 val shouldShowDate = index == 0 || needsDateSeparator(
                     current = photoResult.photo,
                     previous = sortResult.sortedPhotos[index - 1].photo,
-                    zoomLevel = zoomLevel
+                    gridSize = gridSize
                 )
                 if (shouldShowDate) {
-                    add(PhotosNodeContentType.DateItem(photoResult.photo.modificationTime))
+                    add(
+                        PhotosNodeContentType.HeaderItem(
+                            time = photoResult.photo.modificationTime,
+                            shouldShowGridSizeSettings = index == 0
+                        )
+                    )
                 }
                 add(
                     PhotosNodeContentType.PhotoNodeItem(
@@ -136,7 +142,7 @@ class TimelineTabViewModel @Inject constructor(
             daysCardPhotos = photosNodeListCardMapper(photosDateResults = sortResult.photosInDay),
             monthsCardPhotos = photosNodeListCardMapper(photosDateResults = sortResult.photosInMonth),
             yearsCardPhotos = photosNodeListCardMapper(photosDateResults = sortResult.photosInYear),
-            zoomLevel = zoomLevel,
+            gridSize = gridSize,
             selectedPhotoCount = selectedPhotoIds.size,
             currentSort = sortOrderFlow.value,
             isPaginationEnabled = isPaginationEnabled
@@ -146,11 +152,11 @@ class TimelineTabViewModel @Inject constructor(
     private fun needsDateSeparator(
         current: Photo,
         previous: Photo,
-        zoomLevel: ZoomLevel,
+        gridSize: TimelineGridSize,
     ): Boolean {
         val currentDate = current.modificationTime.toLocalDate()
         val previousDate = previous.modificationTime.toLocalDate()
-        return if (zoomLevel == ZoomLevel.Grid_1) {
+        return if (gridSize == TimelineGridSize.Large) {
             currentDate != previousDate
         } else {
             currentDate.month != previousDate.month
@@ -178,4 +184,8 @@ class TimelineTabViewModel @Inject constructor(
     private suspend fun isPaginationEnabled(): Boolean = runCatching {
         getFeatureFlagValueUseCase(AppFeatures.TimelinePhotosPagination)
     }.getOrElse { false }
+
+    internal fun onGridSizeChange(size: TimelineGridSize) {
+        gridSizeFlow.update { size }
+    }
 }

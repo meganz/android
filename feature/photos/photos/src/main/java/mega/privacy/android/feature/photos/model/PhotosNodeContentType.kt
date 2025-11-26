@@ -5,7 +5,10 @@ import java.time.LocalDateTime
 sealed interface PhotosNodeContentType {
     val key: Int
 
-    data class DateItem(val time: LocalDateTime) : PhotosNodeContentType {
+    data class HeaderItem(
+        val time: LocalDateTime,
+        val shouldShowGridSizeSettings: Boolean,
+    ) : PhotosNodeContentType {
         override val key: Int = time.hashCode()
     }
 

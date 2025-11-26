@@ -149,12 +149,14 @@ import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineChevronUpIma
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineClockRotateImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineFilmImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineGrid4ImageVector
+import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineGrid9ImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineHeartImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineImage01ImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineImage04ImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineListSmallImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineMessageChatCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineQueueLineImageVector
+import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineSquareImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineSquares4ImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineTransferCheckCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineTransferErrorImageVector
@@ -575,6 +577,8 @@ public object IconPack : IconPackInterface {
 
                 override val Grid4: ImageVector by lazy { createSmallThinOutlineGrid4ImageVector() }
 
+                override val Grid9: ImageVector by lazy { createSmallThinOutlineGrid9ImageVector() }
+
                 override val Heart: ImageVector by lazy { createSmallThinOutlineHeartImageVector() }
 
                 override val Image01: ImageVector by lazy {
@@ -591,6 +595,10 @@ public object IconPack : IconPackInterface {
 
                 override val QueueLine: ImageVector by lazy {
                         createSmallThinOutlineQueueLineImageVector() }
+
+                override val Square: ImageVector by lazy {
+                    createSmallThinOutlineSquareImageVector()
+                }
 
                 override val Squares4: ImageVector by lazy {
                         createSmallThinOutlineSquares4ImageVector() }

@@ -3,22 +3,27 @@ package mega.privacy.android.feature.photos.presentation.component
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.text.format.DateFormat.getBestDateTimePattern
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
@@ -26,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -34,31 +40,38 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.feature.photos.components.ImagePhotosNode
 import mega.privacy.android.feature.photos.components.PhotosNodeThumbnailData
+import mega.privacy.android.feature.photos.components.TimelineGridSizeSettingsMenu
 import mega.privacy.android.feature.photos.components.VideoPhotosNode
 import mega.privacy.android.feature.photos.extensions.LocalDownloadPhotoResultMock
 import mega.privacy.android.feature.photos.extensions.downloadAsStateWithLifecycle
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
-import mega.privacy.android.feature.photos.model.PhotosNodeContentType.DateItem
+import mega.privacy.android.feature.photos.model.PhotosNodeContentType.HeaderItem
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType.PhotoNodeItem
-import mega.privacy.android.feature.photos.model.ZoomLevel
+import mega.privacy.android.feature.photos.model.TimelineGridSize
+import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.icon.pack.R
+import mega.privacy.android.shared.resources.R as sharedR
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -69,9 +82,8 @@ import kotlin.time.Duration
 @Composable
 fun PhotosNodeGridView(
     items: ImmutableList<PhotosNodeContentType>,
-    zoomLevel: ZoomLevel,
-    onZoomIn: () -> Unit,
-    onZoomOut: () -> Unit,
+    gridSize: TimelineGridSize,
+    onGridSizeChange: (value: TimelineGridSize) -> Unit,
     onClick: (node: PhotoNodeUiState) -> Unit,
     onLongClick: (node: PhotoNodeUiState) -> Unit,
     modifier: Modifier = Modifier,
@@ -81,15 +93,19 @@ fun PhotosNodeGridView(
     val scope = rememberCoroutineScope()
     var userScrollEnabled by remember { mutableStateOf(true) }
     val configuration = LocalConfiguration.current
-    val spanCount = remember(key1 = configuration.orientation, key2 = zoomLevel) {
+    // We need this local state because the value will be read in a lambda. Otherwise, we will face
+    // the "stale-callback" issue. You can confirm this by removing this state and just use
+    // the gridSize parameter when zooming in/out the screen content.
+    val latestGridSize by rememberUpdatedState(gridSize)
+    val spanCount = remember(key1 = configuration.orientation, key2 = latestGridSize) {
         if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            zoomLevel.portrait
+            latestGridSize.portrait
         } else {
-            zoomLevel.landscape
+            latestGridSize.landscape
         }
     }
-    val isPreview by remember(configuration, zoomLevel) {
-        derivedStateOf { isPreview(configuration, zoomLevel) }
+    val isPreview by remember(configuration, latestGridSize) {
+        derivedStateOf { isPreview(configuration, latestGridSize) }
     }
 
     FastScrollLazyVerticalGrid(
@@ -102,8 +118,17 @@ fun PhotosNodeGridView(
                     scope.launch {
                         userScrollEnabled = false
                         when (type) {
-                            ZoomType.ZoomIn -> onZoomIn()
-                            ZoomType.ZoomOut -> onZoomOut()
+                            ZoomType.ZoomIn -> {
+                                if (latestGridSize != TimelineGridSize.entries.first()) {
+                                    onGridSizeChange(TimelineGridSize.entries[latestGridSize.ordinal - 1])
+                                }
+                            }
+
+                            ZoomType.ZoomOut -> {
+                                if (latestGridSize != TimelineGridSize.entries.last()) {
+                                    onGridSizeChange(TimelineGridSize.entries[latestGridSize.ordinal + 1])
+                                }
+                            }
                         }
                         // Delay to disable user scrolling while the grid is being updated
                         delay(250)
@@ -116,12 +141,12 @@ fun PhotosNodeGridView(
             val item = items.getOrNull(index)
             item?.let {
                 val modificationTime = when (it) {
-                    is DateItem -> it.time
+                    is HeaderItem -> it.time
                     is PhotoNodeItem -> it.node.photo.modificationTime
                 }
                 dateText(
                     modificationTime = modificationTime,
-                    zoomLevel = zoomLevel,
+                    gridSize = latestGridSize,
                     locale = configuration.locales[0],
                 )
             }.orEmpty()
@@ -145,20 +170,22 @@ fun PhotosNodeGridView(
             contentType = { it },
             span = { contentType ->
                 when (contentType) {
-                    is DateItem -> GridItemSpan(maxLineSpan)
+                    is HeaderItem -> GridItemSpan(maxLineSpan)
                     is PhotoNodeItem -> GridItemSpan(1)
                 }
             }
         ) { contentType ->
             when (contentType) {
-                is DateItem -> {
-                    DateBody(
+                is HeaderItem -> {
+                    HeaderBody(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp, horizontal = 16.dp)
-                            .testTag(PHOTOS_NODE_GRID_VIEW_DATE_BODY_TAG),
+                            .testTag(PHOTOS_NODE_GRID_VIEW_HEADER_BODY_TAG),
                         time = contentType.time,
-                        zoomLevel = zoomLevel
+                        shouldShowGridSizeSettings = contentType.shouldShowGridSizeSettings,
+                        gridSize = latestGridSize,
+                        onGridSizeChange = onGridSizeChange
                     )
                 }
 
@@ -174,8 +201,7 @@ fun PhotosNodeGridView(
                         node = contentType.node,
                         isPreview = isPreview,
                         isSelected = contentType.node.isSelected,
-                        shouldShowFavourite = contentType.node.photo.isFavourite && zoomLevel == ZoomLevel.Grid_1
-                                || contentType.node.photo.isFavourite && zoomLevel == ZoomLevel.Grid_3
+                        shouldShowFavourite = contentType.node.photo.isFavourite && latestGridSize <= TimelineGridSize.Default
                     )
                 }
             }
@@ -188,22 +214,94 @@ fun PhotosNodeGridView(
 }
 
 @Composable
-private fun DateBody(
+private fun HeaderBody(
     time: LocalDateTime,
-    zoomLevel: ZoomLevel,
+    shouldShowGridSizeSettings: Boolean,
+    gridSize: TimelineGridSize,
+    onGridSizeChange: (value: TimelineGridSize) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val locales = LocalConfiguration.current.locales
-    MegaText(
-        modifier = modifier,
-        text = dateText(
-            modificationTime = time,
-            zoomLevel = zoomLevel,
-            locale = locales[0],
-        ),
-        style = AppTheme.typography.titleSmall,
-        textColor = TextColor.Secondary
-    )
+    var isGridSizeMenuExpanded by remember { mutableStateOf(false) }
+
+    Row(modifier = modifier) {
+        MegaText(
+            modifier = Modifier.weight(weight = 1F),
+            text = dateText(
+                modificationTime = time,
+                gridSize = gridSize,
+                locale = locales[0],
+            ),
+            style = AppTheme.typography.titleSmall,
+            textColor = TextColor.Secondary
+        )
+
+        if (shouldShowGridSizeSettings) {
+            Box {
+                val gridSizeIcon = when (gridSize) {
+                    TimelineGridSize.Large -> IconPack.Small.Thin.Outline.Square
+                    TimelineGridSize.Default -> IconPack.Small.Thin.Outline.Grid4
+                    TimelineGridSize.Compact -> IconPack.Small.Thin.Outline.Grid9
+                }
+                MegaIcon(
+                    modifier = Modifier
+                        .clickable {
+                            isGridSizeMenuExpanded = !isGridSizeMenuExpanded
+                        }
+                        .testTag(PHOTOS_NODE_HEADER_BODY_GRID_SIZE_SETTINGS_ICON_TAG),
+                    imageVector = gridSizeIcon,
+                    tint = IconColor.Secondary,
+                    contentDescription = "Change grid size, current size is : ${gridSize.name}"
+                )
+
+                TimelineGridSizeSettingsMenu(
+                    modifier = Modifier
+                        .widthIn(min = 220.dp)
+                        .padding(vertical = 8.dp, horizontal = 4.dp)
+                        .testTag(PHOTOS_NODE_HEADER_BODY_GRID_SIZE_SETTINGS_MENU_TAG),
+                    expanded = isGridSizeMenuExpanded,
+                    onDismissRequest = { isGridSizeMenuExpanded = false }
+                ) {
+                    MegaText(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp)
+                            .padding(top = 6.dp),
+                        text = stringResource(sharedR.string.timeline_tab_grid_size_menu_title),
+                        style = AppTheme.typography.labelLarge,
+                        textColor = TextColor.Secondary
+                    )
+
+                    TimelineGridSize.entries.reversed().forEach {
+                        DropdownMenuItem(
+                            text = {
+                                MegaText(
+                                    text = stringResource(it.nameResId),
+                                    style = AppTheme.typography.bodyLarge,
+                                    textColor = TextColor.Primary
+                                )
+                            },
+                            leadingIcon = {
+                                if (gridSize == it) {
+                                    MegaIcon(
+                                        imageVector = IconPack.Medium.Thin.Outline.Check,
+                                        tint = IconColor.Primary,
+                                        contentDescription = null
+                                    )
+                                } else {
+                                    Box(modifier = Modifier.size(24.dp))
+                                }
+                            },
+                            onClick = {
+                                onGridSizeChange(it)
+                                isGridSizeMenuExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -272,9 +370,9 @@ private fun PhotoNodeBody(
     }
 }
 
-private fun isPreview(configuration: Configuration, zoomLevel: ZoomLevel) =
+private fun isPreview(configuration: Configuration, gridSize: TimelineGridSize) =
     configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-            && zoomLevel.portrait == ZoomLevel.Grid_1.portrait
+            && gridSize.portrait == TimelineGridSize.Large.portrait
 
 enum class ZoomType {
     ZoomIn, ZoomOut
@@ -308,11 +406,11 @@ private fun Modifier.screenContentZoomGestureDetector(onZoom: (type: ZoomType) -
 )
 
 private fun dateText(
-    zoomLevel: ZoomLevel,
+    gridSize: TimelineGridSize,
     modificationTime: LocalDateTime,
     locale: Locale,
 ): String {
-    val datePattern = if (zoomLevel == ZoomLevel.Grid_1) {
+    val datePattern = if (gridSize == TimelineGridSize.Large) {
         if (modificationTime.year == LocalDateTime.now().year) {
             getBestDateTimePattern(locale, "$DATE_FORMAT_DAY $DATE_FORMAT_MONTH_WITH_DAY")
         } else {
@@ -346,7 +444,10 @@ private fun PhotosNodeGridViewPreview() {
         CompositionLocalProvider(LocalDownloadPhotoResultMock provides DownloadPhotoResult.Idle) {
             PhotosNodeGridView(
                 items = persistentListOf(
-                    DateItem(time = LocalDateTime.now()),
+                    HeaderItem(
+                        time = LocalDateTime.now(),
+                        shouldShowGridSizeSettings = true
+                    ),
                     PhotoNodeItem(
                         node = PhotoNodeUiState(
                             photo = PhotoUiState.Image(
@@ -368,7 +469,7 @@ private fun PhotosNodeGridViewPreview() {
                                 isSensitive = false,
                                 isSensitiveInherited = false
                             ),
-                            defaultIcon = mega.privacy.android.icon.pack.R.drawable.ic_3d_medium_solid,
+                            defaultIcon = R.drawable.ic_3d_medium_solid,
                             isSensitive = false,
                             isSelected = true
                         )
@@ -395,15 +496,14 @@ private fun PhotosNodeGridViewPreview() {
                                 isSensitive = false,
                                 isSensitiveInherited = false
                             ),
-                            defaultIcon = mega.privacy.android.icon.pack.R.drawable.ic_3d_medium_solid,
+                            defaultIcon = R.drawable.ic_3d_medium_solid,
                             isSensitive = true,
                             isSelected = false
                         )
                     )
                 ),
-                zoomLevel = ZoomLevel.Grid_3,
-                onZoomIn = {},
-                onZoomOut = {},
+                gridSize = TimelineGridSize.Default,
+                onGridSizeChange = {},
                 onClick = {},
                 onLongClick = {}
             )
@@ -416,6 +516,10 @@ private const val DATE_FORMAT_MONTH = "LLLL"
 private const val DATE_FORMAT_DAY = "dd"
 private const val DATE_FORMAT_MONTH_WITH_DAY = "MMMM"
 
-internal const val PHOTOS_NODE_GRID_VIEW_DATE_BODY_TAG = "photos_node_grid_view:date_body"
+internal const val PHOTOS_NODE_GRID_VIEW_HEADER_BODY_TAG = "photos_node_grid_view:header_body"
+internal const val PHOTOS_NODE_HEADER_BODY_GRID_SIZE_SETTINGS_ICON_TAG =
+    "header_body:icon_grid_size_settings"
+internal const val PHOTOS_NODE_HEADER_BODY_GRID_SIZE_SETTINGS_MENU_TAG =
+    "header_body:menu_grid_size_settings"
 internal const val PHOTOS_NODE_BODY_IMAGE_NODE_TAG = "photos_node_body:image_photos_node"
 internal const val VIDEO_NODE_BODY_IMAGE_NODE_TAG = "photos_node_body:video_photos_node"

@@ -48,6 +48,8 @@ interface IconPackInterface {
              * small_thin_outline
              */
             interface Outline {
+                val Grid9: ImageVector
+                val Square: ImageVector
                 val TransferError: ImageVector
                 val TransferWarning: ImageVector
                 val TransferPause: ImageVector
