@@ -36,10 +36,12 @@ data class ContactsNavKey(val navType: NavType = NavType.List) : NavKey {
 }
 
 @Serializable
-data class ChatNavKey(val chatId: Long, val action: String?) : NoSessionNavKey.Optional
+@Parcelize
+data class ChatNavKey(val chatId: Long, val action: String?) : NoSessionNavKey.Optional, Parcelable
 
 @Serializable
-data object ChatsNavKey : NavKey
+@Parcelize
+data object ChatsNavKey : NavKey, Parcelable
 
 @Serializable
 data class AddContactToShareNavKey(
