@@ -632,7 +632,8 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
 
                     setParentHandle(node.handle)
                     lifecycleScope.launch {
-                        val childNodes = withContext(ioDispatcher) { megaApi.getChildren(node, order) }
+                        val childNodes =
+                            withContext(ioDispatcher) { megaApi.getChildren(node, order) }
                         updateNodesByAdapter(childNodes)
                         recyclerView.scrollToPosition(0)
                     }
@@ -728,7 +729,8 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             binding.fileListEmptyText.isVisible = false
 
             lifecycleScope.launch {
-                val childNodes = withContext(ioDispatcher) { megaApi.getChildren(parentNode, order) }
+                val childNodes =
+                    withContext(ioDispatcher) { megaApi.getChildren(parentNode, order) }
                 updateNodesByAdapter(childNodes)
                 var lastVisiblePosition = 0
                 if (lastPositionStack.isNotEmpty()) {
@@ -974,7 +976,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
      *
      * @return true is empty, otherwise is false
      */
-    fun isFolderEmpty() = adapter.itemCount <= 0
+    fun isFolderEmpty() = if (::adapter.isInitialized) adapter.itemCount <= 0 else true
 
     companion object {
         private const val SPAN_COUNT = 2

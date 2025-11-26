@@ -948,7 +948,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
      *
      * @return true is empty, otherwise is false
      */
-    fun isFolderEmpty() = adapter.itemCount <= 0
+    fun isFolderEmpty() = if (::adapter.isInitialized) adapter.itemCount <= 0 else true
 
     /**
      * Checks if copy or move button should be shown or hidden depending on the current navigation level.
