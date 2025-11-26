@@ -25,7 +25,7 @@ telephoto = "0.16.0"
 mega-core-ui = "2.230.20251124035650"
 kotlinx-collections-immutable = "0.3.7"
 commonmark-java = "0.24.0"
-ucropnedit = "4.1.5"
+ucropnedit = "4.1.6"
 sqlcipher = "4.9.0"
 slack-compose-lints = "1.4.2"
 
