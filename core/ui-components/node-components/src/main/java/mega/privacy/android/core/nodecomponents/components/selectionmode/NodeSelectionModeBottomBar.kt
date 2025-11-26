@@ -1,5 +1,6 @@
 package mega.privacy.android.core.nodecomponents.components.selectionmode
 
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
@@ -18,12 +19,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
+import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.toolbar.MegaFloatingToolbar
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderAccessDialogNavKey
+import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogM3
+import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.nodecomponents.sheet.nodeactions.NodeMoreOptionsBottomSheet
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,8 +46,72 @@ fun NodeSelectionModeBottomBar(
     isSelecting: Boolean,
     modifier: Modifier = Modifier,
     onActionPressed: (MenuActionWithIcon) -> Unit = {},
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel? = null, // pass the ViewModel if the component needs to handle shares events
+    onNavigate: (NavKey) -> Unit = {},
 ) {
     var showMoreBottomSheet by rememberSaveable { mutableStateOf(false) }
+
+    nodeOptionsActionViewModel?.let { viewModel ->
+        val nodeActionState: NodeActionState by viewModel.uiState.collectAsStateWithLifecycle()
+        var shareNodeHandles by rememberSaveable { mutableStateOf<List<Long>>(emptyList()) }
+
+        val megaResultContract = rememberMegaResultContract()
+        val shareFolderLauncher = rememberLauncherForActivityResult(
+            contract = megaResultContract.shareFolderActivityResultContract
+        ) { result ->
+            result?.let { (contactIds, nodeHandles) ->
+                viewModel.contactSelectedForShareFolder(
+                    contactIds,
+                    nodeHandles
+                )
+            }
+        }
+
+        if (visible) {
+            EventEffect(
+                event = nodeActionState.shareFolderDialogEvent,
+                onConsumed = viewModel::resetShareFolderDialogEvent,
+                action = { handles ->
+                    shareNodeHandles = handles
+                }
+            )
+
+            EventEffect(
+                event = nodeActionState.shareFolderEvent,
+                onConsumed = viewModel::resetShareFolderEvent,
+                action = { handles ->
+                    shareFolderLauncher.launch(handles.toLongArray())
+                }
+            )
+
+            EventEffect(
+                event = nodeActionState.contactsData,
+                onConsumed = nodeOptionsActionViewModel::markShareFolderAccessDialogShown,
+                action = { (contactData, isFromBackups, nodeHandles) ->
+                    onNavigate(
+                        ShareFolderAccessDialogNavKey(
+                            nodes = nodeHandles,
+                            contacts = contactData.joinToString(separator = ","),
+                            isFromBackups = isFromBackups,
+                        )
+                    )
+                },
+            )
+        }
+
+        if (shareNodeHandles.isNotEmpty()) {
+            ShareFolderDialogM3(
+                nodeIds = shareNodeHandles.map { NodeId(it) },
+                onDismiss = {
+                    shareNodeHandles = emptyList()
+                },
+                onConfirm = { nodes ->
+                    val handles = nodes.map { it.id.longValue }.toLongArray()
+                    shareFolderLauncher.launch(handles)
+                }
+            )
+        }
+    }
 
     SelectionModeBottomBar(
         visible = visible,

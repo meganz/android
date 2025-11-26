@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -64,7 +65,7 @@ fun NodeOptionsBottomSheetRoute(
     val keyboardController = LocalSoftwareKeyboardController.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val nodeOptionActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
-    var shareNodeHandles by remember { mutableStateOf<List<Long>>(emptyList()) }
+    var shareNodeHandles by rememberSaveable { mutableStateOf<List<Long>>(emptyList()) }
     val context = LocalContext.current
     val megaActivityResultContract = remember { context.megaActivityResultContract }
     val shareFolderLauncher = rememberLauncherForActivityResult(

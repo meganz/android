@@ -44,21 +44,19 @@ import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
-import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderAccessDialogNavKey
-import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogM3
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetRoute
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
+import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
-import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.HandleNodeOptionEvent
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesContent
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesViewModel
@@ -110,18 +108,7 @@ internal fun SharesScreen(
     // Node options modal state
     var visibleNodeOptionId by remember { mutableStateOf<NodeId?>(null) }
     val nodeOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
-    var shareNodeHandles by remember { mutableStateOf<List<Long>>(emptyList()) }
     val megaResultContract = rememberMegaResultContract()
-    val shareFolderLauncher = rememberLauncherForActivityResult(
-        contract = megaResultContract.shareFolderActivityResultContract
-    ) { result ->
-        result?.let { (contactIds, nodeHandles) ->
-            nodeOptionsActionViewModel.contactSelectedForShareFolder(
-                contactIds,
-                nodeHandles
-            )
-        }
-    }
     val nameCollisionLauncher = rememberLauncherForActivityResult(
         contract = megaResultContract.nameCollisionActivityContract
     ) { message ->
@@ -227,7 +214,9 @@ internal fun SharesScreen(
                 visible = nodeActionState.visibleActions.isNotEmpty() && isInSelectionMode,
                 nodeActionHandler = nodeActionHandler,
                 selectedNodes = getSelectedNodes(),
-                isSelecting = false
+                isSelecting = false,
+                nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+                onNavigate = navigationHandler::navigate
             )
         },
     ) { paddingValues ->
@@ -349,21 +338,6 @@ internal fun SharesScreen(
         }
     )
 
-    EventEffect(
-        event = nodeActionState.shareFolderDialogEvent,
-        onConsumed = nodeOptionsActionViewModel::resetShareFolderDialogEvent,
-        action = { handles ->
-            shareNodeHandles = handles
-        }
-    )
-
-    EventEffect(
-        event = nodeActionState.shareFolderEvent,
-        onConsumed = nodeOptionsActionViewModel::resetShareFolderEvent,
-        action = { handles ->
-            shareFolderLauncher.launch(handles.toLongArray())
-        }
-    )
 
     // Node options modal
     LaunchedEffect(visibleNodeOptionId) {
@@ -398,32 +372,6 @@ internal fun SharesScreen(
         }
     }
 
-    if (shareNodeHandles.isNotEmpty()) {
-        ShareFolderDialogM3(
-            nodeIds = shareNodeHandles.map { NodeId(it) },
-            onDismiss = {
-                shareNodeHandles = emptyList()
-            },
-            onConfirm = { nodes ->
-                val handles = nodes.map { it.id.longValue }.toLongArray()
-                shareFolderLauncher.launch(handles)
-            }
-        )
-    }
-
-    EventEffect(
-        event = nodeActionState.contactsData,
-        onConsumed = nodeOptionsActionViewModel::markShareFolderAccessDialogShown,
-        action = { (contactData, isFromBackups, nodeHandles) ->
-            navigationHandler.navigate(
-                ShareFolderAccessDialogNavKey(
-                    nodes = nodeHandles,
-                    contacts = contactData.joinToString(separator = ","),
-                    isFromBackups = isFromBackups
-                )
-            )
-        },
-    )
 
     if (showSortBottomSheet) {
         val selectedSortConfiguration = when (selectedTab) {
