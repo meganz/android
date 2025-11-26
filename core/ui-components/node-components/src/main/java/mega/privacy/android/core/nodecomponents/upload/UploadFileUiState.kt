@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.clouddrive.presentation.upload
+package mega.privacy.android.core.nodecomponents.upload
 
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
@@ -12,3 +12,4 @@ data class UploadFileUiState(
     val startUploadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     val uploadErrorEvent: StateEventWithContent<Throwable> = consumed(),
 )
+

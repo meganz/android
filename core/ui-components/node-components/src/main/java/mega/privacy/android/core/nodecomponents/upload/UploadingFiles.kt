@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.clouddrive.presentation.upload
+package mega.privacy.android.core.nodecomponents.upload
 
 import android.net.Uri
 import androidx.activity.result.ActivityResultLauncher
@@ -11,15 +11,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
+import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import java.io.IOException
 
 @Composable
-internal fun UploadingFiles(
+fun UploadingFiles(
     nameCollisionLauncher: ActivityResultLauncher<ArrayList<NameCollision>>,
     parentNodeId: NodeId,
     uris: List<Uri>,
@@ -69,3 +69,4 @@ internal fun UploadingFiles(
         }
     }
 }
+

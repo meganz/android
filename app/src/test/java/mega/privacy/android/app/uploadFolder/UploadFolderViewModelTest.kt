@@ -4,18 +4,18 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.kotlin.any
-import org.mockito.kotlin.anyValueClass
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.whenever
 import kotlin.test.Test
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -24,6 +24,7 @@ class UploadFolderViewModelTest {
     private lateinit var underTest: UploadFolderViewModel
 
     private val checkFileNameCollisionsUseCase: CheckFileNameCollisionsUseCase = mock()
+    private val getRootNodeIdUseCase : GetRootNodeIdUseCase = mock()
 
     @BeforeAll
     fun setup() {
@@ -32,7 +33,8 @@ class UploadFolderViewModelTest {
             applySortOrderToDocumentFolderUseCase = mock(),
             documentEntityDataMapper = mock(),
             searchFilesInDocumentFolderRecursiveUseCase = mock(),
-            checkFileNameCollisionsUseCase = checkFileNameCollisionsUseCase
+            checkFileNameCollisionsUseCase = checkFileNameCollisionsUseCase,
+            getRootNodeIdUseCase = getRootNodeIdUseCase
         )
     }
 
@@ -44,6 +46,7 @@ class UploadFolderViewModelTest {
     @Test
     fun `test that the state event is triggered when proceedWithUpload is invoked`() =
         runTest {
+            whenever(getRootNodeIdUseCase()).thenReturn(NodeId(12345L))
             underTest.consumeTransferTriggerEvent()
             underTest.proceedWithUpload(null)
 
@@ -57,6 +60,7 @@ class UploadFolderViewModelTest {
     @Test
     fun `test that the state event is consumed when consume transfer trigger event is invoked`() =
         runTest {
+            whenever(getRootNodeIdUseCase()).thenReturn(NodeId(12345L))
             underTest.proceedWithUpload(null)
             underTest.consumeTransferTriggerEvent()
 

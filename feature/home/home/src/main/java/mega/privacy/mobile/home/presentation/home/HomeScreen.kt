@@ -1,5 +1,7 @@
 package mega.privacy.mobile.home.presentation.home
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,6 +18,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -23,22 +29,30 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.button.MegaOutlinedButton
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOption
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
+import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
+import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.SearchNodeNavKey
+import mega.privacy.android.navigation.extensions.rememberMegaNavigator
+import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.home.presentation.configuration.HomeConfiguration
 import mega.privacy.mobile.home.presentation.home.model.HomeUiState
@@ -51,13 +65,50 @@ internal fun HomeScreen(
     navigationHandler: NavigationHandler,
     transferHandler: TransferHandler,
 ) {
+    val megaNavigator = rememberMegaNavigator()
+    val megaResultContract = rememberMegaResultContract()
+    val rootFolderId = NodeId(-1L)
+    var uploadUris by rememberSaveable { mutableStateOf(emptyList<Uri>()) }
+    val snackbarHostState = LocalSnackBarHostState.current
+    val coroutineScope = rememberCoroutineScope()
+    val uploadHandler = rememberUploadHandler(
+        parentId = rootFolderId,
+        onFilesSelected = { uris ->
+            uploadUris = uris
+        },
+        megaNavigator = megaNavigator,
+        megaResultContract = megaResultContract
+    )
+
+    val nameCollisionLauncher = rememberLauncherForActivityResult(
+        contract = megaResultContract.nameCollisionActivityContract
+    ) { message ->
+        if (!message.isNullOrEmpty()) {
+            coroutineScope.launch {
+                snackbarHostState?.showAutoDurationSnackbar(message)
+            }
+        }
+    }
+
     val fabOption by
     navigationHandler.monitorResult<HomeFabOption>(HomeFabOptionsBottomSheetNavKey.KEY)
         .collectAsStateWithLifecycle(null)
 
     LaunchedEffect(fabOption) {
         if (fabOption != null) {
-            // Handle action and call
+            when (fabOption) {
+                HomeFabOption.UploadFiles -> {
+                    uploadHandler.onUploadFilesClicked()
+                }
+
+                HomeFabOption.UploadFolder -> {
+                    uploadHandler.onUploadFolderClicked()
+                }
+
+                else -> {
+                    // Handle other options later
+                }
+            }
             navigationHandler.clearResult(HomeFabOptionsBottomSheetNavKey.KEY)
         }
     }
@@ -134,4 +185,14 @@ internal fun HomeScreen(
             }
         }
     }
+
+    UploadingFiles(
+        nameCollisionLauncher = nameCollisionLauncher,
+        parentNodeId = rootFolderId,
+        uris = uploadUris,
+        onStartUpload = { transferTriggerEvent ->
+            transferHandler.setTransferEvent(transferTriggerEvent)
+            uploadUris = emptyList()
+        },
+    )
 }

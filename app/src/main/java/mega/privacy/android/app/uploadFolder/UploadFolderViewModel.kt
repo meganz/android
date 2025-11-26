@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
 import mega.privacy.android.app.namecollision.data.NameCollisionResultUiEntity
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.SortOrder
@@ -27,7 +26,9 @@ import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.file.ApplySortOrderToDocumentFolderUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.file.GetFilesInDocumentFolderUseCase
@@ -47,6 +48,7 @@ class UploadFolderViewModel @Inject constructor(
     private val documentEntityDataMapper: DocumentEntityDataMapper,
     private val searchFilesInDocumentFolderRecursiveUseCase: SearchFilesInDocumentFolderRecursiveUseCase,
     private val checkFileNameCollisionsUseCase: CheckFileNameCollisionsUseCase,
+    private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UploadFolderViewState())
@@ -385,25 +387,32 @@ class UploadFolderViewModel @Inject constructor(
     fun proceedWithUpload(
         collisionsResolution: List<NameCollisionResultUiEntity>? = null,
     ) {
-        val collisionRename =
-            collisionsResolution?.filter { it.choice == NameCollisionChoice.RENAME }
-        val pathsAndNames = pendingUploads.associate { folderContentData ->
-            val fileName = (collisionRename
-                ?.firstOrNull { it.nameCollision.name == folderContentData.name }
-                ?.nameCollision?.renameName
-                    ) ?: folderContentData.name
-            folderContentData.uri.toString() to fileName
-        }
-        _uiState.update { viewState ->
-            viewState.copy(
-                transferTriggerEvent = triggered(
-                    TransferTriggerEvent.StartUpload.Files(
-                        pathsAndNames,
-                        NodeId(parentHandle),
-                        waitNotificationPermissionResponseToStart = true
+        viewModelScope.launch {
+            val collisionRename =
+                collisionsResolution?.filter { it.choice == NameCollisionChoice.RENAME }
+            val pathsAndNames = pendingUploads.associate { folderContentData ->
+                val fileName = (collisionRename
+                    ?.firstOrNull { it.nameCollision.name == folderContentData.name }
+                    ?.nameCollision?.renameName
+                        ) ?: folderContentData.name
+                folderContentData.uri.toString() to fileName
+            }
+            val parentOrRootNodeId = if (parentHandle == INVALID_HANDLE) {
+                runCatching { getRootNodeIdUseCase() }.getOrNull() ?: return@launch
+            } else {
+                NodeId(parentHandle)
+            }
+            _uiState.update { viewState ->
+                viewState.copy(
+                    transferTriggerEvent = triggered(
+                        TransferTriggerEvent.StartUpload.Files(
+                            pathsAndNames,
+                            parentOrRootNodeId,
+                            waitNotificationPermissionResponseToStart = true
+                        )
                     )
                 )
-            )
+            }
         }
     }
 

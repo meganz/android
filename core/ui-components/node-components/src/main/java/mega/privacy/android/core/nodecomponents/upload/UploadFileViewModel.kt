@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.clouddrive.presentation.upload
+package mega.privacy.android.core.nodecomponents.upload
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
@@ -104,3 +104,4 @@ class UploadFileViewModel @Inject constructor(
         _uiState.update { it.copy(uploadErrorEvent = consumed()) }
     }
 }
+

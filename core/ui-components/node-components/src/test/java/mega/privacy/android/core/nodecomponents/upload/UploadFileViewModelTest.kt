@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.clouddrive.presentation.upload
+package mega.privacy.android.core.nodecomponents.upload
 
 import android.net.Uri
 import com.google.common.truth.Truth.assertThat
