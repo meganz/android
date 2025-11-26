@@ -1,6 +1,9 @@
 package mega.privacy.android.app.appstate
 
 import android.app.PendingIntent
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -29,7 +32,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
@@ -44,7 +46,6 @@ import androidx.navigation3.ui.NavDisplay
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.NavigationEventEffect
-import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.appstate.content.NavigationGraphViewModel
@@ -81,7 +82,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.transparent.TransparentSceneStrategy
-import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -183,7 +183,7 @@ class MegaActivity : ComponentActivity() {
                         backstack = backStack,
                         currentAuthStatus = authStatus,
                         defaultLandingScreen = HomeScreensNavKey(),
-                        defaultLoginDestination = LoginNavKey(true),
+                        defaultLoginDestination = LoginNavKey(),
                         initialLoginDestination = TourNavKey,
                         hasRootNode = rootNodeState,
                         isPasscodeLocked = passcodeState is PasscodeCheckState.Locked,
@@ -198,7 +198,9 @@ class MegaActivity : ComponentActivity() {
                         (globalState as? GlobalState.LoggedIn)?.session?.let {
                             PendingBackStackNavigationHandler.AuthStatus.LoggedIn(it)
                         } ?: PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn
-
+                    if (authStatus == PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn) {
+                        loginViewModel.stopLogin(isPerformLocalLogOut = false)
+                    }
                     navigationHandler.onLoginChange(authStatus)
                 }
 

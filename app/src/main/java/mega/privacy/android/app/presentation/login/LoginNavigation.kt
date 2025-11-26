@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.login
 
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -21,7 +20,6 @@ import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 
 @Serializable
 data class LoginNavKey(
-    val resetLoginFlow: Boolean = false,
     val action: String? = null,
     val link: String? = null,
 ) : NoSessionNavKey.Mandatory
@@ -66,13 +64,6 @@ internal fun EntryProviderScope<NavKey>.loginScreen(
 ) {
     entry<LoginNavKey> { key ->
         val billingViewModel = hiltViewModel<BillingViewModel>()
-        LaunchedEffect(key.resetLoginFlow) {
-            if (key.resetLoginFlow) {
-                sharedViewModel.onPasswordChanged("")
-                sharedViewModel.onEmailChanged("")
-                sharedViewModel.resetLoginState()
-            }
-        }
 
         checkActions(sharedViewModel = sharedViewModel, action = key.action, link = key.link)
 

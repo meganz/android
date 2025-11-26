@@ -75,7 +75,7 @@ internal class FileContactListComposeActivity : AppCompatActivity() {
                 defaultLandingScreen = navKey,
                 isPasscodeLocked = false,
                 passcodeDestination = PasscodeNavKey,
-                defaultLoginDestination = LoginNavKey(true),
+                defaultLoginDestination = LoginNavKey(),
                 initialLoginDestination = TourNavKey,
                 fetchRootNodeDestination = ::FetchingContentNavKey,
                 navigationResultManager = navigationResultManager,

@@ -86,7 +86,6 @@ import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitR
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
-import mega.privacy.android.domain.usecase.login.ClearLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
 import mega.privacy.android.domain.usecase.login.FastLoginUseCase
 import mega.privacy.android.domain.usecase.login.FetchNodesUseCase
@@ -437,7 +436,7 @@ class LoginViewModel @Inject constructor(
     /**
      * Stops logging in.
      */
-    fun stopLogin() {
+    fun stopLogin(isPerformLocalLogOut: Boolean = true) {
         _state.update {
             it.copy(
                 accountSession = null,
@@ -456,7 +455,7 @@ class LoginViewModel @Inject constructor(
                 hasPreferences = false,
                 hasCUSetting = false,
                 isCUSettingEnabled = false,
-                isLocalLogoutInProgress = true,
+                isLocalLogoutInProgress = isPerformLocalLogOut,
                 isLoginRequired = true,
                 isLoginInProgress = false,
                 loginException = null,
@@ -464,15 +463,17 @@ class LoginViewModel @Inject constructor(
                 isCheckingSignupLink = false
             )
         }
-        viewModelScope.launch {
-            runCatching {
-                localLogoutUseCase(
-                    DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi },
-                )
-            }.onFailure {
-                Timber.w(it, "Exception in local logout.")
+        if (isPerformLocalLogOut) {
+            viewModelScope.launch {
+                runCatching {
+                    localLogoutUseCase(
+                        DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi },
+                    )
+                }.onFailure {
+                    Timber.w(it, "Exception in local logout.")
+                }
+                _state.update { it.copy(isLocalLogoutInProgress = false) }
             }
-            _state.update { it.copy(isLocalLogoutInProgress = false) }
         }
     }
 
