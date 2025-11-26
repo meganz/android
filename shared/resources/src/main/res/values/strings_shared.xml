@@ -1885,4 +1885,10 @@
     <string name="meeting_has_ended_dialog_view_chat_option">View meeting chat</string>
     <!-- Title for the button to dismiss a dialog. -->
     <string name="general_dismiss_dialog">Dismiss</string>
+    <!-- Timeline tab sorting title. This text will be displayed as the sort dialog title and the toolbar action menu, -->
+    <string name="timeline_tab_sort_by_text">Sort by</string>
+    <!-- Timeline tab sort files by date newest first -->
+    <string name="timeline_tab_sort_by_date_newest">Newest</string>
+    <!-- Timeline tab sort files by date oldest first -->
+    <string name="timeline_tab_sort_by_date_oldest">Oldest</string>
 </resources>

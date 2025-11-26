@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.photos.TimelineSortedPhotosResult
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelinePhotosUseCase
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
+import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.model.TimelineGridSize
@@ -224,12 +225,12 @@ class TimelineTabViewModelTest {
             photosNodeListCardMapper.invoke(photosDateResults = any())
         ) doReturn persistentListOf()
 
-        underTest.onSortOrderChange(value = SortOrder.ORDER_MODIFICATION_ASC)
+        underTest.onSortOptionsChange(value = TimelineTabSortOptions.Oldest)
 
         underTest.uiState.test {
             assertThat(
                 expectMostRecentItem().currentSort
-            ).isEqualTo(SortOrder.ORDER_MODIFICATION_ASC)
+            ).isEqualTo(TimelineTabSortOptions.Oldest)
         }
         verify(monitorTimelinePhotosUseCase).sortPhotos(
             isPaginationEnabled = any(),
@@ -264,7 +265,11 @@ class TimelineTabViewModelTest {
                 photosNodeListCardMapper.invoke(photosDateResults = any())
             ) doReturn persistentListOf()
 
-            underTest.onGridSizeChange(size = gridSize)
+            underTest.onGridSizeChange(
+                size = gridSize,
+                isEnableCameraUploadPageShowing = true,
+                mediaSource = FilterMediaSource.CloudDrive
+            )
 
             underTest.uiState.test {
                 assertThat(expectMostRecentItem().gridSize).isEqualTo(gridSize)
@@ -336,4 +341,362 @@ class TimelineTabViewModelTest {
             )
         }
     }
+
+    @Test
+    fun `test that the sort toolbar action is disabled when grid size is changed and the camera upload page is displayed and the media source is not cloud drive`() =
+        runTest {
+            whenever(
+                getFeatureFlagValueUseCase(any())
+            ) doReturn true
+            val photosResult = mock<TimelinePhotosResult> {
+                on { allPhotos } doReturn emptyList()
+                on { nonSensitivePhotos } doReturn emptyList()
+            }
+            whenever(
+                monitorTimelinePhotosUseCase.invoke(request = any())
+            ) doReturn flowOf(photosResult)
+            val now = LocalDateTime.now()
+            val mockFileTypeInfo = mock<VideoFileTypeInfo>()
+            val photo1 = mock<Photo.Image> {
+                on { id } doReturn 1L
+                on { modificationTime } doReturn now
+                on { fileTypeInfo } doReturn mockFileTypeInfo
+            }
+            val photoResult1 = PhotoResult(photo = photo1, isMarkedSensitive = false)
+            val photo1UiState = mock<PhotoUiState.Image>()
+            whenever(
+                photoUiStateMapper.invoke(photo = photo1)
+            ) doReturn photo1UiState
+            val mockTextFileTypeInfo = mock<TextFileTypeInfo>()
+            val photo2 = mock<Photo.Image> {
+                on { id } doReturn 2L
+                on { modificationTime } doReturn now.plusMonths(2)
+                on { fileTypeInfo } doReturn mockTextFileTypeInfo
+            }
+            val photoResult2 = PhotoResult(photo = photo2, isMarkedSensitive = false)
+            val photo2UiState = mock<PhotoUiState.Image>()
+            whenever(
+                photoUiStateMapper.invoke(photo = photo2)
+            ) doReturn photo2UiState
+            val sortResult = mock<TimelineSortedPhotosResult> {
+                on { sortedPhotos } doReturn listOf(photoResult1, photoResult2)
+            }
+            whenever(
+                monitorTimelinePhotosUseCase.sortPhotos(
+                    isPaginationEnabled = eq(true),
+                    photos = eq(emptyList()),
+                    sortOrder = any()
+                )
+            ) doReturn sortResult
+            whenever(
+                photosNodeListCardMapper.invoke(photosDateResults = any())
+            ) doReturn persistentListOf()
+
+            underTest.uiState.test { cancelAndConsumeRemainingEvents() }
+            underTest.onGridSizeChange(
+                size = TimelineGridSize.Large,
+                isEnableCameraUploadPageShowing = true,
+                mediaSource = FilterMediaSource.CameraUpload
+            )
+
+            underTest.actionUiState.test {
+                assertThat(expectMostRecentItem().enableSort).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that the sort toolbar action is disabled when grid size is changed and no photos to display`() =
+        runTest {
+            underTest.onGridSizeChange(
+                size = TimelineGridSize.Large,
+                isEnableCameraUploadPageShowing = false,
+                mediaSource = FilterMediaSource.CloudDrive
+            )
+
+            underTest.actionUiState.test {
+                assertThat(expectMostRecentItem().enableSort).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that the sort toolbar action is enabled when grid size is changed and the camera upload page is not displayed and the media source is cloud drive`() =
+        runTest {
+            whenever(
+                getFeatureFlagValueUseCase(any())
+            ) doReturn true
+            val photosResult = mock<TimelinePhotosResult> {
+                on { allPhotos } doReturn emptyList()
+                on { nonSensitivePhotos } doReturn emptyList()
+            }
+            whenever(
+                monitorTimelinePhotosUseCase.invoke(request = any())
+            ) doReturn flowOf(photosResult)
+            val now = LocalDateTime.now()
+            val mockFileTypeInfo = mock<VideoFileTypeInfo>()
+            val photo1 = mock<Photo.Image> {
+                on { id } doReturn 1L
+                on { modificationTime } doReturn now
+                on { fileTypeInfo } doReturn mockFileTypeInfo
+            }
+            val photoResult1 = PhotoResult(photo = photo1, isMarkedSensitive = false)
+            val photo1UiState = mock<PhotoUiState.Image>()
+            whenever(
+                photoUiStateMapper.invoke(photo = photo1)
+            ) doReturn photo1UiState
+            val mockTextFileTypeInfo = mock<TextFileTypeInfo>()
+            val photo2 = mock<Photo.Image> {
+                on { id } doReturn 2L
+                on { modificationTime } doReturn now.plusMonths(2)
+                on { fileTypeInfo } doReturn mockTextFileTypeInfo
+            }
+            val photoResult2 = PhotoResult(photo = photo2, isMarkedSensitive = false)
+            val photo2UiState = mock<PhotoUiState.Image>()
+            whenever(
+                photoUiStateMapper.invoke(photo = photo2)
+            ) doReturn photo2UiState
+            val sortResult = mock<TimelineSortedPhotosResult> {
+                on { sortedPhotos } doReturn listOf(photoResult1, photoResult2)
+            }
+            whenever(
+                monitorTimelinePhotosUseCase.sortPhotos(
+                    isPaginationEnabled = eq(true),
+                    photos = eq(emptyList()),
+                    sortOrder = any()
+                )
+            ) doReturn sortResult
+            whenever(
+                photosNodeListCardMapper.invoke(photosDateResults = any())
+            ) doReturn persistentListOf()
+
+            underTest.uiState.test { cancelAndConsumeRemainingEvents() }
+            underTest.onGridSizeChange(
+                size = TimelineGridSize.Large,
+                isEnableCameraUploadPageShowing = false,
+                mediaSource = FilterMediaSource.CloudDrive
+            )
+
+            underTest.actionUiState.test {
+                assertThat(expectMostRecentItem().enableSort).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that the sort toolbar action is disabled when CU page is enabled and the media source is not cloud drive`() =
+        runTest {
+            whenever(
+                getFeatureFlagValueUseCase(any())
+            ) doReturn true
+            val photosResult = mock<TimelinePhotosResult> {
+                on { allPhotos } doReturn emptyList()
+                on { nonSensitivePhotos } doReturn emptyList()
+            }
+            whenever(
+                monitorTimelinePhotosUseCase.invoke(request = any())
+            ) doReturn flowOf(photosResult)
+            val now = LocalDateTime.now()
+            val mockFileTypeInfo = mock<VideoFileTypeInfo>()
+            val photo1 = mock<Photo.Image> {
+                on { id } doReturn 1L
+                on { modificationTime } doReturn now
+                on { fileTypeInfo } doReturn mockFileTypeInfo
+            }
+            val photoResult1 = PhotoResult(photo = photo1, isMarkedSensitive = false)
+            val photo1UiState = mock<PhotoUiState.Image>()
+            whenever(
+                photoUiStateMapper.invoke(photo = photo1)
+            ) doReturn photo1UiState
+            val mockTextFileTypeInfo = mock<TextFileTypeInfo>()
+            val photo2 = mock<Photo.Image> {
+                on { id } doReturn 2L
+                on { modificationTime } doReturn now.plusMonths(2)
+                on { fileTypeInfo } doReturn mockTextFileTypeInfo
+            }
+            val photoResult2 = PhotoResult(photo = photo2, isMarkedSensitive = false)
+            val photo2UiState = mock<PhotoUiState.Image>()
+            whenever(
+                photoUiStateMapper.invoke(photo = photo2)
+            ) doReturn photo2UiState
+            val sortResult = mock<TimelineSortedPhotosResult> {
+                on { sortedPhotos } doReturn listOf(photoResult1, photoResult2)
+            }
+            whenever(
+                monitorTimelinePhotosUseCase.sortPhotos(
+                    isPaginationEnabled = eq(true),
+                    photos = eq(emptyList()),
+                    sortOrder = any()
+                )
+            ) doReturn sortResult
+            whenever(
+                photosNodeListCardMapper.invoke(photosDateResults = any())
+            ) doReturn persistentListOf()
+
+            underTest.updateSortActionBasedOnCUPageEnablement(
+                isEnableCameraUploadPageShowing = true,
+                mediaSource = FilterMediaSource.CameraUpload,
+                isCUPageEnabled = true
+            )
+
+            underTest.actionUiState.test {
+                assertThat(expectMostRecentItem().enableSort).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that the sort toolbar action is disabled when CU page is disabled and the media source is cloud drive`() =
+        runTest {
+            whenever(
+                getFeatureFlagValueUseCase(any())
+            ) doReturn true
+            val photosResult = mock<TimelinePhotosResult> {
+                on { allPhotos } doReturn emptyList()
+                on { nonSensitivePhotos } doReturn emptyList()
+            }
+            whenever(
+                monitorTimelinePhotosUseCase.invoke(request = any())
+            ) doReturn flowOf(photosResult)
+            val now = LocalDateTime.now()
+            val mockFileTypeInfo = mock<VideoFileTypeInfo>()
+            val photo1 = mock<Photo.Image> {
+                on { id } doReturn 1L
+                on { modificationTime } doReturn now
+                on { fileTypeInfo } doReturn mockFileTypeInfo
+            }
+            val photoResult1 = PhotoResult(photo = photo1, isMarkedSensitive = false)
+            val photo1UiState = mock<PhotoUiState.Image>()
+            whenever(
+                photoUiStateMapper.invoke(photo = photo1)
+            ) doReturn photo1UiState
+            val mockTextFileTypeInfo = mock<TextFileTypeInfo>()
+            val photo2 = mock<Photo.Image> {
+                on { id } doReturn 2L
+                on { modificationTime } doReturn now.plusMonths(2)
+                on { fileTypeInfo } doReturn mockTextFileTypeInfo
+            }
+            val photoResult2 = PhotoResult(photo = photo2, isMarkedSensitive = false)
+            val photo2UiState = mock<PhotoUiState.Image>()
+            whenever(
+                photoUiStateMapper.invoke(photo = photo2)
+            ) doReturn photo2UiState
+            val sortResult = mock<TimelineSortedPhotosResult> {
+                on { sortedPhotos } doReturn listOf(photoResult1, photoResult2)
+            }
+            whenever(
+                monitorTimelinePhotosUseCase.sortPhotos(
+                    isPaginationEnabled = eq(true),
+                    photos = eq(emptyList()),
+                    sortOrder = any()
+                )
+            ) doReturn sortResult
+            whenever(
+                photosNodeListCardMapper.invoke(photosDateResults = any())
+            ) doReturn persistentListOf()
+
+            underTest.updateSortActionBasedOnCUPageEnablement(
+                isEnableCameraUploadPageShowing = true,
+                mediaSource = FilterMediaSource.CloudDrive,
+                isCUPageEnabled = false
+            )
+
+            underTest.actionUiState.test {
+                assertThat(expectMostRecentItem().enableSort).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that the sort toolbar action is disabled when CU page is disabled and no photos to display`() =
+        runTest {
+            whenever(
+                getFeatureFlagValueUseCase(any())
+            ) doReturn false
+            val photosResult = mock<TimelinePhotosResult> {
+                on { allPhotos } doReturn emptyList()
+                on { nonSensitivePhotos } doReturn emptyList()
+            }
+            whenever(monitorTimelinePhotosUseCase(request = any())) doReturn flowOf(photosResult)
+            val sortResult = mock<TimelineSortedPhotosResult> {
+                on { sortedPhotos } doReturn emptyList()
+            }
+            whenever(
+                monitorTimelinePhotosUseCase.sortPhotos(
+                    isPaginationEnabled = eq(false),
+                    photos = eq(emptyList()),
+                    sortOrder = any()
+                )
+            ) doReturn sortResult
+            whenever(
+                photosNodeListCardMapper.invoke(photosDateResults = any())
+            ) doReturn persistentListOf()
+
+            underTest.updateSortActionBasedOnCUPageEnablement(
+                isEnableCameraUploadPageShowing = false,
+                mediaSource = FilterMediaSource.CloudDrive,
+                isCUPageEnabled = false
+            )
+
+            underTest.actionUiState.test {
+                assertThat(expectMostRecentItem().enableSort).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that the sort toolbar action is enabled when CU page is disabled and the camera upload page is not displayed and the media source is cloud drive`() =
+        runTest {
+            whenever(
+                getFeatureFlagValueUseCase(any())
+            ) doReturn true
+            val photosResult = mock<TimelinePhotosResult> {
+                on { allPhotos } doReturn emptyList()
+                on { nonSensitivePhotos } doReturn emptyList()
+            }
+            whenever(
+                monitorTimelinePhotosUseCase.invoke(request = any())
+            ) doReturn flowOf(photosResult)
+            val now = LocalDateTime.now()
+            val mockFileTypeInfo = mock<VideoFileTypeInfo>()
+            val photo1 = mock<Photo.Image> {
+                on { id } doReturn 1L
+                on { modificationTime } doReturn now
+                on { fileTypeInfo } doReturn mockFileTypeInfo
+            }
+            val photoResult1 = PhotoResult(photo = photo1, isMarkedSensitive = false)
+            val photo1UiState = mock<PhotoUiState.Image>()
+            whenever(
+                photoUiStateMapper.invoke(photo = photo1)
+            ) doReturn photo1UiState
+            val mockTextFileTypeInfo = mock<TextFileTypeInfo>()
+            val photo2 = mock<Photo.Image> {
+                on { id } doReturn 2L
+                on { modificationTime } doReturn now.plusMonths(2)
+                on { fileTypeInfo } doReturn mockTextFileTypeInfo
+            }
+            val photoResult2 = PhotoResult(photo = photo2, isMarkedSensitive = false)
+            val photo2UiState = mock<PhotoUiState.Image>()
+            whenever(
+                photoUiStateMapper.invoke(photo = photo2)
+            ) doReturn photo2UiState
+            val sortResult = mock<TimelineSortedPhotosResult> {
+                on { sortedPhotos } doReturn listOf(photoResult1, photoResult2)
+            }
+            whenever(
+                monitorTimelinePhotosUseCase.sortPhotos(
+                    isPaginationEnabled = eq(true),
+                    photos = eq(emptyList()),
+                    sortOrder = any()
+                )
+            ) doReturn sortResult
+            whenever(
+                photosNodeListCardMapper.invoke(photosDateResults = any())
+            ) doReturn persistentListOf()
+
+            underTest.uiState.test { cancelAndConsumeRemainingEvents() }
+            underTest.updateSortActionBasedOnCUPageEnablement(
+                isEnableCameraUploadPageShowing = false,
+                mediaSource = FilterMediaSource.CloudDrive,
+                isCUPageEnabled = false
+            )
+
+            underTest.actionUiState.test {
+                assertThat(expectMostRecentItem().enableSort).isTrue()
+            }
+        }
 }

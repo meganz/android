@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -63,6 +64,7 @@ import mega.privacy.android.feature.photos.presentation.component.PhotosNodeGrid
 import mega.privacy.android.feature.photos.presentation.timeline.component.EnableCameraUploadsContent
 import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosNodeListCardListView
 import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosSkeletonView
+import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineSortDialog
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -71,6 +73,7 @@ internal fun TimelineTabRoute(
     uiState: TimelineTabUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     mediaFilterUiState: MediaFilterUiState,
+    showTimelineSortDialog: Boolean,
     clearCameraUploadsMessage: () -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
@@ -79,6 +82,8 @@ internal fun TimelineTabRoute(
     onNavigateCameraUploadsSettings: () -> Unit,
     setEnableCUPage: (Boolean) -> Unit,
     onGridSizeChange: (value: TimelineGridSize) -> Unit,
+    onSortDialogDismissed: () -> Unit,
+    onSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     TimelineTabScreen(
@@ -86,6 +91,7 @@ internal fun TimelineTabRoute(
         uiState = uiState,
         mediaFilterUiState = mediaFilterUiState,
         mediaCameraUploadUiState = mediaCameraUploadUiState,
+        showTimelineSortDialog = showTimelineSortDialog,
         clearCameraUploadsMessage = clearCameraUploadsMessage,
         clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
         onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
@@ -94,6 +100,8 @@ internal fun TimelineTabRoute(
         onNavigateCameraUploadsSettings = onNavigateCameraUploadsSettings,
         setEnableCUPage = setEnableCUPage,
         onGridSizeChange = onGridSizeChange,
+        onSortDialogDismissed = onSortDialogDismissed,
+        onSortOptionChange = onSortOptionChange
     )
 }
 
@@ -102,6 +110,7 @@ internal fun TimelineTabScreen(
     uiState: TimelineTabUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     mediaFilterUiState: MediaFilterUiState,
+    showTimelineSortDialog: Boolean,
     clearCameraUploadsMessage: () -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
@@ -110,6 +119,8 @@ internal fun TimelineTabScreen(
     onNavigateCameraUploadsSettings: () -> Unit,
     setEnableCUPage: (Boolean) -> Unit,
     onGridSizeChange: (value: TimelineGridSize) -> Unit,
+    onSortDialogDismissed: () -> Unit,
+    onSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -188,6 +199,15 @@ internal fun TimelineTabScreen(
                     loadNextPage()
                 }
             }
+    }
+
+    if (showTimelineSortDialog) {
+        TimelineSortDialog(
+            modifier = Modifier.testTag(TIMELINE_TAB_SCREEN_SORT_DIALOG_TAG),
+            selected = uiState.currentSort,
+            onDismissRequest = onSortDialogDismissed,
+            onOptionSelected = onSortOptionChange
+        )
     }
 
     when {
@@ -432,6 +452,7 @@ private fun TimelineTabScreenPreview() {
             uiState = TimelineTabUiState(isLoading = false),
             mediaCameraUploadUiState = MediaCameraUploadUiState(),
             mediaFilterUiState = MediaFilterUiState(),
+            showTimelineSortDialog = false,
             clearCameraUploadsMessage = {},
             clearCameraUploadsCompletedMessage = {},
             onChangeCameraUploadsPermissions = {},
@@ -440,6 +461,10 @@ private fun TimelineTabScreenPreview() {
             setEnableCUPage = {},
             onNavigateCameraUploadsSettings = {},
             onGridSizeChange = {},
+            onSortDialogDismissed = {},
+            onSortOptionChange = {}
         )
     }
 }
+
+internal const val TIMELINE_TAB_SCREEN_SORT_DIALOG_TAG = "timeline_tab_screen:dialog_sort"

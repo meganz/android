@@ -9,6 +9,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -30,7 +31,9 @@ import mega.privacy.android.feature.photos.model.MediaAppBarAction.CameraUpload.
 import mega.privacy.android.feature.photos.model.MediaScreen
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabRoute
+import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabActionUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabRoute
+import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSortOptions
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabViewModel
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
@@ -44,11 +47,13 @@ fun MediaMainRoute(
     mediaFilterViewModel: MediaFilterViewModel = hiltViewModel(),
 ) {
     val timelineTabUiState by timelineViewModel.uiState.collectAsStateWithLifecycle()
+    val timelineTabActionUiState by timelineViewModel.actionUiState.collectAsStateWithLifecycle()
     val mediaCameraUploadUiState by mediaCameraUploadViewModel.uiState.collectAsStateWithLifecycle()
     val mediaFilterUiState by mediaFilterViewModel.uiState.collectAsStateWithLifecycle()
 
     MediaMainScreen(
         timelineTabUiState = timelineTabUiState,
+        timelineTabActionUiState = timelineTabActionUiState,
         mediaCameraUploadUiState = mediaCameraUploadUiState,
         mediaFilterUiState = mediaFilterUiState,
         navigateToAlbumContent = navigateToAlbumContent,
@@ -57,23 +62,40 @@ fun MediaMainRoute(
                 mediaSource = mediaFilterUiState.mediaSource,
                 show = shouldShow
             )
+            timelineViewModel.updateSortActionBasedOnCUPageEnablement(
+                isEnableCameraUploadPageShowing = mediaCameraUploadUiState.enableCameraUploadPageShowing,
+                mediaSource = mediaFilterUiState.mediaSource,
+                isCUPageEnabled = shouldShow
+            )
         },
-        onTimelineGridSizeChange = timelineViewModel::onGridSizeChange,
+        onTimelineGridSizeChange = { size ->
+            timelineViewModel.onGridSizeChange(
+                size = size,
+                isEnableCameraUploadPageShowing = mediaCameraUploadUiState.enableCameraUploadPageShowing,
+                mediaSource = mediaFilterUiState.mediaSource
+            )
+        },
+        onTimelineSortOptionChange = timelineViewModel::onSortOptionsChange,
+        loadTimelineNextPage = timelineViewModel::loadNextPage
     )
 }
 
 @Composable
 fun MediaMainScreen(
     timelineTabUiState: TimelineTabUiState,
+    timelineTabActionUiState: TimelineTabActionUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     mediaFilterUiState: MediaFilterUiState,
     setEnableCUPage: (Boolean) -> Unit,
     onTimelineGridSizeChange: (value: TimelineGridSize) -> Unit,
+    onTimelineSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
+    loadTimelineNextPage: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MediaMainViewModel = hiltViewModel(),
     navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
 ) {
     var currentTabIndex by rememberSaveable { mutableIntStateOf(0) }
+    var showTimelineSortDialog by rememberSaveable { mutableStateOf(false) }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier.fillMaxSize(),
@@ -102,11 +124,16 @@ fun MediaMainScreen(
                         }
                     )
 
-                    add(
-                        MenuActionWithClick(menuAction = MediaAppBarAction.More) {
-                            // Todo: Handle More action click
+                    // Menu actions for timeline tab
+                    if (currentTabIndex == MediaScreen.Timeline.ordinal) {
+                        if (timelineTabActionUiState.enableSort) {
+                            add(
+                                MenuActionWithClick(menuAction = MediaAppBarAction.SortBy) {
+                                    showTimelineSortDialog = true
+                                }
+                            )
                         }
-                    )
+                    }
                 }
             )
         }
@@ -135,9 +162,18 @@ fun MediaMainScreen(
                                     timelineTabUiState = timelineTabUiState,
                                     mediaFilterUiState = mediaFilterUiState,
                                     mediaCameraUploadUiState = mediaCameraUploadUiState,
+                                    showTimelineSortDialog = showTimelineSortDialog,
                                     navigateToAlbumContent = navigateToAlbumContent,
                                     setEnableCUPage = setEnableCUPage,
                                     onTimelineGridSizeChange = onTimelineGridSizeChange,
+                                    onTimelineSortDialogDismissed = {
+                                        showTimelineSortDialog = false
+                                    },
+                                    onTimelineSortOptionChange = {
+                                        onTimelineSortOptionChange(it)
+                                        showTimelineSortDialog = false
+                                    },
+                                    loadTimelineNextPage = loadTimelineNextPage
                                 )
                             }
                         )
@@ -162,9 +198,13 @@ private fun MediaScreen.MediaContent(
     timelineTabUiState: TimelineTabUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     mediaFilterUiState: MediaFilterUiState,
+    showTimelineSortDialog: Boolean,
     navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
     setEnableCUPage: (Boolean) -> Unit,
     onTimelineGridSizeChange: (value: TimelineGridSize) -> Unit,
+    onTimelineSortDialogDismissed: () -> Unit,
+    onTimelineSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
+    loadTimelineNextPage: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
@@ -176,14 +216,17 @@ private fun MediaScreen.MediaContent(
                 uiState = timelineTabUiState,
                 mediaCameraUploadUiState = mediaCameraUploadUiState,
                 mediaFilterUiState = mediaFilterUiState,
+                showTimelineSortDialog = showTimelineSortDialog,
                 clearCameraUploadsMessage = {},
                 clearCameraUploadsCompletedMessage = {},
                 onChangeCameraUploadsPermissions = {},
                 clearCameraUploadsChangePermissionsMessage = {},
-                loadNextPage = {},
+                loadNextPage = loadTimelineNextPage,
                 onNavigateCameraUploadsSettings = {},
                 setEnableCUPage = setEnableCUPage,
                 onGridSizeChange = onTimelineGridSizeChange,
+                onSortDialogDismissed = onTimelineSortDialogDismissed,
+                onSortOptionChange = onTimelineSortOptionChange
             )
         }
 
@@ -211,11 +254,14 @@ fun PhotosMainScreenPreview() {
     AndroidThemeForPreviews {
         MediaMainScreen(
             timelineTabUiState = TimelineTabUiState(),
+            timelineTabActionUiState = TimelineTabActionUiState(),
             mediaCameraUploadUiState = MediaCameraUploadUiState(),
             mediaFilterUiState = MediaFilterUiState(),
             navigateToAlbumContent = {},
             setEnableCUPage = {},
-            onTimelineGridSizeChange = {}
+            onTimelineGridSizeChange = {},
+            onTimelineSortOptionChange = {},
+            loadTimelineNextPage = {}
         )
     }
 }

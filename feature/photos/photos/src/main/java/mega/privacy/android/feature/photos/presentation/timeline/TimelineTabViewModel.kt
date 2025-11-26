@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
-import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoResult
 import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
@@ -22,6 +21,7 @@ import mega.privacy.android.domain.entity.photos.TimelineSortedPhotosResult
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelinePhotosUseCase
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
+import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.model.TimelineGridSize
@@ -41,13 +41,21 @@ class TimelineTabViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val gridSizeFlow = MutableStateFlow(TimelineGridSize.Default)
-    private val sortOrderFlow = MutableStateFlow(SortOrder.ORDER_MODIFICATION_DESC)
+    private val sortOptionsFlow = MutableStateFlow(TimelineTabSortOptions.Newest)
     private val selectedPhotoIdsFlow = MutableStateFlow<List<Long>>(emptyList())
 
     internal val uiState: StateFlow<TimelineTabUiState> by lazy {
         timelineTabUiState().asUiStateFlow(
             scope = viewModelScope,
             initialValue = TimelineTabUiState()
+        )
+    }
+
+    private val actionFlow = MutableStateFlow(TimelineTabActionUiState())
+    internal val actionUiState: StateFlow<TimelineTabActionUiState> by lazy {
+        actionFlow.asUiStateFlow(
+            scope = viewModelScope,
+            initialValue = TimelineTabActionUiState()
         )
     }
 
@@ -64,12 +72,12 @@ class TimelineTabViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun monitorPhotos(request: TimelinePhotosRequest) = combine(
         flow = monitorTimelinePhotosUseCase(request = request),
-        flow2 = sortOrderFlow
-    ) { photosResult, sortOrder ->
+        flow2 = sortOptionsFlow
+    ) { photosResult, sortOptions ->
         val sortResult = monitorTimelinePhotosUseCase.sortPhotos(
             isPaginationEnabled = request.isPaginationEnabled,
             photos = photosResult.nonSensitivePhotos,
-            sortOrder = sortOrder
+            sortOrder = sortOptions.sortOrder
         )
         Pair(photosResult.allPhotos, sortResult)
     }.flatMapLatest { (allPhotos, sortResult) ->
@@ -144,7 +152,7 @@ class TimelineTabViewModel @Inject constructor(
             yearsCardPhotos = photosNodeListCardMapper(photosDateResults = sortResult.photosInYear),
             gridSize = gridSize,
             selectedPhotoCount = selectedPhotoIds.size,
-            currentSort = sortOrderFlow.value,
+            currentSort = sortOptionsFlow.value,
             isPaginationEnabled = isPaginationEnabled
         )
     }
@@ -163,8 +171,8 @@ class TimelineTabViewModel @Inject constructor(
         }
     }
 
-    internal fun onSortOrderChange(value: SortOrder) {
-        sortOrderFlow.value = value
+    internal fun onSortOptionsChange(value: TimelineTabSortOptions) {
+        sortOptionsFlow.value = value
     }
 
     internal fun loadNextPage() {
@@ -185,7 +193,49 @@ class TimelineTabViewModel @Inject constructor(
         getFeatureFlagValueUseCase(AppFeatures.TimelinePhotosPagination)
     }.getOrElse { false }
 
-    internal fun onGridSizeChange(size: TimelineGridSize) {
+    internal fun onGridSizeChange(
+        size: TimelineGridSize,
+        isEnableCameraUploadPageShowing: Boolean,
+        mediaSource: FilterMediaSource,
+    ) {
         gridSizeFlow.update { size }
+        updateSortActionEnablement(
+            isEnableCameraUploadPageShowing = isEnableCameraUploadPageShowing,
+            mediaSource = mediaSource
+        )
+    }
+
+    internal fun updateSortActionBasedOnCUPageEnablement(
+        isEnableCameraUploadPageShowing: Boolean,
+        mediaSource: FilterMediaSource,
+        isCUPageEnabled: Boolean,
+    ) {
+        if (isCUPageEnabled && mediaSource != FilterMediaSource.CloudDrive) {
+            disableSortToolbarMenuAction()
+        } else {
+            updateSortActionEnablement(
+                isEnableCameraUploadPageShowing = isEnableCameraUploadPageShowing,
+                mediaSource = mediaSource
+            )
+        }
+    }
+
+    private fun updateSortActionEnablement(
+        isEnableCameraUploadPageShowing: Boolean,
+        mediaSource: FilterMediaSource,
+    ) {
+        if (uiState.value.displayedPhotos.isEmpty() || (isEnableCameraUploadPageShowing && mediaSource != FilterMediaSource.CloudDrive)) {
+            disableSortToolbarMenuAction()
+        } else {
+            enableSortToolbarMenuAction()
+        }
+    }
+
+    private fun disableSortToolbarMenuAction() {
+        actionFlow.update { it.copy(enableSort = false) }
+    }
+
+    private fun enableSortToolbarMenuAction() {
+        actionFlow.update { it.copy(enableSort = true) }
     }
 }
