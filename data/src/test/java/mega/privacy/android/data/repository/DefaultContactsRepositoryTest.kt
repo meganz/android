@@ -1174,12 +1174,14 @@ class DefaultContactsRepositoryTest {
             val myNodeHandle = 2L
             val myName = "Name"
             val myText = "Text"
+            val myfile = "_9j_4AAQSkZJRgABAQAAAQABAAD_2wBDAAgG"
             val request = mock<MegaRequest> {
                 on { email }.thenReturn(myEmail)
                 on { parentHandle }.thenReturn(myParentHandle)
                 on { nodeHandle }.thenReturn(myNodeHandle)
                 on { name }.thenReturn(myName)
                 on { text }.thenReturn(myText)
+                on { file }.thenReturn(myfile)
             }
             val user = mock<MegaUser> {
                 on { email }.thenReturn(myEmail)
@@ -1196,7 +1198,8 @@ class DefaultContactsRepositoryTest {
                     email = request.email,
                     contactHandle = request.parentHandle,
                     contactLinkHandle = request.nodeHandle,
-                    fullName = "${request.name} ${request.text}"
+                    fullName = "${request.name} ${request.text}",
+                    avatarFileInBase64 = request.file
                 )
             )
         }

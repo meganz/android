@@ -909,7 +909,8 @@ internal class DefaultContactsRepository @Inject constructor(
                                             megaChatApiGateway.getUserOnlineStatus(
                                                 request.parentHandle
                                             )
-                                        )
+                                        ),
+                                        avatarFileInBase64 = request.file,
                                     )
                                 )
                             )

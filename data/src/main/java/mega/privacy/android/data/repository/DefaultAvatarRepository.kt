@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 import mega.privacy.android.data.constant.FileConstant
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
@@ -33,6 +34,7 @@ import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import java.io.File
+import java.util.Base64
 import javax.inject.Inject
 import kotlin.coroutines.resume
 
@@ -215,6 +217,26 @@ internal class DefaultAvatarRepository @Inject constructor(
         }
         Unit
     }
+
+    override suspend fun getAvatarFromBase64String(userHandle: Long, base64StringAvatar: String) =
+        withContext(ioDispatcher) {
+            // Remove any data URL prefix if present
+            base64StringAvatar.substringAfter(",")
+                // Convert URL-safe Base64 to standard Base64
+                .replace('_', '/').replace('-', '+')
+                .let { standardBase64 ->
+                    // Decode Base64
+                    yield()
+                    Base64.getDecoder().decode(standardBase64).let { imageBytes ->
+                        cacheGateway
+                            .buildAvatarFile(userHandle.toString() + FileConstant.JPG_EXTENSION)
+                            .also {
+                                yield()
+                                it?.writeBytes(imageBytes)
+                            }
+                    }
+                }
+        }
 
     companion object {
         /**

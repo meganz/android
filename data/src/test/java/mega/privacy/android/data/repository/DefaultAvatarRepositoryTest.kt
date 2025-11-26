@@ -35,6 +35,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
+import java.util.Base64
 import kotlin.contracts.ExperimentalContracts
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -316,6 +317,28 @@ internal class DefaultAvatarRepositoryTest {
         underTest.monitorUserAvatarUpdates().test {
             assertThat(awaitItem()).isEqualTo(2L)
             awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test that getAvatarFromBase64String returns correctly`() = runTest {
+        val strings = arrayOf(
+            "data:image/jpeg;base64,_9j_4AAQSkZJRgABAQAAAQABAAD_2wBDAAgG",
+            "_9j_4AAQSkZJRgABAQAAAQABAAD-2wBDAAgG",
+            "_9j_4AAQSkZJRgABAQAAAQABAAD+2wBDAAgG",
+        )
+        val userHandle = 12345L
+        val expected = "/9j/4AAQSkZJRgABAQAAAQABAAD+2wBDAAgG"
+        val imageBytes = Base64.getDecoder().decode(expected)
+        val avatarFile = File.createTempFile(userHandle.toString(), FileConstant.JPG_EXTENSION)
+        avatarFile.writeBytes(imageBytes)
+
+        whenever(cacheGateway.buildAvatarFile(userHandle.toString() + FileConstant.JPG_EXTENSION))
+            .thenReturn(avatarFile)
+
+        strings.forEach { base64String ->
+            assertThat(underTest.getAvatarFromBase64String(userHandle, base64String))
+                .isEqualTo(avatarFile)
         }
     }
 }
