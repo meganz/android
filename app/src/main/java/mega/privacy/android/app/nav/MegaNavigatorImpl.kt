@@ -10,6 +10,7 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.getLink.GetLinkActivity
@@ -81,6 +82,7 @@ import mega.privacy.android.feature.sync.ui.SyncHostActivity
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.navigation.settings.SettingsNavigator
@@ -106,8 +108,9 @@ internal class MegaNavigatorImpl @Inject constructor(
     AppNavigatorImpl, SettingsNavigator by settingsNavigator {
 
     private fun navigateForSingleActivity(
-        legacyNavigation: () -> Unit,
+        context: Context,
         singleActivityDestination: NavKey,
+        legacyNavigation: () -> Unit,
     ) {
         applicationScope.launch {
             runCatching { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) }
@@ -115,6 +118,7 @@ internal class MegaNavigatorImpl @Inject constructor(
                     legacyNavigation()
                 }.onSuccess { singleActivity ->
                     if (singleActivity) {
+                        context.startActivity(Intent(context, MegaActivity::class.java))
                         navigationQueue.emit(singleActivityDestination)
                     } else {
                         legacyNavigation()
@@ -449,12 +453,18 @@ internal class MegaNavigatorImpl @Inject constructor(
     }
 
     override fun openSyncMegaFolder(context: Context, handle: Long) {
-        context.startActivity(
-            Intent(context, ManagerActivity::class.java)
-                .setAction(ACTION_OPEN_SYNC_MEGA_FOLDER)
-                .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
-                .putExtra(INTENT_EXTRA_KEY_HANDLE, handle)
-        )
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = CloudDriveNavKey(nodeHandle = handle)
+        ) {
+            context.startActivity(
+                Intent(context, ManagerActivity::class.java)
+                    .setAction(ACTION_OPEN_SYNC_MEGA_FOLDER)
+                    .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
+                    .putExtra(INTENT_EXTRA_KEY_HANDLE, handle)
+            )
+        }
+
     }
 
     override fun openDeviceCenter(context: Context) {
@@ -605,6 +615,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         nodeName: String,
     ) {
         navigateForSingleActivity(
+            context = context,
             legacyNavigation = {
                 openFileContactListActivity(context = context, handle = handle)
             },
