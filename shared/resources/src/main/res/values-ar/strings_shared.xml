@@ -1069,15 +1069,15 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">إخفاء الملفات والمجلدات المهمة</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy in one easy step.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">يمكنك إخفاء الملفات والمجلدات الحساسة للخصوصية في خطوة واحدة سهلة.</string>
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">بعيدًا عن الأنظار</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
+    <string name="hidden_nodes_description_control_visibility">يمكنك فقط الكشف عن الملفات المخفية إما بشكل فردي أو عن طريق عرض العناصر المخفية مؤقتًا من الإعدادات.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Blur for privacy</string>
+    <string name="hidden_nodes_title_visible_shared_files">طمس للخصوصية</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
+    <string name="hidden_nodes_description_visible_shared_files">اعرض العناصر المخفية مع عدم وضوح الصور المصغرة الخاصة بها حتى تتمكن من التعرف عليها دون الكشف عن محتوياتها.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">حافظ على صورك آمنة دائمًا</string>
     <!--Camera backup permission screen description-->
@@ -1898,31 +1898,39 @@
     <!-- The description of camera uploads low battery paused warning banner -->
     <string name="camera_update_low_battery_banner_description">تم إيقاف الترفيعات مؤقتًا بسبب انخفاض طاقة البطارية. اشحن جهازك للمتابعة.</string>
     <!-- The description of camera uploads network requirement not met paused warning banner -->
-    <string name="camera_update_network_requirement_not_met_banner_description">Camera uploads paused, connect to WIFI or allow mobile data</string>
+    <string name="camera_update_network_requirement_not_met_banner_description">Camera uploads paused, connect to Wi-Fi or allow mobile data</string>
     <!-- The button text of camera uploads network requirement not met paused warning banner -->
     <string name="camera_update_network_requirement_not_met_banner_button_text">السماح ببيانات الهاتف المحمول</string>
     <!-- Billing info with discount label -->
     <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s for %3$s</string>
     <!-- campaign name for Black Friday deal -->
-    <string name="campaign_name_black_friday">Black Friday deal: %1$d%% off</string>
+    <string name="campaign_name_black_friday">صفقة الجمعة السوداء: خصم %1$d%%</string>
     <!-- campaign name for Cyber Monday deal -->
-    <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
+    <string name="campaign_name_cyber_monday">صفقة الاثنين الالكتروني: خصم %1$d%%</string>
     <!-- campaign name for Special offer -->
-    <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
+    <string name="campaign_name_special_offer">عرض خاص: خصم %1$d%%</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="one">%1$s for the first %2$d month</item>
-        <item quantity="other">%1$s for the first %2$d months</item>
+        <item quantity="zero">%1$s لأول %2$d شهر</item>
+        <item quantity="one">%1$s لأول %2$d شهر</item>
+        <item quantity="two">%1$s لأول %2$d شهرين</item>
+        <item quantity="few">%1$s لأول %2$d شهور</item>
+        <item quantity="many">%1$s لأول %2$d شهر</item>
+        <item quantity="other">%1$s لأول %2$d شهر</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one">%1$s for the first %2$d year</item>
-        <item quantity="other">%1$s for the first %2$d years</item>
+        <item quantity="zero">%1$s لأول %2$d سنة</item>
+        <item quantity="one">%1$s لأول %2$d سنة</item>
+        <item quantity="two">%1$s لأول %2$d سنتين</item>
+        <item quantity="few">%1$s لأول %2$d سنوات</item>
+        <item quantity="many">%1$s لأول %2$d سنة</item>
+        <item quantity="other">%1$s لأول %2$d سنة</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">مجموعة الخصوصية من ميغا MEGA</string>
     <!-- Message about savings on yearly plan in case it has discount -->
-    <string name="account_upgrade_account_label_save_at_least">Save at least 16% on a yearly plan</string>
+    <string name="account_upgrade_account_label_save_at_least">وفر 16٪ على الأقل على باقة سنوية</string>
     <!-- Add new album on Media screen dialog title -->
     <string name="media_add_new_album_dialog_title">أدخل اسم الألبوم</string>
     <!-- Add new album on Media screen dialog positive button text -->
@@ -1934,19 +1942,23 @@
     <!-- Title of raw album. -->
     <string name="system_album_raw_title">RAW</string>
     <!-- General error message to show when an invalid string is detected -->
-    <string name="general_invalid_string">Cannot be empty</string>
+    <string name="general_invalid_string">لا يمكن أن تكون فارغة</string>
     <!-- Error message for creating an album with a system albums name -->
     <string name="album_invalid_name_error_message">اسم هذا الألبوم غير مسموح به. أدخل اسمًا مختلفًا.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="album_name_exists_error_message">يوجد بالفعل ألبوم بهذا الاسم. أدخل اسمًا مختلفًا.</string>
     <!-- sentence to detail the permanent awarded text related to VPN achievement -->
-    <string name="mega_vpn_achievement_awarded_storage_text_permanent">Get %1$s of free storage when you start a MEGA&#160;VPN free trial, valid permanently</string>
+    <string name="mega_vpn_achievement_awarded_storage_text_permanent">احصل على %1$s من مساحة التخزين المجانية عند بدء تشغيل الفترة التجريبية المجانية لميغا في بي إن MEGA&#160;VPN صالحة بشكل دائم</string>
     <!-- sentence to detail the permanent awarded text related to PWM achievement -->
-    <string name="mega_pass_achievement_awarded_storage_text_permanent">Get %1$s of free storage when you start a MEGA&#160;Pass free trial, valid permanently</string>
+    <string name="mega_pass_achievement_awarded_storage_text_permanent">احصل على %1$s من مساحة التخزين المجاني عند بدء تشغيل الفترة التجريبية المجانية لميغا باس MEGA&#160;Pass صالحة بشكل دائم</string>
     <!-- sentence to detail the figures of award achievement days left -->
     <plurals name="trial_awarded_achievement_days_left_text">
-        <item quantity="one">%1$d day left</item>
-        <item quantity="other">%1$d days left</item>
+        <item quantity="zero">%1$d يوم متبقي</item>
+        <item quantity="one">%1$d يوم متبقي</item>
+        <item quantity="two">%1$d يومان متبقيان</item>
+        <item quantity="few">%1$d أيام متبقية</item>
+        <item quantity="many">%1$d يوم متبقي</item>
+        <item quantity="other">%1$d يوم متبقي</item>
     </plurals>
     <!-- sentence to detail the figures of award achievement days left -->
     <plurals name="trial_awarded_achievement_days_left_detail_title">
@@ -1958,11 +1970,11 @@
         <item quantity="other">تنتهي صلاحية المكافأة في %1$d يوم</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
+    <string name="label_first_time_in_months_full_singular">%1$s للشهر الأول</string>
     <!-- Discount label for first year singular -->
-    <string name="label_first_time_in_years_full_singular">%1$s for the first year</string>
+    <string name="label_first_time_in_years_full_singular">%1$s للسنة الأولى</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
-    <string name="hidden_nodes_description_control_visibility_tag">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the [A]settings[/A].</string>
+    <string name="hidden_nodes_description_control_visibility_tag">يمكنك فقط الكشف عن الملفات المخفية إما بشكل فردي أو عن طريق عرض العناصر المخفية مؤقتًا من [A]إعدادات[/A].</string>
     <!-- Dialog confirmation text for removing photos in an album -->
     <string name="album_content_remove_photos_dialog_description">إزالة من الألبوم؟</string>
     <!--Album content more options action description-->
@@ -2025,15 +2037,48 @@
         <item quantity="other">إزالة الروابط</item>
     </plurals>
     <!-- Hint for password dialog -->
-    <string name="password_dialog_hint">أدخل كلمة المرور</string>
+    <string name="password_dialog_hint">أدخل كلمة مرور الرابط</string>
     <!-- Text for decrypt button -->
-    <string name="general_decrypt">فك التشفير</string>
+    <string name="general_decrypt">استمرار</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="password_dialog_error">كلمة مرور الرابط غير صالحة</string>
     <!-- Message of the Camera Uploads no full access warning banner in Photos -->
     <string name="camera_upload_no_full_access_banner_change_permissions_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library. [A]Tap to change permissions.[/A]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="camera_upload_banner_enable_cu_subtitle">نسخ احتياطي للصور ومقاطع الفيديو تلقائياً إلى سواقتك السحابية.</string>
+    <string name="camera_upload_banner_enable_cu_subtitle">Automatically back up your photos and videos to your Cloud drive</string>
     <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
     <string name="onboarding_camera_upload_permission_enabled_message">تم تمكين ترفيعات الكاميرا</string>
+    <!-- Alert to inform the user that have to be logged in to perform the action -->
+    <string name="general_alert_not_logged_in">You must be logged in to perform this action</string>
+    <!-- camera uploads limited access -->
+    <string name="timeline_tab_camera_uploads_limited_access">MEGA has limited access to your photo library and can’t back up all your photos</string>
+    <!-- menu item -->
+    <string name="timeline_tab_file_properties_shared_folder_change_permissions">تغيير  الإذونات</string>
+    <!-- Timeline tab screen: Empty state no media found -->
+    <string name="timeline_tab_empty_body_no_media_found">لم يتم العثور على أي وسائط</string>
+    <!-- Timeline tab screen: Camera uploads disabled banner description. We show this banner when there is no photo available in timeline tab screen. -->
+    <string name="timeline_tab_enable_camera_uploads_banner_description">Camera uploads requires [A]full access[/A] to your photo library</string>
+    <!-- Camera uploads completed info in TimelineTab screen. -->
+    <plurals name="timeline_tab_camera_uploads_completed">
+        <item quantity="zero">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملف</item>
+        <item quantity="one">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملف</item>
+        <item quantity="two">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملفين</item>
+        <item quantity="few">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملفات</item>
+        <item quantity="many">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملفاً</item>
+        <item quantity="other">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملف</item>
+    </plurals>
+    <!-- Timeline tab screen grid size menu title -->
+    <string name="timeline_tab_grid_size_menu_title">Grid size</string>
+    <!-- Timeline tab screen compact grid size menu item -->
+    <string name="timeline_tab_grid_size_compact">Compact</string>
+    <!-- Timeline tab screen default grid size menu item -->
+    <string name="timeline_tab_grid_size_default">الإفتراضي</string>
+    <!-- Timeline tab screen large grid size menu item -->
+    <string name="timeline_tab_grid_size_large">Large</string>
+    <!-- the message in the alert dialog for notifying the meeting has ended-->
+    <string name="meeting_has_ended_dialog_title">تم إنهاء الاجتماع</string>
+    <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
+    <string name="meeting_has_ended_dialog_view_chat_option">عرض محادثة الاجتماع</string>
+    <!-- Title for the button to dismiss a dialog. -->
+    <string name="general_dismiss_dialog">رفض</string>
 </resources>

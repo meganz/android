@@ -1781,7 +1781,7 @@
     <!-- The description of camera uploads low battery paused warning banner -->
     <string name="camera_update_low_battery_banner_description">Les téléversements sont suspendus en raison d\’un niveau de batterie insuffisant. Rechargez votre appareil pour continuer.</string>
     <!-- The description of camera uploads network requirement not met paused warning banner -->
-    <string name="camera_update_network_requirement_not_met_banner_description">Camera uploads paused, connect to WIFI or allow mobile data</string>
+    <string name="camera_update_network_requirement_not_met_banner_description">Camera uploads paused, connect to Wi-Fi or allow mobile data</string>
     <!-- The button text of camera uploads network requirement not met paused warning banner -->
     <string name="camera_update_network_requirement_not_met_banner_button_text">Autoriser l\’utilisation des données mobiles</string>
     <!-- Billing info with discount label -->
@@ -1893,15 +1893,45 @@
         <item quantity="other">Supprimer les liens</item>
     </plurals>
     <!-- Hint for password dialog -->
-    <string name="password_dialog_hint">Saisissez un mot de passe</string>
+    <string name="password_dialog_hint">Enter link password</string>
     <!-- Text for decrypt button -->
-    <string name="general_decrypt">Déchiffrer</string>
+    <string name="general_decrypt">Poursuivre</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="password_dialog_error">Le mot de passe du lien est erroné</string>
     <!-- Message of the Camera Uploads no full access warning banner in Photos -->
     <string name="camera_upload_no_full_access_banner_change_permissions_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library. [A]Tap to change permissions.[/A]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="camera_upload_banner_enable_cu_subtitle">Sauvegardez automatiquement vos photos et vos vidéos dans votre Disque nuagique.</string>
+    <string name="camera_upload_banner_enable_cu_subtitle">Automatically back up your photos and videos to your Cloud drive</string>
     <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
     <string name="onboarding_camera_upload_permission_enabled_message">Les Téléversements de l’appareil photo sont activés</string>
+    <!-- Alert to inform the user that have to be logged in to perform the action -->
+    <string name="general_alert_not_logged_in">You must be logged in to perform this action</string>
+    <!-- camera uploads limited access -->
+    <string name="timeline_tab_camera_uploads_limited_access">MEGA has limited access to your photo library and can’t back up all your photos</string>
+    <!-- menu item -->
+    <string name="timeline_tab_file_properties_shared_folder_change_permissions">Changer les droits</string>
+    <!-- Timeline tab screen: Empty state no media found -->
+    <string name="timeline_tab_empty_body_no_media_found">Aucun média n’a été trouvé</string>
+    <!-- Timeline tab screen: Camera uploads disabled banner description. We show this banner when there is no photo available in timeline tab screen. -->
+    <string name="timeline_tab_enable_camera_uploads_banner_description">Camera uploads requires [A]full access[/A] to your photo library</string>
+    <!-- Camera uploads completed info in TimelineTab screen. -->
+    <plurals name="timeline_tab_camera_uploads_completed">
+        <item quantity="one">Téléversements de l’appareil photo terminés, %1$d&#160;fichier téléversé</item>
+        <item quantity="many">Téléversements de l’appareil photo terminés, %1$d de fichiers téléversés</item>
+        <item quantity="other">Téléversements de l’appareil photo terminés, %1$d&#160;fichiers téléversés</item>
+    </plurals>
+    <!-- Timeline tab screen grid size menu title -->
+    <string name="timeline_tab_grid_size_menu_title">Grid size</string>
+    <!-- Timeline tab screen compact grid size menu item -->
+    <string name="timeline_tab_grid_size_compact">Compact</string>
+    <!-- Timeline tab screen default grid size menu item -->
+    <string name="timeline_tab_grid_size_default">Par défaut</string>
+    <!-- Timeline tab screen large grid size menu item -->
+    <string name="timeline_tab_grid_size_large">Large</string>
+    <!-- the message in the alert dialog for notifying the meeting has ended-->
+    <string name="meeting_has_ended_dialog_title">La réunion est terminée</string>
+    <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
+    <string name="meeting_has_ended_dialog_view_chat_option">Visualiser l’historique de la réunion</string>
+    <!-- Title for the button to dismiss a dialog. -->
+    <string name="general_dismiss_dialog">Fermer</string>
 </resources>

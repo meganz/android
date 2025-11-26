@@ -682,7 +682,7 @@
     <!-- Error when the user leaves empty the password field -->
     <string name="invalid_string">Darf nicht leer bleiben</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
-    <string name="invalid_input">Not a valid entry</string>
+    <string name="invalid_input">Keine gültige Eingabe</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Passwort-Reset</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->

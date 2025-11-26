@@ -1703,7 +1703,7 @@
     <!-- The description of camera uploads low battery paused warning banner -->
     <string name="camera_update_low_battery_banner_description">由於電池電量不足，上傳已暫停。請為您的裝置充電以繼續上傳。</string>
     <!-- The description of camera uploads network requirement not met paused warning banner -->
-    <string name="camera_update_network_requirement_not_met_banner_description">Camera uploads paused, connect to WIFI or allow mobile data</string>
+    <string name="camera_update_network_requirement_not_met_banner_description">梘機上傳已暫停，請連線Wi-Fi或開啟行動數據連線</string>
     <!-- The button text of camera uploads network requirement not met paused warning banner -->
     <string name="camera_update_network_requirement_not_met_banner_button_text">使用行動數據網路</string>
     <!-- Billing info with discount label -->
@@ -1769,7 +1769,7 @@
     <!--Album content delete action description-->
     <string name="album_content_selection_action_delete_description">刪除</string>
     <!-- Message shown when user tries to preview an undecrypted file -->
-    <string name="preview_not_available_undecrypted_files">Preview not available for undecrypted files</string>
+    <string name="preview_not_available_undecrypted_files">未解密的檔案無法預覽。</string>
     <!-- Delete album confirmation dialog positive button text. -->
     <string name="delete_album_confirmation_positive_button_text">刪除</string>
     <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
@@ -1783,7 +1783,7 @@
         <item quantity="other">相簿將會被刪除但裡面的內容將保留在您的時間軸中。</item>
     </plurals>
     <!-- External checkout button text -->
-    <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
+    <string name="external_checkout_button_text">在我們的網站上購買（最多可省%1$.0f%%）</string>
     <!-- Title for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_title">
         <item quantity="other"></item>
@@ -1797,15 +1797,43 @@
         <item quantity="other">移除連結</item>
     </plurals>
     <!-- Hint for password dialog -->
-    <string name="password_dialog_hint">輸入密碼</string>
+    <string name="password_dialog_hint">輸入連結密碼</string>
     <!-- Text for decrypt button -->
-    <string name="general_decrypt">解密</string>
+    <string name="general_decrypt">繼續</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="password_dialog_error">無效的連結密碼</string>
     <!-- Message of the Camera Uploads no full access warning banner in Photos -->
-    <string name="camera_upload_no_full_access_banner_change_permissions_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library. [A]Tap to change permissions.[/A]</string>
+    <string name="camera_upload_no_full_access_banner_change_permissions_description">為了確保我們不會遺失您的所有回憶，MEGA需要您相簿的完全存取權限。[A]點選更改權限。[/A]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="camera_upload_banner_enable_cu_subtitle">自動將您的相片與影片備份到您的雲端硬碟。</string>
+    <string name="camera_upload_banner_enable_cu_subtitle">自動將您的相片與影片備份到您的雲端硬碟</string>
     <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
     <string name="onboarding_camera_upload_permission_enabled_message">已開啟相機上傳</string>
+    <!-- Alert to inform the user that have to be logged in to perform the action -->
+    <string name="general_alert_not_logged_in">您必須登入才能執行此操作</string>
+    <!-- camera uploads limited access -->
+    <string name="timeline_tab_camera_uploads_limited_access">MEGA沒有完全權限存取您的相簿，無法備份您的所有照片。</string>
+    <!-- menu item -->
+    <string name="timeline_tab_file_properties_shared_folder_change_permissions">更改權限</string>
+    <!-- Timeline tab screen: Empty state no media found -->
+    <string name="timeline_tab_empty_body_no_media_found">未找到影片</string>
+    <!-- Timeline tab screen: Camera uploads disabled banner description. We show this banner when there is no photo available in timeline tab screen. -->
+    <string name="timeline_tab_enable_camera_uploads_banner_description">相機上傳需要您的相簿[A]完全存取[/A]權限</string>
+    <!-- Camera uploads completed info in TimelineTab screen. -->
+    <plurals name="timeline_tab_camera_uploads_completed">
+        <item quantity="other">相機上傳已完成，%1$d個檔案已上傳</item>
+    </plurals>
+    <!-- Timeline tab screen grid size menu title -->
+    <string name="timeline_tab_grid_size_menu_title">Grid size</string>
+    <!-- Timeline tab screen compact grid size menu item -->
+    <string name="timeline_tab_grid_size_compact">Compact</string>
+    <!-- Timeline tab screen default grid size menu item -->
+    <string name="timeline_tab_grid_size_default">預設</string>
+    <!-- Timeline tab screen large grid size menu item -->
+    <string name="timeline_tab_grid_size_large">Large</string>
+    <!-- the message in the alert dialog for notifying the meeting has ended-->
+    <string name="meeting_has_ended_dialog_title">會議結束</string>
+    <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
+    <string name="meeting_has_ended_dialog_view_chat_option">檢視會議對話</string>
+    <!-- Title for the button to dismiss a dialog. -->
+    <string name="general_dismiss_dialog">忽略</string>
 </resources>

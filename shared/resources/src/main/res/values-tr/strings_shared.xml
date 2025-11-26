@@ -798,8 +798,8 @@
     <string name="transfers_notification_downloading_preview_paused">%1$s ön izleme için hazırlanıyor (duraklatıldı)</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
-        <item quantity="one">“%1$s” kuyruktan kaldırıldı</item>
-        <item quantity="other">%2$d öğe kuyruktan kaldırıldı</item>
+        <item quantity="one">“%1$s” sıradan kaldırıldı</item>
+        <item quantity="other">%2$d öğe sıradan kaldırıldı</item>
     </plurals>
     <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
     <string name="transfers_preview_paused_dialog_title">Aktarımlar duraklatıldı</string>
@@ -1742,7 +1742,7 @@
     <!-- The description of camera uploads low battery paused warning banner -->
     <string name="camera_update_low_battery_banner_description">Düşük şarj seviyesi nedeniyle yüklemeler duraklatıldı. Devam etmek için cihazınızı şarj edin.</string>
     <!-- The description of camera uploads network requirement not met paused warning banner -->
-    <string name="camera_update_network_requirement_not_met_banner_description">Camera uploads paused, connect to WIFI or allow mobile data</string>
+    <string name="camera_update_network_requirement_not_met_banner_description">Kamera yüklemeleri duraklatıldı, Wi-Fi’a bağlanın veya mobil veriye izin verin</string>
     <!-- The button text of camera uploads network requirement not met paused warning banner -->
     <string name="camera_update_network_requirement_not_met_banner_button_text">Mobil veriye izin ver</string>
     <!-- Billing info with discount label -->
@@ -1812,7 +1812,7 @@
     <!--Album content delete action description-->
     <string name="album_content_selection_action_delete_description">Sil</string>
     <!-- Message shown when user tries to preview an undecrypted file -->
-    <string name="preview_not_available_undecrypted_files">Preview not available for undecrypted files</string>
+    <string name="preview_not_available_undecrypted_files">Şifresi çözülmemiş dosyalar için ön izleme mevcut değildir</string>
     <!-- Delete album confirmation dialog positive button text. -->
     <string name="delete_album_confirmation_positive_button_text">Sil</string>
     <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
@@ -1828,7 +1828,7 @@
         <item quantity="other">Albümler silinecek ancak içerikleri Zaman akışınızda kalacaktır.</item>
     </plurals>
     <!-- External checkout button text -->
-    <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
+    <string name="external_checkout_button_text">Web sitemizden satın alın (%%%1$.0f kadar tasarruf edin)</string>
     <!-- Title for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_title">
         <item quantity="one"></item>
@@ -1845,15 +1845,44 @@
         <item quantity="other">Bağlantıları kaldır</item>
     </plurals>
     <!-- Hint for password dialog -->
-    <string name="password_dialog_hint">Şifreyi girin</string>
+    <string name="password_dialog_hint">Bağlantı şifresini girin</string>
     <!-- Text for decrypt button -->
-    <string name="general_decrypt">Şifreyi çöz</string>
+    <string name="general_decrypt">Devam et</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="password_dialog_error">Geçersiz bağlantı şifresi</string>
     <!-- Message of the Camera Uploads no full access warning banner in Photos -->
-    <string name="camera_upload_no_full_access_banner_change_permissions_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library. [A]Tap to change permissions.[/A]</string>
+    <string name="camera_upload_no_full_access_banner_change_permissions_description">Tüm anılarınızı yüklediğimizden emin olmak için, MEGA’nın fotoğraf arşivinize tam erişime ihtiyacı var. [A]İzinleri değiştirmek için dokunun.[/A]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="camera_upload_banner_enable_cu_subtitle">Fotoğraflarınızı ve videolarınızı otomatik olarak Bulut depolamanıza yedekleyin.</string>
+    <string name="camera_upload_banner_enable_cu_subtitle">Fotoğraf ve videolarınızı otomatik olarak Bulut depolamanıza yedekleyin</string>
     <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
     <string name="onboarding_camera_upload_permission_enabled_message">Kamera yüklemeleri etkinleştirildi</string>
+    <!-- Alert to inform the user that have to be logged in to perform the action -->
+    <string name="general_alert_not_logged_in">Bu işlemi gerçekleştirebilmek için giriş yapmış olmalısınız</string>
+    <!-- camera uploads limited access -->
+    <string name="timeline_tab_camera_uploads_limited_access">MEGA’nın fotoğraf arşivinize sınırlı erişimi var ve tüm fotoğraflarınızı yedekleyemiyor</string>
+    <!-- menu item -->
+    <string name="timeline_tab_file_properties_shared_folder_change_permissions">İzinleri değiştir</string>
+    <!-- Timeline tab screen: Empty state no media found -->
+    <string name="timeline_tab_empty_body_no_media_found">Medya bulunamadı</string>
+    <!-- Timeline tab screen: Camera uploads disabled banner description. We show this banner when there is no photo available in timeline tab screen. -->
+    <string name="timeline_tab_enable_camera_uploads_banner_description">Kamera yüklemeleri, fotoğraf arşivinize [A]tam erişim[/A] gerektirir</string>
+    <!-- Camera uploads completed info in TimelineTab screen. -->
+    <plurals name="timeline_tab_camera_uploads_completed">
+        <item quantity="one">Kamera yüklemeleri tamamlandı, %1$d dosya yüklendi</item>
+        <item quantity="other">Kamera yüklemeleri tamamlandı, %1$d dosya yüklendi</item>
+    </plurals>
+    <!-- Timeline tab screen grid size menu title -->
+    <string name="timeline_tab_grid_size_menu_title">Grid size</string>
+    <!-- Timeline tab screen compact grid size menu item -->
+    <string name="timeline_tab_grid_size_compact">Compact</string>
+    <!-- Timeline tab screen default grid size menu item -->
+    <string name="timeline_tab_grid_size_default">Varsayılan</string>
+    <!-- Timeline tab screen large grid size menu item -->
+    <string name="timeline_tab_grid_size_large">Large</string>
+    <!-- the message in the alert dialog for notifying the meeting has ended-->
+    <string name="meeting_has_ended_dialog_title">Toplantı sona erdi</string>
+    <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
+    <string name="meeting_has_ended_dialog_view_chat_option">Toplantı sohbetini görüntüle</string>
+    <!-- Title for the button to dismiss a dialog. -->
+    <string name="general_dismiss_dialog">Yok say</string>
 </resources>

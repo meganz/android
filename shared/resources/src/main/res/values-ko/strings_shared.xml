@@ -1713,9 +1713,9 @@
     <!-- The description of camera uploads low battery paused warning banner -->
     <string name="camera_update_low_battery_banner_description">배터리가 부족하여 업로드가 일시정지 되었습니다. 계속하려면 장치를 충전하세요.</string>
     <!-- The description of camera uploads network requirement not met paused warning banner -->
-    <string name="camera_update_network_requirement_not_met_banner_description">Camera uploads paused, connect to WIFI or allow mobile data</string>
+    <string name="camera_update_network_requirement_not_met_banner_description">카메라 업로드가 일시정지 되었습니다, Wi-Fi에 연결하거나 모바일 데이터를 허용하세요</string>
     <!-- The button text of camera uploads network requirement not met paused warning banner -->
-    <string name="camera_update_network_requirement_not_met_banner_button_text">Allow mobile data</string>
+    <string name="camera_update_network_requirement_not_met_banner_button_text">모바일 데이터 허용</string>
     <!-- Billing info with discount label -->
     <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s for %3$s</string>
     <!-- campaign name for Black Friday deal -->
@@ -1779,7 +1779,7 @@
     <!--Album content delete action description-->
     <string name="album_content_selection_action_delete_description">삭제</string>
     <!-- Message shown when user tries to preview an undecrypted file -->
-    <string name="preview_not_available_undecrypted_files">Preview not available for undecrypted files</string>
+    <string name="preview_not_available_undecrypted_files">복호화되지 않은 파일은 미리 보기할 수 없습니다</string>
     <!-- Delete album confirmation dialog positive button text. -->
     <string name="delete_album_confirmation_positive_button_text">삭제</string>
     <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
@@ -1793,7 +1793,7 @@
         <item quantity="other">사진첩이 삭제되지만 항목들은 연표에 남게 됩니다.</item>
     </plurals>
     <!-- External checkout button text -->
-    <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
+    <string name="external_checkout_button_text">우리 웹사이트에서 구매 (최대 %1$.0f%% 절약)</string>
     <!-- Title for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_title">
         <item quantity="other"></item>
@@ -1807,15 +1807,43 @@
         <item quantity="other">링크 제거</item>
     </plurals>
     <!-- Hint for password dialog -->
-    <string name="password_dialog_hint">암호 입력</string>
+    <string name="password_dialog_hint">링크 암호 입력</string>
     <!-- Text for decrypt button -->
-    <string name="general_decrypt">복호화</string>
+    <string name="general_decrypt">계속</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="password_dialog_error">잘못된 링크 암호</string>
     <!-- Message of the Camera Uploads no full access warning banner in Photos -->
-    <string name="camera_upload_no_full_access_banner_change_permissions_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library. [A]Tap to change permissions.[/A]</string>
+    <string name="camera_upload_no_full_access_banner_change_permissions_description">당신의 추억을 잃지 않게 하기 위해, MEGA는 당신의 사진 라이브러리에 대한 전체 접근 권한이 필요합니다. [A]권한을 변경하려면 탭하세요.[/A]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="camera_upload_banner_enable_cu_subtitle">자동으로 당신의 사진과 동영상을 클라우드 드라이브에 백업합니다.</string>
+    <string name="camera_upload_banner_enable_cu_subtitle">자동으로 당신의 사진과 동영상을 클라우드 드라이브에 백업합니다</string>
     <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
     <string name="onboarding_camera_upload_permission_enabled_message">카메라 업로드 활성화됨</string>
+    <!-- Alert to inform the user that have to be logged in to perform the action -->
+    <string name="general_alert_not_logged_in">이 행동을 하려면 로그인해야 합니다</string>
+    <!-- camera uploads limited access -->
+    <string name="timeline_tab_camera_uploads_limited_access">MEGA가 사진 라이브러리에 제한된 접근 권한을 가지고 있어서 모든 사진을 백업할 수 없습니다</string>
+    <!-- menu item -->
+    <string name="timeline_tab_file_properties_shared_folder_change_permissions">권한 변경</string>
+    <!-- Timeline tab screen: Empty state no media found -->
+    <string name="timeline_tab_empty_body_no_media_found">발견된 미디어 없음</string>
+    <!-- Timeline tab screen: Camera uploads disabled banner description. We show this banner when there is no photo available in timeline tab screen. -->
+    <string name="timeline_tab_enable_camera_uploads_banner_description">카메라 업로드는 사진 라이브러리에 대해 [A]전체 접근[/A]이 필요합니다</string>
+    <!-- Camera uploads completed info in TimelineTab screen. -->
+    <plurals name="timeline_tab_camera_uploads_completed">
+        <item quantity="other">카메라 업로드 진행 중, 파일 %1$d개 대기 중</item>
+    </plurals>
+    <!-- Timeline tab screen grid size menu title -->
+    <string name="timeline_tab_grid_size_menu_title">격자 크기</string>
+    <!-- Timeline tab screen compact grid size menu item -->
+    <string name="timeline_tab_grid_size_compact">소형</string>
+    <!-- Timeline tab screen default grid size menu item -->
+    <string name="timeline_tab_grid_size_default">기본</string>
+    <!-- Timeline tab screen large grid size menu item -->
+    <string name="timeline_tab_grid_size_large">대형</string>
+    <!-- the message in the alert dialog for notifying the meeting has ended-->
+    <string name="meeting_has_ended_dialog_title">회의가 종료되었습니다</string>
+    <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
+    <string name="meeting_has_ended_dialog_view_chat_option">회의 대화 보기</string>
+    <!-- Title for the button to dismiss a dialog. -->
+    <string name="general_dismiss_dialog">해제</string>
 </resources>
