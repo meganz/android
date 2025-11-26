@@ -743,7 +743,6 @@
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".presentation.photos.albums.add.AddToAlbumActivity" />
         <activity android:name=".presentation.settings.compose.SettingsHomeActivity" />
-        <activity android:name=".presentation.filecontact.FileContactListComposeActivity" />
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:theme="@style/Theme.Mega.PhotoEditor" />

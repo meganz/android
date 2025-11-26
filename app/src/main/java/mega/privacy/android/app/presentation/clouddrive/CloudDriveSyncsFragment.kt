@@ -215,6 +215,7 @@ class CloudDriveSyncsFragment : Fragment() {
             },
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             megaNodeUtilWrapper = megaNodeUtilWrapper,
+            megaNavigator = megaNavigator,
         )
     }
 

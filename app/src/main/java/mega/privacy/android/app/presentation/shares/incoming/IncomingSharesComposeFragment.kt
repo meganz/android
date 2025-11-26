@@ -70,6 +70,7 @@ import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
@@ -110,6 +111,9 @@ class IncomingSharesComposeFragment : Fragment() {
      */
     @Inject
     lateinit var toolbarActionsValidator: ToolbarActionsValidator
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     /**
      * Mapper to get file type icon
@@ -153,6 +157,7 @@ class IncomingSharesComposeFragment : Fragment() {
             },
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             megaNodeUtilWrapper = megaNodeUtilWrapper,
+            megaNavigator = megaNavigator,
         )
     }
 

@@ -39,8 +39,6 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
-import mega.privacy.android.app.presentation.filecontact.FileContactListComposeActivity
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgressState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEvent
@@ -76,7 +74,7 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
@@ -108,6 +106,9 @@ class FileInfoActivity : BaseActivity() {
     @Inject
     @IoDispatcher
     lateinit var ioDispatcher: CoroutineDispatcher
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private lateinit var selectContactForShareFolderLauncher: ActivityResultLauncher<NodeId>
     private lateinit var versionHistoryLauncher: ActivityResultLauncher<Long>
@@ -307,6 +308,7 @@ class FileInfoActivity : BaseActivity() {
             },
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             megaNodeUtilWrapper = megaNodeUtilWrapper,
+            megaNavigator = megaNavigator,
         )
     }
 
@@ -420,19 +422,11 @@ class FileInfoActivity : BaseActivity() {
     }
 
     private fun navigateToSharedContacts() {
-        lifecycleScope.launch {
-            val intent = if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-                Intent(this@FileInfoActivity, FileContactListComposeActivity::class.java)
-            } else {
-                Intent(this@FileInfoActivity, FileContactListActivity::class.java)
-            }
-            startActivity(
-                intent.apply {
-                    putExtra(Constants.NAME, viewModel.nodeId.longValue)
-                }
-            )
-        }
-
+        megaNavigator.openFileContactListActivity(
+            context = this,
+            handle = viewModel.nodeId.longValue,
+            nodeName = viewModel.typedNode.name
+        )
     }
 
     private fun navigateToUserDetails(contactItem: ContactItem) {

@@ -7091,6 +7091,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         },
         getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         megaNodeUtilWrapper = megaNodeUtilWrapper,
+        megaNavigator = megaNavigator,
     )
 
     /**

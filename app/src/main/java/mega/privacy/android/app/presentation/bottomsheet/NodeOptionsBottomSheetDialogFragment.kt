@@ -56,8 +56,6 @@ import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformat
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.extensions.isOutShare
-import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
-import mega.privacy.android.app.presentation.filecontact.FileContactListComposeActivity
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.manager.model.SharesTab
@@ -103,7 +101,6 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as RPack
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
@@ -1843,18 +1840,11 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 }
 
                 if (it.typedNode.isOutShare()) {
-                    val intent =
-                        if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-                            FileContactListComposeActivity.newIntent(
-                                context = requireContext(),
-                                nodeHandle = it.typedNode.id.longValue,
-                                nodeName = it.typedNode.name
-                            )
-                        } else {
-                            Intent(requireContext(), FileContactListActivity::class.java)
-                        }
-                    intent.putExtra(Constants.NAME, it.typedNode.id.longValue)
-                    startActivity(intent)
+                    megaNavigator.openFileContactListActivity(
+                        context = requireContext(),
+                        handle = it.typedNode.id.longValue,
+                        nodeName = it.typedNode.name
+                    )
                     dismissAllowingStateLoss()
                 } else {
                     if (nodeType != BACKUP_NONE) {

@@ -1,7 +1,6 @@
 package mega.privacy.android.app.sync.fileBackups
 
 import android.content.DialogInterface
-import android.content.Intent
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
@@ -10,20 +9,17 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.interfaces.ActionBackupNodeCallback
 import mega.privacy.android.app.main.controllers.NodeController
-import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
-import mega.privacy.android.app.presentation.filecontact.FileContactListComposeActivity
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_CANCEL
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_EXECUTE
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_MENU_BACKUP_SHARE_FOLDER
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.createBackupsWarningDialog
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 
@@ -35,6 +31,7 @@ class FileBackupManager(
     val actionBackupListener: ActionBackupListener?,
     val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     val megaNodeUtilWrapper: MegaNodeUtilWrapper,
+    val megaNavigator: MegaNavigator,
 ) {
 
     object BackupDialogState {
@@ -114,22 +111,11 @@ class FileBackupManager(
             when (actionType) {
                 ACTION_BACKUP_SHARE_FOLDER -> activity.lifecycleScope.launch {
                     if (megaNode?.let { megaNodeUtilWrapper.isOutShare(it) } == true) {
-                        val intent =
-                            if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-                                FileContactListComposeActivity.newIntent(
-                                    context = activity,
-                                    nodeHandle = megaNode.handle,
-                                    nodeName = megaNode.name
-                                )
-                            } else {
-                                Intent(
-                                    activity,
-                                    FileContactListActivity::class.java
-                                )
-                            }
-                        intent.putExtra(Constants.NAME, megaNode.handle)
-                        activity.startActivity(intent)
-
+                        megaNavigator.openFileContactListActivity(
+                            context = activity,
+                            handle = megaNode.handle,
+                            nodeName = megaNode.name
+                        )
                     } else {
                         nodeController?.selectContactToShareFolder(megaNode)
                     }

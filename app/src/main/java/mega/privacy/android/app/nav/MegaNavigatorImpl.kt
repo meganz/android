@@ -6,6 +6,7 @@ import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
+import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
@@ -21,7 +22,6 @@ import mega.privacy.android.app.presentation.contact.invite.InviteContactActivit
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsActivity
 import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
-import mega.privacy.android.app.presentation.filecontact.FileContactListComposeActivity
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
@@ -73,11 +73,15 @@ import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountActivity
 import mega.privacy.android.feature.sync.navigation.SyncNewFolder
 import mega.privacy.android.feature.sync.ui.SyncHostActivity
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.navigation.settings.SettingsNavigator
 import java.io.File
@@ -96,8 +100,28 @@ internal class MegaNavigatorImpl @Inject constructor(
     private val settingsNavigator: SettingsNavigatorImpl,
     private val getDomainNameUseCase: GetDomainNameUseCase,
     private val mediaPlayerIntentMapper: MediaPlayerIntentMapper,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val navigationQueue: NavigationEventQueue,
 ) : MegaNavigator,
     AppNavigatorImpl, SettingsNavigator by settingsNavigator {
+
+    private fun navigateForSingleActivity(
+        legacyNavigation: () -> Unit,
+        singleActivityDestination: NavKey,
+    ) {
+        applicationScope.launch {
+            runCatching { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) }
+                .onFailure {
+                    legacyNavigation()
+                }.onSuccess { singleActivity ->
+                    if (singleActivity) {
+                        navigationQueue.emit(singleActivityDestination)
+                    } else {
+                        legacyNavigation()
+                    }
+                }
+        }
+    }
 
     override fun openSettingsCameraUploads(context: Context) {
         context.startActivity(Intent(context, SettingsCameraUploadsActivity::class.java))
@@ -580,11 +604,13 @@ internal class MegaNavigatorImpl @Inject constructor(
         handle: Long,
         nodeName: String,
     ) {
-        context.startActivity(
-            FileContactListComposeActivity.newIntent(
-                context = context,
-                nodeHandle = handle,
-                nodeName = nodeName
+        navigateForSingleActivity(
+            legacyNavigation = {
+                openFileContactListActivity(context = context, handle = handle)
+            },
+            singleActivityDestination = FileContactInfoNavKey(
+                folderHandle = handle,
+                folderName = nodeName
             )
         )
     }

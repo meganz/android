@@ -18,7 +18,8 @@ import java.util.stream.Stream
 class ManageShareFolderBottomSheetMenuItemTest {
     private val manageShareFolderBottomSheetMenuItem = ManageShareFolderBottomSheetMenuItem(
         menuAction = ManageShareFolderMenuAction(),
-        getFeatureFlagValueUseCase = mock()
+        getFeatureFlagValueUseCase = mock(),
+        megaNavigator = mock()
     )
 
     @ParameterizedTest(name = "isNodeInRubbish {0} - accessPermission {1} - isInBackups {2} - node {3} - isConnected {4} - expected {5}")

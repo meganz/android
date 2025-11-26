@@ -99,7 +99,6 @@ import mega.privacy.android.domain.usecase.shares.GetNodeShareDataUseCase
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -835,7 +834,7 @@ class NodeActionClickHandlerTest {
     @Test
     fun `test ManageShareFolderAction canHandle returns true for ManageShareFolderMenuAction`() {
         val action =
-            ManageShareFolderActionClickHandler(mockGetFeatureFlagValueUseCase, mockMegaNavigator)
+            ManageShareFolderActionClickHandler(mockMegaNavigator)
         val menuAction = mock<ManageShareFolderMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -844,15 +843,12 @@ class NodeActionClickHandlerTest {
     @Test
     fun `test ManageShareFolderAction single node handle calls megaNavigator`() = runTest {
         val action =
-            ManageShareFolderActionClickHandler(mockGetFeatureFlagValueUseCase, mockMegaNavigator)
+            ManageShareFolderActionClickHandler(mockMegaNavigator)
         val menuAction = mock<ManageShareFolderMenuAction>()
-
-        whenever(mockGetFeatureFlagValueUseCase(any())).thenReturn(true)
-
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockNavigationHandler).navigate(any<FileContactInfoNavKey>())
+        verify(mockMegaNavigator).openFileContactListActivity(any(), any(), any())
     }
 
     // InfoAction Tests
@@ -1385,7 +1381,6 @@ class NodeActionClickHandlerTest {
         assertThat(LabelActionClickHandler().canHandle(wrongAction)).isFalse()
         assertThat(
             ManageShareFolderActionClickHandler(
-                mockGetFeatureFlagValueUseCase,
                 mockMegaNavigator
             ).canHandle(wrongAction)
         ).isFalse()
