@@ -1,11 +1,15 @@
 package mega.privacy.android.app.presentation.snackbar
 
 import androidx.compose.material.Scaffold
-import androidx.compose.material.SnackbarDuration
-import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.SnackbarDuration as SnackbarDurationM2
+import androidx.compose.material.SnackbarHostState as SnackbarHostStateM2
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import mega.android.core.ui.model.SnackbarAttributes
+import mega.privacy.android.app.appstate.global.util.toM3Duration
 import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
 import timber.log.Timber
 
@@ -14,11 +18,11 @@ import timber.log.Timber
  * It's just a temporary solution while migrating to Material3. It will be removed once everything is migrated to Material3
  */
 class SnackbarHostStateWrapper private constructor(
-    private val snackBarHostStateM2: SnackbarHostState?,
-    private val snackBarHostState: androidx.compose.material3.SnackbarHostState?,
+    private val snackBarHostStateM2: SnackbarHostStateM2?,
+    private val snackBarHostState: SnackbarHostState?,
 ) {
-    constructor(snackBarHostStateM2: SnackbarHostState) : this(snackBarHostStateM2, null)
-    constructor(snackBarHostState: androidx.compose.material3.SnackbarHostState)
+    constructor(snackBarHostStateM2: SnackbarHostStateM2) : this(snackBarHostStateM2, null)
+    constructor(snackBarHostState: SnackbarHostState)
             : this(null, snackBarHostState)
 
     /**
@@ -28,13 +32,30 @@ class SnackbarHostStateWrapper private constructor(
     suspend fun showSnackbar(
         message: String,
         actionLabel: String? = null,
-        duration: SnackbarDuration = SnackbarDuration.Short,
+        duration: SnackbarDurationM2 = SnackbarDurationM2.Short,
     ) = snackBarHostStateM2?.showSnackbar(message, actionLabel, duration)
         ?: snackBarHostState?.showSnackbar(
             message, actionLabel, duration = when (duration) {
-                SnackbarDuration.Short -> androidx.compose.material3.SnackbarDuration.Short
-                SnackbarDuration.Long -> androidx.compose.material3.SnackbarDuration.Long
-                SnackbarDuration.Indefinite -> androidx.compose.material3.SnackbarDuration.Indefinite
+                SnackbarDurationM2.Short -> SnackbarDuration.Short
+                SnackbarDurationM2.Long -> SnackbarDuration.Long
+                SnackbarDurationM2.Indefinite -> SnackbarDuration.Indefinite
+            }
+        )
+
+    /**
+     * Shows or queues to be shown a [Snackbar] at the bottom of the [Scaffold] to which this state
+     * is attached and suspends until the snackbar has disappeared.
+     */
+    suspend fun showSnackbar(
+        message: String,
+        actionLabel: String? = null,
+        duration: SnackbarDuration = SnackbarDuration.Short,
+    ) = snackBarHostState?.showSnackbar(message, actionLabel, duration = duration)
+        ?: snackBarHostStateM2?.showSnackbar(
+            message, actionLabel, duration = when (duration) {
+                SnackbarDuration.Short -> SnackbarDurationM2.Short
+                SnackbarDuration.Long -> SnackbarDurationM2.Long
+                SnackbarDuration.Indefinite -> SnackbarDurationM2.Indefinite
             }
         )
 }
@@ -65,5 +86,5 @@ suspend fun SnackbarHostStateWrapper?.showAutoDurationSnackbar(
 ) = this?.showSnackbar(
     message = message,
     actionLabel = actionLabel,
-    duration = if (message.length > 50 || actionLabel != null) SnackbarDuration.Long else SnackbarDuration.Short
+    duration = SnackbarAttributes.determineDuration(message, actionLabel).toM3Duration()
 ) ?: run { Timber.d("Snackbarhost not found to show a snackbar message: $message") }
