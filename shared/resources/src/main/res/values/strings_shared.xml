@@ -1879,4 +1879,10 @@
     <string name="timeline_tab_grid_size_default">Default</string>
     <!-- Timeline tab screen large grid size menu item -->
     <string name="timeline_tab_grid_size_large">Large</string>
+    <!-- the message in the alert dialog for notifying the meeting has ended-->
+    <string name="meeting_has_ended_dialog_title">Meeting has ended</string>
+    <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
+    <string name="meeting_has_ended_dialog_view_chat_option">View meeting chat</string>
+    <!-- Title for the button to dismiss a dialog. -->
+    <string name="general_dismiss_dialog">Dismiss</string>
 </resources>

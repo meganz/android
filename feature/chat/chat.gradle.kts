@@ -30,6 +30,7 @@ dependencies {
     implementation(lib.kotlin.serialisation)
     implementation(androidx.navigation.compose)
     implementation(androidx.navigation3.runtime)
+    implementation(androidx.navigation3.ui)
 
     //test
     testImplementation(project(":core-test"))
