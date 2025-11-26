@@ -14,6 +14,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.SearchNodeNavKey
 import mega.privacy.android.shared.resources.R as sharedR
@@ -21,7 +22,7 @@ import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdenti
 import mega.privacy.mobile.analytics.event.CloudDriveBottomNavigationItemEvent
 
 class DriveSyncNavItem : MainNavItem {
-    override val destination: NavKey = DriveSyncNavKey()
+    override val destination: MainNavItemNavKey = DriveSyncNavKey()
     override val screen: EntryProviderScope<NavKey>.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
         { navigationHandler, navigationController, transferHandler ->
             driveSyncScreen(

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.settings
 
-import androidx.navigation3.runtime.NavKey
 import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -52,6 +51,7 @@ import mega.privacy.android.domain.usecase.setting.SetSubFolderMediaDiscoveryEna
 import mega.privacy.android.domain.usecase.setting.ToggleContactLinksOptionUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -109,7 +109,7 @@ class SettingsViewModelTest {
 
     private val screenPreferenceDestinationMapper = mock<ScreenPreferenceDestinationMapper>()
 
-    private val defaultStartScreen = mock<NavKey>()
+    private val defaultStartScreen = mock<MainNavItemNavKey>()
 
     @BeforeEach
     fun setUp() {
@@ -618,10 +618,10 @@ class SettingsViewModelTest {
 
             val mainNavItems = setOf(
                 mock<MainNavItem> {
-                    on { destination } doReturn mock<NavKey>()
+                    on { destination } doReturn mock<MainNavItemNavKey>()
                 },
                 mock<MainNavItem> {
-                    on { destination } doReturn mock<NavKey>()
+                    on { destination } doReturn mock<MainNavItemNavKey>()
                 },
                 expectedMainNavItem,
             )
@@ -662,16 +662,16 @@ class SettingsViewModelTest {
             }
         }
 
-        val selectedOption = mock<NavKey>()
+        val selectedOption = mock<MainNavItemNavKey>()
         val expectedMainNavItem = mock<MainNavItem> {
             on { destination } doReturn selectedOption
         }
         val mainNavItems = setOf(
             mock<MainNavItem> {
-                on { destination } doReturn mock<NavKey>()
+                on { destination } doReturn mock<MainNavItemNavKey>()
             },
             mock<MainNavItem> {
-                on { destination } doReturn mock<NavKey>()
+                on { destination } doReturn mock<MainNavItemNavKey>()
             },
             expectedMainNavItem,
         )

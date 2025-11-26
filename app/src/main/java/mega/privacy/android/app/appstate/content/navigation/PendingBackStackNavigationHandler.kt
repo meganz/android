@@ -79,6 +79,12 @@ class PendingBackStackNavigationHandler(
         logBackStack("back")
     }
 
+    override fun remove(navKey: NavKey) {
+        Timber.d("PendingBackStackNavigationHandler::remove $navKey")
+        backstack.pending = backstack.pending.filterNot { it == navKey }
+        backstack.remove(navKey)
+    }
+
     override fun navigate(destination: NavKey) {
         Timber.d("PendingBackStackNavigationHandler::navigate $destination")
         if (destination === backstack.lastOrNull()) {

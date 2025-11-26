@@ -28,6 +28,7 @@ import mega.privacy.android.domain.usecase.preference.SetStartScreenPreferenceDe
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -70,7 +71,7 @@ class StartScreenViewModelTest {
 
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
-    private val defaultStartScreen = mock<NavKey>()
+    private val defaultStartScreen = mock<MainNavItemNavKey>()
 
     private fun initViewModel(mainNavItems: Set<MainNavItem> = setOf(mock<MainNavItem>())) {
         underTest = StartScreenViewModel(
@@ -225,7 +226,7 @@ class StartScreenViewModelTest {
                         }
             }
             if (singleActivityFlagEnabled) {
-                val expected = mock<NavKey>()
+                val expected = mock<MainNavItemNavKey>()
                 screenPreferenceDestinationMapper.stub {
                     on { invoke(preference) } doReturn expected
                 }

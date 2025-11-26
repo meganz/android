@@ -8,9 +8,10 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 
 @Serializable
-data object Home : NavKey
+data object Home : MainNavItemNavKey
 
 fun EntryProviderScope<NavKey>.homeScreen(
     navigationHandler: NavigationHandler,

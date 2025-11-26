@@ -5,6 +5,7 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 
 /**
  * Cloud drive route args
@@ -47,7 +48,7 @@ data class OfflineNavKey(
 data class DriveSyncNavKey(
     val initialTabIndex: Int = 0,
     val highlightedNodeHandle: Long? = null,
-) : NavKey
+) : MainNavItemNavKey
 
 /**
  * Favourites route args

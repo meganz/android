@@ -3,17 +3,24 @@ package mega.privacy.android.app.appstate.content.navigation
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 
 /**
  * Default implementation of NavigationHandler that wraps back stack functionality.
  */
 class TopLevelBackStackNavigationHandler(
-    private val backStack: TopLevelBackStack<NavKey>,
+    private val backStack: TopLevelBackStack<NavKey, MainNavItemNavKey>,
     private val navigationResultManager: NavigationResultManager,
 ) : NavigationHandler {
 
     override fun back() {
         backStack.removeLast()
+    }
+
+    override fun remove(navKey: NavKey) {
+        backStack.topLevelBackStacks.values.forEach {
+            it.remove(navKey)
+        }
     }
 
     override fun navigate(destination: NavKey) {

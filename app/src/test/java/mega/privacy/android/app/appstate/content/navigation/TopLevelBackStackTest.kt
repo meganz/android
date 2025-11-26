@@ -2,16 +2,17 @@ package mega.privacy.android.app.appstate.content.navigation
 
 import androidx.navigation3.runtime.NavKey
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class TopLevelBackStackTest {
 
-    private lateinit var underTest: TopLevelBackStack<NavKey>
+    private lateinit var underTest: TopLevelBackStack<NavKey, MainNavItemNavKey>
 
-    private data object StartKey : NavKey
-    private data object TopLevelKey1 : NavKey
-    private data object TopLevelKey2 : NavKey
+    private data object StartKey : MainNavItemNavKey
+    private data object TopLevelKey1 : MainNavItemNavKey
+    private data object TopLevelKey2 : MainNavItemNavKey
     private data object Destination1 : NavKey
     private data object Destination2 : NavKey
     private data object Destination3 : NavKey

@@ -2,7 +2,6 @@ package mega.privacy.android.app.appstate.content.navigation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.toImmutableSet
@@ -26,6 +25,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.preference.MonitorStartScreenPreferenceDestinationUseCase
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.MainNavItemBadge
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.android.navigation.contract.qualifier.DefaultStartScreen
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import mega.privacy.mobile.navigation.snowflake.model.NavigationItem
@@ -39,7 +39,7 @@ class MainNavigationStateViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorStartScreenPreferenceDestinationUseCase: MonitorStartScreenPreferenceDestinationUseCase,
     private val screenPreferenceDestinationMapper: ScreenPreferenceDestinationMapper,
-    @DefaultStartScreen private val defaultStartScreen: NavKey,
+    @DefaultStartScreen private val defaultStartScreen: MainNavItemNavKey,
     val navigationResultManager: NavigationResultManager,
 ) : ViewModel() {
 

@@ -11,13 +11,14 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.android.navigation.destination.MediaMainNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 import mega.privacy.mobile.analytics.event.PhotosBottomNavigationItemEvent
 
 class MediaNavItem : MainNavItem {
-    override val destination: NavKey = MediaMainNavKey
+    override val destination: MainNavItemNavKey = MediaMainNavKey
     override val screen: EntryProviderScope<NavKey>.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
         { navigationHandler, navigationController, transferHandler ->
             mediaMainRoute(navigationHandler = navigationHandler)

@@ -43,7 +43,7 @@ import mega.privacy.android.navigation.contract.DefaultNumberBadge
 import mega.privacy.android.navigation.contract.MainNavItemBadge
 import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.android.navigation.contract.PreferredSlot
-import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.navigation.snowflake.item.MainNavigationIcon
 import mega.privacy.mobile.navigation.snowflake.model.NavigationAnimationConfig
@@ -61,7 +61,7 @@ val DefaultNavigationAnimationConfig = NavigationAnimationConfig(
 fun MainNavigationScaffold(
     modifier: Modifier = Modifier,
     mainNavItems: ImmutableSet<NavigationItem>,
-    onDestinationClick: (NavKey) -> Unit,
+    onDestinationClick: (MainNavItemNavKey) -> Unit,
     isSelected: (NavKey) -> Boolean,
     animationConfig: NavigationAnimationConfig = DefaultNavigationAnimationConfig,
     mainNavItemIcon: @Composable (ImageVector, String, Modifier) -> Unit = { icon, label, modifier ->
@@ -112,7 +112,7 @@ private fun MegaNavigationSuite(
     orderedItems: List<NavigationItem>,
     mainNavItemIcon: @Composable ((ImageVector, String, Modifier) -> Unit),
     isSelected: (NavKey) -> Boolean,
-    onDestinationClick: (NavKey) -> Unit,
+    onDestinationClick: (MainNavItemNavKey) -> Unit,
 ) {
     val scaffoldColors = NavigationScaffoldColors.scaffoldColors()
     val itemColors = NavigationScaffoldColors.itemColors()
@@ -313,7 +313,7 @@ private fun MainNavigationScaffoldPreview(modifier: Modifier = Modifier) {
                 IconPack.Medium.Thin.Outline.Menu01 to IconPack.Medium.Thin.Solid.Menu01,
             ).mapIndexed { index, icons ->
                 NavigationItem(
-                    destination = NavKeyForPreview(index),
+                    destination = MainNavItemNavKeyForPreview(index),
                     icon = icons.first,
                     selectedIcon = icons.second,
                     label = sharedR.string.general_menu,
@@ -326,12 +326,12 @@ private fun MainNavigationScaffoldPreview(modifier: Modifier = Modifier) {
                         else -> null
                     }
                 )
-            }.toImmutableSet(),
-            onDestinationClick = { selectedIndex = (it as? NavKeyForPreview)?.index ?: 1 },
-            isSelected = { selectedIndex == (it as? NavKeyForPreview)?.index },
+            }.toImmutableSet(), onDestinationClick = {
+                selectedIndex = (it as? MainNavItemNavKeyForPreview)?.index ?: 1
+            }, isSelected = { selectedIndex == (it as? MainNavItemNavKeyForPreview)?.index },
             navContent = {}
         )
     }
 }
 
-private data class NavKeyForPreview(val index: Int) : NoSessionNavKey.Optional
+private data class MainNavItemNavKeyForPreview(val index: Int) : MainNavItemNavKey

@@ -14,6 +14,11 @@ interface NavigationHandler {
     fun back()
 
     /**
+     * Remove a specific destination from the back stack.
+     */
+    fun remove(navKey: NavKey)
+
+    /**
      * Navigate to a specific destination.
      *
      * @param destination The destination to navigate to

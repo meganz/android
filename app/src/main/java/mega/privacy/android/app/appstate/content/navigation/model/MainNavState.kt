@@ -7,6 +7,7 @@ import kotlinx.collections.immutable.ImmutableSet
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.mobile.navigation.snowflake.model.NavigationItem
 
 @Stable
@@ -16,6 +17,6 @@ sealed interface MainNavState {
     data class Data(
         val mainNavItems: ImmutableSet<NavigationItem>,
         val mainNavScreens: ImmutableSet<EntryProviderScope<NavKey>.(navigationHandler: NavigationHandler, NavigationUiController, TransferHandler) -> Unit>,
-        val initialDestination: NavKey,
+        val initialDestination: MainNavItemNavKey,
     ) : MainNavState
 }

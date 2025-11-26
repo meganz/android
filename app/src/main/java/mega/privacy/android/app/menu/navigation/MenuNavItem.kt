@@ -16,13 +16,14 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 import mega.privacy.mobile.analytics.event.MenuBottomNavigationItemEvent
 
 
 class MenuNavItem(menuItems: Map<Int, NavDrawerItem>) : MainNavItem {
-    override val destination: NavKey = MenuHomeScreen
+    override val destination: MainNavItemNavKey = MenuHomeScreen
     override val screen: EntryProviderScope<NavKey>.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
         { navigationHandler, _, _ -> menuHomeScreen(navigationHandler::navigate) }
     override val icon: ImageVector = IconPack.Medium.Thin.Outline.Menu01

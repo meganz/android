@@ -67,7 +67,6 @@ class CloudDriveDeepLinkHandler @Inject constructor(
             } ?: emptyList()
             val highlightedInRoot = if (ancestorIds.isEmpty()) highlightedNode else null
             val rootDestination: NavKey = when (nodeSourceType) {
-                NodeSourceType.CLOUD_DRIVE -> DriveSyncNavKey(highlightedNodeHandle = highlightedInRoot?.longValue)
                 NodeSourceType.RUBBISH_BIN -> RubbishBinNavKey(highlightedNodeHandle = highlightedInRoot?.longValue)
                 else -> SharesNavKey
             }
@@ -98,7 +97,7 @@ class CloudDriveDeepLinkHandler @Inject constructor(
                     //cloud drive under HomeScreensNavKey to show bottom navigation
                     add(
                         HomeScreensNavKey(
-                            rootDestination,
+                            DriveSyncNavKey(highlightedNodeHandle = highlightedInRoot?.longValue),
                             childDestinations.takeIf { it.isNotEmpty() }
                         )
                     )

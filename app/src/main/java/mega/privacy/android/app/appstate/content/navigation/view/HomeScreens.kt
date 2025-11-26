@@ -42,6 +42,7 @@ import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.mobile.navigation.snowflake.MainNavigationScaffold
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,7 +50,7 @@ import mega.privacy.mobile.navigation.snowflake.MainNavigationScaffold
 fun HomeScreens(
     transferHandler: TransferHandler,
     outerNavigationHandler: NavigationHandler,
-    initialDestination: Pair<NavKey, List<NavKey>?>?,
+    initialDestination: Pair<MainNavItemNavKey, List<NavKey>?>?,
     modifier: Modifier = Modifier,
 ) {
     val viewModel = hiltViewModel<MainNavigationStateViewModel>()

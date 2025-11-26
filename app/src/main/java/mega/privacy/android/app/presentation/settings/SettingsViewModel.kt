@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -57,6 +56,7 @@ import mega.privacy.android.domain.usecase.setting.SetSubFolderMediaDiscoveryEna
 import mega.privacy.android.domain.usecase.setting.ToggleContactLinksOptionUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.android.navigation.contract.qualifier.DefaultStartScreen
 import timber.log.Timber
 import javax.inject.Inject
@@ -95,7 +95,7 @@ class SettingsViewModel @Inject constructor(
     private val mainDestinations: Set<@JvmSuppressWildcards MainNavItem>,
     private val monitorStartScreenPreferenceDestinationUseCase: MonitorStartScreenPreferenceDestinationUseCase,
     private val screenPreferenceDestinationMapper: ScreenPreferenceDestinationMapper,
-    @DefaultStartScreen private val defaultStartScreen: NavKey,
+    @DefaultStartScreen private val defaultStartScreen: MainNavItemNavKey,
 ) : ViewModel() {
     private val state = MutableStateFlow(initialiseState())
     val uiState: StateFlow<SettingsState> = state

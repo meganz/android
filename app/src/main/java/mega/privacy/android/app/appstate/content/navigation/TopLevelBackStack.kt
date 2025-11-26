@@ -21,11 +21,12 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.encoding.decodeStructure
 import kotlinx.serialization.encoding.encodeStructure
 import kotlinx.serialization.serializer
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 
 @Serializable(with = TopLevelBackStackSerializer::class)
-class TopLevelBackStack<T : NavKey>(val startKey: T) {
+class TopLevelBackStack<T : NavKey, U : T>(val startKey: U) {
 
-    internal var topLevelBackStacks: HashMap<T, NavBackStack<T>> = hashMapOf(
+    internal var topLevelBackStacks: HashMap<U, NavBackStack<T>> = hashMapOf(
         startKey to NavBackStack(startKey)
     )
 
@@ -46,12 +47,12 @@ class TopLevelBackStack<T : NavKey>(val startKey: T) {
         }
     }
 
-    fun switchTopLevel(key: T) {
+    fun switchTopLevel(key: U) {
         switchOrCreateStack(key)
         updateBackStack()
     }
 
-    private fun switchOrCreateStack(key: T) {
+    private fun switchOrCreateStack(key: U) {
         if (topLevelBackStacks[key] == null) {
             topLevelBackStacks[key] = NavBackStack(key)
         }
@@ -63,7 +64,7 @@ class TopLevelBackStack<T : NavKey>(val startKey: T) {
         updateBackStack()
     }
 
-    fun switchAndAdd(topLevelKey: T, vararg keys: T) {
+    fun switchAndAdd(topLevelKey: U, vararg keys: T) {
         switchOrCreateStack(topLevelKey)
         topLevelBackStacks[topLevelKey]?.addAll(keys)
         updateBackStack()
@@ -92,9 +93,9 @@ class TopLevelBackStack<T : NavKey>(val startKey: T) {
 }
 
 @Composable
-fun rememberTopLevelBackStack(startKey: NavKey): TopLevelBackStack<NavKey> {
+fun rememberTopLevelBackStack(startKey: MainNavItemNavKey): TopLevelBackStack<NavKey, MainNavItemNavKey> {
     return rememberSerializable(
-        serializer = TopLevelBackStackSerializer(NavKeySerializer()),
+        serializer = TopLevelBackStackSerializer(NavKeySerializer(), NavKeySerializer()),
         init = {
             TopLevelBackStack(startKey)
         }
@@ -102,12 +103,13 @@ fun rememberTopLevelBackStack(startKey: NavKey): TopLevelBackStack<NavKey> {
 }
 
 
-class TopLevelBackStackSerializer<T : NavKey>(
+class TopLevelBackStackSerializer<T : NavKey, U : T>(
     private val elementSerializer: KSerializer<T>,
-) : KSerializer<TopLevelBackStack<T>> {
+    private val keyElementSerializer: KSerializer<U>,
+) : KSerializer<TopLevelBackStack<T, U>> {
 
     private val navBackStackSerializer = NavBackStackSerializer(elementSerializer)
-    private val mapDelegate = MapSerializer(elementSerializer, navBackStackSerializer)
+    private val mapDelegate = MapSerializer(keyElementSerializer, navBackStackSerializer)
 
     @OptIn(ExperimentalSerializationApi::class)
     override val descriptor: SerialDescriptor =
@@ -117,7 +119,7 @@ class TopLevelBackStackSerializer<T : NavKey>(
             element("topLevelBackStacks", mapDelegate.descriptor)
         }
 
-    override fun serialize(encoder: Encoder, value: TopLevelBackStack<T>) {
+    override fun serialize(encoder: Encoder, value: TopLevelBackStack<T, U>) {
         encoder.encodeStructure(descriptor) {
             encodeSerializableElement(descriptor, 0, elementSerializer, value.startKey)
             encodeSerializableElement(descriptor, 1, elementSerializer, value.topLevelKey)
@@ -130,16 +132,19 @@ class TopLevelBackStackSerializer<T : NavKey>(
         }
     }
 
-    override fun deserialize(decoder: Decoder): TopLevelBackStack<T> {
+    @Suppress("UNCHECKED_CAST")
+    override fun deserialize(decoder: Decoder): TopLevelBackStack<T, U> {
         var startKey: T? = null
-        var topLevelKey: T? = null
-        var topLevelBackStacks: Map<T, NavBackStack<T>> = emptyMap()
+        var topLevelKey: U? = null
+        var topLevelBackStacks: Map<U, NavBackStack<T>> = emptyMap()
 
         decoder.decodeStructure(descriptor) {
             while (true) {
                 when (val index = decodeElementIndex(descriptor)) {
-                    0 -> startKey = decodeSerializableElement(descriptor, 0, elementSerializer)
-                    1 -> topLevelKey = decodeSerializableElement(descriptor, 1, elementSerializer)
+                    0 -> startKey = decodeSerializableElement(descriptor, 0, keyElementSerializer)
+                    1 -> topLevelKey =
+                        decodeSerializableElement(descriptor, 1, keyElementSerializer)
+
                     2 -> topLevelBackStacks = decodeSerializableElement(descriptor, 2, mapDelegate)
                     CompositeDecoder.DECODE_DONE -> break
                     else -> error("Unexpected index: $index")
@@ -151,10 +156,13 @@ class TopLevelBackStackSerializer<T : NavKey>(
             it.topLevelBackStacks = HashMap(topLevelBackStacks)
             it.topLevelKey = topLevelKey!!
             it.updateBackStack()
-        }
+        } as TopLevelBackStack<T, U>
     }
 }
 
-inline fun <reified T : NavKey> TopLevelBackStackSerializer(): TopLevelBackStackSerializer<T> {
-    return TopLevelBackStackSerializer(elementSerializer = serializer<T>())
+inline fun <reified T : NavKey, reified U : T> TopLevelBackStackSerializer(): TopLevelBackStackSerializer<T, U> {
+    return TopLevelBackStackSerializer(
+        elementSerializer = serializer<T>(),
+        keyElementSerializer = serializer<U>()
+    )
 }

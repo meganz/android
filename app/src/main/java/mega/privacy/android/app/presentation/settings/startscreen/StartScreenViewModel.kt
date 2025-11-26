@@ -24,6 +24,7 @@ import mega.privacy.android.domain.usecase.preference.MonitorStartScreenPreferen
 import mega.privacy.android.domain.usecase.preference.SetStartScreenPreferenceDestinationUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.android.navigation.contract.qualifier.DefaultStartScreen
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import javax.inject.Inject
@@ -40,7 +41,7 @@ class StartScreenViewModel @Inject constructor(
     private val startScreenDestinationPreferenceNavKeyMapper: StartScreenDestinationPreferenceNavKeyMapper,
     private val setStartScreenPreferenceDestinationUseCase: SetStartScreenPreferenceDestinationUseCase,
     startScreenDestinationOptionMapper: StartScreenDestinationOptionMapper,
-    @DefaultStartScreen private val defaultStartScreen: NavKey,
+    @DefaultStartScreen private val defaultStartScreen: MainNavItemNavKey,
 ) : ViewModel() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
