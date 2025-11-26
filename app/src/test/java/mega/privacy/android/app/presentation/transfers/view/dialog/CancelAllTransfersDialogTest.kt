@@ -7,6 +7,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,7 +31,7 @@ class CancelAllTransfersDialogTest {
         with(composeTestRule) {
             onNodeWithTag(TEST_TAG_CANCEL_ALL_TRANSFERS_DIALOG).assertIsDisplayed()
             onNodeWithText(R.string.cancel_all_transfer_confirmation).assertIsDisplayed()
-            onNodeWithText(R.string.general_dismiss).assertIsDisplayed()
+            onNodeWithText(sharedR.string.general_dismiss_dialog).assertIsDisplayed()
             onNodeWithText(R.string.cancel_all_action).assertIsDisplayed()
         }
     }
@@ -49,7 +50,7 @@ class CancelAllTransfersDialogTest {
     fun `test that clicking on dismiss button calls onDismiss but not onCancelAllTransfers`() {
         initComposeTestRule()
 
-        composeTestRule.onNodeWithText(R.string.general_dismiss).performClick()
+        composeTestRule.onNodeWithText(sharedR.string.general_dismiss_dialog).performClick()
 
         verify(onDismiss).invoke()
         verifyNoInteractions(onCancelAllTransfers)

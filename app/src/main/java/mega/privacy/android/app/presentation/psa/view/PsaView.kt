@@ -27,6 +27,7 @@ import coil3.compose.rememberAsyncImagePainter
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.icon.pack.R as IconPack
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -177,7 +178,7 @@ private fun ButtonRow(
         positiveButton?.invoke()
 
         TextMegaButton(
-            text = stringResource(R.string.general_dismiss),
+            text = stringResource(sharedR.string.general_dismiss_dialog),
             onClick = onDismiss,
             modifier = Modifier
                 .padding(horizontal = 16.dp)

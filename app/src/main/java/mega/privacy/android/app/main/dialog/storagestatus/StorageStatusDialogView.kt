@@ -174,7 +174,7 @@ internal fun StorageStatusDialogView(
                     ) {
                         TextMegaButton(
                             modifier = Modifier.testTag(HORIZONTAL_DISMISS_TAG),
-                            textId = R.string.general_dismiss,
+                            textId = sharedR.string.general_dismiss_dialog,
                             onClick = dismissClickListener,
                         )
 
@@ -207,7 +207,7 @@ internal fun StorageStatusDialogView(
 
                         TextMegaButton(
                             modifier = Modifier.testTag(VERTICAL_DISMISS_TAG),
-                            textId = R.string.general_dismiss,
+                            textId = sharedR.string.general_dismiss_dialog,
                             onClick = dismissClickListener,
                         )
                     }

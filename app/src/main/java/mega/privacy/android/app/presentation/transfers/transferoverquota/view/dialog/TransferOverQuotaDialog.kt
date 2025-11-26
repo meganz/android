@@ -123,7 +123,7 @@ internal fun TransferOverQuotaDialogContent(
                 else -> sharedR.string.login_text
             }
         ),
-        cancelButtonText = stringResource(R.string.general_dismiss),
+        cancelButtonText = stringResource(sharedR.string.general_dismiss_dialog),
         onConfirm = {
             if (isLoggedIn) {
                 Analytics.tracker.trackEvent(TransferOverQuotaUpgradeAccountButtonEvent)

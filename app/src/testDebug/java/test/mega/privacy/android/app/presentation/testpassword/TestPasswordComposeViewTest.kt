@@ -16,6 +16,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.testpassword.model.PasswordState
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.presentation.testpassword.model.TestPasswordUIState
 import mega.privacy.android.app.presentation.testpassword.view.Constants.BACKUP_BUTTON_TAG
 import mega.privacy.android.app.presentation.testpassword.view.Constants.BOTTOM_SHEET_TITLE
@@ -130,7 +131,7 @@ class TestPasswordComposeViewTest {
         composeTestRule.onNodeWithTag(PASSWORD_REMINDER_DESC_TAG).assertIsDisplayed()
             .assert(hasText(fromId(R.string.remember_pwd_dialog_text)))
         composeTestRule.onNodeWithTag(PASSWORD_REMINDER_DISMISS_BUTTON_TAG).assertIsDisplayed()
-            .assert(hasText(fromId(R.string.general_dismiss)))
+            .assert(hasText(fromId(sharedR.string.general_dismiss_dialog)))
     }
 
     @Test

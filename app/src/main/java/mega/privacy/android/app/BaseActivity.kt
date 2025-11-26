@@ -367,7 +367,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         text.setText(R.string.ssl_error_dialog_text)
         retryButton.setText(R.string.general_retry)
         openBrowserButton.setText(R.string.general_open_browser)
-        dismissButton.setText(R.string.general_dismiss)
+        dismissButton.setText(sharedR.string.general_dismiss_dialog)
 
         sslErrorDialog = builder.create().apply {
             setCancelable(false)

@@ -32,6 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
@@ -113,7 +114,7 @@ private fun BusinessGraceView(modifier: Modifier = Modifier, onDismissRequest: (
                     modifier = Modifier
                         .padding(horizontal = 8.dp)
                         .align(Alignment.End),
-                    textId = R.string.general_dismiss,
+                    textId = sharedR.string.general_dismiss_dialog,
                     onClick = onDismissRequest,
                 )
             }

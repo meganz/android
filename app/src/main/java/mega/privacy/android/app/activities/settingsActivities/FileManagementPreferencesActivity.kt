@@ -71,7 +71,7 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
             .setPositiveButton(getString(R.string.general_clear)) { _, _ ->
                 viewModel.clearOffline()
             }
-            .setNegativeButton(getString(R.string.general_dismiss), null)
+            .setNegativeButton(getString(sharedR.string.general_dismiss_dialog), null)
             .create()
         clearOfflineDialog?.show()
     }

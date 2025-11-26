@@ -418,7 +418,7 @@ private fun PasswordReminderModeLayout(
     @StringRes val descriptionText: Int =
         if (uiState.isLogoutMode) R.string.remember_pwd_dialog_text_logout else R.string.remember_pwd_dialog_text
     @StringRes val dismissButtonText: Int =
-        if (uiState.isLogoutMode) R.string.proceed_to_logout else R.string.general_dismiss
+        if (uiState.isLogoutMode) R.string.proceed_to_logout else sharedResR.string.general_dismiss_dialog
     val dismissButtonColor =
         if (uiState.isLogoutMode) MaterialTheme.colors.red_600_red_300 else MaterialTheme.colors.secondary
 
@@ -660,7 +660,7 @@ private fun TestPasswordModeLayout(
                 modifier = Modifier
                     .testTag(DISMISS_BUTTON_TAG)
                     .padding(top = 12.dp),
-                text = stringResource(id = R.string.general_dismiss),
+                text = stringResource(id = sharedResR.string.general_dismiss_dialog),
                 onClick = {
                     onBackPressedDispatcher?.onBackPressed()
                 },

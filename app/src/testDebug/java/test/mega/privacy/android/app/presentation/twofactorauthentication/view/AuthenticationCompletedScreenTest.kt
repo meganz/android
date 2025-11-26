@@ -9,6 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.AuthenticationCompletedScreen
 import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.RK_EXPORT_BOX_TEST_TAG
 import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.RK_EXPORT_INSTRUCTION_TEST_TAG
@@ -73,19 +74,19 @@ class AuthenticationCompletedScreenTest {
     @Test
     fun `test that Dismiss key button is shown when isMasterKeyExported is equal to true`() {
         setupRule(stateWithMasterKeyExported)
-        composeRule.onNodeWithText(fromId(R.string.general_dismiss)).assertIsDisplayed()
+        composeRule.onNodeWithText(fromId(sharedR.string.general_dismiss_dialog)).assertIsDisplayed()
     }
 
     @Test
     fun `test that Dismiss key button is not visible when isMasterKeyExported is equal to false`() {
         setupRule()
-        composeRule.onNodeWithText(fromId(R.string.general_dismiss)).assertDoesNotExist()
+        composeRule.onNodeWithText(fromId(sharedR.string.general_dismiss_dialog)).assertDoesNotExist()
     }
 
     @Test
     fun `test that Dismiss key button is clickable`() {
         setupRule(stateWithMasterKeyExported)
-        composeRule.onNodeWithText(fromId(R.string.general_dismiss)).assertHasClickAction()
+        composeRule.onNodeWithText(fromId(sharedR.string.general_dismiss_dialog)).assertHasClickAction()
     }
 
     @Test

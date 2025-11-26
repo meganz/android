@@ -68,7 +68,7 @@
             android:paddingTop="10dp"
             android:paddingRight="16dp"
             android:paddingBottom="10dp"
-            android:text="@string/general_dismiss" />
+            android:text="@string/general_dismiss_dialog" />
     </LinearLayout>
 
 </ScrollView>

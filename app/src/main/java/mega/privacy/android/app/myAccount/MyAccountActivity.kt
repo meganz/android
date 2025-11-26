@@ -558,7 +558,7 @@ internal class MyAccountActivity : PasscodeActivity(),
                     getString(R.string.send_cancel_subscriptions),
                     null
                 )
-                .setNegativeButton(getString(R.string.general_dismiss), null)
+                .setNegativeButton(getString(sharedR.string.general_dismiss_dialog), null)
                 .create()
 
         cancelSubscriptionsDialog?.apply {
@@ -675,7 +675,7 @@ internal class MyAccountActivity : PasscodeActivity(),
             .setTitle(getString(R.string.delete_account))
             .setMessage(getString(messageId))
             .setView(errorInputBinding.root)
-            .setNegativeButton(getString(R.string.general_dismiss), null)
+            .setNegativeButton(getString(sharedR.string.general_dismiss_dialog), null)
             .setPositiveButton(getString(R.string.delete_account), null)
             .setOnDismissListener {
                 /* Clear the value of current CancelAccountDialogState when the dialog is dismissed

@@ -314,7 +314,7 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
                     MegaAlertDialog(
                         title = stringResource(R.string.error_file_not_available),
                         body = stringResource(R.string.error_takendown_file),
-                        confirmButtonText = stringResource(R.string.general_dismiss),
+                        confirmButtonText = stringResource(sharedR.string.general_dismiss_dialog),
                         cancelButtonText = null,
                         onConfirm = {
                             if (!isFinishing) {

@@ -161,7 +161,7 @@ object AlertsAndWarnings {
         MaterialAlertDialogBuilder(activity)
             .setTitle(activity.getString(R.string.error_file_not_available))
             .setMessage(activity.getString(R.string.error_takendown_file))
-            .setNegativeButton(activity.getString(R.string.general_dismiss)) { _, _ ->
+            .setNegativeButton(activity.getString(sharedR.string.general_dismiss_dialog)) { _, _ ->
                 if (!activity.isFinishing) activity.finish()
             }
             .create().apply {

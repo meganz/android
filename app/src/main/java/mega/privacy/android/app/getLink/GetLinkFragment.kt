@@ -648,7 +648,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
                     }
                 }
             }
-            .setNegativeButton(getString(R.string.general_dismiss)) { _, _ ->
+            .setNegativeButton(getString(sharedR.string.general_dismiss_dialog)) { _, _ ->
                 if (type == SHARE) {
                     viewModel.shareCompleteLink { intent -> startActivity(intent) }
                 } else if (type == SEND_TO_CHAT) {

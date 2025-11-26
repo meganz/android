@@ -33,6 +33,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
@@ -698,7 +699,7 @@ class HomepageFragment : Fragment() {
                 callManager { manager -> manager.moveToSettingsSectionStartScreen() }
                 startScreenUtil.notAlertAnymoreAboutStartScreen()
             }
-            .setNegativeButton(getString(R.string.general_dismiss)) { _, _ ->
+            .setNegativeButton(getString(sharedR.string.general_dismiss_dialog)) { _, _ ->
                 startScreenUtil.notAlertAnymoreAboutStartScreen()
             }
             .show().apply {

@@ -194,7 +194,7 @@ internal fun StorageStatusDialogViewM3(
 
                             Box(modifier = Modifier.testTag(VERTICAL_DISMISS_TAG_M3)) {
                                 DialogButton(
-                                    buttonText = stringResource(R.string.general_dismiss),
+                                    buttonText = stringResource(sharedR.string.general_dismiss_dialog),
                                     onButtonClicked = dismissClickListener,
                                 )
                             }
@@ -208,7 +208,7 @@ internal fun StorageStatusDialogViewM3(
                         ) {
                             Box(modifier = Modifier.testTag(HORIZONTAL_DISMISS_TAG_M3)) {
                                 DialogButton(
-                                    buttonText = stringResource(R.string.general_dismiss),
+                                    buttonText = stringResource(sharedR.string.general_dismiss_dialog),
                                     onButtonClicked = dismissClickListener,
                                 )
                             }

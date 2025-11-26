@@ -28,6 +28,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Psa view
@@ -173,7 +174,7 @@ private fun MegaButtonRow(
         positiveButton?.invoke()
 
         TextOnlyButton(
-            text = stringResource(R.string.general_dismiss),
+            text = stringResource(sharedR.string.general_dismiss_dialog),
             onClick = onDismiss,
             modifier = Modifier
                 .padding(horizontal = 16.dp)

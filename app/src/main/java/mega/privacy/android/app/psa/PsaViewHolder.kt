@@ -8,6 +8,7 @@ import androidx.core.view.isVisible
 import coil3.load
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.PsaLayoutBinding
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Util
@@ -58,7 +59,7 @@ class PsaViewHolder(
             binding.rightButton.visibility = View.VISIBLE
             binding.rightButton.setOnClickListener { onDismiss(psa.id) }
         } else {
-            binding.leftButton.setText(R.string.general_dismiss)
+            binding.leftButton.setText(sharedR.string.general_dismiss_dialog)
             binding.leftButton.setOnClickListener { onDismiss(psa.id) }
         }
     }

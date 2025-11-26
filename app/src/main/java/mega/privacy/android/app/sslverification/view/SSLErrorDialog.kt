@@ -10,6 +10,7 @@ import mega.android.core.ui.components.dialogs.VERTICAL
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 internal fun SSLErrorDialog(
@@ -37,7 +38,7 @@ internal fun SSLErrorDialog(
                 }
             ),
             BasicDialogButton(
-                text = stringResource(id = R.string.general_dismiss),
+                text = stringResource(id = sharedR.string.general_dismiss_dialog),
                 onClick = {
                     onDismiss()
                     closeDialog()

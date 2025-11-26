@@ -596,9 +596,8 @@ public object IconPack : IconPackInterface {
                 override val QueueLine: ImageVector by lazy {
                         createSmallThinOutlineQueueLineImageVector() }
 
-                override val Square: ImageVector by lazy {
-                    createSmallThinOutlineSquareImageVector()
-                }
+                override val Square: ImageVector by lazy { createSmallThinOutlineSquareImageVector()
+                        }
 
                 override val Squares4: ImageVector by lazy {
                         createSmallThinOutlineSquares4ImageVector() }

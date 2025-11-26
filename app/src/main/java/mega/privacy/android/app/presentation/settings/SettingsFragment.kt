@@ -442,7 +442,7 @@ class SettingsFragment :
             .setTitle(getString(R.string.delete_account))
             .setMessage(resources.getString(R.string.delete_account_text))
             .setPositiveButton(R.string.delete_account) { _, _ -> deleteAccountConfirmed() }
-            .setNegativeButton(R.string.general_dismiss) { _, _ -> }
+            .setNegativeButton(sharedResR.string.general_dismiss_dialog) { _, _ -> }
             .show()
 
     }

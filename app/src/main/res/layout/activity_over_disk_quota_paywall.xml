@@ -93,7 +93,7 @@
                     android:paddingTop="10dp"
                     android:paddingEnd="16dp"
                     android:paddingBottom="10dp"
-                    android:text="@string/general_dismiss" />
+                    android:text="@string/general_dismiss_dialog" />
 
                 <Button
                     android:id="@+id/upgrade_button"

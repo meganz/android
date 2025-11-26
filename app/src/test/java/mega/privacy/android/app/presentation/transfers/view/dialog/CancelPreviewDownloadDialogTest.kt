@@ -34,7 +34,7 @@ class CancelPreviewDownloadDialogTest {
             onNodeWithTag(TEST_TAG_CANCEL_PREVIEW_DOWNLOAD_DIALOG).assertIsDisplayed()
             onNodeWithText(sharedR.string.transfers_cancel_preview_download_warning_title).assertIsDisplayed()
             onNodeWithText(sharedR.string.transfers_cancel_preview_download_warning_text).assertIsDisplayed()
-            onNodeWithText(R.string.general_dismiss).assertIsDisplayed()
+            onNodeWithText(sharedR.string.general_dismiss_dialog).assertIsDisplayed()
             onNodeWithText(sharedR.string.general_dialog_cancel_button).assertIsDisplayed()
         }
     }

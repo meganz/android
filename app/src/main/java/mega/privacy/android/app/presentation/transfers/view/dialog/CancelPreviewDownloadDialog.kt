@@ -26,7 +26,7 @@ fun CancelPreviewDownloadDialog(
     text = stringResource(sharedR.string.transfers_cancel_preview_download_warning_text),
     confirmButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
     onConfirm = onCancelTransfer,
-    cancelButtonText = stringResource(id = R.string.general_dismiss),
+    cancelButtonText = stringResource(id = sharedR.string.general_dismiss_dialog),
     onDismiss = onDismiss,
 )
 

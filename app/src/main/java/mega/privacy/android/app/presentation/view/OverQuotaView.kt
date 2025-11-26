@@ -97,7 +97,7 @@ private fun OverQuotaBannerText(
                 TextMegaButton(
                     modifier = Modifier
                         .padding(end = 16.dp, top = 8.dp, bottom = 8.dp),
-                    text = stringResource(id = R.string.general_dismiss),
+                    text = stringResource(id = sharedR.string.general_dismiss_dialog),
                     onClick = { onDismissClicked() }
                 )
             }

@@ -53,7 +53,7 @@ class TransferOverQuotaDialogTest {
             onNodeWithText(sharedR.string.general_upgrade_button).assertIsNotDisplayed()
             onNodeWithText(R.string.plans_depleted_transfer_overquota).assertIsNotDisplayed()
             onNodeWithText(sharedR.string.login_text).assertIsDisplayed()
-            onNodeWithText(R.string.general_dismiss).assertIsDisplayed()
+            onNodeWithText(sharedR.string.general_dismiss_dialog).assertIsDisplayed()
         }
     }
 
@@ -67,7 +67,7 @@ class TransferOverQuotaDialogTest {
             onNodeWithText(sharedR.string.general_upgrade_button).assertIsDisplayed()
             onNodeWithText(R.string.plans_depleted_transfer_overquota).assertIsNotDisplayed()
             onNodeWithText(sharedR.string.login_text).assertIsNotDisplayed()
-            onNodeWithText(R.string.general_dismiss).assertIsDisplayed()
+            onNodeWithText(sharedR.string.general_dismiss_dialog).assertIsDisplayed()
         }
     }
 
@@ -81,7 +81,7 @@ class TransferOverQuotaDialogTest {
             onNodeWithText(sharedR.string.general_upgrade_button).assertIsNotDisplayed()
             onNodeWithText(R.string.plans_depleted_transfer_overquota).assertIsDisplayed()
             onNodeWithText(sharedR.string.login_text).assertIsNotDisplayed()
-            onNodeWithText(R.string.general_dismiss).assertIsDisplayed()
+            onNodeWithText(sharedR.string.general_dismiss_dialog).assertIsDisplayed()
         }
     }
 
@@ -95,7 +95,7 @@ class TransferOverQuotaDialogTest {
             onNodeWithText(sharedR.string.general_upgrade_button).assertIsNotDisplayed()
             onNodeWithText(R.string.plans_depleted_transfer_overquota).assertIsNotDisplayed()
             onNodeWithText(sharedR.string.login_text).assertIsDisplayed()
-            onNodeWithText(R.string.general_dismiss).assertIsDisplayed()
+            onNodeWithText(sharedR.string.general_dismiss_dialog).assertIsDisplayed()
         }
     }
 
@@ -143,7 +143,7 @@ class TransferOverQuotaDialogTest {
     fun `test that dismiss button works properly`() {
         initComposeTestRule()
 
-        composeTestRule.onNodeWithText(R.string.general_dismiss).performClick()
+        composeTestRule.onNodeWithText(sharedR.string.general_dismiss_dialog).performClick()
 
         assertThat(analyticsRule.events).doesNotContain(TransferOverQuotaUpgradeAccountButtonEvent)
         verify(onDismiss).invoke()
