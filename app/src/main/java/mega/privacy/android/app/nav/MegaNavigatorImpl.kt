@@ -83,7 +83,9 @@ import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.DeviceCenterNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
+import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.navigation.settings.SettingsNavigator
 import java.io.File
@@ -412,18 +414,29 @@ internal class MegaNavigatorImpl @Inject constructor(
         remoteFolderHandle: Long?,
         remoteFolderName: String?,
     ) {
-        context.startActivity(Intent(context, SyncHostActivity::class.java).apply {
-            putExtra(
-                SyncHostActivity.EXTRA_NEW_FOLDER_DETAIL,
-                SyncNewFolder(
-                    syncType = syncType,
-                    isFromManagerActivity = isFromManagerActivity,
-                    remoteFolderHandle = remoteFolderHandle,
-                    remoteFolderName = remoteFolderName,
-                )
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = SyncNewFolderNavKey(
+                syncType = syncType,
+                isFromManagerActivity = isFromManagerActivity,
+                isFromCloudDrive = isFromCloudDrive,
+                remoteFolderHandle = remoteFolderHandle,
+                remoteFolderName = remoteFolderName
             )
-            putExtra(SyncHostActivity.EXTRA_IS_FROM_CLOUD_DRIVE, isFromCloudDrive)
-        })
+        ) {
+            context.startActivity(Intent(context, SyncHostActivity::class.java).apply {
+                putExtra(
+                    SyncHostActivity.EXTRA_NEW_FOLDER_DETAIL,
+                    SyncNewFolder(
+                        syncType = syncType,
+                        isFromManagerActivity = isFromManagerActivity,
+                        remoteFolderHandle = remoteFolderHandle,
+                        remoteFolderName = remoteFolderName,
+                    )
+                )
+                putExtra(SyncHostActivity.EXTRA_IS_FROM_CLOUD_DRIVE, isFromCloudDrive)
+            })
+        }
     }
 
     override fun openInternalFolderPicker(
@@ -468,11 +481,16 @@ internal class MegaNavigatorImpl @Inject constructor(
     }
 
     override fun openDeviceCenter(context: Context) {
-        context.startActivity(
-            Intent(context, ManagerActivity::class.java)
-                .setAction(ACTION_OPEN_DEVICE_CENTER)
-                .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
-        )
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = DeviceCenterNavKey
+        ) {
+            context.startActivity(
+                Intent(context, ManagerActivity::class.java)
+                    .setAction(ACTION_OPEN_DEVICE_CENTER)
+                    .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
+            )
+        }
     }
 
     override fun openSelectStopBackupDestinationFromSyncsTab(
