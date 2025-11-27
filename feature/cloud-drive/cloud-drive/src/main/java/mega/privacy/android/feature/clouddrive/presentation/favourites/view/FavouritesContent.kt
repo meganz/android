@@ -46,7 +46,7 @@ import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
-import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.core.sharedcomponents.node.rememberNodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -84,7 +84,7 @@ internal fun FavouritesContent(
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackBarHostState.current
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
-    var visibleNodeOptionId by remember { mutableStateOf<NodeId?>(null) }
+    var visibleNodeOptionId by rememberNodeId(null)
     val nodeOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     var shouldShowSkeleton by remember { mutableStateOf(false) }
     val isListView = uiState.currentViewType == ViewType.LIST

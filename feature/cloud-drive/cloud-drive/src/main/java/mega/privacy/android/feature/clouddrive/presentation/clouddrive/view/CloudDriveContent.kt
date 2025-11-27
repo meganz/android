@@ -62,6 +62,7 @@ import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
+import mega.privacy.android.core.sharedcomponents.node.rememberNodeId
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -180,7 +181,7 @@ internal fun CloudDriveContent(
             }
         },
     )
-    var visibleNodeOptionId by remember { mutableStateOf(visibleParentNodeOptionId) }
+    var visibleNodeOptionId by rememberNodeId(null)
     val nodeOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     var shouldShowSkeleton by remember { mutableStateOf(false) }
     val isListView = uiState.currentViewType == ViewType.LIST
@@ -189,7 +190,11 @@ internal fun CloudDriveContent(
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(visibleParentNodeOptionId) {
-        visibleNodeOptionId = visibleParentNodeOptionId
+        // Only update when not null to prevent hiding bottom sheet during configuration changes
+        // visibleNodeOptionId will retain value after configuration change
+        if (visibleParentNodeOptionId != null) {
+            visibleNodeOptionId = visibleParentNodeOptionId
+        }
     }
 
     LaunchedEffect(visibleNodeOptionId) {

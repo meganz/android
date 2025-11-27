@@ -51,6 +51,7 @@ import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
+import mega.privacy.android.core.sharedcomponents.node.rememberNodeId
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -106,7 +107,7 @@ internal fun SharesScreen(
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
 
     // Node options modal state
-    var visibleNodeOptionId by remember { mutableStateOf<NodeId?>(null) }
+    var visibleNodeOptionId by rememberNodeId(null)
     val nodeOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     val megaResultContract = rememberMegaResultContract()
     val nameCollisionLauncher = rememberLauncherForActivityResult(

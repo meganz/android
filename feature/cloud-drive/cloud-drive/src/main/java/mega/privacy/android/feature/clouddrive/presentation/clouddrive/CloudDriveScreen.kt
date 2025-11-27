@@ -22,8 +22,8 @@ import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSel
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
+import mega.privacy.android.core.sharedcomponents.node.rememberNodeId
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.DeselectAllItems
@@ -60,7 +60,7 @@ fun CloudDriveScreen(
         megaNavigator = megaNavigator,
     )
     // Controls the visibility of the Node Options Bottom Sheet on CloudDriveContent
-    var visibleNodeOptionId: NodeId? by remember { mutableStateOf(null) }
+    var visibleNodeOptionId by rememberNodeId(null)
 
     BackHandler(enabled = uiState.isInSelectionMode) {
         viewModel.processAction(DeselectAllItems)
