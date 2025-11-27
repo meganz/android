@@ -442,7 +442,7 @@ public class TimeUtils implements Comparator<Calendar> {
             }
         }
 
-        return "00:01";
+        return "";
     }
 
     /**

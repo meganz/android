@@ -20,6 +20,7 @@ class DurationInSecondsTextMapper @Inject constructor() {
         val minutes: Int = (seconds % (60 * 60)) / (60)
         val finalSeconds: Int = seconds % 60
         return when {
+            finalSeconds == -1 -> ""
             hours > 0 -> "%d:%02d:%02d".format(hours, minutes, finalSeconds)
             else -> "%d:%02d".format(minutes, finalSeconds)
         }
