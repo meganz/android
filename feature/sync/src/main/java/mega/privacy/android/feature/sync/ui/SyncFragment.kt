@@ -79,6 +79,8 @@ internal class SyncFragment : Fragment() {
                         onBackPressed = { requireActivity().onBackPressedDispatcher.onBackPressed() },
                         shouldNavigateToSyncList = activity?.intent?.getBooleanExtra(
                             SyncHostActivity.EXTRA_IS_FROM_CLOUD_DRIVE, false
+                        ) == false && activity?.intent?.getBooleanExtra(
+                            SyncHostActivity.EXTRA_IS_SINGLE_ACTIVITY_NAVIGATION, false
                         ) == false,
                         newFolderDetail = activity?.intent?.getParcelableExtra(
                             SyncHostActivity.EXTRA_NEW_FOLDER_DETAIL,

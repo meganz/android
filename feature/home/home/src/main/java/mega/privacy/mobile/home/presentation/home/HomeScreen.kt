@@ -51,9 +51,11 @@ import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.SearchNodeNavKey
+import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedR
@@ -112,6 +114,15 @@ internal fun HomeScreen(
                 HomeFabOption.ScanDocument -> {
                     scanDocumentViewModel.prepareDocumentScanner()
                 }
+
+                HomeFabOption.AddNewSync -> {
+                    navigationHandler.navigate(SyncNewFolderNavKey())
+                }
+
+                HomeFabOption.AddNewBackup -> {
+                    navigationHandler.navigate(SyncNewFolderNavKey(syncType = SyncType.TYPE_BACKUP))
+                }
+
 
                 else -> {
                     // Handle other options later
