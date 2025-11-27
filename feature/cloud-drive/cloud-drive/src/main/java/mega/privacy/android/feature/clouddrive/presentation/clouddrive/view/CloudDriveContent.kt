@@ -110,6 +110,7 @@ internal fun CloudDriveContent(
     ),
     visibleParentNodeOptionId: NodeId? = null,
     onDismissNodeOptionsBottomSheet: () -> Unit = {},
+    onPrepareScanDocument: () -> Unit = {},
 ) {
     var showNewFolderDialog by remember { mutableStateOf(false) }
     var showNewTextFileDialog by remember { mutableStateOf(false) }
@@ -389,7 +390,7 @@ internal fun CloudDriveContent(
                     uploadHandler.onUploadFolderClicked()
                 },
                 onScanDocumentClicked = {
-                    onAction(CloudDriveAction.StartDocumentScanning)
+                    onPrepareScanDocument()
                 },
                 onCaptureClicked = {
                     cameraPermissionLauncher.launch(arrayOf(CAMERA, RECORD_AUDIO))

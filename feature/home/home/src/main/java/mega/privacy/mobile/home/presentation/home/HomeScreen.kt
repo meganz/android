@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
@@ -41,6 +42,8 @@ import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOption
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
+import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
+import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
 import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
@@ -64,6 +67,7 @@ internal fun HomeScreen(
     state: HomeUiState,
     navigationHandler: NavigationHandler,
     transferHandler: TransferHandler,
+    scanDocumentViewModel: ScanDocumentViewModel = hiltViewModel(),
 ) {
     val megaNavigator = rememberMegaNavigator()
     val megaResultContract = rememberMegaResultContract()
@@ -103,6 +107,10 @@ internal fun HomeScreen(
 
                 HomeFabOption.UploadFolder -> {
                     uploadHandler.onUploadFolderClicked()
+                }
+
+                HomeFabOption.ScanDocument -> {
+                    scanDocumentViewModel.prepareDocumentScanner()
                 }
 
                 else -> {
@@ -194,5 +202,11 @@ internal fun HomeScreen(
             transferHandler.setTransferEvent(transferTriggerEvent)
             uploadUris = emptyList()
         },
+    )
+
+    ScanDocumentHandler(
+        parentNodeId = rootFolderId,
+        megaNavigator = megaNavigator,
+        viewModel = scanDocumentViewModel
     )
 }

@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.clouddrive
 
+import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -18,6 +19,8 @@ import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
+import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
+import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
@@ -44,7 +47,8 @@ fun CloudDriveScreen(
     onTransfer: (TransferTriggerEvent) -> Unit,
     openSearch: (Long, NodeSourceType) -> Unit,
     viewModel: CloudDriveViewModel = hiltViewModel(),
-    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel()
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
+    scanDocumentViewModel: ScanDocumentViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showUploadOptionsBottomSheet by remember { mutableStateOf(false) }
@@ -127,6 +131,7 @@ fun CloudDriveScreen(
                 onDismissUploadOptionsBottomSheet = { showUploadOptionsBottomSheet = false },
                 contentPadding = innerPadding,
                 onAction = viewModel::processAction,
+                onPrepareScanDocument = scanDocumentViewModel::prepareDocumentScanner,
                 onNavigateBack = onBack,
                 onTransfer = onTransfer,
                 onSortNodes = viewModel::setCloudSortOrder,
@@ -138,10 +143,10 @@ fun CloudDriveScreen(
         }
     )
 
-    CloudDriveScanDocumentHandler(
-        cloudDriveUiState = uiState,
-        onDocumentScannerFailedToOpen = viewModel::onDocumentScannerFailedToOpen,
-        onGmsDocumentScannerConsumed = viewModel::onGmsDocumentScannerConsumed,
-        onDocumentScanningErrorConsumed = viewModel::onDocumentScanningErrorConsumed,
+    @SuppressLint("ComposeViewModelForwarding")
+    ScanDocumentHandler(
+        parentNodeId = uiState.currentFolderId,
+        megaNavigator = megaNavigator,
+        viewModel = scanDocumentViewModel
     )
 }

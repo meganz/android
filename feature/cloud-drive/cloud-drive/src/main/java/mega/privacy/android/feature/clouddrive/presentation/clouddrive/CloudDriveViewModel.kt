@@ -26,9 +26,6 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMa
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
-import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
-import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
-import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeChanges
@@ -70,7 +67,6 @@ class CloudDriveViewModel @AssistedInject constructor(
     private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase,
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     private val nodeUiItemMapper: NodeUiItemMapper,
-    private val scannerHandler: ScannerHandler,
     private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
     private val getNodesByIdInChunkUseCase: GetNodesByIdInChunkUseCase,
     private val setCloudSortOrderUseCase: SetCloudSortOrder,
@@ -120,7 +116,6 @@ class CloudDriveViewModel @AssistedInject constructor(
             is CloudDriveAction.DeselectAllItems -> deselectAllItems()
             is CloudDriveAction.NavigateToFolderEventConsumed -> onNavigateToFolderEventConsumed()
             is CloudDriveAction.NavigateBackEventConsumed -> onNavigateBackEventConsumed()
-            is CloudDriveAction.StartDocumentScanning -> prepareDocumentScanner()
             is CloudDriveAction.OverQuotaConsumptionWarning -> onConsumeOverQuotaWarning()
         }
     }
@@ -428,49 +423,6 @@ class CloudDriveViewModel @AssistedInject constructor(
         }
     }
 
-    /**
-     * Prepares the ML Kit Document Scanner from Google Play Services
-     */
-    fun prepareDocumentScanner() {
-        viewModelScope.launch {
-            runCatching {
-                scannerHandler.prepareDocumentScanner()
-            }.onSuccess { gmsDocumentScanner ->
-                _uiState.update { it.copy(gmsDocumentScanner = gmsDocumentScanner) }
-            }.onFailure { exception ->
-                _uiState.update {
-                    it.copy(
-                        documentScanningError = if (exception is InsufficientRAMToLaunchDocumentScanner) {
-                            DocumentScanningError.InsufficientRAM
-                        } else {
-                            DocumentScanningError.GenericError
-                        }
-                    )
-                }
-            }
-        }
-    }
-
-    /**
-     * When the system fails to open the ML Kit Document Scanner, display a generic error message
-     */
-    fun onDocumentScannerFailedToOpen() {
-        _uiState.update { it.copy(documentScanningError = DocumentScanningError.GenericError) }
-    }
-
-    /**
-     * Resets the value of [CloudDriveUiState.gmsDocumentScanner]
-     */
-    fun onGmsDocumentScannerConsumed() {
-        _uiState.update { it.copy(gmsDocumentScanner = null) }
-    }
-
-    /**
-     * Resets the value of [CloudDriveUiState.documentScanningError]
-     */
-    fun onDocumentScanningErrorConsumed() {
-        _uiState.update { it.copy(documentScanningError = null) }
-    }
 
     /**
      * Monitor storage over quota state

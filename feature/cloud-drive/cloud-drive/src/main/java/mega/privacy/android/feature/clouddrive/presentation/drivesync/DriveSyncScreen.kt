@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.drivesync
 
+import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
@@ -18,7 +19,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -35,13 +35,14 @@ import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
+import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
+import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveScanDocumentHandler
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveViewModel
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.DeselectAllItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.SelectAllItems
@@ -73,10 +74,10 @@ internal fun DriveSyncScreen(
     cloudDriveViewModel: CloudDriveViewModel,
     viewModel: DriveSyncViewModel = hiltViewModel(),
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
+    scanDocumentViewModel: ScanDocumentViewModel = hiltViewModel(),
     initialTabIndex: Int = 0,
 ) {
     val cloudDriveUiState by cloudDriveViewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
     val megaNavigator = viewModel.megaNavigator
     var showUploadOptionsBottomSheet by remember { mutableStateOf(false) }
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(initialTabIndex) }
@@ -174,6 +175,7 @@ internal fun DriveSyncScreen(
                         ),
                         uiState = cloudDriveUiState,
                         onAction = cloudDriveViewModel::processAction,
+                        onPrepareScanDocument = scanDocumentViewModel::prepareDocumentScanner,
                         onNavigateBack = { }, // Ignore back navigation in this tab
                         onTransfer = onTransfer,
                         showUploadOptionsBottomSheet = showUploadOptionsBottomSheet,
@@ -241,12 +243,11 @@ internal fun DriveSyncScreen(
         setNavigationItemVisibility(!cloudDriveUiState.isInSelectionMode)
     }
 
-    // Handle scan document functionality
-    CloudDriveScanDocumentHandler(
-        cloudDriveUiState = cloudDriveUiState,
-        onDocumentScannerFailedToOpen = cloudDriveViewModel::onDocumentScannerFailedToOpen,
-        onGmsDocumentScannerConsumed = cloudDriveViewModel::onGmsDocumentScannerConsumed,
-        onDocumentScanningErrorConsumed = cloudDriveViewModel::onDocumentScanningErrorConsumed,
+    @SuppressLint("ComposeViewModelForwarding")
+    ScanDocumentHandler(
+        parentNodeId = cloudDriveUiState.currentFolderId,
+        viewModel = scanDocumentViewModel,
+        megaNavigator = megaNavigator,
     )
 
     SyncSettingsBottomSheetViewM3(shouldShowBottomSheet = showSyncSettings) {

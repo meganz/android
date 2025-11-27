@@ -49,11 +49,6 @@ sealed interface CloudDriveAction {
     data object NavigateBackEventConsumed : CloudDriveAction
 
     /**
-     * Start document scanning action
-     */
-    data object StartDocumentScanning : CloudDriveAction
-
-    /**
      * Consume transfer over quota warning action
      */
     data object OverQuotaConsumptionWarning : CloudDriveAction

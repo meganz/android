@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.clouddrive.presentation.clouddrive
+package mega.privacy.android.core.nodecomponents.upload
 
 import android.app.Activity
 import androidx.activity.compose.LocalActivity
@@ -7,39 +7,40 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
-import mega.privacy.android.navigation.megaNavigator
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.resources.R as SharedR
 import timber.log.Timber
 
 /**
- * Shared component for handling scan document functionality in Cloud Drive screens
+ * Reusable component for handling scan document functionality.
  *
- * @param cloudDriveUiState Current UI state containing scanner and error information
- * @param onDocumentScannerFailedToOpen Callback when document scanner fails to open
- * @param onGmsDocumentScannerConsumed Callback when GMS document scanner is consumed
- * @param onDocumentScanningErrorConsumed Callback when document scanning error is acknowledged
+ * @param parentNodeId The parent node ID where scanned documents will be saved
+ * @param originatedFromChat Whether the scan originated from chat, defaults to false
+ * @param megaNavigator Optional navigator, defaults to rememberMegaNavigator()
+ * @param viewModel Optional ViewModel, defaults to hiltViewModel()
  */
 @Composable
-fun CloudDriveScanDocumentHandler(
-    cloudDriveUiState: CloudDriveUiState,
-    onDocumentScannerFailedToOpen: () -> Unit,
-    onGmsDocumentScannerConsumed: () -> Unit,
-    onDocumentScanningErrorConsumed: () -> Unit,
+fun ScanDocumentHandler(
+    parentNodeId: NodeId,
+    originatedFromChat: Boolean = false,
+    megaNavigator: MegaNavigator = rememberMegaNavigator(),
+    viewModel: ScanDocumentViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val activity = LocalActivity.current
-    val megaNavigator = remember {
-        context.megaNavigator
-    }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val scanDocumentLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartIntentSenderForResult()
@@ -56,23 +57,23 @@ fun CloudDriveScanDocumentHandler(
                         megaNavigator.openSaveScannedDocumentsActivity(
                             context = context,
                             originatedFromChat = false,
-                            cloudDriveParentHandle = cloudDriveUiState.currentFolderId.longValue,
+                            cloudDriveParentHandle = parentNodeId.longValue,
                             scanPdfUri = pdfUri,
                             scanSoloImageUri = if (imageUris.size == 1) imageUris[0] else null,
                         )
                     } ?: run {
-                        Timber.e("The PDF file could not be retrieved from Cloud Drive after scanning")
+                        Timber.e("The PDF file could not be retrieved after scanning")
                     }
                 }
             }
         } else {
-            Timber.e("The ML Kit Document Scan result could not be retrieved from Cloud Drive")
+            Timber.e("The ML Kit Document Scan result could not be retrieved")
         }
     }
 
     // Handle document scanner state changes
-    LaunchedEffect(cloudDriveUiState.gmsDocumentScanner) {
-        cloudDriveUiState.gmsDocumentScanner?.let { documentScanner ->
+    LaunchedEffect(uiState.gmsDocumentScanner) {
+        uiState.gmsDocumentScanner?.let { documentScanner ->
             documentScanner.apply {
                 getStartScanIntent(activity!!)
                     .addOnSuccessListener {
@@ -81,21 +82,21 @@ fun CloudDriveScanDocumentHandler(
                     .addOnFailureListener { exception ->
                         Timber.e(
                             exception,
-                            "An error occurred when attempting to run the ML Kit Document Scanner from Cloud Drive",
+                            "An error occurred when attempting to run the ML Kit Document Scanner",
                         )
-                        onDocumentScannerFailedToOpen()
+                        viewModel.onDocumentScannerFailedToOpen()
                     }
             }
-            onGmsDocumentScannerConsumed()
+            viewModel.onGmsDocumentScannerConsumed()
         }
     }
 
     // Show error dialog when documentScanningError is not null
-    cloudDriveUiState.documentScanningError?.let { errorType ->
-        CloudDriveDocumentScanningErrorDialog(
+    uiState.documentScanningError?.let { errorType ->
+        DocumentScanningErrorDialog(
             documentScanningError = errorType,
-            onErrorAcknowledged = onDocumentScanningErrorConsumed,
-            onErrorDismissed = onDocumentScanningErrorConsumed
+            onErrorAcknowledged = viewModel::onDocumentScanningErrorConsumed,
+            onErrorDismissed = viewModel::onDocumentScanningErrorConsumed
         )
     }
 }
@@ -108,13 +109,13 @@ fun CloudDriveScanDocumentHandler(
  * @param onErrorDismissed Lambda to execute upon clicking outside the Dialog bounds
  */
 @Composable
-private fun CloudDriveDocumentScanningErrorDialog(
+private fun DocumentScanningErrorDialog(
     documentScanningError: DocumentScanningError,
     onErrorAcknowledged: () -> Unit,
     onErrorDismissed: () -> Unit,
 ) {
     BasicDialog(
-        modifier = Modifier.testTag(CLOUD_DRIVE_DOCUMENT_SCANNING_ERROR_DIALOG),
+        modifier = Modifier.testTag(SCAN_DOCUMENT_ERROR_DIALOG_TEST_TAG),
         title = stringResource(SharedR.string.document_scanning_error_dialog_title),
         description = stringResource(documentScanningError.textRes),
         positiveButtonText = stringResource(SharedR.string.document_scanning_error_dialog_confirm_button),
@@ -124,7 +125,8 @@ private fun CloudDriveDocumentScanningErrorDialog(
 }
 
 /**
- * Test Tag for the Cloud Drive Document Scanning Error Dialog
+ * Test Tag for the Document Scanning Error Dialog
  */
-private const val CLOUD_DRIVE_DOCUMENT_SCANNING_ERROR_DIALOG =
-    "cloud_drive_document_scanning_error_dialog:basic_dialog" 
+private const val SCAN_DOCUMENT_ERROR_DIALOG_TEST_TAG =
+    "scan_document_error_dialog:basic_dialog"
+
