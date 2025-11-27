@@ -29,6 +29,7 @@ import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDi
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.MediaListItem
 import mega.privacy.android.app.presentation.photos.model.MediaListItem.PhotoItem
+import mega.privacy.android.app.presentation.photos.model.MediaListItem.VideoItem
 import mega.privacy.android.app.presentation.photos.model.MediaListMedia
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.util.createDaysCardList
@@ -522,23 +523,29 @@ class MediaDiscoveryViewModel @Inject constructor(
                 updateSelectedTimeBarState(
                     TimeBarTab.Months,
                     _state.value.monthsCardList.indexOfFirst {
-                        it.photo.modificationTime == dateCard.photo.modificationTime
-                    })
+                        it.photo.modificationTime.toLocalDate() == dateCard.photo.modificationTime.toLocalDate()
+                    }
+                )
             }
 
             is DateCard.MonthsCard -> {
                 updateSelectedTimeBarState(
                     TimeBarTab.Days,
                     _state.value.daysCardList.indexOfFirst {
-                        it.photo.modificationTime == dateCard.photo.modificationTime
-                    })
+                        it.photo.modificationTime.toLocalDate() == dateCard.photo.modificationTime.toLocalDate()
+                    }
+                )
             }
 
             is DateCard.DaysCard -> {
                 updateSelectedTimeBarState(
                     TimeBarTab.All,
-                    _state.value.mediaListItemList.indexOfFirst {
-                        it.key == dateCard.photo.id.toString()
+                    _state.value.mediaListItemList.indexOfFirst { item ->
+                        when (item) {
+                            is VideoItem -> item.video.id == dateCard.photo.id
+                            is PhotoItem -> item.photo.id == dateCard.photo.id
+                            else -> item.key == dateCard.photo.id.toString()
+                        }
                     },
                 )
             }

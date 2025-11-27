@@ -450,6 +450,18 @@ private fun MDView(
         derivedStateOf { !lazyGridState.isScrollInProgress }
     }
 
+    LaunchedEffect(mediaDiscoveryViewState.scrollStartIndex) {
+        if (mediaDiscoveryViewState.scrollStartIndex > 0) {
+            val startIndex = if (mediaDiscoveryViewState.selectedTimeBarTab == TimeBarTab.All) {
+                mediaDiscoveryViewState.scrollStartIndex
+            } else {
+                // Since CardListView has two headers, the index needs to be incremented by 2.
+                mediaDiscoveryViewState.scrollStartIndex + 2
+            }
+            lazyGridState.animateScrollToItem(startIndex)
+        }
+    }
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.BottomEnd,
