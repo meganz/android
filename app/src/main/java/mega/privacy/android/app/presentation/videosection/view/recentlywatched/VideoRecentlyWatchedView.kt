@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.videosection.view.recentlywatched
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as shareR
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -14,7 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -24,8 +22,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -36,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEvent
 import kotlinx.coroutines.launch
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VideoItemView
@@ -43,13 +42,14 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as shareR
 import nz.mega.sdk.MegaNode
 
 /**
@@ -69,11 +69,11 @@ fun VideoRecentlyWatchedView(
     onMenuClick: (VideoUIEntity) -> Unit,
     clearRecentlyWatchedVideosMessageShown: () -> Unit,
     removedRecentlyWatchedItemMessageShown: () -> Unit,
+    scaffoldState: ScaffoldState = rememberScaffoldState(),
 ) {
-    val snackBarHostState = remember { SnackbarHostState() }
-    val scaffoldState = rememberScaffoldState(snackbarHostState = snackBarHostState)
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+    val resources = LocalResources.current
     val lazyListState = rememberLazyListState()
 
     val isInFirstItem by remember { derivedStateOf { lazyListState.firstVisibleItemIndex != 0 } }
@@ -83,10 +83,8 @@ fun VideoRecentlyWatchedView(
         onConsumed = clearRecentlyWatchedVideosMessageShown,
         action = {
             coroutineScope.launch {
-                snackBarHostState.showAutoDurationSnackbar(
-                    context.resources.getString(
-                        shareR.string.video_section_message_clear_recently_watched
-                    )
+                scaffoldState.snackbarHostState.showAutoDurationSnackbar(
+                    resources.getString(shareR.string.video_section_message_clear_recently_watched)
                 )
             }
         }
@@ -97,8 +95,8 @@ fun VideoRecentlyWatchedView(
         onConsumed = removedRecentlyWatchedItemMessageShown,
         action = {
             coroutineScope.launch {
-                snackBarHostState.showAutoDurationSnackbar(
-                    context.resources.getString(
+                scaffoldState.snackbarHostState.showAutoDurationSnackbar(
+                    resources.getString(
                         shareR.string.video_section_message_remove_recently_watched_item
                     )
                 )
@@ -107,7 +105,7 @@ fun VideoRecentlyWatchedView(
     )
 
     MegaScaffold(
-        modifier = Modifier.semantics { testTagsAsResourceId = true },
+        modifier = modifier.semantics { testTagsAsResourceId = true },
         scaffoldState = scaffoldState,
         topBar = {
             MegaAppBar(

@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.ScaffoldState
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -22,12 +24,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.extensions.getStorageState
+import mega.privacy.android.app.presentation.node.NodeActionHandler
+import mega.privacy.android.app.presentation.node.view.toolbar.NodeToolbarViewModel
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
 import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
 import mega.privacy.android.app.presentation.videosection.model.LocationFilterOption
@@ -43,6 +50,7 @@ import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPla
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.resources.R as sharedR
@@ -70,6 +78,10 @@ internal fun VideoSectionComposeView(
     onDeleteDialogButtonClicked: () -> Unit,
     onMenuAction: (VideoSectionMenuAction?) -> Unit,
     retryActionCallback: () -> Unit,
+    navHostController: NavHostController = rememberNavController(),
+    handler: NodeActionHandler? = null,
+    scaffoldState: ScaffoldState = rememberScaffoldState(),
+    toolbarViewModel: NodeToolbarViewModel = hiltViewModel(),
 ) {
     val uiState by videoSectionViewModel.state.collectAsStateWithLifecycle()
     val tabState by videoSectionViewModel.tabState.collectAsStateWithLifecycle()
@@ -103,6 +115,9 @@ internal fun VideoSectionComposeView(
     var showDeleteVideoPlaylist by rememberSaveable { mutableStateOf(false) }
     var showRenameVideoPlaylistDialog by rememberSaveable { mutableStateOf(false) }
 
+    val toolbarState by toolbarViewModel.state.collectAsStateWithLifecycle()
+    val isVideoSectionActivityEnabled = handler != null
+
     LaunchedEffect(pagerState.currentPage) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
             videoSectionViewModel.onTabSelected(selectTab = tabState.tabs[page])
@@ -129,64 +144,124 @@ internal fun VideoSectionComposeView(
         }
     }
 
+    if (isVideoSectionActivityEnabled) {
+        LaunchedEffect(key1 = uiState.selectedVideoHandles) {
+            toolbarViewModel.updateToolbarState(
+                selectedNodes = videoSectionViewModel.getSelectedNodes().toSet(),
+                resultCount = uiState.allVideos.size,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
+            )
+        }
+    }
+
     MegaScaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
         contentWindowInsets = WindowInsets.ime,
+        scaffoldState = scaffoldState,
         topBar = {
-            VideoSectionTopBar(
-                tab = tabState.selectedTab,
-                title = stringResource(R.string.sortby_type_video_first),
-                isActionMode = uiState.isInSelection,
-                selectedSize = if (tabState.selectedTab == VideoSectionTab.All)
-                    uiState.selectedVideoHandles.size
-                else
-                    uiState.selectedVideoPlaylistHandles.size,
-                searchState = uiState.searchState,
-                query = uiState.query,
-                onMenuActionClicked = { action ->
-                    when (action) {
-                        is VideoSectionMenuAction.VideoSectionSelectAllAction ->
-                            if (tabState.selectedTab == VideoSectionTab.All) {
-                                videoSectionViewModel.selectAllNodes()
-                            } else {
+            if (isVideoSectionActivityEnabled) {
+                VideoSectionTopBar(
+                    tab = tabState.selectedTab,
+                    title = stringResource(R.string.sortby_type_video_first),
+                    isActionMode = uiState.isInSelection,
+                    selectedSize = if (tabState.selectedTab == VideoSectionTab.All)
+                        uiState.selectedVideoHandles.size
+                    else
+                        uiState.selectedVideoPlaylistHandles.size,
+                    searchState = uiState.searchState,
+                    query = uiState.query,
+                    onMenuActionClicked = { action ->
+                        when (action) {
+                            is VideoSectionMenuAction.VideoSectionSelectAllAction ->
                                 videoSectionViewModel.selectAllVideoPlaylists()
-                            }
 
+                            is VideoSectionMenuAction.VideoSectionClearSelectionAction ->
+                                videoSectionViewModel.clearAllSelectedVideoPlaylists()
 
-                        is VideoSectionMenuAction.VideoSectionClearSelectionAction ->
-                            if (tabState.selectedTab == VideoSectionTab.All) {
+                            is VideoSectionMenuAction.VideoSectionRemoveAction ->
+                                showDeleteVideoPlaylist = true
+
+                            else -> onMenuAction(action)
+                        }
+                    },
+                    onSearchTextChanged = videoSectionViewModel::searchQuery,
+                    onCloseClicked = videoSectionViewModel::exitSearch,
+                    onSearchClicked = videoSectionViewModel::searchWidgetStateUpdate,
+                    onBackPressed = {
+                        when {
+                            uiState.isInSelection -> {
                                 videoSectionViewModel.clearAllSelectedVideos()
-                            } else {
                                 videoSectionViewModel.clearAllSelectedVideoPlaylists()
                             }
 
-                        is VideoSectionMenuAction.VideoSectionRemoveAction ->
-                            showDeleteVideoPlaylist = true
+                            uiState.searchState == SearchWidgetState.EXPANDED ->
+                                videoSectionViewModel.exitSearch()
 
-                        else -> onMenuAction(action)
-                    }
-                },
-                onSearchTextChanged = videoSectionViewModel::searchQuery,
-                onCloseClicked = videoSectionViewModel::exitSearch,
-                onSearchClicked = videoSectionViewModel::searchWidgetStateUpdate,
-                onBackPressed = {
-                    when {
-                        uiState.isInSelection -> {
-                            videoSectionViewModel.clearAllSelectedVideos()
-                            videoSectionViewModel.clearAllSelectedVideoPlaylists()
+                            else ->
+                                onBackPressedDispatcher?.onBackPressed()
                         }
+                    },
+                    menuItems = toolbarState.toolbarMenuItems,
+                    handler = handler,
+                    navHostController = navHostController,
+                    clearSelection = videoSectionViewModel::clearAllSelectedVideos,
+                )
+            } else {
+                VideoSectionTopBar(
+                    tab = tabState.selectedTab,
+                    title = stringResource(R.string.sortby_type_video_first),
+                    isActionMode = uiState.isInSelection,
+                    selectedSize = if (tabState.selectedTab == VideoSectionTab.All)
+                        uiState.selectedVideoHandles.size
+                    else
+                        uiState.selectedVideoPlaylistHandles.size,
+                    searchState = uiState.searchState,
+                    query = uiState.query,
+                    onMenuActionClicked = { action ->
+                        when (action) {
+                            is VideoSectionMenuAction.VideoSectionSelectAllAction ->
+                                if (tabState.selectedTab == VideoSectionTab.All) {
+                                    videoSectionViewModel.selectAllNodes()
+                                } else {
+                                    videoSectionViewModel.selectAllVideoPlaylists()
+                                }
 
-                        uiState.searchState == SearchWidgetState.EXPANDED ->
-                            videoSectionViewModel.exitSearch()
 
-                        else ->
-                            onBackPressedDispatcher?.onBackPressed()
-                    }
-                },
-                isHideMenuActionVisible = uiState.isHideMenuActionVisible,
-                isUnhideMenuActionVisible = uiState.isUnhideMenuActionVisible,
-                isRemoveLinkMenuActionVisible = uiState.isRemoveLinkMenuActionVisible,
-            )
+                            is VideoSectionMenuAction.VideoSectionClearSelectionAction ->
+                                if (tabState.selectedTab == VideoSectionTab.All) {
+                                    videoSectionViewModel.clearAllSelectedVideos()
+                                } else {
+                                    videoSectionViewModel.clearAllSelectedVideoPlaylists()
+                                }
+
+                            is VideoSectionMenuAction.VideoSectionRemoveAction ->
+                                showDeleteVideoPlaylist = true
+
+                            else -> onMenuAction(action)
+                        }
+                    },
+                    onSearchTextChanged = videoSectionViewModel::searchQuery,
+                    onCloseClicked = videoSectionViewModel::exitSearch,
+                    onSearchClicked = videoSectionViewModel::searchWidgetStateUpdate,
+                    onBackPressed = {
+                        when {
+                            uiState.isInSelection -> {
+                                videoSectionViewModel.clearAllSelectedVideos()
+                                videoSectionViewModel.clearAllSelectedVideoPlaylists()
+                            }
+
+                            uiState.searchState == SearchWidgetState.EXPANDED ->
+                                videoSectionViewModel.exitSearch()
+
+                            else ->
+                                onBackPressedDispatcher?.onBackPressed()
+                        }
+                    },
+                    isHideMenuActionVisible = uiState.isHideMenuActionVisible,
+                    isUnhideMenuActionVisible = uiState.isUnhideMenuActionVisible,
+                    isRemoveLinkMenuActionVisible = uiState.isRemoveLinkMenuActionVisible,
+                )
+            }
         }
     ) { paddingValues ->
         VideoSectionBodyView(

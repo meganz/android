@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -102,6 +103,7 @@ fun VideoPlaylistDetailView(
     isStorageOverQuota: () -> Boolean,
     modifier: Modifier = Modifier,
     errorMessage: Int? = null,
+    scaffoldState: ScaffoldState = rememberScaffoldState()
 ) {
     val items = playlist?.videos ?: emptyList()
     val lazyListState = rememberLazyListState()
@@ -117,8 +119,6 @@ fun VideoPlaylistDetailView(
     LaunchedEffect(isNotInFirstItem) {
         playlistTitle = if (isNotInFirstItem) playlist?.title ?: "" else ""
     }
-
-    val scaffoldState = rememberScaffoldState()
 
     val coroutineScope = rememberCoroutineScope()
 
