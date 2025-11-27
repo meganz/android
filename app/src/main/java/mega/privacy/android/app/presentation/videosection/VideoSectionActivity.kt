@@ -243,9 +243,6 @@ class VideoSectionActivity : PasscodeActivity(), ActionNodeCallback {
                                     .fillMaxWidth(),
                                 onSortOrderClick = { showNewSortByPanel() },
                                 videoSectionViewModel = videoSectionViewModel,
-                                onMenuClick = { item, mode ->
-                                    // Will be implemented in ticket AND-21815
-                                },
                                 onMenuAction = { action ->
                                     when (action) {
                                         VideoSectionMenuAction.VideoSectionShareAction ->

@@ -5,6 +5,7 @@ import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -32,6 +33,7 @@ import mega.privacy.android.app.presentation.search.navigation.foreignNodeDialog
 import mega.privacy.android.app.presentation.search.navigation.leaveFolderShareDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.moveToRubbishOrDeleteNavigation
 import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetNavigation
+import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetRoute
 import mega.privacy.android.app.presentation.search.navigation.overQuotaDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.removeShareFolderDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.renameDialogNavigation
@@ -47,6 +49,7 @@ import mega.privacy.android.app.presentation.videosection.view.recentlywatched.V
 import mega.privacy.android.app.presentation.videosection.view.recentlywatched.videoRecentlyWatchedRoute
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
 import mega.privacy.mobile.analytics.event.RecentlyWatchedOpenedButtonPressedEvent
@@ -240,7 +243,6 @@ internal fun VideoSectionScreen(
     modifier: Modifier,
     videoSectionViewModel: VideoSectionViewModel,
     onSortOrderClick: () -> Unit,
-    onMenuClick: (VideoUIEntity, index: Int) -> Unit,
     onMenuAction: (VideoSectionMenuAction?) -> Unit,
     retryActionCallback: () -> Unit,
     nodeActionHandler: NodeActionHandler,
@@ -250,11 +252,22 @@ internal fun VideoSectionScreen(
     navHostController: NavHostController,
     bottomSheetNavigator: BottomSheetNavigator,
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     VideoSectionNavHost(
         modifier = modifier,
         viewModel = videoSectionViewModel,
         onSortOrderClick = onSortOrderClick,
-        onMenuClick = onMenuClick,
+        onMenuClick = { item ->
+            keyboardController?.hide()
+            navHostController.navigate(
+                route = nodeBottomSheetRoute.plus("/${item.id.longValue}")
+                    .plus("/${NodeSourceType.CLOUD_DRIVE.name}")
+            ) {
+                popUpTo(nodeBottomSheetRoute) { inclusive = true }
+                launchSingleTop = true
+            }
+        },
         onMenuAction = onMenuAction,
         retryActionCallback = retryActionCallback,
         nodeActionHandler = nodeActionHandler,
@@ -271,7 +284,7 @@ internal fun VideoSectionScreen(
 @Composable
 internal fun VideoSectionNavHost(
     onSortOrderClick: () -> Unit,
-    onMenuClick: (VideoUIEntity, index: Int) -> Unit,
+    onMenuClick: (VideoUIEntity) -> Unit,
     modifier: Modifier,
     onMenuAction: (VideoSectionMenuAction?) -> Unit,
     retryActionCallback: () -> Unit,
@@ -307,9 +320,14 @@ internal fun VideoSectionNavHost(
 
     navHostController.addOnDestinationChangedListener { _, destination, _ ->
         destination.route?.let { route ->
-            viewModel.setCurrentDestinationRoute(route)
-            if (route != videoPlaylistDetailRoute) {
-                viewModel.updateCurrentVideoPlaylist(null)
+            if (route == videoPlaylistDetailRoute
+                || route == videoRecentlyWatchedRoute
+                || route == videoSectionRoute
+            ) {
+                viewModel.setCurrentDestinationRoute(route)
+                if (route != videoPlaylistDetailRoute) {
+                    viewModel.updateCurrentVideoPlaylist(null)
+                }
             }
         }
     }
@@ -333,7 +351,7 @@ internal fun VideoSectionNavHost(
                     videoSectionViewModel = viewModel,
                     onClick = viewModel::onItemClicked,
                     onSortOrderClick = onSortOrderClick,
-                    onMenuClick = { onMenuClick(it, VIDEO_SECTION_MODE) },
+                    onMenuClick = onMenuClick,
                     onLongClick = viewModel::onItemLongClicked,
                     onPlaylistItemClick = { playlist, index ->
                         if (state.isInSelection) {
@@ -386,7 +404,7 @@ internal fun VideoSectionNavHost(
                             viewModel.onVideoItemOfPlaylistClicked(item, index)
                         }
                     },
-                    onMenuClick = { onMenuClick(it, VIDEO_PLAYLIST_DETAIL) },
+                    onMenuClick = onMenuClick,
                     onLongClick = viewModel::onVideoItemOfPlaylistLongClicked,
                     onDeleteVideosDialogPositiveButtonClicked = onDeleteVideosDialogPositiveButtonClicked,
                     onPlayAllClicked = viewModel::playAllButtonClicked,
@@ -456,7 +474,7 @@ internal fun VideoSectionNavHost(
                             viewModel.clearRecentlyWatchedVideos()
                         }
                     },
-                    onMenuClick = { onMenuClick(it, VIDEO_RECENTLY_WATCHED_MODE) },
+                    onMenuClick = onMenuClick,
                     clearRecentlyWatchedVideosMessageShown = viewModel::resetClearRecentlyWatchedVideosSuccess,
                     removedRecentlyWatchedItemMessageShown = viewModel::resetRemoveRecentlyWatchedItemSuccess,
                     scaffoldState = scaffoldState,
