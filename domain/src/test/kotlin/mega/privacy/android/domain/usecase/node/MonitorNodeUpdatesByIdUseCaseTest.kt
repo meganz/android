@@ -81,7 +81,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf(Unit))
-            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+            whenever(monitorContactNameUpdatesUseCase(updateContactCache = true)).thenReturn(
                 flowOf(
                     UserUpdate(
                         emptyMap(),
@@ -337,7 +337,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
                 )
             )
             whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
-            whenever(monitorContactNameUpdatesUseCase()).thenReturn(emptyFlow())
+            whenever(monitorContactNameUpdatesUseCase(updateContactCache = true)).thenReturn(emptyFlow())
 
             underTest(NodeId(-1L)).test {
                 // Should emit because offline node with parentId=-1L is matched
@@ -367,7 +367,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
-            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+            whenever(monitorContactNameUpdatesUseCase(updateContactCache = true)).thenReturn(
                 flowOf(
                     UserUpdate(
                         emptyMap(),
@@ -404,7 +404,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
-            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+            whenever(monitorContactNameUpdatesUseCase(updateContactCache = true)).thenReturn(
                 flowOf(
                     UserUpdate(
                         emptyMap(),
@@ -443,7 +443,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf(Unit))
-            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+            whenever(monitorContactNameUpdatesUseCase(updateContactCache = true)).thenReturn(
                 flowOf(
                     UserUpdate(
                         emptyMap(),
@@ -480,7 +480,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf(Unit))
-            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+            whenever(monitorContactNameUpdatesUseCase(updateContactCache = true)).thenReturn(
                 flowOf(
                     UserUpdate(
                         emptyMap(),
@@ -517,7 +517,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
-            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+            whenever(monitorContactNameUpdatesUseCase(updateContactCache = true)).thenReturn(
                 flowOf(
                     UserUpdate(
                         emptyMap(),
@@ -557,7 +557,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf(Unit))
-            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+            whenever(monitorContactNameUpdatesUseCase(updateContactCache = true)).thenReturn(
                 flowOf(
                     UserUpdate(
                         emptyMap(),
@@ -594,7 +594,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
-            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+            whenever(monitorContactNameUpdatesUseCase(updateContactCache = true)).thenReturn(
                 flowOf(
                     UserUpdate(
                         emptyMap(),
@@ -631,7 +631,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
-            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+            whenever(monitorContactNameUpdatesUseCase(updateContactCache = true)).thenReturn(
                 flowOf(
                     UserUpdate(
                         emptyMap(),
@@ -668,7 +668,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
-            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+            whenever(monitorContactNameUpdatesUseCase(updateContactCache = true)).thenReturn(
                 flowOf(
                     UserUpdate(
                         emptyMap(),
@@ -705,7 +705,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
-            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+            whenever(monitorContactNameUpdatesUseCase(updateContactCache = true)).thenReturn(
                 flowOf(
                     UserUpdate(
                         emptyMap(),
@@ -742,7 +742,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
-            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+            whenever(monitorContactNameUpdatesUseCase(updateContactCache = true)).thenReturn(
                 flowOf(
                     UserUpdate(
                         emptyMap(),
@@ -765,7 +765,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(emptyFlow())
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
-            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+            whenever(monitorContactNameUpdatesUseCase(updateContactCache = true)).thenReturn(
                 flowOf(
                     UserUpdate(
                         emptyMap(),
@@ -788,7 +788,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(emptyFlow())
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
             whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
-            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+            whenever(monitorContactNameUpdatesUseCase(updateContactCache = true)).thenReturn(
                 flowOf(
                     UserUpdate(
                         emptyMap(),
@@ -827,7 +827,7 @@ class MonitorNodeUpdatesByIdUseCaseTest {
                 )
             )
             whenever(monitorRefreshSessionUseCase()).thenReturn(flowOf(Unit))
-            whenever(monitorContactNameUpdatesUseCase()).thenReturn(
+            whenever(monitorContactNameUpdatesUseCase(updateContactCache = true)).thenReturn(
                 flowOf(
                     UserUpdate(
                         emptyMap(),

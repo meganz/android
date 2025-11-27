@@ -512,4 +512,6 @@ interface ContactsRepository {
      * @return The [Contact]
      */
     fun monitorContactByEmail(email: String): Flow<Contact?>
+
+    suspend fun updateContactCache(userUpdate: UserUpdate)
 }

@@ -996,7 +996,7 @@ internal class DefaultContactsRepository @Inject constructor(
 
     override val monitorContactCacheUpdates: Flow<UserUpdate> = _monitorContactCacheUpdates
 
-    private suspend fun updateContactCache(userUpdate: UserUpdate) {
+    override suspend fun updateContactCache(userUpdate: UserUpdate) {
         Timber.d("updateContactCache")
         if (userUpdate.changes.any { it.value.contains(UserChanges.Alias) }) {
             getCurrentUserAliases()

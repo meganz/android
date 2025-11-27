@@ -146,7 +146,7 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
      */
     private fun monitorContactNameUpdates(nodeSourceType: NodeSourceType) =
         if (nodeSourceType == NodeSourceType.INCOMING_SHARES || nodeSourceType == NodeSourceType.OUTGOING_SHARES) {
-            monitorContactNameUpdatesUseCase().map {
+            monitorContactNameUpdatesUseCase(updateContactCache = true).map {
                 NodeChanges.Attributes
             }
         } else emptyFlow()

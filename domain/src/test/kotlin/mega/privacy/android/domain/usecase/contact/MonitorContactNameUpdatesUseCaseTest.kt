@@ -14,8 +14,11 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -32,46 +35,48 @@ class MonitorContactNameUpdatesUseCaseTest {
 
     @ParameterizedTest
     @MethodSource("observedUserChangesProvider")
-    fun `test that use case emits updates when observed changes occur`(userChange: UserChanges) = runTest {
-        // Given
-        val userId = UserId(1L)
-        val contactUpdatesFlow = MutableSharedFlow<UserUpdate>()
-        val userUpdate = UserUpdate(
-            changes = mapOf(userId to listOf(userChange)),
-            emailMap = mapOf(userId to "user@example.com")
-        )
+    fun `test that use case emits updates when observed changes occur`(userChange: UserChanges) =
+        runTest {
+            // Given
+            val userId = UserId(1L)
+            val contactUpdatesFlow = MutableSharedFlow<UserUpdate>()
+            val userUpdate = UserUpdate(
+                changes = mapOf(userId to listOf(userChange)),
+                emailMap = mapOf(userId to "user@example.com")
+            )
 
-        whenever(contactsRepository.monitorContactUpdates()).thenReturn(contactUpdatesFlow)
+            whenever(contactsRepository.monitorContactUpdates()).thenReturn(contactUpdatesFlow)
 
-        // When & Then
-        underTest().test {
-            contactUpdatesFlow.emit(userUpdate)
-            val result = awaitItem()
-            assertThat(result).isEqualTo(userUpdate)
-            cancelAndIgnoreRemainingEvents()
+            // When & Then
+            underTest().test {
+                contactUpdatesFlow.emit(userUpdate)
+                val result = awaitItem()
+                assertThat(result).isEqualTo(userUpdate)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @ParameterizedTest
     @MethodSource("nonObservedUserChangesProvider")
-    fun `test that use case filters out updates with only non-observed changes`(userChange: UserChanges) = runTest {
-        // Given
-        val userId = UserId(1L)
-        val contactUpdatesFlow = MutableSharedFlow<UserUpdate>()
-        val userUpdate = UserUpdate(
-            changes = mapOf(userId to listOf(userChange)),
-            emailMap = mapOf(userId to "user@example.com")
-        )
+    fun `test that use case filters out updates with only non-observed changes`(userChange: UserChanges) =
+        runTest {
+            // Given
+            val userId = UserId(1L)
+            val contactUpdatesFlow = MutableSharedFlow<UserUpdate>()
+            val userUpdate = UserUpdate(
+                changes = mapOf(userId to listOf(userChange)),
+                emailMap = mapOf(userId to "user@example.com")
+            )
 
-        whenever(contactsRepository.monitorContactUpdates()).thenReturn(contactUpdatesFlow)
+            whenever(contactsRepository.monitorContactUpdates()).thenReturn(contactUpdatesFlow)
 
-        // When & Then
-        underTest().test {
-            contactUpdatesFlow.emit(userUpdate)
-            // Should not emit anything as no observed changes are present
-            expectNoEvents()
+            // When & Then
+            underTest().test {
+                contactUpdatesFlow.emit(userUpdate)
+                // Should not emit anything as no observed changes are present
+                expectNoEvents()
+            }
         }
-    }
 
     companion object {
         @JvmStatic
@@ -218,7 +223,7 @@ class MonitorContactNameUpdatesUseCaseTest {
     @MethodSource("mixedChangesProvider")
     fun `test that use case emits updates when mixed observed and non-observed changes occur`(
         observedChange: UserChanges,
-        nonObservedChange: UserChanges
+        nonObservedChange: UserChanges,
     ) = runTest {
         // Given
         val userId = UserId(1L)
@@ -271,4 +276,97 @@ class MonitorContactNameUpdatesUseCaseTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that updateContactCache is not called when updateContactCache is false`() = runTest {
+        // Given
+        val userId = UserId(1L)
+        val contactUpdatesFlow = MutableSharedFlow<UserUpdate>()
+        val userUpdate = UserUpdate(
+            changes = mapOf(userId to listOf(UserChanges.Firstname)),
+            emailMap = mapOf(userId to "user@example.com")
+        )
+
+        whenever(contactsRepository.monitorContactUpdates()).thenReturn(contactUpdatesFlow)
+        whenever(contactsRepository.updateContactCache(any())).thenReturn(Unit)
+
+        // When & Then
+        underTest(updateContactCache = false).test {
+            contactUpdatesFlow.emit(userUpdate)
+            val result = awaitItem()
+            assertThat(result).isEqualTo(userUpdate)
+            verify(contactsRepository).monitorContactUpdates()
+            verify(contactsRepository, org.mockito.kotlin.never()).updateContactCache(any())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that updateContactCache is called when updateContactCache is true`() = runTest {
+        // Given
+        val userId = UserId(1L)
+        val contactUpdatesFlow = MutableSharedFlow<UserUpdate>()
+        val userUpdate = UserUpdate(
+            changes = mapOf(userId to listOf(UserChanges.Firstname)),
+            emailMap = mapOf(userId to "user@example.com")
+        )
+
+        whenever(contactsRepository.monitorContactUpdates()).thenReturn(contactUpdatesFlow)
+        whenever(contactsRepository.updateContactCache(any())).thenReturn(Unit)
+
+        // When & Then
+        underTest(updateContactCache = true).test {
+            contactUpdatesFlow.emit(userUpdate)
+            val result = awaitItem()
+            assertThat(result).isEqualTo(userUpdate)
+            verify(contactsRepository).updateContactCache(userUpdate)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that updateContactCache is not called when updateContactCache is false and no observed changes`() =
+        runTest {
+            // Given
+            val userId = UserId(1L)
+            val contactUpdatesFlow = MutableSharedFlow<UserUpdate>()
+            val userUpdate = UserUpdate(
+                changes = mapOf(userId to listOf(UserChanges.Email)),
+                emailMap = mapOf(userId to "user@example.com")
+            )
+
+            whenever(contactsRepository.monitorContactUpdates()).thenReturn(contactUpdatesFlow)
+            whenever(contactsRepository.updateContactCache(any())).thenReturn(Unit)
+
+            // When & Then
+            underTest(updateContactCache = false).test {
+                contactUpdatesFlow.emit(userUpdate)
+                expectNoEvents()
+                verify(contactsRepository).monitorContactUpdates()
+                verify(contactsRepository, never()).updateContactCache(any())
+            }
+        }
+
+    @Test
+    fun `test that updateContactCache is not called when updateContactCache is true but no observed changes`() =
+        runTest {
+            // Given
+            val userId = UserId(1L)
+            val contactUpdatesFlow = MutableSharedFlow<UserUpdate>()
+            val userUpdate = UserUpdate(
+                changes = mapOf(userId to listOf(UserChanges.Email)),
+                emailMap = mapOf(userId to "user@example.com")
+            )
+
+            whenever(contactsRepository.monitorContactUpdates()).thenReturn(contactUpdatesFlow)
+            whenever(contactsRepository.updateContactCache(any())).thenReturn(Unit)
+
+            // When & Then
+            underTest(updateContactCache = true).test {
+                contactUpdatesFlow.emit(userUpdate)
+                expectNoEvents()
+                verify(contactsRepository).monitorContactUpdates()
+                verify(contactsRepository, never()).updateContactCache(any())
+            }
+        }
 }
