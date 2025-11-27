@@ -33,7 +33,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
@@ -119,20 +118,18 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        initialize()
         super.onViewCreated(view, savedInstanceState)
+        initialize()
     }
 
     private fun initialize() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            if (!viewModel.isInitialized()) {
-                checkSensitiveItems()
-            } else {
-                initNode()
+        if (!viewModel.isInitialized()) {
+            checkSensitiveItems()
+        } else {
+            initNode()
 
-                setupView()
-                setupObservers()
-            }
+            setupView()
+            setupObservers()
         }
     }
 
@@ -244,35 +241,37 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
     }
 
     private fun setupObservers() {
-        viewModel.getLink().observe(viewLifecycleOwner, ::updateLink)
-        viewModel.getExpiryDate().observe(viewLifecycleOwner, ::updateExpiryDate)
+        if (isVisible) {
+            viewModel.getLink().observe(viewLifecycleOwner, ::updateLink)
+            viewModel.getExpiryDate().observe(viewLifecycleOwner, ::updateExpiryDate)
 
-        viewLifecycleOwner.collectFlow(viewModel.linkCopied) {
-            it?.let { pair ->
-                copyToClipboard(pair)
-                viewModel.resetLink()
-            }
-        }
-        viewLifecycleOwner.collectFlow(viewModel.sendLinkToChatResult) {
-            it?.let { sendLinkToChatResult ->
-                val message = when (sendLinkToChatResult) {
-                    is SendLinkResult.LinkWithKey -> getString(R.string.link_and_key_sent)
-                    is SendLinkResult.LinkWithPassword -> getString(R.string.link_and_password_sent)
-                    is SendLinkResult.NormalLink -> resources.getQuantityString(
-                        R.plurals.links_sent,
-                        1
-                    )
+            viewLifecycleOwner.collectFlow(viewModel.linkCopied) {
+                it?.let { pair ->
+                    copyToClipboard(pair)
+                    viewModel.resetLink()
                 }
-                (activity as? SnackbarShower)?.showSnackbarWithChat(
-                    message,
-                    sendLinkToChatResult.chatId
-                )
-                viewModel.onShareLinkResultHandled()
             }
-        }
-        viewLifecycleOwner.collectFlow(viewModel.state) { uiState ->
-            binding.keyText.text = uiState.key
-            updatePassword(uiState.password)
+            viewLifecycleOwner.collectFlow(viewModel.sendLinkToChatResult) {
+                it?.let { sendLinkToChatResult ->
+                    val message = when (sendLinkToChatResult) {
+                        is SendLinkResult.LinkWithKey -> getString(R.string.link_and_key_sent)
+                        is SendLinkResult.LinkWithPassword -> getString(R.string.link_and_password_sent)
+                        is SendLinkResult.NormalLink -> resources.getQuantityString(
+                            R.plurals.links_sent,
+                            1
+                        )
+                    }
+                    (activity as? SnackbarShower)?.showSnackbarWithChat(
+                        message,
+                        sendLinkToChatResult.chatId
+                    )
+                    viewModel.onShareLinkResultHandled()
+                }
+            }
+            viewLifecycleOwner.collectFlow(viewModel.state) { uiState ->
+                binding.keyText.text = uiState.key
+                updatePassword(uiState.password)
+            }
         }
     }
 
