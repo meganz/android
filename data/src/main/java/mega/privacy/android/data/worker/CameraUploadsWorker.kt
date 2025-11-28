@@ -426,7 +426,9 @@ class CameraUploadsWorker @AssistedInject constructor(
 
             else -> {
                 cancelAllTransfers()
-                sendTransfersInterruptedInfoToBackupCenter()
+                if (finishedReason != CameraUploadsFinishedReason.UNKNOWN) {
+                    sendTransfersInterruptedInfoToBackupCenter()
+                }
                 when (restartMode) {
                     CameraUploadsRestartMode.RestartImmediately -> {
                         Result.retry()
