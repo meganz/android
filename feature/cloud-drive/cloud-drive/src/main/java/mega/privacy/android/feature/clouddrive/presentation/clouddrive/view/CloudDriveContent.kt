@@ -1,10 +1,7 @@
 package mega.privacy.android.feature.clouddrive.presentation.clouddrive.view
 
-import android.Manifest.permission.CAMERA
-import android.Manifest.permission.RECORD_AUDIO
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -59,6 +56,7 @@ import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
 import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
+import mega.privacy.android.core.nodecomponents.upload.rememberCaptureHandler
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
@@ -80,7 +78,6 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import mega.privacy.android.feature.transfers.components.OverQuotaBanner
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.navigation.camera.CameraArg
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.MediaDiscoveryNavKey
@@ -131,35 +128,20 @@ internal fun CloudDriveContent(
         megaNavigator = megaNavigator,
         megaResultContract = megaResultContract
     )
+
+    val captureHandler = rememberCaptureHandler(
+        onPhotoCaptured = { uri ->
+            uploadUris = listOf(uri)
+        },
+        megaResultContract = megaResultContract
+    )
+
     val nameCollisionLauncher = rememberLauncherForActivityResult(
         contract = megaResultContract.nameCollisionActivityContract
     ) { message ->
         if (!message.isNullOrEmpty()) {
             coroutineScope.launch {
                 snackbarHostState?.showAutoDurationSnackbar(message)
-            }
-        }
-    }
-    val takePictureLauncher = rememberLauncherForActivityResult(
-        contract = megaResultContract.inAppCameraResultContract
-    ) { uri: Uri? ->
-        if (uri != null) {
-            uploadUris = listOf(uri)
-        }
-    }
-    val cameraPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissionsResult ->
-        if (permissionsResult[CAMERA] == true) {
-            takePictureLauncher.launch(
-                CameraArg(
-                    title = context.getString(R.string.context_upload),
-                    buttonText = context.getString(R.string.context_upload)
-                )
-            )
-        } else {
-            coroutineScope.launch {
-                snackbarHostState?.showAutoDurationSnackbar(context.getString(R.string.chat_attach_pick_from_camera_deny_permission))
             }
         }
     }
@@ -398,7 +380,7 @@ internal fun CloudDriveContent(
                     onPrepareScanDocument()
                 },
                 onCaptureClicked = {
-                    cameraPermissionLauncher.launch(arrayOf(CAMERA, RECORD_AUDIO))
+                    captureHandler.onCaptureClicked()
                 },
                 onNewFolderClicked = {
                     showNewFolderDialog = true

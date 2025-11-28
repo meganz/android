@@ -45,6 +45,7 @@ import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomS
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
 import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
+import mega.privacy.android.core.nodecomponents.upload.rememberCaptureHandler
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
@@ -86,6 +87,13 @@ internal fun HomeScreen(
         megaResultContract = megaResultContract
     )
 
+    val captureHandler = rememberCaptureHandler(
+        onPhotoCaptured = { uri ->
+            uploadUris = listOf(uri)
+        },
+        megaResultContract = megaResultContract
+    )
+
     val nameCollisionLauncher = rememberLauncherForActivityResult(
         contract = megaResultContract.nameCollisionActivityContract
     ) { message ->
@@ -103,25 +111,16 @@ internal fun HomeScreen(
     LaunchedEffect(fabOption) {
         if (fabOption != null) {
             when (fabOption) {
-                HomeFabOption.UploadFiles -> {
-                    uploadHandler.onUploadFilesClicked()
-                }
-
-                HomeFabOption.UploadFolder -> {
-                    uploadHandler.onUploadFolderClicked()
-                }
-
-                HomeFabOption.ScanDocument -> {
-                    scanDocumentViewModel.prepareDocumentScanner()
-                }
-
-                HomeFabOption.AddNewSync -> {
-                    navigationHandler.navigate(SyncNewFolderNavKey())
-                }
-
-                HomeFabOption.AddNewBackup -> {
-                    navigationHandler.navigate(SyncNewFolderNavKey(syncType = SyncType.TYPE_BACKUP))
-                }
+                HomeFabOption.UploadFiles -> uploadHandler.onUploadFilesClicked()
+                HomeFabOption.UploadFolder -> uploadHandler.onUploadFolderClicked()
+                HomeFabOption.ScanDocument -> scanDocumentViewModel.prepareDocumentScanner()
+                HomeFabOption.Capture -> captureHandler.onCaptureClicked()
+                HomeFabOption.AddNewSync -> navigationHandler.navigate(SyncNewFolderNavKey())
+                HomeFabOption.AddNewBackup -> navigationHandler.navigate(
+                    SyncNewFolderNavKey(
+                        syncType = SyncType.TYPE_BACKUP
+                    )
+                )
 
 
                 else -> {
