@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.triggered
 import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.permissions.NEW_PERMISSIONS_SCREEN_CAMERA_BACKUP_PERMISSION
@@ -145,18 +146,22 @@ class NewPermissionsContentTest {
 
     @Test
     fun `test that callback should invoke on finish event`() {
-        val mockCallback = mock<() -> Unit>()
+        var callbackInvoked = false
 
         composeTestRule.setContent {
             NewPermissionsContent(
                 uiState = PermissionsUIState(
                     finishEvent = triggered,
                 ),
-                closePermissionScreen = mockCallback
+                closePermissionScreen = {
+                    callbackInvoked = true
+                }
             )
         }
 
-        verify(mockCallback).invoke()
+        composeTestRule.waitForIdle()
+
+        assertThat(callbackInvoked).isTrue()
     }
 
     @Test

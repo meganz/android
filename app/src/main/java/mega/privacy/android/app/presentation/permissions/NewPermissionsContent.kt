@@ -27,7 +27,7 @@ fun NewPermissionsContent(
     askCameraBackupPermission: () -> Unit = {},
     onSkipNotificationPermission: () -> Unit = {},
     onSkipCameraBackupPermission: () -> Unit = {},
-    closePermissionScreen: () -> Unit = {},
+    closePermissionScreen: suspend () -> Unit = {},
     resetFinishEvent: () -> Unit = {},
     onPermissionPageShown: () -> Unit = {},
 ) {

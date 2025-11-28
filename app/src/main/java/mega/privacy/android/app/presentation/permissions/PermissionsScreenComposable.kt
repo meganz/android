@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -23,6 +24,8 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.permissions.model.Permission
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AllowNotificationsCTAButtonPressedEvent
 import mega.privacy.mobile.analytics.event.CameraBackupsCTAScreenEvent
 import mega.privacy.mobile.analytics.event.DontAllowCameraBackupsCTAButtonPressedEvent
@@ -49,6 +52,8 @@ fun PermissionsScreenComposable(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isDarkTheme = uiState.themeMode.isDarkMode()
     val lifecycleOwner = LocalLifecycleOwner.current
+    val snackbarQueue = rememberSnackBarQueue()
+    val context = LocalContext.current
 
     // Permission launchers
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
@@ -160,6 +165,9 @@ fun PermissionsScreenComposable(
                 viewModel.nextPermission()
             },
             closePermissionScreen = {
+                if (uiState.isCameraUploadsEnabled) {
+                    snackbarQueue.queueMessage(context.getString(sharedR.string.onboarding_camera_upload_permission_enabled_message))
+                }
                 onPermissionsCompleted(uiState.isCameraUploadsEnabled)
             },
             resetFinishEvent = viewModel::resetFinishEvent,
