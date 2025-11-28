@@ -25,7 +25,6 @@ import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.domain.usecase.node.ValidNameType
-import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import javax.inject.Inject

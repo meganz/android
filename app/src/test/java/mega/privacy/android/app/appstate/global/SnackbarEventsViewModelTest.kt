@@ -10,7 +10,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.SnackbarAttributes
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueueReceiver
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
@@ -23,13 +23,13 @@ import org.mockito.kotlin.whenever
 class SnackbarEventsViewModelTest {
 
     private lateinit var underTest: SnackbarEventsViewModel
-    private val snackbarEventQueue: SnackbarEventQueue = mock()
+    private val snackbarEventQueueReceiver: SnackbarEventQueueReceiver = mock()
     private val testChannel = Channel<SnackbarAttributes>(Channel.UNLIMITED)
 
     private fun init() {
-        whenever(snackbarEventQueue.eventQueue).thenReturn(testChannel)
+        whenever(snackbarEventQueueReceiver.eventQueue).thenReturn(testChannel)
 
-        underTest = SnackbarEventsViewModel(snackbarEventQueue)
+        underTest = SnackbarEventsViewModel(snackbarEventQueueReceiver)
     }
 
     @Test

@@ -23,7 +23,7 @@ import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
-import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance

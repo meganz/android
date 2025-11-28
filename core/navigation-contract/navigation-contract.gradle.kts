@@ -1,6 +1,7 @@
 plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.library.compose)
+    alias(convention.plugins.mega.android.hilt)
     id("kotlin-parcelize")
 }
 
@@ -26,6 +27,8 @@ dependencies {
     implementation(lib.logging.timber)
 
     implementation(lib.javax.inject)
+
+    implementation(google.hilt.android)
 
     testImplementation(platform(testlib.junit5.bom))
     testImplementation(testlib.bundles.junit5.api)

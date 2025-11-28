@@ -6,7 +6,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
-import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import javax.inject.Inject
 
 /**

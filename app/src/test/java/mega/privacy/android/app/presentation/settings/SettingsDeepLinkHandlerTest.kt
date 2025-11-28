@@ -5,7 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.RegexPatternType.ENABLE_CAMERA_UPLOADS_LINK
-import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.BeforeAll

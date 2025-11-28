@@ -5,7 +5,7 @@ import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.feature.clouddrive.presentation.shares.links.OpenPasswordLinkDialogNavKey
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
-import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import javax.inject.Inject
 
 /**

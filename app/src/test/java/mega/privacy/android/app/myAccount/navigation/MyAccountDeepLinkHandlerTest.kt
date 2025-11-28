@@ -13,7 +13,7 @@ import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.exception.ResetPasswordLinkException
 import mega.privacy.android.domain.usecase.QueryResetPasswordLinkUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
-import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.WebSiteNavKey
 import mega.privacy.android.shared.resources.R as sharedR

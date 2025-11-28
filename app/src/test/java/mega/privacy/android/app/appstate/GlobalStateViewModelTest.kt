@@ -28,7 +28,7 @@ import mega.privacy.android.domain.usecase.account.HandleBlockedStateSessionUseC
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
-import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll

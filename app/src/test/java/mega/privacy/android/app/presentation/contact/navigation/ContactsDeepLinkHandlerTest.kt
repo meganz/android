@@ -5,7 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.RegexPatternType.PENDING_CONTACTS_LINK
-import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.ContactsNavKey
 import mega.privacy.android.navigation.destination.ContactsNavKey.NavType
 import mega.privacy.android.shared.resources.R as sharedR

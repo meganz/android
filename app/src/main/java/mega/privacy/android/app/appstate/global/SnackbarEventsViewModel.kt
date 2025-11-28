@@ -16,12 +16,12 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.SnackbarAttributes
-import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueueReceiver
 import javax.inject.Inject
 
 @HiltViewModel
 class SnackbarEventsViewModel @Inject constructor(
-    private val snackbarEventQueue: SnackbarEventQueue,
+    private val snackbarEventQueueReceiver: SnackbarEventQueueReceiver,
 ) : ViewModel() {
     private val snackbarEventConsumedSignal =
         MutableSharedFlow<StateEventWithContentConsumed>()
@@ -38,7 +38,7 @@ class SnackbarEventsViewModel @Inject constructor(
     }
 
     private fun monitorEventQueue() = flow {
-        for (event in snackbarEventQueue.eventQueue) {
+        for (event in snackbarEventQueueReceiver.eventQueue) {
             emit(triggered(event))
             awaitEventConsumed()
         }

@@ -15,13 +15,13 @@ import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.model.SnackbarDuration
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.core.sharedcomponents.snackbar.MegaSnackbarDuration
+import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature_flags.AppFeatures
-import mega.privacy.android.core.sharedcomponents.snackbar.MegaSnackbarDuration
-import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
-import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import javax.inject.Inject
 import javax.inject.Singleton
 

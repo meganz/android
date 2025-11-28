@@ -8,7 +8,7 @@ import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.RegexPatternType.CONFIRMATION_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.LOGIN_LINK
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
-import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import javax.inject.Inject
 
 class LoginDeepLinkHandler @Inject constructor(

@@ -18,7 +18,7 @@ import mega.privacy.android.domain.usecase.node.GetFileNodeContentForFileNodeUse
 import mega.privacy.android.domain.usecase.node.GetNodeIdFromBase64UseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
-import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey

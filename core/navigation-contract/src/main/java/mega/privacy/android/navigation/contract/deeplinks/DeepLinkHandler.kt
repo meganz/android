@@ -5,7 +5,7 @@ import androidx.annotation.StringRes
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
-import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 

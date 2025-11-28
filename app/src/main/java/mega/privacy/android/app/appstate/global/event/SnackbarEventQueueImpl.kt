@@ -13,15 +13,18 @@ import mega.android.core.ui.model.SnackbarAttributes
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature_flags.AppFeatures
-import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueueReceiver
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class SnackbarEventQueueImpl @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @ApplicationContext private val context: Context,
-) : SnackbarEventQueue {
+) : SnackbarEventQueue, SnackbarEventQueueReceiver {
     private val _events = Channel<SnackbarAttributes>(Channel.UNLIMITED)
     private val isSingleActivityEnabled = MutableStateFlow<Boolean?>(null)
 
