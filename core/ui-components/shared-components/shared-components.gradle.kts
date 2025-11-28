@@ -29,6 +29,7 @@ dependencies {
     // Compose
     implementation(androidx.bundles.compose.bom)
     implementation(androidx.material3)
+    implementation(androidx.compose.activity)
     implementation(androidx.material3.adaptive)
     implementation(androidx.material3.adaptive.layout)
     implementation(androidx.material3.adaptive.navigation)

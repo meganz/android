@@ -2,22 +2,14 @@ package mega.privacy.android.core.nodecomponents.upload
 
 import android.Manifest.permission.CAMERA
 import android.Manifest.permission.RECORD_AUDIO
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
-import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.app.ActivityCompat
-import kotlinx.coroutines.launch
-import mega.android.core.ui.components.LocalSnackBarHostState
-import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.core.sharedcomponents.handler.rememberAppSettingsHandler
 import mega.privacy.android.navigation.MegaActivityResultContract
 import mega.privacy.android.navigation.camera.CameraArg
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
@@ -44,9 +36,7 @@ fun rememberCaptureHandler(
     onPhotoCaptured: (Uri) -> Unit,
     megaResultContract: MegaActivityResultContract = rememberMegaResultContract(),
 ): CaptureHandler {
-    val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
-    val snackbarHostState = LocalSnackBarHostState.current
 
     val takePictureLauncher = rememberLauncherForActivityResult(
         contract = megaResultContract.inAppCameraResultContract
@@ -56,14 +46,11 @@ fun rememberCaptureHandler(
         }
     }
 
-    val appSettingLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) {
-        if (ActivityCompat.checkSelfPermission(
-                context,
-                CAMERA
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
+    val appSettingsHandler = rememberAppSettingsHandler(
+        message = context.getString(R.string.chat_attach_pick_from_camera_deny_permission),
+        actionLabel = context.getString(R.string.general_allow),
+        CAMERA,
+        onPermissionsGranted = {
             takePictureLauncher.launch(
                 CameraArg(
                     title = context.getString(R.string.context_upload),
@@ -71,7 +58,7 @@ fun rememberCaptureHandler(
                 )
             )
         }
-    }
+    )
 
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -84,21 +71,7 @@ fun rememberCaptureHandler(
                 )
             )
         } else {
-            coroutineScope.launch {
-                val result = snackbarHostState?.showAutoDurationSnackbar(
-                    message = context.getString(R.string.chat_attach_pick_from_camera_deny_permission),
-                    actionLabel = context.getString(R.string.general_allow)
-                )
-                if (result == SnackbarResult.ActionPerformed) {
-                    runCatching {
-                        appSettingLauncher.launch(
-                            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                data = Uri.parse("package:${context.packageName}")
-                            }
-                        )
-                    }
-                }
-            }
+            appSettingsHandler.onPermissionDenied()
         }
     }
 
