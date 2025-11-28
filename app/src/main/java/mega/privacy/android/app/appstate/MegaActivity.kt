@@ -1,9 +1,6 @@
 package mega.privacy.android.app.appstate
 
 import android.app.PendingIntent
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
-import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -32,6 +29,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
@@ -46,6 +44,7 @@ import androidx.navigation3.ui.NavDisplay
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.NavigationEventEffect
+import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.appstate.content.NavigationGraphViewModel
@@ -82,6 +81,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.transparent.TransparentSceneStrategy
+import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -377,10 +377,13 @@ class MegaActivity : ComponentActivity() {
         /**
          * Get Intent to open this activity with Single top and clear top flags
          */
-        fun getIntent(context: Context) = Intent(
+        fun getIntent(context: Context, warningMessage: String? = null) = Intent(
             context,
             MegaActivity::class.java
         ).apply {
+            warningMessage?.let {
+                putExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE, warningMessage)
+            }
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
 
@@ -392,14 +395,7 @@ class MegaActivity : ComponentActivity() {
             warningMessage: String,
             requestCode: Int = warningMessage.hashCode(), //unique request code per warning message
         ): PendingIntent {
-            val intent = Intent(
-                context,
-                MegaActivity::class.java
-            ).apply {
-                putExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE, warningMessage)
-                flags =
-                    Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            }
+            val intent = getIntent(context, warningMessage)
             return PendingIntent.getActivity(
                 context,
                 requestCode,

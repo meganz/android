@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -91,6 +92,7 @@ import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
@@ -164,6 +166,9 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
+    @Inject
+    lateinit var crashReporter: CrashReporter
+
     /**
      * Monitor Chat Signal Presence Use Case
      * Check if chat has signal presence
@@ -219,6 +224,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enforceSingleActivityGuard()
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         collectFlow(
@@ -1225,6 +1231,38 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                 snackbar.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
             snackTextView.maxLines = 5
             snackbar.show()
+        }
+    }
+
+    /**
+     * IMPORTANT: this value should be override ONLY in Activities that will NOT BE USED once the [AppFeatures.SingleActivity] is activated
+     *
+     * When this value is override by true, if the [AppFeatures.SingleActivity] feature flag is activated, this activity will be finished
+     * at creation and the [MegaActivity] will be launched (or moved to the front) showing an error message.
+     * An error will be also logged to the crash reporting.
+     */
+    open val enforceSingleActivityGuard = false
+
+    private fun enforceSingleActivityGuard() {
+        if (enforceSingleActivityGuard) {
+            val intentForLog = intent
+            lifecycleScope.launch {
+                if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
+                    val exception = IllegalStateException(
+                        "Trying to show ${this@BaseActivity::class.java.simpleName} " +
+                                "while SingleActivity feature flag is activated. " +
+                                "$intentForLog - action: ${intentForLog?.action} - extras: ${intentForLog?.extras}"
+                    )
+
+                    crashReporter.report(exception)
+                    Timber.e(exception)
+
+                    startActivity(
+                        MegaActivity.getIntent(this@BaseActivity, getString(R.string.general_error))
+                    )
+                    finish()
+                }
+            }
         }
     }
 }

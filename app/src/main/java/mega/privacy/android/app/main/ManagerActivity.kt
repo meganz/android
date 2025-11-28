@@ -112,6 +112,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.contract.VersionsFileActivityContract
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.contacts.ContactsActivity
@@ -313,6 +314,7 @@ import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
 import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetView
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionBottomSheet
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionViewModel
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.settings.arguments.TargetPreference
@@ -462,9 +464,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
     @Inject
     lateinit var workManager: WorkManager
-
-    @Inject
-    lateinit var crashReporter: CrashReporter
 
     @Inject
     lateinit var googleAdsManager: GoogleAdsManager
@@ -789,6 +788,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         viewModel.markHandledMessage()
         super.onStart()
     }
+
+    override val enforceSingleActivityGuard = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate")
