@@ -38,6 +38,7 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
+import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOption
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
@@ -73,6 +74,7 @@ internal fun HomeScreen(
     val megaResultContract = rememberMegaResultContract()
     val rootFolderId = NodeId(-1L)
     var uploadUris by rememberSaveable { mutableStateOf(emptyList<Uri>()) }
+    var showNewTextFileDialog by rememberSaveable { mutableStateOf(false) }
     val snackbarHostState = LocalSnackBarHostState.current
     val coroutineScope = rememberCoroutineScope()
     val uploadHandler = rememberUploadHandler(
@@ -112,6 +114,7 @@ internal fun HomeScreen(
                 HomeFabOption.UploadFolder -> uploadHandler.onUploadFolderClicked()
                 HomeFabOption.ScanDocument -> scanDocumentViewModel.prepareDocumentScanner()
                 HomeFabOption.Capture -> captureHandler.onCaptureClicked()
+                HomeFabOption.CreateNewTextFile -> showNewTextFileDialog = true
                 HomeFabOption.AddNewSync -> navigationHandler.navigate(SyncNewFolderNavKey())
                 HomeFabOption.AddNewBackup -> navigationHandler.navigate(
                     SyncNewFolderNavKey(
@@ -204,4 +207,13 @@ internal fun HomeScreen(
         megaNavigator = megaNavigator,
         viewModel = scanDocumentViewModel
     )
+
+    if (showNewTextFileDialog) {
+        NewTextFileNodeDialog(
+            parentNode = rootFolderId,
+            onDismiss = {
+                showNewTextFileDialog = false
+            }
+        )
+    }
 }
