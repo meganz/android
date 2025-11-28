@@ -8,7 +8,10 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import kotlinx.coroutines.flow.flowOf
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
+import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
 import mega.privacy.mobile.home.presentation.home.widget.recents.mapper.RecentActionUiItemMapper
 import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsTimestampText
 import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsUiItem
@@ -19,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -30,6 +34,8 @@ class RecentsWidgetViewModelTest {
 
     private val getRecentActionsUseCase = mock<GetRecentActionsUseCase>()
     private val recentActionUiItemMapper = mock<RecentActionUiItemMapper>()
+    private val setHideRecentActivityUseCase = mock<SetHideRecentActivityUseCase>()
+    private val monitorHideRecentActivityUseCase = mock<MonitorHideRecentActivityUseCase>()
 
     private val bucket1 = createMockRecentActionBucket(
         timestamp = 1000L,
@@ -59,13 +65,16 @@ class RecentsWidgetViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        reset(getRecentActionsUseCase, recentActionUiItemMapper)
+        reset(getRecentActionsUseCase, recentActionUiItemMapper, setHideRecentActivityUseCase, monitorHideRecentActivityUseCase)
+        whenever(monitorHideRecentActivityUseCase()).thenReturn(flowOf(false))
     }
 
     private fun initViewModel() {
         underTest = RecentsWidgetViewModel(
             getRecentActionsUseCase = getRecentActionsUseCase,
             recentActionUiItemMapper = recentActionUiItemMapper,
+            setHideRecentActivityUseCase = setHideRecentActivityUseCase,
+            monitorHideRecentActivityUseCase = monitorHideRecentActivityUseCase,
         )
     }
 
@@ -113,6 +122,52 @@ class RecentsWidgetViewModelTest {
             assertThat(state.isLoading).isFalse()
             assertThat(state.recentActionItems).isEmpty()
         }
+    }
+
+    @Test
+    fun `test that isHideRecentsEnabled is updated when monitor emits true`() = runTest {
+        whenever(monitorHideRecentActivityUseCase()).thenReturn(flowOf(true))
+
+        initViewModel()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isHideRecentsEnabled).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that isHideRecentsEnabled is updated when monitor emits false`() = runTest {
+        whenever(monitorHideRecentActivityUseCase()).thenReturn(flowOf(false))
+
+        initViewModel()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isHideRecentsEnabled).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that hideRecentActivity calls setHideRecentActivityUseCase with true`() = runTest {
+        whenever(setHideRecentActivityUseCase(any())).thenReturn(Unit)
+
+        initViewModel()
+
+        underTest.hideRecentActivity()
+
+        verify(setHideRecentActivityUseCase).invoke(true)
+    }
+
+    @Test
+    fun `test that showRecentActivity calls setHideRecentActivityUseCase with false`() = runTest {
+        whenever(setHideRecentActivityUseCase(any())).thenReturn(Unit)
+
+        initViewModel()
+
+        underTest.showRecentActivity()
+
+        verify(setHideRecentActivityUseCase).invoke(false)
     }
 
     private fun createMockRecentActionBucket(

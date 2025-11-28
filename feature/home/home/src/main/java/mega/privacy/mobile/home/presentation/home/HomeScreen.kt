@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
@@ -34,7 +33,6 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
-import mega.android.core.ui.components.button.MegaOutlinedButton
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
@@ -60,7 +58,6 @@ import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.mobile.home.presentation.configuration.HomeConfiguration
 import mega.privacy.mobile.home.presentation.home.model.HomeUiState
 
 
@@ -175,18 +172,6 @@ internal fun HomeScreen(
                 ) {
                     items(state.widgets, key = { it.identifier }) { it ->
                         it.content(Modifier, navigationHandler::navigate, transferHandler)
-                    }
-
-                    item {
-                        MegaOutlinedButton(
-                            text = "Configure Widgets",
-                            onClick = {
-                                navigationHandler.navigate(HomeConfiguration)
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 12.dp)
-                        )
                     }
                 }
             }

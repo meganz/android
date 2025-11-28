@@ -1,6 +1,7 @@
 package mega.privacy.mobile.home.presentation.home.widget.recents
 
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
@@ -21,7 +22,12 @@ import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentAct
 import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsTimestampText
 import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsUiItem
 import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsWidgetUiState
+import mega.privacy.mobile.home.presentation.home.widget.recents.view.DATE_HEADER_TEST_TAG
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.FIRST_LINE_TEST_TAG
+import mega.privacy.mobile.home.presentation.home.widget.recents.view.RECENTS_HIDDEN_BUTTON_TEST_TAG
+import mega.privacy.mobile.home.presentation.home.widget.recents.view.RECENTS_HIDDEN_TEXT_TEST_TAG
+import mega.privacy.mobile.home.presentation.home.widget.recents.view.RECENTS_MENU_TEST_TAG
+import mega.privacy.mobile.home.presentation.home.widget.recents.view.TITLE_TEST_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,11 +49,13 @@ class RecentsWidgetTest {
                         isLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
                 )
             }
         }
 
-        composeRule.onNodeWithTag(TITLE_TEST_TAG).assertExists()
+        composeRule.onNodeWithTag(TITLE_TEST_TAG).assertIsDisplayed()
     }
 
     @Test
@@ -73,6 +81,8 @@ class RecentsWidgetTest {
                         isLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
                 )
             }
         }
@@ -110,6 +120,8 @@ class RecentsWidgetTest {
                         isLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
                 )
             }
         }
@@ -141,14 +153,16 @@ class RecentsWidgetTest {
                         isLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
                 )
             }
         }
 
         composeRule.waitForIdle()
         // First item should always show a date header
-        composeRule.onNodeWithTag(FIRST_LINE_TEST_TAG, true).assertExists()
-        composeRule.onNodeWithTag(DATE_HEADER_TEST_TAG, true).assertExists()
+        composeRule.onNodeWithTag(FIRST_LINE_TEST_TAG, true).assertIsDisplayed()
+        composeRule.onNodeWithTag(DATE_HEADER_TEST_TAG, true).assertIsDisplayed()
     }
 
     @Test
@@ -182,6 +196,8 @@ class RecentsWidgetTest {
                         isLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
                 )
             }
         }
@@ -229,6 +245,8 @@ class RecentsWidgetTest {
                         isLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
                 )
             }
         }
@@ -269,6 +287,8 @@ class RecentsWidgetTest {
                         clickedNode = node
                         clickedSourceType = sourceType
                     },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
                 )
             }
         }
@@ -307,6 +327,8 @@ class RecentsWidgetTest {
                         clickedNode = node
                         clickedSourceType = sourceType
                     },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
                 )
             }
         }
@@ -346,6 +368,8 @@ class RecentsWidgetTest {
                         clickedNode = node
                         clickedSourceType = sourceType
                     },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
                 )
             }
         }
@@ -356,6 +380,107 @@ class RecentsWidgetTest {
 
         assertThat(clickedNode).isNull()
         assertThat(clickedSourceType).isNull()
+    }
+
+    @Test
+    fun `test that onWidgetOptionsClicked is called when menu button is clicked`() {
+        var optionsClicked = false
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsView(
+                    uiState = RecentsWidgetUiState(
+                        recentActionItems = emptyList(),
+                        isLoading = false,
+                    ),
+                    onFileClicked = { _, _ -> },
+                    onWidgetOptionsClicked = { optionsClicked = true },
+                    onShowRecentActivity = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(RECENTS_MENU_TEST_TAG).performClick()
+
+        assertThat(optionsClicked).isTrue()
+    }
+
+    @Test
+    fun `test that hidden view is displayed when isHideRecentsEnabled is true`() {
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsView(
+                    uiState = RecentsWidgetUiState(
+                        recentActionItems = emptyList(),
+                        isLoading = false,
+                        isHideRecentsEnabled = true,
+                    ),
+                    onFileClicked = { _, _ -> },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(RECENTS_HIDDEN_TEXT_TEST_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(RECENTS_HIDDEN_BUTTON_TEST_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that items are not displayed when isHideRecentsEnabled is true`() {
+        val item = createMockRecentsUiItem(
+            title = RecentActionTitleText.SingleNode("Document.pdf"),
+            parentFolderName = LocalizedText.Literal("Cloud Drive"),
+            timestamp = System.currentTimeMillis() / 1000,
+            icon = IconPackR.drawable.ic_generic_medium_solid,
+        )
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsView(
+                    uiState = RecentsWidgetUiState(
+                        recentActionItems = listOf(item),
+                        isLoading = false,
+                        isHideRecentsEnabled = true,
+                    ),
+                    onFileClicked = { _, _ -> },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(RECENTS_HIDDEN_TEXT_TEST_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+        composeRule.onAllNodesWithTag(FIRST_LINE_TEST_TAG, true)
+            .assertCountEquals(0)
+    }
+
+    @Test
+    fun `test that onShowRecentActivity is called when show activity button is clicked`() {
+        var showActivityClicked = false
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsView(
+                    uiState = RecentsWidgetUiState(
+                        recentActionItems = emptyList(),
+                        isLoading = false,
+                        isHideRecentsEnabled = true,
+                    ),
+                    onFileClicked = { _, _ -> },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = { showActivityClicked = true },
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(RECENTS_HIDDEN_BUTTON_TEST_TAG, useUnmergedTree = true)
+            .performClick()
+
+        assertThat(showActivityClicked).isTrue()
     }
 
     private fun createMockTypedFileNode(
