@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -103,7 +104,7 @@ fun VideoPlaylistDetailView(
     isStorageOverQuota: () -> Boolean,
     modifier: Modifier = Modifier,
     errorMessage: Int? = null,
-    scaffoldState: ScaffoldState = rememberScaffoldState()
+    scaffoldState: ScaffoldState = rememberScaffoldState(),
 ) {
     val items = playlist?.videos ?: emptyList()
     val lazyListState = rememberLazyListState()
@@ -174,7 +175,6 @@ fun VideoPlaylistDetailView(
 
     MegaScaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
-        scaffoldState = scaffoldState,
         scrollableContentState = lazyListState,
         topBar = {
             VideoPlaylistDetailTopBar(
@@ -281,7 +281,11 @@ fun VideoPlaylistDetailView(
             )
 
             else -> {
-                LazyColumn(state = lazyListState, modifier = modifier.padding(paddingValue)) {
+                LazyColumn(
+                    state = lazyListState,
+                    modifier = modifier.padding(paddingValue),
+                    contentPadding = PaddingValues(bottom = 150.dp)
+                ) {
                     item(
                         key = "header"
                     ) {

@@ -106,7 +106,6 @@ fun VideoRecentlyWatchedView(
 
     MegaScaffold(
         modifier = modifier.semantics { testTagsAsResourceId = true },
-        scaffoldState = scaffoldState,
         topBar = {
             MegaAppBar(
                 appBarType = AppBarType.BACK_NAVIGATION,

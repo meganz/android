@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.videosection.view.playlist
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
@@ -203,6 +204,7 @@ internal fun VideoPlaylistsView(
                         state = lazyListState,
                         totalItems = items.size,
                         modifier = modifier.semantics { testTagsAsResourceId = true },
+                        contentPadding = PaddingValues(bottom = 150.dp)
                     ) {
                         item(key = "header") {
                             HeaderViewItem(

@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -20,9 +21,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -38,6 +41,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
@@ -55,7 +59,6 @@ import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.qrcode.findActivity
-import mega.privacy.android.app.presentation.search.SEARCH_SCREEN_TRANSFERS_WIDGET_TEST_TAG
 import mega.privacy.android.app.presentation.search.navigation.contactArraySeparator
 import mega.privacy.android.app.presentation.search.navigation.searchForeignNodeDialog
 import mega.privacy.android.app.presentation.search.navigation.searchOverQuotaDialog
@@ -69,6 +72,7 @@ import mega.privacy.android.app.presentation.videosection.model.LocationFilterOp
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 import mega.privacy.android.app.presentation.videosection.view.VideoSectionScreen
+import mega.privacy.android.app.presentation.videosection.view.playlist.videoPlaylistDetailRoute
 import mega.privacy.android.app.presentation.videosection.view.videoSectionRoute
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
@@ -88,8 +92,11 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaFloatingActionButton
+import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -185,6 +192,12 @@ class VideoSectionActivity : PasscodeActivity(), ActionNodeCallback {
             val nodeActionState by nodeActionsViewModel.state.collectAsStateWithLifecycle()
             val bottomSheetNavigator = rememberBottomSheetNavigator()
             val navHostController = rememberNavController(bottomSheetNavigator)
+            val uiState by videoSectionViewModel.state.collectAsStateWithLifecycle()
+            val tabState by videoSectionViewModel.tabState.collectAsStateWithLifecycle()
+
+            val isAddFabShown = tabState.selectedTab == VideoSectionTab.Playlists ||
+                    (uiState.currentDestinationRoute == videoPlaylistDetailRoute &&
+                            uiState.currentVideoPlaylist?.isSystemVideoPlayer == false)
 
             val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
                 { OriginalTheme(isDark = mode.isDarkMode(), content = it) },
@@ -210,11 +223,28 @@ class VideoSectionActivity : PasscodeActivity(), ActionNodeCallback {
                             .semantics { testTagsAsResourceId = true },
                         scaffoldState = scaffoldState,
                         floatingActionButton = {
-                            TransfersWidget(
-                                modifier = Modifier
-                                    .navigationBarsPadding()
-                                    .testTag(SEARCH_SCREEN_TRANSFERS_WIDGET_TEST_TAG)
-                            )
+                            Column {
+                                TransfersWidget(
+                                    modifier = Modifier
+                                        .navigationBarsPadding()
+                                        .testTag(VIDEO_SECTION_SCREEN_TRANSFERS_WIDGET_TEST_TAG)
+                                )
+
+                                if (isAddFabShown) {
+                                    MegaFloatingActionButton(
+                                        onClick = { videoSectionViewModel.addFabButtonClicked() },
+                                        modifier = Modifier
+                                            .padding(top = 15.dp)
+                                            .testTag(tag = VIDEO_SECTION_SCREEN_ADD_FAB_TAG_TEST_TAG),
+                                    ) {
+                                        MegaIcon(
+                                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus),
+                                            contentDescription = null,
+                                            tint = IconColor.InverseAccent
+                                        )
+                                    }
+                                }
+                            }
                         },
                     ) { padding ->
                         ConstraintLayout(
@@ -528,5 +558,19 @@ class VideoSectionActivity : PasscodeActivity(), ActionNodeCallback {
                 Timber.e(it)
             }
         }
+    }
+
+    companion object {
+        /**
+         * video section screen transfers widget test tag
+         */
+        const val VIDEO_SECTION_SCREEN_TRANSFERS_WIDGET_TEST_TAG =
+            "video_section_screen:transfers_widget_view"
+
+        /**
+         * video section screen add floating button test tag
+         */
+        const val VIDEO_SECTION_SCREEN_ADD_FAB_TAG_TEST_TAG =
+            "video_section_screen:floating_action_button_add"
     }
 }
