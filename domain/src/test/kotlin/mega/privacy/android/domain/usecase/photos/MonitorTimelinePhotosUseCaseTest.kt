@@ -415,13 +415,13 @@ class MonitorTimelinePhotosUseCaseTest {
             on { isSensitiveInherited } doReturn false
         }
         val photoTodayResult = PhotoResult(photo = photoToday, isMarkedSensitive = false)
-        val photoYesterday = mock<Photo.Image> {
+        val photoLastMonth = mock<Photo.Image> {
             on { id } doReturn 2
-            on { modificationTime } doReturn now.minusDays(1)
+            on { modificationTime } doReturn now.minusMonths(1)
             on { isSensitive } doReturn false
             on { isSensitiveInherited } doReturn false
         }
-        val photoYesterdayResult = PhotoResult(photo = photoYesterday, isMarkedSensitive = false)
+        val photoLastMonthResult = PhotoResult(photo = photoLastMonth, isMarkedSensitive = false)
         val photoLastYear = mock<Photo.Image> {
             on { id } doReturn 3
             on { modificationTime } doReturn now.minusYears(1)
@@ -429,7 +429,7 @@ class MonitorTimelinePhotosUseCaseTest {
             on { isSensitiveInherited } doReturn false
         }
         val photoLastYearResult = PhotoResult(photo = photoLastYear, isMarkedSensitive = false)
-        val photos = listOf(photoTodayResult, photoYesterdayResult, photoLastYearResult)
+        val photos = listOf(photoTodayResult, photoLastMonthResult, photoLastYearResult)
 
         val actual = underTest.sortPhotos(
             isPaginationEnabled = false,
@@ -438,7 +438,7 @@ class MonitorTimelinePhotosUseCaseTest {
         )
 
         assertThat(actual.photosInDay.size).isEqualTo(3)
-        assertThat(actual.photosInMonth.size).isEqualTo(2)
+        assertThat(actual.photosInMonth.size).isEqualTo(3)
         assertThat(actual.photosInYear.size).isEqualTo(2)
         assertThat(actual.photosInDay[0]).isInstanceOf(PhotoDateResult.Day::class.java)
         assertThat(actual.photosInMonth[0]).isInstanceOf(PhotoDateResult.Month::class.java)
