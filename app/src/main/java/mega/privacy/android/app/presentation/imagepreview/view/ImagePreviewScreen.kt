@@ -534,7 +534,7 @@ private fun ImagePreviewContent(
                 val (progress, imagePath, fallbackImagePath) = imageResultTriple
 
                 val zoomableState = rememberZoomableState(
-                    zoomSpec = ZoomSpec(maxZoomFactor = Int.MAX_VALUE.toFloat())
+                    zoomSpec = ZoomSpec(maxZoomFactor = 10.0f)
                 )
                 SideEffect {
                     if (index != pagerState.currentPage) {

@@ -415,7 +415,7 @@ private fun SlideShowContent(
             onImageDownloadStatus(imageNode, isDownloaded)
 
             val zoomableState = rememberZoomableState(
-                zoomSpec = ZoomSpec(maxZoomFactor = Int.MAX_VALUE.toFloat())
+                zoomSpec = ZoomSpec(maxZoomFactor = 10.0f)
             )
             val imageState = rememberZoomableImageState(zoomableState)
             onCacheImageState(imageNode, imageState.zoomableState)
