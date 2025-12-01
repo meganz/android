@@ -609,11 +609,13 @@ class NodeOptionsActionViewModel @Inject constructor(
                                     LocalizedText.PluralsRes(
                                         resId = R.plurals.hidden_nodes_result_message,
                                         quantity = selectedNodes.size,
+                                        formatArgs = listOf(selectedNodes.size)
                                     )
                                 } else {
                                     LocalizedText.PluralsRes(
                                         resId = sharedResR.plurals.unhidden_nodes_result_message,
                                         quantity = selectedNodes.size,
+                                        formatArgs = listOf(selectedNodes.size)
                                     )
                                 }
                             )
