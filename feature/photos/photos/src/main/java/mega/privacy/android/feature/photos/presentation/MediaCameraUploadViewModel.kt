@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.StateEvent
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
@@ -25,6 +26,7 @@ import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.feature.photos.model.CameraUploadsStatus
 import mega.privacy.android.feature.photos.model.FilterMediaSource
+import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
@@ -399,5 +401,12 @@ class MediaCameraUploadViewModel @Inject constructor(
     internal fun shouldEnableCUPage(mediaSource: FilterMediaSource, show: Boolean) {
         val isShown = show && mediaSource != FilterMediaSource.CloudDrive
         _uiState.update { it.copy(enableCameraUploadPageShowing = isShown) }
+    }
+
+    internal suspend fun updateCUPageEnablementBasedOnDisplayedPhotos(photos: ImmutableList<PhotosNodeContentType>) {
+        runCatching { isCameraUploadsEnabledUseCase() }
+            .onSuccess { isCameraUploadsEnabled ->
+                _uiState.update { it.copy(enableCameraUploadPageShowing = photos.isEmpty() && !isCameraUploadsEnabled) }
+            }
     }
 }

@@ -45,6 +45,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.chip.MegaChip
@@ -83,8 +84,15 @@ internal fun TimelineTabRoute(
     onGridSizeChange: (value: TimelineGridSize) -> Unit,
     onSortDialogDismissed: () -> Unit,
     onSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
+    resetCUButtonAndProgress: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // Follow the same behavior as the existing code. We can improve this in phase 2.
+    LifecycleResumeEffect(Unit) {
+        resetCUButtonAndProgress()
+        onPauseOrDispose {}
+    }
+
     TimelineTabScreen(
         modifier = modifier,
         uiState = uiState,

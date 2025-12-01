@@ -2,6 +2,7 @@ package mega.privacy.android.feature.photos.presentation
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -19,6 +20,7 @@ import mega.privacy.android.domain.usecase.photos.SetCameraUploadShownUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.feature.photos.model.CameraUploadsStatus
+import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -31,6 +33,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.LocalDateTime
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -246,6 +249,46 @@ class MediaCameraUploadViewModelTest {
                 val item = expectMostRecentItem()
                 assertThat(item.enableCameraUploadButtonShowing).isTrue()
                 assertThat(item.cameraUploadsStatus).isEqualTo(CameraUploadsStatus.None)
+            }
+        }
+
+    @Test
+    fun `test that CU page is not displayed when the photos are not empty`() = runTest {
+        val photos = persistentListOf(
+            PhotosNodeContentType.HeaderItem(
+                time = LocalDateTime.now(),
+                shouldShowGridSizeSettings = true
+            )
+        )
+        whenever(isCameraUploadsEnabledUseCase()) doReturn false
+
+        underTest.updateCUPageEnablementBasedOnDisplayedPhotos(photos)
+
+        underTest.uiState.test {
+            assertThat(expectMostRecentItem().enableCameraUploadPageShowing).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that CU page is not displayed when the CU is enabled`() = runTest {
+        whenever(isCameraUploadsEnabledUseCase()) doReturn true
+
+        underTest.updateCUPageEnablementBasedOnDisplayedPhotos(persistentListOf())
+
+        underTest.uiState.test {
+            assertThat(expectMostRecentItem().enableCameraUploadPageShowing).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that CU page is displayed when the photos are empty and CU is not enabled`() =
+        runTest {
+            whenever(isCameraUploadsEnabledUseCase()) doReturn false
+
+            underTest.updateCUPageEnablementBasedOnDisplayedPhotos(persistentListOf())
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().enableCameraUploadPageShowing).isTrue()
             }
         }
 }

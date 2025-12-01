@@ -2,11 +2,13 @@
 
 package mega.privacy.android.feature.photos.presentation
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -26,6 +28,8 @@ import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
+import mega.privacy.android.feature.photos.model.FilterMediaSource
+import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.MediaAppBarAction
 import mega.privacy.android.feature.photos.model.MediaAppBarAction.CameraUpload.CameraUploadStatus
 import mega.privacy.android.feature.photos.model.MediaScreen
@@ -37,12 +41,15 @@ import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabRout
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSortOptions
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabViewModel
+import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineFilterView
+import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
 fun MediaMainRoute(
     navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
+    setNavigationItemVisibility: (Boolean) -> Unit,
     timelineViewModel: TimelineTabViewModel = hiltViewModel(),
     mediaCameraUploadViewModel: MediaCameraUploadViewModel = hiltViewModel(),
 ) {
@@ -50,6 +57,30 @@ fun MediaMainRoute(
     val timelineTabActionUiState by timelineViewModel.actionUiState.collectAsStateWithLifecycle()
     val timelineFilterUiState by timelineViewModel.filterUiState.collectAsStateWithLifecycle()
     val mediaCameraUploadUiState by mediaCameraUploadViewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(
+        timelineTabUiState.displayedPhotos,
+        timelineTabUiState.isLoading,
+    ) {
+        if (!timelineTabUiState.isLoading) {
+            mediaCameraUploadViewModel.updateCUPageEnablementBasedOnDisplayedPhotos(
+                photos = timelineTabUiState.displayedPhotos
+            )
+        }
+    }
+
+    LaunchedEffect(
+        mediaCameraUploadUiState.enableCameraUploadPageShowing,
+        timelineFilterUiState.mediaSource,
+        timelineTabUiState.isLoading,
+    ) {
+        if (!timelineTabUiState.isLoading) {
+            timelineViewModel.updateSortActionEnablement(
+                isEnableCameraUploadPageShowing = mediaCameraUploadUiState.enableCameraUploadPageShowing,
+                mediaSource = timelineFilterUiState.mediaSource
+            )
+        }
+    }
 
     MediaMainScreen(
         timelineTabUiState = timelineTabUiState,
@@ -76,7 +107,10 @@ fun MediaMainRoute(
             )
         },
         onTimelineSortOptionChange = timelineViewModel::onSortOptionsChange,
-        loadTimelineNextPage = timelineViewModel::loadNextPage
+        loadTimelineNextPage = timelineViewModel::loadNextPage,
+        onTimelineApplyFilterClick = timelineViewModel::onFilterChange,
+        setNavigationItemVisibility = setNavigationItemVisibility,
+        resetCUButtonAndProgress = mediaCameraUploadViewModel::resetCUButtonAndProgress
     )
 }
 
@@ -90,12 +124,21 @@ fun MediaMainScreen(
     onTimelineGridSizeChange: (value: TimelineGridSize) -> Unit,
     onTimelineSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
     loadTimelineNextPage: () -> Unit,
+    onTimelineApplyFilterClick: (request: TimelineFilterRequest) -> Unit,
+    setNavigationItemVisibility: (Boolean) -> Unit,
+    resetCUButtonAndProgress: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MediaMainViewModel = hiltViewModel(),
     navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
 ) {
     var currentTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showTimelineSortDialog by rememberSaveable { mutableStateOf(false) }
+    var showTimelineFilter by rememberSaveable { mutableStateOf(false) }
+
+    BackHandler(enabled = showTimelineFilter) {
+        showTimelineFilter = false
+        setNavigationItemVisibility(true)
+    }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier.fillMaxSize(),
@@ -126,6 +169,22 @@ fun MediaMainScreen(
 
                     // Menu actions for timeline tab
                     if (currentTabIndex == MediaScreen.Timeline.ordinal) {
+                        val isFilterApplied =
+                            timelineFilterUiState.mediaType != FilterMediaType.ALL_MEDIA || timelineFilterUiState.mediaSource != FilterMediaSource.AllPhotos
+                        if (isFilterApplied) {
+                            add(
+                                MenuActionWithClick(menuAction = MediaAppBarAction.Filter) {
+                                    showTimelineFilter = true
+                                }
+                            )
+                        }
+
+                        add(
+                            MenuActionWithClick(menuAction = MediaAppBarAction.FilterSecondary) {
+                                showTimelineFilter = true
+                            }
+                        )
+
                         if (timelineTabActionUiState.enableSort) {
                             add(
                                 MenuActionWithClick(menuAction = MediaAppBarAction.SortBy) {
@@ -174,12 +233,30 @@ fun MediaMainScreen(
                                         showTimelineSortDialog = false
                                     },
                                     loadTimelineNextPage = loadTimelineNextPage,
+                                    resetCUButtonAndProgress = resetCUButtonAndProgress
                                 )
                             }
                         )
                     }
                 }
             }
+        )
+    }
+
+    if (showTimelineFilter) {
+        setNavigationItemVisibility(false)
+        TimelineFilterView(
+            modifier = Modifier.fillMaxSize(),
+            currentFilter = timelineFilterUiState,
+            onApplyFilterClick = { request ->
+                onTimelineApplyFilterClick(request)
+                showTimelineFilter = false
+                setNavigationItemVisibility(true)
+            },
+            onClose = {
+                showTimelineFilter = false
+                setNavigationItemVisibility(true)
+            },
         )
     }
 }
@@ -205,6 +282,7 @@ private fun MediaScreen.MediaContent(
     onTimelineSortDialogDismissed: () -> Unit,
     onTimelineSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
     loadTimelineNextPage: () -> Unit,
+    resetCUButtonAndProgress: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
@@ -227,6 +305,7 @@ private fun MediaScreen.MediaContent(
                 onGridSizeChange = onTimelineGridSizeChange,
                 onSortDialogDismissed = onTimelineSortDialogDismissed,
                 onSortOptionChange = onTimelineSortOptionChange,
+                resetCUButtonAndProgress = resetCUButtonAndProgress
             )
         }
 
@@ -261,7 +340,10 @@ fun PhotosMainScreenPreview() {
             setEnableCUPage = {},
             onTimelineGridSizeChange = {},
             onTimelineSortOptionChange = {},
-            loadTimelineNextPage = {}
+            loadTimelineNextPage = {},
+            onTimelineApplyFilterClick = {},
+            setNavigationItemVisibility = {},
+            resetCUButtonAndProgress = {}
         )
     }
 }

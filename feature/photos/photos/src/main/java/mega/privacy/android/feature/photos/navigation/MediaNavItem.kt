@@ -21,7 +21,10 @@ class MediaNavItem : MainNavItem {
     override val destination: MainNavItemNavKey = MediaMainNavKey
     override val screen: EntryProviderScope<NavKey>.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
         { navigationHandler, navigationController, transferHandler ->
-            mediaMainRoute(navigationHandler = navigationHandler)
+            mediaMainRoute(
+                navigationHandler = navigationHandler,
+                setNavigationItemVisibility = navigationController::showNavigation
+            )
         }
     override val icon: ImageVector = IconPack.Medium.Thin.Outline.Image01
     override val selectedIcon: ImageVector = IconPack.Medium.Thin.Solid.Image01

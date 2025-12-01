@@ -27,12 +27,12 @@ import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.mapper.TimelineFilterUiStateMapper
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLocationValue
-import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.FilterMediaType.Companion.toMediaTypeValue
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotosNodeListCardMapper
+import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
@@ -267,17 +267,13 @@ class TimelineTabViewModel @Inject constructor(
         actionFlow.update { it.copy(enableSort = true) }
     }
 
-    internal fun onFilterChange(
-        isRemembered: Boolean,
-        mediaType: FilterMediaType,
-        mediaSource: FilterMediaSource,
-    ) {
+    internal fun onFilterChange(request: TimelineFilterRequest) {
         viewModelScope.launch {
             runCatching {
                 val newPreferences = mapOf(
-                    TimelinePreferencesJSON.JSON_KEY_REMEMBER_PREFERENCES.value to isRemembered.toString(),
-                    TimelinePreferencesJSON.JSON_KEY_MEDIA_TYPE.value to mediaType.toMediaTypeValue(),
-                    TimelinePreferencesJSON.JSON_KEY_LOCATION.value to mediaSource.toLocationValue(),
+                    TimelinePreferencesJSON.JSON_KEY_REMEMBER_PREFERENCES.value to request.isRemembered.toString(),
+                    TimelinePreferencesJSON.JSON_KEY_MEDIA_TYPE.value to request.mediaType.toMediaTypeValue(),
+                    TimelinePreferencesJSON.JSON_KEY_LOCATION.value to request.mediaSource.toLocationValue(),
                 )
                 setTimelineFilterPreferencesUseCase(newPreferences)
                 newPreferences

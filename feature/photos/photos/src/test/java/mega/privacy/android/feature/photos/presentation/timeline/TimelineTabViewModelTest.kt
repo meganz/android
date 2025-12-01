@@ -30,6 +30,7 @@ import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotosNodeListCardMapper
+import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -745,9 +746,11 @@ class TimelineTabViewModelTest {
             whenever(getTimelineFilterPreferencesUseCase()) doReturn preferenceMap
 
             underTest.onFilterChange(
-                isRemembered = isRemembered,
-                mediaType = mediaType,
-                mediaSource = mediaSource
+                TimelineFilterRequest(
+                    isRemembered = isRemembered,
+                    mediaType = mediaType,
+                    mediaSource = mediaSource
+                )
             )
 
             underTest.filterUiState.test { cancelAndConsumeRemainingEvents() }

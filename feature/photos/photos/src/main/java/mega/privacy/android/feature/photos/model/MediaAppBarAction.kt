@@ -76,4 +76,25 @@ sealed interface MediaAppBarAction : MenuAction {
     ), MediaAppBarAction {
         override val orderInCategory: Int = 110
     }
+
+    data object Filter : MenuActionWithIcon, MediaAppBarAction {
+
+        override val orderInCategory: Int = 75
+
+        override val testTag: String = "media_app_bar:filter"
+
+        @Composable
+        override fun getDescription(): String = "Filter"
+
+        @Composable
+        override fun getIconPainter(): Painter =
+            rememberVectorPainter(IconPack.Medium.Thin.Outline.Filter)
+    }
+
+    data object FilterSecondary : MenuActionWithoutIcon(
+        testTag = "media_app_bar:filter_secondary",
+        descriptionRes = sharedResR.string.timeline_tab_filter_text
+    ), MediaAppBarAction {
+        override val orderInCategory: Int = 105
+    }
 }

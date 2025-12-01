@@ -21,9 +21,13 @@ import mega.privacy.android.navigation.destination.MediaMainNavKey
 
 fun EntryProviderScope<NavKey>.mediaMainRoute(
     navigationHandler: NavigationHandler,
+    setNavigationItemVisibility: (Boolean) -> Unit,
 ) {
     entry<MediaMainNavKey> {
-        MediaMainRoute(navigateToAlbumContent = navigationHandler::navigate)
+        MediaMainRoute(
+            navigateToAlbumContent = navigationHandler::navigate,
+            setNavigationItemVisibility = setNavigationItemVisibility
+        )
     }
 }
 
