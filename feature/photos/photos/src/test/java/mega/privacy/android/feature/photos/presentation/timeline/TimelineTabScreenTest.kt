@@ -9,7 +9,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
-import mega.privacy.android.feature.photos.presentation.MediaFilterUiState
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -53,7 +52,7 @@ class TimelineTabScreenTest {
     private fun ComposeContentTestRule.setScreen(
         uiState: TimelineTabUiState = TimelineTabUiState(),
         mediaCameraUploadUiState: MediaCameraUploadUiState = MediaCameraUploadUiState(),
-        mediaFilterUiState: MediaFilterUiState = MediaFilterUiState(),
+        timelineFilterUiState: TimelineFilterUiState = TimelineFilterUiState(),
         showTimelineSortDialog: Boolean = false,
         clearCameraUploadsMessage: () -> Unit = {},
         clearCameraUploadsCompletedMessage: () -> Unit = {},
@@ -70,7 +69,7 @@ class TimelineTabScreenTest {
             TimelineTabScreen(
                 uiState = uiState,
                 mediaCameraUploadUiState = mediaCameraUploadUiState,
-                mediaFilterUiState = mediaFilterUiState,
+                timelineFilterUiState = timelineFilterUiState,
                 showTimelineSortDialog = showTimelineSortDialog,
                 clearCameraUploadsMessage = clearCameraUploadsMessage,
                 clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,

@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoDateResult
 import mega.privacy.android.domain.entity.photos.PhotoResult
 import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
+import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -32,6 +33,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
+import kotlin.random.Random
 
 @Suppress("UnusedFlow")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -444,4 +446,61 @@ class MonitorTimelinePhotosUseCaseTest {
         assertThat(actual.photosInMonth[0]).isInstanceOf(PhotoDateResult.Month::class.java)
         assertThat(actual.photosInYear[0]).isInstanceOf(PhotoDateResult.Year::class.java)
     }
+
+    @Test
+    fun `test that sensitive photos are successfully filtered with the new filter when hidden nodes flag is active`() =
+        runTest(dispatcher) {
+            val isRemembered = Random.nextBoolean()
+            val mediaType = "images"
+            val mediaSource = "cloudDrive"
+            val newFilter = mapOf(
+                TimelinePreferencesJSON.JSON_KEY_REMEMBER_PREFERENCES.value to isRemembered.toString(),
+                TimelinePreferencesJSON.JSON_KEY_MEDIA_TYPE.value to mediaType,
+                TimelinePreferencesJSON.JSON_KEY_LOCATION.value to mediaSource,
+            )
+            whenever(getTimelineFilterPreferencesUseCase()) doReturn mapOf(
+                TimelinePreferencesJSON.JSON_KEY_REMEMBER_PREFERENCES.value to "false",
+                TimelinePreferencesJSON.JSON_KEY_MEDIA_TYPE.value to mediaType,
+                TimelinePreferencesJSON.JSON_KEY_LOCATION.value to mediaSource,
+            )
+            val request = TimelinePhotosRequest(
+                isPaginationEnabled = false,
+                selectedFilterFlow = flowOf(newFilter)
+            )
+            val accountLevelDetail = mock<AccountLevelDetail> {
+                on { accountType } doReturn AccountType.PRO_III
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { levelDetail } doReturn accountLevelDetail
+            }
+            val now = LocalDateTime.now()
+            val photo1Id = 1L
+            val photo1 = mock<Photo.Image> {
+                on { id } doReturn photo1Id
+                on { modificationTime } doReturn now.minusDays(1)
+                on { isSensitive } doReturn false
+                on { isSensitiveInherited } doReturn false
+            }
+            val photo2Id = 2L
+            val photo2 = mock<Photo.Image> {
+                on { id } doReturn photo2Id
+                on { modificationTime } doReturn now.minusDays(2)
+                on { isSensitive } doReturn true
+                on { isSensitiveInherited } doReturn false
+            }
+            val photo3Id = 3L
+            val photo3 = mock<Photo.Video> {
+                on { id } doReturn photo3Id
+                on { modificationTime } doReturn now.minusDays(3)
+                on { isSensitive } doReturn false
+                on { isSensitiveInherited } doReturn true
+            }
+            val allPhotosList = listOf(photo1, photo2, photo3)
+            whenever(getTimelinePhotosUseCase()) doReturn flowOf(allPhotosList)
+            whenever(monitorShowHiddenItemsUseCase()) doReturn flowOf(false)
+            whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
+
+            underTest(request = request).test { cancelAndConsumeRemainingEvents() }
+            verify(getCloudDrivePhotos).invoke(source = allPhotosList)
+        }
 }

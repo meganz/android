@@ -17,11 +17,18 @@ import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoResult
 import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
+import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.entity.photos.TimelineSortedPhotosResult
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelinePhotosUseCase
+import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
+import mega.privacy.android.feature.photos.mapper.TimelineFilterUiStateMapper
 import mega.privacy.android.feature.photos.model.FilterMediaSource
+import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLocationValue
+import mega.privacy.android.feature.photos.model.FilterMediaType
+import mega.privacy.android.feature.photos.model.FilterMediaType.Companion.toMediaTypeValue
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.model.TimelineGridSize
@@ -38,18 +45,14 @@ class TimelineTabViewModel @Inject constructor(
     private val photoUiStateMapper: PhotoUiStateMapper,
     private val fileTypeIconMapper: FileTypeIconMapper,
     private val photosNodeListCardMapper: PhotosNodeListCardMapper,
+    private val getTimelineFilterPreferencesUseCase: GetTimelineFilterPreferencesUseCase,
+    private val setTimelineFilterPreferencesUseCase: SetTimelineFilterPreferencesUseCase,
+    private val timelineFilterUiStateMapper: TimelineFilterUiStateMapper,
 ) : ViewModel() {
 
     private val gridSizeFlow = MutableStateFlow(TimelineGridSize.Default)
     private val sortOptionsFlow = MutableStateFlow(TimelineTabSortOptions.Newest)
     private val selectedPhotoIdsFlow = MutableStateFlow<List<Long>>(emptyList())
-
-    internal val uiState: StateFlow<TimelineTabUiState> by lazy {
-        timelineTabUiState().asUiStateFlow(
-            scope = viewModelScope,
-            initialValue = TimelineTabUiState()
-        )
-    }
 
     private val actionFlow = MutableStateFlow(TimelineTabActionUiState())
     internal val actionUiState: StateFlow<TimelineTabActionUiState> by lazy {
@@ -59,12 +62,37 @@ class TimelineTabViewModel @Inject constructor(
         )
     }
 
+    private val selectedFilterFlow = MutableStateFlow<Map<String, String?>?>(null)
+    internal val filterUiState: StateFlow<TimelineFilterUiState> by lazy {
+        combine(
+            flow { emit(getTimelineFilterPreferencesUseCase()) },
+            selectedFilterFlow,
+            ::Pair
+        ).map { (preferenceMap, newFilter) ->
+            timelineFilterUiStateMapper(
+                preferenceMap = newFilter ?: preferenceMap,
+                shouldApplyFilterFromPreference = newFilter != null
+            )
+        }.asUiStateFlow(
+            scope = viewModelScope,
+            initialValue = TimelineFilterUiState()
+        )
+    }
+
+    internal val uiState: StateFlow<TimelineTabUiState> by lazy {
+        timelineTabUiState().asUiStateFlow(
+            scope = viewModelScope,
+            initialValue = TimelineTabUiState()
+        )
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun timelineTabUiState() =
         flow { emit(isPaginationEnabled()) }
             .map { isPaginationEnabled ->
                 TimelinePhotosRequest(
-                    isPaginationEnabled = isPaginationEnabled
+                    isPaginationEnabled = isPaginationEnabled,
+                    selectedFilterFlow = selectedFilterFlow
                 )
             }
             .flatMapLatest(::monitorPhotos)
@@ -220,7 +248,7 @@ class TimelineTabViewModel @Inject constructor(
         }
     }
 
-    private fun updateSortActionEnablement(
+    internal fun updateSortActionEnablement(
         isEnableCameraUploadPageShowing: Boolean,
         mediaSource: FilterMediaSource,
     ) {
@@ -237,5 +265,27 @@ class TimelineTabViewModel @Inject constructor(
 
     private fun enableSortToolbarMenuAction() {
         actionFlow.update { it.copy(enableSort = true) }
+    }
+
+    internal fun onFilterChange(
+        isRemembered: Boolean,
+        mediaType: FilterMediaType,
+        mediaSource: FilterMediaSource,
+    ) {
+        viewModelScope.launch {
+            runCatching {
+                val newPreferences = mapOf(
+                    TimelinePreferencesJSON.JSON_KEY_REMEMBER_PREFERENCES.value to isRemembered.toString(),
+                    TimelinePreferencesJSON.JSON_KEY_MEDIA_TYPE.value to mediaType.toMediaTypeValue(),
+                    TimelinePreferencesJSON.JSON_KEY_LOCATION.value to mediaSource.toLocationValue(),
+                )
+                setTimelineFilterPreferencesUseCase(newPreferences)
+                newPreferences
+            }.onSuccess { newPreferences ->
+                selectedFilterFlow.update { newPreferences }
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
     }
 }

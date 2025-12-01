@@ -59,7 +59,6 @@ import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
-import mega.privacy.android.feature.photos.presentation.MediaFilterUiState
 import mega.privacy.android.feature.photos.presentation.component.PhotosNodeGridView
 import mega.privacy.android.feature.photos.presentation.timeline.component.EnableCameraUploadsContent
 import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosNodeListCardListView
@@ -72,7 +71,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 internal fun TimelineTabRoute(
     uiState: TimelineTabUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
-    mediaFilterUiState: MediaFilterUiState,
+    timelineFilterUiState: TimelineFilterUiState,
     showTimelineSortDialog: Boolean,
     clearCameraUploadsMessage: () -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
@@ -89,7 +88,7 @@ internal fun TimelineTabRoute(
     TimelineTabScreen(
         modifier = modifier,
         uiState = uiState,
-        mediaFilterUiState = mediaFilterUiState,
+        timelineFilterUiState = timelineFilterUiState,
         mediaCameraUploadUiState = mediaCameraUploadUiState,
         showTimelineSortDialog = showTimelineSortDialog,
         clearCameraUploadsMessage = clearCameraUploadsMessage,
@@ -101,7 +100,7 @@ internal fun TimelineTabRoute(
         setEnableCUPage = setEnableCUPage,
         onGridSizeChange = onGridSizeChange,
         onSortDialogDismissed = onSortDialogDismissed,
-        onSortOptionChange = onSortOptionChange
+        onSortOptionChange = onSortOptionChange,
     )
 }
 
@@ -109,7 +108,7 @@ internal fun TimelineTabRoute(
 internal fun TimelineTabScreen(
     uiState: TimelineTabUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
-    mediaFilterUiState: MediaFilterUiState,
+    timelineFilterUiState: TimelineFilterUiState,
     showTimelineSortDialog: Boolean,
     clearCameraUploadsMessage: () -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
@@ -144,7 +143,7 @@ internal fun TimelineTabScreen(
         }
     }
     val showEnableCUPage = mediaCameraUploadUiState.enableCameraUploadPageShowing
-            && mediaFilterUiState.mediaSource != FilterMediaSource.CloudDrive
+            && timelineFilterUiState.mediaSource != FilterMediaSource.CloudDrive
 
     LaunchedEffect(mediaCameraUploadUiState.cameraUploadsMessage) {
         if (mediaCameraUploadUiState.cameraUploadsMessage.isNotEmpty()) {
@@ -225,7 +224,7 @@ internal fun TimelineTabScreen(
         uiState.displayedPhotos.isEmpty() -> {
             EmptyBody(
                 enableCameraUploadButtonShowing = mediaCameraUploadUiState.enableCameraUploadButtonShowing,
-                mediaSource = mediaFilterUiState.mediaSource,
+                mediaSource = timelineFilterUiState.mediaSource,
                 setEnableCUPage = setEnableCUPage,
             )
         }
@@ -306,6 +305,7 @@ private fun TimelineTabContent(
                 PhotosNodeGridView(
                     modifier = Modifier.fillMaxSize(),
                     lazyGridState = lazyGridState,
+                    contentPadding = PaddingValues(top = 8.dp),
                     items = uiState.displayedPhotos,
                     gridSize = uiState.gridSize,
                     onGridSizeChange = onGridSizeChange,
@@ -451,7 +451,7 @@ private fun TimelineTabScreenPreview() {
             modifier = Modifier.fillMaxSize(),
             uiState = TimelineTabUiState(isLoading = false),
             mediaCameraUploadUiState = MediaCameraUploadUiState(),
-            mediaFilterUiState = MediaFilterUiState(),
+            timelineFilterUiState = TimelineFilterUiState(),
             showTimelineSortDialog = false,
             clearCameraUploadsMessage = {},
             clearCameraUploadsCompletedMessage = {},
@@ -462,7 +462,7 @@ private fun TimelineTabScreenPreview() {
             onNavigateCameraUploadsSettings = {},
             onGridSizeChange = {},
             onSortDialogDismissed = {},
-            onSortOptionChange = {}
+            onSortOptionChange = {},
         )
     }
 }

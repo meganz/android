@@ -14,11 +14,18 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoResult
 import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
 import mega.privacy.android.domain.entity.photos.TimelinePhotosResult
+import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.entity.photos.TimelineSortedPhotosResult
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelinePhotosUseCase
+import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
+import mega.privacy.android.feature.photos.mapper.TimelineFilterUiStateMapper
 import mega.privacy.android.feature.photos.model.FilterMediaSource
+import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLocationValue
+import mega.privacy.android.feature.photos.model.FilterMediaType
+import mega.privacy.android.feature.photos.model.FilterMediaType.Companion.toMediaTypeValue
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.model.TimelineGridSize
@@ -34,12 +41,14 @@ import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.isA
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
+import kotlin.random.Random
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -52,6 +61,9 @@ class TimelineTabViewModelTest {
     private val photoUiStateMapper: PhotoUiStateMapper = mock()
     private val fileTypeIconMapper: FileTypeIconMapper = mock()
     private val photosNodeListCardMapper: PhotosNodeListCardMapper = mock()
+    private val getTimelineFilterPreferencesUseCase: GetTimelineFilterPreferencesUseCase = mock()
+    private val setTimelineFilterPreferencesUseCase: SetTimelineFilterPreferencesUseCase = mock()
+    private val timelineFilterUiStateMapper: TimelineFilterUiStateMapper = mock()
 
     @BeforeEach
     fun setup() {
@@ -60,7 +72,10 @@ class TimelineTabViewModelTest {
             monitorTimelinePhotosUseCase = monitorTimelinePhotosUseCase,
             photoUiStateMapper = photoUiStateMapper,
             fileTypeIconMapper = fileTypeIconMapper,
-            photosNodeListCardMapper = photosNodeListCardMapper
+            photosNodeListCardMapper = photosNodeListCardMapper,
+            getTimelineFilterPreferencesUseCase = getTimelineFilterPreferencesUseCase,
+            setTimelineFilterPreferencesUseCase = setTimelineFilterPreferencesUseCase,
+            timelineFilterUiStateMapper = timelineFilterUiStateMapper
         )
     }
 
@@ -71,7 +86,10 @@ class TimelineTabViewModelTest {
             monitorTimelinePhotosUseCase,
             photoUiStateMapper,
             fileTypeIconMapper,
-            photosNodeListCardMapper
+            photosNodeListCardMapper,
+            getTimelineFilterPreferencesUseCase,
+            setTimelineFilterPreferencesUseCase,
+            timelineFilterUiStateMapper
         )
     }
 
@@ -128,8 +146,7 @@ class TimelineTabViewModelTest {
             assertThat(item.allPhotos.size).isEqualTo(2)
             assertThat(item.isPaginationEnabled).isTrue()
         }
-        val expectedRequest = TimelinePhotosRequest(isPaginationEnabled = true)
-        verify(monitorTimelinePhotosUseCase).invoke(expectedRequest)
+        verify(monitorTimelinePhotosUseCase).invoke(isA<TimelinePhotosRequest>())
         verify(monitorTimelinePhotosUseCase).sortPhotos(
             isPaginationEnabled = true,
             photos = photosResult.nonSensitivePhotos,
@@ -698,5 +715,46 @@ class TimelineTabViewModelTest {
             underTest.actionUiState.test {
                 assertThat(expectMostRecentItem().enableSort).isTrue()
             }
+        }
+
+    @Test
+    fun `test that the default filter preference map values are used to set the filter when no new filter is applied`() =
+        runTest {
+            val preferenceMap = mapOf<String, String?>()
+            whenever(getTimelineFilterPreferencesUseCase()) doReturn preferenceMap
+
+            underTest.filterUiState.test { cancelAndConsumeRemainingEvents() }
+            verify(timelineFilterUiStateMapper).invoke(
+                preferenceMap = preferenceMap,
+                shouldApplyFilterFromPreference = false
+            )
+        }
+
+    @Test
+    fun `test that the new filter values are used to set the filter when a new filter is applied`() =
+        runTest {
+            val preferenceMap = mapOf<String, String?>()
+            val isRemembered = Random.nextBoolean()
+            val mediaType = FilterMediaType.entries.random()
+            val mediaSource = FilterMediaSource.entries.random()
+            val newFilter = mapOf(
+                TimelinePreferencesJSON.JSON_KEY_REMEMBER_PREFERENCES.value to isRemembered.toString(),
+                TimelinePreferencesJSON.JSON_KEY_MEDIA_TYPE.value to mediaType.toMediaTypeValue(),
+                TimelinePreferencesJSON.JSON_KEY_LOCATION.value to mediaSource.toLocationValue(),
+            )
+            whenever(getTimelineFilterPreferencesUseCase()) doReturn preferenceMap
+
+            underTest.onFilterChange(
+                isRemembered = isRemembered,
+                mediaType = mediaType,
+                mediaSource = mediaSource
+            )
+
+            underTest.filterUiState.test { cancelAndConsumeRemainingEvents() }
+            verify(timelineFilterUiStateMapper).invoke(
+                preferenceMap = newFilter,
+                shouldApplyFilterFromPreference = true
+            )
+            verify(setTimelineFilterPreferencesUseCase).invoke(newFilter)
         }
 }

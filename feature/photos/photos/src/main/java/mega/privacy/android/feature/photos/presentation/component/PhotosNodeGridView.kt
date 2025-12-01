@@ -10,6 +10,7 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -88,6 +89,7 @@ fun PhotosNodeGridView(
     onLongClick: (node: PhotoNodeUiState) -> Unit,
     modifier: Modifier = Modifier,
     lazyGridState: LazyGridState = rememberLazyGridState(),
+    contentPadding: PaddingValues = PaddingValues(),
     header: (@Composable () -> Unit)? = null,
 ) {
     val scope = rememberCoroutineScope()
@@ -136,6 +138,7 @@ fun PhotosNodeGridView(
                     }
                 }
             ),
+        contentPadding = contentPadding,
         state = lazyGridState,
         tooltipText = { index ->
             val item = items.getOrNull(index)
@@ -201,7 +204,7 @@ fun PhotosNodeGridView(
                         node = contentType.node,
                         isPreview = isPreview,
                         isSelected = contentType.node.isSelected,
-                        shouldShowFavourite = contentType.node.photo.isFavourite && latestGridSize <= TimelineGridSize.Default
+                        shouldShowFavourite = contentType.node.photo.isFavourite
                     )
                 }
             }

@@ -71,11 +71,13 @@ class MonitorTimelinePhotosUseCase @Inject constructor(
         return combine(
             flow = timelinePhotoSource,
             flow2 = showHiddenItemsSource,
-            flow3 = accountDetailSource
-        ) { photos, showHiddenItems, accountDetail ->
+            flow3 = accountDetailSource,
+            flow4 = request.selectedFilterFlow
+        ) { photos, showHiddenItems, accountDetail, newFilter ->
             photos.toGetAndMonitorTimelinePhotosResult(
                 showHiddenItems = showHiddenItems,
                 accountDetail = accountDetail,
+                shouldApplyFilterFromPreference = newFilter != null
             )
         }.flowOn(ioDispatcher)
     }
@@ -83,6 +85,7 @@ class MonitorTimelinePhotosUseCase @Inject constructor(
     private suspend fun List<Photo>.toGetAndMonitorTimelinePhotosResult(
         showHiddenItems: Boolean?,
         accountDetail: AccountDetail?,
+        shouldApplyFilterFromPreference: Boolean,
     ): TimelinePhotosResult = withContext(defaultDispatcher) {
         val accountType = accountDetail?.levelDetail?.accountType
         val isPaidAccount = accountType?.isPaid
@@ -95,7 +98,8 @@ class MonitorTimelinePhotosUseCase @Inject constructor(
             this@toGetAndMonitorTimelinePhotosResult.toPhotoResult(shouldBeMarkedSensitive = shouldBeMarkedSensitive)
         val filteredByMediaType = filterByMediaType(
             photos = allPhotos,
-            shouldBeMarkedSensitive = shouldBeMarkedSensitive
+            shouldBeMarkedSensitive = shouldBeMarkedSensitive,
+            shouldApplyFilterFromPreference = shouldApplyFilterFromPreference
         )
         val nonSensitivePhotos = filterNonSensitivePhotos(
             showHiddenItems = showHiddenItems,
@@ -111,13 +115,14 @@ class MonitorTimelinePhotosUseCase @Inject constructor(
 
     private suspend fun filterByMediaType(
         shouldBeMarkedSensitive: Boolean,
+        shouldApplyFilterFromPreference: Boolean,
         photos: List<PhotoResult>,
     ): List<PhotoResult> {
         return runCatching {
             getTimelineFilterPreferencesUseCase()?.let { preferences ->
                 val arePreferencesRemembered =
                     preferences[TimelinePreferencesJSON.JSON_KEY_REMEMBER_PREFERENCES.value].toBoolean()
-                if (arePreferencesRemembered) {
+                if (arePreferencesRemembered || shouldApplyFilterFromPreference) {
                     val mediaType = preferences[TimelinePreferencesJSON.JSON_KEY_MEDIA_TYPE.value]
                         ?: TimelinePreferencesJSON.JSON_VAL_MEDIA_TYPE_ALL_MEDIA.value
                     val mediaSource = preferences[TimelinePreferencesJSON.JSON_KEY_LOCATION.value]

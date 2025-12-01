@@ -31,6 +31,7 @@ import mega.privacy.android.feature.photos.model.MediaAppBarAction.CameraUpload.
 import mega.privacy.android.feature.photos.model.MediaScreen
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabRoute
+import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabActionUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabRoute
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSortOptions
@@ -44,27 +45,26 @@ fun MediaMainRoute(
     navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
     timelineViewModel: TimelineTabViewModel = hiltViewModel(),
     mediaCameraUploadViewModel: MediaCameraUploadViewModel = hiltViewModel(),
-    mediaFilterViewModel: MediaFilterViewModel = hiltViewModel(),
 ) {
     val timelineTabUiState by timelineViewModel.uiState.collectAsStateWithLifecycle()
     val timelineTabActionUiState by timelineViewModel.actionUiState.collectAsStateWithLifecycle()
+    val timelineFilterUiState by timelineViewModel.filterUiState.collectAsStateWithLifecycle()
     val mediaCameraUploadUiState by mediaCameraUploadViewModel.uiState.collectAsStateWithLifecycle()
-    val mediaFilterUiState by mediaFilterViewModel.uiState.collectAsStateWithLifecycle()
 
     MediaMainScreen(
         timelineTabUiState = timelineTabUiState,
         timelineTabActionUiState = timelineTabActionUiState,
         mediaCameraUploadUiState = mediaCameraUploadUiState,
-        mediaFilterUiState = mediaFilterUiState,
+        timelineFilterUiState = timelineFilterUiState,
         navigateToAlbumContent = navigateToAlbumContent,
         setEnableCUPage = { shouldShow ->
             mediaCameraUploadViewModel.shouldEnableCUPage(
-                mediaSource = mediaFilterUiState.mediaSource,
+                mediaSource = timelineFilterUiState.mediaSource,
                 show = shouldShow
             )
             timelineViewModel.updateSortActionBasedOnCUPageEnablement(
                 isEnableCameraUploadPageShowing = mediaCameraUploadUiState.enableCameraUploadPageShowing,
-                mediaSource = mediaFilterUiState.mediaSource,
+                mediaSource = timelineFilterUiState.mediaSource,
                 isCUPageEnabled = shouldShow
             )
         },
@@ -72,7 +72,7 @@ fun MediaMainRoute(
             timelineViewModel.onGridSizeChange(
                 size = size,
                 isEnableCameraUploadPageShowing = mediaCameraUploadUiState.enableCameraUploadPageShowing,
-                mediaSource = mediaFilterUiState.mediaSource
+                mediaSource = timelineFilterUiState.mediaSource
             )
         },
         onTimelineSortOptionChange = timelineViewModel::onSortOptionsChange,
@@ -85,7 +85,7 @@ fun MediaMainScreen(
     timelineTabUiState: TimelineTabUiState,
     timelineTabActionUiState: TimelineTabActionUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
-    mediaFilterUiState: MediaFilterUiState,
+    timelineFilterUiState: TimelineFilterUiState,
     setEnableCUPage: (Boolean) -> Unit,
     onTimelineGridSizeChange: (value: TimelineGridSize) -> Unit,
     onTimelineSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
@@ -160,7 +160,7 @@ fun MediaMainScreen(
                                     modifier = Modifier.fillMaxSize(),
                                     mainViewModel = viewModel,
                                     timelineTabUiState = timelineTabUiState,
-                                    mediaFilterUiState = mediaFilterUiState,
+                                    timelineFilterUiState = timelineFilterUiState,
                                     mediaCameraUploadUiState = mediaCameraUploadUiState,
                                     showTimelineSortDialog = showTimelineSortDialog,
                                     navigateToAlbumContent = navigateToAlbumContent,
@@ -173,7 +173,7 @@ fun MediaMainScreen(
                                         onTimelineSortOptionChange(it)
                                         showTimelineSortDialog = false
                                     },
-                                    loadTimelineNextPage = loadTimelineNextPage
+                                    loadTimelineNextPage = loadTimelineNextPage,
                                 )
                             }
                         )
@@ -197,7 +197,7 @@ private fun MediaScreen.MediaContent(
     mainViewModel: MediaMainViewModel,
     timelineTabUiState: TimelineTabUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
-    mediaFilterUiState: MediaFilterUiState,
+    timelineFilterUiState: TimelineFilterUiState,
     showTimelineSortDialog: Boolean,
     navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
     setEnableCUPage: (Boolean) -> Unit,
@@ -215,7 +215,7 @@ private fun MediaScreen.MediaContent(
                 modifier = Modifier.fillMaxSize(),
                 uiState = timelineTabUiState,
                 mediaCameraUploadUiState = mediaCameraUploadUiState,
-                mediaFilterUiState = mediaFilterUiState,
+                timelineFilterUiState = timelineFilterUiState,
                 showTimelineSortDialog = showTimelineSortDialog,
                 clearCameraUploadsMessage = {},
                 clearCameraUploadsCompletedMessage = {},
@@ -226,7 +226,7 @@ private fun MediaScreen.MediaContent(
                 setEnableCUPage = setEnableCUPage,
                 onGridSizeChange = onTimelineGridSizeChange,
                 onSortDialogDismissed = onTimelineSortDialogDismissed,
-                onSortOptionChange = onTimelineSortOptionChange
+                onSortOptionChange = onTimelineSortOptionChange,
             )
         }
 
@@ -255,8 +255,8 @@ fun PhotosMainScreenPreview() {
         MediaMainScreen(
             timelineTabUiState = TimelineTabUiState(),
             timelineTabActionUiState = TimelineTabActionUiState(),
+            timelineFilterUiState = TimelineFilterUiState(),
             mediaCameraUploadUiState = MediaCameraUploadUiState(),
-            mediaFilterUiState = MediaFilterUiState(),
             navigateToAlbumContent = {},
             setEnableCUPage = {},
             onTimelineGridSizeChange = {},

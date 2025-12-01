@@ -4,6 +4,8 @@ import androidx.annotation.StringRes
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.feature.photos.model.FilterMediaSource
+import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.model.TimelineGridSize
@@ -40,3 +42,9 @@ enum class TimelineTabSortOptions(
         sortOrder = SortOrder.ORDER_MODIFICATION_ASC
     )
 }
+
+data class TimelineFilterUiState(
+    val isRemembered: Boolean = false,
+    val mediaType: FilterMediaType = FilterMediaType.ALL_MEDIA,
+    val mediaSource: FilterMediaSource = FilterMediaSource.AllPhotos,
+)

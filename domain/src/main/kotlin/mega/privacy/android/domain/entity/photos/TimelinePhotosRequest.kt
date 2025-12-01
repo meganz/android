@@ -1,7 +1,17 @@
 package mega.privacy.android.domain.entity.photos
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+
+/**
+ * A model to request timeline photos.
+ *
+ * @property isPaginationEnabled
+ * @property selectedFilterFlow Used to retrigger the timeline photos result.
+ */
 data class TimelinePhotosRequest(
-    val isPaginationEnabled: Boolean
+    val isPaginationEnabled: Boolean,
+    val selectedFilterFlow: Flow<Map<String, String?>?> = flowOf(null),
 )
 
 data class TimelinePhotosResult(
