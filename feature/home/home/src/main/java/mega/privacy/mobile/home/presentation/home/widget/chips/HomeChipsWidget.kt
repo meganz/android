@@ -23,6 +23,7 @@ import mega.privacy.android.navigation.contract.home.HomeWidget
 import mega.privacy.android.navigation.destination.ChatsNavKey
 import mega.privacy.android.navigation.destination.FavouritesNavKey
 import mega.privacy.android.navigation.destination.OfflineNavKey
+import mega.privacy.android.navigation.destination.VideoSectionNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 
@@ -70,7 +71,7 @@ private fun HomeChips(
             selected = false,
             leadingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.Film),
             onClick = {
-                // TODO
+                onNavigate(VideoSectionNavKey)
             },
         )
         MegaChip(

@@ -16,6 +16,7 @@ import mega.privacy.android.app.presentation.settings.cookieSettingsNavigationDe
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.legacyExportRecoveryKeyScreen
 import mega.privacy.android.app.presentation.settings.settingsCameraUploadsNavigationDestination
 import mega.privacy.android.app.presentation.testpassword.navigation.testPasswordLegacyDestination
+import mega.privacy.android.app.presentation.videosection.videoSectionLegacyDestination
 import mega.privacy.android.app.textEditor.legacyTextEditorScreen
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.navigation.contract.FeatureDestination
@@ -53,5 +54,6 @@ class LegacyCoreActivityFeatureGraph(
             legacyImageViewerScreen(navigationHandler::back)
             legacyTextEditorScreen(navigationHandler::back)
             legacyMediaPlayerScreen(navigationHandler::back, mediaPlayerIntentMapper)
+            videoSectionLegacyDestination(navigationHandler::back)
         }
 }
