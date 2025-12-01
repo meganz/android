@@ -30,6 +30,7 @@ import mega.privacy.android.feature.photos.presentation.albums.model.AlbumTitle
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import mega.privacy.android.feature.photos.presentation.albums.view.ALBUM_DYNAMIC_CONTENT_GRID_SORT_ITEM
+import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -78,6 +79,9 @@ class AlbumContentScreenComposeTest {
         navigateToPaywall: () -> Unit = {},
         resetPaywallEvent: () -> Unit = {},
         sortPhotos: (AlbumSortConfiguration) -> Unit = {},
+        previewPhoto: (PhotoUiState) -> Unit = {},
+        resetPreviewPhoto: () -> Unit = {},
+        navigateToPhotoPreview: (AlbumContentPreviewNavKey) -> Unit = {},
         onTransfer: (TransferTriggerEvent) -> Unit = {},
         consumeDownloadEvent: () -> Unit = {},
         consumeInfoToShowEvent: () -> Unit = {},
@@ -118,6 +122,9 @@ class AlbumContentScreenComposeTest {
                     navigateToPaywall = navigateToPaywall,
                     resetPaywallEvent = resetPaywallEvent,
                     sortPhotos = sortPhotos,
+                    previewPhoto = previewPhoto,
+                    resetPreviewPhoto = resetPreviewPhoto,
+                    navigateToPhotoPreview = navigateToPhotoPreview,
                     onTransfer = onTransfer,
                     consumeDownloadEvent = consumeDownloadEvent,
                     consumeInfoToShowEvent = consumeInfoToShowEvent,

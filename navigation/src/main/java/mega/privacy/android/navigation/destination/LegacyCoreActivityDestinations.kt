@@ -137,6 +137,15 @@ data class LegacyFolderLinkNavKey(
 ) : NoSessionNavKey.Optional
 
 @Serializable
+data class AlbumContentPreviewNavKey(
+    val albumId: Long?,
+    val photoId: Long,
+    val albumType: String,
+    val sortType: String,
+    val title: String
+) : NavKey
+
+@Serializable
 data class LegacyAlbumCoverSelectionNavKey(val albumId: Long) : NavKey {
     companion object Companion {
         const val MESSAGE = "extra_message"

@@ -2,6 +2,7 @@ package mega.privacy.android.feature.photos.presentation.albums.content
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
@@ -52,15 +53,18 @@ import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.photos.mapper.AlbumNameValidationExceptionMessageMapper
 import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
 import mega.privacy.android.feature.photos.mapper.LegacyMediaSystemAlbumMapper
+import mega.privacy.android.feature.photos.mapper.LegacyPhotosSortMapper
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.model.AlbumSortConfiguration
 import mega.privacy.android.feature.photos.model.AlbumSortOption
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
+import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
+import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -115,6 +119,7 @@ class AlbumContentViewModelTest {
         mock()
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase = mock()
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
+    private val legacyPhotosSortMapper: LegacyPhotosSortMapper = mock()
     private val themeModeFlow = MutableStateFlow(ThemeMode.System)
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -159,7 +164,8 @@ class AlbumContentViewModelTest {
             removeAlbumsUseCase,
             snackbarEventQueue,
             monitorThemeModeUseCase,
-            monitorStorageStateEventUseCase
+            monitorStorageStateEventUseCase,
+            legacyPhotosSortMapper
         )
         stubCommon()
         Analytics.initialise(analyticsTracker)
@@ -213,6 +219,7 @@ class AlbumContentViewModelTest {
             albumNameValidationExceptionMessageMapper = albumNameValidationExceptionMessageMapper,
             monitorThemeModeUseCase = monitorThemeModeUseCase,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
+            legacyPhotosSortMapper = legacyPhotosSortMapper,
             defaultDispatcher = testDispatcher,
             navKey = navKey,
         )
@@ -1254,6 +1261,49 @@ class AlbumContentViewModelTest {
                 assertThat(state.photos[0].id).isEqualTo(photo2UiState.id)
                 assertThat(state.photos[1].id).isEqualTo(photo3UiState.id)
                 assertThat(state.photos[2].id).isEqualTo(photo1UiState.id)
+            }
+        }
+
+    @Test
+    fun `test that preview photo should trigger event with correct args`() =
+        runTest {
+            val albumId = AlbumId(123L)
+            val mockUserAlbum = mock<MediaAlbum.User> {
+                on { id }.thenReturn(albumId)
+            }
+            val mockAlbumUiState = mock<AlbumUiState> {
+                on { mediaAlbum }.thenReturn(mockUserAlbum)
+                on { title }.thenReturn("Album")
+                on { cover }.thenReturn(null)
+            }
+            val legacyPhoto = mock<Photo.Image> {
+                on { id }.thenReturn(1L)
+            }
+            val photo = mock<PhotoUiState.Image> {
+                on { id }.thenReturn(1L)
+            }
+            whenever(photo.id).thenReturn(1L)
+            whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
+            whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
+            whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf(listOf(legacyPhoto)))
+            whenever(photoUiStateMapper(legacyPhoto)).thenReturn(photo)
+            whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
+            whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
+            whenever(observeAlbumPhotosRemovingProgress(any())).thenReturn(flowOf())
+            whenever(legacyPhotosSortMapper(any())).thenReturn(Sort.OLDEST)
+
+            createViewModel(AlbumContentNavKey(id = albumId.id, type = "custom"))
+
+            underTest.previewPhoto(photo)
+
+            underTest.state.test {
+                val state = awaitItem()
+                val result =
+                    (state.previewAlbumContentEvent as StateEventWithContentTriggered<AlbumContentPreviewNavKey>).content
+                assertThat(result.albumId).isEqualTo(albumId.id)
+                assertThat(result.photoId).isEqualTo(photo.id)
+                assertThat(result.albumType).isEqualTo("custom")
+                assertThat(result.sortType).isEqualTo(Sort.OLDEST.name)
             }
         }
 }

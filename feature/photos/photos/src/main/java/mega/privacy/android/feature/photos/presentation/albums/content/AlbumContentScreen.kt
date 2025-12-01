@@ -86,6 +86,7 @@ import mega.privacy.android.feature.photos.presentation.albums.dialog.RemoveAlbu
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.feature.photos.presentation.albums.view.AlbumDynamicContentGrid
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
 import mega.privacy.android.navigation.destination.AlbumGetLinkNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.OverDiskQuotaPaywallWarningNavKey
@@ -154,6 +155,9 @@ fun AlbumContentScreen(
             navigationHandler.navigate(OverDiskQuotaPaywallWarningNavKey)
         },
         sortPhotos = viewModel::sortPhotos,
+        previewPhoto = viewModel::previewPhoto,
+        resetPreviewPhoto = viewModel::resetPreviewPhoto,
+        navigateToPhotoPreview = navigationHandler::navigate,
         onTransfer = onTransfer,
         consumeDownloadEvent = actionViewModel::markDownloadEventConsumed,
         consumeInfoToShowEvent = actionViewModel::onInfoToShowEventConsumed,
@@ -196,6 +200,9 @@ internal fun AlbumContentScreen(
     navigateToPaywall: () -> Unit,
     resetPaywallEvent: () -> Unit,
     sortPhotos: (AlbumSortConfiguration) -> Unit,
+    previewPhoto: (PhotoUiState) -> Unit,
+    resetPreviewPhoto: () -> Unit,
+    navigateToPhotoPreview: (AlbumContentPreviewNavKey) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     consumeDownloadEvent: () -> Unit,
     consumeInfoToShowEvent: () -> Unit,
@@ -307,6 +314,12 @@ internal fun AlbumContentScreen(
         action = navigateToPaywall
     )
 
+    EventEffect(
+        event = uiState.previewAlbumContentEvent,
+        onConsumed = resetPreviewPhoto,
+        action = navigateToPhotoPreview
+    )
+
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
             .fillMaxSize()
@@ -390,7 +403,7 @@ internal fun AlbumContentScreen(
             smallWidth = smallWidth,
             onClick = { photo ->
                 if (uiState.selectedPhotos.isEmpty()) {
-                    //onNavigatePhotoPreview(photo, photos)
+                    previewPhoto(photo)
                 } else {
                     togglePhotoSelection(photo)
                 }
@@ -672,6 +685,9 @@ private fun AlbumContentScreenPreview() {
             navigateToPaywall = {},
             resetPaywallEvent = {},
             sortPhotos = {},
+            previewPhoto = {},
+            resetPreviewPhoto = {},
+            navigateToPhotoPreview = {},
             onTransfer = {},
             consumeDownloadEvent = {},
             consumeInfoToShowEvent = {},

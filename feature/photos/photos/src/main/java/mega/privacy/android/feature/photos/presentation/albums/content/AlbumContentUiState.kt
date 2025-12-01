@@ -19,6 +19,7 @@ import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
+import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
 
 /**
  * State of the Album Content screen.
@@ -90,6 +91,7 @@ data class AlbumContentUiState(
         sortOption = AlbumSortOption.Modified,
         sortDirection = SortDirection.Descending
     ),
+    val previewAlbumContentEvent: StateEventWithContent<AlbumContentPreviewNavKey> = consumed()
 ) {
     val isAddingPhotosProgressCompleted: Boolean
         get() = !isAddingPhotos && totalAddedPhotos > 0

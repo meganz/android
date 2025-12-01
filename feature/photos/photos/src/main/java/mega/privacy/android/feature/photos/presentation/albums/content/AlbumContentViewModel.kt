@@ -69,6 +69,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.photos.mapper.AlbumNameValidationExceptionMessageMapper
 import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
 import mega.privacy.android.feature.photos.mapper.LegacyMediaSystemAlbumMapper
+import mega.privacy.android.feature.photos.mapper.LegacyPhotosSortMapper
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.model.AlbumSortConfiguration
 import mega.privacy.android.feature.photos.model.FilterMediaType
@@ -77,6 +78,7 @@ import mega.privacy.android.feature.photos.presentation.albums.content.model.Alb
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
+import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.AlbumContentDeleteAlbumEvent
 import mega.privacy.mobile.analytics.event.PhotoItemSelected
@@ -115,6 +117,7 @@ class AlbumContentViewModel @AssistedInject constructor(
     private val albumNameValidationExceptionMessageMapper: AlbumNameValidationExceptionMessageMapper,
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
+    private val legacyPhotosSortMapper: LegacyPhotosSortMapper,
     @Assisted private val navKey: AlbumContentNavKey?,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumContentUiState())
@@ -486,6 +489,24 @@ class AlbumContentViewModel @AssistedInject constructor(
                 )
             }
         }
+    }
+
+    fun previewPhoto(photo: PhotoUiState) {
+        viewModelScope.launch {
+            val args = AlbumContentPreviewNavKey(
+                albumId = (_state.value.uiAlbum?.mediaAlbum as? MediaAlbum.User)?.id?.id,
+                photoId = photo.id,
+                albumType = albumType.orEmpty(),
+                sortType = legacyPhotosSortMapper(_state.value.albumSortConfiguration.sortDirection).name,
+                title = _state.value.uiAlbum?.title.orEmpty()
+            )
+
+            _state.update { it.copy(previewAlbumContentEvent = triggered(args)) }
+        }
+    }
+
+    fun resetPreviewPhoto() {
+        _state.update { it.copy(previewAlbumContentEvent = consumed()) }
     }
 
     fun setCurrentMediaType(mediaType: FilterMediaType) {
