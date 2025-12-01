@@ -58,8 +58,7 @@ import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
 import mega.privacy.android.app.appstate.content.transfer.TransferHandlerImpl
 import mega.privacy.android.app.appstate.global.GlobalStateViewModel
 import mega.privacy.android.app.appstate.global.SnackbarEventsViewModel
-import mega.privacy.android.app.appstate.global.event.AppDialogViewModel
-import mega.privacy.android.app.appstate.global.event.NavigationEventViewModel
+import mega.privacy.android.app.appstate.global.event.QueueEventViewModel
 import mega.privacy.android.app.appstate.global.model.GlobalState
 import mega.privacy.android.app.appstate.global.util.show
 import mega.privacy.android.app.presence.SignalPresenceViewModel
@@ -80,6 +79,8 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartT
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
+import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.transparent.TransparentSceneStrategy
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import timber.log.Timber
@@ -153,10 +154,9 @@ class MegaActivity : ComponentActivity() {
             val navGraphViewModel = hiltViewModel<NavigationGraphViewModel>() // nav graph content
             val presenceViewModel = hiltViewModel<SignalPresenceViewModel>()
             val snackbarEventsViewModel = viewModel<SnackbarEventsViewModel>()
-            val appDialogViewModel = hiltViewModel<AppDialogViewModel>()
             val appTransferViewModel = hiltViewModel<AppTransferViewModel>()
             val loginViewModel = hiltViewModel<LoginViewModel>()
-            val navigationEventViewModel = hiltViewModel<NavigationEventViewModel>()
+            val navigationEventViewModel = hiltViewModel<QueueEventViewModel>()
 
             val navGraphState by navGraphViewModel.state.collectAsStateWithLifecycle()
             val globalState by globalStateViewModel.state.collectAsStateWithLifecycle()
@@ -233,7 +233,6 @@ class MegaActivity : ComponentActivity() {
                             is NavigationGraphState.Loading -> {}
                             is NavigationGraphState.Data -> {
                                 val snackbarEventsState by snackbarEventsViewModel.snackbarEventState.collectAsStateWithLifecycle()
-                                val dialogEvents by appDialogViewModel.dialogEvents.collectAsStateWithLifecycle()
                                 val transferState by appTransferViewModel.state.collectAsStateWithLifecycle()
                                 val loginState by loginViewModel.state.collectAsStateWithLifecycle()
                                 val navigationEvents by navigationEventViewModel.navigationEvents.collectAsStateWithLifecycle()
@@ -278,7 +277,7 @@ class MegaActivity : ComponentActivity() {
                                                 destination.navigationGraph(
                                                     this,
                                                     navigationHandler,
-                                                    appDialogViewModel::eventHandled
+                                                    navigationEventViewModel::eventHandled
                                                 )
                                             }
 
@@ -323,17 +322,18 @@ class MegaActivity : ComponentActivity() {
                                 }
 
                                 NavigationEventEffect(
-                                    event = dialogEvents,
-                                    onConsumed = appDialogViewModel::dialogDisplayed
-                                ) {
-                                    navigationHandler.displayDialog(it.dialogDestination)
-                                }
-
-                                NavigationEventEffect(
                                     event = navigationEvents,
-                                    onConsumed = navigationEventViewModel::eventHandled
+                                    onConsumed = navigationEventViewModel::eventDisplayed
                                 ) {
-                                    navigationHandler.navigate(it)
+                                    when (it) {
+                                        is NavigationQueueEvent -> {
+                                            navigationHandler.navigate(it.keys)
+                                        }
+
+                                        is AppDialogEvent -> {
+                                            navigationHandler.displayDialog(it.dialogDestination)
+                                        }
+                                    }
                                 }
 
                                 val focusManager = LocalFocusManager.current

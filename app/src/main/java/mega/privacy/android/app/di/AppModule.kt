@@ -19,9 +19,7 @@ import mega.privacy.android.app.LegacyDatabaseMigrationImpl
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.activities.UpgradeAccountDeepLinkHandler
 import mega.privacy.android.app.activities.navigation.WebViewDeepLinkHandler
-import mega.privacy.android.app.appstate.global.event.AppDialogsEventQueueImpl
-import mega.privacy.android.app.appstate.global.event.AppDialogsEventQueueReceiver
-import mega.privacy.android.app.appstate.global.event.NavigationEventQueueImpl
+import mega.privacy.android.app.appstate.global.event.CombinedEventQueueImpl
 import mega.privacy.android.app.appstate.global.event.NavigationEventQueueReceiver
 import mega.privacy.android.app.consent.ConsentDialogDestinations
 import mega.privacy.android.app.myAccount.navigation.MyAccountDeepLinkHandler
@@ -193,18 +191,14 @@ internal class AppModule {
         DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
 
     @Provides
-    fun provideAppDialogsEventQueue(queue: AppDialogsEventQueueImpl): AppDialogsEventQueue = queue
-
-    @Provides
-    fun provideAppDialogsEventQueueReceiver(queue: AppDialogsEventQueueImpl): AppDialogsEventQueueReceiver =
+    fun provideNavigationEventQueueReceiver(queue: CombinedEventQueueImpl): NavigationEventQueueReceiver =
         queue
 
     @Provides
-    fun provideNavigationEventQueue(queue: NavigationEventQueueImpl): NavigationEventQueue = queue
+    fun provideNavigationEventQueue(queue: CombinedEventQueueImpl): NavigationEventQueue = queue
 
     @Provides
-    fun provideNavigationEventQueueReceiver(queue: NavigationEventQueueImpl): NavigationEventQueueReceiver =
-        queue
+    fun provideAppDialogEventQueue(queue: CombinedEventQueueImpl): AppDialogsEventQueue = queue
 
     @Provides
     fun provideAppContainerProvider(
