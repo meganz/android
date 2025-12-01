@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.contacts
 
+import kotlinx.serialization.Serializable
+
 /**
  * Contact link query result
  *
@@ -11,6 +13,7 @@ package mega.privacy.android.domain.entity.contacts
  * @property status
  * @property avatarFileInBase64
  */
+@Serializable
 data class ContactLinkQueryResult(
     val isContact: Boolean = false,
     val email: String? = null,

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.transfers.transferoverquota.view.dialog
+package mega.privacy.android.app.presentation.contact.link.dialog
 
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -7,20 +7,19 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import kotlinx.serialization.Serializable
-import mega.privacy.android.app.presentation.login.LoginNavKey
-import mega.privacy.android.app.presentation.transfers.transferoverquota.TransferOverQuotaViewModel
+import mega.privacy.android.app.presentation.contact.link.ContactLinkDialogViewModel
+import mega.privacy.android.domain.entity.contacts.ContactLinkQueryResult
 import mega.privacy.android.navigation.contract.AppDialogDestinations
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
-import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
+import mega.privacy.android.navigation.destination.ContactInfoNavKey
 
 @Serializable
-data object TransferOverQuotaDialog : NoSessionNavKey.Optional
+data class ContactLinkDialogNavKey(val contactLinkQueryResult: ContactLinkQueryResult) : NavKey
 
-data object TransferOverQuotaDialogDestinations : AppDialogDestinations {
+data object ContactLinkDialogDestinations : AppDialogDestinations {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, () -> Unit) -> Unit =
         { navigationHandler, onHandled ->
-            transferOverQuotaDialogDestination(
+            contactLinkDialogDestination(
                 navigateBack = navigationHandler::back,
                 navigate = navigationHandler::navigate,
                 onDialogHandled = onHandled
@@ -28,30 +27,33 @@ data object TransferOverQuotaDialogDestinations : AppDialogDestinations {
         }
 }
 
-fun EntryProviderScope<NavKey>.transferOverQuotaDialogDestination(
+fun EntryProviderScope<NavKey>.contactLinkDialogDestination(
     navigateBack: () -> Unit,
     navigate: (NavKey) -> Unit,
     onDialogHandled: () -> Unit,
 ) {
-    entry<TransferOverQuotaDialog>(
+    entry<ContactLinkDialogNavKey>(
         metadata = DialogSceneStrategy.dialog()
-    ) {
-        val viewModel = hiltViewModel<TransferOverQuotaViewModel>()
+    ) { key ->
+        val viewModel =
+            hiltViewModel<ContactLinkDialogViewModel, ContactLinkDialogViewModel.Factory>(
+                creationCallback = { factory -> factory.create(key) }
+            )
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        TransferOverQuotaDialog(
+        ContactLinkDialog(
             uiState = uiState,
-            navigateToUpgradeAccount = {
-                navigate(UpgradeAccountNavKey())
-            },
-            navigateToLogin = {
-                navigate(LoginNavKey())
+            inviteContact = viewModel::inviteContact,
+            viewContact = {
+                key.contactLinkQueryResult.email?.let { email ->
+                    navigate(ContactInfoNavKey(email))
+                }
             },
             onDismiss = {
-                viewModel.bandwidthOverQuotaDelayConsumed()
                 onDialogHandled()
                 navigateBack()
             },
+            navigateToContactRequests = navigate,
         )
     }
 }
