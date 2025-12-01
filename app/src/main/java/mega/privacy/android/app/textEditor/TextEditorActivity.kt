@@ -141,6 +141,8 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         private const val STATE = "STATE"
         private const val STATE_SHOWN = 0
         private const val STATE_HIDDEN = 1
+        private const val KEYBOARD_SCROLL_DELAY_MS = 150L
+        private const val CURSOR_SCROLL_TOP_MARGIN_PX = 50
 
         /**
          * Create intent for TextEditorActivity
@@ -287,6 +289,37 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                     0
                 }
             }
+
+            // Scroll to show cursor when keyboard appears in edit mode
+            if (isImeVisible && viewModel.isEditMode()) {
+                binding.contentEditText.postDelayed({
+                    val cursorPosition = binding.contentEditText.selectionStart
+                    val layout = binding.contentEditText.layout
+                    if (layout != null && cursorPosition >= 0) {
+                        // Get the line number where the cursor is
+                        val line = layout.getLineForOffset(cursorPosition)
+                        val lineTop = layout.getLineTop(line)
+
+                        // Get EditText's position relative to scroll view
+                        val editTextTop = binding.contentEditText.top
+
+                        // Calculate the absolute Y position of the cursor line
+                        val cursorLineY = editTextTop + lineTop
+
+                        // Calculate scroll position to show cursor line
+                        // We want some margin from the top (app bar + some padding)
+                        val targetScrollY = cursorLineY - appBarHeight - CURSOR_SCROLL_TOP_MARGIN_PX
+
+                        // Ensure we don't scroll beyond bounds
+                        val child = binding.fileEditorScrollView.getChildAt(0)
+                        val maxScrollY = (child?.height ?: 0) - binding.fileEditorScrollView.height
+                        val finalScrollY = targetScrollY.coerceIn(0, maxScrollY.coerceAtLeast(0))
+
+                        binding.fileEditorScrollView.smoothScrollTo(0, finalScrollY)
+                    }
+                }, KEYBOARD_SCROLL_DELAY_MS) // Delay to ensure keyboard animation and layout are complete
+            }
+
             WindowInsetsCompat.CONSUMED
         }
     }
@@ -938,6 +971,15 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
             binding.contentEditText.isVisible = true
             binding.editFab.hide()
+
+            // Scroll to end and move cursor to the end when entering edit mode
+            binding.contentEditText.post {
+                // Set cursor to the end of text
+                val textLength = binding.contentEditText.text?.length ?: 0
+                binding.contentEditText.setSelection(textLength)
+
+                binding.fileEditorScrollView.fullScroll(android.view.View.FOCUS_DOWN)
+            }
         }
     }
 
