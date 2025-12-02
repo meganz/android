@@ -2,6 +2,7 @@ package mega.privacy.android.app.appstate.global.event
 
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.channels.ReceiveChannel
+import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
@@ -41,13 +42,41 @@ class CombinedEventQueueImpl(
 
 
     override suspend fun emit(navKeys: List<NavKey>, priority: NavPriority) {
-        queueChannel.add(
-            QueuedEvent(
-                event = NavigationQueueEvent(keys = navKeys),
-                priority = priority,
-                timestamp = getTime()
+        val pendingNavKeys = mutableListOf<NavKey>()
+        for (navKey in navKeys) {
+            if (navKey is DialogNavKey) {
+                if (pendingNavKeys.isNotEmpty()) {
+                    queueChannel.add(
+                        QueuedEvent(
+                            event = NavigationQueueEvent(keys = pendingNavKeys.toList()),
+                            priority = priority,
+                            timestamp = getTime()
+                        )
+                    )
+                    pendingNavKeys.clear()
+                }
+
+                queueChannel.add(
+                    QueuedEvent(
+                        event = AppDialogEvent(navKey),
+                        priority = priority,
+                        timestamp = getTime()
+                    )
+                )
+            } else {
+                pendingNavKeys += navKey
+            }
+        }
+
+        if (pendingNavKeys.isNotEmpty()) {
+            queueChannel.add(
+                QueuedEvent(
+                    event = NavigationQueueEvent(keys = pendingNavKeys),
+                    priority = priority,
+                    timestamp = getTime()
+                )
             )
-        )
+        }
     }
 
     override suspend fun emit(navKey: NavKey, priority: NavPriority) =

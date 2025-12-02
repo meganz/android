@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
@@ -26,6 +27,7 @@ class CombinedEventQueueImplTest {
 
     private data object TestKey1 : NavKey
     private data class TestKey2(val id: Int) : NavKey
+    private data object DialogTestKey : DialogNavKey
 
     @BeforeEach
     fun setUp() {
@@ -160,6 +162,35 @@ class CombinedEventQueueImplTest {
             assertThat(awaitItem()).isEqualTo(expectedSecond)
         }
 
+    }
+
+    @Test
+    fun `test that passing a dialog key as a nav key adds a dialog event`() = runTest {
+        mockTimeProvider()
+
+        underTest.emit(DialogTestKey)
+
+        underTest.events.receiveAsFlow().map { it.invoke() }.test {
+            assertThat(awaitItem()).isInstanceOf(AppDialogEvent::class.java)
+        }
+    }
+
+    @Test
+    fun `test that mixed events are added correctly`() = runTest {
+        mockTimeProvider(1, 2, 3, 4, 5, 6)
+        val initialKeys = listOf(TestKey1, TestKey2(1))
+        val dialogKey = DialogTestKey
+        val finalKeys = listOf(TestKey2(2), TestKey2(3))
+
+        val input = initialKeys + dialogKey + finalKeys
+
+        underTest.emit(input)
+
+        underTest.events.receiveAsFlow().map { it.invoke() }.test {
+            assertThat(awaitItem()).isEqualTo(NavigationQueueEvent(initialKeys))
+            assertThat(awaitItem()).isEqualTo(NavigationQueueEvent(finalKeys))
+            assertThat(awaitItem()).isEqualTo(AppDialogEvent(dialogKey))
+        }
     }
 
     private fun mockTimeProvider(firstTime: Long = 0L, vararg times: Long = longArrayOf(0L)) {
