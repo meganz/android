@@ -3,6 +3,7 @@ package mega.privacy.android.feature.photos.presentation.albums.view
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -147,6 +148,24 @@ fun AlbumDynamicContentGrid(
 
         item {
             Spacer(modifier = Modifier.height(endSpacing))
+        }
+    }
+}
+
+@Composable
+fun AlbumDynamicContentGridSkeleton(
+    size: Dp,
+    modifier: Modifier = Modifier,
+    count: Int = 1
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(1.dp)
+    ) {
+        repeat(count) {
+            AlbumContentHighlightStartShimmer(size)
+            AlbumContentUniformShimmer(size)
+            AlbumContentHighlightEndShimmer(size)
         }
     }
 }

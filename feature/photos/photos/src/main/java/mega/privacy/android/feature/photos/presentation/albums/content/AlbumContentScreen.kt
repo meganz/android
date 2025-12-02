@@ -44,15 +44,14 @@ import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.launch
-import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.dialogs.BasicDialog
+import mega.android.core.ui.components.indicators.InfiniteProgressBarIndicator
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.components.sheets.SheetActionHeader
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -85,7 +84,10 @@ import mega.privacy.android.feature.photos.presentation.albums.dialog.EnterAlbum
 import mega.privacy.android.feature.photos.presentation.albums.dialog.RemoveAlbumConfirmationDialog
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.feature.photos.presentation.albums.view.AlbumDynamicContentGrid
+import mega.privacy.android.feature.photos.presentation.albums.view.AlbumDynamicContentGridSkeleton
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
 import mega.privacy.android.navigation.destination.AlbumGetLinkNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
@@ -206,10 +208,10 @@ internal fun AlbumContentScreen(
     onTransfer: (TransferTriggerEvent) -> Unit,
     consumeDownloadEvent: () -> Unit,
     consumeInfoToShowEvent: () -> Unit,
+    snackbarQueue: SnackbarEventQueue = rememberSnackBarQueue(),
 ) {
     val context = LocalContext.current
     val resources = LocalResources.current
-    val snackbarHostState = LocalSnackBarHostState.current
     val lazyListState = rememberLazyListState()
     val configuration = LocalConfiguration.current
     val smallWidth = remember(configuration) {
@@ -221,7 +223,6 @@ internal fun AlbumContentScreen(
     var showDeletePhotosConfirmation by remember { mutableStateOf(false) }
     var isMoreOptionsSheetVisible by rememberSaveable { mutableStateOf(false) }
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
 
     EventEffect(
         event = actionState.downloadEvent,
@@ -265,7 +266,7 @@ internal fun AlbumContentScreen(
         event = actionState.infoToShowEvent,
         onConsumed = consumeInfoToShowEvent,
         action = { info ->
-            snackbarHostState?.showAutoDurationSnackbar(info.get(context))
+            snackbarQueue.queueMessage(info.get(context))
         }
     )
 
@@ -289,7 +290,7 @@ internal fun AlbumContentScreen(
         event = uiState.linkRemovedSuccessEvent,
         onConsumed = resetLinkRemovedSuccessEvent,
         action = {
-            snackbarHostState?.showSnackbar(
+            snackbarQueue.queueMessage(
                 resources.getQuantityString(
                     sharedR.plurals.context_link_removal_success,
                     1
@@ -394,33 +395,55 @@ internal fun AlbumContentScreen(
             )
         },
     ) { innerPadding ->
-        AlbumDynamicContentGrid(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = innerPadding.calculateTopPadding()),
-            lazyListState = lazyListState,
-            photos = uiState.photos,
-            smallWidth = smallWidth,
-            onClick = { photo ->
-                if (uiState.selectedPhotos.isEmpty()) {
-                    previewPhoto(photo)
-                } else {
-                    togglePhotoSelection(photo)
+        if (uiState.photos.isEmpty() && (uiState.isLoading || uiState.isAddingPhotos)) {
+            AlbumDynamicContentGridSkeleton(
+                modifier = Modifier
+                    .testTag(ALBUM_CONTENT_SCREEN_SKELETON)
+                    .fillMaxSize()
+                    .padding(top = innerPadding.calculateTopPadding()),
+                size = smallWidth
+            )
+        } else if (uiState.photos.isNotEmpty()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = innerPadding.calculateTopPadding()),
+            ) {
+                if (uiState.isAddingPhotos || uiState.isRemovingPhotos) {
+                    InfiniteProgressBarIndicator(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(ALBUM_CONTENT_SCREEN_LOADING_PROGRESS)
+                    )
                 }
-            },
-            onLongPress = { photo ->
-                togglePhotoSelection(photo)
-            },
-            selectedPhotos = uiState.selectedPhotos,
-            shouldApplySensitiveMode = uiState.hiddenNodeEnabled
-                    && uiState.accountType?.isPaid == true
-                    && !uiState.isBusinessAccountExpired,
-            contentPadding = PaddingValues(bottom = innerPadding.calculateBottomPadding()),
-            onSortOrderClick = {
-                showSortBottomSheet = true
-            },
-            sortConfiguration = uiState.albumSortConfiguration
-        )
+
+                AlbumDynamicContentGrid(
+                    modifier = Modifier.fillMaxSize(),
+                    lazyListState = lazyListState,
+                    photos = uiState.photos,
+                    smallWidth = smallWidth,
+                    onClick = { photo ->
+                        if (uiState.selectedPhotos.isEmpty()) {
+                            previewPhoto(photo)
+                        } else {
+                            togglePhotoSelection(photo)
+                        }
+                    },
+                    onLongPress = { photo ->
+                        togglePhotoSelection(photo)
+                    },
+                    selectedPhotos = uiState.selectedPhotos,
+                    shouldApplySensitiveMode = uiState.hiddenNodeEnabled
+                            && uiState.accountType?.isPaid == true
+                            && !uiState.isBusinessAccountExpired,
+                    contentPadding = PaddingValues(bottom = innerPadding.calculateBottomPadding()),
+                    onSortOrderClick = {
+                        showSortBottomSheet = true
+                    },
+                    sortConfiguration = uiState.albumSortConfiguration
+                )
+            }
+        }
 
         RemovePhotosConfirmationDialog(
             isVisible = showDeletePhotosConfirmation,
@@ -712,3 +735,7 @@ internal const val ALBUM_CONTENT_SCREEN_REMOVE_LINKS_DIALOG =
     "album_content_screen:remove_links_dialog"
 internal const val ALBUM_CONTENT_SCREEN_SORT_BOTTOM_SHEET =
     "album_content_screen:sort_bottom_sheet"
+internal const val ALBUM_CONTENT_SCREEN_LOADING_PROGRESS =
+    "album_content_screen:loading_progress"
+internal const val ALBUM_CONTENT_SCREEN_SKELETON =
+    "album_content_screen:skeleton"

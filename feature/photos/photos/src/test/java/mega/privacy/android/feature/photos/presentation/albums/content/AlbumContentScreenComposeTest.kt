@@ -30,10 +30,14 @@ import mega.privacy.android.feature.photos.presentation.albums.model.AlbumTitle
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import mega.privacy.android.feature.photos.presentation.albums.view.ALBUM_DYNAMIC_CONTENT_GRID_SORT_ITEM
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
+import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.mock
+import org.mockito.kotlin.reset
 import org.robolectric.annotation.Config
 
 /**
@@ -44,6 +48,13 @@ import org.robolectric.annotation.Config
 class AlbumContentScreenComposeTest {
     @get:Rule
     val composeTestRule = createComposeRule()
+
+    private val snackbarEventQueue: SnackbarEventQueue = mock()
+
+    @After
+    fun resetMocks() {
+        reset(snackbarEventQueue)
+    }
 
     private fun setComposeContent(
         uiState: AlbumContentUiState = AlbumContentUiState(),
@@ -128,6 +139,7 @@ class AlbumContentScreenComposeTest {
                     onTransfer = onTransfer,
                     consumeDownloadEvent = consumeDownloadEvent,
                     consumeInfoToShowEvent = consumeInfoToShowEvent,
+                    snackbarQueue = snackbarEventQueue,
                 )
             }
         }
@@ -475,9 +487,10 @@ class AlbumContentScreenComposeTest {
 
     @Test
     fun `test that sort bottom sheet is visible when sort option clicked`() {
+        val photos = listOf(createMockPhoto(id = 1L))
         val uiState = AlbumContentUiState(
             uiAlbum = createMockAlbumUiState(),
-            photos = persistentListOf(),
+            photos = photos.toImmutableList(),
             selectedPhotos = persistentSetOf(),
         )
 
@@ -492,6 +505,80 @@ class AlbumContentScreenComposeTest {
 
         composeTestRule
             .onNodeWithTag(ALBUM_CONTENT_SCREEN_SORT_BOTTOM_SHEET)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that loading indicator is displayed when adding photos`() {
+        val photos = listOf(createMockPhoto(id = 1L))
+        val uiState = AlbumContentUiState(
+            uiAlbum = createMockAlbumUiState(),
+            photos = photos.toImmutableList(),
+            selectedPhotos = persistentSetOf(),
+            isAddingPhotos = true
+        )
+
+        setComposeContent(uiState)
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule
+            .onNodeWithTag(ALBUM_CONTENT_SCREEN_LOADING_PROGRESS)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that loading indicator is displayed when removing photos`() {
+        val photos = listOf(createMockPhoto(id = 1L))
+        val uiState = AlbumContentUiState(
+            uiAlbum = createMockAlbumUiState(),
+            photos = photos.toImmutableList(),
+            selectedPhotos = persistentSetOf(),
+            isRemovingPhotos = true
+        )
+
+        setComposeContent(uiState)
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule
+            .onNodeWithTag(ALBUM_CONTENT_SCREEN_LOADING_PROGRESS)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that skeleton is visible when photos are empty and loading`() {
+        val uiState = AlbumContentUiState(
+            uiAlbum = createMockAlbumUiState(),
+            photos = persistentListOf(),
+            selectedPhotos = persistentSetOf(),
+            isLoading = true
+        )
+
+        setComposeContent(uiState)
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule
+            .onNodeWithTag(ALBUM_CONTENT_SCREEN_SKELETON)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that skeleton is visible when photos are empty and adding photos`() {
+        val uiState = AlbumContentUiState(
+            uiAlbum = createMockAlbumUiState(),
+            photos = persistentListOf(),
+            selectedPhotos = persistentSetOf(),
+            isAddingPhotos = true
+        )
+
+        setComposeContent(uiState)
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule
+            .onNodeWithTag(ALBUM_CONTENT_SCREEN_SKELETON)
             .assertIsDisplayed()
     }
 
