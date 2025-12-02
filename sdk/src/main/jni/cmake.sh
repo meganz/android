@@ -3,7 +3,7 @@ set -e
 
 start_time=$SECONDS
 
-ANDROID_API_LEVEL=26
+ANDROID_API_LEVEL=28
 export ANDROID_NDK_HOME=${NDK_ROOT}
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
