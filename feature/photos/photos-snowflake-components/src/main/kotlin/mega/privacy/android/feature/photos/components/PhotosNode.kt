@@ -88,25 +88,27 @@ fun VideoPhotosNode(
             shouldShowFavourite = shouldShowFavourite
         )
 
-        MegaText(
-            modifier = Modifier
-                .padding(bottom = 4.dp, end = 4.dp)
-                .background(
-                    color = DSTokens.colors.background.surfaceTransparent.copy(
-                        alpha = 0.7F
-                    ),
-                    shape = RoundedCornerShape(2.dp)
-                )
-                .padding(
-                    vertical = 2.dp,
-                    horizontal = 4.dp
-                )
-                .align(Alignment.BottomEnd)
-                .testTag(VIDEO_PHOTOS_NODE_DURATION_TEXT_TAG),
-            text = duration,
-            style = MaterialTheme.typography.labelSmall,
-            textColor = TextColor.OnColor
-        )
+        if (duration.isNotEmpty()) {
+            MegaText(
+                modifier = Modifier
+                    .padding(bottom = 4.dp, end = 4.dp)
+                    .background(
+                        color = DSTokens.colors.background.surfaceTransparent.copy(
+                            alpha = 0.7F
+                        ),
+                        shape = RoundedCornerShape(2.dp)
+                    )
+                    .padding(
+                        vertical = 2.dp,
+                        horizontal = 4.dp
+                    )
+                    .align(Alignment.BottomEnd)
+                    .testTag(VIDEO_PHOTOS_NODE_DURATION_TEXT_TAG),
+                text = duration,
+                style = MaterialTheme.typography.labelSmall,
+                textColor = TextColor.OnColor
+            )
+        }
     }
 }
 

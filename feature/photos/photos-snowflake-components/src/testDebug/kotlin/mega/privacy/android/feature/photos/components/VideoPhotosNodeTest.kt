@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.photos.components
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -69,6 +70,15 @@ class VideoPhotosNodeTest {
             setNode(duration = duration, isSelected = true)
 
             onNodeWithText(duration).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that the video duration is not displayed when duration is empty`() {
+        composeRuleScope {
+            setNode()
+
+            onNodeWithTag(VIDEO_PHOTOS_NODE_DURATION_TEXT_TAG).assertIsNotDisplayed()
         }
     }
 
