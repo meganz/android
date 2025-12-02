@@ -9,15 +9,17 @@ import androidx.navigation3.scene.DialogSceneStrategy
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.contact.link.ContactLinkDialogViewModel
 import mega.privacy.android.domain.entity.contacts.ContactLinkQueryResult
-import mega.privacy.android.navigation.contract.AppDialogDestinations
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
+import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
 
 @Serializable
-data class ContactLinkDialogNavKey(val contactLinkQueryResult: ContactLinkQueryResult) : NavKey
+data class ContactLinkDialogNavKey(val contactLinkQueryResult: ContactLinkQueryResult) :
+    DialogNavKey
 
 data object ContactLinkDialogDestinations : AppDialogDestinations {
-    override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, () -> Unit) -> Unit =
+    override val navigationGraph: EntryProviderScope<DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
         { navigationHandler, onHandled ->
             contactLinkDialogDestination(
                 navigateBack = navigationHandler::back,
@@ -27,7 +29,7 @@ data object ContactLinkDialogDestinations : AppDialogDestinations {
         }
 }
 
-fun EntryProviderScope<NavKey>.contactLinkDialogDestination(
+fun EntryProviderScope<DialogNavKey>.contactLinkDialogDestination(
     navigateBack: () -> Unit,
     navigate: (NavKey) -> Unit,
     onDialogHandled: () -> Unit,

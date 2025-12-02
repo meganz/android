@@ -17,10 +17,10 @@ import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
 import mega.privacy.android.navigation.MegaActivityResultContract
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.navigation.contract.AppDialogDestinations
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
+import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
 import nz.mega.sdk.MegaApiAndroid

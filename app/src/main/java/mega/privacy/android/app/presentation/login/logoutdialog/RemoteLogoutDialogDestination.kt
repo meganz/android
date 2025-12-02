@@ -4,7 +4,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.EntryProviderScope
-import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.serialization.Serializable
@@ -12,15 +11,16 @@ import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.dialogs.BasicDialogButton
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.login.LOGGED_OUT_DIALOG
-import mega.privacy.android.navigation.contract.AppDialogDestinations
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
+import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 
 @Serializable
-data object RemoteLogoutDialogNavKey : NoSessionNavKey.Mandatory
+data object RemoteLogoutDialogNavKey : NoSessionNavKey.Mandatory, DialogNavKey
 
 data object RemoteLogoutDialogDestinations : AppDialogDestinations {
-    override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, () -> Unit) -> Unit =
+    override val navigationGraph: EntryProviderScope<DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
         { navigationHandler, onHandled ->
             remoteLogoutDestination(
                 navigateBack = navigationHandler::back,
@@ -29,7 +29,7 @@ data object RemoteLogoutDialogDestinations : AppDialogDestinations {
         }
 }
 
-fun EntryProviderScope<NavKey>.remoteLogoutDestination(
+fun EntryProviderScope<DialogNavKey>.remoteLogoutDestination(
     navigateBack: () -> Unit,
     onDialogHandled: () -> Unit,
 ) {

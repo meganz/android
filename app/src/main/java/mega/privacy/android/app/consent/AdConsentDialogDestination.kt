@@ -6,17 +6,17 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
-import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import com.google.android.ump.UserMessagingPlatform
 import de.palm.composestateevents.EventEffect
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.consent.model.AdsConsentState
+import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 
 @Serializable
-data object AdConsentDialog : NavKey
+data object AdConsentDialog : DialogNavKey
 
-fun EntryProviderScope<NavKey>.adConsentDialogDestination(
+fun EntryProviderScope<DialogNavKey>.adConsentDialogDestination(
     navigateBack: () -> Unit,
     onDialogHandled: () -> Unit,
 ) {

@@ -13,8 +13,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.app.appstate.content.model.NavigationGraphState
 import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUseCase
-import mega.privacy.android.navigation.contract.AppDialogDestinations
 import mega.privacy.android.navigation.contract.FeatureDestination
+import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject

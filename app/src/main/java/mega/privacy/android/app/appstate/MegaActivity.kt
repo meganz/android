@@ -32,6 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -78,6 +79,7 @@ import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckS
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
+import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
@@ -275,7 +277,7 @@ class MegaActivity : ComponentActivity() {
 
                                             graphstate.appDialogDestinations.forEach { destination ->
                                                 destination.navigationGraph(
-                                                    this,
+                                                    this as EntryProviderScope<DialogNavKey>,
                                                     navigationHandler,
                                                     navigationEventViewModel::eventHandled
                                                 )

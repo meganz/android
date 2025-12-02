@@ -15,13 +15,14 @@ import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.privacy.android.app.R
 import mega.privacy.android.app.consent.model.CookieConsentState
 import mega.privacy.android.app.consent.view.CookieConsentDialog
+import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.destination.CookieSettingsNavKey
 import mega.privacy.android.navigation.destination.WebSiteNavKey
 
 @Serializable
-data object CookieDialog : NavKey
+data object CookieDialog : DialogNavKey
 
-fun EntryProviderScope<NavKey>.cookieDialogDestination(
+fun EntryProviderScope<DialogNavKey>.cookieDialogDestination(
     navigateBack: () -> Unit,
     navigate: (NavKey) -> Unit,
     onDialogHandled: () -> Unit,
