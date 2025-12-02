@@ -9,9 +9,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
 import mega.privacy.android.core.sharedcomponents.serializable
-import mega.privacy.android.feature.photos.model.FilterMediaType
-import mega.privacy.android.feature.photos.model.Sort
-import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.ImageNode
@@ -19,6 +16,9 @@ import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.FilterCameraUploadImageNodesUseCase
 import mega.privacy.android.domain.usecase.FilterCloudDriveImageNodesUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelineNodesUseCase
+import mega.privacy.android.feature.photos.model.FilterMediaType
+import mega.privacy.android.feature.photos.model.Sort
+import mega.privacy.android.feature.photos.model.TimelinePhotosSource
 import javax.inject.Inject
 
 class TimelineImageNodeFetcher @Inject constructor(

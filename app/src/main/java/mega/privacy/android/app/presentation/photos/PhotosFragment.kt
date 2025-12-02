@@ -60,18 +60,15 @@ import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumsActi
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.photos.albums.albumcontent.AlbumContentFragment
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
-import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.compose.navigation.CameraUploadsTransferScreen
 import mega.privacy.android.app.presentation.photos.compose.navigation.PhotosNavigationGraph
 import mega.privacy.android.app.presentation.photos.compose.navigation.photosNavigationGraph
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
-import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.search.PhotosSearchActivity
 import mega.privacy.android.app.presentation.photos.timeline.actionMode.TimelineActionModeCallback
 import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMediaType
-import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
@@ -99,6 +96,9 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature.photos.model.Sort
+import mega.privacy.android.feature.photos.model.TimelinePhotosSource
+import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as SharedR

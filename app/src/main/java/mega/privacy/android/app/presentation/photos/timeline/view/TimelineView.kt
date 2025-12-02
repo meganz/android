@@ -29,7 +29,6 @@ import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsBannerType
-import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.view.CardListView
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
@@ -38,6 +37,7 @@ import mega.privacy.android.app.presentation.photos.view.isScrolledToTop
 import mega.privacy.android.app.presentation.photos.view.isScrollingDown
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.feature.photos.model.CameraUploadsStatus
+import mega.privacy.android.feature.photos.model.TimelinePhotosSource
 import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosSkeletonView
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar

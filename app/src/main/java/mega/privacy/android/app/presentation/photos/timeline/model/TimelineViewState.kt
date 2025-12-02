@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.feature.photos.model.CameraUploadsStatus
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.Sort
+import mega.privacy.android.feature.photos.model.TimelinePhotosSource
 import mega.privacy.android.feature.photos.model.ZoomLevel
 
 /**

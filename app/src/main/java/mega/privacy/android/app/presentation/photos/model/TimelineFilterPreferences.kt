@@ -1,8 +1,8 @@
 package mega.privacy.android.app.presentation.photos.model
 
-import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.feature.photos.model.FilterMediaType
+import mega.privacy.android.feature.photos.model.TimelinePhotosSource
 
 /**
  * Sealed interface for the Timeline Filter Preference
