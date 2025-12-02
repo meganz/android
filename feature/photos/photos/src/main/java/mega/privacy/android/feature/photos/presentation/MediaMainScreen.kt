@@ -41,6 +41,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabRout
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSortOptions
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabViewModel
+import mega.privacy.android.feature.photos.presentation.videos.VideosTabRoute
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineFilterView
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
@@ -318,10 +319,12 @@ private fun MediaScreen.MediaContent(
             )
         }
 
-        // Todo: Implement Videos and Playlists Screens
+        MediaScreen.Videos -> VideosTabRoute()
+
+        // Todo: Implement Playlists Screens
         else -> {
             Box(modifier) {
-                MegaText("Video / Playlists Screen - To be implemented")
+                MegaText("Playlists Screen - To be implemented")
             }
         }
     }
