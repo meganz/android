@@ -39,9 +39,16 @@ data class ContactsNavKey(val navType: NavType = NavType.List) : NavKey {
 @Parcelize
 data class ChatNavKey(val chatId: Long, val action: String?) : NoSessionNavKey.Optional, Parcelable
 
+/**
+ * Navigation key for Chat List
+ *
+ * @param createNewChat True if the Chat List screen should open with the Create New Chat flow
+ */
 @Serializable
 @Parcelize
-data object ChatsNavKey : NavKey, Parcelable
+data class ChatsNavKey(
+    val createNewChat: Boolean = false,
+) : NavKey, Parcelable
 
 @Serializable
 data class AddContactToShareNavKey(

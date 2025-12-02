@@ -50,6 +50,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.SendToChatActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.extensions.navigateToAppSettings
+import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.NavigationDrawerManager
 import mega.privacy.android.app.main.dialog.chatstatus.ChatStatusDialogFragment
@@ -71,7 +72,9 @@ import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
 import mega.privacy.android.app.presentation.meeting.model.ShareLinkOption
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
+import mega.privacy.android.app.presentation.startconversation.StartConversationActivity.Companion.EXTRA_JOIN_MEETING
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity.Companion.EXTRA_NEW_CHAT_ID
+import mega.privacy.android.app.presentation.startconversation.StartConversationActivity.Companion.EXTRA_NEW_MEETING
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
@@ -161,9 +164,26 @@ class ChatTabsFragment : Fragment() {
     private val startConversationLauncher: ActivityResultLauncher<Intent?> =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val intentData = result.data
-            if (result.resultCode == Activity.RESULT_OK && intentData?.hasExtra(EXTRA_NEW_CHAT_ID) == true) {
-                val chatId = intentData.getLongExtra(EXTRA_NEW_CHAT_ID, MEGACHAT_INVALID_HANDLE)
-                launchChatScreen(chatId)
+            if (result.resultCode == Activity.RESULT_CANCELED) {
+                activity?.finish()
+            } else if (result.resultCode == Activity.RESULT_OK && intentData != null) {
+                val isNewMeeting =
+                    intentData.getBooleanExtra(EXTRA_NEW_MEETING, false)
+                val isJoinMeeting =
+                    intentData.getBooleanExtra(EXTRA_JOIN_MEETING, false)
+                if (isNewMeeting) {
+                    (activity as? MeetingBottomSheetDialogActionListener)?.onCreateMeeting()
+                } else if (isJoinMeeting) {
+                    (activity as? MeetingBottomSheetDialogActionListener)?.onJoinMeeting()
+                } else {
+                    val chatId = intentData.getLongExtra(
+                        EXTRA_NEW_CHAT_ID,
+                        MEGACHAT_INVALID_HANDLE
+                    )
+                    if (chatId != MEGACHAT_INVALID_HANDLE) {
+                        launchChatScreen(chatId)
+                    }
+                }
             } else {
                 Timber.w("StartConversationActivity invalid result: $result")
             }
@@ -419,6 +439,17 @@ class ChatTabsFragment : Fragment() {
         }
 
         collectFlows()
+
+        val createNewChat = arguments?.getBoolean(ChatHostActivity.CREATE_NEW_CHAT, false) ?: false
+        if (createNewChat && savedInstanceState == null) {
+            startConversationLauncher.launch(
+                Intent(
+                    activity,
+                    StartConversationActivity::class.java
+                )
+            )
+            arguments?.remove(ChatHostActivity.CREATE_NEW_CHAT)
+        }
 
         viewLifecycleOwner.collectFlow(viewModel.getState(), Lifecycle.State.RESUMED) { state ->
             if (state.selectedIds.isNotEmpty()) {

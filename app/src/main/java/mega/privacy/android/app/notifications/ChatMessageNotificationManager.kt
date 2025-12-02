@@ -98,7 +98,7 @@ class ChatMessageNotificationManager @Inject constructor(
         val pendingIntent = if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
             MegaActivity.getPendingIntentWithExtraDestinations(
                 context,
-                listOf(ChatsNavKey, ChatNavKey(chat.chatId, null))
+                listOf(ChatsNavKey(), ChatNavKey(chat.chatId, null))
             )
         } else {
             val intent = Intent(context, ManagerActivity::class.java).apply {

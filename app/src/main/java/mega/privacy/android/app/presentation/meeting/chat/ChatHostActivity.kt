@@ -93,5 +93,6 @@ class ChatHostActivity : AppCompatActivity(), MeetingBottomSheetDialogActionList
 
     companion object {
         const val OPEN_CHAT_LIST = "open_chat_list"
+        const val CREATE_NEW_CHAT = "create_new_chat"
     }
 }

@@ -87,7 +87,7 @@ private fun HomeChips(
             selected = false,
             leadingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.MessageChatCircle),
             onClick = {
-                onNavigate(ChatsNavKey)
+                onNavigate(ChatsNavKey())
             },
         )
 

@@ -19,7 +19,7 @@ class ChatsDeepLinkHandler @Inject constructor(
         uri: Uri,
         regexPatternType: RegexPatternType?,
     ): List<NavKey>? = when (regexPatternType) {
-        NEW_MESSAGE_CHAT_LINK -> listOf(ChatsNavKey)
+        NEW_MESSAGE_CHAT_LINK -> listOf(ChatsNavKey())
 
         else -> null
     }

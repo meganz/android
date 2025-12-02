@@ -49,7 +49,7 @@ class ChatsDeepLinkHandlerTest {
         val actual = underTest.getNavKeys(uri, NEW_MESSAGE_CHAT_LINK, isLoggedIn)
 
         if (isLoggedIn) {
-            assertThat(actual).containsExactly(ChatsNavKey)
+            assertThat(actual).containsExactly(ChatsNavKey())
             verifyNoInteractions(snackbarEventQueue)
         } else {
             assertThat(actual).isEmpty()

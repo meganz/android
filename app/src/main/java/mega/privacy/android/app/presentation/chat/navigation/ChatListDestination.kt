@@ -17,6 +17,7 @@ fun EntryProviderScope<NavKey>.chatListLegacyDestination(removeDestination: () -
         LaunchedEffect(Unit) {
             val intent = Intent(context, ChatHostActivity::class.java).apply {
                 putExtra(ChatHostActivity.OPEN_CHAT_LIST, true)
+                putExtra(ChatHostActivity.CREATE_NEW_CHAT, key.createNewChat)
             }
             context.startActivity(intent)
             removeDestination()

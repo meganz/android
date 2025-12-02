@@ -55,7 +55,7 @@ class ChatItem(
     getNumUnreadChatsUseCase: GetNumUnreadChatsUseCase,
     monitorOngoingCallUseCase: MonitorOngoingCallUseCase,
 ) : NavDrawerItem.Account(
-    destination = ChatsNavKey,
+    destination = ChatsNavKey(),
     icon = IconPack.Medium.Thin.Outline.MessageChatCircle,
     title = sharedR.string.general_chat,
     badge = combine(

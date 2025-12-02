@@ -54,6 +54,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.destination.ChatsNavKey
 import mega.privacy.android.navigation.destination.SearchNodeNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
@@ -108,6 +109,7 @@ internal fun HomeScreen(
         .collectAsStateWithLifecycle(null)
 
     LaunchedEffect(fabOption) {
+        val fabOption = fabOption
         if (fabOption != null) {
             when (fabOption) {
                 HomeFabOption.UploadFiles -> uploadHandler.onUploadFilesClicked()
@@ -122,10 +124,9 @@ internal fun HomeScreen(
                     )
                 )
 
-
-                else -> {
-                    // Handle other options later
-                }
+                HomeFabOption.NewChat -> navigationHandler.navigate(
+                    ChatsNavKey(createNewChat = true)
+                )
             }
             navigationHandler.clearResult(HomeFabOptionsBottomSheetNavKey.KEY)
         }
