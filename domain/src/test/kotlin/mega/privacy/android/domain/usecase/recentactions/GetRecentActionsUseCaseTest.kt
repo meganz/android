@@ -576,4 +576,53 @@ class GetRecentActionsUseCaseTest {
             assertThat(result[0].isKeyVerified).isTrue()
             assertThat(result[0].isNodeKeyDecrypted).isFalse()
         }
+
+    @Test
+    fun `test that maxBucketCount limits the number of buckets returned`() = runTest {
+        val buckets = (0..10).map { index ->
+            val node = mock<FileNode> {
+                on { id } doReturn NodeId(index.toLong())
+                on { isNodeKeyDecrypted }.thenReturn(true)
+            }
+            whenever(addNodeType(node)).thenReturn(DefaultTypedFileNode(node))
+            RecentActionBucketUnTyped(
+                timestamp = index.toLong(),
+                userEmail = "aaa@aaa.com",
+                parentNodeId = NodeId(0L),
+                isUpdate = false,
+                isMedia = false,
+                nodes = listOf(node)
+            )
+        }
+        whenever(recentActionsRepository.getRecentActions(any())).thenReturn(buckets)
+
+        val result = underTest(false, maxBucketCount = 5)
+
+        assertThat(result).hasSize(5)
+    }
+
+    @Test
+    fun `test that maxBucketCount returns all buckets when count is larger than available`() =
+        runTest {
+            val buckets = (0..3).map { index ->
+                val node = mock<FileNode> {
+                    on { id } doReturn NodeId(index.toLong())
+                    on { isNodeKeyDecrypted }.thenReturn(true)
+                }
+                whenever(addNodeType(node)).thenReturn(DefaultTypedFileNode(node))
+                RecentActionBucketUnTyped(
+                    timestamp = index.toLong(),
+                    userEmail = "aaa@aaa.com",
+                    parentNodeId = NodeId(0L),
+                    isUpdate = false,
+                    isMedia = false,
+                    nodes = listOf(node)
+                )
+            }
+            whenever(recentActionsRepository.getRecentActions(any())).thenReturn(buckets)
+
+            val result = underTest(false, maxBucketCount = 10)
+
+            assertThat(result).hasSize(4)
+        }
 }

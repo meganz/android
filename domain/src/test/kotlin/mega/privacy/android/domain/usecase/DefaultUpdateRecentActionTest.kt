@@ -65,7 +65,7 @@ class DefaultUpdateRecentActionTest {
         runTest {
             val expected = createBucket(isMedia = true, isUpdate = true, 0L, NodeId(1L), "1")
             val list = listOf(expected, expected, expected)
-            whenever(getRecentActionsUseCase(any())).thenReturn(list)
+            whenever(getRecentActionsUseCase(any(), any())).thenReturn(list)
 
             assertThat(underTest.invoke(expected, null, false)).isEqualTo(expected)
         }
@@ -83,7 +83,7 @@ class DefaultUpdateRecentActionTest {
             val cachedActionList = listOf(current, item1, item2)
 
             val list = listOf(expected, item1, item2)
-            whenever(getRecentActionsUseCase(any())).thenReturn(list)
+            whenever(getRecentActionsUseCase(any(), any())).thenReturn(list)
 
             assertThat(underTest.invoke(current, cachedActionList, false)).isEqualTo(expected)
         }
@@ -99,7 +99,7 @@ class DefaultUpdateRecentActionTest {
             val cachedActionList = listOf(current, item1, item2)
 
             val list = listOf(item1, item2)
-            whenever(getRecentActionsUseCase(any())).thenReturn(list)
+            whenever(getRecentActionsUseCase(any(), any())).thenReturn(list)
 
             assertThat(underTest.invoke(current, cachedActionList, false)).isEqualTo(null)
         }

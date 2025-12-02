@@ -43,6 +43,7 @@ class GetRecentActionsUseCase @Inject constructor(
      */
     suspend operator fun invoke(
         excludeSensitives: Boolean,
+        maxBucketCount: Int = 500
     ): List<RecentActionBucket> = coroutineScope {
         val visibleContactsDeferred = async { contactsRepository.getAllContactsName() }
         val recentActionsDeferred = async {
@@ -64,6 +65,7 @@ class GetRecentActionsUseCase @Inject constructor(
 
         recentActionsDeferred.await()
             .filter { it.nodes.isNotEmpty() }
+            .take(maxBucketCount)
             .map { bucket ->
                 async(coroutineDispatcher) {
                     semaphore.withPermit {

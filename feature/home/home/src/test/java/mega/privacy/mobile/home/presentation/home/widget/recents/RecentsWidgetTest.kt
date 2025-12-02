@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.mobile.home.presentation.home.widget.recents.RecentsWidgetConstants.MAX_BUCKETS
 import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentActionTitleText
 import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsTimestampText
 import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsUiItem
@@ -481,6 +482,100 @@ class RecentsWidgetTest {
             .performClick()
 
         assertThat(showActivityClicked).isTrue()
+    }
+
+    @Test
+    fun `test that view all button is displayed when there are MAX_BUCKETS items`() {
+        val timestamp = System.currentTimeMillis() / 1000
+        val items = (0..MAX_BUCKETS).map { index ->
+            createMockRecentsUiItem(
+                title = RecentActionTitleText.SingleNode("Document$index.pdf"),
+                parentFolderName = LocalizedText.Literal("Cloud Drive"),
+                timestamp = timestamp,
+                icon = IconPackR.drawable.ic_generic_medium_solid,
+            )
+        }
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsView(
+                    uiState = RecentsWidgetUiState(
+                        recentActionItems = items,
+                        isLoading = false,
+                    ),
+                    onFileClicked = { _, _ -> },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
+                )
+            }
+        }
+
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag(RECENTS_VIEW_ALL_BUTTON_TEST_TAG, true)
+            .assertExists()
+    }
+
+    @Test
+    fun `test that view all button is not displayed when there are fewer than MAX_BUCKETS items`() {
+        val timestamp = System.currentTimeMillis() / 1000
+        val items = (0..2).map { index ->
+            createMockRecentsUiItem(
+                title = RecentActionTitleText.SingleNode("Document$index.pdf"),
+                parentFolderName = LocalizedText.Literal("Cloud Drive"),
+                timestamp = timestamp,
+                icon = IconPackR.drawable.ic_generic_medium_solid,
+            )
+        }
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsView(
+                    uiState = RecentsWidgetUiState(
+                        recentActionItems = items,
+                        isLoading = false,
+                    ),
+                    onFileClicked = { _, _ -> },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
+                )
+            }
+        }
+
+        composeRule.waitForIdle()
+        composeRule.onAllNodesWithTag(RECENTS_VIEW_ALL_BUTTON_TEST_TAG)
+            .assertCountEquals(0)
+    }
+
+    @Test
+    fun `test that view all button is not displayed when recents are hidden`() {
+        val timestamp = System.currentTimeMillis() / 1000
+        val items = (0..3).map { index ->
+            createMockRecentsUiItem(
+                title = RecentActionTitleText.SingleNode("Document$index.pdf"),
+                parentFolderName = LocalizedText.Literal("Cloud Drive"),
+                timestamp = timestamp,
+                icon = IconPackR.drawable.ic_generic_medium_solid,
+            )
+        }
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsView(
+                    uiState = RecentsWidgetUiState(
+                        recentActionItems = items,
+                        isLoading = false,
+                        isHideRecentsEnabled = true,
+                    ),
+                    onFileClicked = { _, _ -> },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
+                )
+            }
+        }
+
+        composeRule.waitForIdle()
+        composeRule.onAllNodesWithTag(RECENTS_VIEW_ALL_BUTTON_TEST_TAG)
+            .assertCountEquals(0)
     }
 
     private fun createMockTypedFileNode(

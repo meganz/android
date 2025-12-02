@@ -1,6 +1,8 @@
 package mega.privacy.mobile.home.presentation.home.widget.recents
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,14 +11,20 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.AppTheme
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.RecentActionBucket
@@ -91,7 +99,7 @@ class RecentsWidget @Inject constructor() : HomeWidget {
             onHideRecentActivity = {
                 viewModel.hideRecentActivity()
                 coroutineScope.launch {
-                    snackBarEventQueue.queueMessage("You’re recent activity has been hidden") // TODO: Localize
+                    snackBarEventQueue.queueMessage("Your recent activity has been hidden") // TODO: Localize
                 }
             },
         )
@@ -146,9 +154,32 @@ fun RecentsView(
                     )
                 }
             }
+
+            if (uiState.recentActionItems.size >= RecentsWidgetConstants.MAX_BUCKETS) {
+                TextButton(
+                    onClick = {
+                        // TODO: Navigate to full recents screen
+                    },
+                    modifier = Modifier.testTag(RECENTS_VIEW_ALL_BUTTON_TEST_TAG),
+                    contentPadding = PaddingValues(
+                        horizontal = 16.dp,
+                    )
+                ) {
+                    MegaText(
+                        text = "View all", // TODO: localize
+                        style = AppTheme.typography.titleSmall.copy(
+                            textDecoration = TextDecoration.Underline,
+                            fontWeight = FontWeight.W500
+                        )
+                    )
+                }
+            }
         }
     }
 }
+
+internal const val RECENTS_VIEW_ALL_BUTTON_TEST_TAG = "recents_widget:view_all_button"
+
 
 @CombinedThemePreviews
 @Composable
@@ -175,6 +206,18 @@ private fun RecentsViewPreview() {
                     ),
                     createMockRecentsUiItem(
                         title = RecentActionTitleText.RegularBucket("Presentation.pptx", 3),
+                        parentFolderName = LocalizedText.Literal("Work"),
+                        timestamp = System.currentTimeMillis() / 1000 - 207200,
+                        icon = IconPackR.drawable.ic_generic_medium_solid,
+                        isUpdate = true,
+                        updatedByText = LocalizedText.StringRes(
+                            mega.privacy.android.feature.home.R.string.update_action_bucket,
+                            listOf("John Doe")
+                        ),
+                        userName = "John Doe",
+                    ),
+                    createMockRecentsUiItem(
+                        title = RecentActionTitleText.SingleNode("Test.pptx",),
                         parentFolderName = LocalizedText.Literal("Work"),
                         timestamp = System.currentTimeMillis() / 1000 - 207200,
                         icon = IconPackR.drawable.ic_generic_medium_solid,

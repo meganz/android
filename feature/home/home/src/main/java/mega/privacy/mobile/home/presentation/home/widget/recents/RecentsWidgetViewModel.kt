@@ -39,8 +39,10 @@ class RecentsWidgetViewModel @Inject constructor(
     private fun loadRecentActions() {
         viewModelScope.launch {
             runCatching {
-                getRecentActionsUseCase(excludeSensitives = false) // TODO: Handle hidden nodes
-                    .map { recentActionUiItemMapper(it) }
+                getRecentActionsUseCase(
+                    excludeSensitives = false, // TODO: Handle hidden nodes
+                    maxBucketCount = RecentsWidgetConstants.MAX_BUCKETS
+                ).map { recentActionUiItemMapper(it) }
             }.onSuccess { buckets ->
                 _uiState.update {
                     it.copy(
@@ -95,4 +97,11 @@ class RecentsWidgetViewModel @Inject constructor(
             }
         }
     }
+}
+
+object RecentsWidgetConstants {
+    /**
+     * Maximum number of recent action buckets to display in the widget
+     */
+    const val MAX_BUCKETS = 4
 }

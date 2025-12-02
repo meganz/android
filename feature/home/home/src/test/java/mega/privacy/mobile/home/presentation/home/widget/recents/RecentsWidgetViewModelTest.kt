@@ -3,12 +3,12 @@ package mega.privacy.mobile.home.presentation.home.widget.recents
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import kotlinx.coroutines.flow.flowOf
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
@@ -80,7 +80,7 @@ class RecentsWidgetViewModelTest {
 
     @Test
     fun `test that empty list results in isLoading false and empty items`() = runTest {
-        whenever(getRecentActionsUseCase(any())).thenReturn(emptyList())
+        whenever(getRecentActionsUseCase(any(), any())).thenReturn(emptyList())
 
         initViewModel()
 
@@ -93,7 +93,7 @@ class RecentsWidgetViewModelTest {
 
     @Test
     fun `test that recent actions are loaded and mapped correctly`() = runTest {
-        whenever(getRecentActionsUseCase(excludeSensitives = false)).thenReturn(
+        whenever(getRecentActionsUseCase(excludeSensitives = false, maxBucketCount = 4)).thenReturn(
             listOf(bucket1, bucket2, bucket3)
         )
         whenever(recentActionUiItemMapper(bucket1)).thenReturn(uiItem1)
