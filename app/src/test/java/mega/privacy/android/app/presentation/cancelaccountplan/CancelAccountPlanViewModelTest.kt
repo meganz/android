@@ -98,7 +98,8 @@ internal class CancelAccountPlanViewModelTest {
             storage = storage,
             transfer = transfer,
             amount = CurrencyPoint.SystemCurrencyPoint(0L),
-            currency = Currency(code = "USD")
+            currency = Currency(code = "USD"),
+            hasOffer = false,
         )
 
     private fun initViewModel() {

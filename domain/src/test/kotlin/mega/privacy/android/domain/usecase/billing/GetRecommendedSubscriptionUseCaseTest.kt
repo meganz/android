@@ -104,6 +104,7 @@ class GetRecommendedSubscriptionUseCaseTest {
         transfer = 450,
         amount = CurrencyPoint.SystemCurrencyPoint(499L),
         currency = Currency("EUR"),
+        hasOffer = false,
     )
 
     private val subscriptionOptionI = SubscriptionOption(
@@ -115,6 +116,7 @@ class GetRecommendedSubscriptionUseCaseTest {
         transfer = 2048,
         amount = CurrencyPoint.SystemCurrencyPoint(999L),
         currency = Currency("EUR"),
+        hasOffer = false,
     )
 
     private val subscriptionOptionII = SubscriptionOption(
@@ -126,6 +128,7 @@ class GetRecommendedSubscriptionUseCaseTest {
         transfer = 8192,
         amount = CurrencyPoint.SystemCurrencyPoint(1999L),
         currency = Currency("EUR"),
+        hasOffer = false,
     )
 
     private val localPricingLite = LocalPricing(

@@ -28,6 +28,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
         transfer = 2048,
         amount = CurrencyPoint.SystemCurrencyPoint(999.toLong()),
         currency = Currency("EUR"),
+        hasOffer = false,
     )
 
     private val subscriptionPlanProIYearly = SubscriptionOption(
@@ -39,6 +40,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
         transfer = 24576,
         amount = CurrencyPoint.SystemCurrencyPoint(9999.toLong()),
         currency = Currency("EUR"),
+        hasOffer = false,
     )
 
     private val subscriptionPlanProIIMonthly = SubscriptionOption(
@@ -50,6 +52,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
         transfer = 8192,
         amount = CurrencyPoint.SystemCurrencyPoint(1999.toLong()),
         currency = Currency("EUR"),
+        hasOffer = false,
     )
 
     private val subscriptionPlanProIIYearly = SubscriptionOption(
@@ -61,6 +64,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
         transfer = 98304,
         amount = CurrencyPoint.SystemCurrencyPoint(19999.toLong()),
         currency = Currency("EUR"),
+        hasOffer = false,
     )
 
     private val subscriptionPlanProIIIMonthly = SubscriptionOption(
@@ -72,6 +76,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
         transfer = 16384,
         amount = CurrencyPoint.SystemCurrencyPoint(2999.toLong()),
         currency = Currency("EUR"),
+        hasOffer = false,
     )
 
     private val subscriptionPlanProIIIYearly = SubscriptionOption(
@@ -83,6 +88,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
         transfer = 196608,
         amount = CurrencyPoint.SystemCurrencyPoint(29999.toLong()),
         currency = Currency("EUR"),
+        hasOffer = false,
     )
 
     private val subscriptionPlanProLiteMonthly = SubscriptionOption(
@@ -94,6 +100,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
         transfer = 1024,
         amount = CurrencyPoint.SystemCurrencyPoint(499.toLong()),
         currency = Currency("EUR"),
+        hasOffer = false,
     )
 
     private val subscriptionPlanProLiteYearly = SubscriptionOption(
@@ -105,6 +112,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
         transfer = 12288,
         amount = CurrencyPoint.SystemCurrencyPoint(4999.toLong()),
         currency = Currency("EUR"),
+        hasOffer = false,
     )
 
     private val subscriptionPlanBusiness = SubscriptionOption(
@@ -116,6 +124,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
         transfer = -1,
         amount = CurrencyPoint.SystemCurrencyPoint(0.toLong()),
         currency = Currency("EUR"),
+        hasOffer = false,
     )
 
     private val subscriptionPlanProFlexi = SubscriptionOption(
@@ -127,6 +136,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
         transfer = -1,
         amount = CurrencyPoint.SystemCurrencyPoint(1.toLong()),
         currency = Currency("EUR"),
+        hasOffer = false,
     )
 
     private val subscriptionPlanUnknown = SubscriptionOption(
@@ -138,6 +148,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
         transfer = -1,
         amount = CurrencyPoint.SystemCurrencyPoint(1.toLong()),
         currency = Currency("EUR"),
+        hasOffer = false,
     )
 
     private val fullListOfSubscriptionOptions = listOf(

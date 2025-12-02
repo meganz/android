@@ -36,7 +36,8 @@ class GetSubscriptionsUseCaseTest {
         transfer = 450,
         amount = CurrencyPoint.SystemCurrencyPoint(9999.toLong()),
         currency = Currency("EUR"),
-        sku = "android.test.purchased.month"
+        sku = "android.test.purchased.month",
+        hasOffer = false,
     )
 
     private val yearlySubscriptionOption = SubscriptionOption(
@@ -47,7 +48,8 @@ class GetSubscriptionsUseCaseTest {
         transfer = 450,
         amount = CurrencyPoint.SystemCurrencyPoint(99999.toLong()),
         currency = Currency("EUR"),
-        sku = SKU_PRO_LITE_YEAR
+        sku = SKU_PRO_LITE_YEAR,
+        hasOffer = false,
     )
 
     private val monthlySubscription = Subscription(

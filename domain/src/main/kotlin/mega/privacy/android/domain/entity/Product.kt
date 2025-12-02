@@ -21,16 +21,4 @@ data class Product(
     val amount: Int,
     val currency: String?,
     val isBusiness: Boolean,
-) {
-    /**
-     * Is monthly
-     */
-    val isMonthly: Boolean
-        get() = months == 1
-
-    /**
-     * Is yearly
-     */
-    val isYearly: Boolean
-        get() = months == 12
-}
+)
