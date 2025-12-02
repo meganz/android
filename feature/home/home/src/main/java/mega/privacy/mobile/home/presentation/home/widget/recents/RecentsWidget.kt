@@ -26,6 +26,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
+import mega.privacy.android.core.nodecomponents.list.NodeListViewItemSkeleton
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionsSharesType
@@ -119,59 +120,71 @@ fun RecentsView(
             modifier = Modifier,
             onOptionsClicked = onWidgetOptionsClicked
         )
-        if (uiState.isHideRecentsEnabled) {
-            RecentsHiddenView(
-                modifier = modifier,
-                onShowActivityClicked = onShowRecentActivity,
-            )
-        } else {
-            val grouped = remember(uiState.recentActionItems) {
-                uiState.recentActionItems.groupBy { it.timestampText.dateOnlyTimestamp }
+        when {
+            uiState.isHideRecentsEnabled -> {
+                RecentsHiddenView(
+                    modifier = modifier,
+                    onShowActivityClicked = onShowRecentActivity,
+                )
             }
 
-            grouped.forEach { (dateTimestamp, itemsForDate) ->
-                RecentDateHeader(dateTimestamp)
+            uiState.isLoading -> {
+                // TODO: Update skeleton to match final design
+                NodeListViewItemSkeleton()
+                NodeListViewItemSkeleton()
+                NodeListViewItemSkeleton()
+                NodeListViewItemSkeleton()
+            }
 
-                itemsForDate.forEach { item ->
-                    RecentsListItemView(
-                        item = item,
-                        onItemClicked = {
-                            if (item.isSingleNode) {
-                                val nodeSourceType =
-                                    if (item.bucket.parentFolderSharesType == RecentActionsSharesType.INCOMING_SHARES) {
-                                        NodeSourceType.INCOMING_SHARES
-                                    } else {
-                                        NodeSourceType.CLOUD_DRIVE
-                                    }
-                                onFileClicked(item.bucket.nodes.first(), nodeSourceType)
-                            } else {
-                                // TODO: Handle bucket click
-                            }
-                        },
-                        onMenuClicked = {
-                            // TODO: Handle menu click
-                        }
-                    )
+            else -> {
+                val grouped = remember(uiState.recentActionItems) {
+                    uiState.recentActionItems.groupBy { it.timestampText.dateOnlyTimestamp }
                 }
-            }
 
-            if (uiState.recentActionItems.size >= RecentsWidgetConstants.MAX_BUCKETS) {
-                TextButton(
-                    onClick = {
-                        // TODO: Navigate to full recents screen
-                    },
-                    modifier = Modifier.testTag(RECENTS_VIEW_ALL_BUTTON_TEST_TAG),
-                    contentPadding = PaddingValues(
-                        horizontal = 16.dp,
-                    )
-                ) {
-                    MegaText(
-                        text = "View all", // TODO: localize
-                        style = AppTheme.typography.titleSmall.copy(
-                            textDecoration = TextDecoration.Underline,
-                            fontWeight = FontWeight.W500
+                grouped.forEach { (dateTimestamp, itemsForDate) ->
+                    RecentDateHeader(dateTimestamp)
+
+                    itemsForDate.forEach { item ->
+                        RecentsListItemView(
+                            item = item,
+                            onItemClicked = {
+                                if (item.isSingleNode) {
+                                    val nodeSourceType =
+                                        if (item.bucket.parentFolderSharesType == RecentActionsSharesType.INCOMING_SHARES) {
+                                            NodeSourceType.INCOMING_SHARES
+                                        } else {
+                                            NodeSourceType.CLOUD_DRIVE
+                                        }
+                                    onFileClicked(item.bucket.nodes.first(), nodeSourceType)
+                                } else {
+                                    // TODO: Handle bucket click
+                                }
+                            },
+                            onMenuClicked = {
+                                // TODO: Handle menu click
+                            }
                         )
-                    )
+                    }
+                }
+
+                if (uiState.recentActionItems.size >= RecentsWidgetConstants.MAX_BUCKETS) {
+                    TextButton(
+                        onClick = {
+                            // TODO: Navigate to full recents screen
+                        },
+                        modifier = Modifier.testTag(RECENTS_VIEW_ALL_BUTTON_TEST_TAG),
+                        contentPadding = PaddingValues(
+                            horizontal = 16.dp,
+                        )
+                    ) {
+                        MegaText(
+                            text = "View all", // TODO: localize
+                            style = AppTheme.typography.titleSmall.copy(
+                                textDecoration = TextDecoration.Underline,
+                                fontWeight = FontWeight.W500
+                            )
+                        )
+                    }
                 }
             }
         }
@@ -211,25 +224,26 @@ private fun RecentsViewPreview() {
                         icon = IconPackR.drawable.ic_generic_medium_solid,
                         isUpdate = true,
                         updatedByText = LocalizedText.StringRes(
-                            mega.privacy.android.feature.home.R.string.update_action_bucket,
+                            R.string.update_action_bucket,
                             listOf("John Doe")
                         ),
                         userName = "John Doe",
                     ),
                     createMockRecentsUiItem(
-                        title = RecentActionTitleText.SingleNode("Test.pptx",),
+                        title = RecentActionTitleText.SingleNode("Test.pptx"),
                         parentFolderName = LocalizedText.Literal("Work"),
                         timestamp = System.currentTimeMillis() / 1000 - 207200,
                         icon = IconPackR.drawable.ic_generic_medium_solid,
                         isUpdate = true,
                         updatedByText = LocalizedText.StringRes(
-                            mega.privacy.android.feature.home.R.string.update_action_bucket,
+                            R.string.update_action_bucket,
                             listOf("John Doe")
                         ),
                         userName = "John Doe",
                     ),
                 ),
-                isLoading = false,
+                isNodesLoading = false,
+                isHiddenNodeSettingsLoading = false
             ),
             onFileClicked = { _, _ -> },
             onWidgetOptionsClicked = {},
@@ -245,7 +259,7 @@ private fun RecentsHiddenViewPreview() {
         RecentsView(
             uiState = RecentsWidgetUiState(
                 recentActionItems = emptyList(),
-                isLoading = false,
+                isNodesLoading = false,
                 isHideRecentsEnabled = true
             ),
             onFileClicked = { _, _ -> },
@@ -262,7 +276,8 @@ private fun RecentsViewEmptyPreview() {
         RecentsView(
             uiState = RecentsWidgetUiState(
                 recentActionItems = emptyList(),
-                isLoading = false,
+                isNodesLoading = false,
+                isHiddenNodeSettingsLoading = false
             ),
             onFileClicked = { _, _ -> },
             onWidgetOptionsClicked = {},
@@ -278,7 +293,8 @@ private fun RecentsViewLoadingPreview() {
         RecentsView(
             uiState = RecentsWidgetUiState(
                 recentActionItems = emptyList(),
-                isLoading = true,
+                isNodesLoading = true,
+                isHiddenNodeSettingsLoading = true
             ),
             onFileClicked = { _, _ -> },
             onWidgetOptionsClicked = {},
@@ -321,6 +337,7 @@ private fun createMockRecentsUiItem(
         isFavourite = isFavourite,
         nodeLabel = nodeLabel,
         bucket = mockBucket,
-        isSingleNode = !isMediaBucket
+        isSingleNode = !isMediaBucket,
+        isSensitive = false
     )
 }

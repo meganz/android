@@ -58,6 +58,7 @@ class RecentActionUiItemMapper @Inject constructor(
             isFavourite = isSingleNode && node.isFavourite,
             nodeLabel = if (isSingleNode) node.nodeLabel else null,
             isSingleNode = isSingleNode,
+            isSensitive = isSingleNode && (node.isMarkedSensitive || node.isSensitiveInherited),
             bucket = item
         )
     }

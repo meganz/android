@@ -35,4 +35,5 @@ data class RecentsUiItem(
     val nodeLabel: NodeLabel?,
     val bucket: RecentActionBucket,
     val isSingleNode: Boolean,
+    val isSensitive: Boolean,
 )

@@ -69,6 +69,7 @@ fun RecentsListItemView(
         label = item.nodeLabel,
         showFavourite = item.isFavourite,
         showVersion = item.isUpdate,
+        isSensitive = item.isSensitive,
         isMediaBucket = item.isMediaBucket,
         isExpanded = isExpanded,
         onMenuClicked = onMenuClicked,
@@ -114,6 +115,7 @@ fun RecentsListItemView(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .alpha(1f.takeIf { !isSensitive } ?: 0.5f)
             .clickable {
                 onItemClicked()
             }

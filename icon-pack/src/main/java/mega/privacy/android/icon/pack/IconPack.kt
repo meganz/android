@@ -290,8 +290,7 @@ public object IconPack : IconPackInterface {
                         createMediumThinOutlineFileUploadImageVector() }
 
                 override val Filter: ImageVector by lazy {
-                    createMediumThinOutlineFilterImageVector()
-                }
+                        createMediumThinOutlineFilterImageVector() }
 
                 override val Folder: ImageVector by lazy {
                         createMediumThinOutlineFolderImageVector() }

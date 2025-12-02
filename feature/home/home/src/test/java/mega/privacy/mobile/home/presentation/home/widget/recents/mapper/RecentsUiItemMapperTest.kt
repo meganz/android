@@ -425,16 +425,182 @@ class RecentsUiItemMapperTest {
         assertThat(result.icon).isEqualTo(expectedIcon)
     }
 
+    @Test
+    fun `test that isSensitive is true for single node when node is marked sensitive`() {
+        val node = createMockFileNode(
+            name = "sensitive.txt",
+            isMarkedSensitive = true,
+            isSensitiveInherited = false
+        )
+        val bucket = createMockRecentActionBucket(
+            nodes = listOf(node),
+            isNodeKeyDecrypted = true
+        )
+
+        val result = underTest(bucket)
+
+        assertThat(result.isSensitive).isTrue()
+    }
+
+    @Test
+    fun `test that isSensitive is true for single node when node has sensitive inherited`() {
+        val node = createMockFileNode(
+            name = "inherited_sensitive.txt",
+            isMarkedSensitive = false,
+            isSensitiveInherited = true
+        )
+        val bucket = createMockRecentActionBucket(
+            nodes = listOf(node),
+            isNodeKeyDecrypted = true
+        )
+
+        val result = underTest(bucket)
+
+        assertThat(result.isSensitive).isTrue()
+    }
+
+    @Test
+    fun `test that isSensitive is true for single node when both marked sensitive and inherited`() {
+        val node = createMockFileNode(
+            name = "both_sensitive.txt",
+            isMarkedSensitive = true,
+            isSensitiveInherited = true
+        )
+        val bucket = createMockRecentActionBucket(
+            nodes = listOf(node),
+            isNodeKeyDecrypted = true
+        )
+
+        val result = underTest(bucket)
+
+        assertThat(result.isSensitive).isTrue()
+    }
+
+    @Test
+    fun `test that isSensitive is false for single node when node is not marked sensitive and not inherited`() {
+        val node = createMockFileNode(
+            name = "normal.txt",
+            isMarkedSensitive = false,
+            isSensitiveInherited = false
+        )
+        val bucket = createMockRecentActionBucket(
+            nodes = listOf(node),
+            isNodeKeyDecrypted = true
+        )
+
+        val result = underTest(bucket)
+
+        assertThat(result.isSensitive).isFalse()
+    }
+
+    @Test
+    fun `test that isSensitive is false for multiple nodes even if one is marked sensitive`() {
+        val node1 = createMockFileNode(
+            name = "sensitive.txt",
+            isMarkedSensitive = true,
+            isSensitiveInherited = false
+        )
+        val node2 = createMockFileNode(
+            name = "normal.txt",
+            isMarkedSensitive = false,
+            isSensitiveInherited = false
+        )
+        val bucket = createMockRecentActionBucket(
+            nodes = listOf(node1, node2),
+            isNodeKeyDecrypted = true
+        )
+
+        val result = underTest(bucket)
+
+        assertThat(result.isSensitive).isFalse()
+    }
+
+    @Test
+    fun `test that isSensitive is false for multiple nodes even if one has sensitive inherited`() {
+        val node1 = createMockFileNode(
+            name = "inherited_sensitive.txt",
+            isMarkedSensitive = false,
+            isSensitiveInherited = true
+        )
+        val node2 = createMockFileNode(
+            name = "normal.txt",
+            isMarkedSensitive = false,
+            isSensitiveInherited = false
+        )
+        val bucket = createMockRecentActionBucket(
+            nodes = listOf(node1, node2),
+            isNodeKeyDecrypted = true
+        )
+
+        val result = underTest(bucket)
+
+        assertThat(result.isSensitive).isFalse()
+    }
+
+    @Test
+    fun `test that isSensitive is false for media buckets even when marked sensitive`() {
+        val imageNode1 = createMockFileNode(
+            name = "image1.jpg",
+            mimeType = "image/jpeg",
+            isMarkedSensitive = true,
+            isSensitiveInherited = false
+        )
+        val imageNode2 = createMockFileNode(
+            name = "image2.png",
+            mimeType = "image/png",
+            isMarkedSensitive = true,
+            isSensitiveInherited = false
+        )
+        val bucket = createMockRecentActionBucket(
+            nodes = listOf(imageNode1, imageNode2),
+            isMedia = true,
+            isNodeKeyDecrypted = true
+        )
+
+        val result = underTest(bucket)
+
+        assertThat(result.isSensitive).isFalse()
+    }
+
+    @Test
+    fun `test that isSensitive is false for media buckets even when has sensitive inherited`() {
+        val imageNode1 = createMockFileNode(
+            name = "image1.jpg",
+            mimeType = "image/jpeg",
+            isMarkedSensitive = false,
+            isSensitiveInherited = true
+        )
+        val imageNode2 = createMockFileNode(
+            name = "image2.png",
+            mimeType = "image/png",
+            isMarkedSensitive = false,
+            isSensitiveInherited = true
+        )
+        val bucket = createMockRecentActionBucket(
+            nodes = listOf(imageNode1, imageNode2),
+            isMedia = true,
+            isNodeKeyDecrypted = true
+        )
+
+        val result = underTest(bucket)
+
+        assertThat(result.isSensitive).isFalse()
+    }
+
     private fun createMockFileNode(
         name: String = "testFile.txt",
         extension: String = "txt",
         mimeType: String = "text/plain",
         isFavourite: Boolean = false,
         nodeLabel: NodeLabel? = null,
+        isMarkedSensitive: Boolean = false,
+        isSensitiveInherited: Boolean = false,
     ): TypedFileNode = mock {
         on { it.name }.thenReturn(name)
         on { it.isFavourite }.thenReturn(isFavourite)
         on { it.nodeLabel }.thenReturn(nodeLabel)
+        on { it.isMarkedSensitive }.thenReturn(isMarkedSensitive)
+        on { it.isSensitiveInherited }.thenReturn(isSensitiveInherited)
         val fileTypeInfo = when {
             mimeType.startsWith("image/") -> StaticImageFileTypeInfo(mimeType, extension)
             mimeType.startsWith("video/") -> VideoFileTypeInfo(

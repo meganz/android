@@ -47,7 +47,8 @@ class RecentsWidgetTest {
                 RecentsView(
                     uiState = RecentsWidgetUiState(
                         recentActionItems = emptyList(),
-                        isLoading = false,
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
@@ -79,7 +80,8 @@ class RecentsWidgetTest {
                 RecentsView(
                     uiState = RecentsWidgetUiState(
                         recentActionItems = listOf(item1, item2),
-                        isLoading = false,
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
@@ -118,7 +120,8 @@ class RecentsWidgetTest {
                 RecentsView(
                     uiState = RecentsWidgetUiState(
                         recentActionItems = listOf(item1, item2),
-                        isLoading = false,
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
@@ -151,7 +154,8 @@ class RecentsWidgetTest {
                 RecentsView(
                     uiState = RecentsWidgetUiState(
                         recentActionItems = listOf(item),
-                        isLoading = false,
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
@@ -194,7 +198,8 @@ class RecentsWidgetTest {
                 RecentsView(
                     uiState = RecentsWidgetUiState(
                         recentActionItems = listOf(item1, item2, item3),
-                        isLoading = false,
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
@@ -243,7 +248,8 @@ class RecentsWidgetTest {
                 RecentsView(
                     uiState = RecentsWidgetUiState(
                         recentActionItems = listOf(item1, item2, item3),
-                        isLoading = false,
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
@@ -282,7 +288,8 @@ class RecentsWidgetTest {
                 RecentsView(
                     uiState = RecentsWidgetUiState(
                         recentActionItems = listOf(item),
-                        isLoading = false,
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { node, sourceType ->
                         clickedNode = node
@@ -322,7 +329,8 @@ class RecentsWidgetTest {
                 RecentsView(
                     uiState = RecentsWidgetUiState(
                         recentActionItems = listOf(item),
-                        isLoading = false,
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { node, sourceType ->
                         clickedNode = node
@@ -363,7 +371,8 @@ class RecentsWidgetTest {
                 RecentsView(
                     uiState = RecentsWidgetUiState(
                         recentActionItems = listOf(item),
-                        isLoading = false,
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { node, sourceType ->
                         clickedNode = node
@@ -392,7 +401,7 @@ class RecentsWidgetTest {
                 RecentsView(
                     uiState = RecentsWidgetUiState(
                         recentActionItems = emptyList(),
-                        isLoading = false,
+                        isNodesLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = { optionsClicked = true },
@@ -413,7 +422,8 @@ class RecentsWidgetTest {
                 RecentsView(
                     uiState = RecentsWidgetUiState(
                         recentActionItems = emptyList(),
-                        isLoading = false,
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
                         isHideRecentsEnabled = true,
                     ),
                     onFileClicked = { _, _ -> },
@@ -443,7 +453,8 @@ class RecentsWidgetTest {
                 RecentsView(
                     uiState = RecentsWidgetUiState(
                         recentActionItems = listOf(item),
-                        isLoading = false,
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
                         isHideRecentsEnabled = true,
                     ),
                     onFileClicked = { _, _ -> },
@@ -468,7 +479,8 @@ class RecentsWidgetTest {
                 RecentsView(
                     uiState = RecentsWidgetUiState(
                         recentActionItems = emptyList(),
-                        isLoading = false,
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
                         isHideRecentsEnabled = true,
                     ),
                     onFileClicked = { _, _ -> },
@@ -501,7 +513,8 @@ class RecentsWidgetTest {
                 RecentsView(
                     uiState = RecentsWidgetUiState(
                         recentActionItems = items,
-                        isLoading = false,
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
@@ -532,7 +545,8 @@ class RecentsWidgetTest {
                 RecentsView(
                     uiState = RecentsWidgetUiState(
                         recentActionItems = items,
-                        isLoading = false,
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
@@ -563,7 +577,7 @@ class RecentsWidgetTest {
                 RecentsView(
                     uiState = RecentsWidgetUiState(
                         recentActionItems = items,
-                        isLoading = false,
+                        isNodesLoading = false,
                         isHideRecentsEnabled = true,
                     ),
                     onFileClicked = { _, _ -> },
@@ -600,6 +614,7 @@ class RecentsWidgetTest {
         nodeLabel: NodeLabel? = null,
         nodes: List<TypedFileNode> = emptyList(),
         parentFolderSharesType: RecentActionsSharesType = RecentActionsSharesType.NONE,
+        isSensitive: Boolean = false,
     ): RecentsUiItem {
         val mockBucket = RecentActionBucket(
             timestamp = timestamp,
@@ -623,7 +638,8 @@ class RecentsWidgetTest {
             isFavourite = isFavourite,
             nodeLabel = nodeLabel,
             bucket = mockBucket,
-            isSingleNode = !isMediaBucket
+            isSingleNode = !isMediaBucket,
+            isSensitive = isSensitive
         )
     }
 }

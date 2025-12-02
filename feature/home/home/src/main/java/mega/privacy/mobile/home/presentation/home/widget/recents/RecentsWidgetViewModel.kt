@@ -3,14 +3,19 @@ package mega.privacy.mobile.home.presentation.home.widget.recents
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
 import mega.privacy.mobile.home.presentation.home.widget.recents.mapper.RecentActionUiItemMapper
 import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsWidgetUiState
@@ -23,51 +28,81 @@ class RecentsWidgetViewModel @Inject constructor(
     private val recentActionUiItemMapper: RecentActionUiItemMapper,
     private val setHideRecentActivityUseCase: SetHideRecentActivityUseCase,
     private val monitorHideRecentActivityUseCase: MonitorHideRecentActivityUseCase,
+    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RecentsWidgetUiState())
     val uiState = _uiState.asStateFlow()
+    private var loadRecentsJob: Job? = null
 
     init {
-        loadRecentActions()
+        loadRecents()
+        monitorHiddenNodesState()
         monitorHideRecentActivity()
     }
 
-    /**
-     * Load recent actions
-     */
-    private fun loadRecentActions() {
-        viewModelScope.launch {
+    private fun loadRecents() {
+        loadRecentsJob?.cancel()
+        loadRecentsJob = viewModelScope.launch {
             runCatching {
                 getRecentActionsUseCase(
-                    excludeSensitives = false, // TODO: Handle hidden nodes
+                    excludeSensitives = uiState.value.excludeSensitives,
                     maxBucketCount = RecentsWidgetConstants.MAX_BUCKETS
                 ).map { recentActionUiItemMapper(it) }
             }.onSuccess { buckets ->
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        recentActionItems = buckets,
-                    )
+                // Only update state if this coroutine not cancelled
+                if (isActive) {
+                    _uiState.update {
+                        it.copy(
+                            isNodesLoading = false,
+                            recentActionItems = buckets,
+                        )
+                    }
                 }
             }.onFailure { throwable ->
                 Timber.e(throwable, "Failed to load recent actions")
-                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
 
-    /**
-     * Monitor hide recent activity state
-     */
+    private fun monitorHiddenNodesState() {
+        viewModelScope.launch {
+            combine(
+                monitorHiddenNodesEnabledUseCase(),
+                monitorShowHiddenItemsUseCase()
+            ) { isHiddenNodesEnabled, showHiddenNodes ->
+                isHiddenNodesEnabled to showHiddenNodes
+            }
+                .catch {
+                    Timber.e(it, "Failed to monitor hidden nodes state")
+                }
+                .collectLatest { (isHiddenNodesEnabled, showHiddenNodes) ->
+                    val newExcludeSensitives = isHiddenNodesEnabled && !showHiddenNodes
+                    val isReloadRequired = uiState.value.excludeSensitives != newExcludeSensitives
+                    _uiState.update {
+                        it.copy(
+                            isHiddenNodeSettingsLoading = false,
+                            isNodesLoading = isReloadRequired || it.isNodesLoading, // keep showing loading state while reloading node buckets
+                            isHiddenNodesEnabled = isHiddenNodesEnabled,
+                            showHiddenNodes = showHiddenNodes,
+                        )
+                    }
+                    if (isReloadRequired) {
+                        loadRecents()
+                    }
+                }
+        }
+    }
+
     private fun monitorHideRecentActivity() {
         viewModelScope.launch {
             monitorHideRecentActivityUseCase()
                 .catch {
                     Timber.e(it, "Failed to monitor hide recent activity")
                 }
-                .collectLatest { isHidden ->
-                    _uiState.update { it.copy(isHideRecentsEnabled = isHidden) }
+                .collectLatest { enabled ->
+                    _uiState.update { it.copy(isHideRecentsEnabled = enabled) }
                 }
         }
     }

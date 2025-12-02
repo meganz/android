@@ -4,22 +4,27 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
 import mega.privacy.mobile.home.presentation.home.widget.recents.mapper.RecentActionUiItemMapper
 import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsTimestampText
 import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsUiItem
+import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsWidgetUiState
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -36,6 +41,8 @@ class RecentsWidgetViewModelTest {
     private val recentActionUiItemMapper = mock<RecentActionUiItemMapper>()
     private val setHideRecentActivityUseCase = mock<SetHideRecentActivityUseCase>()
     private val monitorHideRecentActivityUseCase = mock<MonitorHideRecentActivityUseCase>()
+    private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
+    private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
 
     private val bucket1 = createMockRecentActionBucket(
         timestamp = 1000L,
@@ -65,8 +72,17 @@ class RecentsWidgetViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        reset(getRecentActionsUseCase, recentActionUiItemMapper, setHideRecentActivityUseCase, monitorHideRecentActivityUseCase)
+        reset(
+            getRecentActionsUseCase,
+            recentActionUiItemMapper,
+            setHideRecentActivityUseCase,
+            monitorHideRecentActivityUseCase,
+            monitorHiddenNodesEnabledUseCase,
+            monitorShowHiddenItemsUseCase
+        )
         whenever(monitorHideRecentActivityUseCase()).thenReturn(flowOf(false))
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
     }
 
     private fun initViewModel() {
@@ -75,6 +91,8 @@ class RecentsWidgetViewModelTest {
             recentActionUiItemMapper = recentActionUiItemMapper,
             setHideRecentActivityUseCase = setHideRecentActivityUseCase,
             monitorHideRecentActivityUseCase = monitorHideRecentActivityUseCase,
+            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
         )
     }
 
@@ -86,7 +104,7 @@ class RecentsWidgetViewModelTest {
 
         underTest.uiState.test {
             val state = awaitItem()
-            assertThat(state.isLoading).isFalse()
+            assertThat(state.isNodesLoading).isFalse()
             assertThat(state.recentActionItems).isEmpty()
         }
     }
@@ -104,22 +122,26 @@ class RecentsWidgetViewModelTest {
 
         underTest.uiState.test {
             val state = awaitItem()
-            assertThat(state.isLoading).isFalse()
+            assertThat(state.isNodesLoading).isFalse()
             assertThat(state.recentActionItems).hasSize(3)
         }
     }
 
     @Test
-    fun `test that isLoading is set to false when loading fails`() = runTest {
-        whenever(getRecentActionsUseCase(excludeSensitives = false)).thenThrow(
+    fun `test that isLoading remains true when loading fails`() = runTest {
+        whenever(getRecentActionsUseCase(any(), any())).thenThrow(
             RuntimeException("Test error")
         )
 
         initViewModel()
+        advanceUntilIdle()
 
         underTest.uiState.test {
             val state = awaitItem()
-            assertThat(state.isLoading).isFalse()
+            // When loading fails, isNodesLoading remains true (not updated to false)
+            // but isHiddenNodeSettingsLoading should be false after first emission
+            assertThat(state.isNodesLoading).isTrue()
+            assertThat(state.isHiddenNodeSettingsLoading).isFalse()
             assertThat(state.recentActionItems).isEmpty()
         }
     }
@@ -168,6 +190,164 @@ class RecentsWidgetViewModelTest {
         underTest.showRecentActivity()
 
         verify(setHideRecentActivityUseCase).invoke(false)
+    }
+
+    @Test
+    fun `test that excludeSensitives is false when hidden nodes disabled`() = runTest {
+        whenever(getRecentActionsUseCase(any(), any())).thenReturn(emptyList())
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.excludeSensitives).isFalse()
+            assertThat(state.isHiddenNodesEnabled).isFalse()
+            assertThat(state.showHiddenNodes).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that excludeSensitives is true when hidden nodes enabled and showHiddenNodes is false`() =
+        runTest {
+            whenever(getRecentActionsUseCase(any(), any())).thenReturn(emptyList())
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.excludeSensitives).isTrue()
+                assertThat(state.isHiddenNodesEnabled).isTrue()
+                assertThat(state.showHiddenNodes).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that excludeSensitives is false when hidden nodes enabled and showHiddenNodes is true`() =
+        runTest {
+            whenever(getRecentActionsUseCase(any(), any())).thenReturn(emptyList())
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.excludeSensitives).isFalse()
+                assertThat(state.isHiddenNodesEnabled).isTrue()
+                assertThat(state.showHiddenNodes).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that loadRecents is called with correct excludeSensitives value`() = runTest {
+        whenever(getRecentActionsUseCase(excludeSensitives = true, maxBucketCount = 4)).thenReturn(
+            emptyList()
+        )
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+
+        initViewModel()
+        advanceUntilIdle()
+
+        verify(getRecentActionsUseCase).invoke(excludeSensitives = true, maxBucketCount = 4)
+    }
+
+    @Test
+    fun `test that recents are reloaded when excludeSensitives changes from false to true`() =
+        runTest {
+            whenever(getRecentActionsUseCase(any(), any())).thenReturn(emptyList())
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(
+                flowOf(false, true) // First false, then true
+            )
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+
+            initViewModel()
+            advanceUntilIdle()
+
+            // Should be called twice: once on init, once when excludeSensitives changes
+            val inOrder = inOrder(getRecentActionsUseCase)
+            inOrder.verify(getRecentActionsUseCase)
+                .invoke(excludeSensitives = false, maxBucketCount = 4)
+            inOrder.verify(getRecentActionsUseCase)
+                .invoke(excludeSensitives = true, maxBucketCount = 4)
+        }
+
+    @Test
+    fun `test that recents are reloaded when showHiddenNodes changes from false to true`() =
+        runTest {
+            whenever(getRecentActionsUseCase(any(), any())).thenReturn(emptyList())
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(
+                flowOf(false, true) // First false, then true
+            )
+
+            initViewModel()
+            advanceUntilIdle()
+
+            // Should be called twice: once on init with excludeSensitives=true, once when it changes to false
+            val inOrder = inOrder(getRecentActionsUseCase)
+            inOrder.verify(getRecentActionsUseCase)
+                .invoke(excludeSensitives = true, maxBucketCount = 4)
+            inOrder.verify(getRecentActionsUseCase)
+                .invoke(excludeSensitives = false, maxBucketCount = 4)
+        }
+
+    @Test
+    fun `test that isHiddenNodeSettingsLoading is set to false after first emission`() = runTest {
+        whenever(getRecentActionsUseCase(any(), any())).thenReturn(emptyList())
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isHiddenNodeSettingsLoading).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that isLoading is true when isNodesLoading is true`() = runTest {
+        val state = RecentsWidgetUiState(
+            isNodesLoading = true,
+            isHiddenNodeSettingsLoading = false
+        )
+        assertThat(state.isLoading).isTrue()
+    }
+
+    @Test
+    fun `test that isLoading is true when isHiddenNodeSettingsLoading is true`() = runTest {
+        val state = RecentsWidgetUiState(
+            isNodesLoading = false,
+            isHiddenNodeSettingsLoading = true
+        )
+        assertThat(state.isLoading).isTrue()
+    }
+
+    @Test
+    fun `test that isLoading is true when both loading flags are true`() = runTest {
+        val state = RecentsWidgetUiState(
+            isNodesLoading = true,
+            isHiddenNodeSettingsLoading = true
+        )
+        assertThat(state.isLoading).isTrue()
+    }
+
+    @Test
+    fun `test that isLoading is false when both loading flags are false`() = runTest {
+        val state = RecentsWidgetUiState(
+            isNodesLoading = false,
+            isHiddenNodeSettingsLoading = false
+        )
+        assertThat(state.isLoading).isFalse()
     }
 
     private fun createMockRecentActionBucket(

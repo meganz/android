@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.node.hiddennode
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -22,20 +23,22 @@ class MonitorHiddenNodesEnabledUseCase @Inject constructor(
      *
      * @return [Flow<Boolean>] true if hidden nodes feature is enabled, false otherwise
      */
-    operator fun invoke(): Flow<Boolean> = monitorAccountDetailUseCase().map { accountDetail ->
-        val accountType = accountDetail.levelDetail?.accountType
-        if (accountType?.isPaid == true) {
-            if (accountType.isBusinessAccount) {
-                // For business accounts, check if they're active or in grace period
-                val businessStatus = runCatching { getBusinessStatusUseCase() }.getOrNull()
-                businessStatus == BusinessAccountStatus.Active || businessStatus == BusinessAccountStatus.GracePeriod
+    operator fun invoke(): Flow<Boolean> = monitorAccountDetailUseCase()
+        .filter { it.levelDetail != null }
+        .map { accountDetail ->
+            val accountType = accountDetail.levelDetail?.accountType
+            if (accountType?.isPaid == true) {
+                if (accountType.isBusinessAccount) {
+                    // For business accounts, check if they're active or in grace period
+                    val businessStatus = runCatching { getBusinessStatusUseCase() }.getOrNull()
+                    businessStatus == BusinessAccountStatus.Active || businessStatus == BusinessAccountStatus.GracePeriod
+                } else {
+                    // For non-business paid accounts, always enable
+                    true
+                }
             } else {
-                // For non-business paid accounts, always enable
-                true
+                // For free accounts, always disable
+                false
             }
-        } else {
-            // For free accounts, always disable
-            false
         }
-    }
 }

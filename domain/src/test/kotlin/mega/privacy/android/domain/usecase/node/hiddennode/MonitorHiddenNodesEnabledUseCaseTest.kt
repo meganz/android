@@ -325,21 +325,6 @@ class MonitorHiddenNodesEnabledUseCaseTest {
     }
 
     @Test
-    fun `test that hidden nodes are disabled when level detail is null`() = runTest {
-
-        val accountDetail = mock<AccountDetail> {
-            on { levelDetail } doReturn null
-        }
-        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
-
-        underTest().test {
-            val result = awaitItem()
-            assertThat(result).isFalse()
-            awaitComplete()
-        }
-    }
-
-    @Test
     fun `test that hidden nodes are disabled when account type is null`() = runTest {
 
         val accountLevelDetail = mock<AccountLevelDetail> {
@@ -391,6 +376,29 @@ class MonitorHiddenNodesEnabledUseCaseTest {
         underTest().test {
             val result = awaitItem()
             assertThat(result).isFalse()
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test that null levelDetail is filtered out`() = runTest {
+        val accountDetailWithNullLevel = mock<AccountDetail> {
+            on { levelDetail } doReturn null
+        }
+        val accountLevelDetail = mock<AccountLevelDetail> {
+            on { accountType } doReturn AccountType.PRO_I
+        }
+        val accountDetailWithLevel = mock<AccountDetail> {
+            on { levelDetail } doReturn accountLevelDetail
+        }
+        whenever(monitorAccountDetailUseCase()).thenReturn(
+            flowOf(accountDetailWithNullLevel, accountDetailWithLevel)
+        )
+
+        underTest().test {
+            // Should only emit the value with non-null levelDetail
+            val result = awaitItem()
+            assertThat(result).isTrue()
             awaitComplete()
         }
     }
