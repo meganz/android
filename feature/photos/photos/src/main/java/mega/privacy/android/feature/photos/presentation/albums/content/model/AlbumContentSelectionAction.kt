@@ -10,6 +10,18 @@ import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
 
 sealed interface AlbumContentSelectionAction : MenuActionWithIcon {
+    data object AddItems : AlbumContentSelectionAction {
+        override val testTag: String = "album_content_selection_action:add_items"
+
+        @Composable
+        override fun getDescription() =
+            stringResource(sharedR.string.album_content_action_add_items)
+
+        @Composable
+        override fun getIconPainter() =
+            rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus)
+    }
+
     data object More : AlbumContentSelectionAction {
         override val testTag: String = "album_content_selection_action:more"
 

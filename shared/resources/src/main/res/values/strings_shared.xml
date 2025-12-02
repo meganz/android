@@ -1907,4 +1907,8 @@
     <string name="general_invite_contact">Invite contact</string>
     <!-- Contact found title for a dialog showing contact link info -->
     <string name="contact_found_dialog_title">Contact found</string>
+    <!--Album content empty album layout title when an album content is empty-->
+    <string name="album_content_empty_album_title">Empty album</string>
+    <!--Album content action to add more items to the album-->
+    <string name="album_content_action_add_items">Add items</string>
 </resources>

@@ -59,6 +59,7 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
+import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
@@ -394,54 +395,83 @@ internal fun AlbumContentScreen(
                 }
             )
         },
-    ) { innerPadding ->
-        if (uiState.photos.isEmpty() && (uiState.isLoading || uiState.isAddingPhotos)) {
-            AlbumDynamicContentGridSkeleton(
-                modifier = Modifier
-                    .testTag(ALBUM_CONTENT_SCREEN_SKELETON)
-                    .fillMaxSize()
-                    .padding(top = innerPadding.calculateTopPadding()),
-                size = smallWidth
+        floatingActionButton = {
+            AddContentFab(
+                visible = uiState.photos.isNotEmpty(),
+                onClick = {
+                    // Todo select and add photos to current album AND-21900
+                }
             )
-        } else if (uiState.photos.isNotEmpty()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = innerPadding.calculateTopPadding()),
-            ) {
-                if (uiState.isAddingPhotos || uiState.isRemovingPhotos) {
-                    InfiniteProgressBarIndicator(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag(ALBUM_CONTENT_SCREEN_LOADING_PROGRESS)
+        }
+    ) { innerPadding ->
+        val isLoadingEmpty =
+            uiState.photos.isEmpty() && (uiState.isLoading || uiState.isAddingPhotos)
+        val hasPhotos = uiState.photos.isNotEmpty()
+
+        when {
+            isLoadingEmpty -> {
+                // Show skeleton loading state when album is empty and loading
+                AlbumDynamicContentGridSkeleton(
+                    modifier = Modifier
+                        .testTag(ALBUM_CONTENT_SCREEN_SKELETON)
+                        .fillMaxSize()
+                        .padding(top = innerPadding.calculateTopPadding()),
+                    size = smallWidth
+                )
+            }
+
+            hasPhotos -> {
+                // Show photo grid with optional progress indicator
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = innerPadding.calculateTopPadding()),
+                ) {
+                    if (uiState.isAddingPhotos || uiState.isRemovingPhotos) {
+                        InfiniteProgressBarIndicator(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag(ALBUM_CONTENT_SCREEN_LOADING_PROGRESS)
+                        )
+                    }
+
+                    AlbumDynamicContentGrid(
+                        modifier = Modifier.fillMaxSize(),
+                        lazyListState = lazyListState,
+                        photos = uiState.photos,
+                        smallWidth = smallWidth,
+                        onClick = { photo ->
+                            if (uiState.selectedPhotos.isEmpty()) {
+                                previewPhoto(photo)
+                            } else {
+                                togglePhotoSelection(photo)
+                            }
+                        },
+                        onLongPress = { photo ->
+                            togglePhotoSelection(photo)
+                        },
+                        selectedPhotos = uiState.selectedPhotos,
+                        shouldApplySensitiveMode = uiState.hiddenNodeEnabled
+                                && uiState.accountType?.isPaid == true
+                                && !uiState.isBusinessAccountExpired,
+                        contentPadding = PaddingValues(bottom = innerPadding.calculateBottomPadding()),
+                        onSortOrderClick = {
+                            showSortBottomSheet = true
+                        },
+                        sortConfiguration = uiState.albumSortConfiguration
                     )
                 }
+            }
 
-                AlbumDynamicContentGrid(
-                    modifier = Modifier.fillMaxSize(),
-                    lazyListState = lazyListState,
-                    photos = uiState.photos,
-                    smallWidth = smallWidth,
-                    onClick = { photo ->
-                        if (uiState.selectedPhotos.isEmpty()) {
-                            previewPhoto(photo)
-                        } else {
-                            togglePhotoSelection(photo)
-                        }
-                    },
-                    onLongPress = { photo ->
-                        togglePhotoSelection(photo)
-                    },
-                    selectedPhotos = uiState.selectedPhotos,
-                    shouldApplySensitiveMode = uiState.hiddenNodeEnabled
-                            && uiState.accountType?.isPaid == true
-                            && !uiState.isBusinessAccountExpired,
-                    contentPadding = PaddingValues(bottom = innerPadding.calculateBottomPadding()),
-                    onSortOrderClick = {
-                        showSortBottomSheet = true
-                    },
-                    sortConfiguration = uiState.albumSortConfiguration
-                )
+            else -> {
+                // Show empty state when album has no photos and not loading
+                AlbumContentEmptyLayout(
+                    modifier = Modifier
+                        .testTag(ALBUM_CONTENT_SCREEN_EMPTY_PHOTOS_LAYOUT)
+                        .fillMaxSize()
+                ) {
+                    // Todo select and add photos to current album AND-21900
+                }
             }
         }
 
@@ -739,3 +769,5 @@ internal const val ALBUM_CONTENT_SCREEN_LOADING_PROGRESS =
     "album_content_screen:loading_progress"
 internal const val ALBUM_CONTENT_SCREEN_SKELETON =
     "album_content_screen:skeleton"
+internal const val ALBUM_CONTENT_SCREEN_EMPTY_PHOTOS_LAYOUT =
+    "album_content_screen:empty_photos_layout"

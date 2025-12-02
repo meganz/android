@@ -509,6 +509,24 @@ class AlbumContentScreenComposeTest {
     }
 
     @Test
+    fun `test that skeleton is visible when photos are empty and adding photos`() {
+        val uiState = AlbumContentUiState(
+            uiAlbum = createMockAlbumUiState(),
+            photos = persistentListOf(),
+            selectedPhotos = persistentSetOf(),
+            isAddingPhotos = true
+        )
+
+        setComposeContent(uiState)
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule
+            .onNodeWithTag(ALBUM_CONTENT_SCREEN_SKELETON)
+            .assertIsDisplayed()
+    }
+
+    @Test
     fun `test that loading indicator is displayed when adding photos`() {
         val photos = listOf(createMockPhoto(id = 1L))
         val uiState = AlbumContentUiState(
@@ -565,12 +583,12 @@ class AlbumContentScreenComposeTest {
     }
 
     @Test
-    fun `test that skeleton is visible when photos are empty and adding photos`() {
+    fun `test that empty photos layout is visible when photos are empty and not loading`() {
         val uiState = AlbumContentUiState(
             uiAlbum = createMockAlbumUiState(),
             photos = persistentListOf(),
             selectedPhotos = persistentSetOf(),
-            isAddingPhotos = true
+            isLoading = false
         )
 
         setComposeContent(uiState)
@@ -578,7 +596,7 @@ class AlbumContentScreenComposeTest {
         composeTestRule.waitForIdle()
 
         composeTestRule
-            .onNodeWithTag(ALBUM_CONTENT_SCREEN_SKELETON)
+            .onNodeWithTag(ALBUM_CONTENT_SCREEN_EMPTY_PHOTOS_LAYOUT)
             .assertIsDisplayed()
     }
 
