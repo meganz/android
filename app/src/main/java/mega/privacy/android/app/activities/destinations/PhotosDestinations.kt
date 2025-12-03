@@ -8,6 +8,7 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumContentImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.TimelineImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.photos.SelectAlbumCoverContract
@@ -23,6 +24,7 @@ import mega.privacy.android.navigation.destination.AlbumGetLinkNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumImportNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
+import mega.privacy.android.navigation.destination.MediaTimelinePhotoPreviewNavKey
 
 fun EntryProviderScope<NavKey>.legacyAlbumCoverSelection(
     returnResult: (String, String?) -> Unit,
@@ -146,6 +148,31 @@ fun EntryProviderScope<NavKey>.legacyAlbumContentPreview(
                 },
             )
 
+            context.startActivity(intent)
+
+            // Immediately pop this destination from the back stack
+            removeDestination()
+        }
+    }
+}
+
+fun EntryProviderScope<NavKey>.legacyMediaTimelinePhotoPreview(removeDestination: () -> Unit) {
+    entry<MediaTimelinePhotoPreviewNavKey> { args ->
+        val context = LocalContext.current
+
+        LaunchedEffect(Unit) {
+            val intent = ImagePreviewActivity.createIntent(
+                context = context,
+                imageSource = ImagePreviewFetcherSource.TIMELINE,
+                menuOptionsSource = ImagePreviewMenuSource.TIMELINE,
+                anchorImageNodeId = NodeId(args.id),
+                params = mapOf(
+                    TimelineImageNodeFetcher.TIMELINE_SORT_TYPE to args.sortType,
+                    TimelineImageNodeFetcher.TIMELINE_FILTER_TYPE to args.filterType,
+                    TimelineImageNodeFetcher.TIMELINE_MEDIA_SOURCE to args.mediaSource,
+                ),
+                enableAddToAlbum = true,
+            )
             context.startActivity(intent)
 
             // Immediately pop this destination from the back stack

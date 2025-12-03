@@ -217,3 +217,11 @@ data class LegacyMediaPlayerNavKey(
 
 @Serializable
 data object VideoSectionNavKey : NavKey
+
+@Serializable
+data class MediaTimelinePhotoPreviewNavKey(
+    val id: Long,
+    val sortType: String,
+    val filterType: String,
+    val mediaSource: String,
+) : NavKey

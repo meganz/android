@@ -57,5 +57,6 @@ class LegacyCoreActivityFeatureGraph(
             legacyMediaPlayerScreen(navigationHandler::back, mediaPlayerIntentMapper)
             videoSectionLegacyDestination(navigationHandler::back)
             legacyAlbumContentPreview(navigationHandler::back)
+            legacyMediaTimelinePhotoPreview(navigationHandler::back)
         }
 }
