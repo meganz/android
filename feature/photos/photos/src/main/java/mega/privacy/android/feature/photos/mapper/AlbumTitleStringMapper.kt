@@ -1,11 +1,11 @@
-package mega.privacy.android.app.presentation.photos.albums
+package mega.privacy.android.feature.photos.mapper
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumTitle
 import javax.inject.Inject
 
-internal class AlbumTitleStringMapper @Inject constructor(
+class AlbumTitleStringMapper @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
     operator fun invoke(albumTitle: AlbumTitle): String {

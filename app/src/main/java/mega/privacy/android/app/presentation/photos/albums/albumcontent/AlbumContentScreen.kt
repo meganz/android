@@ -38,7 +38,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
+import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.view.CreateNewAlbumDialog
 import mega.privacy.android.app.presentation.photos.albums.view.DeleteAlbumsConfirmationDialog

@@ -1,6 +1,7 @@
-package test.mega.privacy.android.app.presentation.photos.search
+package mega.privacy.android.feature.photos.presentation.search
 
 import app.cash.turbine.test
+import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -10,8 +11,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.presentation.photos.albums.AlbumTitleStringMapper
-import mega.privacy.android.app.presentation.photos.search.PhotosSearchViewModel
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.account.AccountDetail
@@ -23,6 +22,7 @@ import mega.privacy.android.domain.usecase.RetrievePhotosRecentQueriesUseCase
 import mega.privacy.android.domain.usecase.SavePhotosRecentQueriesUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.feature.photos.mapper.AlbumTitleStringMapper
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumTitle
 import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import org.junit.Before

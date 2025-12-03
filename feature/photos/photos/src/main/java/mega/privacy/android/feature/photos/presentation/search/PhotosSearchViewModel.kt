@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.photos.search
+package mega.privacy.android.feature.photos.presentation.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.photos.albums.AlbumTitleStringMapper
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.photos.Photo
@@ -22,12 +21,13 @@ import mega.privacy.android.domain.usecase.RetrievePhotosRecentQueriesUseCase
 import mega.privacy.android.domain.usecase.SavePhotosRecentQueriesUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.feature.photos.mapper.AlbumTitleStringMapper
 import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-internal class PhotosSearchViewModel @Inject constructor(
+class PhotosSearchViewModel @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val albumTitleStringMapper: AlbumTitleStringMapper,
     private val retrievePhotosRecentQueriesUseCase: RetrievePhotosRecentQueriesUseCase,

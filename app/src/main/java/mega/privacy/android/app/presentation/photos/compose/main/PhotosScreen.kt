@@ -24,7 +24,7 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.TimelineImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
+import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.PhotosViewComposeCoordinator
 import mega.privacy.android.app.presentation.photos.PhotosViewModel
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel

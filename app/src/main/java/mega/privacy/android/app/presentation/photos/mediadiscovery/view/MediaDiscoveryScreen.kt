@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
+import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryGlobalStateViewModel
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryViewModel
 import mega.privacy.android.app.presentation.photos.model.DateCard

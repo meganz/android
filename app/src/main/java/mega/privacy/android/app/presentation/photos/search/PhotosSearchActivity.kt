@@ -31,7 +31,7 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
-import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
+import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.PhotosCache
 import mega.privacy.android.app.presentation.search.model.navigation.removeNodeLinkDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.cannotOpenFileDialogNavigation
@@ -63,6 +63,7 @@ import mega.privacy.android.domain.entity.photos.Album.RawAlbum
 import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.feature.photos.presentation.search.PhotosSearchViewModel
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme

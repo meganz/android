@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.photos
+package mega.privacy.android.feature.photos.downloader
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

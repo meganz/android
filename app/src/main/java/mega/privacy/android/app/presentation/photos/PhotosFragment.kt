@@ -96,6 +96,7 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource
 import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum

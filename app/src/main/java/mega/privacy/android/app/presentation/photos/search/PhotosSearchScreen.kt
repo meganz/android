@@ -51,7 +51,7 @@ import coil3.request.crossfade
 import kotlinx.coroutines.delay
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
+import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.transfers.widget.TransfersWidget
@@ -61,6 +61,7 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.feature.photos.presentation.search.PhotosSearchViewModel
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.legacy.core.ui.controls.appbar.ExpandedSearchAppBar
