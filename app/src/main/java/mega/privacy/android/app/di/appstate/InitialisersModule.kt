@@ -8,6 +8,7 @@ import dagger.multibindings.ElementsIntoSet
 import dagger.multibindings.IntoSet
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPaymentInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPermissionInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.PsaInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.ReloadContactDatabaseInitialiser
 import mega.privacy.android.app.appstate.initialisation.initialisers.AppStartInitialiser
 import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
@@ -86,4 +87,10 @@ class InitialisersModule {
     @IntoSet
     fun provideReloadContactDatabaseInitialiser(initialiser: ReloadContactDatabaseInitialiser): PostLoginInitialiser =
         initialiser
+
+    @Provides
+    @IntoSet
+    fun providePsaInitialiser(initialiser: PsaInitialiser): PostLoginInitialiser =
+        initialiser
+
 }

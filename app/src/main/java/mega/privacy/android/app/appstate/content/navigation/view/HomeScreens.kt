@@ -38,7 +38,6 @@ import mega.privacy.android.app.appstate.content.navigation.model.MainNavState
 import mega.privacy.android.app.appstate.content.navigation.rememberTopLevelBackStack
 import mega.privacy.android.app.main.ads.NewAdsContainer
 import mega.privacy.android.app.presentation.login.view.MEGA_LOGO_TEST_TAG
-import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
@@ -101,45 +100,43 @@ fun HomeScreens(
                         homeScreenStacks.topLevelKey == destination
                     },
                     navContent = { navigationUiController ->
-                        PsaContainer {
-                            Column(Modifier.fillMaxSize()) {
-                                NavDisplay(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxWidth(),
-                                    backStack = homeScreenStacks.backStack,
-                                    onBack = { homeScreenStacks.removeLast() },
-                                    entryDecorators = listOf(
-                                        rememberSaveableStateHolderNavEntryDecorator(),
-                                        rememberViewModelStoreNavEntryDecorator()
-                                    ),
-                                    entryProvider = entryProvider({
-                                        fallback(
-                                            unknownKey = it,
-                                            outerNavigationHandler = outerNavigationHandler,
-                                            innerNavigationHandler = innerNavigationHandler
-                                        )
-                                    }) {
-                                        currentState.mainNavScreens.forEach { screenProvider ->
-                                            screenProvider(
-                                                innerNavigationHandler,
-                                                navigationUiController,
-                                                transferHandler
-                                            )
-                                        }
-                                    },
-                                    predictivePopTransitionSpec = {
-                                        ContentTransform(
-                                            fadeIn(animationSpec = tween(700)),
-                                            fadeOut(animationSpec = tween(700)),
+                        Column(Modifier.fillMaxSize()) {
+                            NavDisplay(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth(),
+                                backStack = homeScreenStacks.backStack,
+                                onBack = { homeScreenStacks.removeLast() },
+                                entryDecorators = listOf(
+                                    rememberSaveableStateHolderNavEntryDecorator(),
+                                    rememberViewModelStoreNavEntryDecorator()
+                                ),
+                                entryProvider = entryProvider({
+                                    fallback(
+                                        unknownKey = it,
+                                        outerNavigationHandler = outerNavigationHandler,
+                                        innerNavigationHandler = innerNavigationHandler
+                                    )
+                                }) {
+                                    currentState.mainNavScreens.forEach { screenProvider ->
+                                        screenProvider(
+                                            innerNavigationHandler,
+                                            navigationUiController,
+                                            transferHandler
                                         )
                                     }
-                                )
-                                MiniAudioPlayerView(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                )
-                            }
+                                },
+                                predictivePopTransitionSpec = {
+                                    ContentTransform(
+                                        fadeIn(animationSpec = tween(700)),
+                                        fadeOut(animationSpec = tween(700)),
+                                    )
+                                }
+                            )
+                            MiniAudioPlayerView(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            )
                         }
                     },
                 )
