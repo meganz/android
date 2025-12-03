@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.appstate.global.model.RefreshEvent
 import mega.privacy.android.app.appstate.initialisation.GlobalInitialiser
 import mega.privacy.android.app.presentation.extensions.error
 import mega.privacy.android.app.presentation.extensions.newError
@@ -65,12 +66,11 @@ class FetchNodesViewModel @AssistedInject constructor(
     private val isMegaApiLoggedInUseCase: IsMegaApiLoggedInUseCase,
     private val getUserDataUseCase: GetUserDataUseCase,
     private val globalInitialiser: GlobalInitialiser,
-    @Assisted val session: String,
-    @Assisted val isFromLogin: Boolean,
+    @Assisted val args: Args,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(FetchNodesUiState(isFromLogin = isFromLogin))
+    private val _state = MutableStateFlow(FetchNodesUiState(isFromLogin = args.isFromLogin))
     val state: StateFlow<FetchNodesUiState> = _state
 
     /**
@@ -106,19 +106,23 @@ class FetchNodesViewModel @AssistedInject constructor(
         performFetchNodesOrLogin()
     }
 
-    private fun performFetchNodesOrLogin() {
+    private fun performFetchNodesOrLogin() = runCatching {
         viewModelScope.launch {
-            if (isMegaApiLoggedInUseCase()) {
-                // this case mean user just logged in by account so we only need to fetch nodes
+            // this case mean user just logged in by account so we only need to fetch nodes
+            if (args.refreshEvent == RefreshEvent.Refresh) {
+                fetchNodes(isRefreshSession = true)
+            } else if (isMegaApiLoggedInUseCase()) {
                 Timber.d("User is logged in, fetch nodes")
                 handlePostLogin(isFastLogin = false)
                 fetchNodes(isRefreshSession = false)
             } else {
                 // this case mean user logged in and open app again, so we need to fast login
                 Timber.d("User is not logged in, fast login")
-                fastLogin(session = session, refreshChatUrl = false)
+                fastLogin(session = args.session, refreshChatUrl = false)
             }
         }
+    }.onFailure {
+        Timber.e(it, "Error performing fetch nodes or login")
     }
 
     private fun enableAndMonitorRequestStatusProgressEvent() {
@@ -321,7 +325,7 @@ class FetchNodesViewModel @AssistedInject constructor(
     }
 
     private fun handlePostLogin(isFastLogin: Boolean) {
-        globalInitialiser.onPostLogin(session = session, isFastLogin)
+        globalInitialiser.onPostLogin(session = args.session, isFastLogin)
     }
 
     private fun stopFetchingNodes() {
@@ -338,6 +342,12 @@ class FetchNodesViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(session: String, isFromLogin: Boolean): FetchNodesViewModel
+        fun create(navKey: Args): FetchNodesViewModel
     }
+
+    data class Args(
+        val session: String,
+        val isFromLogin: Boolean = false,
+        val refreshEvent: RefreshEvent? = null,
+    )
 }

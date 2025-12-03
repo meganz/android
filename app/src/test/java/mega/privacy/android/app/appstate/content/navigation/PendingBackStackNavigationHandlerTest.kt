@@ -6,6 +6,8 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.appstate.content.destinations.FetchingContentNavKey
+import mega.privacy.android.app.appstate.global.model.RefreshEvent
+import mega.privacy.android.app.appstate.global.model.RootNodeState
 import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 import org.junit.jupiter.api.AfterEach
@@ -41,9 +43,9 @@ class PendingBackStackNavigationHandlerTest {
 
     private val initialSession = "initial"
 
-    private val getFetchNodeDestinationFunction: (String, Boolean) -> NavKey =
-        { sessionValue, fromLogin ->
-            FetchingContentNavKey(sessionValue, fromLogin)
+    private val getFetchNodeDestinationFunction: (String, Boolean, RefreshEvent?) -> NavKey =
+        { sessionValue, fromLogin, refreshEvent ->
+            FetchingContentNavKey(sessionValue, fromLogin, refreshEvent)
         }
 
     @BeforeEach
@@ -300,14 +302,14 @@ class PendingBackStackNavigationHandlerTest {
 
     @Test
     fun `test that no-node destination is added even if not logged in`() = runTest {
-        underTest.onRootNodeChange(false)
+        underTest.onRootNodeChange(RootNodeState(exists = false))
         underTest.navigate(NoNodeDestination1)
         assertThat(backStack.last()).isEqualTo(NoNodeDestination1)
     }
 
     @Test
     fun `test that no-node destinations are added even if not logged in`() = runTest {
-        underTest.onRootNodeChange(false)
+        underTest.onRootNodeChange(RootNodeState(exists = false))
         underTest.navigate(listOf(NoNodeDestination1, NoNodeDestination2))
         assertThat(backStack.takeLast(2)).containsExactly(
             NoNodeDestination1, NoNodeDestination2
@@ -317,7 +319,7 @@ class PendingBackStackNavigationHandlerTest {
     @Test
     fun `test that fetch node destination is added instead if not fetched in and destination requires it`() =
         runTest {
-            underTest.onRootNodeChange(false)
+            underTest.onRootNodeChange(RootNodeState(exists = false))
             underTest.navigate(Destination1)
             assertThat(backStack).containsExactly(FetchingContentNavKey(initialSession, false))
         }
@@ -325,7 +327,7 @@ class PendingBackStackNavigationHandlerTest {
     @Test
     fun `test that fetch node destination is added instead if not fetched and last destination requires it`() =
         runTest {
-            underTest.onRootNodeChange(false)
+            underTest.onRootNodeChange(RootNodeState(exists = false))
             underTest.navigate(listOf(NoNodeDestination1, Destination2))
             assertThat(backStack).containsExactly(FetchingContentNavKey(initialSession, false))
         }
@@ -413,7 +415,7 @@ class PendingBackStackNavigationHandlerTest {
         runTest {
             backStack.addAll(listOf(Destination1, Destination3))
 
-            underTest.onRootNodeChange(false)
+            underTest.onRootNodeChange(RootNodeState(exists = false))
 
             assertThat(backStack).containsExactly(FetchingContentNavKey(initialSession, false))
         }
@@ -429,9 +431,9 @@ class PendingBackStackNavigationHandlerTest {
     @Test
     fun `test that if session is added, but there is no pending destinations, the default landing screen is added`() =
         runTest {
-            underTest.onRootNodeChange(false)
+            underTest.onRootNodeChange(RootNodeState(exists = false))
             assertThat(backStack.pending).isEmpty()
-            underTest.onRootNodeChange(true)
+            underTest.onRootNodeChange(RootNodeState(exists = true))
 
             assertThat(backStack.lastOrNull()).isEqualTo(DefaultLandingScreen)
         }
@@ -439,11 +441,11 @@ class PendingBackStackNavigationHandlerTest {
     @Test
     fun `test that pending destinations are added to the backstack when root node is fetched`() =
         runTest {
-            underTest.onRootNodeChange(false)
+            underTest.onRootNodeChange(RootNodeState(exists = false))
 
             backStack.pending = listOf(Destination2, Destination3)
 
-            underTest.onRootNodeChange(true)
+            underTest.onRootNodeChange(RootNodeState(exists = true))
 
             assertThat(backStack).containsExactly(DefaultLandingScreen, Destination2, Destination3)
         }
@@ -503,7 +505,7 @@ class PendingBackStackNavigationHandlerTest {
         assertThat(tempBackStack).containsExactly(InitialLoginDestination)
         tempHandler.onLoginChange(PendingBackStackNavigationHandler.AuthStatus.LoggedIn(session))
         assertThat(tempBackStack).containsExactly(FetchingContentNavKey(session, true))
-        tempHandler.onRootNodeChange(true)
+        tempHandler.onRootNodeChange(RootNodeState(exists = true))
         assertThat(tempBackStack).containsExactly(PasscodeDestination)
     }
 
@@ -557,5 +559,85 @@ class PendingBackStackNavigationHandlerTest {
 
         assertThat(tempBackStack).containsExactly(DefaultLoginDestination)
     }
+
+    @Test
+    fun `test that refresh event Refresh is passed correctly when root node changes to false`() =
+        runTest {
+            backStack.addAll(listOf(Destination1, Destination3))
+
+            underTest.onRootNodeChange(RootNodeState(exists = false, refreshEvent = RefreshEvent.Refresh))
+
+            val lastDestination = backStack.last() as? FetchingContentNavKey
+            assertThat(lastDestination).isNotNull()
+            assertThat(lastDestination?.session).isEqualTo(initialSession)
+            assertThat(lastDestination?.isFromLogin).isFalse()
+            assertThat(lastDestination?.refreshEvent).isEqualTo(RefreshEvent.Refresh)
+        }
+
+    @Test
+    fun `test that refresh event ChangeEnvironment is passed correctly when root node changes to false`() =
+        runTest {
+            backStack.addAll(listOf(Destination1, Destination3))
+
+            underTest.onRootNodeChange(
+                RootNodeState(
+                    exists = false,
+                    refreshEvent = RefreshEvent.ChangeEnvironment
+                )
+            )
+
+            val lastDestination = backStack.last() as? FetchingContentNavKey
+            assertThat(lastDestination).isNotNull()
+            assertThat(lastDestination?.session).isEqualTo(initialSession)
+            assertThat(lastDestination?.isFromLogin).isFalse()
+            assertThat(lastDestination?.refreshEvent).isEqualTo(RefreshEvent.ChangeEnvironment)
+        }
+
+    @Test
+    fun `test that null refresh event is passed correctly when root node changes to false`() =
+        runTest {
+            backStack.addAll(listOf(Destination1, Destination3))
+
+            underTest.onRootNodeChange(RootNodeState(exists = false, refreshEvent = null))
+
+            val lastDestination = backStack.last() as? FetchingContentNavKey
+            assertThat(lastDestination).isNotNull()
+            assertThat(lastDestination?.session).isEqualTo(initialSession)
+            assertThat(lastDestination?.isFromLogin).isFalse()
+            assertThat(lastDestination?.refreshEvent).isNull()
+        }
+
+    @Test
+    fun `test that refresh event Refresh is passed when root node changes from true to false with refresh event`() =
+        runTest {
+            backStack.addAll(listOf(Destination1, Destination2))
+
+            underTest.onRootNodeChange(RootNodeState(exists = false, refreshEvent = RefreshEvent.Refresh))
+
+            val lastDestination = backStack.last() as? FetchingContentNavKey
+            assertThat(lastDestination).isNotNull()
+            assertThat(lastDestination?.refreshEvent).isEqualTo(RefreshEvent.Refresh)
+            assertThat(backStack).containsExactly(FetchingContentNavKey(initialSession, false, RefreshEvent.Refresh))
+        }
+
+    @Test
+    fun `test that refresh event ChangeEnvironment is passed when root node changes from true to false with change environment event`() =
+        runTest {
+            backStack.addAll(listOf(Destination1, Destination2))
+
+            underTest.onRootNodeChange(
+                RootNodeState(
+                    exists = false,
+                    refreshEvent = RefreshEvent.ChangeEnvironment
+                )
+            )
+
+            val lastDestination = backStack.last() as? FetchingContentNavKey
+            assertThat(lastDestination).isNotNull()
+            assertThat(lastDestination?.refreshEvent).isEqualTo(RefreshEvent.ChangeEnvironment)
+            assertThat(backStack).containsExactly(
+                FetchingContentNavKey(initialSession, false, RefreshEvent.ChangeEnvironment)
+            )
+        }
 
 }

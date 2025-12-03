@@ -2,6 +2,8 @@ package mega.privacy.android.app.appstate.content.navigation
 
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.app.appstate.global.model.RefreshEvent
+import mega.privacy.android.app.appstate.global.model.RootNodeState
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
@@ -19,7 +21,7 @@ class PendingBackStackNavigationHandler(
     private val passcodeDestination: NavKey,
     private val defaultLoginDestination: NoSessionNavKey,
     initialLoginDestination: NoSessionNavKey,
-    private val fetchRootNodeDestination: (session: String, fromLogin: Boolean) -> NavKey,
+    private val fetchRootNodeDestination: (session: String, fromLogin: Boolean, RefreshEvent?) -> NavKey,
     private val navigationResultManager: NavigationResultManager,
 ) : NavigationHandler {
     private var fromLogin = false
@@ -52,7 +54,7 @@ class PendingBackStackNavigationHandler(
         return authRequiredDestinations
     }
 
-    private fun removeRootNodeRequiredDestinations(): List<NavKey> {
+    private fun removeRootNodeRequiredDestinations(event: RefreshEvent? = null): List<NavKey> {
         Timber.d("PendingBackStackNavigationHandler::removeRootNodeRequiredDestinations")
         val rootNodeRequiredDestinations = backstack.takeLastWhile { it !is NoNodeNavKey }
 
@@ -61,7 +63,7 @@ class PendingBackStackNavigationHandler(
         }
 
         (currentAuthStatus as? AuthStatus.LoggedIn)?.session?.let {
-            val fetchDestination = fetchRootNodeDestination(it, fromLogin)
+            val fetchDestination = fetchRootNodeDestination(it, fromLogin, event)
             if (backstack.lastOrNull() != fetchDestination) backstack.add(fetchDestination)
         }
         logBackStack("removeRootNodeRequiredDestinations")
@@ -138,7 +140,8 @@ class PendingBackStackNavigationHandler(
         (currentAuthStatus as? AuthStatus.LoggedIn)?.session?.let {
             fetchRootNodeDestination(
                 it,
-                fromLogin
+                fromLogin,
+                null
             )
         }
 
@@ -224,10 +227,10 @@ class PendingBackStackNavigationHandler(
         }
     }
 
-    fun onRootNodeChange(hasRootNode: Boolean) {
+    fun onRootNodeChange(rootNodeState: RootNodeState) {
         Timber.d("PendingBackStackNavigationHandler::onRootNodeChange")
-        if (this.hasRootNode == hasRootNode) return
-        this.hasRootNode = hasRootNode
+        if (this.hasRootNode == rootNodeState.exists) return
+        this.hasRootNode = rootNodeState.exists
 
         if (this.hasRootNode) {
             backstack.removeAll { it is NoNodeNavKey }
@@ -237,7 +240,7 @@ class PendingBackStackNavigationHandler(
                 navigateToPendingScreens()
             }
         } else {
-            removeRootNodeRequiredDestinations()
+            removeRootNodeRequiredDestinations(rootNodeState.refreshEvent)
         }
     }
 

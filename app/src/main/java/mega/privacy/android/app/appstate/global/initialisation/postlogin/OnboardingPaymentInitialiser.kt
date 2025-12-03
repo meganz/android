@@ -1,6 +1,7 @@
 package mega.privacy.android.app.appstate.global.initialisation.postlogin
 
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.take
 import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.domain.usecase.account.ShouldShowUpgradeAccountUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
@@ -22,7 +23,7 @@ class OnboardingPaymentInitialiser @Inject constructor(
     action = { _, isFastLogin ->
         if (!isFastLogin) {
             runCatching {
-                monitorFetchNodesFinishUseCase().collectLatest { isFinish ->
+                monitorFetchNodesFinishUseCase().take(1).collectLatest { isFinish ->
                     if (shouldShowUpgradeAccountUseCase() && isFinish) {
                         navigationEventQueue.emit(
                             UpgradeAccountNavKey(

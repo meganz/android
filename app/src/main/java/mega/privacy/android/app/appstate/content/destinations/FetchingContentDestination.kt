@@ -10,12 +10,17 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.ui.NavDisplay
 import kotlinx.serialization.Serializable
+import mega.privacy.android.app.appstate.global.model.RefreshEvent
 import mega.privacy.android.app.presentation.login.FetchNodesViewModel
 import mega.privacy.android.app.presentation.login.view.FetchNodesContent
 import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
 
 @Serializable
-data class FetchingContentNavKey(val session: String, val isFromLogin: Boolean) : NoNodeNavKey
+data class FetchingContentNavKey(
+    val session: String,
+    val isFromLogin: Boolean,
+    val refreshEvent: RefreshEvent? = null,
+) : NoNodeNavKey
 
 fun EntryProviderScope<NavKey>.fetchingContentDestination() {
     entry<FetchingContentNavKey>(
@@ -25,7 +30,13 @@ fun EntryProviderScope<NavKey>.fetchingContentDestination() {
     ) {
         val viewModel = hiltViewModel<FetchNodesViewModel, FetchNodesViewModel.Factory>(
             creationCallback = { factory ->
-                factory.create(session = it.session, isFromLogin = it.isFromLogin)
+                factory.create(
+                    FetchNodesViewModel.Args(
+                        session = it.session,
+                        isFromLogin = it.isFromLogin,
+                        refreshEvent = it.refreshEvent
+                    )
+                )
             }
         )
         val state by viewModel.state.collectAsStateWithLifecycle()

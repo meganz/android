@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
@@ -38,8 +39,6 @@ import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ANDROID_PLATFORM_
 import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ITUNES
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
 import mega.privacy.android.app.presentation.login.LoginActivity
-import mega.privacy.android.core.sharedcomponents.snackbar.MegaSnackbarDuration
-import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
@@ -59,6 +58,8 @@ import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
+import mega.privacy.android.core.sharedcomponents.snackbar.MegaSnackbarDuration
+import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
@@ -101,11 +102,13 @@ import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.avatar.SetAvatarUseCase
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatusUseCase
 import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumberUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -193,6 +196,7 @@ class MyAccountViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
     private val getUsedTransferStatusUseCase: GetUsedTransferStatusUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
 ) : ViewModel() {
 
@@ -661,12 +665,21 @@ class MyAccountViewModel @Inject constructor(
      *
      * @param activity
      */
-    fun refresh(activity: Activity) {
-        val intent = Intent(activity, LoginActivity::class.java)
-        intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-        intent.action = ACTION_REFRESH
+    suspend fun refresh(activity: Activity) = runCatching {
+        val intent = if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
+            Intent(activity, MegaActivity::class.java).apply {
+                action = ACTION_REFRESH
+            }
+        } else {
+            Intent(activity, LoginActivity::class.java).apply {
+                putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
+                action = ACTION_REFRESH
+            }
+        }
 
         activity.startActivityForResult(intent, REQUEST_CODE_REFRESH)
+    }.onFailure {
+        Timber.e(it, "Error refreshing account")
     }
 
     /**
@@ -1049,7 +1062,7 @@ class MyAccountViewModel @Inject constructor(
                 confirmationLink = newAccountCancellationLink
                 checkAccountCancellationLinkValidity()
             }.onFailure { exception ->
-                Timber.e("An issue occurred when querying the Account Cancellation Link", exception)
+                Timber.e(exception, "An issue occurred when querying the Account Cancellation Link")
                 _state.update {
                     it.copy(
                         errorMessageRes = when (exception) {
@@ -1086,8 +1099,8 @@ class MyAccountViewModel @Inject constructor(
                 }
             }.onFailure { exception ->
                 Timber.e(
-                    "An issue occurred when checking if the URL matches the Cancel Account Link Regex",
-                    exception
+                    exception,
+                    "An issue occurred when checking if the URL matches the Cancel Account Link Regex"
                 )
                 _state.update { it.copy(errorMessageRes = R.string.general_error_word) }
             }
@@ -1153,7 +1166,7 @@ class MyAccountViewModel @Inject constructor(
                 confirmationLink = newChangeEmailLink
                 checkChangeEmailLinkValidity()
             }.onFailure { exception ->
-                Timber.e("An issue occurred when querying the Change Email Link", exception)
+                Timber.e(exception, "An issue occurred when querying the Change Email Link")
                 if (exception is QueryChangeEmailLinkException.LinkNotGenerated) {
                     _state.update { it.copy(showInvalidChangeEmailLinkPrompt = true) }
                 } else {
@@ -1185,8 +1198,8 @@ class MyAccountViewModel @Inject constructor(
             }
         }.onFailure { exception ->
             Timber.e(
-                "An issue occurred when checking if the URL matches the Change Email Link Regex",
-                exception
+                exception,
+                "An issue occurred when checking if the URL matches the Change Email Link Regex"
             )
             _state.update { it.copy(errorMessageRes = R.string.general_error_word) }
         }

@@ -69,6 +69,7 @@ import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.avatar.SetAvatarUseCase
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCase
@@ -100,7 +101,6 @@ import kotlin.random.Random
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class MyAccountViewModelTest {
-
     private lateinit var underTest: MyAccountViewModel
 
     private val context: Context = mock()
@@ -156,6 +156,8 @@ internal class MyAccountViewModelTest {
         on { invoke() }.thenReturn(myAccountUpdateFlow)
     }
 
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+
     @BeforeEach
     fun setup() = runTest {
         Dispatchers.setMain(testDispatcher)
@@ -189,6 +191,7 @@ internal class MyAccountViewModelTest {
         whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Active)
         whenever(myAccountInfo.usedFormatted).thenReturn("")
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
+        whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
         storageStateFlow.value = StorageState.Unknown
     }
 
@@ -233,7 +236,8 @@ internal class MyAccountViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             monitorStorageStateUseCase = monitorStorageStateUseCase,
             getUsedTransferStatusUseCase = getUsedTransferStatusUseCase,
-            monitorMyAccountUpdateUseCase = monitorMyAccountUpdateUseCase
+            monitorMyAccountUpdateUseCase = monitorMyAccountUpdateUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
         )
     }
 

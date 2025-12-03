@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.appstate.global.model.RefreshEvent
 import mega.privacy.android.app.appstate.initialisation.GlobalInitialiser
 import mega.privacy.android.app.triggeredContent
 import mega.privacy.android.domain.entity.AccountBlockedEvent
@@ -109,7 +110,13 @@ class FetchNodesViewModelTest {
         )
     }
 
-    private fun initViewModel() {
+    private fun initViewModel(
+        args: FetchNodesViewModel.Args = FetchNodesViewModel.Args(
+            session = "test-session",
+            isFromLogin = false,
+            refreshEvent = null
+        ),
+    ) {
         underTest = FetchNodesViewModel(
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             rootNodeExistsUseCase = rootNodeExistsUseCase,
@@ -124,8 +131,7 @@ class FetchNodesViewModelTest {
             isMegaApiLoggedInUseCase = isMegaApiLoggedInUseCase,
             getUserDataUseCase = getUserDataUseCase,
             globalInitialiser = globalInitialiser,
-            isFromLogin = false,
-            session = "test-session",
+            args = args,
             applicationScope = applicationScope,
         )
     }
@@ -167,11 +173,11 @@ class FetchNodesViewModelTest {
             assertThat(state.isFastLogin).isTrue()
 
             verify(fastLoginUseCase).invoke(any(), any(), any())
-            
+
             // Emit login success to trigger onPostLogin
             loginStatusFlow.emit(LoginStatus.LoginSucceed)
             advanceUntilIdle()
-            
+
             verify(globalInitialiser).onPostLogin("test-session", true)
             cancelAndIgnoreRemainingEvents()
         }
@@ -425,6 +431,131 @@ class FetchNodesViewModelTest {
         underTest.state.test {
             val state = awaitItem()
             assertThat(state.requestStatusProgress).isNull()
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isFromLogin is passed correctly to state`() = runTest {
+        // Setup mocks
+        whenever(isConnectedToInternetUseCase()).thenReturn(true)
+        whenever(loginMutex.isLocked).thenReturn(false)
+        whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
+        whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
+        wheneverBlocking { isMegaApiLoggedInUseCase() }.thenReturn(true)
+        whenever(fetchNodesUseCase()).thenReturn(emptyFlow())
+
+        initViewModel(
+            args = FetchNodesViewModel.Args(
+                session = "test-session",
+                isFromLogin = true,
+                refreshEvent = null
+            )
+        )
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isFromLogin).isTrue()
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that refresh event Refresh triggers fetch nodes with refresh session`() = runTest {
+        // Setup mocks
+        whenever(isConnectedToInternetUseCase()).thenReturn(true)
+        whenever(loginMutex.isLocked).thenReturn(false)
+        whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
+        whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
+        wheneverBlocking { isMegaApiLoggedInUseCase() }.thenReturn(true)
+        val fetchNodesFlow = MutableStateFlow(FetchNodesUpdate())
+        whenever(fetchNodesUseCase()).thenReturn(fetchNodesFlow)
+
+        initViewModel(
+            args = FetchNodesViewModel.Args(
+                session = "test-session",
+                isFromLogin = false,
+                refreshEvent = RefreshEvent.Refresh
+            )
+        )
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            // When refresh event is Refresh, it should call fetchNodes with isRefreshSession = true
+            // which resets the fetchNodesUpdate to clean state
+            assertThat(state.fetchNodesUpdate).isNotNull()
+
+            verify(fetchNodesUseCase).invoke()
+            // When refreshEvent is Refresh, handlePostLogin is not called
+            verify(globalInitialiser, never()).onPostLogin(any(), any())
+            verify(fastLoginUseCase, never()).invoke(any(), any(), any())
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that refresh event ChangeEnvironment triggers normal fetch nodes flow`() = runTest {
+        // Setup mocks
+        whenever(isConnectedToInternetUseCase()).thenReturn(true)
+        whenever(loginMutex.isLocked).thenReturn(false)
+        whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
+        whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
+        wheneverBlocking { isMegaApiLoggedInUseCase() }.thenReturn(true)
+        whenever(fetchNodesUseCase()).thenReturn(emptyFlow())
+
+        initViewModel(
+            args = FetchNodesViewModel.Args(
+                session = "test-session",
+                isFromLogin = false,
+                refreshEvent = RefreshEvent.ChangeEnvironment
+            )
+        )
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isFastLoginInProgress).isFalse()
+            assertThat(state.isFastLogin).isFalse()
+
+            verify(fetchNodesUseCase).invoke()
+            verify(globalInitialiser).onPostLogin("test-session", false)
+            verify(fastLoginUseCase, never()).invoke(any(), any(), any())
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that null refresh event triggers normal fetch nodes flow when logged in`() = runTest {
+        // Setup mocks
+        whenever(isConnectedToInternetUseCase()).thenReturn(true)
+        whenever(loginMutex.isLocked).thenReturn(false)
+        whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
+        whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
+        wheneverBlocking { isMegaApiLoggedInUseCase() }.thenReturn(true)
+        whenever(fetchNodesUseCase()).thenReturn(emptyFlow())
+
+        initViewModel(
+            args = FetchNodesViewModel.Args(
+                session = "test-session",
+                isFromLogin = false,
+                refreshEvent = null
+            )
+        )
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isFastLoginInProgress).isFalse()
+            assertThat(state.isFastLogin).isFalse()
+
+            verify(fetchNodesUseCase).invoke()
+            verify(globalInitialiser).onPostLogin("test-session", false)
+            verify(fastLoginUseCase, never()).invoke(any(), any(), any())
 
             cancelAndIgnoreRemainingEvents()
         }

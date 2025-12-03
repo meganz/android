@@ -61,6 +61,7 @@ import mega.privacy.android.app.appstate.global.GlobalStateViewModel
 import mega.privacy.android.app.appstate.global.SnackbarEventsViewModel
 import mega.privacy.android.app.appstate.global.event.QueueEventViewModel
 import mega.privacy.android.app.appstate.global.model.GlobalState
+import mega.privacy.android.app.appstate.global.model.RefreshEvent
 import mega.privacy.android.app.appstate.global.util.show
 import mega.privacy.android.app.presence.SignalPresenceViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -122,8 +123,16 @@ class MegaActivity : ComponentActivity() {
     }
 
     private suspend fun consumeIntentExtras() {
+        consumeActions()
         consumeWarningMessage()
         consumeIntentDestinations()
+    }
+
+    private fun consumeActions() {
+        if (intent.action == Constants.ACTION_REFRESH) {
+            globalStateViewModel.refreshSession(RefreshEvent.Refresh)
+            intent.action = null
+        }
     }
 
     private fun consumeWarningMessage() {
@@ -187,7 +196,7 @@ class MegaActivity : ComponentActivity() {
                         defaultLandingScreen = HomeScreensNavKey(),
                         defaultLoginDestination = LoginNavKey(),
                         initialLoginDestination = TourNavKey,
-                        hasRootNode = rootNodeState,
+                        hasRootNode = rootNodeState.exists,
                         isPasscodeLocked = passcodeState is PasscodeCheckState.Locked,
                         passcodeDestination = PasscodeNavKey,
                         fetchRootNodeDestination = ::FetchingContentNavKey,

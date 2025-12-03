@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -23,6 +24,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.appstate.global.mapper.BlockedStateMapper
 import mega.privacy.android.app.appstate.global.model.BlockedState
 import mega.privacy.android.app.appstate.global.model.GlobalState
+import mega.privacy.android.app.appstate.global.model.RefreshEvent
+import mega.privacy.android.app.appstate.global.model.RootNodeState
 import mega.privacy.android.app.appstate.initialisation.GlobalInitialiser
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.extension.onFirst
@@ -50,6 +53,8 @@ class GlobalStateViewModel @Inject constructor(
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
 ) : ViewModel() {
+    private val refreshSessionFlow = MutableSharedFlow<RefreshEvent>()
+
     init {
         globalInitialiser.onAppStart()
     }
@@ -83,18 +88,20 @@ class GlobalStateViewModel @Inject constructor(
         }
     }
 
-    val rootNodeExistsFlow: StateFlow<Boolean> by lazy {
+    val rootNodeExistsFlow: StateFlow<RootNodeState> by lazy {
         merge(
             monitorFetchNodesFinishUseCase()
                 .onStart { emit(doesRootNodeExist()) }
+                .map { RootNodeState(it) }
                 .catch { Timber.e(it, "Error monitoring fetch nodes finish") },
             getPostLoginSessionFlow()
                 .catch { Timber.e(it, "Error monitoring post login session") }
-                .emitFalseOnLogout()
+                .emitFalseOnLogout(),
+            refreshSessionFlow.map { RootNodeState(false, it) }
         ).catch { Timber.e(it, "Error monitoring fetch nodes finish") }
             .asUiStateFlow(
                 scope = viewModelScope,
-                initialValue = false
+                initialValue = RootNodeState(false)
             )
     }
 
@@ -104,7 +111,7 @@ class GlobalStateViewModel @Inject constructor(
     private fun getPostLoginSessionFlow(): Flow<String?> = sessionFlow.dropWhile { it != null }
 
     private fun Flow<String?>.emitFalseOnLogout() = this.filter { it == null }
-        .map { false }
+        .map { RootNodeState(false) }
 
 
     private fun monitorBlockedState() =
@@ -126,6 +133,11 @@ class GlobalStateViewModel @Inject constructor(
         }
     }
 
+    fun refreshSession(event: RefreshEvent) {
+        viewModelScope.launch {
+            refreshSessionFlow.emit(event)
+        }
+    }
 
     private val sessionFlow: SharedFlow<String?> by lazy {
         monitorUserCredentialsUseCase()

@@ -324,7 +324,10 @@ internal class MyAccountActivity : PasscodeActivity(),
             R.id.action_kill_all_sessions -> showConfirmationKillSessions()
             R.id.action_change_pass -> navController.navigate(R.id.action_my_account_to_change_password)
             R.id.action_export_MK -> navController.navigate(R.id.action_my_account_to_export_recovery_key)
-            R.id.action_refresh -> viewModel.refresh(this)
+            R.id.action_refresh -> lifecycleScope.launch {
+                viewModel.refresh(this@MyAccountActivity)
+            }
+
             R.id.action_upgrade_account -> {
                 megaNavigator.openUpgradeAccount(
                     context = this,
