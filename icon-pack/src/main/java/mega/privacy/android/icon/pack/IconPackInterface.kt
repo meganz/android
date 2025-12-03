@@ -208,6 +208,7 @@ interface IconPackInterface {
                 val SlidersHorizontal01: ImageVector
                 val SlidersVertical02: ImageVector
                 val Square: ImageVector
+                val Star: ImageVector
                 val Sync01: ImageVector
                 val TagSimple: ImageVector
                 val TransferArrowsUpDownAlt: ImageVector

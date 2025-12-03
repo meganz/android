@@ -14,6 +14,7 @@ import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableSet
 import mega.android.core.ui.model.menu.MenuAction
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.media.MediaAlbum
@@ -50,6 +51,9 @@ class AlbumContentScreenComposeTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
+    @get:Rule
+    val analyticsRule = AnalyticsTestRule()
+
     private val snackbarEventQueue: SnackbarEventQueue = mock()
 
     @After
@@ -72,7 +76,8 @@ class AlbumContentScreenComposeTest {
         sendPhotosToChatEvent: () -> Unit = {},
         resetSendPhotosToChatEvent: () -> Unit = {},
         hidePhotosEvent: () -> Unit = {},
-        resetHidePhotosEvent: () -> Unit = {},
+        unhidePhotosEvent: () -> Unit = {},
+        removeFavourites: () -> Unit = {},
         removePhotos: () -> Unit = {},
         deleteAlbum: () -> Unit = {},
         resetDeleteAlbumSuccessEvent: () -> Unit = {},
@@ -117,7 +122,8 @@ class AlbumContentScreenComposeTest {
                     sendPhotosToChatEvent = sendPhotosToChatEvent,
                     resetSendPhotosToChatEvent = resetSendPhotosToChatEvent,
                     hidePhotosEvent = hidePhotosEvent,
-                    resetHidePhotosEvent = resetHidePhotosEvent,
+                    unhidePhotosEvent = unhidePhotosEvent,
+                    removeFavourites = removeFavourites,
                     removePhotos = removePhotos,
                     deleteAlbum = deleteAlbum,
                     hideDeleteConfirmation = hideDeleteConfirmation,

@@ -56,6 +56,7 @@ dependencies {
     implementation(lib.kotlinx.collections.immutable)
 
     // test
+    testImplementation(project(":core:analytics:analytics-test"))
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))
     testImplementation(androidx.navigation.testing)

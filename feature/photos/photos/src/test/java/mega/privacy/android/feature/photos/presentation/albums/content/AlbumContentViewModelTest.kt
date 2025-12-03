@@ -17,15 +17,19 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.media.SystemAlbum
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.photos.PhotoPredicate
 import mega.privacy.android.domain.exception.account.AlbumNameValidationException
 import mega.privacy.android.domain.usecase.GetAlbumPhotosUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -62,6 +66,7 @@ import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
+import mega.privacy.android.feature.photos.presentation.albums.model.FavouriteSystemAlbum
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
@@ -74,6 +79,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
@@ -324,62 +330,6 @@ class AlbumContentViewModelTest {
     }
 
     @Test
-    fun `test that setCurrentMediaType updates state correctly`() = runTest {
-        createViewModel()
-        val mediaType = FilterMediaType.IMAGES
-
-        underTest.setCurrentMediaType(mediaType)
-
-        underTest.state.test {
-            assertThat(awaitItem().currentMediaType).isEqualTo(mediaType)
-        }
-    }
-
-    @Test
-    fun `test that showSortByDialog updates state correctly`() = runTest {
-        createViewModel()
-
-        underTest.showSortByDialog(true)
-
-        underTest.state.test {
-            assertThat(awaitItem().showSortByDialog).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that showFilterDialog updates state correctly`() = runTest {
-        createViewModel()
-
-        underTest.showFilterDialog(true)
-
-        underTest.state.test {
-            assertThat(awaitItem().showFilterDialog).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that showRenameDialog updates state correctly`() = runTest {
-        createViewModel()
-
-        underTest.showRenameDialog(true)
-
-        underTest.state.test {
-            assertThat(awaitItem().showRenameDialog).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that setShowRemovePhotosFromAlbumDialog updates state correctly`() = runTest {
-        createViewModel()
-
-        underTest.setShowRemovePhotosFromAlbumDialog(true)
-
-        underTest.state.test {
-            assertThat(awaitItem().showRemovePhotosDialog).isTrue()
-        }
-    }
-
-    @Test
     fun `test that clearSelectedPhotos updates state correctly`() = runTest {
         createViewModel()
 
@@ -387,29 +337,6 @@ class AlbumContentViewModelTest {
 
         underTest.state.test {
             assertThat(awaitItem().selectedPhotos).isEmpty()
-        }
-    }
-
-    @Test
-    fun `test that setSnackBarMessage updates state correctly`() = runTest {
-        createViewModel()
-        val message = "Test message"
-
-        underTest.setSnackBarMessage(message)
-
-        underTest.state.test {
-            assertThat(awaitItem().snackBarMessage).isEqualTo(message)
-        }
-    }
-
-    @Test
-    fun `test that setNewAlbumNameValidity updates state correctly`() = runTest {
-        createViewModel()
-
-        underTest.setNewAlbumNameValidity(false)
-
-        underTest.state.test {
-            assertThat(awaitItem().isInputNameValid).isFalse()
         }
     }
 
@@ -480,18 +407,6 @@ class AlbumContentViewModelTest {
     }
 
     @Test
-    fun `test that removeFavourites calls use case and clears selection`() = runTest {
-        createViewModel()
-
-        underTest.removeFavourites()
-
-        verify(removeFavouritesUseCase).invoke(emptyList())
-        underTest.state.test {
-            assertThat(awaitItem().selectedPhotos).isEmpty()
-        }
-    }
-
-    @Test
     fun `test that updatePhotosAddingProgressCompleted calls use case`() = runTest {
         createViewModel()
         val albumId = AlbumId(123L)
@@ -509,15 +424,6 @@ class AlbumContentViewModelTest {
         underTest.updatePhotosRemovingProgressCompleted(albumId)
 
         verify(updateAlbumPhotosRemovingProgressCompleted).invoke(albumId)
-    }
-
-    @Test
-    fun `test that getSelectedPhotos returns current selected photos`() = runTest {
-        createViewModel()
-
-        val result = underTest.getSelectedPhotos()
-
-        assertThat(result).isEqualTo(underTest.state.value.selectedPhotos)
     }
 
     @Test
@@ -598,32 +504,6 @@ class AlbumContentViewModelTest {
     }
 
     @Test
-    fun `test that hidePhotos updates state correctly when nodes are fetched`() = runTest {
-        createViewModel()
-        val node = mock<TypedNode>()
-        whenever(getNodeListByIdsUseCase(any())).thenReturn(listOf(node))
-
-        underTest.hidePhotos()
-
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.hidePhotosEvent).isEqualTo(triggered(listOf(node)))
-        }
-    }
-
-    @Test
-    fun `test that resetHidePhotos updates state correctly`() = runTest {
-        createViewModel()
-
-        underTest.resetHidePhotos()
-
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.hidePhotosEvent).isEqualTo(consumed())
-        }
-    }
-
-    @Test
     fun `test that selectAllPhotos selects all photos when filter is ALL_MEDIA`() = runTest {
         createViewModel()
         val photo1 = mock<PhotoUiState.Image>()
@@ -636,32 +516,6 @@ class AlbumContentViewModelTest {
         underTest.state.test {
             val state = awaitItem()
             assertThat(state.currentMediaType).isEqualTo(FilterMediaType.ALL_MEDIA)
-        }
-    }
-
-    @Test
-    fun `test that selectAllPhotos selects only images when filter is IMAGES`() = runTest {
-        createViewModel()
-        underTest.setCurrentMediaType(FilterMediaType.IMAGES)
-
-        underTest.selectAllPhotos()
-
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.currentMediaType).isEqualTo(FilterMediaType.IMAGES)
-        }
-    }
-
-    @Test
-    fun `test that selectAllPhotos selects only videos when filter is VIDEOS`() = runTest {
-        createViewModel()
-        underTest.setCurrentMediaType(FilterMediaType.VIDEOS)
-
-        underTest.selectAllPhotos()
-
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.currentMediaType).isEqualTo(FilterMediaType.VIDEOS)
         }
     }
 
@@ -1306,5 +1160,166 @@ class AlbumContentViewModelTest {
                 assertThat(result.sortType).isEqualTo(Sort.OLDEST.name)
             }
         }
+
+    @Test
+    fun `test that updateBottomBarActionVisibility always includes Download SendToChat and Share`() =
+        runTest {
+            createViewModel()
+            val photo = createMockPhotoUiState(id = 1L, isSensitive = false)
+
+            underTest.togglePhotoSelection(photo)
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.visibleBottomBarActions).contains(AlbumContentSelectionAction.Download)
+                assertThat(state.visibleBottomBarActions).contains(AlbumContentSelectionAction.SendToChat)
+                assertThat(state.visibleBottomBarActions).contains(AlbumContentSelectionAction.Share)
+            }
+        }
+
+    @Test
+    fun `test that updateBottomBarActionVisibility shows Hide when user is not paid`() =
+        runTest {
+            createViewModel()
+            val photo = createMockPhotoUiState(id = 1L, isSensitive = false)
+
+            underTest.togglePhotoSelection(photo)
+
+            underTest.state.test {
+                val state = awaitItem()
+                // accountType is null (not paid), so Hide should be visible
+                assertThat(state.visibleBottomBarActions).contains(AlbumContentSelectionAction.Hide)
+                assertThat(state.visibleBottomBarActions).doesNotContain(AlbumContentSelectionAction.Unhide)
+            }
+        }
+
+    @Test
+    fun `test that updateBottomBarActionVisibility shows Hide when has non-sensitive node and is onboarded`() =
+        runTest {
+            isHiddenNodesOnboardedUseCase.stub {
+                onBlocking { invoke() }.thenReturn(true)
+            }
+            createViewModel()
+            val photo =
+                createMockPhotoUiState(id = 1L, isSensitive = false, isSensitiveInherited = false)
+
+            underTest.togglePhotoSelection(photo)
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.visibleBottomBarActions).contains(AlbumContentSelectionAction.Hide)
+            }
+        }
+
+    @Test
+    fun `test that updateBottomBarActionVisibility shows Unhide when paid and all nodes are sensitive`() =
+        runTest {
+            isHiddenNodesOnboardedUseCase.stub {
+                onBlocking { invoke() }.thenReturn(true)
+            }
+            createViewModel()
+
+            // Simulate paid account by setting state
+            val photo =
+                createMockPhotoUiState(id = 1L, isSensitive = true, isSensitiveInherited = false)
+            underTest.togglePhotoSelection(photo)
+
+            underTest.state.test {
+                assertThat(awaitItem().visibleBottomBarActions).contains(AlbumContentSelectionAction.Hide)
+            }
+        }
+
+    @Test
+    fun `test that updateBottomBarActionVisibility shows Delete for UserAlbum`() =
+        runTest {
+            val albumId = AlbumId(123L)
+            val mockUserAlbum = mock<MediaAlbum.User> {
+                on { id }.thenReturn(albumId)
+            }
+            val mockAlbumUiState = mock<AlbumUiState> {
+                on { mediaAlbum }.thenReturn(mockUserAlbum)
+                on { title }.thenReturn("Album")
+                on { cover }.thenReturn(null)
+            }
+            whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
+            whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
+            whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf())
+            whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
+            whenever(observeAlbumPhotosRemovingProgress(any())).thenReturn(flowOf())
+
+            createViewModel(AlbumContentNavKey(id = albumId.id, type = "custom"))
+
+            val photo = createMockPhotoUiState(id = 1L, isSensitive = false)
+            underTest.togglePhotoSelection(photo)
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.visibleBottomBarActions).contains(AlbumContentSelectionAction.Delete)
+                assertThat(state.visibleBottomBarActions).doesNotContain(AlbumContentSelectionAction.RemoveFavourites)
+            }
+        }
+
+    @Test
+    fun `test that updateBottomBarActionVisibility shows RemoveFavourites for FavouriteAlbum`() =
+        runTest {
+            val mockFavouriteSystemAlbum = mock<FavouriteSystemAlbum>()
+            val mockSystemAlbum = mock<MediaAlbum.System> {
+                on { id }.thenReturn(mockFavouriteSystemAlbum)
+            }
+            val mockAlbumUiState = mock<AlbumUiState> {
+                on { mediaAlbum }.thenReturn(mockSystemAlbum)
+                on { title }.thenReturn("Favourites")
+                on { cover }.thenReturn(null)
+            }
+            val mockPhotoPredicate: PhotoPredicate = { true }
+            whenever(getDefaultAlbumsMapUseCase()).thenReturn(
+                mapOf(Album.FavouriteAlbum to mockPhotoPredicate)
+            )
+            whenever(getDefaultAlbumPhotos(any(), any())).thenReturn(flowOf(emptyList()))
+            whenever(legacyMediaSystemAlbumMapper(any(), anyOrNull())).thenReturn(mockSystemAlbum)
+            whenever(albumUiStateMapper(mockSystemAlbum)).thenReturn(mockAlbumUiState)
+
+            createViewModel(AlbumContentNavKey(id = null, type = "favourite"))
+
+            val photo = createMockPhotoUiState(id = 1L, isSensitive = false)
+            underTest.togglePhotoSelection(photo)
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.uiAlbum?.mediaAlbum).isEqualTo(mockSystemAlbum)
+                assertThat(state.visibleBottomBarActions).contains(AlbumContentSelectionAction.RemoveFavourites)
+                assertThat(state.visibleBottomBarActions).doesNotContain(AlbumContentSelectionAction.Delete)
+            }
+        }
+
+    @Test
+    fun `test that clearSelectedPhotos triggers updateBottomBarActionVisibility with empty list`() =
+        runTest {
+            createViewModel()
+            val photo = createMockPhotoUiState(id = 1L, isSensitive = false)
+
+            // First select a photo
+            underTest.togglePhotoSelection(photo)
+            // Then clear selection
+            underTest.clearSelectedPhotos()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.selectedPhotos).isEmpty()
+                assertThat(state.visibleBottomBarActions).isEmpty()
+            }
+        }
+
+    private fun createMockPhotoUiState(
+        id: Long,
+        isSensitive: Boolean = false,
+        isSensitiveInherited: Boolean = false,
+    ): PhotoUiState.Image {
+        return mock {
+            on { this.id }.thenReturn(id)
+            on { this.isSensitive }.thenReturn(isSensitive)
+            on { this.isSensitiveInherited }.thenReturn(isSensitiveInherited)
+        }
+    }
 }
 

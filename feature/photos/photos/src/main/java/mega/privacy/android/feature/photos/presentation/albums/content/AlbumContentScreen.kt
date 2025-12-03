@@ -63,7 +63,6 @@ import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
-import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
@@ -96,8 +95,12 @@ import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavK
 import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
 import mega.privacy.android.navigation.destination.OverDiskQuotaPaywallWarningNavKey
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.AlbumAddPhotosFABEvent
 import mega.privacy.mobile.analytics.event.AlbumContentDeleteAlbumEvent
+import mega.privacy.mobile.analytics.event.AlbumContentScreenEvent
+import mega.privacy.mobile.analytics.event.AlbumContentShareLinkMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.DeleteAlbumCancelButtonPressedEvent
+import mega.privacy.mobile.analytics.event.RemoveItemsFromAlbumDialogButtonEvent
 
 @Composable
 fun AlbumContentScreen(
@@ -127,8 +130,9 @@ fun AlbumContentScreen(
         resetSharePhotosEvent = viewModel::resetSharePhotos,
         sendPhotosToChatEvent = viewModel::sendPhotosToChat,
         resetSendPhotosToChatEvent = viewModel::resetSendPhotosToChat,
-        hidePhotosEvent = viewModel::hidePhotos,
-        resetHidePhotosEvent = viewModel::resetHidePhotos,
+        hidePhotosEvent = { viewModel.hideOrUnhideNodes(true) },
+        unhidePhotosEvent = { viewModel.hideOrUnhideNodes(false) },
+        removeFavourites = viewModel::removeFavourites,
         removePhotos = viewModel::removePhotosFromAlbum,
         deleteAlbum = viewModel::deleteAlbum,
         resetDeleteAlbumSuccessEvent = viewModel::resetDeleteAlbumSuccess,
@@ -188,7 +192,8 @@ internal fun AlbumContentScreen(
     sendPhotosToChatEvent: () -> Unit,
     resetSendPhotosToChatEvent: () -> Unit,
     hidePhotosEvent: () -> Unit,
-    resetHidePhotosEvent: () -> Unit,
+    unhidePhotosEvent: () -> Unit,
+    removeFavourites: () -> Unit,
     removePhotos: () -> Unit,
     deleteAlbum: () -> Unit,
     resetDeleteAlbumSuccessEvent: () -> Unit,
@@ -231,6 +236,10 @@ internal fun AlbumContentScreen(
     var isMoreOptionsSheetVisible by rememberSaveable { mutableStateOf(false) }
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        Analytics.tracker.trackEvent(AlbumContentScreenEvent)
+    }
+
     EventEffect(
         event = actionState.downloadEvent,
         onConsumed = consumeDownloadEvent,
@@ -258,14 +267,6 @@ internal fun AlbumContentScreen(
         onConsumed = resetSendPhotosToChatEvent,
         action = { photos ->
             actionHandler(SendToChatMenuAction(), photos)
-        }
-    )
-
-    EventEffect(
-        event = uiState.hidePhotosEvent,
-        onConsumed = resetHidePhotosEvent,
-        action = { photos ->
-            actionHandler(HideMenuAction(), photos)
         }
     )
 
@@ -386,7 +387,7 @@ internal fun AlbumContentScreen(
                 modifier = Modifier
                     .testTag(ALBUM_CONTENT_SCREEN_SELECTION_BOTTOM_BAR),
                 visible = uiState.selectedPhotos.isNotEmpty(),
-                actions = AlbumContentSelectionAction.bottomBarItems,
+                actions = uiState.visibleBottomBarActions,
                 onActionPressed = {
                     when (it) {
                         is AlbumContentSelectionAction.Delete -> {
@@ -400,6 +401,7 @@ internal fun AlbumContentScreen(
                         }
 
                         is AlbumContentSelectionAction.Share -> {
+                            Analytics.tracker.trackEvent(AlbumContentShareLinkMenuToolbarEvent)
                             sharePhotos()
                             deselectAll()
                         }
@@ -409,8 +411,18 @@ internal fun AlbumContentScreen(
                             deselectAll()
                         }
 
+                        is AlbumContentSelectionAction.Unhide -> {
+                            unhidePhotosEvent()
+                            deselectAll()
+                        }
+
                         is AlbumContentSelectionAction.SendToChat -> {
                             sendPhotosToChatEvent()
+                            deselectAll()
+                        }
+
+                        is AlbumContentSelectionAction.RemoveFavourites -> {
+                            removeFavourites()
                             deselectAll()
                         }
                     }
@@ -421,6 +433,7 @@ internal fun AlbumContentScreen(
             AddContentFab(
                 visible = uiState.uiAlbum?.mediaAlbum is MediaAlbum.User && uiState.photos.isNotEmpty(),
                 onClick = {
+                    Analytics.tracker.trackEvent(AlbumAddPhotosFABEvent)
                     handleAction(AlbumContentSelectionAction.AddItems)
                 }
             )
@@ -501,7 +514,7 @@ internal fun AlbumContentScreen(
         RemovePhotosConfirmationDialog(
             isVisible = showDeletePhotosConfirmation,
             onConfirm = {
-                Analytics.tracker.trackEvent(AlbumContentDeleteAlbumEvent)
+                Analytics.tracker.trackEvent(RemoveItemsFromAlbumDialogButtonEvent)
                 removePhotos()
                 deselectAll()
                 showDeletePhotosConfirmation = false
@@ -743,7 +756,8 @@ private fun AlbumContentScreenPreview() {
             sendPhotosToChatEvent = {},
             resetSendPhotosToChatEvent = {},
             hidePhotosEvent = {},
-            resetHidePhotosEvent = {},
+            unhidePhotosEvent = {},
+            removeFavourites = {},
             removePhotos = {},
             deleteAlbum = {},
             resetDeleteAlbumSuccessEvent = {},

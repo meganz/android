@@ -17,7 +17,7 @@ import mega.privacy.android.feature.photos.model.AlbumSortConfiguration
 import mega.privacy.android.feature.photos.model.AlbumSortOption
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
-import mega.privacy.android.feature.photos.model.Sort
+import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
 
@@ -26,28 +26,18 @@ import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
  * @property isLoading True if the screen is loading, false otherwise.
  * @property isAddingPhotos True if the screen is adding photos, false otherwise.
  * @property totalAddedPhotos Total added photos.
- * @property isDeleteAlbum True if the screen is deleting the album, false otherwise.
  * @property isRemovingPhotos True if the screen is removing photos, false otherwise.
  * @property totalRemovedPhotos Total removed photos.
  * @property showRemoveLinkConfirmation True if the remove link confirmation is shown, false otherwise.
- * @property isLinkRemoved True if the link is removed, false otherwise.
  * @property uiAlbum The UIAlbum.
  * @property photos The list of photos.
  * @property selectedPhotos The set of selected photos.
- * @property currentSort The current sort.
  * @property currentMediaType The current media type.
- * @property snackBarMessage The snackbar message.
- * @property showRenameDialog True if the rename dialog is shown, false otherwise.
- * @property showSortByDialog True if the sort by dialog is shown, false otherwise.
- * @property showFilterDialog True if the filter dialog is shown, false otherwise.
- * @property showRemovePhotosDialog True if the remove photos dialog is shown, false otherwise.
- * @property isInputNameValid True if the input name is valid, false otherwise.
- * @property createDialogErrorMessage The create dialog error message.
- * @property newAlbumTitleInput The new album title input.
  * @property accountType The account type.
  * @property isHiddenNodesOnboarded True if the hidden nodes are onboarded, false otherwise.
  * @property isBusinessAccountExpired True if the business account is expired, false otherwise.
  * @property hiddenNodeEnabled True if the hidden node is enabled, false otherwise.
+ * @property visibleBottomBarActions The list of visible bottom bar actions based on current selection.
  */
 data class AlbumContentUiState(
     val isLoading: Boolean = true,
@@ -58,16 +48,7 @@ data class AlbumContentUiState(
     val uiAlbum: AlbumUiState? = null,
     val photos: ImmutableList<PhotoUiState> = persistentListOf(),
     val selectedPhotos: ImmutableSet<PhotoUiState> = persistentSetOf(),
-    val currentSort: Sort = Sort.NEWEST,
     val currentMediaType: FilterMediaType = FilterMediaType.ALL_MEDIA,
-    val snackBarMessage: String = "",
-    val showRenameDialog: Boolean = false,
-    val showSortByDialog: Boolean = false,
-    val showFilterDialog: Boolean = false,
-    val showRemovePhotosDialog: Boolean = false,
-    val isInputNameValid: Boolean = true,
-    val createDialogErrorMessage: Int? = null,
-    val newAlbumTitleInput: String = "",
     val accountType: AccountType? = null,
     val isHiddenNodesOnboarded: Boolean? = null,
     val isBusinessAccountExpired: Boolean = false,
@@ -76,7 +57,6 @@ data class AlbumContentUiState(
     val savePhotosToDeviceEvent: StateEventWithContent<List<TypedNode>> = consumed(),
     val sharePhotosEvent: StateEventWithContent<List<TypedNode>> = consumed(),
     val sendPhotosToChatEvent: StateEventWithContent<List<TypedNode>> = consumed(),
-    val hidePhotosEvent: StateEventWithContent<List<TypedNode>> = consumed(),
     val deleteAlbumSuccessEvent: StateEvent = consumed,
     val showDeleteAlbumConfirmation: StateEvent = consumed,
     val updateAlbumNameErrorMessage: StateEventWithContent<String> = consumed(),
@@ -92,7 +72,8 @@ data class AlbumContentUiState(
         sortDirection = SortDirection.Descending
     ),
     val previewAlbumContentEvent: StateEventWithContent<AlbumContentPreviewNavKey> = consumed(),
-    val addMoreItemsEvent: StateEvent = consumed
+    val addMoreItemsEvent: StateEvent = consumed,
+    val visibleBottomBarActions: ImmutableList<AlbumContentSelectionAction> = persistentListOf(),
 ) {
     val isAddingPhotosProgressCompleted: Boolean
         get() = !isAddingPhotos && totalAddedPhotos > 0

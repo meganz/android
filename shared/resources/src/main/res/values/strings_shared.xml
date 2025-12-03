@@ -1891,8 +1891,6 @@
     <string name="timeline_tab_sort_by_date_newest">Newest</string>
     <!-- Timeline tab sort files by date oldest first -->
     <string name="timeline_tab_sort_by_date_oldest">Oldest</string>
-    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
-    <string name="videos_tab_empty_hint_video">[B]No[/B] [A]videos[/A] [B]found[/B]</string>
     <!-- Timeline filter title. This text will be displayed as the filter screen title and the toolbar action menu -->
     <string name="timeline_tab_filter_text">Filter</string>
     <!-- Timeline filter media type selection header. -->
@@ -1913,4 +1911,8 @@
     <string name="album_content_empty_album_title">Empty album</string>
     <!--Album content action to add more items to the album-->
     <string name="album_content_action_add_items">Add items</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="videos_tab_empty_hint_video">[B]No[/B] [A]videos[/A] [B]found[/B]</string>
+    <!-- Action to remove items from the Favourites album -->
+    <string name="album_content_action_remove_favourites">Remove favourites</string>
 </resources>

@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableSet
@@ -75,6 +76,7 @@ import mega.privacy.android.feature.photos.model.AlbumSortConfiguration
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
+import mega.privacy.android.feature.photos.presentation.albums.model.FavouriteSystemAlbum
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
@@ -201,6 +203,7 @@ class AlbumContentViewModel @AssistedInject constructor(
                     hiddenNodeEnabled = true,
                 )
             }
+
             if (_state.value.isLoading) return@onEach
 
             val filteredPhotos = filterNonSensitivePhotos(photos = sourcePhotos.orEmpty())
@@ -218,6 +221,70 @@ class AlbumContentViewModel @AssistedInject constructor(
 
         _state.update {
             it.copy(selectedPhotos = selectedPhotos.toImmutableSet())
+        }
+
+        updateBottomBarActionVisibility()
+    }
+
+    /**
+     * Updates the visibility of bottom bar actions based on:
+     * - Album type (FavouriteAlbum shows RemoveFavourites, UserAlbum shows Delete)
+     * - Selected photos' sensitive state (for Hide/Unhide actions)
+     * - Account type (paid/free)
+     * - Business account expired status
+     * - Hidden nodes onboarded status
+     */
+    private fun updateBottomBarActionVisibility() {
+        viewModelScope.launch(defaultDispatcher) {
+            val state = _state.value
+            val selectedPhotos = state.selectedPhotos
+
+            if (selectedPhotos.isEmpty()) {
+                _state.update {
+                    it.copy(visibleBottomBarActions = persistentListOf())
+                }
+                return@launch
+            }
+
+            val mediaAlbum = state.uiAlbum?.mediaAlbum
+            val isPaid = state.accountType?.isPaid ?: false
+            val isBusinessAccountExpired = state.isBusinessAccountExpired
+            val isHiddenNodesOnboarded = state.isHiddenNodesOnboarded
+
+            // Hide/Unhide visibility logic
+            val includeSensitiveInheritedNode = selectedPhotos.any { it.isSensitiveInherited }
+            val hasNonSensitiveNode = selectedPhotos.any { !it.isSensitive }
+
+            val showHide = !isPaid ||
+                    isBusinessAccountExpired ||
+                    (hasNonSensitiveNode && isHiddenNodesOnboarded != null && !includeSensitiveInheritedNode)
+            val showUnhide = isPaid &&
+                    !isBusinessAccountExpired &&
+                    !hasNonSensitiveNode &&
+                    !includeSensitiveInheritedNode
+
+            // Delete (Remove Photos) - only visible for UserAlbum
+            val showDelete = mediaAlbum is MediaAlbum.User
+
+            // RemoveFavourites - only visible for FavouriteAlbum
+            val showRemoveFavourites =
+                (mediaAlbum as? MediaAlbum.System)?.id is FavouriteSystemAlbum
+
+            val visibleActions = AlbumContentSelectionAction
+                .bottomBarItems
+                .filter { action ->
+                    when (action) {
+                        is AlbumContentSelectionAction.Hide -> showHide
+                        is AlbumContentSelectionAction.Unhide -> showUnhide
+                        is AlbumContentSelectionAction.Delete -> showDelete
+                        is AlbumContentSelectionAction.RemoveFavourites -> showRemoveFavourites
+                        else -> true
+                    }
+                }
+
+            _state.update {
+                it.copy(visibleBottomBarActions = visibleActions.toImmutableList())
+            }
         }
     }
 
@@ -487,36 +554,6 @@ class AlbumContentViewModel @AssistedInject constructor(
         _state.update { it.copy(previewAlbumContentEvent = consumed()) }
     }
 
-    fun setCurrentMediaType(mediaType: FilterMediaType) {
-        _state.update {
-            it.copy(currentMediaType = mediaType)
-        }
-    }
-
-    fun showSortByDialog(showSortByDialog: Boolean) {
-        _state.update {
-            it.copy(showSortByDialog = showSortByDialog)
-        }
-    }
-
-    fun showFilterDialog(showFilterDialog: Boolean) {
-        _state.update {
-            it.copy(showFilterDialog = showFilterDialog)
-        }
-    }
-
-    fun showRenameDialog(showRenameDialog: Boolean) {
-        _state.update {
-            it.copy(showRenameDialog = showRenameDialog)
-        }
-    }
-
-    fun setShowRemovePhotosFromAlbumDialog(show: Boolean) {
-        _state.update {
-            it.copy(showRemovePhotosDialog = show)
-        }
-    }
-
     fun removeFavourites() = viewModelScope.launch {
         val selectedPhotoIds = _state.value.selectedPhotos.map { NodeId(it.id) }
         removeFavouritesUseCase(selectedPhotoIds)
@@ -571,16 +608,6 @@ class AlbumContentViewModel @AssistedInject constructor(
         _state.update { it.copy(sendPhotosToChatEvent = consumed()) }
     }
 
-    internal fun hidePhotos() {
-        fetchNodesAndExecute { nodes ->
-            _state.update { it.copy(hidePhotosEvent = triggered(nodes)) }
-        }
-    }
-
-    internal fun resetHidePhotos() {
-        _state.update { it.copy(hidePhotosEvent = consumed()) }
-    }
-
     private fun fetchNodesAndExecute(block: (List<TypedNode>) -> Unit) {
         viewModelScope.launch {
             runCatching {
@@ -604,12 +631,15 @@ class AlbumContentViewModel @AssistedInject constructor(
         _state.update {
             it.copy(selectedPhotos = selectedPhotos.toImmutableSet())
         }
+        updateBottomBarActionVisibility()
     }
 
     fun clearSelectedPhotos() {
         _state.update {
             it.copy(selectedPhotos = persistentSetOf())
         }
+
+        updateBottomBarActionVisibility()
     }
 
     fun togglePhotoSelection(photo: PhotoUiState) {
@@ -629,15 +659,8 @@ class AlbumContentViewModel @AssistedInject constructor(
         _state.update {
             it.copy(selectedPhotos = selectedPhotos.toImmutableSet())
         }
+        updateBottomBarActionVisibility()
     }
-
-    fun setSnackBarMessage(snackBarMessage: String) {
-        _state.update {
-            it.copy(snackBarMessage = snackBarMessage)
-        }
-    }
-
-    suspend fun getSelectedPhotos() = _state.value.selectedPhotos
 
     fun updateAlbumName(name: String) = viewModelScope.launch {
         runCatching {
@@ -667,10 +690,6 @@ class AlbumContentViewModel @AssistedInject constructor(
         _state.update {
             it.copy(updateAlbumNameErrorMessage = consumed())
         }
-    }
-
-    fun setNewAlbumNameValidity(valid: Boolean) = _state.update {
-        it.copy(isInputNameValid = valid)
     }
 
     fun hideOrUnhideNodes(hide: Boolean) {

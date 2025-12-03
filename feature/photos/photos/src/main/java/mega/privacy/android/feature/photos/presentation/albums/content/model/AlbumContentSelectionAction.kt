@@ -112,6 +112,17 @@ sealed interface AlbumContentSelectionAction : MenuActionWithIcon {
             rememberVectorPainter(IconPack.Medium.Thin.Outline.EyeOff)
     }
 
+    data object Unhide : AlbumContentSelectionAction {
+        override val testTag: String = "album_content_selection_action:unhide"
+
+        @Composable
+        override fun getDescription() = stringResource(sharedR.string.general_unhide_node)
+
+        @Composable
+        override fun getIconPainter() =
+            rememberVectorPainter(IconPack.Medium.Thin.Outline.Eye)
+    }
+
     data object Delete : AlbumContentSelectionAction {
         override val testTag: String = "album_content_selection_action:delete"
 
@@ -122,6 +133,20 @@ sealed interface AlbumContentSelectionAction : MenuActionWithIcon {
         @Composable
         override fun getIconPainter() =
             rememberVectorPainter(IconPack.Medium.Thin.Outline.Trash)
+
+        override val highlightIcon: Boolean = true
+    }
+
+    data object RemoveFavourites : AlbumContentSelectionAction {
+        override val testTag: String = "album_content_selection_action:remove_favourites"
+
+        @Composable
+        override fun getDescription() =
+            stringResource(sharedR.string.album_content_action_remove_favourites)
+
+        @Composable
+        override fun getIconPainter() =
+            rememberVectorPainter(IconPack.Medium.Thin.Outline.Star)
 
         override val highlightIcon: Boolean = true
     }
@@ -156,7 +181,9 @@ sealed interface AlbumContentSelectionAction : MenuActionWithIcon {
             SendToChat,
             Share,
             Hide,
-            Delete
+            Unhide,
+            Delete,
+            RemoveFavourites
         )
 
         val bottomSheetItems = listOf(
