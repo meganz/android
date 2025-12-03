@@ -2,13 +2,13 @@ package mega.privacy.android.app.presentation.login
 
 import android.net.Uri
 import androidx.navigation3.runtime.NavKey
-import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants.ACTION_CONFIRM
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.RegexPatternType.CONFIRMATION_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.LOGIN_LINK
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.shared.resources.R
 import javax.inject.Inject
 
 class LoginDeepLinkHandler @Inject constructor(
@@ -30,9 +30,9 @@ class LoginDeepLinkHandler @Inject constructor(
         else -> null
     }
 
-    // TODO: Replace with new AND string once create
     override fun loggedOutRequiredMessage(
         navKeys: List<NavKey>,
         regexPatternType: RegexPatternType?,
-    ) = if (regexPatternType == CONFIRMATION_LINK) R.string.log_out_warning else null
+    ) = if (regexPatternType == CONFIRMATION_LINK) R.string.open_link_account_confirmation_error
+    else null
 }

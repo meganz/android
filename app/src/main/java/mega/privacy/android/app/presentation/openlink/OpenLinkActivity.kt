@@ -308,7 +308,11 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                 Timber.d("Confirmation url")
                 urlConfirmationLink = url
                 MegaApplication.urlConfirmationLink = urlConfirmationLink
-                viewModel.logout()
+                if (isLoggedIn) {
+                    setError(getString(sharedR.string.open_link_account_confirmation_error))
+                } else {
+                    viewModel.logout()
+                }
             }
             // Folder Download link
             matchRegexs(url, FOLDER_LINK_REGEXS) -> {

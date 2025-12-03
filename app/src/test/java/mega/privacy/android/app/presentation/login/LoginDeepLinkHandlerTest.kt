@@ -3,10 +3,10 @@ package mega.privacy.android.app.presentation.login
 import android.net.Uri
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants.ACTION_CONFIRM
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.shared.resources.R
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -66,7 +66,7 @@ class LoginDeepLinkHandlerTest {
 
         if (isLoggedIn) {
             assertThat(actual).isEmpty()
-            verify(snackbarEventQueue).queueMessage(R.string.log_out_warning)
+            verify(snackbarEventQueue).queueMessage(R.string.open_link_account_confirmation_error)
         } else {
             assertThat(actual).containsExactly(expected)
             verifyNoInteractions(snackbarEventQueue)

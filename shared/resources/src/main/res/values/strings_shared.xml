@@ -1921,4 +1921,6 @@
     <string name="context_empty_cloud_drive_title">Nothing in your cloud drive yet</string>
     <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
     <string name="context_empty_cloud_drive_description">Keep something safe with zero-knowledge encryption.</string>
+    <!-- Error shown when trying to confirm an account from a confirmation link and the app is already logged in -->
+    <string name="open_link_account_confirmation_error">You are already logged in to a MEGA account. Log out this account first, then try to open the same account confirmation link again.</string>
 </resources>
