@@ -32,17 +32,24 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.AccountStorageDetail
+import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.NodeChanges
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
+import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.IsAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.notifications.MonitorNotSeenUserAlertsCountUseCase
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import org.junit.jupiter.api.AfterAll
@@ -53,6 +60,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
@@ -80,6 +88,9 @@ class MenuViewModelTest {
     private val isAchievementsEnabledUseCase = mock<IsAchievementsEnabledUseCase>()
     private val checkPasswordReminderUseCase = mock<CheckPasswordReminderUseCase>()
     private val monitorNotSeenUserAlertsCountUseCase = mock<MonitorNotSeenUserAlertsCountUseCase>()
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
+    private val getRubbishNodeUseCase = mock<GetRubbishNodeUseCase>()
+    private val getSpecificAccountDetailUseCase = mock<GetSpecificAccountDetailUseCase>()
     private val ioDispatcher = UnconfinedTestDispatcher()
 
     private object TestDestination : NavKey
@@ -111,6 +122,9 @@ class MenuViewModelTest {
             isAchievementsEnabledUseCase,
             checkPasswordReminderUseCase,
             monitorNotSeenUserAlertsCountUseCase,
+            monitorNodeUpdatesUseCase,
+            getRubbishNodeUseCase,
+            getSpecificAccountDetailUseCase,
         )
     }
 
@@ -548,6 +562,12 @@ class MenuViewModelTest {
         }
 
         whenever(isAchievementsEnabledUseCase()).thenReturn(true)
+
+        monitorNodeUpdatesUseCase.stub {
+            on { invoke() }.thenReturn(flow { awaitCancellation() })
+        }
+
+        whenever(getRubbishNodeUseCase()).thenReturn(null)
     }
 
     private fun initUnderTest(
@@ -568,8 +588,11 @@ class MenuViewModelTest {
             monitorUserUpdates = monitorUserUpdates,
             isAchievementsEnabledUseCase = isAchievementsEnabledUseCase,
             checkPasswordReminderUseCase = checkPasswordReminderUseCase,
-            ioDispatcher = ioDispatcher,
             monitorNotSeenUserAlertsCountUseCase = monitorNotSeenUserAlertsCountUseCase,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
+            getRubbishNodeUseCase = getRubbishNodeUseCase,
+            getSpecificAccountDetailUseCase = getSpecificAccountDetailUseCase,
+            ioDispatcher = ioDispatcher,
         )
     }
 
@@ -1026,5 +1049,287 @@ class MenuViewModelTest {
             assertThat(state.showLogoutConfirmationEvent).isEqualTo(consumed)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `test that rubbish bin node id is fetched when monitoring node updates`() = runTest {
+        stubDefaultDependencies()
+        val rubbishBinNodeId = NodeId(100L)
+        val rubbishBinNode = mock<FolderNode> {
+            on { id } doReturn rubbishBinNodeId
+        }
+
+        whenever(getRubbishNodeUseCase()).thenReturn(rubbishBinNode)
+
+        monitorNodeUpdatesUseCase.stub {
+            on { invoke() }.thenReturn(flow { awaitCancellation() })
+        }
+
+        initUnderTest()
+
+        verify(getRubbishNodeUseCase).invoke()
+    }
+
+    @Test
+    fun `test that node updates monitoring handles null rubbish bin node gracefully`() = runTest {
+        stubDefaultDependencies()
+        whenever(getRubbishNodeUseCase()).thenReturn(null)
+
+        monitorNodeUpdatesUseCase.stub {
+            on { invoke() }.thenReturn(flow { awaitCancellation() })
+        }
+
+        initUnderTest()
+
+        // Should not crash when rubbish bin node is null
+        val state = underTest.uiState.value
+        assertThat(state).isNotNull()
+        verify(getRubbishNodeUseCase).invoke()
+        // Should not start monitoring when rubbish bin node is null
+        verify(monitorNodeUpdatesUseCase, times(0)).invoke()
+    }
+
+    @Test
+    fun `test that node updates monitoring handles rubbish bin node fetch exceptions gracefully`() =
+        runTest {
+            stubDefaultDependencies()
+            whenever(getRubbishNodeUseCase()).thenThrow(RuntimeException("Rubbish bin node error"))
+
+            initUnderTest()
+
+            // Should not crash despite error
+            val state = underTest.uiState.value
+            assertThat(state).isNotNull()
+            verify(getRubbishNodeUseCase).invoke()
+            // Should not start monitoring when rubbish bin node fetch fails
+            verify(monitorNodeUpdatesUseCase, times(0)).invoke()
+        }
+
+    @Test
+    fun `test that node updates are monitored when rubbish bin node is available`() = runTest {
+        stubDefaultDependencies()
+        val rubbishBinNodeId = NodeId(100L)
+        val rubbishBinNode = mock<FolderNode> {
+            on { id } doReturn rubbishBinNodeId
+        }
+
+        whenever(getRubbishNodeUseCase()).thenReturn(rubbishBinNode)
+
+        val testNode = mock<FolderNode> {
+            on { id } doReturn NodeId(1L)
+            on { parentId } doReturn NodeId(0L)
+        }
+        val nodeUpdate = NodeUpdate(mapOf(testNode to listOf(NodeChanges.Attributes)))
+
+        monitorNodeUpdatesUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(nodeUpdate))
+        }
+
+        initUnderTest()
+
+        verify(getRubbishNodeUseCase).invoke()
+        verify(monitorNodeUpdatesUseCase).invoke()
+    }
+
+    @Test
+    fun `test that account storage details are refreshed on init`() = runTest {
+        stubDefaultDependencies()
+
+        val accountDetail = createAccountDetail(
+            usedStorage = 2000000L,
+            totalStorage = 4000000L,
+            usedRubbish = 1000000L,
+        )
+
+        whenever(getSpecificAccountDetailUseCase(storage = true, transfer = false, pro = false))
+            .thenReturn(accountDetail)
+
+        initUnderTest()
+
+        verify(getSpecificAccountDetailUseCase).invoke(
+            storage = true,
+            transfer = false,
+            pro = false
+        )
+    }
+
+    @Test
+    fun `test that account storage details are refreshed when rubbish bin node is updated`() =
+        runTest {
+            stubDefaultDependencies()
+            val rubbishBinNodeId = NodeId(100L)
+            val rubbishBinNode = mock<FolderNode> {
+                on { id } doReturn rubbishBinNodeId
+            }
+
+            whenever(getRubbishNodeUseCase()).thenReturn(rubbishBinNode)
+
+
+            val accountDetail = createAccountDetail(
+                usedStorage = 2000000L,
+                totalStorage = 4000000L,
+                usedRubbish = 1000000L,
+            )
+
+            whenever(getSpecificAccountDetailUseCase(storage = true, transfer = false, pro = false))
+                .thenReturn(accountDetail)
+
+            val updatedRubbishBinNode = mock<FolderNode> {
+                on { id } doReturn rubbishBinNodeId
+                on { parentId } doReturn NodeId(0L)
+            }
+            val nodeUpdate = NodeUpdate(
+                mapOf(updatedRubbishBinNode to listOf(NodeChanges.Attributes))
+            )
+
+            monitorNodeUpdatesUseCase.stub {
+                on { invoke() }.thenReturn(flowOf(nodeUpdate))
+            }
+
+            initUnderTest()
+
+            //Called on init and after node update
+            verify(getSpecificAccountDetailUseCase, times(2)).invoke(
+                storage = true,
+                transfer = false,
+                pro = false
+            )
+
+        }
+
+    @Test
+    fun `test that account storage details are refreshed when child of rubbish bin is updated`() =
+        runTest {
+            stubDefaultDependencies()
+            val rubbishBinNodeId = NodeId(100L)
+            val rubbishBinNode = mock<FolderNode> {
+                on { id } doReturn rubbishBinNodeId
+            }
+
+            whenever(getRubbishNodeUseCase()).thenReturn(rubbishBinNode)
+
+            val childNode = mock<FolderNode> {
+                on { id } doReturn NodeId(101L)
+                on { parentId } doReturn rubbishBinNodeId
+            }
+            val nodeUpdate = NodeUpdate(
+                mapOf(childNode to listOf(NodeChanges.Remove))
+            )
+
+            monitorNodeUpdatesUseCase.stub {
+                on { invoke() }.thenReturn(flowOf(nodeUpdate))
+            }
+
+            val accountDetail = createAccountDetail(
+                usedStorage = 2000000L,
+                totalStorage = 4000000L,
+                usedRubbish = 500000L,
+            )
+
+            whenever(getSpecificAccountDetailUseCase(storage = true, transfer = false, pro = false))
+                .thenReturn(accountDetail)
+
+            initUnderTest()
+
+            //Called on init and after node update
+            verify(getSpecificAccountDetailUseCase, times(2)).invoke(
+                storage = true,
+                transfer = false,
+                pro = false
+            )
+        }
+
+    @Test
+    fun `test that account storage details are not refreshed for unrelated node updates`() =
+        runTest {
+            stubDefaultDependencies()
+            val rubbishBinNodeId = NodeId(100L)
+            val rubbishBinNode = mock<FolderNode> {
+                on { id } doReturn rubbishBinNodeId
+            }
+
+            whenever(getRubbishNodeUseCase()).thenReturn(rubbishBinNode)
+
+            val unrelatedNode = mock<FolderNode> {
+                on { id } doReturn NodeId(200L)
+                on { parentId } doReturn NodeId(0L)
+            }
+            val nodeUpdate = NodeUpdate(
+                mapOf(unrelatedNode to listOf(NodeChanges.Attributes))
+            )
+
+            monitorNodeUpdatesUseCase.stub {
+                on { invoke() }.thenReturn(flowOf(nodeUpdate))
+            }
+
+            initUnderTest()
+
+            //Called only on init and not after node update
+            verify(getSpecificAccountDetailUseCase, times(1)).invoke(
+                storage = true,
+                transfer = false,
+                pro = false
+            )
+        }
+
+    @Test
+    fun `test that account storage refresh handles exceptions gracefully`() = runTest {
+        stubDefaultDependencies()
+        val rubbishBinNodeId = NodeId(100L)
+        val rubbishBinNode = mock<FolderNode> {
+            on { id } doReturn rubbishBinNodeId
+        }
+
+        whenever(getRubbishNodeUseCase()).thenReturn(rubbishBinNode)
+
+        val updatedRubbishBinNode = mock<FolderNode> {
+            on { id } doReturn rubbishBinNodeId
+            on { parentId } doReturn NodeId(0L)
+        }
+        val nodeUpdate = NodeUpdate(
+            mapOf(updatedRubbishBinNode to listOf(NodeChanges.Attributes))
+        )
+
+        monitorNodeUpdatesUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(nodeUpdate))
+        }
+
+        whenever(getSpecificAccountDetailUseCase(storage = true, transfer = false, pro = false))
+            .thenThrow(RuntimeException("Account detail error"))
+
+        initUnderTest()
+
+        // Should not crash despite error (both on init and after node update)
+        val state = underTest.uiState.value
+        assertThat(state).isNotNull()
+        // Called on init and after node update, both should handle exceptions gracefully
+        verify(getSpecificAccountDetailUseCase, times(2)).invoke(
+            storage = true,
+            transfer = false,
+            pro = false
+        )
+    }
+
+    @Test
+    fun `test that node update monitoring handles exceptions gracefully`() = runTest {
+        stubDefaultDependencies()
+        val rubbishBinNodeId = NodeId(100L)
+        val rubbishBinNode = mock<FolderNode> {
+            on { id } doReturn rubbishBinNodeId
+        }
+
+        whenever(getRubbishNodeUseCase()).thenReturn(rubbishBinNode)
+
+        monitorNodeUpdatesUseCase.stub {
+            on { invoke() }.thenReturn(flow { throw RuntimeException("Node update error") })
+        }
+
+        initUnderTest()
+
+        // Should not crash despite error in node update monitoring
+        val state = underTest.uiState.value
+        assertThat(state).isNotNull()
+        verify(getRubbishNodeUseCase).invoke()
+        verify(monitorNodeUpdatesUseCase).invoke()
     }
 } 

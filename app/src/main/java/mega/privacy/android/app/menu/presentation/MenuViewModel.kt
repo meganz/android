@@ -28,15 +28,18 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
+import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.IsAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.notifications.MonitorNotSeenUserAlertsCountUseCase
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import timber.log.Timber
@@ -59,6 +62,9 @@ class MenuViewModel @Inject constructor(
     private val isAchievementsEnabledUseCase: IsAchievementsEnabledUseCase,
     private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase,
     private val monitorNotSeenUserAlertsCountUseCase: MonitorNotSeenUserAlertsCountUseCase,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
+    private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
+    private val getSpecificAccountDetailUseCase: GetSpecificAccountDetailUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     // Flows for items that need dynamic subtitles
@@ -81,11 +87,13 @@ class MenuViewModel @Inject constructor(
         setMyAccountItems()
         monitorConnectivity()
         monitorUserDataAndAvatar()
+        refreshAccountStorageDetails()
         monitorAccountDetails()
         refreshUserName(false)
         refreshCurrentUserEmail()
         monitorUserChanges()
         monitorUnreadNotificationsCount()
+        monitorNodeUpdatesForRubbishBin()
     }
 
     private fun setMyAccountItems() {
@@ -170,6 +178,43 @@ class MenuViewModel @Inject constructor(
                         it.copy(unreadNotificationsCount = unreadCount)
                     }
                 }
+        }
+    }
+
+    private fun monitorNodeUpdatesForRubbishBin() {
+        viewModelScope.launch {
+            runCatching {
+                getRubbishNodeUseCase()?.id?.longValue
+            }.onSuccess { rubbishBinNodeId ->
+                rubbishBinNodeId?.let {
+                    monitorNodeUpdatesUseCase()
+                        .catch { Timber.w("Exception monitoring node updates: $it") }
+                        .collectLatest { nodeUpdate ->
+                            val hasRubbishBinUpdate = nodeUpdate.changes.keys.any { node ->
+                                node.id.longValue == rubbishBinNodeId || node.parentId.longValue == rubbishBinNodeId
+                            }
+                            if (hasRubbishBinUpdate) {
+                                refreshAccountStorageDetails()
+                            }
+                        }
+                }
+            }.onFailure {
+                Timber.e(it, "Error getting rubbish bin node id")
+            }
+        }
+    }
+
+    private fun refreshAccountStorageDetails() {
+        viewModelScope.launch {
+            getSpecificAccountDetail()
+        }
+    }
+
+    private suspend fun getSpecificAccountDetail() {
+        runCatching {
+            getSpecificAccountDetailUseCase(storage = true, transfer = false, pro = false)
+        }.onFailure {
+            Timber.e(it, "Error refreshing account storage details")
         }
     }
 
