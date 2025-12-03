@@ -1915,4 +1915,10 @@
     <string name="videos_tab_empty_hint_video">[B]No[/B] [A]videos[/A] [B]found[/B]</string>
     <!-- Action to remove items from the Favourites album -->
     <string name="album_content_action_remove_favourites">Remove favourites</string>
+    <!-- Title of the empty screen when a folder is empty -->
+    <string name="context_empty_folder_title">This folder is empty</string>
+    <!-- Title of the empty screen when there are no items in the root Cloud Drive -->
+    <string name="context_empty_cloud_drive_title">Nothing in your cloud drive yet</string>
+    <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
+    <string name="context_empty_cloud_drive_description">Keep something safe with zero-knowledge encryption.</string>
 </resources>

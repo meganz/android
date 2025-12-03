@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -23,7 +24,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -37,7 +37,6 @@ import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
-import mega.privacy.android.core.nodecomponents.R as nodeComponentsR
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
@@ -58,12 +57,10 @@ import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottom
 import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
 import mega.privacy.android.core.nodecomponents.upload.rememberCaptureHandler
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
-import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.core.sharedcomponents.node.rememberNodeId
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
@@ -77,7 +74,6 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import mega.privacy.android.feature.transfers.components.OverQuotaBanner
-import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.MediaDiscoveryNavKey
@@ -92,7 +88,7 @@ internal fun CloudDriveContent(
     navigationHandler: NavigationHandler,
     uiState: CloudDriveUiState,
     showUploadOptionsBottomSheet: Boolean,
-    onDismissUploadOptionsBottomSheet: () -> Unit,
+    onToggleShowUploadOptionsBottomSheet: (Boolean) -> Unit,
     onAction: (CloudDriveAction) -> Unit,
     onNavigateBack: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
@@ -278,14 +274,10 @@ internal fun CloudDriveContent(
             }
 
             uiState.isEmpty -> {
-                val (imageDrawable, textId) = if (uiState.isCloudDriveRoot) {
-                    iconPackR.drawable.ic_empty_cloud_glass to nodeComponentsR.string.context_empty_cloud_drive
-                } else {
-                    iconPackR.drawable.ic_empty_folder_glass to nodeComponentsR.string.file_browser_empty_folder_new
-                }
-                MegaEmptyView(
-                    imagePainter = painterResource(id = imageDrawable),
-                    text = stringResource(id = textId)
+                CloudDriveEmptyView(
+                    isRootCloudDrive = uiState.isCloudDriveRoot,
+                    modifier = Modifier.fillMaxSize(),
+                    onAddItemsClicked = { onToggleShowUploadOptionsBottomSheet(true) }
                 )
             }
 
@@ -388,7 +380,9 @@ internal fun CloudDriveContent(
                 onNewTextFileClicked = {
                     showNewTextFileDialog = true
                 },
-                onDismissSheet = onDismissUploadOptionsBottomSheet
+                onDismissSheet = {
+                    onToggleShowUploadOptionsBottomSheet(false)
+                }
             )
         }
 

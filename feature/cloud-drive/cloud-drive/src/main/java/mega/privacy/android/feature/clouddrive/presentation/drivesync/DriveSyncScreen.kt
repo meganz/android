@@ -149,7 +149,7 @@ internal fun DriveSyncScreen(
         },
         floatingActionButton = {
             val showFab =
-                selectedTabIndex == 0 && !cloudDriveUiState.isInSelectionMode
+                selectedTabIndex == 0 && !cloudDriveUiState.isInSelectionMode && !cloudDriveUiState.isEmpty
             AddContentFab(
                 visible = showFab,
                 onClick = { showUploadOptionsBottomSheet = true }
@@ -179,8 +179,8 @@ internal fun DriveSyncScreen(
                         onNavigateBack = { }, // Ignore back navigation in this tab
                         onTransfer = onTransfer,
                         showUploadOptionsBottomSheet = showUploadOptionsBottomSheet,
-                        onDismissUploadOptionsBottomSheet = {
-                            showUploadOptionsBottomSheet = false
+                        onToggleShowUploadOptionsBottomSheet = {
+                            showUploadOptionsBottomSheet = it
                         },
                         onSortNodes = cloudDriveViewModel::setCloudSortOrder,
                         nodeOptionsActionViewModel = nodeOptionsActionViewModel,

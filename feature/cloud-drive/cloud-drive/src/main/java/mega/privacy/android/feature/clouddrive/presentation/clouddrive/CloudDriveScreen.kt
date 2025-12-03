@@ -118,7 +118,7 @@ fun CloudDriveScreen(
         },
         floatingActionButton = {
             AddContentFab(
-                visible = !uiState.isInSelectionMode,
+                visible = !uiState.isInSelectionMode && !uiState.isEmpty,
                 onClick = { showUploadOptionsBottomSheet = true }
             )
         },
@@ -128,7 +128,7 @@ fun CloudDriveScreen(
                 navigationHandler = navigationHandler,
                 uiState = uiState,
                 showUploadOptionsBottomSheet = showUploadOptionsBottomSheet,
-                onDismissUploadOptionsBottomSheet = { showUploadOptionsBottomSheet = false },
+                onToggleShowUploadOptionsBottomSheet = { showUploadOptionsBottomSheet = it },
                 contentPadding = innerPadding,
                 onAction = viewModel::processAction,
                 onPrepareScanDocument = scanDocumentViewModel::prepareDocumentScanner,
