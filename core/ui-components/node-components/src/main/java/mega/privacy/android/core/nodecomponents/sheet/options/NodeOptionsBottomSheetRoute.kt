@@ -42,6 +42,7 @@ import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.text
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.isSharedSource
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.megaActivityResultContract
@@ -130,6 +131,7 @@ fun NodeOptionsBottomSheetRoute(
         uiState = uiState,
         navigationHandler = navigationHandler,
         actionHandler = actionHandler,
+        nodeSourceType = nodeSourceType,
         onDismiss = onDismiss,
         showSnackbar = viewModel::showSnackbar,
         onConsumeErrorState = viewModel::onConsumeErrorState,
@@ -164,6 +166,7 @@ internal fun NodeOptionsBottomSheetContent(
     uiState: NodeBottomSheetState,
     navigationHandler: NavigationHandler,
     actionHandler: NodeActionHandler,
+    nodeSourceType: NodeSourceType,
     onDismiss: () -> Unit,
     showSnackbar: suspend (SnackbarAttributes) -> Unit,
     onConsumeErrorState: () -> Unit = {},
@@ -198,6 +201,10 @@ internal fun NodeOptionsBottomSheetContent(
             icon = uiState.node.iconRes,
             thumbnailData = uiState.node.thumbnailData,
             accessPermissionIcon = uiState.node.accessPermissionIcon,
+            // Shared items (incoming shares, outgoing shares, links) should not show blur effect
+            // or sensitive flags as they are not owned by the current user
+            showBlurEffect = !nodeSourceType.isSharedSource() && uiState.node.showBlurEffect,
+            isSensitive = !nodeSourceType.isSharedSource() && uiState.node.isSensitive,
             onItemClicked = {},
             enableClick = false,
         )

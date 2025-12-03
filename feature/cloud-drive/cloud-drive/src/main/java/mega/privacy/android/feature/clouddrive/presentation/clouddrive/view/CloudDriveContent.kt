@@ -196,7 +196,7 @@ internal fun CloudDriveContent(
     LaunchedEffect(uiState.selectedItemsCount) {
         nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
             uiState.selectedNodes.toSet(),
-            NodeSourceType.CLOUD_DRIVE
+            nodeSourceType = uiState.nodeSourceType
         )
     }
 
@@ -351,7 +351,7 @@ internal fun CloudDriveContent(
                 snackBarHostState = snackbarHostState,
                 coroutineScope = coroutineScope,
                 onActionHandled = { onAction(OpenedFileNodeHandled) },
-                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                nodeSourceType = uiState.nodeSourceType,
                 onDownloadEvent = onTransfer,
                 sortOrder = uiState.selectedSortOrder,
                 onNavigate = navigationHandler::navigate,
@@ -445,7 +445,7 @@ internal fun CloudDriveContent(
                         onDismissNodeOptionsBottomSheet()
                     },
                     nodeId = nodeId.longValue,
-                    nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                    nodeSourceType = uiState.nodeSourceType,
                     onTransfer = onTransfer,
                     actionHandler = nodeActionHandler,
                     nodeOptionsActionViewModel = nodeOptionsActionViewModel,
@@ -456,7 +456,7 @@ internal fun CloudDriveContent(
         if (showSortBottomSheet) {
             SortBottomSheet(
                 title = stringResource(sharedR.string.action_sort_by_header),
-                options = NodeSortOption.getOptionsForSourceType(NodeSourceType.CLOUD_DRIVE),
+                options = NodeSortOption.getOptionsForSourceType(uiState.nodeSourceType),
                 sheetState = sortBottomSheetState,
                 selectedSort = SortBottomSheetResult(
                     sortOptionItem = uiState.selectedSortConfiguration.sortOption,

@@ -65,3 +65,15 @@ enum class NodeSourceType {
      */
     OFFLINE
 }
+
+/**
+ * Checks if the [NodeSourceType] represents a shared item.
+ *
+ * Shared items include incoming shares, outgoing shares, and links.
+ *
+ * @return true if the node source is INCOMING_SHARES, OUTGOING_SHARES, or LINKS; false otherwise.
+ */
+fun NodeSourceType.isSharedSource(): Boolean = when (this) {
+    NodeSourceType.INCOMING_SHARES, NodeSourceType.OUTGOING_SHARES, NodeSourceType.LINKS -> true
+    else -> false
+}

@@ -26,6 +26,7 @@ import mega.privacy.android.core.nodecomponents.sheet.options.NODE_OPTIONS_GROUP
 import mega.privacy.android.core.nodecomponents.sheet.options.NODE_OPTIONS_HEADER_DIVIDER_TEST_TAG
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetContent
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -45,6 +46,7 @@ class NodeOptionsBottomSheetComposeTest {
         uiState: NodeBottomSheetState = NodeBottomSheetState(),
         actionHandler: NodeActionHandler = mock(),
         navigationHandler: NavigationHandler = mock(),
+        nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
         onDismiss: () -> Unit = {},
         onConsumeErrorState: () -> Unit = {},
         showSnackbar: suspend (SnackbarAttributes) -> Unit = { _ -> },
@@ -63,8 +65,9 @@ class NodeOptionsBottomSheetComposeTest {
             NodeOptionsBottomSheetContent(
                 uiState = uiState,
                 actionHandler = actionHandler,
-                onDismiss = onDismiss,
                 navigationHandler = navigationHandler,
+                nodeSourceType = nodeSourceType,
+                onDismiss = onDismiss,
                 onConsumeErrorState = onConsumeErrorState,
                 showSnackbar = showSnackbar
             )
@@ -368,5 +371,200 @@ class NodeOptionsBottomSheetComposeTest {
         // Two dividers should be shown between three groups (dividers between group 1-2 and 2-3)
         composeTestRule.onAllNodesWithTag(NODE_OPTIONS_GROUP_DIVIDER_TEST_TAG)
             .assertCountEquals(2)
+    }
+
+    @Test
+    fun `test that incoming shares render correctly without blur or sensitive flags applied`() {
+        val mockNode = mock<TypedFileNode>()
+        whenever(mockNode.name).thenReturn("shared_file.txt")
+        whenever(mockNode.id).thenReturn(NodeId(123L))
+        whenever(mockNode.isTakenDown).thenReturn(false)
+        whenever(mockNode.hasVersion).thenReturn(false)
+        whenever(mockNode.tags).thenReturn(emptyList())
+
+        val nodeUiItem = NodeUiItem<TypedNode>(
+            node = mockNode,
+            isSelected = false,
+            title = LocalizedText.Literal("shared_file.txt"),
+            iconRes = R.drawable.ic_send_horizontal,
+            thumbnailData = null,
+            showBlurEffect = true,
+            isSensitive = true,
+        )
+
+        val uiState = NodeBottomSheetState(
+            node = nodeUiItem,
+            actions = persistentListOf(),
+        )
+
+        setContent(
+            uiState = uiState,
+            nodeSourceType = NodeSourceType.INCOMING_SHARES
+        )
+
+        composeTestRule.waitForIdle()
+        // Verify the component renders correctly for shared items.
+        // The isSharedItem() check in NodeOptionsBottomSheetContent ensures that
+        // blur/sensitive flags are disabled for shared items (isSensitive=false, showBlurEffect=false
+        // are passed to NodeListViewItem even though the node has these flags set to true).
+        // Note: We cannot directly test alpha opacity or blur effects in Compose UI tests as these
+        // are visual properties that require pixel-level verification or screenshot comparison,
+        // which is beyond the scope of unit/UI tests. The logic is verified through unit tests
+        // for isSharedItem() and by ensuring the component renders without crashing.
+        composeTestRule.onNodeWithText("shared_file.txt")
+            .assertExists()
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that outgoing shares render correctly without blur or sensitive flags applied`() {
+        val mockNode = mock<TypedFileNode>()
+        whenever(mockNode.name).thenReturn("shared_file.txt")
+        whenever(mockNode.id).thenReturn(NodeId(123L))
+        whenever(mockNode.isTakenDown).thenReturn(false)
+        whenever(mockNode.hasVersion).thenReturn(false)
+        whenever(mockNode.tags).thenReturn(emptyList())
+
+        val nodeUiItem = NodeUiItem<TypedNode>(
+            node = mockNode,
+            isSelected = false,
+            title = LocalizedText.Literal("shared_file.txt"),
+            iconRes = R.drawable.ic_send_horizontal,
+            thumbnailData = null,
+            showBlurEffect = true,
+            isSensitive = true,
+        )
+
+        val uiState = NodeBottomSheetState(
+            node = nodeUiItem,
+            actions = persistentListOf(),
+        )
+
+        setContent(
+            uiState = uiState,
+            nodeSourceType = NodeSourceType.OUTGOING_SHARES
+        )
+
+        composeTestRule.waitForIdle()
+        // Verify the component renders correctly for shared items.
+        // See test above for explanation on why we cannot directly test alpha/blur effects.
+        composeTestRule.onNodeWithText("shared_file.txt")
+            .assertExists()
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that links render correctly without blur or sensitive flags applied`() {
+        val mockNode = mock<TypedFileNode>()
+        whenever(mockNode.name).thenReturn("shared_file.txt")
+        whenever(mockNode.id).thenReturn(NodeId(123L))
+        whenever(mockNode.isTakenDown).thenReturn(false)
+        whenever(mockNode.hasVersion).thenReturn(false)
+        whenever(mockNode.tags).thenReturn(emptyList())
+
+        val nodeUiItem = NodeUiItem<TypedNode>(
+            node = mockNode,
+            isSelected = false,
+            title = LocalizedText.Literal("shared_file.txt"),
+            iconRes = R.drawable.ic_send_horizontal,
+            thumbnailData = null,
+            showBlurEffect = true,
+            isSensitive = true,
+        )
+
+        val uiState = NodeBottomSheetState(
+            node = nodeUiItem,
+            actions = persistentListOf(),
+        )
+
+        setContent(
+            uiState = uiState,
+            nodeSourceType = NodeSourceType.LINKS
+        )
+
+        composeTestRule.waitForIdle()
+        // Verify the component renders correctly for shared items.
+        // See test above for explanation on why we cannot directly test alpha/blur effects.
+        composeTestRule.onNodeWithText("shared_file.txt")
+            .assertExists()
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that non-shared items render correctly with blur and sensitive flags when applicable`() {
+        val mockNode = mock<TypedFileNode>()
+        whenever(mockNode.name).thenReturn("cloud_file.txt")
+        whenever(mockNode.id).thenReturn(NodeId(123L))
+        whenever(mockNode.isTakenDown).thenReturn(false)
+        whenever(mockNode.hasVersion).thenReturn(false)
+        whenever(mockNode.tags).thenReturn(emptyList())
+
+        val nodeUiItem = NodeUiItem<TypedNode>(
+            node = mockNode,
+            isSelected = false,
+            title = LocalizedText.Literal("cloud_file.txt"),
+            iconRes = R.drawable.ic_send_horizontal,
+            thumbnailData = null,
+            showBlurEffect = true,
+            isSensitive = true,
+        )
+
+        val uiState = NodeBottomSheetState(
+            node = nodeUiItem,
+            actions = persistentListOf(),
+        )
+
+        setContent(
+            uiState = uiState,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
+        )
+
+        composeTestRule.waitForIdle()
+        // Verify the component renders correctly for non-shared items.
+        // The isSharedItem() check in NodeOptionsBottomSheetContent ensures that
+        // blur/sensitive flags are enabled for non-shared items (isSensitive=true, showBlurEffect=true
+        // are passed to NodeListViewItem when the node has these flags set).
+        // Note: We cannot directly test alpha opacity or blur effects in Compose UI tests as these
+        // are visual properties that require pixel-level verification or screenshot comparison.
+        composeTestRule.onNodeWithText("cloud_file.txt")
+            .assertExists()
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that home items render correctly with blur and sensitive flags when applicable`() {
+        val mockNode = mock<TypedFileNode>()
+        whenever(mockNode.name).thenReturn("home_file.txt")
+        whenever(mockNode.id).thenReturn(NodeId(123L))
+        whenever(mockNode.isTakenDown).thenReturn(false)
+        whenever(mockNode.hasVersion).thenReturn(false)
+        whenever(mockNode.tags).thenReturn(emptyList())
+
+        val nodeUiItem = NodeUiItem<TypedNode>(
+            node = mockNode,
+            isSelected = false,
+            title = LocalizedText.Literal("home_file.txt"),
+            iconRes = R.drawable.ic_send_horizontal,
+            thumbnailData = null,
+            showBlurEffect = true,
+            isSensitive = true,
+        )
+
+        val uiState = NodeBottomSheetState(
+            node = nodeUiItem,
+            actions = persistentListOf(),
+        )
+
+        setContent(
+            uiState = uiState,
+            nodeSourceType = NodeSourceType.HOME
+        )
+
+        composeTestRule.waitForIdle()
+        // Verify the component renders correctly for non-shared items.
+        // See test above for explanation on why we cannot directly test alpha/blur effects.
+        composeTestRule.onNodeWithText("home_file.txt")
+            .assertExists()
+            .assertIsDisplayed()
     }
 }

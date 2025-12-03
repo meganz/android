@@ -88,6 +88,7 @@ class CloudDriveViewModel @AssistedInject constructor(
             title = LocalizedText.Literal(navKey.nodeName ?: ""),
             currentFolderId = NodeId(navKey.nodeHandle),
             isCloudDriveRoot = navKey.nodeHandle == -1L,
+            nodeSourceType = navKey.nodeSourceType,
         )
     )
     internal val uiState = _uiState.asStateFlow()

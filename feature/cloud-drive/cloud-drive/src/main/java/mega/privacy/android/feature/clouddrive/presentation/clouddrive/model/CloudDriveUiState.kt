@@ -8,6 +8,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -49,6 +50,7 @@ data class CloudDriveUiState(
     val isTransferOverQuota: Boolean = false,
     val isContactVerificationOn: Boolean = false,
     val showContactNotVerifiedBanner: Boolean = false,
+    val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
 ) {
 
     /**
