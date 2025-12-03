@@ -70,7 +70,8 @@ class MyAccountDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.CANCEL_ACCOUNT_LINK, isLoggedIn)
+        val actual = underTest
+            .getNavKeysInternal(uri, RegexPatternType.CANCEL_ACCOUNT_LINK, isLoggedIn)
 
         if (isLoggedIn) {
             assertThat(actual).containsExactly(
@@ -96,7 +97,8 @@ class MyAccountDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.VERIFY_CHANGE_MAIL_LINK, isLoggedIn)
+        val actual = underTest
+            .getNavKeysInternal(uri, RegexPatternType.VERIFY_CHANGE_MAIL_LINK, isLoggedIn)
 
         if (isLoggedIn) {
             assertThat(actual).containsExactly(
@@ -129,7 +131,8 @@ class MyAccountDeepLinkHandlerTest {
             whenever(queryResetPasswordLinkUseCase(uriString)) doReturn result
             whenever(getAccountCredentialsUseCase()) doReturn accountCredentials
 
-            val actual = underTest.getNavKeys(uri, RegexPatternType.RESET_PASSWORD_LINK, true)
+            val actual = underTest
+                .getNavKeysInternal(uri, RegexPatternType.RESET_PASSWORD_LINK, true)
 
             assertThat(actual).isEmpty()
             verify(snackbarEventQueue).queueMessage(R.string.error_not_logged_with_correct_account)
@@ -160,7 +163,8 @@ class MyAccountDeepLinkHandlerTest {
         whenever(queryResetPasswordLinkUseCase(uriString)) doReturn result
         whenever(getAccountCredentialsUseCase()) doReturn accountCredentials
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.RESET_PASSWORD_LINK, isLoggedIn)
+        val actual = underTest
+            .getNavKeysInternal(uri, RegexPatternType.RESET_PASSWORD_LINK, isLoggedIn)
 
         if (isLoggedIn) {
             assertThat(actual).containsExactly(
@@ -206,7 +210,8 @@ class MyAccountDeepLinkHandlerTest {
         whenever(queryResetPasswordLinkUseCase(uriString)) doReturn result
         whenever(getAccountCredentialsUseCase()) doReturn accountCredentials
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.RESET_PASSWORD_LINK, isLoggedIn)
+        val actual = underTest
+            .getNavKeysInternal(uri, RegexPatternType.RESET_PASSWORD_LINK, isLoggedIn)
 
         assertThat(actual).containsExactly(WebSiteNavKey(uriString))
         verifyNoInteractions(snackbarEventQueue)
@@ -226,7 +231,8 @@ class MyAccountDeepLinkHandlerTest {
             throw ResetPasswordLinkException.LinkInvalid
         }
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.RESET_PASSWORD_LINK, isLoggedIn)
+        val actual = underTest
+            .getNavKeysInternal(uri, RegexPatternType.RESET_PASSWORD_LINK, isLoggedIn)
 
         assertThat(actual).isEmpty()
         verify(snackbarEventQueue).queueMessage(R.string.invalid_link)
@@ -246,7 +252,8 @@ class MyAccountDeepLinkHandlerTest {
             throw ResetPasswordLinkException.LinkExpired
         }
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.RESET_PASSWORD_LINK, isLoggedIn)
+        val actual = underTest
+            .getNavKeysInternal(uri, RegexPatternType.RESET_PASSWORD_LINK, isLoggedIn)
 
         assertThat(actual).isEmpty()
         verify(snackbarEventQueue).queueMessage(R.string.recovery_link_expired)
@@ -266,7 +273,8 @@ class MyAccountDeepLinkHandlerTest {
             throw ResetPasswordLinkException.LinkAccessDenied
         }
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.RESET_PASSWORD_LINK, isLoggedIn)
+        val actual = underTest
+            .getNavKeysInternal(uri, RegexPatternType.RESET_PASSWORD_LINK, isLoggedIn)
 
         assertThat(actual).isEmpty()
         verify(snackbarEventQueue).queueMessage(R.string.error_not_logged_with_correct_account)
@@ -284,7 +292,8 @@ class MyAccountDeepLinkHandlerTest {
 
         whenever(queryResetPasswordLinkUseCase(uriString)) doThrow RuntimeException()
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.RESET_PASSWORD_LINK, isLoggedIn)
+        val actual = underTest
+            .getNavKeysInternal(uri, RegexPatternType.RESET_PASSWORD_LINK, isLoggedIn)
 
         assertThat(actual).isEmpty()
         verify(snackbarEventQueue).queueMessage(R.string.general_text_error)
@@ -300,7 +309,7 @@ class MyAccountDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK, isLoggedIn)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.FILE_LINK, isLoggedIn)
 
         assertThat(actual).isNull()
         verifyNoInteractions(snackbarEventQueue)

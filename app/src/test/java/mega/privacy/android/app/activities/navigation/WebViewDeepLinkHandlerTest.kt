@@ -55,7 +55,8 @@ class WebViewDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        assertThat(underTest.getNavKeys(uri, regexPatternType, true)).containsExactly(expected)
+        assertThat(underTest.getNavKeysInternal(uri, regexPatternType, true))
+            .containsExactly(expected)
     }
 
     @ParameterizedTest
@@ -74,7 +75,8 @@ class WebViewDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        assertThat(underTest.getNavKeys(uri, regexPatternType, false)).containsExactly(expected)
+        assertThat(underTest.getNavKeysInternal(uri, regexPatternType, false))
+            .containsExactly(expected)
     }
 
     @ParameterizedTest
@@ -87,7 +89,8 @@ class WebViewDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        assertThat(underTest.getNavKeys(uri, RegexPatternType.FOLDER_LINK, isLoggedIn)).isNull()
+        assertThat(underTest.getNavKeysInternal(uri, RegexPatternType.FOLDER_LINK, isLoggedIn))
+            .isNull()
     }
 
     @ParameterizedTest
@@ -104,7 +107,7 @@ class WebViewDeepLinkHandlerTest {
 
         whenever(getSessionLinkUseCase(uriString)) doReturn sessionUriString
 
-        assertThat(underTest.getNavKeys(uri, RegexPatternType.MEGA_LINK, isLoggedIn))
+        assertThat(underTest.getNavKeysInternal(uri, RegexPatternType.MEGA_LINK, isLoggedIn))
             .containsExactly(expected)
     }
 
@@ -121,7 +124,7 @@ class WebViewDeepLinkHandlerTest {
 
         whenever(getSessionLinkUseCase(uriString)) doThrow RuntimeException()
 
-        assertThat(underTest.getNavKeys(uri, RegexPatternType.MEGA_LINK, isLoggedIn))
+        assertThat(underTest.getNavKeysInternal(uri, RegexPatternType.MEGA_LINK, isLoggedIn))
             .containsExactly(expected)
     }
 
@@ -138,7 +141,7 @@ class WebViewDeepLinkHandlerTest {
 
         whenever(getSessionLinkUseCase(uriString)) doReturn null
 
-        assertThat(underTest.getNavKeys(uri, RegexPatternType.MEGA_LINK, isLoggedIn))
+        assertThat(underTest.getNavKeysInternal(uri, RegexPatternType.MEGA_LINK, isLoggedIn))
             .containsExactly(expected)
     }
 }

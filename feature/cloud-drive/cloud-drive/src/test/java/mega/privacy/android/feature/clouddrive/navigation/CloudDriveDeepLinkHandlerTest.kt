@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.node.GetAncestorsIdsUseCase
 import mega.privacy.android.domain.usecase.node.GetFileNodeContentForFileNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeIdFromBase64UseCase
@@ -22,6 +23,7 @@ import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueu
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
+import mega.privacy.android.navigation.destination.LegacyOpenLinkAfterFetchNodes
 import mega.privacy.android.navigation.destination.LegacyPdfViewerNavKey
 import mega.privacy.android.navigation.destination.RubbishBinNavKey
 import mega.privacy.android.shared.resources.R as sharedR
@@ -55,6 +57,7 @@ class CloudDriveDeepLinkHandlerTest {
     private val getAncestorsIdsUseCase = mock<GetAncestorsIdsUseCase>()
     private val isNodeInCloudDriveUseCase = mock<IsNodeInCloudDriveUseCase>()
     private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
+    private val rootNodeExistsUseCase = mock<RootNodeExistsUseCase>()
 
 
     @BeforeAll
@@ -68,6 +71,7 @@ class CloudDriveDeepLinkHandlerTest {
             snackbarEventQueue = snackbarEventQueue,
             isNodeInCloudDriveUseCase = isNodeInCloudDriveUseCase,
             isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
+            rootNodeExistsUseCase = rootNodeExistsUseCase,
         )
     }
 
@@ -82,9 +86,34 @@ class CloudDriveDeepLinkHandlerTest {
             snackbarEventQueue,
             isNodeInCloudDriveUseCase,
             isNodeInRubbishBinUseCase,
+            rootNodeExistsUseCase,
         )
         wheneverBlocking { isNodeInCloudDriveUseCase(any()) } doReturn true
         wheneverBlocking { isNodeInRubbishBinUseCase(anyValueClass()) } doReturn false
+        wheneverBlocking { rootNodeExistsUseCase() } doReturn true
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that correct NavKey is returned when regex pattern type is HANDLE_LINK and root node does not exist`(
+        isLoggedIn: Boolean,
+    ) = runTest {
+        val uriString = "https://mega.nz/#ag89eag"
+        val uri = mock<Uri> {
+            on { this.toString() } doReturn uriString
+        }
+
+        whenever(rootNodeExistsUseCase()) doReturn false
+
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
+
+        if (isLoggedIn) {
+            assertThat(actual).isEqualTo(listOf(LegacyOpenLinkAfterFetchNodes(uriString)))
+            verifyNoInteractions(snackbarEventQueue)
+        } else {
+            assertThat(actual).isEmpty()
+            verify(snackbarEventQueue).queueMessage(sharedR.string.general_alert_not_logged_in)
+        }
     }
 
     @ParameterizedTest
@@ -97,7 +126,7 @@ class CloudDriveDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK, isLoggedIn)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.FILE_LINK, isLoggedIn)
 
         assertThat(actual).isNull()
         verifyNoInteractions(snackbarEventQueue)
@@ -116,7 +145,7 @@ class CloudDriveDeepLinkHandlerTest {
         }
         whenever(getNodeIdFromBase64UseCase(base64Handle)) doThrow (RuntimeException())
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
         assertThat(actual).isEmpty()
     }
@@ -134,7 +163,7 @@ class CloudDriveDeepLinkHandlerTest {
         }
         whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn null
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
         if (isLoggedIn) {
             assertThat(actual).containsExactly(
@@ -164,7 +193,7 @@ class CloudDriveDeepLinkHandlerTest {
         whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
         whenever(getNodeByIdUseCase(nodeId)) doReturn null
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
         if (isLoggedIn) {
             assertThat(actual).containsExactly(
@@ -200,7 +229,7 @@ class CloudDriveDeepLinkHandlerTest {
         whenever(getNodeByIdUseCase(nodeId)) doReturn folderNode
         whenever(getAncestorsIdsUseCase(folderNode)) doReturn listOf(parentId, rootId)
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
         if (isLoggedIn) {
             assertThat(actual).containsExactly(
@@ -243,7 +272,7 @@ class CloudDriveDeepLinkHandlerTest {
         whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
         whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(parentId, rootId)
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
         if (isLoggedIn) {
             assertThat(actual).containsExactly(
@@ -289,7 +318,7 @@ class CloudDriveDeepLinkHandlerTest {
         whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
         whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(parentId, grandParentId, rootId)
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
         if (isLoggedIn) {
             assertThat(actual).containsExactly(
@@ -332,7 +361,7 @@ class CloudDriveDeepLinkHandlerTest {
         whenever(getNodeByIdUseCase(nodeId)) doReturn folderNode
         whenever(getAncestorsIdsUseCase(folderNode)) doReturn emptyList()
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
         if (isLoggedIn) {
             assertThat(actual).containsExactly(
@@ -385,7 +414,7 @@ class CloudDriveDeepLinkHandlerTest {
         ) doReturn previewNavKey
         whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(parentId)
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
         if (isLoggedIn) {
             assertThat(actual).containsExactly(
@@ -422,7 +451,7 @@ class CloudDriveDeepLinkHandlerTest {
         whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
         whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(rootId)
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, true)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, true)
 
         assertThat(actual).containsExactly(
             HomeScreensNavKey(DriveSyncNavKey(highlightedNodeHandle = nodeId.longValue))
@@ -451,7 +480,7 @@ class CloudDriveDeepLinkHandlerTest {
         whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
         whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(rootId)
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, true)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, true)
 
         assertThat(actual).containsExactly(
             RubbishBinNavKey(highlightedNodeHandle = nodeId.longValue),
@@ -486,7 +515,7 @@ class CloudDriveDeepLinkHandlerTest {
         whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
         whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(parentId, grandParentId, rootId)
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
         if (isLoggedIn) {
             assertThat(actual).containsExactly(
@@ -548,7 +577,7 @@ class CloudDriveDeepLinkHandlerTest {
             fileNodeContentToNavKeyMapper(fileNodeContent, fileNode, NodeSourceType.RUBBISH_BIN)
         ) doReturn previewNavKey
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
         if (isLoggedIn) {
             assertThat(actual).containsExactly(
@@ -597,7 +626,7 @@ class CloudDriveDeepLinkHandlerTest {
         whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
         whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(parentId, grandParentId)
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
         if (isLoggedIn) {
             assertThat(actual).containsExactly(
@@ -659,7 +688,7 @@ class CloudDriveDeepLinkHandlerTest {
             fileNodeContentToNavKeyMapper(fileNodeContent, fileNode, NodeSourceType.INCOMING_SHARES)
         ) doReturn previewNavKey
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
         if (isLoggedIn) {
             assertThat(actual).containsExactly(

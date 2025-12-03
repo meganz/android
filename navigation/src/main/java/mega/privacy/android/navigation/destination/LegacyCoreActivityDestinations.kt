@@ -236,3 +236,6 @@ data class LegacyAddToAlbumActivityNavKey(
         const val ADD_TO_ALBUM_RESULT = "ADD_TO_ALBUM_RESULT"
     }
 }
+
+@Serializable
+data class LegacyOpenLinkAfterFetchNodes(val link: String) : NavKey

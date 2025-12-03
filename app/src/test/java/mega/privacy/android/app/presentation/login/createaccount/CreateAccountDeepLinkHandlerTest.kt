@@ -31,7 +31,8 @@ class CreateAccountDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.REGISTRATION_LINK, isLoggedIn)
+        val actual = underTest
+            .getNavKeysInternal(uri, RegexPatternType.REGISTRATION_LINK, isLoggedIn)
 
         assertThat(actual).containsExactly(expected)
     }
@@ -46,7 +47,8 @@ class CreateAccountDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK, isLoggedIn)
+        val actual = underTest
+            .getNavKeysInternal(uri, RegexPatternType.FILE_LINK, isLoggedIn)
 
         assertThat(actual).isNull()
     }

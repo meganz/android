@@ -54,7 +54,7 @@ class AccountInvitationDeepLinkHandlerTest {
 
         whenever(querySignupLinkUseCase(uriString)) doReturn expectedEmail
 
-        val actual = underTest.getNavKeys(
+        val actual = underTest.getNavKeysInternal(
             regexPatternType = RegexPatternType.ACCOUNT_INVITATION_LINK,
             uri = uri,
             isLoggedIn = isLoggedIn,
@@ -79,7 +79,7 @@ class AccountInvitationDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        val actual = underTest.getNavKeys(
+        val actual = underTest.getNavKeysInternal(
             regexPatternType = RegexPatternType.LOGIN_LINK,
             uri = uri,
             isLoggedIn = isLoggedIn,
@@ -101,7 +101,7 @@ class AccountInvitationDeepLinkHandlerTest {
 
         whenever(querySignupLinkUseCase(uriString)) doThrow RuntimeException("something bad")
 
-        val actual = underTest.getNavKeys(
+        val actual = underTest.getNavKeysInternal(
             regexPatternType = RegexPatternType.ACCOUNT_INVITATION_LINK,
             uri = uri,
             isLoggedIn = isLoggedIn,

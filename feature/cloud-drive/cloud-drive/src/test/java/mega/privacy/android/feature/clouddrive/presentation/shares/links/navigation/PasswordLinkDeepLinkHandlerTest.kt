@@ -46,7 +46,7 @@ class PasswordLinkDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.PASSWORD_LINK, isLoggedIn)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.PASSWORD_LINK, isLoggedIn)
 
         assertThat(actual).containsExactly(expected)
     }
@@ -61,7 +61,7 @@ class PasswordLinkDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK, isLoggedIn)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.FILE_LINK, isLoggedIn)
 
         assertThat(actual).isNull()
         verifyNoInteractions(snackbarEventQueue)

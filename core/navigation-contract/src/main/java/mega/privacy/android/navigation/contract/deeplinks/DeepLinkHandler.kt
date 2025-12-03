@@ -25,12 +25,14 @@ abstract class DeepLinkHandler(
      * @param isLoggedIn
      * @return The NavKeys if the Uri is valid, empty list if it's valid but can't be shown (login required for instance), null if it's not a valid link for this feature
      */
-    open suspend fun getNavKeys(
+    suspend fun getNavKeysInternal(
         uri: Uri,
         regexPatternType: RegexPatternType?,
         isLoggedIn: Boolean,
     ): List<NavKey>? {
-        val navKeys = getNavKeys(uri, regexPatternType)
+        val navKeys = getNavKeys(uri, regexPatternType, isLoggedIn)
+            ?: getNavKeys(uri, regexPatternType)
+
         return when {
             navKeys.isNullOrEmpty() -> navKeys
 
@@ -86,12 +88,27 @@ abstract class DeepLinkHandler(
      *
      * @param uri The Uri to check
      * @param regexPatternType
+     * @param isLoggedIn
      * @return The NavKeys if the Uri is valid, null otherwise
      */
-    abstract suspend fun getNavKeys(
+    open suspend fun getNavKeys(
         uri: Uri,
         regexPatternType: RegexPatternType?,
-    ): List<NavKey>?
+        isLoggedIn: Boolean,
+    ): List<NavKey>? = null
+
+    /**
+     * Get the NavKeys from the given Uri and [RegexPatternType] if it is a valid deep link for this feature.
+     * A list of NavKeys can be added if the Uri points to a detail destination that needs the parent to be in the backStack
+     *
+     * @param uri The Uri to check
+     * @param regexPatternType
+     * @return The NavKeys if the Uri is valid, null otherwise
+     */
+    open suspend fun getNavKeys(
+        uri: Uri,
+        regexPatternType: RegexPatternType?,
+    ): List<NavKey>? = null
 
 
     /**

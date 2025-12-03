@@ -45,7 +45,8 @@ class SettingsDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        val actual = underTest.getNavKeys(uri, ENABLE_CAMERA_UPLOADS_LINK, isLoggedIn)
+        val actual = underTest
+            .getNavKeysInternal(uri, ENABLE_CAMERA_UPLOADS_LINK, isLoggedIn)
 
         if (isLoggedIn) {
             assertThat(actual).containsExactly(SettingsCameraUploadsNavKey)
@@ -66,7 +67,7 @@ class SettingsDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK, isLoggedIn)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.FILE_LINK, isLoggedIn)
 
         assertThat(actual).isNull()
         verifyNoInteractions(snackbarEventQueue)

@@ -44,7 +44,9 @@ class ExportRecoveryKeyDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.EXPORT_MASTER_KEY_LINK, isLoggedIn)
+        val actual = underTest
+            .getNavKeysInternal(uri, RegexPatternType.EXPORT_MASTER_KEY_LINK, isLoggedIn)
+
         if (isLoggedIn) {
             assertThat(actual).containsExactly(LegacyExportRecoveryKeyNavKey)
             verifyNoInteractions(snackbarEventQueue)
@@ -64,7 +66,7 @@ class ExportRecoveryKeyDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK, isLoggedIn)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.FILE_LINK, isLoggedIn)
 
         assertThat(actual).isNull()
         verifyNoInteractions(snackbarEventQueue)

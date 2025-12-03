@@ -1,9 +1,11 @@
 package mega.privacy.android.app.presentation.openlink
 
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
+import android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -159,6 +161,14 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
         intent.data?.let {
             viewModel.decodeUri(it)
         }
+    }
+
+    companion object {
+        fun getIntent(context: Context, link: Uri) =
+            Intent(context, OpenLinkActivity::class.java).apply {
+                data = link
+                flags = FLAG_ACTIVITY_CLEAR_TOP or FLAG_ACTIVITY_SINGLE_TOP
+            }
     }
 
     /**

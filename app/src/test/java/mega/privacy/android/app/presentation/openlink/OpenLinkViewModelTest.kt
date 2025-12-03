@@ -168,9 +168,9 @@ class OpenLinkViewModelTest {
             whenever(getAccountCredentialsUseCase()) doReturn null
             val navKey = mock<NavKey>()
             val expected = listOf(navKey)
-            whenever(deepLinkHandler.getNavKeys(uri, regexPatternType, false)) doReturn null
+            whenever(deepLinkHandler.getNavKeysInternal(uri, regexPatternType, false)) doReturn null
             whenever(
-                deepLinkHandler2.getNavKeys(uri, regexPatternType, false)
+                deepLinkHandler2.getNavKeysInternal(uri, regexPatternType, false)
             ) doReturn expected
 
             underTest.decodeUri(uri)

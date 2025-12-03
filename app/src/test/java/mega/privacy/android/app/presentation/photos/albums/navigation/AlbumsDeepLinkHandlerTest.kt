@@ -36,7 +36,8 @@ class AlbumsDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.ALBUM_LINK, isLoggedIn)
+        val actual = underTest
+            .getNavKeysInternal(uri, RegexPatternType.ALBUM_LINK, isLoggedIn)
 
         assertThat(actual).containsExactly(expected)
     }
@@ -51,7 +52,7 @@ class AlbumsDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK, isLoggedIn)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.FILE_LINK, isLoggedIn)
 
         assertThat(actual).isNull()
     }

@@ -44,7 +44,8 @@ class DeviceCenterDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.OPEN_DEVICE_CENTER_LINK, isLoggedIn)
+        val actual = underTest
+            .getNavKeysInternal(uri, RegexPatternType.OPEN_DEVICE_CENTER_LINK, isLoggedIn)
 
         if (isLoggedIn) {
             assertThat(actual).containsExactly(DeviceCenterNavKey)
@@ -65,7 +66,7 @@ class DeviceCenterDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK, isLoggedIn)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.FILE_LINK, isLoggedIn)
 
         assertThat(actual).isNull()
         verifyNoInteractions(snackbarEventQueue)
@@ -81,7 +82,7 @@ class DeviceCenterDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        val actual = underTest.getNavKeys(uri, null, isLoggedIn)
+        val actual = underTest.getNavKeysInternal(uri, null, isLoggedIn)
 
         assertThat(actual).isNull()
         verifyNoInteractions(snackbarEventQueue)

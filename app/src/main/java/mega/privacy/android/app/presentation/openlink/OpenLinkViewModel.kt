@@ -188,7 +188,7 @@ class OpenLinkViewModel @Inject constructor(
         val isLoggedIn = getAccountCredentials() != null
 
         deepLinkHandlers.firstNotNullOfOrNull { deepLinkHandler ->
-            deepLinkHandler.getNavKeys(uri, regexPatternType, isLoggedIn)
+            deepLinkHandler.getNavKeysInternal(uri, regexPatternType, isLoggedIn)
         }?.let { navKeys ->
             if (navKeys.isNotEmpty()) {
                 navigationEventQueue.emit(navKeys)

@@ -44,7 +44,8 @@ class UpgradeAccountDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.UPGRADE_PAGE_LINK, isLoggedIn)
+        val actual = underTest
+            .getNavKeysInternal(uri, RegexPatternType.UPGRADE_PAGE_LINK, isLoggedIn)
 
         if (isLoggedIn) {
             assertThat(actual).containsExactly(UpgradeAccountNavKey())
@@ -65,7 +66,7 @@ class UpgradeAccountDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.UPGRADE_LINK, isLoggedIn)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.UPGRADE_LINK, isLoggedIn)
 
         if (isLoggedIn) {
             assertThat(actual).containsExactly(UpgradeAccountNavKey())
@@ -86,7 +87,7 @@ class UpgradeAccountDeepLinkHandlerTest {
             on { this.toString() } doReturn uriString
         }
 
-        val actual = underTest.getNavKeys(uri, RegexPatternType.FILE_LINK, isLoggedIn)
+        val actual = underTest.getNavKeysInternal(uri, RegexPatternType.FILE_LINK, isLoggedIn)
 
         assertThat(actual).isNull()
         verifyNoInteractions(snackbarEventQueue)
