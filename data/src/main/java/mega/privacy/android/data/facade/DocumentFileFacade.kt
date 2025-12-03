@@ -300,12 +300,6 @@ class DocumentFileFacade @Inject constructor(
                 // content://com.android.providers.downloads.documents/tree/raw:/storage/emulated/0/Download/Denai/document/raw:/storage/emulated/0/Download/Denai
                 // content://com.android.providers.downloads.documents/tree/downloads/document/raw:/storage/emulated/0/Download/Denai
                 when {
-                    // API 26 - 27 => content://com.android.providers.downloads.documents/document/22
-                    Build.VERSION.SDK_INT < Build.VERSION_CODES.P && path.matches(Regex("/document/\\d+")) -> {
-                        val fileName = uri.getNameFromDownloadsDocument() ?: return ""
-                        "${Environment.DIRECTORY_DOWNLOADS}/$fileName"
-                    }
-
                     Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && path.matches(Regex("(.*?)/ms[f,d]:\\d+(.*?)")) -> {
                         if (isTreeDocumentFile) {
                             val parentTree = mutableListOf(name.orEmpty())
@@ -384,15 +378,6 @@ class DocumentFileFacade @Inject constructor(
 
             isDownloadsDocument -> {
                 when {
-                    // API 26 - 27 => content://com.android.providers.downloads.documents/document/22
-                    Build.VERSION.SDK_INT < Build.VERSION_CODES.P && path.matches(Regex("/document/\\d+")) -> {
-                        val fileName = uri.getNameFromDownloadsDocument() ?: return ""
-                        File(
-                            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                            fileName
-                        ).absolutePath
-                    }
-
                     Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && path.matches(Regex("(.*?)/ms[f,d]:\\d+(.*?)")) -> {
                         if (isTreeDocumentFile) {
                             val parentTree = mutableListOf(name.orEmpty())

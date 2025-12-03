@@ -92,7 +92,7 @@ extra["appVersion"] = "15.23"
 
 // Sdk and tools
 extra["compileSdkVersion"] = 36
-extra["minSdkVersion"] = 26
+extra["minSdkVersion"] = 28
 extra["targetSdkVersion"] = 36
 
 extra["buildTools"] = "36.0.0"
