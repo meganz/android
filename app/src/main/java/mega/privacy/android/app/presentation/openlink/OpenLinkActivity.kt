@@ -505,12 +505,17 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
 
             matchRegexs(url, HANDLE_LINK_REGEXS) -> {
                 Timber.d("Handle link url")
-                startActivity(
-                    Intent(this, ManagerActivity::class.java)
-                        .setAction(ACTION_OPEN_HANDLE_NODE)
-                        .setData(Uri.parse(url))
-                )
-                finish()
+                if (isLoggedIn) {
+                    startActivity(
+                        Intent(this, ManagerActivity::class.java)
+                            .setAction(ACTION_OPEN_HANDLE_NODE)
+                            .setData(Uri.parse(url))
+                    )
+                    finish()
+                } else {
+                    Timber.w("Not logged")
+                    setError(getString(sharedR.string.general_alert_not_logged_in))
+                }
             }
             //Contact link
             matchRegexs(url, CONTACT_LINK_REGEXS) -> {
@@ -548,9 +553,12 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
             //Upgrade Account link
             getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.UPGRADE_PAGE_LINK
                     || getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.UPGRADE_LINK -> {
-                lifecycleScope.launch {
+                if (isLoggedIn) {
                     navigateToUpgradeAccount()
                     finish()
+                } else {
+                    Timber.w("Not logged")
+                    setError(getString(sharedR.string.general_alert_not_logged_in))
                 }
             }
             //Enable camera uploads link
