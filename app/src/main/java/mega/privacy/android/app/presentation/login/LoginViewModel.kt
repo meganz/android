@@ -247,8 +247,16 @@ class LoginViewModel @Inject constructor(
                 if (session.isNullOrEmpty()) Constants.TOUR_FRAGMENT else Constants.LOGIN_FRAGMENT
             }
 
+        savedStateHandle.get<String>(Constants.EMAIL)?.let { initialEmail ->
+            _state.update { state -> state.copy(initialEmail = initialEmail) }
+        }
+
         setPendingFragmentToShow(LoginScreen.entries.find { it.value == visibleFragment }
             ?: LoginScreen.LoginScreen)
+    }
+
+    fun onInitialEmailConsumed() {
+        _state.update { state -> state.copy(initialEmail = null) }
     }
 
     private fun enableAndMonitorRequestStatusProgressEvent() {

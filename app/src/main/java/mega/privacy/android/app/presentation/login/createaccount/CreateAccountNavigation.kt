@@ -9,6 +9,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
+import androidx.navigation.toRoute
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
@@ -38,6 +39,7 @@ internal fun NavGraphBuilder.createAccountScreen(
     stopShowingSplashScreen: () -> Unit,
 ) {
     composable<CreateAccountNavKey> { backStackEntry ->
+        val key = backStackEntry.toRoute<CreateAccountNavKey>()
         val sharedViewModel = activityViewModel ?: run {
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry<LoginGraph>()
@@ -61,6 +63,7 @@ internal fun NavGraphBuilder.createAccountScreen(
         ) {
             NewCreateAccountRoute(
                 activityViewModel = sharedViewModel,
+                initialEmail = key.initialEmail,
                 modifier = Modifier.fillMaxSize(),
             )
         }

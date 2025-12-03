@@ -71,7 +71,10 @@ fun NavGraphBuilder.loginNavigationGraph(
 
                 when (it) {
                     LoginScreen.LoginScreen -> navController.openLoginScreen()
-                    LoginScreen.CreateAccount -> navController.openCreateAccountScreen()
+                    LoginScreen.CreateAccount -> {
+                        navController.openCreateAccountScreen(uiState.initialEmail)
+                        sharedViewModel.onInitialEmailConsumed()
+                    }
 
                     LoginScreen.Tour -> {
                         focusManager.clearFocus()

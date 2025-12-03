@@ -110,6 +110,7 @@ data class LoginState(
     val shouldShowUpgradeAccount: Boolean = false,
     val recoveryKeyLink: String? = null,
     val shouldShowNotificationPermission: Boolean = false,
+    val initialEmail: String? = null,
 ) {
 
     /**

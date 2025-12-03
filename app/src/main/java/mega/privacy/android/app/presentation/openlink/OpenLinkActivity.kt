@@ -209,9 +209,10 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                     viewModel.onUrlRedirectionEventConsumed()
                 }
 
+                handleAccountInvitationEmailState(accountInvitationEmail)
+
                 if (logoutCompletedEvent) {
                     handleLoggedOutState()
-                    handleAccountInvitationEmailState(accountInvitationEmail)
                     viewModel.onLogoutCompletedEventConsumed()
                 }
 
