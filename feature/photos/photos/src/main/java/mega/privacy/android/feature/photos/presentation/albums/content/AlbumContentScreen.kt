@@ -77,6 +77,7 @@ import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.extensions.downloadAsStateWithLifecycle
+import mega.privacy.android.feature.photos.model.AlbumFlow
 import mega.privacy.android.feature.photos.model.AlbumSortConfiguration
 import mega.privacy.android.feature.photos.model.AlbumSortOption
 import mega.privacy.android.feature.photos.model.PhotoUiState
@@ -92,6 +93,7 @@ import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQ
 import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
 import mega.privacy.android.navigation.destination.AlbumGetLinkNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
+import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
 import mega.privacy.android.navigation.destination.OverDiskQuotaPaywallWarningNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AlbumContentDeleteAlbumEvent
@@ -152,7 +154,7 @@ fun AlbumContentScreen(
                 )
             )
         },
-        handleBottomSheetAction = viewModel::handleBottomSheetAction,
+        handleAction = viewModel::handleAction,
         resetPaywallEvent = viewModel::resetPaywallEvent,
         navigateToPaywall = {
             navigationHandler.navigate(OverDiskQuotaPaywallWarningNavKey)
@@ -161,6 +163,8 @@ fun AlbumContentScreen(
         previewPhoto = viewModel::previewPhoto,
         resetPreviewPhoto = viewModel::resetPreviewPhoto,
         navigateToPhotoPreview = navigationHandler::navigate,
+        resetAddMoreItems = viewModel::resetAddMoreItems,
+        navigateToLegacyPhotoSelection = navigationHandler::navigate,
         onTransfer = onTransfer,
         consumeDownloadEvent = actionViewModel::markDownloadEventConsumed,
         consumeInfoToShowEvent = actionViewModel::onInfoToShowEventConsumed,
@@ -199,13 +203,15 @@ internal fun AlbumContentScreen(
     removeLink: () -> Unit,
     resetLinkRemovedSuccessEvent: () -> Unit,
     openGetLink: (AlbumId, Boolean) -> Unit,
-    handleBottomSheetAction: (AlbumContentSelectionAction) -> Unit,
+    handleAction: (AlbumContentSelectionAction) -> Unit,
     navigateToPaywall: () -> Unit,
     resetPaywallEvent: () -> Unit,
     sortPhotos: (AlbumSortConfiguration) -> Unit,
     previewPhoto: (PhotoUiState) -> Unit,
     resetPreviewPhoto: () -> Unit,
     navigateToPhotoPreview: (AlbumContentPreviewNavKey) -> Unit,
+    resetAddMoreItems: () -> Unit,
+    navigateToLegacyPhotoSelection: (LegacyPhotoSelectionNavKey) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     consumeDownloadEvent: () -> Unit,
     consumeInfoToShowEvent: () -> Unit,
@@ -322,6 +328,22 @@ internal fun AlbumContentScreen(
         action = navigateToPhotoPreview
     )
 
+    EventEffect(
+        event = uiState.addMoreItemsEvent,
+        onConsumed = resetAddMoreItems,
+        action = {
+            val album = (uiState.uiAlbum?.mediaAlbum as? MediaAlbum.User) ?: return@EventEffect
+
+            navigateToLegacyPhotoSelection(
+                LegacyPhotoSelectionNavKey(
+                    albumId = album.id.id,
+                    selectionMode = AlbumFlow.Addition.ordinal,
+                    captureResult = false
+                )
+            )
+        }
+    )
+
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
             .fillMaxSize()
@@ -397,9 +419,9 @@ internal fun AlbumContentScreen(
         },
         floatingActionButton = {
             AddContentFab(
-                visible = uiState.photos.isNotEmpty(),
+                visible = uiState.uiAlbum?.mediaAlbum is MediaAlbum.User && uiState.photos.isNotEmpty(),
                 onClick = {
-                    // Todo select and add photos to current album AND-21900
+                    handleAction(AlbumContentSelectionAction.AddItems)
                 }
             )
         }
@@ -468,9 +490,10 @@ internal fun AlbumContentScreen(
                 AlbumContentEmptyLayout(
                     modifier = Modifier
                         .testTag(ALBUM_CONTENT_SCREEN_EMPTY_PHOTOS_LAYOUT)
-                        .fillMaxSize()
+                        .fillMaxSize(),
+                    isActionVisible = uiState.uiAlbum?.mediaAlbum is MediaAlbum.User && uiState.photos.isEmpty()
                 ) {
-                    // Todo select and add photos to current album AND-21900
+                    handleAction(AlbumContentSelectionAction.AddItems)
                 }
             }
         }
@@ -517,7 +540,7 @@ internal fun AlbumContentScreen(
             isVisible = isMoreOptionsSheetVisible && isUserAlbum,
             onDismiss = { isMoreOptionsSheetVisible = false },
             albumUiState = uiState.uiAlbum,
-            onAction = handleBottomSheetAction,
+            onAction = handleAction,
             isDarkTheme = uiState.themeMode.isDarkMode()
         )
 
@@ -741,10 +764,12 @@ private fun AlbumContentScreenPreview() {
             previewPhoto = {},
             resetPreviewPhoto = {},
             navigateToPhotoPreview = {},
+            resetAddMoreItems = {},
             onTransfer = {},
             consumeDownloadEvent = {},
             consumeInfoToShowEvent = {},
-            handleBottomSheetAction = {}
+            handleAction = {},
+            navigateToLegacyPhotoSelection = {}
         )
     }
 }

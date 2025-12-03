@@ -32,6 +32,7 @@ import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import mega.privacy.android.feature.photos.presentation.albums.view.ALBUM_DYNAMIC_CONTENT_GRID_SORT_ITEM
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
+import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
@@ -93,6 +94,8 @@ class AlbumContentScreenComposeTest {
         previewPhoto: (PhotoUiState) -> Unit = {},
         resetPreviewPhoto: () -> Unit = {},
         navigateToPhotoPreview: (AlbumContentPreviewNavKey) -> Unit = {},
+        resetAddMoreItems: () -> Unit = {},
+        navigateToLegacyPhotoSelection: (LegacyPhotoSelectionNavKey) -> Unit = {},
         onTransfer: (TransferTriggerEvent) -> Unit = {},
         consumeDownloadEvent: () -> Unit = {},
         consumeInfoToShowEvent: () -> Unit = {},
@@ -129,13 +132,15 @@ class AlbumContentScreenComposeTest {
                     removeLink = removeLink,
                     resetLinkRemovedSuccessEvent = resetLinkRemovedSuccessEvent,
                     openGetLink = openGetLink,
-                    handleBottomSheetAction = handleBottomSheetAction,
+                    handleAction = handleBottomSheetAction,
                     navigateToPaywall = navigateToPaywall,
                     resetPaywallEvent = resetPaywallEvent,
                     sortPhotos = sortPhotos,
                     previewPhoto = previewPhoto,
                     resetPreviewPhoto = resetPreviewPhoto,
                     navigateToPhotoPreview = navigateToPhotoPreview,
+                    resetAddMoreItems = resetAddMoreItems,
+                    navigateToLegacyPhotoSelection = navigateToLegacyPhotoSelection,
                     onTransfer = onTransfer,
                     consumeDownloadEvent = consumeDownloadEvent,
                     consumeInfoToShowEvent = consumeInfoToShowEvent,

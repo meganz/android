@@ -48,6 +48,7 @@ import mega.privacy.android.feature.photos.model.TimelinePhotosSource
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource.ALL_PHOTOS
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource.CAMERA_UPLOAD
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource.CLOUD_DRIVE
+import mega.privacy.android.feature.photos.model.AlbumFlow
 import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 import java.io.File

@@ -63,12 +63,12 @@ class AlbumsTabViewModel @Inject constructor(
                         it.copy(addNewAlbumErrorMessage = triggered(message))
                     }
                 }
-            }.onSuccess {
+            }.onSuccess { albumId ->
                 Timber.d("AlbumsTabViewModel: $name created")
                 uiState.update {
                     it.copy(
                         addNewAlbumErrorMessage = consumed(),
-                        addNewAlbumSuccessEvent = triggered
+                        addNewAlbumSuccessEvent = triggered(albumId)
                     )
                 }
             }
@@ -80,6 +80,6 @@ class AlbumsTabViewModel @Inject constructor(
     }
 
     internal fun resetAddNewAlbumSuccess() {
-        uiState.update { it.copy(addNewAlbumSuccessEvent = consumed) }
+        uiState.update { it.copy(addNewAlbumSuccessEvent = consumed()) }
     }
 }

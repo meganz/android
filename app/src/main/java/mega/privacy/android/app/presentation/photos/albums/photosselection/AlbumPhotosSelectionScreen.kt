@@ -62,6 +62,7 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.feature.photos.R as featurePhotosR
+import mega.privacy.android.feature.photos.model.AlbumFlow
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource.ALL_PHOTOS
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource.CAMERA_UPLOAD

@@ -160,6 +160,17 @@ data class LegacyAlbumCoverSelectionNavKey(val albumId: Long) : NavKey {
 }
 
 @Serializable
+data class LegacyPhotoSelectionNavKey(
+    val albumId: Long,
+    val selectionMode: Int,
+    val captureResult: Boolean = true
+) : NavKey {
+    companion object Companion {
+        const val RESULT = "extra_result"
+    }
+}
+
+@Serializable
 data class AlbumGetLinkNavKey(
     val albumId: Long,
     val hasSensitiveContent: Boolean,

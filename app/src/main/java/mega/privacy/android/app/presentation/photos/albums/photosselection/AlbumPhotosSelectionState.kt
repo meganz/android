@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource
+import mega.privacy.android.feature.photos.model.AlbumFlow
 
 data class AlbumPhotosSelectionState(
     val albumFlow: AlbumFlow = AlbumFlow.Creation,
@@ -26,11 +27,6 @@ data class AlbumPhotosSelectionState(
     val isBusinessAccountExpired: Boolean = false,
     val hiddenNodeEnabled: Boolean = false,
 )
-
-enum class AlbumFlow {
-    Creation,
-    Addition,
-}
 
 typealias PhotoDownload = suspend (
     photo: Photo,

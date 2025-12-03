@@ -23,13 +23,16 @@ import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.components.AlbumGridItem
 import mega.privacy.android.feature.photos.extensions.downloadAsStateWithLifecycle
-import mega.privacy.android.navigation.destination.AlbumContentNavKey
+import mega.privacy.android.feature.photos.model.AlbumFlow
 import mega.privacy.android.feature.photos.presentation.albums.content.toAlbumContentNavKey
 import mega.privacy.android.feature.photos.presentation.albums.dialog.EnterAlbumNameDialog
+import mega.privacy.android.navigation.destination.AlbumContentNavKey
+import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
 
 @Composable
 fun AlbumsTabRoute(
     navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
+    navigateToLegacyPhotoSelection: (LegacyPhotoSelectionNavKey) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AlbumsTabViewModel = hiltViewModel(),
     showNewAlbumDialogEvent: StateEvent = consumed,
@@ -41,6 +44,7 @@ fun AlbumsTabRoute(
         uiState = uiState,
         addNewAlbum = viewModel::addNewAlbum,
         navigateToAlbumContent = navigateToAlbumContent,
+        navigateToLegacyPhotoSelection = navigateToLegacyPhotoSelection,
         modifier = modifier,
         showNewAlbumDialogEvent = showNewAlbumDialogEvent,
         resetNewAlbumDialogEvent = resetNewAlbumDialogEvent,
@@ -54,6 +58,7 @@ fun AlbumsTabScreen(
     uiState: AlbumsTabUiState,
     addNewAlbum: (String) -> Unit,
     navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
+    navigateToLegacyPhotoSelection: (LegacyPhotoSelectionNavKey) -> Unit,
     modifier: Modifier = Modifier,
     showNewAlbumDialogEvent: StateEvent = consumed,
     resetNewAlbumDialogEvent: () -> Unit = {},
@@ -69,8 +74,14 @@ fun AlbumsTabScreen(
     EventEffect(
         event = uiState.addNewAlbumSuccessEvent,
         onConsumed = resetAddNewAlbumSuccess
-    ) {
+    ) { albumId ->
         resetNewAlbumDialogEvent()
+        navigateToLegacyPhotoSelection(
+            LegacyPhotoSelectionNavKey(
+                albumId = albumId.id,
+                selectionMode = AlbumFlow.Creation.ordinal
+            )
+        )
     }
 
     LazyVerticalGrid(

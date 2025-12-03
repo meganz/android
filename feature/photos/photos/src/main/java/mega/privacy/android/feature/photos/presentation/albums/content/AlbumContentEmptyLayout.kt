@@ -17,6 +17,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 @Composable
 fun AlbumContentEmptyLayout(
     modifier: Modifier = Modifier,
+    isActionVisible: Boolean = false,
     onAddPhotosClicked: () -> Unit,
 ) {
     val action = AlbumContentSelectionAction.AddItems
@@ -28,12 +29,14 @@ fun AlbumContentEmptyLayout(
             text = stringResource(sharedR.string.album_content_empty_album_title)
         ),
         actions = {
-            PrimaryFilledButton(
-                modifier = Modifier.wrapContentSize(),
-                text = action.getDescription(),
-                leadingIcon = action.getIconPainter(),
-                onClick = onAddPhotosClicked
-            )
+            if (isActionVisible) {
+                PrimaryFilledButton(
+                    modifier = Modifier.wrapContentSize(),
+                    text = action.getDescription(),
+                    leadingIcon = action.getIconPainter(),
+                    onClick = onAddPhotosClicked
+                )
+            }
         }
     )
 }

@@ -389,13 +389,6 @@ class AlbumContentViewModel @AssistedInject constructor(
         }
     }
 
-    internal fun showDeleteAlbumConfirmation() {
-        // Todo Add Paywall checking here
-        _state.update {
-            it.copy(showDeleteAlbumConfirmation = triggered)
-        }
-    }
-
     internal fun resetDeleteAlbumSuccess() {
         _state.update {
             it.copy(deleteAlbumSuccessEvent = consumed)
@@ -405,13 +398,6 @@ class AlbumContentViewModel @AssistedInject constructor(
     internal fun resetShowDeleteConfirmation() {
         _state.update {
             it.copy(showDeleteAlbumConfirmation = consumed)
-        }
-    }
-
-    fun manageLink() {
-        // Todo Add Paywall checking here
-        _state.update {
-            it.copy(manageLinkEvent = triggered(getManageLinkEvent()))
         }
     }
 
@@ -430,14 +416,6 @@ class AlbumContentViewModel @AssistedInject constructor(
     fun resetManageLink() {
         _state.update {
             it.copy(manageLinkEvent = consumed())
-        }
-    }
-
-
-    fun showRemoveLinkConfirmation() {
-        // Todo Add Paywall checking here
-        _state.update {
-            it.copy(showRemoveLinkConfirmation = triggered)
         }
     }
 
@@ -679,12 +657,6 @@ class AlbumContentViewModel @AssistedInject constructor(
         }
     }
 
-    fun showUpdateAlbumName() {
-        _state.update {
-            it.copy(showUpdateAlbumName = triggered)
-        }
-    }
-
     fun resetShowUpdateAlbumName() {
         _state.update {
             it.copy(showUpdateAlbumName = consumed)
@@ -726,12 +698,14 @@ class AlbumContentViewModel @AssistedInject constructor(
         }
     }
 
-    fun handleBottomSheetAction(action: AlbumContentSelectionAction) {
+    fun handleAction(action: AlbumContentSelectionAction) {
         viewModelScope.launch {
             validateStorageState {
                 when (action) {
                     is AlbumContentSelectionAction.Rename -> {
-                        showUpdateAlbumName()
+                        _state.update {
+                            it.copy(showUpdateAlbumName = triggered)
+                        }
                     }
 
                     is AlbumContentSelectionAction.SelectAlbumCover -> {
@@ -742,11 +716,15 @@ class AlbumContentViewModel @AssistedInject constructor(
                     }
 
                     is AlbumContentSelectionAction.ManageLink -> {
-                        manageLink()
+                        _state.update {
+                            it.copy(manageLinkEvent = triggered(getManageLinkEvent()))
+                        }
                     }
 
                     is AlbumContentSelectionAction.RemoveLink -> {
-                        showRemoveLinkConfirmation()
+                        _state.update {
+                            it.copy(showRemoveLinkConfirmation = triggered)
+                        }
                     }
 
                     is AlbumContentSelectionAction.Delete -> {
@@ -754,7 +732,15 @@ class AlbumContentViewModel @AssistedInject constructor(
                             Analytics.tracker.trackEvent(AlbumContentDeleteAlbumEvent)
                             deleteAlbum()
                         } else {
-                            showDeleteAlbumConfirmation()
+                            _state.update {
+                                it.copy(showDeleteAlbumConfirmation = triggered)
+                            }
+                        }
+                    }
+
+                    is AlbumContentSelectionAction.AddItems -> {
+                        _state.update {
+                            it.copy(addMoreItemsEvent = triggered)
                         }
                     }
 
@@ -783,6 +769,12 @@ class AlbumContentViewModel @AssistedInject constructor(
     fun resetPaywallEvent() {
         _state.update {
             it.copy(paywallEvent = consumed)
+        }
+    }
+
+    fun resetAddMoreItems() {
+        _state.update {
+            it.copy(addMoreItemsEvent = consumed)
         }
     }
 

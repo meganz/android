@@ -17,15 +17,34 @@ import mega.privacy.android.feature.photos.presentation.albums.content.AlbumCont
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
+import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
 import mega.privacy.android.navigation.destination.MediaMainNavKey
 
 fun EntryProviderScope<NavKey>.mediaMainRoute(
     navigationHandler: NavigationHandler,
     setNavigationItemVisibility: (Boolean) -> Unit,
+    photoSelectionResultFlow: (String) -> Flow<Long?>,
 ) {
     entry<MediaMainNavKey> {
+        val photoSelectionResult by photoSelectionResultFlow(LegacyPhotoSelectionNavKey.RESULT)
+            .collectAsStateWithLifecycle(null)
+
+        LaunchedEffect(photoSelectionResult) {
+            if (photoSelectionResult != null) {
+                navigationHandler.navigate(
+                    AlbumContentNavKey(
+                        id = photoSelectionResult,
+                        type = "custom"
+                    )
+                )
+
+                navigationHandler.clearResult(LegacyPhotoSelectionNavKey.RESULT)
+            }
+        }
+
         MediaMainRoute(
             navigateToAlbumContent = navigationHandler::navigate,
+            navigateToLegacyPhotoSelection = navigationHandler::navigate,
             setNavigationItemVisibility = setNavigationItemVisibility
         )
     }
@@ -49,6 +68,7 @@ fun EntryProviderScope<NavKey>.albumContentScreen(
             coroutineScope.launch {
                 albumCoverSelectionResult?.let {
                     snackbarHostState?.showSnackbar(it)
+                    navigationHandler.clearResult(LegacyAlbumCoverSelectionNavKey.MESSAGE)
                 }
             }
         }

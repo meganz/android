@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
+import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
 import mega.privacy.android.shared.resources.R as sharedResR
 import org.junit.Rule
 import org.junit.Test
@@ -43,6 +44,7 @@ class AlbumsTabScreenComposeTest {
         showNewAlbumDialogEvent: StateEvent = consumed,
         resetNewAlbumDialogEvent: () -> Unit = {},
         navigateToAlbumContent: (AlbumContentNavKey) -> Unit = {},
+        navigateToLegacyPhotoSelection: (LegacyPhotoSelectionNavKey) -> Unit = {}
     ) {
         composeTestRule.setContent {
             AlbumsTabScreen(
@@ -51,7 +53,8 @@ class AlbumsTabScreenComposeTest {
                 addNewAlbum = addNewAlbum,
                 showNewAlbumDialogEvent = showNewAlbumDialogEvent,
                 resetNewAlbumDialogEvent = resetNewAlbumDialogEvent,
-                navigateToAlbumContent = navigateToAlbumContent
+                navigateToAlbumContent = navigateToAlbumContent,
+                navigateToLegacyPhotoSelection = navigateToLegacyPhotoSelection
             )
         }
     }

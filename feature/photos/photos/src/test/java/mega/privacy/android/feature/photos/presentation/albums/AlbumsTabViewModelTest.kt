@@ -131,6 +131,7 @@ internal class AlbumsTabViewModelTest {
     @Test
     fun `test that add new albums calls the use case and update state on success`() = runTest {
         val expectedName = "New Album"
+        whenever(validateAndCreateUserAlbumUseCase(expectedName)).thenReturn(AlbumId(1))
 
         initViewModel()
 
@@ -139,7 +140,7 @@ internal class AlbumsTabViewModelTest {
         underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.addNewAlbumErrorMessage).isEqualTo(consumed())
-            assertThat(state.addNewAlbumSuccessEvent).isEqualTo(triggered)
+            assertThat(state.addNewAlbumSuccessEvent).isEqualTo(triggered(AlbumId(1)))
         }
 
         verify(validateAndCreateUserAlbumUseCase).invoke(expectedName)

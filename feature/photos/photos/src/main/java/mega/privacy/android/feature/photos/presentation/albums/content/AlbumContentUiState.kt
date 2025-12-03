@@ -91,7 +91,8 @@ data class AlbumContentUiState(
         sortOption = AlbumSortOption.Modified,
         sortDirection = SortDirection.Descending
     ),
-    val previewAlbumContentEvent: StateEventWithContent<AlbumContentPreviewNavKey> = consumed()
+    val previewAlbumContentEvent: StateEventWithContent<AlbumContentPreviewNavKey> = consumed(),
+    val addMoreItemsEvent: StateEvent = consumed
 ) {
     val isAddingPhotosProgressCompleted: Boolean
         get() = !isAddingPhotos && totalAddedPhotos > 0

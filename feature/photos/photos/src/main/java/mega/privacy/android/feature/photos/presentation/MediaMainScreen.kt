@@ -45,11 +45,13 @@ import mega.privacy.android.feature.photos.presentation.videos.VideosTabRoute
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineFilterView
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
+import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
 import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
 fun MediaMainRoute(
     navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
+    navigateToLegacyPhotoSelection: (LegacyPhotoSelectionNavKey) -> Unit,
     setNavigationItemVisibility: (Boolean) -> Unit,
     timelineViewModel: TimelineTabViewModel = hiltViewModel(),
     mediaCameraUploadViewModel: MediaCameraUploadViewModel = hiltViewModel(),
@@ -111,7 +113,8 @@ fun MediaMainRoute(
         loadTimelineNextPage = timelineViewModel::loadNextPage,
         onTimelineApplyFilterClick = timelineViewModel::onFilterChange,
         setNavigationItemVisibility = setNavigationItemVisibility,
-        resetCUButtonAndProgress = mediaCameraUploadViewModel::resetCUButtonAndProgress
+        resetCUButtonAndProgress = mediaCameraUploadViewModel::resetCUButtonAndProgress,
+        navigateToLegacyPhotoSelection = navigateToLegacyPhotoSelection
     )
 }
 
@@ -128,9 +131,10 @@ fun MediaMainScreen(
     onTimelineApplyFilterClick: (request: TimelineFilterRequest) -> Unit,
     setNavigationItemVisibility: (Boolean) -> Unit,
     resetCUButtonAndProgress: () -> Unit,
+    navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
+    navigateToLegacyPhotoSelection: (LegacyPhotoSelectionNavKey) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MediaMainViewModel = hiltViewModel(),
-    navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
 ) {
     var currentTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showTimelineSortDialog by rememberSaveable { mutableStateOf(false) }
@@ -224,6 +228,7 @@ fun MediaMainScreen(
                                     mediaCameraUploadUiState = mediaCameraUploadUiState,
                                     showTimelineSortDialog = showTimelineSortDialog,
                                     navigateToAlbumContent = navigateToAlbumContent,
+                                    navigateToLegacyPhotoSelection = navigateToLegacyPhotoSelection,
                                     setEnableCUPage = setEnableCUPage,
                                     onTimelineGridSizeChange = onTimelineGridSizeChange,
                                     onTimelineSortDialogDismissed = {
@@ -278,6 +283,7 @@ private fun MediaScreen.MediaContent(
     timelineFilterUiState: TimelineFilterUiState,
     showTimelineSortDialog: Boolean,
     navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
+    navigateToLegacyPhotoSelection: (LegacyPhotoSelectionNavKey) -> Unit,
     setEnableCUPage: (Boolean) -> Unit,
     onTimelineGridSizeChange: (value: TimelineGridSize) -> Unit,
     onTimelineSortDialogDismissed: () -> Unit,
@@ -315,7 +321,8 @@ private fun MediaScreen.MediaContent(
                 modifier = Modifier.fillMaxSize(),
                 showNewAlbumDialogEvent = uiState.newAlbumDialogEvent,
                 resetNewAlbumDialogEvent = mainViewModel::resetNewAlbumDialog,
-                navigateToAlbumContent = navigateToAlbumContent
+                navigateToAlbumContent = navigateToAlbumContent,
+                navigateToLegacyPhotoSelection = navigateToLegacyPhotoSelection
             )
         }
 
@@ -346,7 +353,8 @@ fun PhotosMainScreenPreview() {
             loadTimelineNextPage = {},
             onTimelineApplyFilterClick = {},
             setNavigationItemVisibility = {},
-            resetCUButtonAndProgress = {}
+            resetCUButtonAndProgress = {},
+            navigateToLegacyPhotoSelection = {}
         )
     }
 }

@@ -23,7 +23,8 @@ class MediaNavItem : MainNavItem {
         { navigationHandler, navigationController, transferHandler ->
             mediaMainRoute(
                 navigationHandler = navigationHandler,
-                setNavigationItemVisibility = navigationController::showNavigation
+                setNavigationItemVisibility = navigationController::showNavigation,
+                photoSelectionResultFlow = navigationHandler::monitorResult
             )
         }
     override val icon: ImageVector = IconPack.Medium.Thin.Outline.Image01

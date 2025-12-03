@@ -11,15 +11,18 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumContentIm
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.photos.SelectAlbumCoverContract
+import mega.privacy.android.app.presentation.photos.SelectAlbumPhotosContract
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumLink
+import mega.privacy.android.feature.photos.model.AlbumFlow
 import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
 import mega.privacy.android.navigation.destination.AlbumGetLinkNavKey
-import mega.privacy.android.navigation.destination.LegacyAlbumImportNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
+import mega.privacy.android.navigation.destination.LegacyAlbumImportNavKey
+import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
 
 fun EntryProviderScope<NavKey>.legacyAlbumCoverSelection(
     returnResult: (String, String?) -> Unit,
@@ -33,6 +36,40 @@ fun EntryProviderScope<NavKey>.legacyAlbumCoverSelection(
 
         LaunchedEffect(Unit) {
             launcher.launch(contract)
+        }
+    }
+}
+
+fun EntryProviderScope<NavKey>.legacyAlbumPhotosSelection(
+    removeDestination: () -> Unit,
+    returnResult: (String, Long?) -> Unit,
+) {
+    entry<LegacyPhotoSelectionNavKey> { contract ->
+        val context = LocalContext.current
+        val launcher = rememberLauncherForActivityResult(
+            SelectAlbumPhotosContract()
+        ) { albumId ->
+            returnResult(LegacyPhotoSelectionNavKey.RESULT, albumId)
+        }
+
+        LaunchedEffect(Unit) {
+            if (contract.captureResult) {
+                // Navigate to the photos selection screen by listening to its result
+                launcher.launch(contract)
+            } else {
+                // Navigate to the photos selection screen without listening to its result
+                val intent = AlbumScreenWrapperActivity
+                    .createAlbumPhotosSelectionScreen(
+                        context = context,
+                        albumId = AlbumId(contract.albumId),
+                        albumFlow = AlbumFlow.entries[contract.selectionMode]
+                    )
+
+                context.startActivity(intent)
+
+                // Immediately pop this destination from the back stack
+                removeDestination()
+            }
         }
     }
 }

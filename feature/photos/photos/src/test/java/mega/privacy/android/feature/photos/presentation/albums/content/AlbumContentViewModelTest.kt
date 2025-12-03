@@ -305,7 +305,7 @@ class AlbumContentViewModelTest {
     fun `test that showRemoveLinkConfirmation updates state correctly`() = runTest {
         createViewModel()
 
-        underTest.showRemoveLinkConfirmation()
+        underTest.handleAction(AlbumContentSelectionAction.RemoveLink)
 
         underTest.state.test {
             assertThat(awaitItem().showRemoveLinkConfirmation).isEqualTo(triggered)
@@ -760,7 +760,7 @@ class AlbumContentViewModelTest {
         runTest {
             createViewModel()
 
-            underTest.handleBottomSheetAction(AlbumContentSelectionAction.Rename)
+            underTest.handleAction(AlbumContentSelectionAction.Rename)
 
             underTest.state.test {
                 assertThat(awaitItem().showUpdateAlbumName).isEqualTo(triggered)
@@ -787,7 +787,7 @@ class AlbumContentViewModelTest {
 
             createViewModel(AlbumContentNavKey(id = albumId.id, type = "custom"))
 
-            underTest.handleBottomSheetAction(AlbumContentSelectionAction.SelectAlbumCover)
+            underTest.handleAction(AlbumContentSelectionAction.SelectAlbumCover)
 
             underTest.state.test {
                 val state = awaitItem()
@@ -800,7 +800,7 @@ class AlbumContentViewModelTest {
         runTest {
             createViewModel()
 
-            underTest.handleBottomSheetAction(AlbumContentSelectionAction.SelectAlbumCover)
+            underTest.handleAction(AlbumContentSelectionAction.SelectAlbumCover)
 
             underTest.state.test {
                 val state = awaitItem()
@@ -827,7 +827,7 @@ class AlbumContentViewModelTest {
 
         createViewModel(AlbumContentNavKey(id = albumId.id, type = "custom"))
 
-        underTest.handleBottomSheetAction(AlbumContentSelectionAction.ManageLink)
+        underTest.handleAction(AlbumContentSelectionAction.ManageLink)
 
         underTest.state.test {
             val state = awaitItem()
@@ -840,7 +840,7 @@ class AlbumContentViewModelTest {
         runTest {
             createViewModel()
 
-            underTest.handleBottomSheetAction(AlbumContentSelectionAction.RemoveLink)
+            underTest.handleAction(AlbumContentSelectionAction.RemoveLink)
 
             underTest.state.test {
                 assertThat(awaitItem().showRemoveLinkConfirmation).isEqualTo(triggered)
@@ -855,7 +855,7 @@ class AlbumContentViewModelTest {
             whenever(removeAlbumsUseCase(listOf(albumId))).thenReturn(Unit)
             createViewModel()
 
-            underTest.handleBottomSheetAction(AlbumContentSelectionAction.Delete)
+            underTest.handleAction(AlbumContentSelectionAction.Delete)
 
             verify(removeAlbumsUseCase).invoke(listOf(albumId))
             underTest.state.test {
@@ -893,7 +893,7 @@ class AlbumContentViewModelTest {
 
             createViewModel(AlbumContentNavKey(id = albumId.id, type = "custom"))
 
-            underTest.handleBottomSheetAction(AlbumContentSelectionAction.Delete)
+            underTest.handleAction(AlbumContentSelectionAction.Delete)
 
             underTest.state.test {
                 assertThat(awaitItem().showDeleteAlbumConfirmation).isEqualTo(triggered)
@@ -919,7 +919,7 @@ class AlbumContentViewModelTest {
 
         createViewModel(AlbumContentNavKey(id = albumId.id, type = "custom"))
 
-        underTest.handleBottomSheetAction(AlbumContentSelectionAction.SelectAlbumCover)
+        underTest.handleAction(AlbumContentSelectionAction.SelectAlbumCover)
         underTest.resetSelectAlbumCoverEvent()
 
         underTest.state.test {
@@ -936,7 +936,7 @@ class AlbumContentViewModelTest {
 
         createViewModel()
 
-        underTest.handleBottomSheetAction(action)
+        underTest.handleAction(action)
 
         underTest.state.test {
             assertThat(awaitItem().paywallEvent).isEqualTo(triggered)
