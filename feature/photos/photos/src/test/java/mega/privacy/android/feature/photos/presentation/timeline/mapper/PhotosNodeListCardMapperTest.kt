@@ -39,7 +39,11 @@ class PhotosNodeListCardMapperTest {
     fun `test that the list of photo date results is successfully mapped`() {
         val photo = mock<Photo.Image>()
         val date = "2022-01-01"
-        val photoResult = PhotoResult(photo = photo, isMarkedSensitive = false)
+        val photoResult = PhotoResult(
+            photo = photo,
+            isMarkedSensitive = false,
+            inTypedNode = null
+        )
         val photoCount = 1
         val photosDateResults = listOf(
             PhotoDateResult.Day(

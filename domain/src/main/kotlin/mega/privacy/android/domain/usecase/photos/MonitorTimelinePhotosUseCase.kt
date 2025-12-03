@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.photos
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
@@ -10,6 +11,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoDateResult
 import mega.privacy.android.domain.entity.photos.PhotoResult
@@ -17,11 +19,13 @@ import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
 import mega.privacy.android.domain.entity.photos.TimelinePhotosResult
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.entity.photos.TimelineSortedPhotosResult
+import mega.privacy.android.domain.extension.mapAsync
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import java.text.SimpleDateFormat
@@ -46,6 +50,7 @@ class MonitorTimelinePhotosUseCase @Inject constructor(
     private val getCloudDrivePhotos: FilterCloudDrivePhotos,
     private val getCameraUploadPhotos: FilterCameraUploadPhotos,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
 ) {
 
     private val dayMonthDateFormatter =
@@ -227,11 +232,25 @@ class MonitorTimelinePhotosUseCase @Inject constructor(
         else -> photos
     }
 
-    private fun List<Photo>.toPhotoResult(shouldBeMarkedSensitive: Boolean) = map {
-        PhotoResult(
-            photo = it,
-            isMarkedSensitive = shouldBeMarkedSensitive && (it.isSensitive || it.isSensitiveInherited)
-        )
+    private suspend fun List<Photo>.toPhotoResult(shouldBeMarkedSensitive: Boolean): List<PhotoResult> {
+        return coroutineScope {
+            mapAsync { photo ->
+                runCatching {
+                    val inTypedNode = getNodeByIdUseCase(id = NodeId(photo.id))
+                    PhotoResult(
+                        photo = photo,
+                        isMarkedSensitive = shouldBeMarkedSensitive && (photo.isSensitive || photo.isSensitiveInherited),
+                        inTypedNode = inTypedNode
+                    )
+                }.getOrDefault(
+                    defaultValue = PhotoResult(
+                        photo = photo,
+                        isMarkedSensitive = shouldBeMarkedSensitive && (photo.isSensitive || photo.isSensitiveInherited),
+                        inTypedNode = null
+                    )
+                )
+            }
+        }
     }
 
     private fun filterNonSensitivePhotos(

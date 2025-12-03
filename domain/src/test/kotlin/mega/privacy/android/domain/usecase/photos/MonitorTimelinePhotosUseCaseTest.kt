@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoDateResult
 import mega.privacy.android.domain.entity.photos.PhotoResult
@@ -20,12 +21,14 @@ import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -51,6 +54,7 @@ class MonitorTimelinePhotosUseCaseTest {
     private val getCloudDrivePhotos: FilterCloudDrivePhotos = mock()
     private val getCameraUploadPhotos: FilterCameraUploadPhotos = mock()
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
+    private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val dispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
@@ -73,7 +77,8 @@ class MonitorTimelinePhotosUseCaseTest {
             getTimelineFilterPreferencesUseCase = getTimelineFilterPreferencesUseCase,
             getCloudDrivePhotos = getCloudDrivePhotos,
             getCameraUploadPhotos = getCameraUploadPhotos,
-            getBusinessStatusUseCase = getBusinessStatusUseCase
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
+            getNodeByIdUseCase = getNodeByIdUseCase
         )
     }
 
@@ -88,7 +93,8 @@ class MonitorTimelinePhotosUseCaseTest {
             getTimelineFilterPreferencesUseCase,
             getCloudDrivePhotos,
             getCameraUploadPhotos,
-            getBusinessStatusUseCase
+            getBusinessStatusUseCase,
+            getNodeByIdUseCase
         )
     }
 
@@ -320,11 +326,13 @@ class MonitorTimelinePhotosUseCaseTest {
         val unsortedPhotos = listOf(
             PhotoResult(
                 photo = photo2,
-                isMarkedSensitive = false
+                isMarkedSensitive = false,
+                inTypedNode = null
             ),
             PhotoResult(
                 photo = photo1,
-                isMarkedSensitive = false
+                isMarkedSensitive = false,
+                inTypedNode = null
             )
         )
         val isPaginationEnabled = true
@@ -358,8 +366,16 @@ class MonitorTimelinePhotosUseCaseTest {
                 on { isSensitiveInherited } doReturn false
             }
             val unsortedPhotos = listOf(
-                PhotoResult(photo = photo2, isMarkedSensitive = false),
-                PhotoResult(photo = photo1, isMarkedSensitive = false)
+                PhotoResult(
+                    photo = photo2,
+                    isMarkedSensitive = false,
+                    inTypedNode = null
+                ),
+                PhotoResult(
+                    photo = photo1,
+                    isMarkedSensitive = false,
+                    inTypedNode = null
+                )
             )
             val isPaginationEnabled = false
 
@@ -392,8 +408,16 @@ class MonitorTimelinePhotosUseCaseTest {
                 on { isSensitiveInherited } doReturn false
             }
             val unsortedPhotos = listOf(
-                PhotoResult(photo = photo1, isMarkedSensitive = false),
-                PhotoResult(photo = photo2, isMarkedSensitive = false)
+                PhotoResult(
+                    photo = photo2,
+                    isMarkedSensitive = false,
+                    inTypedNode = null
+                ),
+                PhotoResult(
+                    photo = photo1,
+                    isMarkedSensitive = false,
+                    inTypedNode = null
+                )
             )
             val isPaginationEnabled = false
 
@@ -416,21 +440,33 @@ class MonitorTimelinePhotosUseCaseTest {
             on { isSensitive } doReturn false
             on { isSensitiveInherited } doReturn false
         }
-        val photoTodayResult = PhotoResult(photo = photoToday, isMarkedSensitive = false)
+        val photoTodayResult = PhotoResult(
+            photo = photoToday,
+            isMarkedSensitive = false,
+            inTypedNode = null
+        )
         val photoLastMonth = mock<Photo.Image> {
             on { id } doReturn 2
             on { modificationTime } doReturn now.minusMonths(1)
             on { isSensitive } doReturn false
             on { isSensitiveInherited } doReturn false
         }
-        val photoLastMonthResult = PhotoResult(photo = photoLastMonth, isMarkedSensitive = false)
+        val photoLastMonthResult = PhotoResult(
+            photo = photoLastMonth,
+            isMarkedSensitive = false,
+            inTypedNode = null
+        )
         val photoLastYear = mock<Photo.Image> {
             on { id } doReturn 3
             on { modificationTime } doReturn now.minusYears(1)
             on { isSensitive } doReturn false
             on { isSensitiveInherited } doReturn false
         }
-        val photoLastYearResult = PhotoResult(photo = photoLastYear, isMarkedSensitive = false)
+        val photoLastYearResult = PhotoResult(
+            photo = photoLastYear,
+            isMarkedSensitive = false,
+            inTypedNode = null
+        )
         val photos = listOf(photoTodayResult, photoLastMonthResult, photoLastYearResult)
 
         val actual = underTest.sortPhotos(
@@ -502,5 +538,34 @@ class MonitorTimelinePhotosUseCaseTest {
 
             underTest(request = request).test { cancelAndConsumeRemainingEvents() }
             verify(getCloudDrivePhotos).invoke(source = allPhotosList)
+        }
+
+    @Test
+    fun `test that the correct typed node is returned`() =
+        runTest(dispatcher) {
+            val request = TimelinePhotosRequest(isPaginationEnabled = false)
+            val accountLevelDetail = mock<AccountLevelDetail> {
+                on { accountType } doReturn AccountType.PRO_III
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { levelDetail } doReturn accountLevelDetail
+            }
+            val now = LocalDateTime.now()
+            val photoId = 1L
+            val photo = mock<Photo.Image> {
+                on { id } doReturn photoId
+                on { modificationTime } doReturn now.minusDays(1)
+                on { isSensitive } doReturn false
+                on { isSensitiveInherited } doReturn false
+            }
+            whenever(getTimelinePhotosUseCase()) doReturn flowOf(listOf(photo))
+            whenever(monitorShowHiddenItemsUseCase()) doReturn flowOf(false)
+            whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
+            val typedNode = mock<TypedNode>()
+            whenever(getNodeByIdUseCase(id = any())) doReturn typedNode
+
+            underTest(request = request).test {
+                assertThat(expectMostRecentItem().allPhotos[0].inTypedNode).isEqualTo(typedNode)
+            }
         }
 }

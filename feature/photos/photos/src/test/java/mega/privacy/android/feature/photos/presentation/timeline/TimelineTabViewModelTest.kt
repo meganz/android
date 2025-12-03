@@ -106,7 +106,11 @@ class TimelineTabViewModelTest {
             on { modificationTime } doReturn now
             on { fileTypeInfo } doReturn mockFileTypeInfo
         }
-        val photoResult1 = PhotoResult(photo = photo1, isMarkedSensitive = false)
+        val photoResult1 = PhotoResult(
+            photo = photo1,
+            isMarkedSensitive = false,
+            inTypedNode = null
+        )
         val photoUiState1 = mock<PhotoUiState.Image>()
         whenever(
             photoUiStateMapper.invoke(photo = photo1)
@@ -116,7 +120,11 @@ class TimelineTabViewModelTest {
             on { modificationTime } doReturn now.minusDays(1)
             on { fileTypeInfo } doReturn mockFileTypeInfo
         }
-        val photoResult2 = PhotoResult(photo = photo2, isMarkedSensitive = true)
+        val photoResult2 = PhotoResult(
+            photo = photo2,
+            isMarkedSensitive = true,
+            inTypedNode = null
+        )
         val photosResult = TimelinePhotosResult(
             allPhotos = listOf(photoResult1, photoResult2),
             nonSensitivePhotos = listOf(photoResult1)
@@ -313,7 +321,11 @@ class TimelineTabViewModelTest {
             on { modificationTime } doReturn now
             on { fileTypeInfo } doReturn mockFileTypeInfo
         }
-        val photoResult1 = PhotoResult(photo = photo1, isMarkedSensitive = false)
+        val photoResult1 = PhotoResult(
+            photo = photo1,
+            isMarkedSensitive = false,
+            inTypedNode = null
+        )
         val photo1UiState = mock<PhotoUiState.Image>()
         whenever(
             photoUiStateMapper.invoke(photo = photo1)
@@ -324,7 +336,11 @@ class TimelineTabViewModelTest {
             on { modificationTime } doReturn now.plusMonths(2)
             on { fileTypeInfo } doReturn mockTextFileTypeInfo
         }
-        val photoResult2 = PhotoResult(photo = photo2, isMarkedSensitive = false)
+        val photoResult2 = PhotoResult(
+            photo = photo2,
+            isMarkedSensitive = false,
+            inTypedNode = null
+        )
         val photo2UiState = mock<PhotoUiState.Image>()
         whenever(
             photoUiStateMapper.invoke(photo = photo2)
@@ -380,7 +396,11 @@ class TimelineTabViewModelTest {
                 on { modificationTime } doReturn now
                 on { fileTypeInfo } doReturn mockFileTypeInfo
             }
-            val photoResult1 = PhotoResult(photo = photo1, isMarkedSensitive = false)
+            val photoResult1 = PhotoResult(
+                photo = photo1,
+                isMarkedSensitive = false,
+                inTypedNode = null
+            )
             val photo1UiState = mock<PhotoUiState.Image>()
             whenever(
                 photoUiStateMapper.invoke(photo = photo1)
@@ -391,7 +411,11 @@ class TimelineTabViewModelTest {
                 on { modificationTime } doReturn now.plusMonths(2)
                 on { fileTypeInfo } doReturn mockTextFileTypeInfo
             }
-            val photoResult2 = PhotoResult(photo = photo2, isMarkedSensitive = false)
+            val photoResult2 = PhotoResult(
+                photo = photo2,
+                isMarkedSensitive = false,
+                inTypedNode = null
+            )
             val photo2UiState = mock<PhotoUiState.Image>()
             whenever(
                 photoUiStateMapper.invoke(photo = photo2)
@@ -456,7 +480,11 @@ class TimelineTabViewModelTest {
                 on { modificationTime } doReturn now
                 on { fileTypeInfo } doReturn mockFileTypeInfo
             }
-            val photoResult1 = PhotoResult(photo = photo1, isMarkedSensitive = false)
+            val photoResult1 = PhotoResult(
+                photo = photo1,
+                isMarkedSensitive = false,
+                inTypedNode = null
+            )
             val photo1UiState = mock<PhotoUiState.Image>()
             whenever(
                 photoUiStateMapper.invoke(photo = photo1)
@@ -467,7 +495,11 @@ class TimelineTabViewModelTest {
                 on { modificationTime } doReturn now.plusMonths(2)
                 on { fileTypeInfo } doReturn mockTextFileTypeInfo
             }
-            val photoResult2 = PhotoResult(photo = photo2, isMarkedSensitive = false)
+            val photoResult2 = PhotoResult(
+                photo = photo2,
+                isMarkedSensitive = false,
+                inTypedNode = null
+            )
             val photo2UiState = mock<PhotoUiState.Image>()
             whenever(
                 photoUiStateMapper.invoke(photo = photo2)
@@ -518,7 +550,11 @@ class TimelineTabViewModelTest {
                 on { modificationTime } doReturn now
                 on { fileTypeInfo } doReturn mockFileTypeInfo
             }
-            val photoResult1 = PhotoResult(photo = photo1, isMarkedSensitive = false)
+            val photoResult1 = PhotoResult(
+                photo = photo1,
+                isMarkedSensitive = false,
+                inTypedNode = null
+            )
             val photo1UiState = mock<PhotoUiState.Image>()
             whenever(
                 photoUiStateMapper.invoke(photo = photo1)
@@ -529,7 +565,11 @@ class TimelineTabViewModelTest {
                 on { modificationTime } doReturn now.plusMonths(2)
                 on { fileTypeInfo } doReturn mockTextFileTypeInfo
             }
-            val photoResult2 = PhotoResult(photo = photo2, isMarkedSensitive = false)
+            val photoResult2 = PhotoResult(
+                photo = photo2,
+                isMarkedSensitive = false,
+                inTypedNode = null
+            )
             val photo2UiState = mock<PhotoUiState.Image>()
             whenever(
                 photoUiStateMapper.invoke(photo = photo2)
@@ -579,7 +619,11 @@ class TimelineTabViewModelTest {
                 on { modificationTime } doReturn now
                 on { fileTypeInfo } doReturn mockFileTypeInfo
             }
-            val photoResult1 = PhotoResult(photo = photo1, isMarkedSensitive = false)
+            val photoResult1 = PhotoResult(
+                photo = photo1,
+                isMarkedSensitive = false,
+                inTypedNode = null
+            )
             val photo1UiState = mock<PhotoUiState.Image>()
             whenever(
                 photoUiStateMapper.invoke(photo = photo1)
@@ -590,7 +634,11 @@ class TimelineTabViewModelTest {
                 on { modificationTime } doReturn now.plusMonths(2)
                 on { fileTypeInfo } doReturn mockTextFileTypeInfo
             }
-            val photoResult2 = PhotoResult(photo = photo2, isMarkedSensitive = false)
+            val photoResult2 = PhotoResult(
+                photo = photo2,
+                isMarkedSensitive = false,
+                inTypedNode = null
+            )
             val photo2UiState = mock<PhotoUiState.Image>()
             whenever(
                 photoUiStateMapper.invoke(photo = photo2)
@@ -676,7 +724,11 @@ class TimelineTabViewModelTest {
                 on { modificationTime } doReturn now
                 on { fileTypeInfo } doReturn mockFileTypeInfo
             }
-            val photoResult1 = PhotoResult(photo = photo1, isMarkedSensitive = false)
+            val photoResult1 = PhotoResult(
+                photo = photo1,
+                isMarkedSensitive = false,
+                inTypedNode = null
+            )
             val photo1UiState = mock<PhotoUiState.Image>()
             whenever(
                 photoUiStateMapper.invoke(photo = photo1)
@@ -687,7 +739,11 @@ class TimelineTabViewModelTest {
                 on { modificationTime } doReturn now.plusMonths(2)
                 on { fileTypeInfo } doReturn mockTextFileTypeInfo
             }
-            val photoResult2 = PhotoResult(photo = photo2, isMarkedSensitive = false)
+            val photoResult2 = PhotoResult(
+                photo = photo2,
+                isMarkedSensitive = false,
+                inTypedNode = null
+            )
             val photo2UiState = mock<PhotoUiState.Image>()
             whenever(
                 photoUiStateMapper.invoke(photo = photo2)
