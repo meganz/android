@@ -9,6 +9,7 @@ import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
 import mega.privacy.android.navigation.contract.queue.QueueEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
+import timber.log.Timber
 import java.util.PriorityQueue
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -42,6 +43,8 @@ class CombinedEventQueueImpl(
 
 
     override suspend fun emit(navKeys: List<NavKey>, priority: NavPriority) {
+        Timber.d("Emit navigation events: $navKeys")
+
         val pendingNavKeys = mutableListOf<NavKey>()
         for (navKey in navKeys) {
             if (navKey is DialogNavKey) {
@@ -86,6 +89,7 @@ class CombinedEventQueueImpl(
         event: AppDialogEvent,
         priority: NavPriority,
     ) {
+        Timber.d("Emit dialog event: $event")
         queueChannel.add(
             QueuedEvent(event = event, priority = priority, timestamp = getTime())
         )

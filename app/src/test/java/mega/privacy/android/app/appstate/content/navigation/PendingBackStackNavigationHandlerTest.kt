@@ -445,7 +445,7 @@ class PendingBackStackNavigationHandlerTest {
 
             underTest.onRootNodeChange(true)
 
-            assertThat(backStack).containsExactly(Destination2, Destination3)
+            assertThat(backStack).containsExactly(DefaultLandingScreen, Destination2, Destination3)
         }
 
     @Test
@@ -500,7 +500,7 @@ class PendingBackStackNavigationHandlerTest {
         val session = "newSession"
 
         tempHandler.onPasscodeStateChanged(true)
-        assertThat(tempBackStack).containsExactly(DefaultLoginDestination)
+        assertThat(tempBackStack).containsExactly(InitialLoginDestination)
         tempHandler.onLoginChange(PendingBackStackNavigationHandler.AuthStatus.LoggedIn(session))
         assertThat(tempBackStack).containsExactly(FetchingContentNavKey(session, true))
         tempHandler.onRootNodeChange(true)

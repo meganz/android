@@ -13,6 +13,7 @@ import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
 import mega.privacy.android.navigation.contract.queue.QueueEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,6 +27,7 @@ class QueueEventViewModel @Inject constructor(
         flow {
             for (event in navigationEventQueueReceiver.events) {
                 val queueEvent = event()
+                Timber.d("Collected event from queue: $queueEvent")
 
                 if (queueEvent != null) {
                     eventDisplayedSignal = CompletableDeferred()

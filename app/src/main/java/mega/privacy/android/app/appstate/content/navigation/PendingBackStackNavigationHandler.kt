@@ -95,7 +95,7 @@ class PendingBackStackNavigationHandler(
     }
 
     override fun navigate(destinations: List<NavKey>) {
-        Timber.d("PendingBackStackNavigationHandler::navigate")
+        Timber.d("PendingBackStackNavigationHandler::navigate $destinations")
         when {
             destinations.last() is NoSessionNavKey.Mandatory && currentAuthStatus.isLoggedIn -> {
                 if (backstack.isEmpty()) navigate(defaultLandingScreen)
@@ -123,8 +123,7 @@ class PendingBackStackNavigationHandler(
                     && hasRootNode
                     && destinations.last() == currentFetchNodesDestinationOrNull(
                 currentAuthStatus
-            )
-                -> {
+            ) -> {
                 navigate(defaultLandingScreen)
             }
 
@@ -205,13 +204,14 @@ class PendingBackStackNavigationHandler(
 
     fun onLoginChange(authStatus: AuthStatus) {
         Timber.d("PendingBackStackNavigationHandler::onLoginChange")
+        if (currentAuthStatus == authStatus) return
+
         if (authStatus.isLoggedIn) {
             fromLogin = true
         } else {
             hasRootNode = false
         }
 
-        if (currentAuthStatus == authStatus) return
         this.currentAuthStatus = authStatus
 
         if (currentAuthStatus.isLoggedIn) {
@@ -231,10 +231,11 @@ class PendingBackStackNavigationHandler(
 
         if (this.hasRootNode) {
             backstack.removeAll { it is NoNodeNavKey }
-            val pending =
-                backstack.pending.takeUnless { it.isEmpty() } ?: listOf(defaultLandingScreen)
-            navigate(pending)
-            backstack.pending = emptyList()
+            if (isPasscodeLocked) {
+                showPasscodeScreen()
+            } else {
+                navigateToPendingScreens()
+            }
         } else {
             removeRootNodeRequiredDestinations()
         }
@@ -245,17 +246,27 @@ class PendingBackStackNavigationHandler(
         isPasscodeLocked = isLocked
 
         if (isPasscodeLocked) {
-            backstack.pending = backstack + backstack.pending
-            backstack.clear()
-            navigate(passcodeDestination)
+            if (currentAuthStatus.isLoggedIn && hasRootNode) {
+                showPasscodeScreen()
+            }
         } else {
             if (backstack.contains(passcodeDestination)) {
                 backstack.removeAll { it == passcodeDestination }
-                val pendingDestinations = backstack.pending
-                backstack.pending = emptyList()
-                navigate(pendingDestinations)
+                navigateToPendingScreens()
             }
         }
+    }
+
+    private fun showPasscodeScreen() {
+        backstack.pending = backstack + backstack.pending
+        backstack.clear()
+        navigate(passcodeDestination)
+    }
+
+    private fun navigateToPendingScreens() {
+        val pending = listOf(defaultLandingScreen).union(backstack.pending)
+        backstack.pending = emptyList()
+        navigate(pending.toList())
     }
 
     fun displayDialog(dialogDestination: NavKey) {
