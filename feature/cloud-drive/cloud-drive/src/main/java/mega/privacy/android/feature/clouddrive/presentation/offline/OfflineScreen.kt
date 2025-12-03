@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.banner.TopWarningBanner
 import mega.android.core.ui.components.dialogs.BasicDialog
@@ -50,13 +52,13 @@ import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
+import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
-import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineSelectionAction
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
@@ -151,6 +153,8 @@ internal fun OfflineScreen(
     var selectedHandlesToRemove by rememberSaveable { mutableStateOf<List<Long>>(emptyList()) }
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val offlineBottomSheetState = rememberModalBottomSheetState()
+    val coroutineScope = rememberCoroutineScope()
 
     EventEffect(
         event = uiState.openFolderInPageEvent,
@@ -247,6 +251,20 @@ internal fun OfflineScreen(
         }
     ) { paddingValues ->
         var visibleOfflineInformation by remember { mutableStateOf<OfflineFileInformation?>(null) }
+        val dismissOfflineBottomSheet = remember {
+            {
+                coroutineScope
+                    .launch { offlineBottomSheetState.hide() }
+                    .invokeOnCompletion { visibleOfflineInformation = null }
+            }
+        }
+        val dismissSortBottomSheet = remember {
+            {
+                coroutineScope
+                    .launch { sortBottomSheetState.hide() }
+                    .invokeOnCompletion { showSortBottomSheet = false }
+            }
+        }
 
         Column(
             modifier = Modifier
@@ -308,37 +326,36 @@ internal fun OfflineScreen(
             }
         }
 
-        visibleOfflineInformation?.let { file ->
-            OfflineOptionsBottomSheet(
-                modifier = Modifier
-                    .testTag(OFFLINE_SCREEN_BOTTOM_SHEET_TAG),
-                offlineFileInformation = file,
-                onShareOfflineFile = {
-                    shareOfflineFiles(listOf(file))
-                    visibleOfflineInformation = null
-                },
-                onSaveOfflineFileToDevice = {
-                    val safeHandle = file.handle.toLongOrNull() ?: return@OfflineOptionsBottomSheet
-                    saveOfflineFilesToDevice(listOf(safeHandle))
-                    visibleOfflineInformation = null
-                },
-                onOpenOfflineFile = {
-                    openFileInformation(file.handle)
-                    visibleOfflineInformation = null
-                },
-                onOpenWithFile = {
-                    onOpenFile(file)
-                    visibleOfflineInformation = null
-                },
-                onDeleteOfflineFile = {
-                    val safeHandle = file.handle.toLongOrNull() ?: return@OfflineOptionsBottomSheet
-                    selectedHandlesToRemove = listOf(safeHandle)
-                    showRemoveDialog = true
-                    visibleOfflineInformation = null
-                },
-                onDismiss = { visibleOfflineInformation = null }
-            )
-        }
+        OfflineOptionsBottomSheet(
+            modifier = Modifier
+                .testTag(OFFLINE_SCREEN_BOTTOM_SHEET_TAG),
+            offlineFileInformation = visibleOfflineInformation,
+            onShareOfflineFile = { file ->
+                shareOfflineFiles(listOf(file))
+                dismissOfflineBottomSheet()
+            },
+            onSaveOfflineFileToDevice = { file ->
+                val safeHandle = file.handle.toLongOrNull() ?: return@OfflineOptionsBottomSheet
+                saveOfflineFilesToDevice(listOf(safeHandle))
+                dismissOfflineBottomSheet()
+            },
+            onOpenOfflineFile = { file ->
+                openFileInformation(file.handle)
+                dismissOfflineBottomSheet()
+            },
+            onOpenWithFile = { file ->
+                onOpenFile(file)
+                dismissOfflineBottomSheet()
+            },
+            onDeleteOfflineFile = { file ->
+                val safeHandle = file.handle.toLongOrNull() ?: return@OfflineOptionsBottomSheet
+                selectedHandlesToRemove = listOf(safeHandle)
+                showRemoveDialog = true
+                dismissOfflineBottomSheet()
+            },
+            onDismiss = { dismissOfflineBottomSheet() },
+            sheetState = offlineBottomSheetState
+        )
 
         if (showRemoveDialog) {
             RemoveFromOfflineDialog(
@@ -374,9 +391,13 @@ internal fun OfflineScreen(
                                 sortDirection = it.sortDirection
                             )
                         )
-                        showSortBottomSheet = false
+
+                        dismissSortBottomSheet()
                     }
                 },
+                onDismissRequest = {
+                    dismissSortBottomSheet()
+                }
             )
         }
     }

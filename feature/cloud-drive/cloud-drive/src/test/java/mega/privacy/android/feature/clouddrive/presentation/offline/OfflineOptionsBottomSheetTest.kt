@@ -128,7 +128,7 @@ class OfflineOptionsBottomSheetTest {
 
     @Test
     fun `test that OfflineOptionsBottomSheet calls onShareOfflineFile when share menu item is clicked`() {
-        val mockCallback = mock<() -> Unit>()
+        val mockCallback = mock<(OfflineFileInformation) -> Unit>()
         val offlineFileInformation = createOfflineFileInformation(
             name = "test_file.pdf",
             isFolder = false
@@ -140,12 +140,12 @@ class OfflineOptionsBottomSheetTest {
         )
 
         composeRule.onNodeWithTag(OFFLINE_OPTIONS_SHARE_MENU_ITEM).performClick()
-        verify(mockCallback).invoke()
+        verify(mockCallback).invoke(offlineFileInformation)
     }
 
     @Test
     fun `test that OfflineOptionsBottomSheet calls onSaveOfflineFileToDevice when save to device menu item is clicked`() {
-        val mockCallback = mock<() -> Unit>()
+        val mockCallback = mock<(OfflineFileInformation) -> Unit>()
         val offlineFileInformation = createOfflineFileInformation(
             name = "test_file.pdf",
             isFolder = false
@@ -156,12 +156,12 @@ class OfflineOptionsBottomSheetTest {
         )
 
         composeRule.onNodeWithTag(OFFLINE_OPTIONS_SAVE_TO_DEVICE_MENU_ITEM).performClick()
-        verify(mockCallback).invoke()
+        verify(mockCallback).invoke(offlineFileInformation)
     }
 
     @Test
     fun `test that OfflineOptionsBottomSheet calls onDeleteOfflineFile when delete menu item is clicked`() {
-        val mockCallback = mock<() -> Unit>()
+        val mockCallback = mock<(OfflineFileInformation) -> Unit>()
         val offlineFileInformation = createOfflineFileInformation(
             name = "test_file.pdf",
             isFolder = false
@@ -172,12 +172,12 @@ class OfflineOptionsBottomSheetTest {
         )
 
         composeRule.onNodeWithTag(OFFLINE_OPTIONS_DELETE_MENU_ITEM).performClick()
-        verify(mockCallback).invoke()
+        verify(mockCallback).invoke(offlineFileInformation)
     }
 
     @Test
     fun `test that OfflineOptionsBottomSheet calls onOpenOfflineFile when info menu item is clicked`() {
-        val mockCallback = mock<() -> Unit>()
+        val mockCallback = mock<(OfflineFileInformation) -> Unit>()
         val offlineFileInformation = createOfflineFileInformation(
             name = "test_file.pdf",
             isFolder = false
@@ -188,12 +188,12 @@ class OfflineOptionsBottomSheetTest {
         )
 
         composeRule.onNodeWithTag(OFFLINE_OPTIONS_INFO_MENU_ITEM).performClick()
-        verify(mockCallback).invoke()
+        verify(mockCallback).invoke(offlineFileInformation)
     }
 
     @Test
     fun `test that OfflineOptionsBottomSheet calls onOpenWithFile when open with menu item is clicked`() {
-        val mockCallback = mock<() -> Unit>()
+        val mockCallback = mock<(OfflineFileInformation) -> Unit>()
         val offlineFileInformation = createOfflineFileInformation(
             name = "test_file.pdf",
             isFolder = false
@@ -204,12 +204,12 @@ class OfflineOptionsBottomSheetTest {
         )
 
         composeRule.onNodeWithTag(OFFLINE_OPTIONS_OPEN_WITH_MENU_ITEM).performClick()
-        verify(mockCallback).invoke()
+        verify(mockCallback).invoke(offlineFileInformation)
     }
 
     @Test
     fun `test that OfflineOptionsBottomSheet does not call onOpenWithFile for folders`() {
-        val mockCallback = mock<() -> Unit>()
+        val mockCallback = mock<(OfflineFileInformation) -> Unit>()
         val offlineFileInformation = createOfflineFileInformation(
             name = "test_folder",
             isFolder = true
@@ -225,7 +225,7 @@ class OfflineOptionsBottomSheetTest {
 
     @Test
     fun `test that OfflineOptionsBottomSheet does not call onShareOfflineFile for folders when offline`() {
-        val mockCallback = mock<() -> Unit>()
+        val mockCallback = mock<(OfflineFileInformation) -> Unit>()
         val offlineFileInformation = createOfflineFileInformation(
             name = "test_folder",
             isFolder = true
@@ -256,11 +256,11 @@ class OfflineOptionsBottomSheetTest {
     private fun setupComposeContent(
         offlineFileInformation: OfflineFileInformation,
         isOnline: Boolean = false,
-        onShareOfflineFile: () -> Unit = {},
-        onSaveOfflineFileToDevice: () -> Unit = {},
-        onDeleteOfflineFile: () -> Unit = {},
-        onOpenOfflineFile: () -> Unit = {},
-        onOpenWithFile: () -> Unit = {},
+        onShareOfflineFile: (OfflineFileInformation) -> Unit = {},
+        onSaveOfflineFileToDevice: (OfflineFileInformation) -> Unit = {},
+        onDeleteOfflineFile: (OfflineFileInformation) -> Unit = {},
+        onOpenOfflineFile: (OfflineFileInformation) -> Unit = {},
+        onOpenWithFile: (OfflineFileInformation) -> Unit = {},
         onDismiss: () -> Unit = {},
     ) {
         composeRule.setContent {
@@ -273,7 +273,7 @@ class OfflineOptionsBottomSheetTest {
                         onDeleteOfflineFile = onDeleteOfflineFile,
                         onOpenOfflineFile = onOpenOfflineFile,
                         onOpenWithFile = onOpenWithFile,
-                        isOnline = isOnline
+                        isOnline = isOnline,
                     )
                 }
             }
