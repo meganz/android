@@ -3,11 +3,15 @@ package mega.privacy.android.app.presentation.psa
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.psa.legacy.LegacyPsaGlobalState
 import mega.privacy.android.app.presentation.psa.mapper.PsaStateMapper
@@ -17,6 +21,7 @@ import mega.privacy.android.domain.usecase.psa.DismissPsaUseCase
 import mega.privacy.android.domain.usecase.psa.FetchPsaUseCase
 import mega.privacy.android.domain.usecase.psa.MonitorPsaUseCase
 import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -54,30 +59,31 @@ class PsaViewModel(
         legacyState = legacyState,
     )
 
-    private val _state = MutableStateFlow<PsaState>(PsaState.NoPsa)
+    private val seenChannel = Channel<PsaState>()
 
     /**
      * State
      */
-    val state: StateFlow<PsaState> = _state
-
-    init {
-        viewModelScope.launch {
+    val state: StateFlow<PsaState> by lazy {
+        flow {
             runCatching {
                 if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-                    monitorPsaUseCase(currentTimeProvider)
-                        .map { psaStateMapper(it) }
-                        .onEach { Timber.d("PSA State: $it") }
-                        .catch { Timber.e(it, "Error in monitoring psa") }
-                        .collect { _state.value = it }
+                    emitAll(
+                        merge(
+                            monitorPsaUseCase(currentTimeProvider)
+                                .map { psaStateMapper(it) }
+                                .onEach { Timber.d("PSA State: $it") }
+                                .catch { Timber.e(it, "Error in monitoring psa") },
+                            seenChannel.receiveAsFlow()
+                        )
+                    )
                 } else {
-                    legacyState.state
-                        .collect { _state.value = it }
+                    emitAll(legacyState.state)
                 }
             }.onFailure {
                 Timber.e(it)
             }
-        }
+        }.asUiStateFlow(scope = viewModelScope, initialValue = PsaState.NoPsa)
     }
 
     /**
@@ -88,7 +94,14 @@ class PsaViewModel(
     fun markAsSeen(psaId: Int) = viewModelScope.launch {
         if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
             dismissPsaUseCase(psaId)
-            _state.value = psaStateMapper(fetchPsaUseCase(currentTimeProvider(), false))
+            seenChannel.trySend(
+                psaStateMapper(
+                    fetchPsaUseCase(
+                        currentTime = currentTimeProvider(),
+                        forceRefresh = false
+                    )
+                )
+            )
         } else {
             dismissPsaUseCase(psaId)
             legacyState.clearPsa()
