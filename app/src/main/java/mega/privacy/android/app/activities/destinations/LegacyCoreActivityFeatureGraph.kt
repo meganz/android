@@ -58,5 +58,6 @@ class LegacyCoreActivityFeatureGraph(
             videoSectionLegacyDestination(navigationHandler::back)
             legacyAlbumContentPreview(navigationHandler::back)
             legacyMediaTimelinePhotoPreview(navigationHandler::back)
+            legacyAddToAlbumActivityNavKey(navigationHandler::returnResult)
         }
 }

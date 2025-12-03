@@ -15,7 +15,9 @@ import mega.privacy.android.feature.photos.presentation.MediaMainRoute
 import mega.privacy.android.feature.photos.presentation.albums.content.AlbumContentScreen
 import mega.privacy.android.feature.photos.presentation.albums.content.AlbumContentViewModel
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
+import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
 import mega.privacy.android.navigation.destination.MediaMainNavKey
@@ -24,9 +26,13 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
     navigationHandler: NavigationHandler,
     setNavigationItemVisibility: (Boolean) -> Unit,
     photoSelectionResultFlow: (String) -> Flow<Long?>,
+    timelineAddToAlbumResultFlow: (String) -> Flow<String?>,
 ) {
     entry<MediaMainNavKey> {
+        val snackBarEventQueue = rememberSnackBarQueue()
         val photoSelectionResult by photoSelectionResultFlow(LegacyPhotoSelectionNavKey.RESULT)
+            .collectAsStateWithLifecycle(null)
+        val timelineAddToAlbumResult by timelineAddToAlbumResultFlow(LegacyAddToAlbumActivityNavKey.ADD_TO_ALBUM_RESULT)
             .collectAsStateWithLifecycle(null)
 
         LaunchedEffect(photoSelectionResult) {
@@ -39,6 +45,13 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
                 )
 
                 navigationHandler.clearResult(LegacyPhotoSelectionNavKey.RESULT)
+            }
+        }
+
+        LaunchedEffect(timelineAddToAlbumResult) {
+            timelineAddToAlbumResult?.let {
+                snackBarEventQueue.queueMessage(it)
+                navigationHandler.clearResult(LegacyAddToAlbumActivityNavKey.ADD_TO_ALBUM_RESULT)
             }
         }
 

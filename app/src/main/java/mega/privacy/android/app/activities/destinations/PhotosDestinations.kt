@@ -1,7 +1,10 @@
 package mega.privacy.android.app.activities.destinations
 
+import android.app.Activity
+import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.EntryProviderScope
@@ -14,6 +17,7 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.photos.SelectAlbumCoverContract
 import mega.privacy.android.app.presentation.photos.SelectAlbumPhotosContract
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
+import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
@@ -21,6 +25,7 @@ import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.feature.photos.model.AlbumFlow
 import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
 import mega.privacy.android.navigation.destination.AlbumGetLinkNavKey
+import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumImportNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
@@ -177,6 +182,29 @@ fun EntryProviderScope<NavKey>.legacyMediaTimelinePhotoPreview(removeDestination
 
             // Immediately pop this destination from the back stack
             removeDestination()
+        }
+    }
+}
+
+fun EntryProviderScope<NavKey>.legacyAddToAlbumActivityNavKey(returnResult: (String, String?) -> Unit) {
+    entry<LegacyAddToAlbumActivityNavKey> { args ->
+        val context = LocalContext.current
+        val launcher = rememberLauncherForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            val message = if (result.resultCode != Activity.RESULT_OK) null else {
+                result.data?.getStringExtra("message")
+            }
+            returnResult(LegacyAddToAlbumActivityNavKey.ADD_TO_ALBUM_RESULT, message)
+        }
+
+        LaunchedEffect(Unit) {
+            val intent = Intent(context, AddToAlbumActivity::class.java).apply {
+                val ids = args.photoIds.toTypedArray()
+                putExtra("ids", ids)
+                putExtra("type", args.viewType)
+            }
+            launcher.launch(intent)
         }
     }
 }

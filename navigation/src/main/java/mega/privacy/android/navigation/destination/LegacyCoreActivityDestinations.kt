@@ -225,3 +225,14 @@ data class MediaTimelinePhotoPreviewNavKey(
     val filterType: String,
     val mediaSource: String,
 ) : NavKey
+
+@Serializable
+data class LegacyAddToAlbumActivityNavKey(
+    val photoIds: List<Long>,
+    val viewType: Int, // 0 => Album, 1 => Albums & Playlists
+) : NavKey {
+
+    companion object {
+        const val ADD_TO_ALBUM_RESULT = "ADD_TO_ALBUM_RESULT"
+    }
+}
