@@ -6,21 +6,36 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import kotlinx.serialization.Serializable
 import mega.privacy.android.feature.chat.dialog.MeetingHasEndedDialog
+import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
+import mega.privacy.android.navigation.contract.dialog.DialogNavKey
+import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
 
 /**
- * Meeting has ended dialog destination [NavKey]
+ * Meeting has ended dialog destination [DialogNavKey]
  */
 @Serializable
 data class MeetingHasEndedDialogNavKey(
     val isFromGuest: Boolean,
     val chatId: Long,
-) : NavKey
+) : NoSessionNavKey.Optional, DialogNavKey
 
+data object MeetingHasEndedDialogDestinations : AppDialogDestinations {
+    override val navigationGraph: EntryProviderScope<DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
+        { navigationHandler, onHandled ->
+            meetingHasEndedDialog(
+                navigateBack = navigationHandler::back,
+                navigate = navigationHandler::navigate,
+                onDialogHandled = onHandled
+            )
+        }
+}
 
-fun EntryProviderScope<NavKey>.meetingHasEndedDialog(
-    onBack: () -> Unit,
-    onNavigateToChat: (ChatNavKey) -> Unit,
+fun EntryProviderScope<DialogNavKey>.meetingHasEndedDialog(
+    navigateBack: () -> Unit,
+    navigate: (NavKey) -> Unit,
+    onDialogHandled: () -> Unit,
 ) {
     entry<MeetingHasEndedDialogNavKey>(
         metadata = DialogSceneStrategy.dialog(
@@ -31,11 +46,13 @@ fun EntryProviderScope<NavKey>.meetingHasEndedDialog(
     ) { key ->
         MeetingHasEndedDialog(
             isFromGuest = key.isFromGuest,
-            onDismiss = onBack,
-            onShowChat = {
-                onNavigateToChat(ChatNavKey(key.chatId, ACTION_CHAT_SHOW_MESSAGES))
-            })
+            onDismiss = {
+                navigateBack()
+                onDialogHandled()
+            },
+            onShowChat = { navigate(ChatNavKey(key.chatId, ACTION_CHAT_SHOW_MESSAGES)) },
+        )
     }
 }
 
-private const val ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES"
+internal const val ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES"

@@ -47,6 +47,7 @@ import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
+import mega.privacy.android.feature.chat.navigation.MeetingHasEndedDialogDestinations
 import mega.privacy.android.navigation.MegaActivityResultContract
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.FeatureDestination
@@ -184,6 +185,7 @@ internal class AppModule {
             TransferOverQuotaDialogDestinations,
             RemoteLogoutDialogDestinations,
             ContactLinkDialogDestinations,
+            MeetingHasEndedDialogDestinations,
         )
 
     @Provides

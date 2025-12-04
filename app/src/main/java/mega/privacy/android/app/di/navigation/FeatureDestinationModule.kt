@@ -7,12 +7,16 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import mega.privacy.android.app.activities.destinations.LegacyCoreActivityFeatureGraph
 import mega.privacy.android.app.appstate.content.navigation.PermissionFeatureDestination
+import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.nav.MediaPlayerIntentMapper
 import mega.privacy.android.app.presentation.filecontact.navigation.FileContactFeatureDestination
 import mega.privacy.android.app.presentation.filestorage.FileStorageFeatureDestination
 import mega.privacy.android.app.presentation.logout.LogoutFeatureDestination
 import mega.privacy.android.app.presentation.notification.navigation.NotificationsFeatureDestination
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserFeatureDestination
+import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.navigation.contract.FeatureDestination
 
@@ -25,8 +29,19 @@ class FeatureDestinationModule {
     fun provideLegacyCoreActivityFeatureDestination(
         nodeContentUriIntentMapper: NodeContentUriIntentMapper,
         mediaPlayerIntentMapper: MediaPlayerIntentMapper,
+        megaChatRequestHandler: MegaChatRequestHandler,
+        chatManagement: ChatManagement,
+        setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
+        rtcAudioManagerGateway: RTCAudioManagerGateway,
     ): FeatureDestination =
-        LegacyCoreActivityFeatureGraph(nodeContentUriIntentMapper, mediaPlayerIntentMapper)
+        LegacyCoreActivityFeatureGraph(
+            nodeContentUriIntentMapper,
+            mediaPlayerIntentMapper,
+            megaChatRequestHandler,
+            chatManagement,
+            setChatVideoInDeviceUseCase,
+            rtcAudioManagerGateway
+        )
 
     @Provides
     @IntoSet

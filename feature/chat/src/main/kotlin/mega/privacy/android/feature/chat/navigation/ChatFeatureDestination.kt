@@ -9,6 +9,6 @@ import mega.privacy.android.navigation.contract.TransferHandler
 class ChatFeatureDestination : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(navigationHandler: NavigationHandler, transferHandler: TransferHandler) -> Unit =
         { navigationHandler, transferHandler ->
-            meetingHasEndedDialog(navigationHandler::back, navigationHandler::navigate)
+
         }
 }

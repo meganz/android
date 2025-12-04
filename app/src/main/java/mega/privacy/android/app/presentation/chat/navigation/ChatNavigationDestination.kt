@@ -15,7 +15,12 @@ fun EntryProviderScope<NavKey>.chatLegacyDestination(removeDestination: () -> Un
         val context = LocalContext.current
         val megaNavigator = rememberMegaNavigator()
         LaunchedEffect(Unit) {
-            megaNavigator.openChat(context, key.chatId, key.action)
+            megaNavigator.openChat(
+                context = context,
+                chatId = key.chatId,
+                action = key.action,
+                link = key.link
+            )
             removeDestination()
         }
     }

@@ -2,7 +2,12 @@ package mega.privacy.android.app.activities.destinations
 
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.mediaplayer.legacyMediaPlayerScreen
+import mega.privacy.android.app.meeting.activity.legacyMeetingScreen
+import mega.privacy.android.app.meeting.activity.legacyWaitingRoomScreen
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.nav.MediaPlayerIntentMapper
 import mega.privacy.android.app.presentation.chat.navigation.chatLegacyDestination
 import mega.privacy.android.app.presentation.chat.navigation.chatListLegacyDestination
@@ -18,6 +23,7 @@ import mega.privacy.android.app.presentation.settings.settingsCameraUploadsNavig
 import mega.privacy.android.app.presentation.testpassword.navigation.testPasswordLegacyDestination
 import mega.privacy.android.app.presentation.videosection.videoSectionLegacyDestination
 import mega.privacy.android.app.textEditor.legacyTextEditorScreen
+import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -26,6 +32,10 @@ import mega.privacy.android.navigation.contract.TransferHandler
 class LegacyCoreActivityFeatureGraph(
     nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     mediaPlayerIntentMapper: MediaPlayerIntentMapper,
+    megaChatRequestHandler: MegaChatRequestHandler,
+    chatManagement: ChatManagement,
+    setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
+    rtcAudioManagerGateway: RTCAudioManagerGateway,
 ) : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
         { navigationHandler, transferHandler ->
@@ -60,5 +70,13 @@ class LegacyCoreActivityFeatureGraph(
             legacyMediaTimelinePhotoPreview(navigationHandler::back)
             legacyAddToAlbumActivityNavKey(navigationHandler::returnResult)
             legacyOpenLinkAfterFetchNodes(navigationHandler::back)
+            legacyMeetingScreen(
+                navigationHandler::back,
+                megaChatRequestHandler,
+                chatManagement,
+                setChatVideoInDeviceUseCase,
+                rtcAudioManagerGateway
+            )
+            legacyWaitingRoomScreen(navigationHandler::back, megaChatRequestHandler, chatManagement)
         }
 }

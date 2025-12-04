@@ -22,6 +22,9 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":navigation"))
     implementation(project(":core:navigation-contract"))
+    implementation(project(":icon-pack"))
+    implementation(project(":shared:resources"))
+
     implementation(lib.mega.core.ui)
     implementation(androidx.material3.window)
     implementation(androidx.bundles.compose.bom)

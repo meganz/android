@@ -37,7 +37,11 @@ data class ContactsNavKey(val navType: NavType = NavType.List) : NavKey {
 
 @Serializable
 @Parcelize
-data class ChatNavKey(val chatId: Long, val action: String?) : NoSessionNavKey.Optional, Parcelable
+data class ChatNavKey(
+    val chatId: Long,
+    val action: String?,
+    val link: String? = null,
+) : NoSessionNavKey.Optional, Parcelable
 
 /**
  * Navigation key for Chat List
@@ -149,7 +153,7 @@ data class AlbumContentPreviewNavKey(
     val photoId: Long,
     val albumType: String,
     val sortType: String,
-    val title: String
+    val title: String,
 ) : NavKey
 
 @Serializable
