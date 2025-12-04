@@ -50,6 +50,7 @@ dependencies {
     implementation(lib.coroutines.core)
     implementation(lib.kotlin.serialisation)
     implementation(google.gson)
+    implementation(google.play.age.signals)
     implementation(google.zxing)
     implementation(androidx.java.core)
     implementation(androidx.exifinterface)

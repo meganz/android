@@ -10,6 +10,7 @@ hilt = "2.56.1"
 material = "1.12.0"
 maps-utils = "0.5"
 maps-compose = "6.1.0"
+play-age-signals = "0.0.1-beta02"
 play-review = "2.0.2"
 play-update = "2.1.0"
 protobuff = "3.22.3"
@@ -49,6 +50,7 @@ hilt-android-test = { module = "com.google.dagger:hilt-android-testing", version
 maps-utils = { module = "com.google.maps.android:android-maps-utils", version.ref = "maps-utils" }
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "maps-compose" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
+play-age-signals = { module = "com.google.android.play:age-signals", version.ref = "play-age-signals" }
 play-review = { module = "com.google.android.play:review", version.ref = "play-review" }
 play-review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "play-review" }
 play-update = { module = "com.google.android.play:app-update", version.ref = "play-update" }
