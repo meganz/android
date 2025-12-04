@@ -111,6 +111,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
+import mega.privacy.android.feature.myaccount.presentation.model.QuotaLevel
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.legacy.core.ui.controls.lists.ImageIconItem
 import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
