@@ -27,6 +27,7 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.list.NodeListViewItemSkeleton
+import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionsSharesType
@@ -43,6 +44,7 @@ import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsTi
 import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsUiItem
 import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsWidgetUiState
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentDateHeader
+import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentsEmptyView
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentsHiddenView
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentsListItemView
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentsOptionsBottomSheet
@@ -78,6 +80,9 @@ class RecentsWidget @Inject constructor() : HomeWidget {
             },
             onWidgetOptionsClicked = { showOptionsBottomSheet = true },
             onShowRecentActivity = viewModel::showRecentActivity,
+            onUploadClicked = {
+                onNavigate(HomeFabOptionsBottomSheetNavKey)
+            }
         )
 
         openedFileNode?.let { (node, source) ->
@@ -113,6 +118,7 @@ fun RecentsView(
     onFileClicked: (TypedFileNode, NodeSourceType) -> Unit,
     onShowRecentActivity: () -> Unit,
     onWidgetOptionsClicked: () -> Unit,
+    onUploadClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
@@ -134,6 +140,12 @@ fun RecentsView(
                 NodeListViewItemSkeleton()
                 NodeListViewItemSkeleton()
                 NodeListViewItemSkeleton()
+            }
+
+            uiState.isEmpty -> {
+                RecentsEmptyView(
+                    onUploadClicked = onUploadClicked
+                )
             }
 
             else -> {
@@ -248,6 +260,7 @@ private fun RecentsViewPreview() {
             onFileClicked = { _, _ -> },
             onWidgetOptionsClicked = {},
             onShowRecentActivity = {},
+            onUploadClicked = {}
         )
     }
 }
@@ -265,6 +278,7 @@ private fun RecentsHiddenViewPreview() {
             onFileClicked = { _, _ -> },
             onWidgetOptionsClicked = {},
             onShowRecentActivity = {},
+            onUploadClicked = {}
         )
     }
 }
@@ -282,6 +296,7 @@ private fun RecentsViewEmptyPreview() {
             onFileClicked = { _, _ -> },
             onWidgetOptionsClicked = {},
             onShowRecentActivity = {},
+            onUploadClicked = {}
         )
     }
 }
@@ -299,6 +314,7 @@ private fun RecentsViewLoadingPreview() {
             onFileClicked = { _, _ -> },
             onWidgetOptionsClicked = {},
             onShowRecentActivity = {},
+            onUploadClicked = {}
         )
     }
 }

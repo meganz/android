@@ -25,9 +25,11 @@ import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsUi
 import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsWidgetUiState
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.DATE_HEADER_TEST_TAG
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.FIRST_LINE_TEST_TAG
+import mega.privacy.mobile.home.presentation.home.widget.recents.view.RECENTS_EMPTY_TEXT_TEST_TAG
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RECENTS_HIDDEN_BUTTON_TEST_TAG
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RECENTS_HIDDEN_TEXT_TEST_TAG
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RECENTS_MENU_TEST_TAG
+import mega.privacy.mobile.home.presentation.home.widget.recents.view.RECENTS_UPLOAD_BUTTON_TEST_TAG
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.TITLE_TEST_TAG
 import org.junit.Rule
 import org.junit.Test
@@ -53,6 +55,7 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
+                    onUploadClicked = {}
                 )
             }
         }
@@ -86,6 +89,7 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
+                    onUploadClicked = {}
                 )
             }
         }
@@ -126,6 +130,7 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
+                    onUploadClicked = {}
                 )
             }
         }
@@ -160,6 +165,7 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
+                    onUploadClicked = {}
                 )
             }
         }
@@ -204,6 +210,7 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
+                    onUploadClicked = {}
                 )
             }
         }
@@ -254,6 +261,7 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
+                    onUploadClicked = {}
                 )
             }
         }
@@ -297,6 +305,7 @@ class RecentsWidgetTest {
                     },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
+                    onUploadClicked = {}
                 )
             }
         }
@@ -338,6 +347,7 @@ class RecentsWidgetTest {
                     },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
+                    onUploadClicked = {}
                 )
             }
         }
@@ -380,6 +390,7 @@ class RecentsWidgetTest {
                     },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
+                    onUploadClicked = {}
                 )
             }
         }
@@ -406,6 +417,7 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = { optionsClicked = true },
                     onShowRecentActivity = {},
+                    onUploadClicked = {}
                 )
             }
         }
@@ -429,6 +441,7 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
+                    onUploadClicked = {}
                 )
             }
         }
@@ -460,6 +473,7 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
+                    onUploadClicked = {}
                 )
             }
         }
@@ -486,6 +500,7 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = { showActivityClicked = true },
+                    onUploadClicked = {}
                 )
             }
         }
@@ -519,6 +534,7 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
+                    onUploadClicked = {}
                 )
             }
         }
@@ -551,6 +567,7 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
+                    onUploadClicked = {}
                 )
             }
         }
@@ -583,12 +600,138 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
+                    onUploadClicked = {}
                 )
             }
         }
 
         composeRule.waitForIdle()
         composeRule.onAllNodesWithTag(RECENTS_VIEW_ALL_BUTTON_TEST_TAG)
+            .assertCountEquals(0)
+    }
+
+    @Test
+    fun `test that empty view is displayed when isEmpty is true`() {
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsView(
+                    uiState = RecentsWidgetUiState(
+                        recentActionItems = emptyList(),
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
+                    ),
+                    onFileClicked = { _, _ -> },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
+                    onUploadClicked = {}
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(RECENTS_EMPTY_TEXT_TEST_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(RECENTS_UPLOAD_BUTTON_TEST_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that empty view is not displayed when loading`() {
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsView(
+                    uiState = RecentsWidgetUiState(
+                        recentActionItems = emptyList(),
+                        isNodesLoading = true,
+                        isHiddenNodeSettingsLoading = false,
+                    ),
+                    onFileClicked = { _, _ -> },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
+                    onUploadClicked = {}
+                )
+            }
+        }
+
+        composeRule.onAllNodesWithTag(RECENTS_EMPTY_TEXT_TEST_TAG)
+            .assertCountEquals(0)
+    }
+
+    @Test
+    fun `test that empty view is not displayed when items exist`() {
+        val item = createMockRecentsUiItem(
+            title = RecentActionTitleText.SingleNode("Document.pdf"),
+            parentFolderName = LocalizedText.Literal("Cloud Drive"),
+            timestamp = System.currentTimeMillis() / 1000,
+            icon = IconPackR.drawable.ic_generic_medium_solid,
+        )
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsView(
+                    uiState = RecentsWidgetUiState(
+                        recentActionItems = listOf(item),
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
+                    ),
+                    onFileClicked = { _, _ -> },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
+                    onUploadClicked = {}
+                )
+            }
+        }
+
+        composeRule.waitForIdle()
+        composeRule.onAllNodesWithTag(RECENTS_EMPTY_TEXT_TEST_TAG)
+            .assertCountEquals(0)
+    }
+
+    @Test
+    fun `test that onUploadClicked is called when upload button is clicked in empty view`() {
+        var uploadClicked = false
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsView(
+                    uiState = RecentsWidgetUiState(
+                        recentActionItems = emptyList(),
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
+                    ),
+                    onFileClicked = { _, _ -> },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
+                    onUploadClicked = { uploadClicked = true }
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(RECENTS_UPLOAD_BUTTON_TEST_TAG, useUnmergedTree = true)
+            .performClick()
+
+        assertThat(uploadClicked).isTrue()
+    }
+
+    @Test
+    fun `test that empty view is not displayed when isHideRecentsEnabled is true`() {
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsView(
+                    uiState = RecentsWidgetUiState(
+                        recentActionItems = emptyList(),
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
+                        isHideRecentsEnabled = true,
+                    ),
+                    onFileClicked = { _, _ -> },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
+                    onUploadClicked = {}
+                )
+            }
+        }
+
+        composeRule.onAllNodesWithTag(RECENTS_EMPTY_TEXT_TEST_TAG)
             .assertCountEquals(0)
     }
 

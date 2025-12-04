@@ -24,6 +24,11 @@ data class RecentsWidgetUiState(
     val isLoading = isNodesLoading || isHiddenNodeSettingsLoading
 
     /**
+     * Whether recents section is empty
+     */
+    val isEmpty = !isLoading && recentActionItems.isEmpty()
+
+    /**
      * Whether to exclude sensitive nodes from list based on hidden nodes settings
      */
     val excludeSensitives = isHiddenNodesEnabled && !showHiddenNodes
