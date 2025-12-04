@@ -9,6 +9,7 @@ import mega.privacy.android.app.R
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import mega.privacy.android.shared.resources.R as sharedR
 
 @RunWith(AndroidJUnit4::class)
 class ChatLinkMessageViewTest {
@@ -44,7 +45,7 @@ class ChatLinkMessageViewTest {
                 link = "https://mega.app/chat/1234567890#1234567890",
             )
         )
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.invalid_chat_link))
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.invalid_chat_link_error_message))
             .assertExists()
         composeTestRule.onNodeWithText(Uri.parse("https://mega.app/chat/1234567890#1234567890").authority.orEmpty())
             .assertExists()

@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.commit
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
 import mega.privacy.android.app.presentation.chat.list.ChatTabsFragment
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
@@ -77,7 +77,7 @@ class ChatHostActivity : AppCompatActivity(), MeetingBottomSheetDialogActionList
         if (CallUtil.participatingInACall()) {
             CallUtil.showConfirmationInACall(
                 this,
-                getString(R.string.text_join_call),
+                getString(sharedR.string.can_only_join_one_call_error_message),
             )
         } else {
             (supportFragmentManager.findFragmentById(android.R.id.content) as? ChatTabsFragment)

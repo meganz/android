@@ -182,6 +182,7 @@ import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import java.io.File
 import java.util.stream.Stream
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Test class for [ChatViewModel]
@@ -2208,7 +2209,7 @@ internal class ChatViewModelTest {
             underTest.state.test {
                 val result = ((awaitItem().infoToShowEvent as StateEventWithContentTriggered)
                     .content as InfoToShow.SimpleString).stringId
-                assertThat(result).isEqualTo(R.string.invalid_chat_link)
+                assertThat(result).isEqualTo(sharedR.string.invalid_chat_link_error_message)
             }
         }
 

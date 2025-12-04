@@ -94,6 +94,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 import kotlin.random.Random
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Test class for [MyAccountViewModel]
@@ -405,7 +406,7 @@ internal class MyAccountViewModelTest {
                     errorCode = 30,
                     errorString = "An unexpected issue occurred",
                 ),
-                errorMessageRes = R.string.invalid_link,
+                errorMessageRes = sharedR.string.general_invalid_link,
             )
         }
 

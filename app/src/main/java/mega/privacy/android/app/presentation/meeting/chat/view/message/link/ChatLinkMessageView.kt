@@ -16,6 +16,7 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.messages.RichL
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Chat link message view
@@ -43,7 +44,7 @@ fun ChatLinkMessageView(
     } else {
         RichLinkContentView(
             modifier = modifier,
-            contentTitle = stringResource(id = R.string.invalid_chat_link),
+            contentTitle = stringResource(id = sharedR.string.invalid_chat_link_error_message),
             icon = painterResource(R.drawable.ic_logo_notifications),
             host = Uri.parse(linkContent.link).authority.orEmpty()
         )

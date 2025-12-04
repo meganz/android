@@ -54,7 +54,7 @@ class JoinAnswerCallDialogTest {
         with(composeRule) {
             onNodeWithTag(TEST_TAG_JOIN_ANSWER_CALL_DIALOG).assertIsDisplayed()
             onNodeWithText(R.string.title_join_call).assertIsDisplayed()
-            onNodeWithText(R.string.text_join_call).assertIsDisplayed()
+            onNodeWithText(sharedR.string.can_only_join_one_call_error_message).assertIsDisplayed()
             onNodeWithText(R.string.hold_and_join_call_incoming).assertDoesNotExist()
             onNodeWithText(R.string.end_and_join_call_incoming).assertIsDisplayed()
             onNodeWithText(sharedR.string.general_dialog_cancel_button).assertIsDisplayed()
@@ -90,7 +90,7 @@ class JoinAnswerCallDialogTest {
         with(composeRule) {
             onNodeWithTag(TEST_TAG_JOIN_ANSWER_CALL_DIALOG).assertIsDisplayed()
             onNodeWithText(R.string.title_join_one_to_one_call).assertIsDisplayed()
-            onNodeWithText(R.string.text_join_call).assertIsDisplayed()
+            onNodeWithText(sharedR.string.can_only_join_one_call_error_message).assertIsDisplayed()
             onNodeWithText(R.string.hold_and_answer_call_incoming).assertDoesNotExist()
             onNodeWithText(R.string.end_and_answer_call_incoming).assertIsDisplayed()
             onNodeWithText(sharedR.string.general_dialog_cancel_button).assertIsDisplayed()

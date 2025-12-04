@@ -118,6 +118,7 @@ import nz.mega.sdk.MegaUtilsAndroid
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * My account view model
@@ -1068,7 +1069,7 @@ class MyAccountViewModel @Inject constructor(
                         errorMessageRes = when (exception) {
                             is QueryCancelLinkException.UnrelatedAccountCancellationLink -> R.string.error_not_logged_with_correct_account
                             is QueryCancelLinkException.ExpiredAccountCancellationLink -> R.string.cancel_link_expired
-                            else -> R.string.invalid_link
+                            else -> sharedR.string.general_invalid_link
                         }
                     )
                 }

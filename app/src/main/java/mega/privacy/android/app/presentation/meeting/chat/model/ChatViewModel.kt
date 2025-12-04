@@ -377,7 +377,7 @@ class ChatViewModel @Inject constructor(
                 }.onFailure {
                     Timber.e(it)
                     val infoToShow = if (it is ResourceDoesNotExistChatException) {
-                        InfoToShow.SimpleString(stringId = R.string.invalid_chat_link)
+                        InfoToShow.SimpleString(stringId = sharedR.string.invalid_chat_link_error_message)
                     } else {
                         InfoToShow.SimpleString(stringId = R.string.error_general_nodes)
                     }

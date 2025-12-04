@@ -210,7 +210,7 @@ internal class OpenLinkDialogFragment : DialogFragment() {
             is IAmOnAnotherCallException -> {
                 CallUtil.showConfirmationInACall(
                     requireActivity(),
-                    getString(R.string.text_join_call),
+                    getString(sharedR.string.can_only_join_one_call_error_message),
                 )
                 dismissAllowingStateLoss()
             }

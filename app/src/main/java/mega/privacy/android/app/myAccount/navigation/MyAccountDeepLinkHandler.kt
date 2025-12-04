@@ -18,6 +18,7 @@ import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.WebSiteNavKey
 import timber.log.Timber
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedR
 
 class MyAccountDeepLinkHandler @Inject constructor(
     private val queryResetPasswordLinkUseCase: QueryResetPasswordLinkUseCase,
@@ -81,7 +82,7 @@ class MyAccountDeepLinkHandler @Inject constructor(
                     }
                 } else {
                     when (result.exceptionOrNull()) {
-                        ResetPasswordLinkException.LinkInvalid -> R.string.invalid_link
+                        ResetPasswordLinkException.LinkInvalid -> sharedR.string.general_invalid_link
                         ResetPasswordLinkException.LinkExpired -> R.string.recovery_link_expired
                         ResetPasswordLinkException.LinkAccessDenied -> R.string.error_not_logged_with_correct_account
                         else -> R.string.general_text_error

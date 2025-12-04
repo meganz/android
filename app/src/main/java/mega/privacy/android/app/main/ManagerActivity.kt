@@ -5457,7 +5457,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         if (CallUtil.participatingInACall()) {
             CallUtil.showConfirmationInACall(
                 this,
-                getString(R.string.text_join_call),
+                getString(sharedR.string.can_only_join_one_call_error_message),
             )
         } else {
             showOpenLinkDialog(isJoinMeeting = true)
@@ -7004,7 +7004,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 is IAmOnAnotherCallException -> {
                     CallUtil.showConfirmationInACall(
                         this,
-                        getString(R.string.text_join_call),
+                        getString(sharedR.string.can_only_join_one_call_error_message),
                     )
                 }
 
@@ -7031,7 +7031,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         if (errorCode == MegaChatError.ERROR_NOENT) {
             Util.showAlert(
                 this,
-                getString(R.string.invalid_chat_link),
+                getString(sharedR.string.invalid_chat_link_error_message),
                 getString(R.string.title_alert_chat_link_error)
             )
         }

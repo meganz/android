@@ -230,7 +230,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                         }
                     } else {
                         val errorMessage = when (resetPasswordLinkResult.exceptionOrNull()) {
-                            ResetPasswordLinkException.LinkInvalid -> getString(R.string.invalid_link)
+                            ResetPasswordLinkException.LinkInvalid -> getString(sharedR.string.general_invalid_link)
                             ResetPasswordLinkException.LinkExpired -> getString(R.string.recovery_link_expired)
                             ResetPasswordLinkException.LinkAccessDenied -> getString(R.string.error_not_logged_with_correct_account)
                             else -> getString(R.string.general_text_error)
@@ -874,7 +874,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
         Timber.d("Chat id: $chatId, type: $type, flag: $isFromOpenChatPreview")
 
         if (linkInvalid) {
-            setError(getString(R.string.invalid_link))
+            setError(getString(sharedR.string.general_invalid_link))
             return
         }
         if (type == LINK_IS_FOR_MEETING) {
@@ -882,7 +882,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
             if (participatingInACall()) {
                 showConfirmationInACall(
                     this,
-                    getString(R.string.text_join_call),
+                    getString(sharedR.string.can_only_join_one_call_error_message),
                 )
             } else {
                 when {
@@ -931,6 +931,6 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
      * onErrorLoadingPreview
      */
     override fun onErrorLoadingPreview(errorCode: Int) {
-        setError(getString(R.string.invalid_link))
+        setError(getString(sharedR.string.general_invalid_link))
     }
 }
