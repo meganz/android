@@ -5,7 +5,6 @@ import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.cloudDriveScreen
 import mega.privacy.android.feature.clouddrive.presentation.drivesync.driveSyncScreen
 import mega.privacy.android.feature.clouddrive.presentation.favourites.favouritesScreen
-import mega.privacy.android.feature.clouddrive.presentation.offline.offlineInfoScreen
 import mega.privacy.android.feature.clouddrive.presentation.offline.offlineScreen
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.rubbishBin
 import mega.privacy.android.feature.clouddrive.presentation.shares.links.openPasswordLinkDialog
@@ -55,8 +54,6 @@ class CloudDriveFeatureDestination : FeatureDestination {
                     navigationHandler.navigate(OfflineInfoNavKey(handle = handle))
                 }
             )
-
-            offlineInfoScreen(navigationHandler::back)
 
             driveSyncScreen(
                 navigationHandler = navigationHandler,

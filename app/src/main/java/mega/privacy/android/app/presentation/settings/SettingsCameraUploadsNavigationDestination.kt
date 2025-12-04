@@ -1,12 +1,13 @@
 package mega.privacy.android.app.presentation.settings
 
+import android.content.Intent
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
-import mega.privacy.android.navigation.megaNavigator
 
 fun EntryProviderScope<NavKey>.settingsCameraUploadsNavigationDestination(removeDestination: () -> Unit) {
     entry<SettingsCameraUploadsNavKey>(
@@ -14,7 +15,7 @@ fun EntryProviderScope<NavKey>.settingsCameraUploadsNavigationDestination(remove
     ) {
         val context = LocalContext.current
         LaunchedEffect(Unit) {
-            context.megaNavigator.openSettingsCameraUploads(context)
+            context.startActivity(Intent(context, SettingsCameraUploadsActivity::class.java))
 
             // Immediately pop this destination from the back stack
             removeDestination()

@@ -7,7 +7,6 @@ import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountActivity
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
-import mega.privacy.android.navigation.megaNavigator
 
 fun EntryProviderScope<NavKey>.upgradeAccount(removeDestination: () -> Unit) {
     entry<UpgradeAccountNavKey>(
@@ -16,9 +15,8 @@ fun EntryProviderScope<NavKey>.upgradeAccount(removeDestination: () -> Unit) {
         val context = LocalContext.current
         LaunchedEffect(Unit) {
             if (key.isUpgrade) {
-                context.megaNavigator.openUpgradeAccount(
-                    context = context,
-                    source = key.source
+                ChooseAccountActivity.navigateToUpgradeAccount(
+                    context = context, source = key.source
                 )
             } else {
                 ChooseAccountActivity.navigateToChooseAccount(
