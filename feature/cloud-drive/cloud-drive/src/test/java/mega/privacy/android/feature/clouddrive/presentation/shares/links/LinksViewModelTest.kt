@@ -31,7 +31,7 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetLinksSortOrderUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
-import mega.privacy.android.domain.usecase.node.publiclink.MonitorPublicLinksUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.MonitorLinksUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.shares.links.model.LinksAction
@@ -51,7 +51,7 @@ import org.robolectric.annotation.Config
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [34])
 class LinksViewModelTest {
-    private val monitorPublicLinksUseCase: MonitorPublicLinksUseCase = mock()
+    private val monitorLinksUseCase: MonitorLinksUseCase = mock()
     private val setViewTypeUseCase: SetViewType = mock()
     private val monitorViewTypeUseCase: MonitorViewType = mock()
     private val nodeUiItemMapper: NodeUiItemMapper = mock()
@@ -71,7 +71,7 @@ class LinksViewModelTest {
     fun tearDown() {
         Dispatchers.resetMain()
         reset(
-            monitorPublicLinksUseCase,
+            monitorLinksUseCase,
             setViewTypeUseCase,
             monitorViewTypeUseCase,
             nodeUiItemMapper,
@@ -82,7 +82,7 @@ class LinksViewModelTest {
     }
 
     private fun createViewModel() = LinksViewModel(
-        monitorPublicLinksUseCase = monitorPublicLinksUseCase,
+        monitorLinksUseCase = monitorLinksUseCase,
         setViewTypeUseCase = setViewTypeUseCase,
         monitorViewTypeUseCase = monitorViewTypeUseCase,
         nodeUiItemMapper = nodeUiItemMapper,
@@ -94,7 +94,7 @@ class LinksViewModelTest {
     private suspend fun setupTestData(items: List<PublicLinkNode>) {
         whenever(getLinksSortOrderUseCase(true)).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(NodeSortConfiguration.default)
-        whenever(monitorPublicLinksUseCase(true)).thenReturn(flowOf(items))
+        whenever(monitorLinksUseCase(true)).thenReturn(flowOf(items))
 
         val nodeUiItems = items.map { node ->
             NodeUiItem<TypedNode>(

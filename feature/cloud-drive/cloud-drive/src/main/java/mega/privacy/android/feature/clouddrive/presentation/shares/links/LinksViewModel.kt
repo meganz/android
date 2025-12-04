@@ -24,7 +24,7 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetLinksSortOrderUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
-import mega.privacy.android.domain.usecase.node.publiclink.MonitorPublicLinksUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.MonitorLinksUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.shares.links.model.LinksAction
@@ -34,7 +34,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LinksViewModel @Inject constructor(
-    private val monitorPublicLinksUseCase: MonitorPublicLinksUseCase,
+    private val monitorLinksUseCase: MonitorLinksUseCase,
     private val setViewTypeUseCase: SetViewType,
     private val monitorViewTypeUseCase: MonitorViewType,
     private val nodeUiItemMapper: NodeUiItemMapper,
@@ -71,7 +71,7 @@ class LinksViewModel @Inject constructor(
 
     private fun monitorLinks() {
         viewModelScope.launch {
-            monitorPublicLinksUseCase(true)
+            monitorLinksUseCase(true)
                 .catch { Timber.e(it) }
                 .collectLatest { nodes ->
                     val nodeUiItems = nodeUiItemMapper(
@@ -90,7 +90,7 @@ class LinksViewModel @Inject constructor(
 
     private suspend fun loadLinks() {
         runCatching {
-            val nodes = monitorPublicLinksUseCase(true).first()
+            val nodes = monitorLinksUseCase(true).first()
             val nodeUiItems = nodeUiItemMapper(
                 nodeList = nodes,
                 existingItems = uiState.value.items,
