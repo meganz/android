@@ -119,6 +119,7 @@ public class Constants {
     public static final String ACTION_OPEN_FOLDER = "OPEN_FOLDER";
     public static final String ACTION_CANCEL_ACCOUNT = "CANCEL_ACCOUNT";
     public static final String ACTION_RESET_PASS = "RESET_PASS";
+    public static final String ACTION_OPEN_USAGE_METER_FROM_MENU = "OPEN_USAGE_METER_FROM_MENU";
     public static final String ACTION_RESET_PASS_FROM_LINK = "RESET_PASS_FROM_LINK";
     public static final String ACTION_PASS_CHANGED = "PASS_CHANGED";
     public static final String ACTION_RESET_PASS_FROM_PARK_ACCOUNT = "RESET_PASS_FROM_PARK_ACCOUNT";

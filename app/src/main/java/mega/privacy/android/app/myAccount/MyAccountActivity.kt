@@ -56,6 +56,7 @@ import mega.privacy.android.app.utils.AlertDialogUtil.setEditTextError
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.ACTION_CANCEL_ACCOUNT
 import mega.privacy.android.app.utils.Constants.ACTION_CHANGE_MAIL
+import mega.privacy.android.app.utils.Constants.ACTION_OPEN_USAGE_METER_FROM_MENU
 import mega.privacy.android.app.utils.Constants.ACTION_PASS_CHANGED
 import mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS
 import mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_LINK
@@ -70,6 +71,7 @@ import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
@@ -130,6 +132,8 @@ internal class MyAccountActivity : PasscodeActivity(),
 
     private var menu: Menu? = null
 
+    private var navigateToStorageFromMenu: Boolean = false
+
     private var killSessionsConfirmationDialog: AlertDialog? = null
     private var cancelSubscriptionsDialog: AlertDialog? = null
     private var cancelSubscriptionsConfirmationDialog: AlertDialog? = null
@@ -139,7 +143,7 @@ internal class MyAccountActivity : PasscodeActivity(),
     private var cancelSubscriptionsFeedback: String? = null
     private val onBackPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            if (!navController.navigateUp()) {
+            if (!navController.navigateUp() || navigateToStorageFromMenu) {
                 finish()
             }
         }
@@ -256,6 +260,21 @@ internal class MyAccountActivity : PasscodeActivity(),
                 )
 
                 intent.action = null
+            }
+
+            ACTION_OPEN_USAGE_METER_FROM_MENU -> {
+                lifecycleScope.launch {
+                    navigateToStorageFromMenu = true
+                    if (getFeatureFlagValueUseCase(AppFeatures.MyAccountUsageFragmentComposeUI)) {
+                        navController.navigate(R.id.action_my_account_to_my_account_usage_compose)
+                    } else {
+                        navController.navigate(R.id.action_my_account_to_my_account_usage)
+                    }
+                    supportActionBar?.apply {
+                        title = resources.getString(R.string.storage_space)
+                    }
+                    intent.action = null
+                }
             }
         }
     }
@@ -759,7 +778,9 @@ internal class MyAccountActivity : PasscodeActivity(),
                     } else {
                         when (dialogType) {
                             TYPE_CANCEL_ACCOUNT -> viewModel.finishAccountCancellation(password)
-                            TYPE_CHANGE_EMAIL -> viewModel.finishChangeEmailConfirmation(password)
+                            TYPE_CHANGE_EMAIL -> viewModel.finishChangeEmailConfirmation(
+                                password
+                            )
                         }
 
                         textField.hideKeyboard()

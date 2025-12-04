@@ -1,6 +1,7 @@
 package mega.privacy.android.app.menu.navigation
 
 import kotlinx.coroutines.flow.combine
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorOngoingCallUseCase
 import mega.privacy.android.icon.pack.IconPack
@@ -28,7 +29,7 @@ object CurrentPlanItem : NavDrawerItem.Account(
 )
 
 object StorageItem : NavDrawerItem.Account(
-    destination = MyAccountNavKey(),
+    destination = MyAccountNavKey(action = Constants.ACTION_OPEN_USAGE_METER_FROM_MENU),
     icon = IconPack.Medium.Thin.Outline.HardDrive,
     title = sharedR.string.account_cancel_account_screen_plan_storage
 )
