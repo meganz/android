@@ -34,8 +34,6 @@ class RecentActionUiItemMapper @Inject constructor(
             isSingleNode = isSingleNode,
             isMediaBucket = isMediaBucket
         )
-        val parentFolderName = getParentFolderName(item)
-        val updatedByText = getUpdatedByText(item)
 
         return RecentsUiItem(
             title = title,
@@ -44,16 +42,14 @@ class RecentActionUiItemMapper @Inject constructor(
             } else {
                 fileTypeIconMapper(node.type.extension)
             },
-            shareIcon = when (item.parentFolderSharesType) {
-                RecentActionsSharesType.NONE -> null
-                RecentActionsSharesType.INCOMING_SHARES -> IconPackR.drawable.ic_folder_incoming_medium_solid
-                RecentActionsSharesType.OUTGOING_SHARES, RecentActionsSharesType.PENDING_OUTGOING_SHARES -> IconPackR.drawable.ic_folder_outgoing_medium_solid
+            shareIcon = IconPackR.drawable.ic_folder_users_small_solid.takeIf {
+                item.parentFolderSharesType != RecentActionsSharesType.NONE
             },
-            parentFolderName = parentFolderName,
+            parentFolderName = getParentFolderName(item),
             timestampText = RecentsTimestampText(item.timestamp),
             isMediaBucket = isMediaBucket,
             isUpdate = item.isUpdate,
-            updatedByText = updatedByText,
+            updatedByText = getUpdatedByText(item),
             userName = if (!item.currentUserIsOwner) item.userName else null,
             isFavourite = isSingleNode && node.isFavourite,
             nodeLabel = if (isSingleNode) node.nodeLabel else null,

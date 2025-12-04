@@ -238,7 +238,7 @@ class RecentsUiItemMapperTest {
 
         val result = underTest(bucket)
 
-        assertThat(result.shareIcon).isEqualTo(IconPackR.drawable.ic_folder_incoming_medium_solid)
+        assertThat(result.shareIcon).isEqualTo(IconPackR.drawable.ic_folder_users_small_solid)
     }
 
     @Test
@@ -252,7 +252,7 @@ class RecentsUiItemMapperTest {
 
         val result = underTest(bucket)
 
-        assertThat(result.shareIcon).isEqualTo(IconPackR.drawable.ic_folder_outgoing_medium_solid)
+        assertThat(result.shareIcon).isEqualTo(IconPackR.drawable.ic_folder_users_small_solid)
     }
 
     @Test
@@ -266,7 +266,7 @@ class RecentsUiItemMapperTest {
 
         val result = underTest(bucket)
 
-        assertThat(result.shareIcon).isEqualTo(IconPackR.drawable.ic_folder_outgoing_medium_solid)
+        assertThat(result.shareIcon).isEqualTo(IconPackR.drawable.ic_folder_users_small_solid)
     }
 
     @Test

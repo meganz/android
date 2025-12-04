@@ -26,7 +26,6 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
-import mega.privacy.android.core.nodecomponents.list.NodeListViewItemSkeleton
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.RecentActionBucket
@@ -47,6 +46,7 @@ import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentDate
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentsEmptyView
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentsHiddenView
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentsListItemView
+import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentsLoadingView
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentsOptionsBottomSheet
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentsWidgetHeader
 import javax.inject.Inject
@@ -135,11 +135,7 @@ fun RecentsView(
             }
 
             uiState.isLoading -> {
-                // TODO: Update skeleton to match final design
-                NodeListViewItemSkeleton()
-                NodeListViewItemSkeleton()
-                NodeListViewItemSkeleton()
-                NodeListViewItemSkeleton()
+                RecentsLoadingView()
             }
 
             uiState.isEmpty -> {
@@ -152,7 +148,6 @@ fun RecentsView(
                 val grouped = remember(uiState.recentActionItems) {
                     uiState.recentActionItems.groupBy { it.timestampText.dateOnlyTimestamp }
                 }
-
                 grouped.forEach { (dateTimestamp, itemsForDate) ->
                     RecentDateHeader(dateTimestamp)
 

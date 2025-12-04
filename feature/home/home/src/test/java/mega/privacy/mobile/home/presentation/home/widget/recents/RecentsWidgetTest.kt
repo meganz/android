@@ -28,6 +28,7 @@ import mega.privacy.mobile.home.presentation.home.widget.recents.view.FIRST_LINE
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RECENTS_EMPTY_TEXT_TEST_TAG
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RECENTS_HIDDEN_BUTTON_TEST_TAG
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RECENTS_HIDDEN_TEXT_TEST_TAG
+import mega.privacy.mobile.home.presentation.home.widget.recents.view.RECENTS_LOADING_TEST_TAG
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RECENTS_MENU_TEST_TAG
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RECENTS_UPLOAD_BUTTON_TEST_TAG
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.TITLE_TEST_TAG
@@ -733,6 +734,27 @@ class RecentsWidgetTest {
 
         composeRule.onAllNodesWithTag(RECENTS_EMPTY_TEXT_TEST_TAG)
             .assertCountEquals(0)
+    }
+
+    @Test
+    fun `test that loading view is shown when isLoading is true`() {
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsView(
+                    uiState = RecentsWidgetUiState(
+                        recentActionItems = emptyList(),
+                        isNodesLoading = true,
+                    ),
+                    onFileClicked = { _, _ -> },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
+                    onUploadClicked = {}
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(RECENTS_LOADING_TEST_TAG)
+            .assertExists()
     }
 
     private fun createMockTypedFileNode(

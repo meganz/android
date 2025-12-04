@@ -124,9 +124,10 @@ fun RecentsListItemView(
     ) {
         Image(
             modifier = Modifier
+                .padding(top = 4.dp)
                 .size(32.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .align(Alignment.CenterVertically)
+                .align(Alignment.Top)
                 .testTag(ICON_TEST_TAG),
             painter = painterResource(icon),
             contentDescription = "Thumbnail"
@@ -316,7 +317,7 @@ private fun RecentsListItemView2Preview() {
             title = "Screen recording.mp4",
             updatedByText = "[A]added by[/A] [B]John Doe[/B]",
             icon = IconPackR.drawable.ic_video_medium_solid,
-            shareIcon = IconPackR.drawable.ic_folder_incoming_medium_solid,
+            shareIcon = IconPackR.drawable.ic_folder_users_small_solid,
             time = "08:00",
             parentFolderName = "Tech Share",
             onItemClicked = {},
@@ -334,7 +335,7 @@ private fun RecentsListItemViewUpdatePreview() {
             updatedByText = "[A]updated by[/A] [B]John Doe[/B]",
             showFavourite = true,
             showVersion = true,
-            shareIcon = IconPackR.drawable.ic_folder_incoming_medium_solid,
+            shareIcon = IconPackR.drawable.ic_folder_users_small_solid,
             time = "08:00",
             parentFolderName = "Very Long Folder Name, Very Long Folder Name",
             onItemClicked = {},
