@@ -42,6 +42,6 @@ internal fun NewChangeApiServerDialog(
     ) {
         viewModel.updateNewApiServer(it)
         viewModel.confirmUpdateApiServer()
-        openLoginActivity(context)
+        openLoginActivity(context, uiState.isSingleActivityEnabled)
     }
 }

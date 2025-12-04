@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.apiserver.view
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,6 +16,7 @@ import mega.privacy.android.domain.entity.apiserver.ApiServer
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
@@ -40,7 +40,7 @@ internal fun ChangeApiServerDialog(
         },
         onConfirmRequest = {
             viewModel.confirmUpdateApiServer()
-            openLoginActivity(context)
+            openLoginActivity(context, uiState.isSingleActivityEnabled)
             onDismissRequest()
         },
     )

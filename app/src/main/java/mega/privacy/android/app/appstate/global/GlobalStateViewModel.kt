@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.appstate.global.mapper.BlockedStateMapper
 import mega.privacy.android.app.appstate.global.model.BlockedState
@@ -97,10 +98,13 @@ class GlobalStateViewModel @Inject constructor(
             getPostLoginSessionFlow()
                 .catch { Timber.e(it, "Error monitoring post login session") }
                 .emitFalseOnLogout(),
-            refreshSessionFlow.map { RootNodeState(false, it) }
+            refreshSessionFlow.map {
+                RootNodeState(false, it)
+            }
         ).catch { Timber.e(it, "Error monitoring fetch nodes finish") }
-            .asUiStateFlow(
+            .stateIn(
                 scope = viewModelScope,
+                started = SharingStarted.Lazily,
                 initialValue = RootNodeState(false)
             )
     }

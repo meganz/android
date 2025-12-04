@@ -132,6 +132,9 @@ class MegaActivity : ComponentActivity() {
         if (intent.action == Constants.ACTION_REFRESH) {
             globalStateViewModel.refreshSession(RefreshEvent.Refresh)
             intent.action = null
+        } else if (intent.action == Constants.ACTION_REFRESH_API_SERVER) {
+            globalStateViewModel.refreshSession(RefreshEvent.ChangeEnvironment)
+            intent.action = null
         }
     }
 

@@ -38,7 +38,6 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.chat.IsMegaApiLoggedInUseCase
-import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
 import mega.privacy.android.domain.usecase.login.FastLoginUseCase
 import mega.privacy.android.domain.usecase.login.FetchNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -108,8 +107,11 @@ class FetchNodesViewModel @AssistedInject constructor(
 
     private fun performFetchNodesOrLogin() = runCatching {
         viewModelScope.launch {
-            // this case mean user just logged in by account so we only need to fetch nodes
-            if (args.refreshEvent == RefreshEvent.Refresh) {
+            if (args.refreshEvent == RefreshEvent.ChangeEnvironment) {
+                Timber.d("Environment changed")
+                fastLogin(session = args.session, refreshChatUrl = true)
+            } else if (args.refreshEvent == RefreshEvent.Refresh) {
+                Timber.d("Refresh event - fetch nodes")
                 fetchNodes(isRefreshSession = true)
             } else if (isMegaApiLoggedInUseCase()) {
                 Timber.d("User is logged in, fetch nodes")
@@ -188,9 +190,9 @@ class FetchNodesViewModel @AssistedInject constructor(
             runCatching {
                 fastLoginUseCase(
                     session,
-                    refreshChatUrl,
-                    DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
-                ).collectLatest { status -> status.checkStatus(isFastLogin = true) }
+                    refreshChatUrl
+                ) { MegaApplication.getInstance()::disableMegaChatApi }
+                    .collectLatest { status -> status.checkStatus(isFastLogin = true) }
             }.onFailure { exception ->
                 if (exception !is LoginException) return@onFailure
                 exception.loginFailed()

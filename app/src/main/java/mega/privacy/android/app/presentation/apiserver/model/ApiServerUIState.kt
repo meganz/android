@@ -11,4 +11,5 @@ import mega.privacy.android.domain.entity.apiserver.ApiServer
 data class ApiServerUIState(
     val currentApiServer: ApiServer? = null,
     val newApiServer: ApiServer? = null,
+    val isSingleActivityEnabled: Boolean = false,
 )

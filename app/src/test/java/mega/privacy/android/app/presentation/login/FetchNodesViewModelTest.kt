@@ -44,6 +44,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -498,36 +499,44 @@ class FetchNodesViewModelTest {
     }
 
     @Test
-    fun `test that refresh event ChangeEnvironment triggers normal fetch nodes flow`() = runTest {
-        // Setup mocks
-        whenever(isConnectedToInternetUseCase()).thenReturn(true)
-        whenever(loginMutex.isLocked).thenReturn(false)
-        whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
-        whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
-        wheneverBlocking { isMegaApiLoggedInUseCase() }.thenReturn(true)
-        whenever(fetchNodesUseCase()).thenReturn(emptyFlow())
+    fun `test that refresh event ChangeEnvironment triggers fast login with refreshChatUrl true`() =
+        runTest {
+            // Setup mocks
+            whenever(isConnectedToInternetUseCase()).thenReturn(true)
+            whenever(loginMutex.isLocked).thenReturn(false)
+            whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
+            whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
+            wheneverBlocking { isMegaApiLoggedInUseCase() }.thenReturn(true)
+            val loginStatusFlow = MutableStateFlow<LoginStatus>(LoginStatus.LoginStarted)
+            whenever(fastLoginUseCase.invoke(any(), any(), any())).thenReturn(loginStatusFlow)
+            whenever(fetchNodesUseCase()).thenReturn(emptyFlow())
 
-        initViewModel(
-            args = FetchNodesViewModel.Args(
-                session = "test-session",
-                isFromLogin = false,
-                refreshEvent = RefreshEvent.ChangeEnvironment
+            initViewModel(
+                args = FetchNodesViewModel.Args(
+                    session = "test-session",
+                    isFromLogin = false,
+                    refreshEvent = RefreshEvent.ChangeEnvironment
+                )
             )
-        )
-        advanceUntilIdle()
+            advanceUntilIdle()
 
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.isFastLoginInProgress).isFalse()
-            assertThat(state.isFastLogin).isFalse()
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.isFastLoginInProgress).isTrue()
+                assertThat(state.isFastLogin).isTrue()
 
-            verify(fetchNodesUseCase).invoke()
-            verify(globalInitialiser).onPostLogin("test-session", false)
-            verify(fastLoginUseCase, never()).invoke(any(), any(), any())
+                verify(fastLoginUseCase).invoke(eq("test-session"), eq(true), any())
+                verify(fetchNodesUseCase, never()).invoke()
+                verify(globalInitialiser, never()).onPostLogin(any(), any())
 
-            cancelAndIgnoreRemainingEvents()
+                loginStatusFlow.emit(LoginStatus.LoginSucceed)
+                advanceUntilIdle()
+
+                verify(globalInitialiser).onPostLogin("test-session", true)
+
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
     fun `test that null refresh event triggers normal fetch nodes flow when logged in`() = runTest {
