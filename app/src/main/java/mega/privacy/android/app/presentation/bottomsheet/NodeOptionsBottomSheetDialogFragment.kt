@@ -979,7 +979,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
                         transformations(
                             buildList {
-                                if ((typedNode.isMarkedSensitive || typedNode.isSensitiveInherited) && !isBusinessAccountExpired) {
+                                if (!originShares && (typedNode.isMarkedSensitive || typedNode.isSensitiveInherited) && !isBusinessAccountExpired) {
                                     add(BlurTransformation(requireContext(), radius = 16f))
                                 }
                                 add(
