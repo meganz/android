@@ -26,7 +26,6 @@ import mega.privacy.android.app.menu.navigation.RubbishBinItem
 import mega.privacy.android.app.menu.navigation.StorageItem
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
-import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountDetail
@@ -51,6 +50,7 @@ import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.notifications.MonitorNotSeenUserAlertsCountUseCase
+import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -79,7 +79,7 @@ class MenuViewModelTest {
     private val monitorMyAvatarFile = mock<MonitorMyAvatarFile>()
     private val getMyAvatarColorUseCase = mock<GetMyAvatarColorUseCase>()
     private val getMyAvatarFileUseCase = mock<GetMyAvatarFileUseCase>()
-    private val accountNameMapper = mock<AccountNameMapper>()
+    private val accountTypeNameMapper = mock<AccountTypeNameMapper>()
     private val getStringFromStringResMapper = mock<GetStringFromStringResMapper>()
     private val fileSizeStringMapper = mock<FileSizeStringMapper>()
     private val getUserFullNameUseCase = mock<GetUserFullNameUseCase>()
@@ -113,7 +113,7 @@ class MenuViewModelTest {
             monitorMyAvatarFile,
             getMyAvatarColorUseCase,
             getMyAvatarFileUseCase,
-            accountNameMapper,
+            accountTypeNameMapper,
             getStringFromStringResMapper,
             fileSizeStringMapper,
             getUserFullNameUseCase,
@@ -307,7 +307,7 @@ class MenuViewModelTest {
             on { invoke(2000000L) }.thenReturn(mockRubbishString)
         }
 
-        accountNameMapper.stub {
+        accountTypeNameMapper.stub {
             on { invoke(AccountType.PRO_I) }.thenReturn(mockAccountTypeName)
         }
 
@@ -378,7 +378,7 @@ class MenuViewModelTest {
                 on { invoke(50L) }.thenReturn(mockRubbishString)
             }
 
-            accountNameMapper.stub {
+            accountTypeNameMapper.stub {
                 on { invoke(AccountType.FREE) }.thenReturn(mockAccountTypeName)
             }
 
@@ -400,7 +400,7 @@ class MenuViewModelTest {
                 verify(fileSizeStringMapper).invoke(100L)
                 verify(fileSizeStringMapper).invoke(200L)
                 verify(fileSizeStringMapper).invoke(50L)
-                verify(accountNameMapper).invoke(AccountType.FREE)
+                verify(accountTypeNameMapper).invoke(AccountType.FREE)
                 verify(getStringFromStringResMapper).invoke(mockAccountTypeName)
 
                 assertThat(state.myAccountItems).hasSize(3)
@@ -437,7 +437,7 @@ class MenuViewModelTest {
             on { invoke(1000000000L) }.thenReturn(mock1GBString)
         }
 
-        accountNameMapper.stub {
+        accountTypeNameMapper.stub {
             on { invoke(AccountType.FREE) }.thenReturn(mockAccountTypeName)
         }
 
@@ -461,7 +461,7 @@ class MenuViewModelTest {
             val rubbishBinItem = state.myAccountItems[90]
 
             verify(fileSizeStringMapper, times(2)).invoke(0L)
-            verify(accountNameMapper).invoke(AccountType.FREE)
+            verify(accountTypeNameMapper).invoke(AccountType.FREE)
             verify(getStringFromStringResMapper).invoke(mockAccountTypeName)
 
             assertThat(state.myAccountItems).hasSize(3)
@@ -580,7 +580,7 @@ class MenuViewModelTest {
             monitorMyAvatarFile = monitorMyAvatarFile,
             getMyAvatarColorUseCase = getMyAvatarColorUseCase,
             getMyAvatarFileUseCase = getMyAvatarFileUseCase,
-            accountNameMapper = accountNameMapper,
+            accountTypeNameMapper = accountTypeNameMapper,
             getStringFromStringResMapper = getStringFromStringResMapper,
             fileSizeStringMapper = fileSizeStringMapper,
             getUserFullNameUseCase = getUserFullNameUseCase,

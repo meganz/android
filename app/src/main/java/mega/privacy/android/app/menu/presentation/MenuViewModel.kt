@@ -23,7 +23,6 @@ import mega.privacy.android.app.menu.navigation.RubbishBinItem
 import mega.privacy.android.app.menu.navigation.StorageItem
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
-import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -41,6 +40,7 @@ import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.notifications.MonitorNotSeenUserAlertsCountUseCase
+import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import timber.log.Timber
 import javax.inject.Inject
@@ -53,7 +53,7 @@ class MenuViewModel @Inject constructor(
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
-    private val accountNameMapper: AccountNameMapper,
+    private val accountTypeNameMapper: AccountTypeNameMapper,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
     private val fileSizeStringMapper: FileSizeStringMapper,
     private val getUserFullNameUseCase: GetUserFullNameUseCase,
@@ -263,7 +263,7 @@ class MenuViewModel @Inject constructor(
                     val totalStorage = accountDetail.storageDetail?.totalStorage ?: 0
                     val usedRubbish = accountDetail.storageDetail?.usedRubbish ?: 0
                     val accountType = accountDetail.levelDetail?.accountType ?: AccountType.FREE
-                    val accountTypeName = accountNameMapper(accountType)
+                    val accountTypeName = accountTypeNameMapper(accountType)
                     storageSubtitleFlow.value =
                         "${fileSizeStringMapper(usedStorage)}/${fileSizeStringMapper(totalStorage)}"
                     currentPlanSubtitleFlow.value = getStringFromStringResMapper(accountTypeName)

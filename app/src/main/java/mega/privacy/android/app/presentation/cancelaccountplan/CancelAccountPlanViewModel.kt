@@ -11,7 +11,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.cancelaccountplan.model.CancelAccountPlanUiState
 import mega.privacy.android.app.presentation.cancelaccountplan.model.UICancellationSurveyAnswer
 import mega.privacy.android.app.presentation.cancelaccountplan.model.mapper.CancellationInstructionsTypeMapper
-import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
@@ -20,13 +19,14 @@ import mega.privacy.android.domain.usecase.account.CancelSubscriptionWithSurveyA
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.billing.GetAppSubscriptionOptionsUseCase
 import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
+import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
  * Cancel Account Plan view model
  *
- * @param accountNameMapper mapper to map account type to account name
+ * @param accountTypeNameMapper mapper to map account type to account name
  * @param formattedSizeMapper mapper to format size
  * @param getCurrentPaymentUseCase use case to get the current payment method
  * @param cancellationInstructionsTypeMapper mapper to map cancellation instructions type to payment method
@@ -38,7 +38,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class CancelAccountPlanViewModel @Inject constructor(
-    private val accountNameMapper: AccountNameMapper,
+    private val accountTypeNameMapper: AccountTypeNameMapper,
     private val formattedSizeMapper: FormattedSizeMapper,
     private val getCurrentPaymentUseCase: GetCurrentPaymentUseCase,
     private val cancellationInstructionsTypeMapper: CancellationInstructionsTypeMapper,
@@ -95,7 +95,7 @@ class CancelAccountPlanViewModel @Inject constructor(
                                     accountType = accountType,
                                     sku = planDetails?.sku,
                                     rewindDaysQuota = planRewindDaysQuota,
-                                    accountNameRes = accountNameMapper(accountType),
+                                    accountNameRes = accountTypeNameMapper(accountType),
                                     isLoading = false,
                                     cancellationReasons = getShuffleCancellationReasons(it.cancellationReasons)
                                 )

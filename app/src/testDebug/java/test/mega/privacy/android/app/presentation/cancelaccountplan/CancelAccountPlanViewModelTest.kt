@@ -9,7 +9,6 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.cancelaccountplan.model.CancellationInstructionsType
 import mega.privacy.android.app.presentation.cancelaccountplan.model.UICancellationSurveyAnswer
 import mega.privacy.android.app.presentation.cancelaccountplan.model.mapper.CancellationInstructionsTypeMapper
-import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.core.formatter.model.FormattedSize
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -27,6 +26,7 @@ import mega.privacy.android.domain.usecase.account.CancelSubscriptionWithSurveyA
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.billing.GetAppSubscriptionOptionsUseCase
 import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
+import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -52,7 +52,7 @@ internal class CancelAccountPlanViewModelTest {
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val getAppSubscriptionOptionsUseCase = mock<GetAppSubscriptionOptionsUseCase>()
     private val formattedSizeMapper = mock<FormattedSizeMapper>()
-    private val accountNameMapper = mock<AccountNameMapper>()
+    private val accountTypeNameMapper = mock<AccountTypeNameMapper>()
     private val accountDetailFlow = MutableStateFlow(AccountDetail())
     private val cancelSubscriptionWithSurveyAnswersUseCase =
         mock<CancelSubscriptionWithSurveyAnswersUseCase>()
@@ -108,7 +108,7 @@ internal class CancelAccountPlanViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getAppSubscriptionOptionsUseCase = getAppSubscriptionOptionsUseCase,
             formattedSizeMapper = formattedSizeMapper,
-            accountNameMapper = accountNameMapper,
+            accountTypeNameMapper = accountTypeNameMapper,
             cancelSubscriptionWithSurveyAnswersUseCase = cancelSubscriptionWithSurveyAnswersUseCase,
         )
     }
@@ -121,7 +121,7 @@ internal class CancelAccountPlanViewModelTest {
             cancellationInstructionsTypeMapper,
             getAppSubscriptionOptionsUseCase,
             formattedSizeMapper,
-            accountNameMapper,
+            accountTypeNameMapper,
             cancelSubscriptionWithSurveyAnswersUseCase,
         )
     }
@@ -165,7 +165,7 @@ internal class CancelAccountPlanViewModelTest {
                     size = "50"
                 )
             )
-            whenever(accountNameMapper(any())).thenReturn(45)
+            whenever(accountTypeNameMapper(any())).thenReturn(45)
             whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
 
             initViewModel()
@@ -243,7 +243,7 @@ internal class CancelAccountPlanViewModelTest {
                 size = "50"
             )
         )
-        whenever(accountNameMapper(any())).thenReturn(45)
+        whenever(accountTypeNameMapper(any())).thenReturn(45)
 
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
 
@@ -282,7 +282,7 @@ internal class CancelAccountPlanViewModelTest {
             CancellationInstructionsType.WebClient
         )
         whenever(formattedSizeMapper(size = storage)).thenReturn(planStorage)
-        whenever(accountNameMapper(any())).thenReturn(45)
+        whenever(accountTypeNameMapper(any())).thenReturn(45)
 
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
 
@@ -317,7 +317,7 @@ internal class CancelAccountPlanViewModelTest {
             CancellationInstructionsType.WebClient
         )
         whenever(formattedSizeMapper(size = transfer)).thenReturn(planTransfer)
-        whenever(accountNameMapper(any())).thenReturn(45)
+        whenever(accountTypeNameMapper(any())).thenReturn(45)
 
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
 
@@ -352,7 +352,7 @@ internal class CancelAccountPlanViewModelTest {
                 size = "50"
             )
         )
-        whenever(accountNameMapper(any())).thenReturn(45)
+        whenever(accountTypeNameMapper(any())).thenReturn(45)
 
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
 

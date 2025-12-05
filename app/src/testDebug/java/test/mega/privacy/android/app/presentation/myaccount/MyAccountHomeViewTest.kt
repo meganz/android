@@ -23,7 +23,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.fromId
 import mega.privacy.android.app.fromPluralId
 import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
-import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
 import mega.privacy.android.app.presentation.myaccount.model.MyAccountHomeUIState
 import mega.privacy.android.app.presentation.myaccount.view.AccountTypeSection
 import mega.privacy.android.app.presentation.myaccount.view.Constants.ACCOUNT_TYPE_SECTION
@@ -63,6 +62,7 @@ import mega.privacy.android.domain.entity.AccountType.PRO_LITE
 import mega.privacy.android.domain.entity.AccountType.STARTER
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
@@ -84,7 +84,7 @@ class MyAccountHomeViewTest {
         navController.navigatorProvider.addNavigator(ComposeNavigator())
     }
 
-    private val defaultAccountNameResource = AccountNameMapper()(null)
+    private val defaultAccountNameResource = AccountTypeNameMapper()(null)
 
     private fun initMyAccountWithDefaults(
         uiState: MyAccountHomeUIState = MyAccountHomeUIState(
@@ -606,7 +606,7 @@ class MyAccountHomeViewTest {
     ) {
         composeTestRule.setContent {
             AccountTypeSection(
-                accountDescription = AccountNameMapper()(accountType),
+                accountDescription = AccountTypeNameMapper()(accountType),
                 showUpgradeButton = true,
                 onButtonClickListener = {}
             )

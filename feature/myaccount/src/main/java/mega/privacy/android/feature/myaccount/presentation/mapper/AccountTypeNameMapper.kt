@@ -1,10 +1,13 @@
-package mega.privacy.android.app.presentation.myaccount.mapper
+package mega.privacy.android.feature.myaccount.presentation.mapper
 
-import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.feature.myaccount.R
 import javax.inject.Inject
 
-class AccountNameMapper @Inject constructor() {
+/**
+ * Mapper to get account type name resource ID
+ */
+class AccountTypeNameMapper @Inject constructor() {
 
     /**
      * Get the account description based on the account type
@@ -24,5 +27,4 @@ class AccountNameMapper @Inject constructor() {
             AccountType.ESSENTIAL -> mega.privacy.android.shared.resources.R.string.general_low_tier_plan_essential_label
             else -> R.string.recovering_info
         }
-
 }

@@ -13,7 +13,6 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.TEST_USER_ACCOUNT
 import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
-import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SubscriptionStatus
@@ -41,6 +40,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
 import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatusUseCase
+import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -132,7 +132,7 @@ class MyAccountHomeViewModelTest {
             getUserFullNameUseCase,
             getMyAvatarFileUseCase,
             getUsedTransferStatusUseCase,
-            accountNameMapper = AccountNameMapper(),
+            accountTypeNameMapper = AccountTypeNameMapper(),
             avatarContentMapper,
             isAchievementsEnabledUseCase
         )
