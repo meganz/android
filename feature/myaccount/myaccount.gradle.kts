@@ -28,6 +28,7 @@ dependencies {
     implementation(project(":shared:original-core-ui"))
     implementation(project(":core:ui-components:shared-components"))
 
+    implementation(androidx.bundles.compose.bom)
     implementation(platform(androidx.compose.bom))
     implementation(androidx.hilt.navigation)
     implementation(androidx.material3.adaptive.navigation.suite)
@@ -43,6 +44,5 @@ dependencies {
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.bundles.junit5.api)
     testImplementation(testlib.bundles.ui.test)
-    debugImplementation(androidx.compose.ui.tooling)
     testRuntimeOnly(testlib.junit.jupiter.engine)
 }
