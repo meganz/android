@@ -13,6 +13,6 @@ sealed interface PhotosNodeContentType {
     }
 
     data class PhotoNodeItem(val node: PhotoNodeUiState) : PhotosNodeContentType {
-        override val key: Int = node.hashCode()
+        override val key: Int = node.photo.hashCode()
     }
 }

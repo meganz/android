@@ -46,6 +46,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
+import kotlinx.collections.immutable.ImmutableList
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.chip.MegaChip
@@ -59,6 +60,7 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
+import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
 import mega.privacy.android.feature.photos.presentation.component.PhotosNodeGridView
@@ -67,6 +69,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.component.Photo
 import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosSkeletonView
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineSortDialog
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
+import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
 import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
@@ -115,7 +118,7 @@ internal fun TimelineTabRoute(
         onSortDialogDismissed = onSortDialogDismissed,
         onSortOptionChange = onSortOptionChange,
         onPhotoClick = onPhotoClick,
-        onPhotoSelected = onPhotoSelected
+        onPhotoSelected = onPhotoSelected,
     )
 }
 
@@ -156,12 +159,19 @@ internal fun TimelineTabScreen(
     val shouldShowTimePeriodSelector by remember(selectedTimePeriod) {
         derivedStateOf {
             if (selectedTimePeriod == PhotoModificationTimePeriod.All) {
-                (!isGridScrollingDown && !isGridScrolledToEnd) || isGridScrolledToTop
-            } else (!isListScrollingDown && !isListScrolledToEnd) || isListScrolledToTop
+                !lazyGridState.isScrollInProgress || (!isGridScrollingDown && !isGridScrolledToEnd) || isGridScrolledToTop
+            } else !lazyListState.isScrollInProgress || (!isListScrollingDown && !isListScrolledToEnd) || isListScrolledToTop
         }
     }
+    var shouldScrollToIndex by remember { mutableIntStateOf(0) }
     val showEnableCUPage = mediaCameraUploadUiState.enableCameraUploadPageShowing
             && timelineFilterUiState.mediaSource != FilterMediaSource.CloudDrive
+
+    LaunchedEffect(shouldScrollToIndex) {
+        if (selectedTimePeriod == PhotoModificationTimePeriod.All) {
+            lazyGridState.scrollToItem(shouldScrollToIndex)
+        } else lazyListState.animateScrollToItem(shouldScrollToIndex)
+    }
 
     LaunchedEffect(mediaCameraUploadUiState.cameraUploadsMessage) {
         if (mediaCameraUploadUiState.cameraUploadsMessage.isNotEmpty()) {
@@ -259,7 +269,17 @@ internal fun TimelineTabScreen(
                 onPhotoTimePeriodSelected = { selectedTimePeriod = it },
                 onGridSizeChange = onGridSizeChange,
                 onPhotoClick = onPhotoClick,
-                onPhotoSelected = onPhotoSelected
+                onPhotoSelected = onPhotoSelected,
+                onPhotosNodeListCardClick = { photo ->
+                    selectedTimePeriod =
+                        PhotoModificationTimePeriod.entries[selectedTimePeriod.ordinal + 1]
+                    shouldScrollToIndex = calculateScrollIndex(
+                        photo = photo,
+                        displayedPhotos = uiState.displayedPhotos,
+                        daysCardPhotos = uiState.daysCardPhotos,
+                        monthsCardPhotos = uiState.monthsCardPhotos,
+                    )
+                }
             )
         }
     }
@@ -320,6 +340,7 @@ private fun TimelineTabContent(
     onGridSizeChange: (value: TimelineGridSize) -> Unit,
     onPhotoClick: (node: PhotoNodeUiState) -> Unit,
     onPhotoSelected: (node: PhotoNodeUiState) -> Unit,
+    onPhotosNodeListCardClick: (photo: PhotosNodeListCard) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -349,7 +370,7 @@ private fun TimelineTabContent(
                     state = lazyListState,
                     contentPadding = PaddingValues(bottom = 50.dp),
                     photos = items,
-                    onClick = { }
+                    onClick = onPhotosNodeListCardClick
                 )
             }
         }
@@ -464,6 +485,36 @@ private fun LazyGridState.isScrolledToTop() = remember(this) {
 private fun LazyListState.isScrolledToTop() = remember(this) {
     derivedStateOf {
         firstVisibleItemIndex <= 1 && firstVisibleItemScrollOffset == 0
+    }
+}
+
+private fun calculateScrollIndex(
+    photo: PhotosNodeListCard,
+    displayedPhotos: ImmutableList<PhotosNodeContentType>,
+    daysCardPhotos: ImmutableList<PhotosNodeListCard>,
+    monthsCardPhotos: ImmutableList<PhotosNodeListCard>,
+): Int {
+    return when (photo) {
+        is PhotosNodeListCard.Years -> {
+            val photo = monthsCardPhotos.find {
+                it as PhotosNodeListCard.Months
+                it.photoItem.photo.modificationTime == photo.photoItem.photo.modificationTime
+            }
+            monthsCardPhotos.indexOf(photo)
+        }
+
+        is PhotosNodeListCard.Months -> {
+            val photo = daysCardPhotos.find {
+                it as PhotosNodeListCard.Days
+                it.photoItem.photo.modificationTime == photo.photoItem.photo.modificationTime
+            }
+            daysCardPhotos.indexOf(photo)
+        }
+
+        is PhotosNodeListCard.Days -> {
+            val photo = displayedPhotos.find { it.key == photo.photoItem.photo.hashCode() }
+            displayedPhotos.indexOf(photo)
+        }
     }
 }
 
