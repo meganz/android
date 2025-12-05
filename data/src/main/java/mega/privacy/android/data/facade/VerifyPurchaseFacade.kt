@@ -40,6 +40,12 @@ internal class VerifyPurchaseFacade @Inject constructor(
         return verify(key, signedData, signature)
     }
 
+    override fun generateObfuscatedNewAccountId(): String? = runCatching {
+        megaApi.myUserHandle
+    }.onFailure {
+        Timber.e(it, "Generate obfuscated new account Id failed.")
+    }.getOrNull()
+
     override fun generateObfuscatedAccountId(): String? = runCatching {
         val digest = MessageDigest.getInstance("SHA-256")
         val encodeHash = digest.digest(

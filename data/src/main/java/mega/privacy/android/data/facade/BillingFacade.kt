@@ -121,6 +121,9 @@ internal class BillingFacade @Inject constructor(
     private val obfuscatedAccountId: String?
         get() = verifyPurchaseGateway.generateObfuscatedAccountId()
 
+    private val newObfuscatedAccountId: String?
+        get() = verifyPurchaseGateway.generateObfuscatedNewAccountId()
+
     private suspend fun disconnect() {
         mutex.withLock {
             val client = billingClientRef.get()
@@ -149,7 +152,7 @@ internal class BillingFacade @Inject constructor(
                 throw ProductNotFoundException()
             }
         Timber.d("oldSku is:%s, new sku is:%s", oldSku, skuDetails)
-        Timber.d("Obfuscated account id is:%s", obfuscatedAccountId)
+        Timber.d("Obfuscated account id is:%s", newObfuscatedAccountId)
         // if user upgrade to higher level, it takes effect immediately
         // if user downgrading to the same level from yearly to monthly, it also takes effect immediately
         // otherwise, it will take effect after current subscription period
@@ -181,7 +184,7 @@ internal class BillingFacade @Inject constructor(
             )
             val purchaseParamsBuilder = BillingFlowParams.newBuilder()
                 .setProductDetailsParamsList(productDetailsParams)
-                .setObfuscatedAccountId(obfuscatedAccountId.orEmpty())
+                .setObfuscatedAccountId(newObfuscatedAccountId.orEmpty())
 
             // setSubscriptionUpdateParams asks that have to include the old sku information,
             // otherwise throw an exception
@@ -320,13 +323,16 @@ internal class BillingFacade @Inject constructor(
     ): List<MegaPurchase> = proceedPurchaseMutex.withLock {
         // Verify all available purchases
         var printPurchaseList =
-            "obfuscated account ID is $obfuscatedAccountId, purchaseList size is ${purchaseList.size}, "
+            "old obfuscated account ID is $obfuscatedAccountId," +
+                    " new obfuscated account ID is $newObfuscatedAccountId," +
+                    " purchaseList size is ${purchaseList.size}, "
         val validPurchases = purchaseList.filterIndexed { index, purchase ->
             printPurchaseList += "purchase $index has "
             printPurchaseList += "purchase obfuscated id ${purchase.accountIdentifiers?.obfuscatedAccountId}, "
             printPurchaseList += "purchase original json ${purchase.originalJson}, "
             printPurchaseList += "purchase signature ${purchase.signature} /n"
-            purchase.accountIdentifiers?.obfuscatedAccountId == obfuscatedAccountId
+            (purchase.accountIdentifiers?.obfuscatedAccountId == obfuscatedAccountId ||
+                    purchase.accountIdentifiers?.obfuscatedAccountId == newObfuscatedAccountId)
                     && verifyValidSignature(purchase.originalJson, purchase.signature)
         }
         Timber.d(printPurchaseList)
