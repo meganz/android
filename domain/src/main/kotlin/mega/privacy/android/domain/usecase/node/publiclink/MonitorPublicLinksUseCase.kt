@@ -20,6 +20,11 @@ import javax.inject.Inject
  * @property nodeRepository
  * @constructor Create empty Monitor public links use case
  */
+@Deprecated(
+    message = "This use case is deprecated. Please use MonitorLinksUseCase instead",
+    replaceWith = ReplaceWith("MonitorLinksUseCase"),
+    level = DeprecationLevel.WARNING,
+)
 class MonitorPublicLinksUseCase @Inject constructor(
     private val shareRepository: ShareRepository,
     private val getLinksSortOrderUseCase: GetLinksSortOrderUseCase,
