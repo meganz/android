@@ -186,7 +186,10 @@ internal fun CloudDriveContent(
     EventEffect(
         event = nodeActionState.downloadEvent,
         onConsumed = nodeOptionsActionViewModel::markDownloadEventConsumed,
-        action = onTransfer
+        action = { event ->
+            onTransfer(event)
+            onAction(CloudDriveAction.DeselectAllItems)
+        }
     )
 
     LaunchedEffect(uiState.selectedItemsCount) {
