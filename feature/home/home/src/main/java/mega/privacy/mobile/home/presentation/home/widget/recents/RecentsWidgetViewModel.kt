@@ -3,15 +3,21 @@ package mega.privacy.mobile.home.presentation.home.widget.recents
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
@@ -30,6 +36,7 @@ class RecentsWidgetViewModel @Inject constructor(
     private val monitorHideRecentActivityUseCase: MonitorHideRecentActivityUseCase,
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RecentsWidgetUiState())
@@ -40,6 +47,7 @@ class RecentsWidgetViewModel @Inject constructor(
         loadRecents()
         monitorHiddenNodesState()
         monitorHideRecentActivity()
+        monitorNodeUpdates()
     }
 
     private fun loadRecents() {
@@ -63,6 +71,24 @@ class RecentsWidgetViewModel @Inject constructor(
             }.onFailure { throwable ->
                 Timber.e(throwable, "Failed to load recent actions")
             }
+        }
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun monitorNodeUpdates() {
+        viewModelScope.launch {
+            // Wait till the initial loading is done
+            uiState
+                .map { it.isLoading }
+                .first { !it }
+
+            monitorNodeUpdatesUseCase()
+                .catch { Timber.e(it) }
+                .conflate()
+                .debounce(500L)
+                .collect {
+                    loadRecents()
+                }
         }
     }
 

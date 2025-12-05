@@ -3,13 +3,19 @@ package mega.privacy.mobile.home.presentation.home.widget.recents
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import kotlin.time.Duration.Companion.milliseconds
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.TextFileTypeInfo
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
@@ -27,6 +33,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -43,6 +50,7 @@ class RecentsWidgetViewModelTest {
     private val monitorHideRecentActivityUseCase = mock<MonitorHideRecentActivityUseCase>()
     private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
 
     private val bucket1 = createMockRecentActionBucket(
         timestamp = 1000L,
@@ -78,11 +86,13 @@ class RecentsWidgetViewModelTest {
             setHideRecentActivityUseCase,
             monitorHideRecentActivityUseCase,
             monitorHiddenNodesEnabledUseCase,
-            monitorShowHiddenItemsUseCase
+            monitorShowHiddenItemsUseCase,
+            monitorNodeUpdatesUseCase
         )
         whenever(monitorHideRecentActivityUseCase()).thenReturn(flowOf(false))
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(emptyFlow())
     }
 
     private fun initViewModel() {
@@ -93,6 +103,7 @@ class RecentsWidgetViewModelTest {
             monitorHideRecentActivityUseCase = monitorHideRecentActivityUseCase,
             monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
         )
     }
 
@@ -349,6 +360,115 @@ class RecentsWidgetViewModelTest {
         )
         assertThat(state.isLoading).isFalse()
     }
+
+    @Test
+    fun `test that monitorNodeUpdatesUseCase starts collecting only after isLoading becomes false`() =
+        runTest {
+            val nodeUpdatesFlow = MutableSharedFlow<NodeUpdate>()
+            whenever(monitorNodeUpdatesUseCase()).thenReturn(nodeUpdatesFlow)
+            whenever(getRecentActionsUseCase(any(), any())).thenReturn(emptyList())
+
+            initViewModel()
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isLoading).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            advanceUntilIdle()
+
+            nodeUpdatesFlow.emit(NodeUpdate(emptyMap()))
+            advanceUntilIdle()
+            advanceTimeBy(600.milliseconds)
+
+            verify(getRecentActionsUseCase, times(2))
+                .invoke(excludeSensitives = false, maxBucketCount = 4)
+        }
+
+    @Test
+    fun `test that loadRecents is called when node updates are emitted after loading completes`() =
+        runTest {
+            val nodeUpdatesFlow = MutableSharedFlow<NodeUpdate>()
+            whenever(monitorNodeUpdatesUseCase()).thenReturn(nodeUpdatesFlow)
+            whenever(getRecentActionsUseCase(any(), any())).thenReturn(emptyList())
+
+            initViewModel()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isLoading).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            advanceUntilIdle()
+            advanceTimeBy(100.milliseconds)
+
+            nodeUpdatesFlow.emit(NodeUpdate(emptyMap()))
+            advanceUntilIdle()
+            advanceTimeBy(600.milliseconds)
+
+            verify(getRecentActionsUseCase, times(2))
+                .invoke(excludeSensitives = false, maxBucketCount = 4)
+        }
+
+    @Test
+    fun `test that monitorNodeUpdatesUseCase does not trigger loadRecents when isLoading is true`() =
+        runTest {
+            val nodeUpdatesFlow = MutableSharedFlow<NodeUpdate>()
+            whenever(monitorNodeUpdatesUseCase()).thenReturn(nodeUpdatesFlow)
+            whenever(getRecentActionsUseCase(any(), any())).thenThrow(
+                RuntimeException("Test error")
+            )
+
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isLoading).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            nodeUpdatesFlow.emit(NodeUpdate(emptyMap()))
+            advanceUntilIdle()
+            advanceTimeBy(600.milliseconds)
+
+            verify(getRecentActionsUseCase, times(1))
+                .invoke(excludeSensitives = false, maxBucketCount = 4)
+        }
+
+    @Test
+    fun `test that multiple node updates trigger loadRecents multiple times after loading completes`() =
+        runTest {
+            val nodeUpdatesFlow = MutableSharedFlow<NodeUpdate>()
+            whenever(monitorNodeUpdatesUseCase()).thenReturn(nodeUpdatesFlow)
+            whenever(getRecentActionsUseCase(any(), any())).thenReturn(emptyList())
+
+            initViewModel()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isLoading).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            advanceUntilIdle()
+
+            nodeUpdatesFlow.emit(NodeUpdate(emptyMap()))
+            advanceUntilIdle()
+            advanceTimeBy(600.milliseconds)
+
+            nodeUpdatesFlow.emit(NodeUpdate(emptyMap()))
+            advanceUntilIdle()
+            advanceTimeBy(600.milliseconds)
+
+            nodeUpdatesFlow.emit(NodeUpdate(emptyMap()))
+            advanceUntilIdle()
+            advanceTimeBy(600.milliseconds)
+
+            verify(getRecentActionsUseCase, times(4))
+                .invoke(excludeSensitives = false, maxBucketCount = 4)
+        }
 
     private fun createMockRecentActionBucket(
         timestamp: Long = 1234567890L,
