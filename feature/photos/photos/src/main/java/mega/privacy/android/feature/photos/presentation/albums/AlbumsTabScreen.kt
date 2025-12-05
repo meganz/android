@@ -19,6 +19,7 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import mega.android.core.ui.model.HighlightedText
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.components.AlbumGridItem
@@ -111,7 +112,7 @@ fun AlbumsTabScreen(
                     is DownloadPhotoResult.Success -> result.thumbnailFilePath
                     else -> null
                 },
-                title = album.title,
+                title = HighlightedText(album.title),
                 placeholder = placeholder,
                 errorPlaceholder = placeholder
             )

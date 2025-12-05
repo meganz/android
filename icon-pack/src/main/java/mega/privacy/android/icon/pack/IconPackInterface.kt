@@ -170,6 +170,7 @@ interface IconPackInterface {
                 val Info: ImageVector
                 val Key02: ImageVector
                 val Link01: ImageVector
+                val Link02: ImageVector
                 val LinkOff01: ImageVector
                 val LoaderGrad: ImageVector
                 val Lock: ImageVector

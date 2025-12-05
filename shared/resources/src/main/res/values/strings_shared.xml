@@ -1929,4 +1929,6 @@
     <string name="general_invalid_link">Invalid link, please ask for a new valid link</string>
     <!-- Text of the dialog shown when you want to join a group call and you're already in another call-->
     <string name="can_only_join_one_call_error_message">To join this call you have to end your current call.</string>
+    <!-- Placeholder of the Search Bar -->
+    <string name="search_bar_placeholder_text">Search&#8230;</string>
 </resources>
