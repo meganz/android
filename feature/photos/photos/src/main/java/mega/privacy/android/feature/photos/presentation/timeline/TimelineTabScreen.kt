@@ -58,6 +58,7 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.model.FilterMediaSource
+import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
 import mega.privacy.android.feature.photos.presentation.component.PhotosNodeGridView
@@ -85,7 +86,10 @@ internal fun TimelineTabRoute(
     onSortDialogDismissed: () -> Unit,
     onSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
     resetCUButtonAndProgress: () -> Unit,
+    onPhotoClick: (node: PhotoNodeUiState) -> Unit,
+    onPhotoSelected: (node: PhotoNodeUiState) -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     // Follow the same behavior as the existing code. We can improve this in phase 2.
     LifecycleResumeEffect(Unit) {
@@ -95,6 +99,7 @@ internal fun TimelineTabRoute(
 
     TimelineTabScreen(
         modifier = modifier,
+        contentPadding = contentPadding,
         uiState = uiState,
         timelineFilterUiState = timelineFilterUiState,
         mediaCameraUploadUiState = mediaCameraUploadUiState,
@@ -109,6 +114,8 @@ internal fun TimelineTabRoute(
         onGridSizeChange = onGridSizeChange,
         onSortDialogDismissed = onSortDialogDismissed,
         onSortOptionChange = onSortOptionChange,
+        onPhotoClick = onPhotoClick,
+        onPhotoSelected = onPhotoSelected
     )
 }
 
@@ -128,7 +135,10 @@ internal fun TimelineTabScreen(
     onGridSizeChange: (value: TimelineGridSize) -> Unit,
     onSortDialogDismissed: () -> Unit,
     onSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
+    onPhotoClick: (node: PhotoNodeUiState) -> Unit,
+    onPhotoSelected: (node: PhotoNodeUiState) -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     val context = LocalContext.current
     val resource = LocalResources.current
@@ -240,6 +250,7 @@ internal fun TimelineTabScreen(
         else -> {
             TimelineTabContent(
                 modifier = modifier,
+                contentPadding = contentPadding,
                 uiState = uiState,
                 lazyGridState = lazyGridState,
                 lazyListState = lazyListState,
@@ -247,6 +258,8 @@ internal fun TimelineTabScreen(
                 shouldShowTimePeriodSelector = shouldShowTimePeriodSelector,
                 onPhotoTimePeriodSelected = { selectedTimePeriod = it },
                 onGridSizeChange = onGridSizeChange,
+                onPhotoClick = onPhotoClick,
+                onPhotoSelected = onPhotoSelected
             )
         }
     }
@@ -305,7 +318,10 @@ private fun TimelineTabContent(
     shouldShowTimePeriodSelector: Boolean,
     onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
     onGridSizeChange: (value: TimelineGridSize) -> Unit,
+    onPhotoClick: (node: PhotoNodeUiState) -> Unit,
+    onPhotoSelected: (node: PhotoNodeUiState) -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     Box(modifier = modifier) {
         when (selectedTimePeriod) {
@@ -313,12 +329,12 @@ private fun TimelineTabContent(
                 PhotosNodeGridView(
                     modifier = Modifier.fillMaxSize(),
                     lazyGridState = lazyGridState,
-                    contentPadding = PaddingValues(top = 8.dp),
+                    contentPadding = contentPadding,
                     items = uiState.displayedPhotos,
                     gridSize = uiState.gridSize,
                     onGridSizeChange = onGridSizeChange,
-                    onClick = { },
-                    onLongClick = { },
+                    onClick = onPhotoClick,
+                    onLongClick = onPhotoSelected,
                 )
             }
 
@@ -471,6 +487,8 @@ private fun TimelineTabScreenPreview() {
             onGridSizeChange = {},
             onSortDialogDismissed = {},
             onSortOptionChange = {},
+            onPhotoClick = {},
+            onPhotoSelected = {}
         )
     }
 }

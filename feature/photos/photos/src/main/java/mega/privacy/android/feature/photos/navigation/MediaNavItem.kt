@@ -26,6 +26,7 @@ class MediaNavItem : MainNavItem {
                 setNavigationItemVisibility = navigationController::showNavigation,
                 photoSelectionResultFlow = navigationHandler::monitorResult,
                 timelineAddToAlbumResultFlow = navigationHandler::monitorResult,
+                onTransfer = transferHandler::setTransferEvent,
             )
         }
     override val icon: ImageVector = IconPack.Medium.Thin.Outline.Image01

@@ -26,5 +26,11 @@ enum class FilterMediaSource(@StringRes val nameResId: Int) {
             CloudDrive -> TimelinePreferencesJSON.JSON_VAL_LOCATION_CLOUD_DRIVE.value
             CameraUpload -> TimelinePreferencesJSON.JSON_VAL_LOCATION_CAMERA_UPLOAD.value
         }
+
+        fun FilterMediaSource.toLegacyPhotosSource() = when (this) {
+            AllPhotos -> TimelinePhotosSource.ALL_PHOTOS
+            CloudDrive -> TimelinePhotosSource.CLOUD_DRIVE
+            CameraUpload -> TimelinePhotosSource.CAMERA_UPLOAD
+        }
     }
 }

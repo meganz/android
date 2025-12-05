@@ -7,18 +7,27 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoResult
 import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.entity.photos.TimelineSortedPhotosResult
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelinePhotosUseCase
@@ -33,10 +42,15 @@ import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotosNodeListCardMapper
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
+import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineSelectionMenuAction
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
+
+typealias isPaidAccount = Boolean
+typealias isBusinessAccountExpired = Boolean
+typealias AccountInfo = Pair<isPaidAccount, isBusinessAccountExpired>
 
 @HiltViewModel
 class TimelineTabViewModel @Inject constructor(
@@ -48,11 +62,14 @@ class TimelineTabViewModel @Inject constructor(
     private val getTimelineFilterPreferencesUseCase: GetTimelineFilterPreferencesUseCase,
     private val setTimelineFilterPreferencesUseCase: SetTimelineFilterPreferencesUseCase,
     private val timelineFilterUiStateMapper: TimelineFilterUiStateMapper,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : ViewModel() {
 
+    private var accountInfo: AccountInfo = Pair(first = false, second = false)
     private val gridSizeFlow = MutableStateFlow(TimelineGridSize.Default)
     private val sortOptionsFlow = MutableStateFlow(TimelineTabSortOptions.Newest)
-    private val selectedPhotoIdsFlow = MutableStateFlow<List<Long>>(emptyList())
+    private val selectedPhotoIdsFlow = MutableStateFlow<Set<Long>>(emptySet())
 
     private val actionFlow = MutableStateFlow(TimelineTabActionUiState())
     internal val actionUiState: StateFlow<TimelineTabActionUiState> by lazy {
@@ -80,10 +97,31 @@ class TimelineTabViewModel @Inject constructor(
     }
 
     internal val uiState: StateFlow<TimelineTabUiState> by lazy {
-        timelineTabUiState().asUiStateFlow(
-            scope = viewModelScope,
-            initialValue = TimelineTabUiState()
-        )
+        timelineTabUiState()
+            .onStart { monitorAccountDetail() }
+            .asUiStateFlow(
+                scope = viewModelScope,
+                initialValue = TimelineTabUiState()
+            )
+    }
+
+    private fun monitorAccountDetail() {
+        viewModelScope.launch {
+            monitorAccountDetailUseCase()
+                .catch { Timber.e(it, "Unable to monitor account detail") }
+                .collectLatest { accountDetail ->
+                    val accountType = accountDetail.levelDetail?.accountType
+                    val businessStatus =
+                        if (accountType?.isBusinessAccount == true) {
+                            runCatching { getBusinessStatusUseCase() }
+                                .getOrDefault(defaultValue = null)
+                        } else null
+                    accountInfo = Pair(
+                        first = accountType?.isPaid ?: false,
+                        second = businessStatus == BusinessAccountStatus.Expired
+                    )
+                }
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -138,7 +176,7 @@ class TimelineTabViewModel @Inject constructor(
         allPhotos: List<PhotoResult>,
         sortResult: TimelineSortedPhotosResult,
         gridSize: TimelineGridSize,
-        selectedPhotoIds: List<Long>,
+        selectedPhotoIds: Set<Long>,
         isPaginationEnabled: Boolean,
     ): TimelineTabUiState {
         val displayedPhotos = buildList {
@@ -152,7 +190,7 @@ class TimelineTabViewModel @Inject constructor(
                     add(
                         PhotosNodeContentType.HeaderItem(
                             time = photoResult.photo.modificationTime,
-                            shouldShowGridSizeSettings = index == 0
+                            shouldShowGridSizeSettings = index == 0 && selectedPhotoIds.isEmpty()
                         )
                     )
                 }
@@ -169,11 +207,13 @@ class TimelineTabViewModel @Inject constructor(
             }
         }.toImmutableList()
 
+        val selectedPhotoInTypedNodes = allPhotos
+            .filter { it.photo.id in selectedPhotoIds }
+            .mapNotNull { it.inTypedNode }
+            .toImmutableList()
         return TimelineTabUiState(
             isLoading = false,
-            allPhotos = allPhotos
-                .map { photoUiStateMapper(photo = it.photo) }
-                .toImmutableList(),
+            allPhotos = allPhotos.toImmutableList(),
             displayedPhotos = displayedPhotos,
             daysCardPhotos = photosNodeListCardMapper(photosDateResults = sortResult.photosInDay),
             monthsCardPhotos = photosNodeListCardMapper(photosDateResults = sortResult.photosInMonth),
@@ -181,7 +221,8 @@ class TimelineTabViewModel @Inject constructor(
             gridSize = gridSize,
             selectedPhotoCount = selectedPhotoIds.size,
             currentSort = sortOptionsFlow.value,
-            isPaginationEnabled = isPaginationEnabled
+            isPaginationEnabled = isPaginationEnabled,
+            selectedPhotosInTypedNode = selectedPhotoInTypedNodes
         )
     }
 
@@ -260,11 +301,15 @@ class TimelineTabViewModel @Inject constructor(
     }
 
     private fun disableSortToolbarMenuAction() {
-        actionFlow.update { it.copy(enableSort = false) }
+        actionFlow.update {
+            it.copy(normalModeItem = it.normalModeItem.copy(enableSort = false))
+        }
     }
 
     private fun enableSortToolbarMenuAction() {
-        actionFlow.update { it.copy(enableSort = true) }
+        actionFlow.update {
+            it.copy(normalModeItem = it.normalModeItem.copy(enableSort = true))
+        }
     }
 
     internal fun onFilterChange(request: TimelineFilterRequest) {
@@ -281,6 +326,107 @@ class TimelineTabViewModel @Inject constructor(
                 selectedFilterFlow.update { newPreferences }
             }.onFailure { exception ->
                 Timber.e(exception)
+            }
+        }
+    }
+
+    internal fun onPhotoSelected(node: PhotoNodeUiState) {
+        if (node.photo.id in selectedPhotoIdsFlow.value) {
+            selectedPhotoIdsFlow.update {
+                it.toMutableSet().apply {
+                    remove(node.photo.id)
+                }
+            }
+        } else {
+            selectedPhotoIdsFlow.update {
+                it.toMutableSet().apply {
+                    add(node.photo.id)
+                }
+            }
+        }
+
+        updateSelectionModeActions()
+    }
+
+    internal fun onSelectAllPhotos() {
+        val notAddedIds = uiState.value.displayedPhotos
+            .filterIsInstance<PhotosNodeContentType.PhotoNodeItem>()
+            .filter { it.node.photo.id !in selectedPhotoIdsFlow.value }
+            .map { it.node.photo.id }
+
+        if (notAddedIds.isEmpty()) return
+
+        selectedPhotoIdsFlow.update {
+            it.toMutableSet().apply {
+                addAll(notAddedIds)
+            }
+        }
+
+        updateSelectionModeActions()
+    }
+
+    internal fun onDeselectAllPhotos() {
+        if (selectedPhotoIdsFlow.value.isEmpty()) return
+        selectedPhotoIdsFlow.update { setOf() }
+        updateSelectionModeActions()
+    }
+
+    private fun updateSelectionModeActions() {
+        if (selectedPhotoIdsFlow.value.isEmpty()) return
+
+        viewModelScope.launch {
+            val bottomBarActions = buildList {
+                add(TimelineSelectionMenuAction.Download)
+                add(TimelineSelectionMenuAction.ShareLink)
+                add(TimelineSelectionMenuAction.SendToChat)
+                add(TimelineSelectionMenuAction.Share)
+                add(TimelineSelectionMenuAction.MoveToRubbishBin)
+                add(TimelineSelectionMenuAction.More)
+            }
+
+            val bottomSheetActions = buildList {
+                val selectedNodes = uiState.value.allPhotos.filter {
+                    it.photo.id in selectedPhotoIdsFlow.value
+                }
+                val shouldShowRemoveLink =
+                    selectedPhotoIdsFlow.value.size == 1 && uiState.value.selectedPhotosInTypedNode.firstOrNull()?.exportedData != null
+                if (shouldShowRemoveLink) {
+                    add(TimelineSelectionMenuAction.RemoveLink)
+                }
+
+                val includeSensitiveInheritedNode = selectedNodes.any {
+                    it.photo.isSensitiveInherited
+                }
+                val hasNonSensitiveNode = selectedNodes.any { !it.isMarkedSensitive }
+                val (isPaid, isBusinessAccountExpired) = accountInfo
+                val isNodeHidden =
+                    isPaid && !isBusinessAccountExpired && !hasNonSensitiveNode && !includeSensitiveInheritedNode
+                if (isNodeHidden) {
+                    add(TimelineSelectionMenuAction.Unhide)
+                } else {
+                    add(TimelineSelectionMenuAction.Hide)
+                }
+
+                add(TimelineSelectionMenuAction.Move)
+                add(TimelineSelectionMenuAction.Copy)
+
+                val isAbleToBeAddedToAlbum = uiState.value.selectedPhotosInTypedNode
+                    .filter { node ->
+                        val type = (node as? FileNode)?.type
+                        type is ImageFileTypeInfo || type is VideoFileTypeInfo
+                    }.size == selectedNodes.size
+                if (isAbleToBeAddedToAlbum) {
+                    add(TimelineSelectionMenuAction.AddToAlbum)
+                }
+            }
+
+            actionFlow.update {
+                it.copy(
+                    selectionModeItem = TimelineTabSelectionModeActionUiState(
+                        bottomBarActions = bottomBarActions.toImmutableList(),
+                        bottomSheetActions = bottomSheetActions.toImmutableList()
+                    )
+                )
             }
         }
     }

@@ -7,6 +7,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
 import org.junit.Rule
@@ -64,6 +65,8 @@ class TimelineTabScreenTest {
         onGridSizeChange: (value: TimelineGridSize) -> Unit = {},
         onSortDialogDismissed: () -> Unit = {},
         onSortOptionChange: (value: TimelineTabSortOptions) -> Unit = {},
+        onPhotoClick: (node: PhotoNodeUiState) -> Unit = {},
+        onPhotoSelected: (node: PhotoNodeUiState) -> Unit = {},
     ) {
         setContent {
             TimelineTabScreen(
@@ -80,7 +83,9 @@ class TimelineTabScreenTest {
                 setEnableCUPage = setEnableCUPage,
                 onGridSizeChange = onGridSizeChange,
                 onSortDialogDismissed = onSortDialogDismissed,
-                onSortOptionChange = onSortOptionChange
+                onSortOptionChange = onSortOptionChange,
+                onPhotoClick = onPhotoClick,
+                onPhotoSelected = onPhotoSelected
             )
         }
     }

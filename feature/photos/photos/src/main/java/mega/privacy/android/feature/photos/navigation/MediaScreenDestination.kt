@@ -27,6 +27,7 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
     setNavigationItemVisibility: (Boolean) -> Unit,
     photoSelectionResultFlow: (String) -> Flow<Long?>,
     timelineAddToAlbumResultFlow: (String) -> Flow<String?>,
+    onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
     entry<MediaMainNavKey> {
         val snackBarEventQueue = rememberSnackBarQueue()
@@ -56,9 +57,13 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
         }
 
         MediaMainRoute(
+            navigationHandler = navigationHandler,
             navigateToAlbumContent = navigationHandler::navigate,
             navigateToLegacyPhotoSelection = navigationHandler::navigate,
-            setNavigationItemVisibility = setNavigationItemVisibility
+            setNavigationItemVisibility = setNavigationItemVisibility,
+            onNavigateToTimelinePhotoPreview = navigationHandler::navigate,
+            onTransfer = onTransfer,
+            onNavigateToAddToAlbum = navigationHandler::navigate
         )
     }
 }
