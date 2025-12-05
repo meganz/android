@@ -4,10 +4,6 @@
     android:installLocation="internalOnly">
 
     <application>
-        <activity
-            android:name=".HiltTestActivity"
-            android:exported="false" />
-
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
