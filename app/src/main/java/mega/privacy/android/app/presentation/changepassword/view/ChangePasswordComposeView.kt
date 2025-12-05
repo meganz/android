@@ -1,10 +1,10 @@
 package mega.privacy.android.app.presentation.changepassword.view
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,6 +52,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -76,12 +77,14 @@ import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
 import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.PasswordTextField
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava
 
 internal object Constants {
@@ -506,6 +509,62 @@ fun ChangePasswordActionButtonGroup(
                 backgroundColor = MaterialTheme.colors.secondary.copy(buttonAlpha),
                 contentColor = MaterialTheme.colors.surface
             )
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun ChangePasswordViewPreview() {
+    OriginalTheme(isSystemInDarkTheme()) {
+        ChangePasswordView(
+            uiState = ChangePasswordUIState(
+                isConnectedToNetwork = true,
+                isResetPasswordMode = false,
+                passwordStrength = PasswordStrength.MEDIUM
+            ),
+            onSnackBarShown = {},
+            onPasswordTextChanged = {},
+            onConfirmPasswordTextChanged = {},
+            onTnCLinkClickListener = {},
+            onTriggerChangePassword = {},
+            onTriggerResetPassword = {},
+            onValidatePassword = {},
+            onValidateOnSave = { _, _ -> },
+            onResetValidationState = {},
+            onAfterPasswordChanged = {},
+            onAfterPasswordReset = { _, _ -> },
+            onPromptedMultiFactorAuth = {},
+            onFinishActivity = {},
+            onShowAlert = {}
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun ResetPasswordViewPreview() {
+    OriginalTheme(isSystemInDarkTheme()) {
+        ChangePasswordView(
+            uiState = ChangePasswordUIState(
+                isConnectedToNetwork = true,
+                isResetPasswordMode = true,
+                passwordStrength = PasswordStrength.STRONG
+            ),
+            onSnackBarShown = {},
+            onPasswordTextChanged = {},
+            onConfirmPasswordTextChanged = {},
+            onTnCLinkClickListener = {},
+            onTriggerChangePassword = {},
+            onTriggerResetPassword = {},
+            onValidatePassword = {},
+            onValidateOnSave = { _, _ -> },
+            onResetValidationState = {},
+            onAfterPasswordChanged = {},
+            onAfterPasswordReset = { _, _ -> },
+            onPromptedMultiFactorAuth = {},
+            onFinishActivity = {},
+            onShowAlert = {}
         )
     }
 }

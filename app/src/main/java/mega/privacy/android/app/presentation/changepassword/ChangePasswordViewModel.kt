@@ -17,13 +17,15 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.ChangePasswordUseCase
-import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.IsCurrentPasswordUseCase
 import mega.privacy.android.domain.usecase.ResetPasswordUseCase
+import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -38,6 +40,7 @@ internal class ChangePasswordViewModel @Inject constructor(
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val isMultiFactorAuthEnabledUseCase: IsMultiFactorAuthEnabledUseCase,
     private val logoutUseCase: LogoutUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
     private var mJob: Job? = null
 
@@ -341,6 +344,14 @@ internal class ChangePasswordViewModel @Inject constructor(
         }.onFailure {
             Timber.d("Error on logout $it")
         }
+    }
+
+    suspend fun isFeatureFlagEnabled(flag: AppFeatures): Boolean {
+        return runCatching {
+            getFeatureFlagValueUseCase(flag)
+        }.onFailure {
+            Timber.e(it, "Error getting feature flag value for $flag")
+        }.getOrDefault(false)
     }
 
     companion object {

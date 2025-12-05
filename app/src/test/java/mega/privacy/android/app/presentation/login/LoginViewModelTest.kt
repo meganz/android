@@ -89,6 +89,7 @@ import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCas
 import mega.privacy.android.domain.usecase.transfers.ResumeTransfersForNotLoggedInInstanceUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.CheckIfTransfersShouldBePausedUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -256,8 +257,10 @@ internal class LoginViewModelTest {
         whenever(getFeatureFlagValueUseCase(any())).thenReturn(
             true
         )
+        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
         whenever(getSessionUseCase()).thenReturn(null)
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
+        whenever(monitorEphemeralCredentialsUseCase()).thenReturn(emptyFlow())
         whenever(rootNodeExistsUseCase()).thenReturn(false)
         whenever(hasPreferencesUseCase()).thenReturn(false)
         whenever(hasCameraSyncEnabledUseCase()).thenReturn(false)
@@ -267,6 +270,8 @@ internal class LoginViewModelTest {
         whenever(monitorThemeModeUseCase()).thenReturn(flowOf(ThemeMode.System))
         whenever(monitorMiscLoadedUseCase()).thenReturn(monitorMiscLoadedFlow)
         whenever(getDomainNameUseCase()).thenReturn("mega.foo")
+        whenever(savedStateHandle.get<Int>(any<String>())).thenReturn(null)
+        whenever(savedStateHandle.get<String>(any<String>())).thenReturn(null)
     }
 
     @AfterEach

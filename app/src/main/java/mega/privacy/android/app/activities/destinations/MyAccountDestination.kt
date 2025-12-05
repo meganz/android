@@ -18,7 +18,8 @@ fun EntryProviderScope<NavKey>.myAccount(removeDestination: () -> Unit) {
             MyAccountActivity.getIntent(
                 context = context,
                 action = key.action,
-                link = key.link?.toUri()
+                link = key.link?.toUri(),
+                resultCode = key.resultCode
             ).also { intent -> context.startActivity(intent) }
 
             // Immediately pop this destination from the back stack

@@ -241,18 +241,26 @@ class LoginViewModel @Inject constructor(
                 }
             }
 
-        val session = getSession()
-        val visibleFragment =
-            savedStateHandle.get<Int>(Constants.VISIBLE_FRAGMENT) ?: run {
-                if (session.isNullOrEmpty()) Constants.TOUR_FRAGMENT else Constants.LOGIN_FRAGMENT
+        if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
+            // default navigation already handled in PendingBackStackNavigationHandler
+            val visibleFragment = savedStateHandle.get<Int>(Constants.VISIBLE_FRAGMENT)
+            LoginScreen.entries.find { it.value == visibleFragment }?.let {
+                setPendingFragmentToShow(it)
             }
+        } else {
+            val visibleFragment =
+                savedStateHandle.get<Int>(Constants.VISIBLE_FRAGMENT) ?: run {
+                    val session = getSession()
+                    if (session.isNullOrEmpty()) Constants.TOUR_FRAGMENT else Constants.LOGIN_FRAGMENT
+                }
 
         savedStateHandle.get<String>(Constants.EMAIL)?.let { initialEmail ->
             _state.update { state -> state.copy(initialEmail = initialEmail) }
         }
 
-        setPendingFragmentToShow(LoginScreen.entries.find { it.value == visibleFragment }
-            ?: LoginScreen.LoginScreen)
+            setPendingFragmentToShow(LoginScreen.entries.find { it.value == visibleFragment }
+                ?: LoginScreen.LoginScreen)
+        }
     }
 
     fun onInitialEmailConsumed() {

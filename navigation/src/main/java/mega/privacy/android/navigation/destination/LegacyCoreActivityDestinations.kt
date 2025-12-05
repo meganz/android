@@ -17,7 +17,12 @@ import mega.privacy.android.navigation.payment.UpgradeAccountSource
 data object OverDiskQuotaPaywallWarningNavKey : NavKey
 
 @Serializable
-data class MyAccountNavKey(val action: String? = null, val link: String? = null) : NavKey
+@Parcelize
+data class MyAccountNavKey(
+    val action: String? = null,
+    val link: String? = null,
+    val resultCode: Int = -1
+) : NavKey, Parcelable
 
 @Serializable
 data object AchievementNavKey : NavKey
@@ -167,7 +172,7 @@ data class LegacyAlbumCoverSelectionNavKey(val albumId: Long) : NavKey {
 data class LegacyPhotoSelectionNavKey(
     val albumId: Long,
     val selectionMode: Int,
-    val captureResult: Boolean = true
+    val captureResult: Boolean = true,
 ) : NavKey {
     companion object Companion {
         const val RESULT = "extra_result"

@@ -443,7 +443,7 @@ class MegaActivity : ComponentActivity() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        private fun <T> getIntentWithExtraDestinations(
+        fun <T> getIntentWithExtraDestinations(
             context: Context,
             navKeys: List<T>,
         ) where T : NavKey, T : Parcelable = getIntent(context).apply {

@@ -100,11 +100,18 @@ internal class MyAccountActivity : PasscodeActivity(),
         private const val TYPE_CHANGE_EMAIL = 1
         private const val TYPE_CANCEL_ACCOUNT = 2
 
-        fun getIntent(context: Context, action: String?, link: Uri?): Intent {
-            val fileLinkIntent = Intent(context, MyAccountActivity::class.java)
-            fileLinkIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            fileLinkIntent.action = action
-            fileLinkIntent.data = link
+        fun getIntent(
+            context: Context,
+            action: String?,
+            link: Uri?,
+            resultCode: Int = -1,
+        ): Intent {
+            val fileLinkIntent = Intent(context, MyAccountActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                action?.let { setAction(it) }
+                data = link
+                putExtra(RESULT, resultCode)
+            }
             return fileLinkIntent
         }
     }

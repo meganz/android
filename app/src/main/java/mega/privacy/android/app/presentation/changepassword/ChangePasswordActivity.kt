@@ -13,9 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.changepassword.view.ChangePasswordView
@@ -30,6 +33,8 @@ import mega.privacy.android.app.utils.Constants.CHANGE_PASSWORD_2FA
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaError
 import timber.log.Timber
@@ -143,7 +148,7 @@ class ChangePasswordActivity : PasscodeActivity() {
         if (intent != null && intent.getBooleanExtra(KEY_IS_LOGOUT, false)) {
             viewModel.logout()
         } else {
-            navigateAfterPasswordChanged()
+            navigateToHomeAfterPasswordChanged()
         }
 
         viewModel.onPasswordChanged()
@@ -155,27 +160,54 @@ class ChangePasswordActivity : PasscodeActivity() {
         viewModel.onPasswordReset()
     }
 
-    private fun navigateAfterPasswordChanged() {
-        val intent = Intent(this, ManagerActivity::class.java).apply {
-            action = Constants.ACTION_PASS_CHANGED
-            putExtra(Constants.RESULT, MegaError.API_OK)
-        }
-        startActivity(intent)
-        finish()
-    }
-
-    private fun navigateAfterPasswordReset(isLoggedIn: Boolean, @StringRes errorCode: Int?) {
-        val intent: Intent = if (isLoggedIn) {
-            Intent(this, ManagerActivity::class.java)
-        } else {
-            Intent(this, LoginActivity::class.java).apply {
-                putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+    private fun navigateToHomeAfterPasswordChanged(errCode: Int? = MegaError.API_OK) =
+        lifecycleScope.launch {
+            val intent = if (viewModel.isFeatureFlagEnabled(AppFeatures.SingleActivity)) {
+                MegaActivity.getIntentWithExtraDestinations(
+                    this@ChangePasswordActivity,
+                    listOf(
+                        MyAccountNavKey(
+                            action = Constants.ACTION_PASS_CHANGED,
+                            resultCode = MegaError.API_OK
+                        )
+                    )
+                )
+            } else {
+                Intent(this@ChangePasswordActivity, ManagerActivity::class.java).apply {
+                    action = Constants.ACTION_PASS_CHANGED
+                    putExtra(Constants.RESULT, errCode)
+                }
             }
-        }.apply {
-            action = Constants.ACTION_PASS_CHANGED
-            putExtra(Constants.RESULT, errorCode)
+            startActivity(intent)
+            finish()
         }
 
+    private fun navigateAfterPasswordReset(isLoggedIn: Boolean, @StringRes errorCode: Int?) =
+        lifecycleScope.launch {
+            if (isLoggedIn) {
+                navigateToHomeAfterPasswordChanged(errorCode)
+            } else {
+                navigateToLoginAfterPasswordChanged(errorCode)
+            }
+        }
+
+    private suspend fun navigateToLoginAfterPasswordChanged(errorCode: Int?) {
+        val intent: Intent =
+            if (viewModel.isFeatureFlagEnabled(AppFeatures.SingleActivity)) {
+                MegaActivity.getIntent(
+                    this@ChangePasswordActivity,
+                    getString(R.string.pass_changed_alert).takeIf {
+                        errorCode == MegaError.API_OK || errorCode == null
+                    },
+                )
+            } else {
+                Intent(this@ChangePasswordActivity, LoginActivity::class.java).apply {
+                    putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+                }.apply {
+                    action = Constants.ACTION_PASS_CHANGED
+                    putExtra(Constants.RESULT, errorCode)
+                }
+            }
         startActivity(intent)
         finish()
     }
