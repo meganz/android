@@ -38,6 +38,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.shockwave.pdfium.PdfDocument.Bookmark
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.consumed
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -99,20 +100,11 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatMessage
-import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaEvent
-import nz.mega.sdk.MegaGlobalListenerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
-import nz.mega.sdk.MegaSet
-import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaShare
-import nz.mega.sdk.MegaTransfer
-import nz.mega.sdk.MegaTransferListenerInterface
-import nz.mega.sdk.MegaUser
-import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -129,9 +121,9 @@ import javax.inject.Inject
  * @property progressBar               Loading progress bar.
  */
 @AndroidEntryPoint
-class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageChangeListener,
+class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
     OnLoadCompleteListener, OnPageErrorListener, MegaRequestListenerInterface,
-    MegaTransferListenerInterface, ActionNodeCallback, SnackbarShower {
+    ActionNodeCallback, SnackbarShower {
 
     @Inject
     lateinit var passCodeFacade: PasscodeCheck
@@ -294,9 +286,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             } else {
                 Timber.w("msgId or chatId null")
             }
-            Timber.d("Add transfer listener")
-            megaApi.addTransferListener(this)
-            megaApi.addGlobalListener(this)
             if (uri.toString().contains("http://")) {
                 when {
                     credentials != null -> megaApi
@@ -422,6 +411,14 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
 
                 if (pdfUriData != null && lastPageViewed != null) {
                     loadLocalPDF(lastPageViewed.toInt())
+                }
+                if (invalidateMenuEvent != consumed) {
+                    invalidateOptionsMenu()
+                    viewModel.onMenuInvalidated()
+                }
+                if (showTakenDownDialogEvent != consumed && !isAlertDialogShown(takenDownDialog)) {
+                    takenDownDialog = showTakenDownAlert(this@PdfViewerActivity)
+                    viewModel.onTakenDownDialogShown()
                 }
             }
         }
@@ -585,9 +582,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 } else {
                     Timber.w("msgId or chatId null")
                 }
-                Timber.d("Add transfer listener")
-                megaApi.addTransferListener(this)
-                megaApi.addGlobalListener(this)
             }
 
             binding.toolbarPdfViewer.isVisible = true
@@ -651,40 +645,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         }
     }
 
-    override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>?) {}
-
-    override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert>?) {
-        Timber.d("onUserAlertsUpdate")
-    }
-
-    override fun onNodesUpdate(api: MegaApiJava, nodeList: ArrayList<MegaNode>?) {
-        Timber.d("onNodesUpdate")
-        lifecycleScope.launch {
-            val node = withContext(ioDispatcher) {
-                megaApi.getNodeByHandle(handle)
-            }
-            if (node == null) {
-                return@launch
-            }
-            invalidateOptionsMenu()
-        }
-    }
-
-    override fun onAccountUpdate(api: MegaApiJava) {}
-
-    override fun onContactRequestsUpdate(
-        api: MegaApiJava,
-        requests: ArrayList<MegaContactRequest>?,
-    ) {
-    }
-
-    override fun onEvent(api: MegaApiJava, event: MegaEvent?) {}
-
-    override fun onSetsUpdate(api: MegaApiJava, sets: ArrayList<MegaSet>?) {}
-
-    override fun onSetElementsUpdate(api: MegaApiJava, elements: ArrayList<MegaSetElement>?) {}
-
-    override fun onGlobalSyncStateChanged(api: MegaApiJava) {}
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
         showSnackbar(type, binding.pdfViewerContainer, content, chatId)
@@ -1736,8 +1696,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         val needStopHttpServer =
             intent.getBooleanExtra(ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, false)
         applicationScope.launch {
-            megaApi.removeTransferListener(this@PdfViewerActivity)
-            megaApi.removeGlobalListener(this@PdfViewerActivity)
             if (needStopHttpServer) {
                 megaApi.httpServerStop()
             }
@@ -1751,40 +1709,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         super.onDestroy()
     }
 
-    override fun onTransferStart(api: MegaApiJava, transfer: MegaTransfer) {}
-
-    override fun onTransferFinish(api: MegaApiJava, transfer: MegaTransfer, e: MegaError) {}
-
-    override fun onTransferUpdate(api: MegaApiJava, transfer: MegaTransfer) {}
-
-    override fun onTransferTemporaryError(api: MegaApiJava, transfer: MegaTransfer, e: MegaError) {
-        if (e.errorCode == MegaError.API_EOVERQUOTA) {
-            if (transfer.isForeignOverquota.not() && e.value != 0L) {
-                Timber.w("TRANSFER OVERQUOTA ERROR: ${e.errorCode}")
-                viewModel.broadcastTransferOverQuota()
-            }
-        } else if (e.errorCode == MegaError.API_EBLOCKED && !isAlertDialogShown(takenDownDialog)) {
-            takenDownDialog = showTakenDownAlert(this)
-        }
-    }
-
-    override fun onTransferData(
-        api: MegaApiJava,
-        transfer: MegaTransfer,
-        buffer: ByteArray,
-    ): Boolean = false
-
-    override fun onFolderTransferUpdate(
-        api: MegaApiJava,
-        transfer: MegaTransfer,
-        stage: Int,
-        folderCount: Long,
-        createdFolderCount: Long,
-        fileCount: Long,
-        currentFolder: String?,
-        currentFileLeafName: String?,
-    ) {
-    }
 
     private fun handleHideNodeClick(playingHandle: Long) {
         var isPaid: Boolean

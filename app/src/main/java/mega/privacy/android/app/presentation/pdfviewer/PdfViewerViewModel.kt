@@ -5,8 +5,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,6 +18,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
+import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -26,10 +32,15 @@ import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
+import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.exception.BlockedMegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
+import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
 import mega.privacy.android.domain.usecase.pdf.SetOrUpdateLastPageViewedInPdfUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
@@ -59,10 +70,18 @@ class PdfViewerViewModel @Inject constructor(
     private val broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase,
     private val getLastPageViewedInPdfUseCase: GetLastPageViewedInPdfUseCase,
     private val setOrUpdateLastPageViewedInPdfUseCase: SetOrUpdateLastPageViewedInPdfUseCase,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
+    private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
 ) : ViewModel() {
 
     private val handle: Long
         get() = savedStateHandle["HANDLE"] ?: INVALID_HANDLE
+
+    private val adapterType: Int
+        get() = savedStateHandle[INTENT_EXTRA_KEY_ADAPTER_TYPE] ?: 0
+
+    private val isOffline: Boolean
+        get() = adapterType == OFFLINE_ADAPTER
 
     private val _state = MutableStateFlow(PdfViewerState())
 
@@ -77,7 +96,10 @@ class PdfViewerViewModel @Inject constructor(
         monitorAccountDetail()
         monitorIsHiddenNodesOnboarded()
         checkIsNodeInBackups()
+        monitorNodeUpdates()
+        monitorTransferEvents()
     }
+
 
     private fun checkLastPageViewed() {
         if (handle != INVALID_HANDLE) {
@@ -371,5 +393,71 @@ class PdfViewerViewModel @Inject constructor(
         _state.update {
             it.copy(startChatOfflineDownloadEvent = consumed())
         }
+    }
+
+    /**
+     * Monitor node updates and invalidate menu when current node is updated
+     */
+    private fun monitorNodeUpdates() {
+        if (handle == INVALID_HANDLE) {
+            return
+        }
+        monitorNodeUpdatesUseCase()
+            .onEach { nodeUpdate ->
+                val currentNodeId = NodeId(handle)
+                val hasCurrentNodeUpdate = nodeUpdate.changes.keys.any { it.id == currentNodeId }
+                if (hasCurrentNodeUpdate) {
+                    _state.update { it.copy(invalidateMenuEvent = triggered) }
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    /**
+     * Reset invalidateMenuEvent after menu is invalidated
+     */
+    fun onMenuInvalidated() {
+        _state.update { it.copy(invalidateMenuEvent = consumed) }
+    }
+
+    /**
+     * Monitor transfer events and handle temporary errors
+     * Filter out events when offline or ZIP adapter
+     */
+    private fun monitorTransferEvents() {
+        monitorTransferEventsUseCase()
+            .filter { it is TransferEvent.TransferTemporaryErrorEvent }
+            .filter { 
+                // Filter out when offline or ZIP adapter
+                !isOffline && adapterType != ZIP_ADAPTER
+            }
+            .catch { Timber.e(it, "Error monitoring transfer events") }
+            .onEach { event ->
+                val errorEvent = event as TransferEvent.TransferTemporaryErrorEvent
+                val error = errorEvent.error
+
+                when (error) {
+                    is QuotaExceededMegaException -> {
+                        if (!errorEvent.transfer.isForeignOverQuota && error.value != 0L) {
+                            Timber.w("TRANSFER OVERQUOTA ERROR: ${error.errorCode}")
+                            broadcastTransferOverQuota()
+                        }
+                    }
+
+                    is BlockedMegaException -> {
+                        _state.update { it.copy(showTakenDownDialogEvent = triggered) }
+                    }
+
+                    else -> {}
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    /**
+     * Reset showTakenDownDialogEvent after dialog is shown
+     */
+    fun onTakenDownDialogShown() {
+        _state.update { it.copy(showTakenDownDialogEvent = consumed) }
     }
 }
