@@ -1217,7 +1217,7 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
 
             R.id.pdf_viewer_share -> {
                 if (type == Constants.ZIP_ADAPTER) {
-                    FileUtil.shareFile(this, File(uri.toString()), node?.name)
+                    FileUtil.shareWithUri(this, "pdf", uri)
                 } else if (type == Constants.OFFLINE_ADAPTER || !inside) {
                     FileUtil.shareWithUri(this, "pdf", uri)
                 } else if (type == Constants.FILE_LINK_ADAPTER) {
