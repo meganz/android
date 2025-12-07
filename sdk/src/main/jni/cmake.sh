@@ -4,18 +4,19 @@ set -e
 start_time=$SECONDS
 
 ANDROID_API_LEVEL=28
+
+# Check if NDK_ROOT is set.
+if [ -z "${NDK_ROOT}" ] || [ ! -f "${NDK_ROOT}/ndk-build" ]; then
+    echo "NDK_ROOT is not correctly set. Please download the Android NDK and export NDK_ROOT variable pointing to your Android NDK installation path and try again."
+    exit 1
+fi
+
 export ANDROID_NDK_HOME=${NDK_ROOT}
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
     STRIP_TOOL=${NDK_ROOT}/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-strip
 else
     STRIP_TOOL=${NDK_ROOT}/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip
-fi
-
-# Check if NDK_ROOT is set.
-if [ -z "${NDK_ROOT}" ]; then
-    echo "NDK_ROOT is not set. Exiting."
-    exit 1
 fi
 
 # LIST OF ARCHS TO BE BUILT.
@@ -49,8 +50,8 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 else
     JOBS=$(nproc)
 fi
-echo "-- JOBS: ${JOBS}"
 
+echo "-- JOBS: ${JOBS}"
 echo "-- BUILD_ARCHS: ${BUILD_ARCHS}"
 echo "-- VCPKG_ROOT: ${VCPKG_ROOT}"
 echo "-- ANDROID_NDK_HOME: ${ANDROID_NDK_HOME}"
@@ -66,13 +67,10 @@ for ABI in ${BUILD_ARCHS}; do
     cmake -S megachat/sdk --preset mega-android \
         -B ${BUILD_DIR} \
         -DSDK_DIR=mega/sdk \
-        -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-        -DCMAKE_ANDROID_NDK=${NDK_ROOT} \
-        -DCMAKE_ANDROID_ARCH_ABI=${ABI} \
         -DVCPKG_ROOT=${VCPKG_ROOT} \
-        -DCMAKE_ANDROID_API=${ANDROID_API_LEVEL} \
-        -DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON \
-        -DUSE_WEBRTC=ON &>>${LOG_FILE}
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DANDROID_PLATFORM=${ANDROID_API_LEVEL} \
+        -DANDROID_ABI=${ABI} &>>${LOG_FILE}
 
     echo "* Building MEGA Chat SDK - ${ABI}"
     cmake --build "${BUILD_DIR}" -j "${JOBS}" &>>${LOG_FILE}
