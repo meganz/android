@@ -131,16 +131,22 @@ internal class MegaNavigatorImpl @Inject constructor(
                     legacyNavigation()
                 }.onSuccess { singleActivity ->
                     if (singleActivity) {
-                        val isMegaActivity =
-                            activityLifecycleHandler.getCurrentActivity() is MegaActivity
-                        if (!isMegaActivity) {
-                            context.startActivity(Intent(context, MegaActivity::class.java))
-                        }
+                        launchMegaActivityIfNeeded(context)
                         navigationQueue.emit(singleActivityDestination)
                     } else {
                         legacyNavigation()
                     }
                 }
+        }
+    }
+
+    override fun launchMegaActivityIfNeeded(context: Context) {
+        val isMegaActivity =
+            activityLifecycleHandler.getCurrentActivity() is MegaActivity
+        if (!isMegaActivity) {
+            context.startActivity(
+                Intent(context, MegaActivity::class.java)
+            )
         }
     }
 

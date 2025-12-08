@@ -55,3 +55,8 @@ data class DriveSyncNavKey(
  */
 @Serializable
 data object FavouritesNavKey : NavKey
+
+@Serializable
+data class OverQuotaDialogNavKey(
+    val isOverQuota: Boolean,
+) : NavKey
