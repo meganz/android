@@ -671,11 +671,19 @@ class LinksViewModelTest {
 
     @Test
     fun `test that selectedNodes returns correct nodes`() = runTest {
+        val typedFolderNode1 = mock<TypedFolderNode> {
+            on { id } doReturn NodeId(1L)
+        }
+        val typedFolderNode2 = mock<TypedFolderNode> {
+            on { id } doReturn NodeId(2L)
+        }
         val node1 = mock<PublicLinkFolder> {
             on { id } doReturn NodeId(1L)
+            on { node } doReturn typedFolderNode1
         }
         val node2 = mock<PublicLinkFolder> {
             on { id } doReturn NodeId(2L)
+            on { node } doReturn typedFolderNode2
         }
 
         setupTestData(listOf(node1, node2))
