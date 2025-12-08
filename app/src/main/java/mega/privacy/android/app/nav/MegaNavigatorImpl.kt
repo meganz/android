@@ -810,10 +810,32 @@ internal class MegaNavigatorImpl @Inject constructor(
         }
     }
 
+    @Deprecated("This function will be removed after SingleActivity flag goes live. Note that any calls to it while the flag is enabled will result in an exception")
     override fun openManagerActivity(
         context: Context,
         data: Uri?,
         action: String?,
+        bundle: Bundle?,
+    ) {
+        applicationScope.launch {
+            runCatching { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) }
+                .onSuccess {
+                    if (it) {
+                        throw IllegalStateException("Navigating to ManagerActivity is not allowed when the SingleActivity flag is enabled")
+                    } else {
+                        navigateToManagerActivity(context, action, data, bundle)
+                    }
+                }
+                .onFailure {
+                    navigateToManagerActivity(context, action, data, bundle)
+                }
+        }
+    }
+
+    private fun navigateToManagerActivity(
+        context: Context,
+        action: String?,
+        data: Uri?,
         bundle: Bundle?,
     ) {
         val intent = Intent(context, ManagerActivity::class.java)
