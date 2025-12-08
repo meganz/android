@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.photos.timeline.model
+package mega.privacy.android.feature.photos.presentation.timeline.model
 
 /**
  * Enum class to represent different types of Camera Uploads banners
