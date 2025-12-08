@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.core.text.HtmlCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -24,7 +25,10 @@ import mega.privacy.android.app.utils.TimeUtils.formatDate
 import mega.privacy.android.app.utils.TimeUtils.getHumanizedTimeMs
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.ExtraConstant
+import mega.privacy.android.navigation.megaNavigator
+import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -103,22 +107,43 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
 
             R.id.upgrade_button -> {
                 Timber.i("Starting upgrade process after Over Disk Quota Paywall")
-
-                val intent = Intent(applicationContext, ManagerActivity::class.java)
-                    .putExtra(ExtraConstant.EXTRA_UPGRADE_ACCOUNT, true)
-                    .putExtra(ExtraConstant.EXTRA_ACCOUNT_TYPE, proPlanNeeded)
-                startActivity(intent)
-                finish()
+                lifecycleScope.launch {
+                    runCatching {
+                        if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
+                            megaNavigator.openUpgradeAccount(
+                                this@OverDiskQuotaPaywallActivity,
+                                UpgradeAccountSource.MY_ACCOUNT_SCREEN, //Matches the call made from managerActivity
+                            )
+                        } else {
+                            val intent = Intent(applicationContext, ManagerActivity::class.java)
+                                .putExtra(ExtraConstant.EXTRA_UPGRADE_ACCOUNT, true)
+                                .putExtra(ExtraConstant.EXTRA_ACCOUNT_TYPE, proPlanNeeded)
+                            startActivity(intent)
+                        }
+                    }.onFailure {
+                        Timber.e(it)
+                    }
+                    finish()
+                }
             }
         }
     }
 
     private fun launchManagerActivity() {
         globalScope.launch {
-            val askPermissions = isFirstLaunchUseCase()
-            val intent = Intent(applicationContext, ManagerActivity::class.java)
-                .putExtra(EXTRA_ASK_PERMISSIONS, askPermissions)
-            startActivity(intent)
+            runCatching {
+                if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
+                    megaNavigator.launchMegaActivityIfNeeded(this@OverDiskQuotaPaywallActivity)
+                    finish() //MegaActivity already handles ask permission logic
+                } else {
+                    val askPermissions = isFirstLaunchUseCase()
+                    val intent = Intent(applicationContext, ManagerActivity::class.java)
+                        .putExtra(EXTRA_ASK_PERMISSIONS, askPermissions)
+                    startActivity(intent)
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 
