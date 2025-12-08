@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.chat.RetryConnectionsAndSignalPresenceUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -18,12 +20,27 @@ import javax.inject.Inject
 internal class SessionViewModel @Inject constructor(
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val retryConnectionsAndSignalPresenceUseCase: RetryConnectionsAndSignalPresenceUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SessionState())
     val state = _state.asStateFlow()
 
     private var retryConnectionsAndSignalPresenceJob: Job? = null
+
+    init {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
+            }.onSuccess {
+                _state.update { state ->
+                    state.copy(isSingleActivityEnabled = it)
+                }
+            }.onFailure {
+                Timber.e(it, "Failed to check if single activity feature is enabled")
+            }
+        }
+    }
 
     /**
      * Check if SDK session exists

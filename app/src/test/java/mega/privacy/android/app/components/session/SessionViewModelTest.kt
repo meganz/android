@@ -11,6 +11,8 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.chat.RetryConnectionsAndSignalPresenceUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -31,12 +33,14 @@ internal class SessionViewModelTest {
     private val rootNodeExistsUseCase: RootNodeExistsUseCase = mock()
     private val retryConnectionsAndSignalPresenceUseCase: RetryConnectionsAndSignalPresenceUseCase =
         mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
 
     @BeforeAll
     fun setUp() {
         underTest = SessionViewModel(
             rootNodeExistsUseCase = rootNodeExistsUseCase,
-            retryConnectionsAndSignalPresenceUseCase = retryConnectionsAndSignalPresenceUseCase
+            retryConnectionsAndSignalPresenceUseCase = retryConnectionsAndSignalPresenceUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
         )
     }
 
@@ -44,7 +48,8 @@ internal class SessionViewModelTest {
     fun resetMocks() {
         reset(
             rootNodeExistsUseCase,
-            retryConnectionsAndSignalPresenceUseCase
+            retryConnectionsAndSignalPresenceUseCase,
+            getFeatureFlagValueUseCase
         )
     }
 
@@ -91,5 +96,25 @@ internal class SessionViewModelTest {
         underTest.retryConnectionsAndSignalPresence()
 
         verify(retryConnectionsAndSignalPresenceUseCase).invoke()
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that init block fetches single activity feature flag and updates state correctly`(
+        isEnabled: Boolean,
+    ) = runTest {
+        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(isEnabled)
+
+        val viewModel = SessionViewModel(
+            rootNodeExistsUseCase = rootNodeExistsUseCase,
+            retryConnectionsAndSignalPresenceUseCase = retryConnectionsAndSignalPresenceUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
+        )
+
+        viewModel.state.test {
+            assertThat(awaitItem().isSingleActivityEnabled).isEqualTo(isEnabled)
+        }
+
+        verify(getFeatureFlagValueUseCase).invoke(AppFeatures.SingleActivity)
     }
 }

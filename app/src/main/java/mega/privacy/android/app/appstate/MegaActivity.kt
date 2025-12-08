@@ -1,5 +1,6 @@
 package mega.privacy.android.app.appstate
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -62,6 +63,7 @@ import mega.privacy.android.app.appstate.global.SnackbarEventsViewModel
 import mega.privacy.android.app.appstate.global.event.QueueEventViewModel
 import mega.privacy.android.app.appstate.global.model.GlobalState
 import mega.privacy.android.app.appstate.global.model.RefreshEvent
+import mega.privacy.android.app.appstate.global.model.RootNodeState
 import mega.privacy.android.app.appstate.global.util.show
 import mega.privacy.android.app.presence.SignalPresenceViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -80,6 +82,7 @@ import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckS
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackbarLifetimeController
+import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
@@ -156,6 +159,18 @@ class MegaActivity : ComponentActivity() {
         }
     }
 
+    @SuppressLint("UnsafeIntentLaunch")
+    private fun launchLastActivityIfNeeded(rootNodeState: RootNodeState) {
+        if (rootNodeState.exists && intent.extras?.containsKey(Constants.LAUNCH_INTENT) == true) {
+            intent?.parcelable<Intent>(Constants.LAUNCH_INTENT)?.let { originalIntent ->
+                if (originalIntent.component?.packageName == packageName) {
+                    startActivity(originalIntent)
+                }
+            }
+            intent.removeExtra(Constants.LAUNCH_INTENT)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         var keepSplashScreen by mutableStateOf(true)
@@ -221,6 +236,7 @@ class MegaActivity : ComponentActivity() {
 
                 LaunchedEffect(rootNodeState) {
                     navigationHandler.onRootNodeChange(rootNodeState)
+                    launchLastActivityIfNeeded(rootNodeState)
                 }
 
                 LaunchedEffect(passcodeState) {
