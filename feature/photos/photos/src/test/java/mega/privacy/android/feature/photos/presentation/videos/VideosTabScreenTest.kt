@@ -5,14 +5,20 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.core.nodecomponents.list.SORT_ORDER_TAG
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 import org.robolectric.annotation.Config
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @Config(sdk = [34])
@@ -21,11 +27,18 @@ class VideosTabScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
+    val testVideoType = VideoFileTypeInfo(
+        extension = "mp4",
+        mimeType = "video/mp4",
+        duration = 60.seconds
+    )
+
     private fun setComposeContent(
         uiState: VideosTabUiState = VideosTabUiState.Data(),
         onClick: (item: VideoUiEntity, index: Int) -> Unit = { _, _ -> },
         onMenuClick: (VideoUiEntity) -> Unit = {},
         onLongClick: (item: VideoUiEntity, index: Int) -> Unit = { _, _ -> },
+        onSortNodes: (NodeSortConfiguration) -> Unit = {},
         modifier: Modifier = Modifier,
         highlightText: String = "",
     ) {
@@ -36,7 +49,8 @@ class VideosTabScreenTest {
                 onClick = onClick,
                 onMenuClick = onMenuClick,
                 onLongClick = onLongClick,
-                highlightText = highlightText
+                highlightText = highlightText,
+                onSortNodes = onSortNodes
             )
         }
     }
@@ -73,18 +87,7 @@ class VideosTabScreenTest {
 
     @Test
     fun `test that all videos view is displayed as expected`() {
-        val video = VideoUiEntity(
-            id = NodeId(1L),
-            name = "Video 1",
-            size = 1024L,
-            duration = 60.seconds,
-            fileTypeInfo = VideoFileTypeInfo(
-                extension = "mp4",
-                mimeType = "video/mp4",
-                duration = 60.seconds
-            ),
-            parentId = NodeId(2L)
-        )
+        val video = createVideoUiEntity(1L)
         setComposeContent(
             uiState = VideosTabUiState.Data(
                 allVideos = listOf(video)
@@ -92,11 +95,31 @@ class VideosTabScreenTest {
         )
 
         VIDEO_TAB_ALL_VIDEOS_VIEW_TEST_TAG.assertIsDisplayedWithTag()
+        SORT_ORDER_TAG.assertIsDisplayedWithTag()
 
         listOf(
             VIDEO_TAB_LOADING_VIEW_TEST_TAG,
             VIDEO_TAB_EMPTY_VIEW_TEST_TAG
         ).assertIsNotDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that SortBottomSheet is displayed correctly`() {
+        val video = createVideoUiEntity(1L)
+        val onSortNodes = mock<(NodeSortConfiguration) -> Unit>()
+        setComposeContent(
+            uiState = VideosTabUiState.Data(
+                allVideos = listOf(video),
+            ),
+            onSortNodes = onSortNodes
+        )
+
+        with(SORT_ORDER_TAG.getNodeWithTag()) {
+            assertIsDisplayed()
+            performClick()
+        }
+
+        VIDEO_TAB_SORT_BOTTOM_SHEET_TEST_TAG.assertIsDisplayedWithTag()
     }
 
     private fun String.assertIsDisplayedWithTag() =
@@ -110,4 +133,23 @@ class VideosTabScreenTest {
 
     private fun String.assertIsNotDisplayedWithTag() =
         composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true).assertIsNotDisplayed()
+
+    private fun String.getNodeWithTag() =
+        composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true)
+
+    private fun createVideoUiEntity(
+        handle: Long,
+        name: String = "Video name $handle",
+        size: Long = 1024L,
+        duration: Duration = 60.seconds,
+        fileTypeInfo: FileTypeInfo = testVideoType,
+        parentHandle: Long = 100L,
+    ) = mock<VideoUiEntity> {
+        on { id }.thenReturn(NodeId(handle))
+        on { this.name }.thenReturn(name)
+        on { this.size }.thenReturn(size)
+        on { this.duration }.thenReturn(duration)
+        on { this.fileTypeInfo }.thenReturn(fileTypeInfo)
+        on { parentId }.thenReturn(NodeId(parentHandle))
+    }
 }

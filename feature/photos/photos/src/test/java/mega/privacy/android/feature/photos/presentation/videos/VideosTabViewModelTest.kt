@@ -6,7 +6,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.TextFileTypeInfo
@@ -15,7 +18,9 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import mega.privacy.android.feature.photos.mapper.VideoUiEntityMapper
@@ -29,6 +34,7 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.time.Duration.Companion.seconds
 
@@ -42,6 +48,9 @@ class VideosTabViewModelTest {
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
+    private val setCloudSortOrderUseCase = mock<SetCloudSortOrder>()
+    private val nodeSortConfigurationUiMapper = mock<NodeSortConfigurationUiMapper>()
+    private val monitorSortCloudOrderUseCase = mock<MonitorSortCloudOrderUseCase>()
 
     private val expectedId = NodeId(1L)
     private val expectedVideo = mock<VideoUiEntity> {
@@ -52,6 +61,38 @@ class VideosTabViewModelTest {
 
     @BeforeEach
     fun setUp() {
+        runBlocking {
+            whenever(monitorNodeUpdatesUseCase()).thenReturn(
+                flow {
+                    emptyMap<FileNode, NodeUpdate>()
+                    awaitCancellation()
+                }
+            )
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(
+                flow {
+                    emit(emptyList())
+                    awaitCancellation()
+                }
+            )
+            whenever(monitorSortCloudOrderUseCase()).thenReturn(
+                flow {
+                    emit(null)
+                    awaitCancellation()
+                }
+            )
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
+            whenever(
+                getAllVideosUseCase(
+                    searchQuery = anyOrNull(),
+                    tag = anyOrNull(),
+                    description = anyOrNull()
+                )
+            ).thenReturn(listOf(mock(), mock()))
+            whenever(videoUiEntityMapper(any())).thenReturn(expectedVideo)
+            whenever(nodeSortConfigurationUiMapper(any(), any())).thenReturn(
+                NodeSortConfiguration.default
+            )
+        }
         initUnderTest()
     }
 
@@ -62,6 +103,9 @@ class VideosTabViewModelTest {
             getCloudSortOrder = getCloudSortOrder,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
+            setCloudSortOrderUseCase = setCloudSortOrderUseCase,
+            nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
+            monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
         )
     }
 
@@ -73,6 +117,9 @@ class VideosTabViewModelTest {
             getCloudSortOrder,
             monitorNodeUpdatesUseCase,
             monitorOfflineNodeUpdatesUseCase,
+            setCloudSortOrderUseCase,
+            nodeSortConfigurationUiMapper,
+            monitorSortCloudOrderUseCase
         )
     }
 
@@ -87,7 +134,6 @@ class VideosTabViewModelTest {
     @Test
     fun `test that uiState is correctly updated triggerRefresh is invoked`() =
         runTest {
-            initVideosReturned()
             underTest.triggerRefresh()
 
             underTest.uiState.drop(1).test {
@@ -95,6 +141,7 @@ class VideosTabViewModelTest {
                 assertThat(actual.allVideos).isNotEmpty()
                 assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
                 assertThat(actual.allVideos.size).isEqualTo(2)
+                assertThat(actual.selectedSortConfiguration).isEqualTo(NodeSortConfiguration.default)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -102,7 +149,6 @@ class VideosTabViewModelTest {
     @Test
     fun `test that uiState is correctly updated when monitorNodeUpdatesUseCase is triggered`() =
         runTest {
-            initVideosReturned()
             val testFileNode = mock<FileNode> {
                 on { type }.thenReturn(VideoFileTypeInfo("video", "mp4", 10.seconds))
             }
@@ -127,7 +173,6 @@ class VideosTabViewModelTest {
     @Test
     fun `test that uiState is correctly updated when monitorNodeUpdatesUseCase is triggered but changed node is not videoType`() =
         runTest {
-            initVideosReturned()
             val testFileNode = mock<FileNode> {
                 on { type }.thenReturn(TextFileTypeInfo("TextFile", "txt"))
             }
@@ -149,7 +194,6 @@ class VideosTabViewModelTest {
     @Test
     fun `test that uiState is correctly updated when monitorOfflineNodeUpdatesUseCase is triggered`() =
         runTest {
-            initVideosReturned()
             val testOffline = mock<Offline>()
             monitorOfflineNodeUpdatesUseCase.stub {
                 on { invoke() }.thenReturn(
@@ -169,25 +213,27 @@ class VideosTabViewModelTest {
             }
         }
 
-    private suspend fun initVideosReturned() {
-        monitorNodeUpdatesUseCase.stub {
-            on { invoke() }.thenReturn(
-                flow { emptyMap<FileNode, NodeUpdate>() }
+    @Test
+    fun `test that uiState is correctly updated when setCloudSortOrder is invoked`() =
+        runTest {
+            val sortOrder = SortOrder.ORDER_FAV_ASC
+            whenever(nodeSortConfigurationUiMapper(any<NodeSortConfiguration>()))
+                .thenReturn(sortOrder)
+            whenever(nodeSortConfigurationUiMapper(any(), any())).thenReturn(
+                NodeSortConfiguration.default
             )
+
+            underTest.setCloudSortOrder(NodeSortConfiguration.default)
+
+            underTest.uiState.test {
+                verify(setCloudSortOrderUseCase).invoke(any())
+                assertThat(awaitItem()).isInstanceOf(VideosTabUiState.Loading::class.java)
+                val actual = awaitItem() as VideosTabUiState.Data
+                assertThat(actual.allVideos).isNotEmpty()
+                assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
+                assertThat(actual.allVideos.size).isEqualTo(2)
+                assertThat(actual.selectedSortConfiguration).isEqualTo(NodeSortConfiguration.default)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-        monitorOfflineNodeUpdatesUseCase.stub {
-            on { invoke() }.thenReturn(
-                flow { emit(emptyList()) }
-            )
-        }
-        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
-        whenever(
-            getAllVideosUseCase(
-                searchQuery = anyOrNull(),
-                tag = anyOrNull(),
-                description = anyOrNull()
-            )
-        ).thenReturn(listOf(mock(), mock()))
-        whenever(videoUiEntityMapper(any())).thenReturn(expectedVideo)
-    }
 }

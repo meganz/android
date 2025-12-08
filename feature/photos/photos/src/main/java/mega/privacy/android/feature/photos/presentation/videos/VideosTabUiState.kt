@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.photos.presentation.videos
 
 import androidx.compose.runtime.Stable
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 
@@ -15,10 +16,12 @@ sealed interface VideosTabUiState {
      * @property allVideos the all video items
      * @property sortOrder the sort order
      * @property query the search query
+     * @property selectedSortConfiguration the selected sort configuration
      */
     data class Data(
         val allVideos: List<VideoUiEntity> = emptyList(),
         val sortOrder: SortOrder = SortOrder.ORDER_NONE,
         val query: String? = null,
+        val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
     ) : VideosTabUiState
 }
