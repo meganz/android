@@ -80,6 +80,9 @@ import mega.privacy.android.feature.photos.presentation.timeline.component.Timel
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineSelectionMenuAction
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabRoute
+import mega.privacy.android.feature.photos.presentation.videos.VideosTabUiState
+import mega.privacy.android.feature.photos.presentation.videos.VideosTabViewModel
+import mega.privacy.android.feature.photos.presentation.videos.view.VideosTabToolbar
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
@@ -223,6 +226,7 @@ fun MediaMainScreen(
     onNavigateToAddToAlbum: (key: LegacyAddToAlbumActivityNavKey) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MediaMainViewModel = hiltViewModel(),
+    videosTabViewModel: VideosTabViewModel = hiltViewModel(),
 ) {
     var currentTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showTimelineSortDialog by rememberSaveable { mutableStateOf(false) }
@@ -237,6 +241,10 @@ fun MediaMainScreen(
         derivedStateOf { timelineTabUiState.selectedPhotoCount == timelineTabUiState.displayedPhotos.size }
     }
     var showBottomSheetActions by rememberSaveable { mutableStateOf(false) }
+
+    val videosTabUiState by videosTabViewModel.uiState.collectAsStateWithLifecycle()
+    var isVideosTabSearchBarVisible by rememberSaveable { mutableStateOf(false) }
+    var videosTabQuery by rememberSaveable { mutableStateOf<String?>(null) }
 
     // Handling back handler for timeline filter
     BackHandler(enabled = showTimelineFilter) {
@@ -257,6 +265,23 @@ fun MediaMainScreen(
         setNavigationItemVisibility(!isTimelineInSelectionMode)
     }
 
+    BackHandler(isVideosTabSearchBarVisible) {
+        if (isVideosTabSearchBarVisible) {
+            isVideosTabSearchBarVisible = false
+            videosTabViewModel.searchQuery(null)
+        }
+    }
+
+    LaunchedEffect(videosTabUiState) {
+        if (videosTabUiState is VideosTabUiState.Data) {
+            videosTabViewModel.getCurrentSearchQuery().let {
+                if (it != videosTabQuery) {
+                    videosTabQuery = it
+                }
+            }
+        }
+    }
+
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier.fillMaxSize(),
         floatingActionButton = {
@@ -266,16 +291,28 @@ fun MediaMainScreen(
             )
         },
         topBar = {
-            if (isTimelineInSelectionMode) {
-                NodeSelectionModeAppBar(
+            when {
+                isTimelineInSelectionMode -> NodeSelectionModeAppBar(
                     count = timelineTabUiState.selectedPhotoCount,
                     isAllSelected = areAllTimelinePhotosSelected,
                     isSelecting = false,
                     onSelectAllClicked = onAllTimelinePhotosSelected,
                     onCancelSelectionClicked = onClearTimelinePhotosSelection
                 )
-            } else {
-                MegaTopAppBar(
+
+                currentTabIndex == MediaScreen.Videos.ordinal && isVideosTabSearchBarVisible ->
+                    VideosTabToolbar(
+                        searchQuery = videosTabQuery,
+                        updateSearchQuery = videosTabViewModel::searchQuery,
+                        onSearchingModeChanged = { isSearching ->
+                            if (!isSearching) {
+                                isVideosTabSearchBarVisible = false
+                                videosTabViewModel.searchQuery(null)
+                            }
+                        }
+                    )
+
+                else -> MegaTopAppBar(
                     navigationType = AppBarNavigationType.None,
                     title = stringResource(sharedResR.string.media_feature_title),
                     actions = buildList {
@@ -289,6 +326,9 @@ fun MediaMainScreen(
 
                         add(
                             MenuActionWithClick(menuAction = MediaAppBarAction.Search) {
+                                if (currentTabIndex == MediaScreen.Videos.ordinal) {
+                                    isVideosTabSearchBarVisible = true
+                                }
                                 // Todo: Handle Search action click
                             }
                         )

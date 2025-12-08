@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -36,6 +37,8 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @ExperimentalCoroutinesApi
@@ -74,12 +77,14 @@ class VideosTabViewModelTest {
                     awaitCancellation()
                 }
             )
+
             whenever(monitorSortCloudOrderUseCase()).thenReturn(
                 flow {
                     emit(null)
                     awaitCancellation()
                 }
             )
+
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
             whenever(
                 getAllVideosUseCase(
@@ -141,6 +146,8 @@ class VideosTabViewModelTest {
                 assertThat(actual.allVideos).isNotEmpty()
                 assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
                 assertThat(actual.allVideos.size).isEqualTo(2)
+                assertThat(actual.query).isNull()
+                assertThat(actual.highlightText).isEmpty()
                 assertThat(actual.selectedSortConfiguration).isEqualTo(NodeSortConfiguration.default)
                 cancelAndIgnoreRemainingEvents()
             }
@@ -212,6 +219,46 @@ class VideosTabViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that uiState is correctly updated when searchQuery is invoked`() = runTest {
+        val query = "query"
+        val video = createVideoUiEntity(handle = 2L, name = "video file in query")
+        val typedNode = mock<TypedVideoNode>()
+        whenever(
+            getAllVideosUseCase(
+                searchQuery = query,
+                tag = query.removePrefix("#"),
+                description = query
+            )
+        ).thenReturn(listOf(typedNode))
+        whenever(videoUiEntityMapper(typedNode)).thenReturn(video)
+        underTest.searchQuery(query)
+
+        underTest.uiState.drop(1).test {
+            val actual = awaitItem() as VideosTabUiState.Data
+            assertThat(actual.allVideos).isNotEmpty()
+            assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
+            assertThat(actual.allVideos.size).isEqualTo(1)
+            assertThat(actual.query).isEqualTo(query)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    private fun createVideoUiEntity(
+        handle: Long,
+        parentHandle: Long = 50L,
+        name: String = "video name $handle",
+        duration: Duration = 1.minutes,
+        isSharedItems: Boolean = false,
+    ) = mock<VideoUiEntity> {
+        on { id }.thenReturn(NodeId(handle))
+        on { parentId }.thenReturn(NodeId(parentHandle))
+        on { this.name }.thenReturn(name)
+        on { elementID }.thenReturn(1L)
+        on { this.duration }.thenReturn(duration)
+        on { this.isSharedItems }.thenReturn(isSharedItems)
+    }
 
     @Test
     fun `test that uiState is correctly updated when setCloudSortOrder is invoked`() =

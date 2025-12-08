@@ -23,5 +23,10 @@ sealed interface VideosTabUiState {
         val sortOrder: SortOrder = SortOrder.ORDER_NONE,
         val query: String? = null,
         val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
-    ) : VideosTabUiState
+    ) : VideosTabUiState {
+        /**
+         * The highlight text for search by tags or description
+         */
+        val highlightText get() = query.orEmpty()
+    }
 }

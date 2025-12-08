@@ -61,7 +61,6 @@ internal fun VideosTabScreen(
     onLongClick: (item: VideoUiEntity, index: Int) -> Unit,
     onSortNodes: (NodeSortConfiguration) -> Unit,
     modifier: Modifier = Modifier,
-    highlightText: String = "",
 ) {
     val lazyListState = rememberLazyListState()
     val durationInSecondsTextMapper = remember { DurationInSecondsTextMapper() }
@@ -127,14 +126,14 @@ internal fun VideosTabScreen(
                             if (!videoItem.tags.isNullOrEmpty()) {
                                 TagsRow(
                                     tags = videoItem.tags,
-                                    highlightText = highlightText,
+                                    highlightText = uiState.highlightText,
                                     addSpacing = true,
                                 )
                             }
                         },
                         thumbnailData = ThumbnailRequest(videoItem.id),
                         nodeAvailableOffline = videoItem.nodeAvailableOffline,
-                        highlightText = highlightText,
+                        highlightText = uiState.highlightText,
                         onClick = { onClick(videoItem, it) },
                         onMenuClick = { onMenuClick(videoItem) },
                         onLongClick = { onLongClick(videoItem, it) },

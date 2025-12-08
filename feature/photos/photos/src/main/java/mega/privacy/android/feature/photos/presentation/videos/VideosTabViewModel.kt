@@ -84,7 +84,20 @@ class VideosTabViewModel @Inject constructor(
     }
 
     private suspend fun getVideoUIEntityList() =
-        getAllVideosUseCase().map { videoUiEntityMapper(it) }
+        getAllVideosUseCase(
+            searchQuery = getCurrentSearchQuery(),
+            tag = getCurrentSearchQuery().removePrefix("#"),
+            description = getCurrentSearchQuery()
+        ).map { videoUiEntityMapper(it) }
+
+    internal fun getCurrentSearchQuery() = queryFlow.value.orEmpty()
+
+    internal fun searchQuery(queryString: String?) {
+        if (queryFlow.value != queryString) {
+            queryFlow.update { queryString }
+            triggerRefresh()
+        }
+    }
 
     internal fun setCloudSortOrder(sortConfiguration: NodeSortConfiguration) {
         viewModelScope.launch {

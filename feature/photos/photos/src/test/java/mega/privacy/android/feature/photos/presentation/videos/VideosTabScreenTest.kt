@@ -40,7 +40,6 @@ class VideosTabScreenTest {
         onLongClick: (item: VideoUiEntity, index: Int) -> Unit = { _, _ -> },
         onSortNodes: (NodeSortConfiguration) -> Unit = {},
         modifier: Modifier = Modifier,
-        highlightText: String = "",
     ) {
         composeTestRule.setContent {
             VideosTabScreen(
@@ -49,7 +48,6 @@ class VideosTabScreenTest {
                 onClick = onClick,
                 onMenuClick = onMenuClick,
                 onLongClick = onLongClick,
-                highlightText = highlightText,
                 onSortNodes = onSortNodes
             )
         }
