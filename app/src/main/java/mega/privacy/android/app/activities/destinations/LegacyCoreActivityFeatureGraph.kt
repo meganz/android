@@ -78,5 +78,6 @@ class LegacyCoreActivityFeatureGraph(
                 rtcAudioManagerGateway
             )
             legacyWaitingRoomScreen(navigationHandler::back, megaChatRequestHandler, chatManagement)
+            legacySettingsCameraUploadsActivityNavKey(navigationHandler::back)
         }
 }

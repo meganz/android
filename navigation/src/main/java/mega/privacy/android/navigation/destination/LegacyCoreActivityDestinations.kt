@@ -21,7 +21,7 @@ data object OverDiskQuotaPaywallWarningNavKey : NavKey
 data class MyAccountNavKey(
     val action: String? = null,
     val link: String? = null,
-    val resultCode: Int = -1
+    val resultCode: Int = -1,
 ) : NavKey, Parcelable
 
 @Serializable
@@ -248,3 +248,6 @@ data class LegacyAddToAlbumActivityNavKey(
 
 @Serializable
 data class LegacyOpenLinkAfterFetchNodes(val link: String) : NavKey
+
+@Serializable
+data object LegacySettingsCameraUploadsActivityNavKey : NavKey
