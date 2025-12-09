@@ -22,7 +22,7 @@ data class AccountStorageDetail(
      * Used percentage
      */
     val usedPercentage: Int
-        get() = (100 * usedStorage / totalStorage).toInt()
+        get() = if (totalStorage == 0L) 0 else (100 * usedStorage / totalStorage).toInt()
 
     /**
      * Available space
