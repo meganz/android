@@ -79,6 +79,7 @@ import mega.privacy.android.app.presentation.security.check.PasscodeCheckViewMod
 import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.sharedcomponents.snackbar.SnackbarLifetimeController
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
@@ -268,6 +269,7 @@ class MegaActivity : ComponentActivity() {
                                 CompositionLocalProvider(
                                     LocalSnackBarHostState provides snackbarHostState
                                 ) {
+                                    SnackbarLifetimeController()
                                     NavDisplay(
                                         backStack = backStack,
                                         onBack = { navigationHandler.back() },
