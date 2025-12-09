@@ -660,12 +660,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
             private set
 
         /**
-         * Is blocked due to weak account
-         */
-        @JvmStatic
-        var isBlockedDueToWeakAccount = false
-
-        /**
          * Is web open due to email verification
          */
         var isWebOpenDueToEmailVerification = false

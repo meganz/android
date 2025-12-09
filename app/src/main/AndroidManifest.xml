@@ -492,9 +492,6 @@
             android:label="@string/settings_about_cookie_settings"
             android:launchMode="singleTop" />
         <activity
-            android:name=".presentation.weakaccountprotection.WeakAccountProtectionAlertActivity"
-            android:launchMode="singleTop" />
-        <activity
             android:name=".presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_properties_manage_chat"

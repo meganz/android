@@ -50,7 +50,6 @@ import mega.privacy.android.app.presentation.container.AppContainerWrapper
 import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
-import mega.privacy.android.app.presentation.weakaccountprotection.WeakAccountProtectionAlertActivity
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
@@ -860,23 +859,19 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                     )
                 )
             } else {
-                if (this is WeakAccountProtectionAlertActivity && accountBlockedType == AccountBlockedType.VERIFICATION_EMAIL) {
-                    return
-                } else {
-                    val loginIntent =
-                        Intent(this, LoginActivity::class.java).apply {
-                            action = ACTION_SHOW_WARNING_ACCOUNT_BLOCKED
-                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                            putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-                            putExtra(
-                                ACCOUNT_BLOCKED_STRING, accountBlockedString
-                            )
-                            putExtra(
-                                ACCOUNT_BLOCKED_TYPE, accountBlockedType
-                            )
-                        }
-                    startActivity(loginIntent)
-                }
+                val loginIntent =
+                    Intent(this, LoginActivity::class.java).apply {
+                        action = ACTION_SHOW_WARNING_ACCOUNT_BLOCKED
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                        putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
+                        putExtra(
+                            ACCOUNT_BLOCKED_STRING, accountBlockedString
+                        )
+                        putExtra(
+                            ACCOUNT_BLOCKED_TYPE, accountBlockedType
+                        )
+                    }
+                startActivity(loginIntent)
             }
         }
     }
