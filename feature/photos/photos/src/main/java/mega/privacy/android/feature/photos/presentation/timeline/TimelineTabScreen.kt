@@ -57,17 +57,21 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.feature.photos.R
+import mega.privacy.android.feature.photos.model.CameraUploadsStatus
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
 import mega.privacy.android.feature.photos.presentation.component.PhotosNodeGridView
+import mega.privacy.android.feature.photos.presentation.timeline.component.CameraUploadsBanner
 import mega.privacy.android.feature.photos.presentation.timeline.component.EnableCameraUploadsContent
 import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosNodeListCardListView
 import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosSkeletonView
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineSortDialog
+import mega.privacy.android.feature.photos.presentation.timeline.model.CameraUploadsBannerType
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
 import mega.privacy.android.shared.resources.R as sharedR
@@ -91,6 +95,7 @@ internal fun TimelineTabRoute(
     resetCUButtonAndProgress: () -> Unit,
     onPhotoClick: (node: PhotoNodeUiState) -> Unit,
     onPhotoSelected: (node: PhotoNodeUiState) -> Unit,
+    onDismissEnableCameraUploadsBanner: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -119,6 +124,7 @@ internal fun TimelineTabRoute(
         onSortOptionChange = onSortOptionChange,
         onPhotoClick = onPhotoClick,
         onPhotoSelected = onPhotoSelected,
+        onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner
     )
 }
 
@@ -140,6 +146,7 @@ internal fun TimelineTabScreen(
     onSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
     onPhotoClick: (node: PhotoNodeUiState) -> Unit,
     onPhotoSelected: (node: PhotoNodeUiState) -> Unit,
+    onDismissEnableCameraUploadsBanner: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -166,6 +173,28 @@ internal fun TimelineTabScreen(
     var shouldScrollToIndex by remember { mutableIntStateOf(0) }
     val showEnableCUPage = mediaCameraUploadUiState.enableCameraUploadPageShowing
             && timelineFilterUiState.mediaSource != FilterMediaSource.CloudDrive
+    var cuBannerType by remember {
+        mutableStateOf(
+            value = getCameraUploadsBannerType(
+                timelineTabUiState = uiState,
+                mediaCameraUploadUiState = mediaCameraUploadUiState
+            )
+        )
+    }
+
+    LaunchedEffect(
+        mediaCameraUploadUiState.enableCameraUploadButtonShowing,
+        uiState.selectedPhotoCount,
+        mediaCameraUploadUiState.showCameraUploadsWarning,
+        mediaCameraUploadUiState.cameraUploadsStatus,
+        mediaCameraUploadUiState.cameraUploadsFinishedReason,
+        mediaCameraUploadUiState.isCUPausedWarningBannerEnabled
+    ) {
+        cuBannerType = getCameraUploadsBannerType(
+            timelineTabUiState = uiState,
+            mediaCameraUploadUiState = mediaCameraUploadUiState
+        )
+    }
 
     LaunchedEffect(shouldScrollToIndex) {
         if (selectedTimePeriod == PhotoModificationTimePeriod.All) {
@@ -262,10 +291,12 @@ internal fun TimelineTabScreen(
                 modifier = modifier,
                 contentPadding = contentPadding,
                 uiState = uiState,
+                shouldShowEnableCUBanner = mediaCameraUploadUiState.shouldShowEnableCUBanner,
                 lazyGridState = lazyGridState,
                 lazyListState = lazyListState,
                 selectedTimePeriod = selectedTimePeriod,
                 shouldShowTimePeriodSelector = shouldShowTimePeriodSelector,
+                bannerType = cuBannerType,
                 onPhotoTimePeriodSelected = { selectedTimePeriod = it },
                 onGridSizeChange = onGridSizeChange,
                 onPhotoClick = onPhotoClick,
@@ -279,7 +310,9 @@ internal fun TimelineTabScreen(
                         daysCardPhotos = uiState.daysCardPhotos,
                         monthsCardPhotos = uiState.monthsCardPhotos,
                     )
-                }
+                },
+                onEnableCameraUploads = onNavigateCameraUploadsSettings,
+                onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner
             )
         }
     }
@@ -332,18 +365,30 @@ private fun EmptyBodyContent(modifier: Modifier = Modifier) {
 @Composable
 private fun TimelineTabContent(
     uiState: TimelineTabUiState,
+    shouldShowEnableCUBanner: Boolean,
     lazyGridState: LazyGridState,
     lazyListState: LazyListState,
     selectedTimePeriod: PhotoModificationTimePeriod,
     shouldShowTimePeriodSelector: Boolean,
+    bannerType: CameraUploadsBannerType,
     onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
     onGridSizeChange: (value: TimelineGridSize) -> Unit,
     onPhotoClick: (node: PhotoNodeUiState) -> Unit,
     onPhotoSelected: (node: PhotoNodeUiState) -> Unit,
     onPhotosNodeListCardClick: (photo: PhotosNodeListCard) -> Unit,
+    onEnableCameraUploads: () -> Unit,
+    onDismissEnableCameraUploadsBanner: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
+    val shouldShowCUBanner by remember(
+        key1 = uiState.selectedPhotoCount,
+        key2 = bannerType
+    ) {
+        derivedStateOf {
+            uiState.selectedPhotoCount == 0 && bannerType != CameraUploadsBannerType.NONE
+        }
+    }
     Box(modifier = modifier) {
         when (selectedTimePeriod) {
             PhotoModificationTimePeriod.All -> {
@@ -356,6 +401,16 @@ private fun TimelineTabContent(
                     onGridSizeChange = onGridSizeChange,
                     onClick = onPhotoClick,
                     onLongClick = onPhotoSelected,
+                    header = {
+                        if (shouldShowCUBanner) {
+                            CameraUploadsBanner(
+                                bannerType = bannerType,
+                                shouldShowEnableCUBanner = shouldShowEnableCUBanner,
+                                onEnableCameraUploads = onEnableCameraUploads,
+                                onDismissRequest = onDismissEnableCameraUploadsBanner
+                            )
+                        }
+                    }
                 )
             }
 
@@ -370,7 +425,17 @@ private fun TimelineTabContent(
                     state = lazyListState,
                     contentPadding = PaddingValues(bottom = 50.dp),
                     photos = items,
-                    onClick = onPhotosNodeListCardClick
+                    onClick = onPhotosNodeListCardClick,
+                    header = {
+                        if (shouldShowCUBanner) {
+                            CameraUploadsBanner(
+                                bannerType = bannerType,
+                                shouldShowEnableCUBanner = shouldShowEnableCUBanner,
+                                onEnableCameraUploads = onEnableCameraUploads,
+                                onDismissRequest = onDismissEnableCameraUploadsBanner
+                            )
+                        }
+                    }
                 )
             }
         }
@@ -518,6 +583,42 @@ private fun calculateScrollIndex(
     }
 }
 
+private fun getCameraUploadsBannerType(
+    timelineTabUiState: TimelineTabUiState,
+    mediaCameraUploadUiState: MediaCameraUploadUiState,
+): CameraUploadsBannerType {
+    return when {
+        mediaCameraUploadUiState.enableCameraUploadButtonShowing && timelineTabUiState.selectedPhotoCount == 0 ->
+            CameraUploadsBannerType.EnableCameraUploads
+
+        mediaCameraUploadUiState.isCUPausedWarningBannerEnabled &&
+                mediaCameraUploadUiState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA
+            -> CameraUploadsBannerType.FullStorage
+
+        mediaCameraUploadUiState.isCUPausedWarningBannerEnabled &&
+                mediaCameraUploadUiState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
+            -> CameraUploadsBannerType.NetworkRequirementNotMet
+
+        mediaCameraUploadUiState.isCUPausedWarningBannerEnabled &&
+                mediaCameraUploadUiState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW
+            -> CameraUploadsBannerType.LowBattery
+
+        mediaCameraUploadUiState.isCUPausedWarningBannerEnabled &&
+                mediaCameraUploadUiState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET
+            -> CameraUploadsBannerType.DeviceChargingNotMet
+
+        mediaCameraUploadUiState.isCameraUploadsLimitedAccess -> CameraUploadsBannerType.NoFullAccess
+
+        mediaCameraUploadUiState.cameraUploadsStatus == CameraUploadsStatus.Sync ->
+            CameraUploadsBannerType.CheckingUploads
+
+        mediaCameraUploadUiState.cameraUploadsStatus == CameraUploadsStatus.Uploading ->
+            CameraUploadsBannerType.PendingCount
+
+        else -> CameraUploadsBannerType.NONE
+    }
+}
+
 @CombinedThemePreviews
 @Composable
 private fun TimelineTabScreenPreview() {
@@ -539,7 +640,8 @@ private fun TimelineTabScreenPreview() {
             onSortDialogDismissed = {},
             onSortOptionChange = {},
             onPhotoClick = {},
-            onPhotoSelected = {}
+            onPhotoSelected = {},
+            onDismissEnableCameraUploadsBanner = {}
         )
     }
 }

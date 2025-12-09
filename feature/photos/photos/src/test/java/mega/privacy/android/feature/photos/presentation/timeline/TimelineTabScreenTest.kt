@@ -67,6 +67,7 @@ class TimelineTabScreenTest {
         onSortOptionChange: (value: TimelineTabSortOptions) -> Unit = {},
         onPhotoClick: (node: PhotoNodeUiState) -> Unit = {},
         onPhotoSelected: (node: PhotoNodeUiState) -> Unit = {},
+        onDismissEnableCameraUploadsBanner: () -> Unit = {},
     ) {
         setContent {
             TimelineTabScreen(
@@ -85,7 +86,8 @@ class TimelineTabScreenTest {
                 onSortDialogDismissed = onSortDialogDismissed,
                 onSortOptionChange = onSortOptionChange,
                 onPhotoClick = onPhotoClick,
-                onPhotoSelected = onPhotoSelected
+                onPhotoSelected = onPhotoSelected,
+                onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner
             )
         }
     }

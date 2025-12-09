@@ -63,7 +63,8 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
             setNavigationItemVisibility = setNavigationItemVisibility,
             onNavigateToTimelinePhotoPreview = navigationHandler::navigate,
             onTransfer = onTransfer,
-            onNavigateToAddToAlbum = navigationHandler::navigate
+            onNavigateToAddToAlbum = navigationHandler::navigate,
+            onNavigateToCameraUploadsSettings = navigationHandler::navigate,
         )
     }
 }

@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
@@ -16,7 +17,10 @@ import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSta
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorCameraUploadShownUseCase
+import mega.privacy.android.domain.usecase.photos.MonitorEnableCameraUploadBannerVisibilityUseCase
+import mega.privacy.android.domain.usecase.photos.ResetEnableCameraUploadBannerVisibilityUseCase
 import mega.privacy.android.domain.usecase.photos.SetCameraUploadShownUseCase
+import mega.privacy.android.domain.usecase.photos.SetEnableCameraUploadBannerDismissedTimestampUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.feature.photos.model.CameraUploadsStatus
@@ -51,6 +55,12 @@ class MediaCameraUploadViewModelTest {
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase = mock()
     private val monitorCameraUploadShownUseCase: MonitorCameraUploadShownUseCase = mock()
     private val setCameraUploadShownUseCase: SetCameraUploadShownUseCase = mock()
+    private val monitorEnableCameraUploadBannerVisibilityUseCase: MonitorEnableCameraUploadBannerVisibilityUseCase =
+        mock()
+    private val resetEnableCameraUploadBannerVisibilityUseCase: ResetEnableCameraUploadBannerVisibilityUseCase =
+        mock()
+    private val setEnableCameraUploadBannerDismissedTimestampUseCase: SetEnableCameraUploadBannerDismissedTimestampUseCase =
+        mock()
 
     private var cameraUploadsStatusFlow =
         MutableStateFlow<CameraUploadsStatusInfo>(CameraUploadsStatusInfo.Unknown)
@@ -77,7 +87,10 @@ class MediaCameraUploadViewModelTest {
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             stopCameraUploadsUseCase = stopCameraUploadsUseCase,
             monitorCameraUploadShownUseCase = monitorCameraUploadShownUseCase,
-            setCameraUploadShownUseCase = setCameraUploadShownUseCase
+            setCameraUploadShownUseCase = setCameraUploadShownUseCase,
+            monitorEnableCameraUploadBannerVisibilityUseCase = monitorEnableCameraUploadBannerVisibilityUseCase,
+            resetEnableCameraUploadBannerVisibilityUseCase = resetEnableCameraUploadBannerVisibilityUseCase,
+            setEnableCameraUploadBannerDismissedTimestampUseCase = setEnableCameraUploadBannerDismissedTimestampUseCase
         )
     }
 
@@ -92,7 +105,10 @@ class MediaCameraUploadViewModelTest {
             isCameraUploadsEnabledUseCase,
             stopCameraUploadsUseCase,
             monitorCameraUploadShownUseCase,
-            setCameraUploadShownUseCase
+            setCameraUploadShownUseCase,
+            monitorEnableCameraUploadBannerVisibilityUseCase,
+            resetEnableCameraUploadBannerVisibilityUseCase,
+            setEnableCameraUploadBannerDismissedTimestampUseCase
         )
     }
 
@@ -291,4 +307,62 @@ class MediaCameraUploadViewModelTest {
                 assertThat(expectMostRecentItem().enableCameraUploadPageShowing).isTrue()
             }
         }
+
+    @Test
+    fun `test that enable CU banner is displayed when the visibility is visible and the CU is not enabled`() =
+        runTest {
+            whenever(
+                monitorEnableCameraUploadBannerVisibilityUseCase.enableCameraUploadBannerVisibilityFlow
+            ) doReturn flowOf(true)
+            whenever(isCameraUploadsEnabledUseCase()) doReturn false
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().shouldShowEnableCUBanner).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that enable CU banner visibility is reset if visible`() =
+        runTest {
+            whenever(
+                monitorEnableCameraUploadBannerVisibilityUseCase.enableCameraUploadBannerVisibilityFlow
+            ) doReturn flowOf(true)
+            whenever(isCameraUploadsEnabledUseCase()) doReturn false
+
+            underTest.uiState.test { cancelAndConsumeRemainingEvents() }
+            verify(resetEnableCameraUploadBannerVisibilityUseCase).invoke()
+        }
+
+    @Test
+    fun `test that enable CU banner is not displayed when the visibility is visible but the CU is enabled`() =
+        runTest {
+            whenever(
+                monitorEnableCameraUploadBannerVisibilityUseCase.enableCameraUploadBannerVisibilityFlow
+            ) doReturn flowOf(true)
+            whenever(isCameraUploadsEnabledUseCase()) doReturn true
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().shouldShowEnableCUBanner).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that enable CU banner is not displayed when the CU is disabled but the visibility is not visible`() =
+        runTest {
+            whenever(
+                monitorEnableCameraUploadBannerVisibilityUseCase.enableCameraUploadBannerVisibilityFlow
+            ) doReturn flowOf(false)
+            whenever(isCameraUploadsEnabledUseCase()) doReturn false
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().shouldShowEnableCUBanner).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that the enable CU banner is successfully dismissed`() = runTest {
+        underTest.dismissEnableCUBanner()
+
+        verify(setEnableCameraUploadBannerDismissedTimestampUseCase).invoke()
+    }
 }

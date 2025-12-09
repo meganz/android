@@ -20,7 +20,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
@@ -165,23 +165,27 @@ fun PhotosNodeGridView(
             }
         }
 
-        items(
+        itemsIndexed(
             items = items,
-            key = { it.key },
-            contentType = { it },
-            span = { contentType ->
-                when (contentType) {
+            key = { _, item -> item.key },
+            contentType = { _, item -> item },
+            span = { _, item ->
+                when (item) {
                     is HeaderItem -> GridItemSpan(maxLineSpan)
                     is PhotoNodeItem -> GridItemSpan(1)
                 }
             }
-        ) { contentType ->
+        ) { index, contentType ->
             when (contentType) {
                 is HeaderItem -> {
                     HeaderBody(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp, horizontal = 16.dp)
+                            .padding(
+                                top = if (index == 0) 16.dp else 8.dp,
+                                bottom = 8.dp
+                            )
+                            .padding(horizontal = 16.dp)
                             .testTag(PHOTOS_NODE_GRID_VIEW_HEADER_BODY_TAG),
                         time = contentType.time,
                         shouldShowGridSizeSettings = contentType.shouldShowGridSizeSettings,

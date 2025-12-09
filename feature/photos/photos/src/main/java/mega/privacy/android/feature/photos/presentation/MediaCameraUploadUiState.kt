@@ -33,4 +33,5 @@ data class MediaCameraUploadUiState(
     val showCameraUploadsChangePermissionsMessage: Boolean = false,
     val cameraUploadsMessage: String = "",
     val popBackFromCameraUploadsTransferScreenEvent: StateEvent = consumed,
+    val shouldShowEnableCUBanner: Boolean = false,
 )

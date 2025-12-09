@@ -32,6 +32,7 @@ import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.model.MegaSpanStyle
 import mega.android.core.ui.model.SpanIndicator
 import mega.android.core.ui.model.SpanStyleWithAnnotation
+import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
@@ -39,6 +40,7 @@ import mega.android.core.ui.theme.values.LinkColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.photos.R
+import mega.privacy.android.feature.photos.presentation.timeline.model.CameraUploadsBannerType
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.FullStorageOverQuotaBannerDisplayedEvent
@@ -50,12 +52,33 @@ import mega.privacy.mobile.analytics.event.FullStorageOverQuotaBannerUpgradeButt
  */
 
 @Composable
+internal fun CameraUploadsBanner(
+    bannerType: CameraUploadsBannerType,
+    shouldShowEnableCUBanner: Boolean,
+    onEnableCameraUploads: () -> Unit,
+    onDismissRequest: () -> Unit,
+) {
+    when (bannerType) {
+        CameraUploadsBannerType.EnableCameraUploads -> {
+            if (shouldShowEnableCUBanner) {
+                EnableCameraUploadsBanner(
+                    onEnableCUClick = onEnableCameraUploads,
+                    onDismissRequest = onDismissRequest
+                )
+            }
+        }
+
+        else -> {}
+    }
+}
+
+@Composable
 fun CameraUploadsNoFullAccessBanner(
     onClick: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    CameraUploadsBanner(
+    BasicCameraUploadsBanner(
         modifier = modifier
             .clickable { onClick() }
             .testTag(TIMELINE_CAMERA_UPLOADS_NO_FULL_ACCESS_BANNER_TEST_TAG),
@@ -85,7 +108,7 @@ internal fun DeviceChargingNotMetPausedBanner(
     onOpenSettingsClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    CameraUploadsBanner(
+    BasicCameraUploadsBanner(
         modifier = modifier.testTag(TIMELINE_CAMERA_UPLOADS_DEVICE_CHARGING_NOT_MET_BANNER_TEST_TAG),
         statusIcon = R.drawable.ic_cu_status_warning,
         title = stringResource(sharedR.string.camera_update_paused_warning_banner_title),
@@ -116,7 +139,7 @@ internal fun DeviceChargingNotMetPausedBanner(
 
 @Composable
 internal fun LowBatteryPausedBanner(modifier: Modifier = Modifier) {
-    CameraUploadsBanner(
+    BasicCameraUploadsBanner(
         modifier = modifier
             .testTag(TIMELINE_CAMERA_UPLOADS_LOW_BATTERY_BANNER_TEST_TAG),
         statusIcon = R.drawable.ic_cu_status_warning,
@@ -130,7 +153,7 @@ fun NetworkRequirementNotMetPausedBanner(
     onNavigateMobileDataSetting: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    CameraUploadsBanner(
+    BasicCameraUploadsBanner(
         modifier = modifier,
         statusIcon = R.drawable.ic_cu_status_warning,
         title = stringResource(sharedR.string.camera_update_paused_warning_banner_title),
@@ -183,22 +206,45 @@ fun FullStorageBanner(
 
 @Composable
 fun EnableCameraUploadsBanner(
-    onClick: () -> Unit,
+    onEnableCUClick: () -> Unit,
+    onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    CameraUploadsBanner(
-        modifier = modifier
-            .clickable { onClick() }
-            .testTag(TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_TEST_TAG),
+    BasicCameraUploadsBanner(
+        modifier = modifier.testTag(TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_TEST_TAG),
+        verticalAlignment = Alignment.Top,
         statusIcon = R.drawable.ic_cu_status,
-        title = stringResource(sharedR.string.camera_backup_permission_enable_button_text),
+        title = null,
         description = stringResource(id = sharedR.string.camera_upload_banner_enable_cu_subtitle),
+        action = {
+            val actionTitle =
+                "[A]${stringResource(sharedR.string.camera_backup_permission_enable_button_text)}[/A]"
+            LinkSpannedText(
+                modifier = Modifier.padding(top = 8.dp),
+                value = actionTitle,
+                spanStyles = mapOf(
+                    SpanIndicator('A') to SpanStyleWithAnnotation(
+                        MegaSpanStyle.LinkColorStyle(
+                            SpanStyle(
+                                textDecoration = TextDecoration.Underline,
+                                fontWeight = FontWeight.Medium
+                            ),
+                            LinkColor.Primary
+                        ), "A"
+                    )
+                ),
+                baseTextColor = TextColor.Secondary,
+                baseStyle = AppTheme.typography.labelLarge,
+                onAnnotationClick = { onEnableCUClick() }
+            )
+        },
         endIcon = {
             MegaIcon(
-                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight),
-                contentDescription = "Camera uploads banner end icon",
                 modifier = Modifier
-                    .size(24.dp),
+                    .size(24.dp)
+                    .clickable(onClick = onDismissRequest),
+                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.X),
+                contentDescription = "Camera uploads banner end icon",
                 tint = IconColor.Primary,
             )
         }
@@ -207,7 +253,7 @@ fun EnableCameraUploadsBanner(
 
 @Composable
 fun CameraUploadsCheckingUploadsBanner(modifier: Modifier = Modifier) {
-    CameraUploadsBanner(
+    BasicCameraUploadsBanner(
         modifier = modifier.testTag(TIMELINE_CAMERA_UPLOADS_CHECKING_UPLOADS_BANNER_TEST_TAG),
         statusIcon = R.drawable.ic_cu_status_sync,
         title = stringResource(sharedR.string.camera_uploads_banner_checking_uploads_text),
@@ -222,7 +268,7 @@ fun CameraUploadsPendingCountBanner(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    CameraUploadsBanner(
+    BasicCameraUploadsBanner(
         modifier = modifier
             .clickable { onClick() }
             .testTag(TIMELINE_CAMERA_UPLOADS_PENDING_COUNT_BANNER_TEST_TAG),
@@ -247,11 +293,12 @@ fun CameraUploadsPendingCountBanner(
 
 @SuppressLint("ComposeUnstableCollections")
 @Composable
-private fun CameraUploadsBanner(
+private fun BasicCameraUploadsBanner(
     @DrawableRes statusIcon: Int,
     title: String?,
     description: String?,
     modifier: Modifier = Modifier,
+    verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     spanStyles: Map<SpanIndicator, MegaSpanStyle>? = null,
     action: @Composable (() -> Unit)? = null,
     endIcon: @Composable (() -> Unit)? = null,
@@ -261,7 +308,7 @@ private fun CameraUploadsBanner(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(15.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = verticalAlignment
         ) {
             MegaIcon(
                 modifier = Modifier
@@ -321,6 +368,17 @@ private fun CameraUploadsBanner(
         }
 
         StrongDivider(modifier = Modifier.fillMaxWidth())
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun EnableCameraUploadsBannerPreview() {
+    AndroidThemeForPreviews {
+        EnableCameraUploadsBanner(
+            onEnableCUClick = {},
+            onDismissRequest = {}
+        )
     }
 }
 

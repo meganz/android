@@ -88,6 +88,7 @@ import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQ
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
+import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.navigation.destination.MediaTimelinePhotoPreviewNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -104,6 +105,7 @@ fun MediaMainRoute(
     onNavigateToTimelinePhotoPreview: (key: MediaTimelinePhotoPreviewNavKey) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     onNavigateToAddToAlbum: (key: LegacyAddToAlbumActivityNavKey) -> Unit,
+    onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
     timelineViewModel: TimelineTabViewModel = hiltViewModel(),
     mediaCameraUploadViewModel: MediaCameraUploadViewModel = hiltViewModel(),
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
@@ -199,7 +201,21 @@ fun MediaMainRoute(
         onAllTimelinePhotosSelected = timelineViewModel::onSelectAllPhotos,
         onClearTimelinePhotosSelection = timelineViewModel::onDeselectAllPhotos,
         onNavigateToTimelinePhotoPreview = onNavigateToTimelinePhotoPreview,
-        onNavigateToAddToAlbum = onNavigateToAddToAlbum
+        onNavigateToAddToAlbum = onNavigateToAddToAlbum,
+        clearCameraUploadsMessage = {
+            mediaCameraUploadViewModel.setCameraUploadsMessage("")
+        },
+        clearCameraUploadsCompletedMessage = {
+            mediaCameraUploadViewModel.setCameraUploadsCompletedMessage(false)
+        },
+        onChangeCameraUploadsPermissions = {},
+        clearCameraUploadsChangePermissionsMessage = {
+            mediaCameraUploadViewModel.showCameraUploadsChangePermissionsMessage(false)
+        },
+        onNavigateCameraUploadsSettings = {
+            onNavigateToCameraUploadsSettings(LegacySettingsCameraUploadsActivityNavKey)
+        },
+        onDismissEnableCameraUploadsBanner = mediaCameraUploadViewModel::dismissEnableCUBanner
     )
 }
 
@@ -224,6 +240,12 @@ fun MediaMainScreen(
     onClearTimelinePhotosSelection: () -> Unit,
     onNavigateToTimelinePhotoPreview: (key: MediaTimelinePhotoPreviewNavKey) -> Unit,
     onNavigateToAddToAlbum: (key: LegacyAddToAlbumActivityNavKey) -> Unit,
+    clearCameraUploadsMessage: () -> Unit,
+    clearCameraUploadsCompletedMessage: () -> Unit,
+    onChangeCameraUploadsPermissions: () -> Unit,
+    clearCameraUploadsChangePermissionsMessage: () -> Unit,
+    onNavigateCameraUploadsSettings: () -> Unit,
+    onDismissEnableCameraUploadsBanner: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MediaMainViewModel = hiltViewModel(),
     videosTabViewModel: VideosTabViewModel = hiltViewModel(),
@@ -318,10 +340,9 @@ fun MediaMainScreen(
                     actions = buildList {
                         add(
                             MenuActionWithClick(
-                                menuAction = MediaAppBarAction.CameraUpload(CameraUploadStatus.Default)
-                            ) {
-                                //TODO: Handle Camera Upload action click
-                            }
+                                menuAction = MediaAppBarAction.CameraUpload(CameraUploadStatus.Default),
+                                onClick = onNavigateCameraUploadsSettings
+                            )
                         )
 
                         add(
@@ -438,7 +459,6 @@ fun MediaMainScreen(
                                 MediaContent(
                                     modifier = Modifier.fillMaxSize(),
                                     timelineContentPadding = PaddingValues(
-                                        top = 8.dp,
                                         bottom = if (isTimelineInSelectionMode) {
                                             paddingValues.calculateBottomPadding()
                                         } else {
@@ -477,7 +497,13 @@ fun MediaMainScreen(
                                             )
                                         }
                                     },
-                                    onTimelinePhotoSelected = onTimelinePhotoSelected
+                                    onTimelinePhotoSelected = onTimelinePhotoSelected,
+                                    clearCameraUploadsMessage = clearCameraUploadsMessage,
+                                    clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
+                                    onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
+                                    clearCameraUploadsChangePermissionsMessage = clearCameraUploadsChangePermissionsMessage,
+                                    onNavigateCameraUploadsSettings = onNavigateCameraUploadsSettings,
+                                    onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner
                                 )
                             }
                         )
@@ -593,6 +619,12 @@ private fun MediaScreen.MediaContent(
     resetCUButtonAndProgress: () -> Unit,
     onTimelinePhotoClick: (node: PhotoNodeUiState) -> Unit,
     onTimelinePhotoSelected: (node: PhotoNodeUiState) -> Unit,
+    clearCameraUploadsMessage: () -> Unit,
+    clearCameraUploadsCompletedMessage: () -> Unit,
+    onChangeCameraUploadsPermissions: () -> Unit,
+    clearCameraUploadsChangePermissionsMessage: () -> Unit,
+    onNavigateCameraUploadsSettings: () -> Unit,
+    onDismissEnableCameraUploadsBanner: () -> Unit,
     modifier: Modifier = Modifier,
     timelineContentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -607,19 +639,20 @@ private fun MediaScreen.MediaContent(
                 mediaCameraUploadUiState = mediaCameraUploadUiState,
                 timelineFilterUiState = timelineFilterUiState,
                 showTimelineSortDialog = showTimelineSortDialog,
-                clearCameraUploadsMessage = {},
-                clearCameraUploadsCompletedMessage = {},
-                onChangeCameraUploadsPermissions = {},
-                clearCameraUploadsChangePermissionsMessage = {},
+                clearCameraUploadsMessage = clearCameraUploadsMessage,
+                clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
+                onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
+                clearCameraUploadsChangePermissionsMessage = clearCameraUploadsChangePermissionsMessage,
                 loadNextPage = loadTimelineNextPage,
-                onNavigateCameraUploadsSettings = {},
+                onNavigateCameraUploadsSettings = onNavigateCameraUploadsSettings,
                 setEnableCUPage = setEnableCUPage,
                 onGridSizeChange = onTimelineGridSizeChange,
                 onSortDialogDismissed = onTimelineSortDialogDismissed,
                 onSortOptionChange = onTimelineSortOptionChange,
                 resetCUButtonAndProgress = resetCUButtonAndProgress,
                 onPhotoClick = onTimelinePhotoClick,
-                onPhotoSelected = onTimelinePhotoSelected
+                onPhotoSelected = onTimelinePhotoSelected,
+                onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner
             )
         }
 
@@ -709,7 +742,13 @@ fun PhotosMainScreenPreview() {
             onAllTimelinePhotosSelected = {},
             onClearTimelinePhotosSelection = {},
             onNavigateToTimelinePhotoPreview = {},
-            onNavigateToAddToAlbum = {}
+            onNavigateToAddToAlbum = {},
+            clearCameraUploadsMessage = {},
+            clearCameraUploadsCompletedMessage = {},
+            onChangeCameraUploadsPermissions = {},
+            clearCameraUploadsChangePermissionsMessage = {},
+            onNavigateCameraUploadsSettings = {},
+            onDismissEnableCameraUploadsBanner = {}
         )
     }
 }

@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -70,12 +70,14 @@ internal fun PhotosNodeListCardListView(
             }
         }
 
-        items(
+        itemsIndexed(
             items = photos,
-            key = { it.key }
-        ) { photo ->
+            key = { _, item -> item.key }
+        ) { index, photo ->
             SecondaryHeaderListItem(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = if (index == 0) 8.dp else 0.dp),
                 text = photo.date
             )
 

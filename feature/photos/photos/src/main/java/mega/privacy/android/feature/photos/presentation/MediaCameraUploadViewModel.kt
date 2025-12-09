@@ -21,7 +21,10 @@ import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSta
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorCameraUploadShownUseCase
+import mega.privacy.android.domain.usecase.photos.MonitorEnableCameraUploadBannerVisibilityUseCase
+import mega.privacy.android.domain.usecase.photos.ResetEnableCameraUploadBannerVisibilityUseCase
 import mega.privacy.android.domain.usecase.photos.SetCameraUploadShownUseCase
+import mega.privacy.android.domain.usecase.photos.SetEnableCameraUploadBannerDismissedTimestampUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.feature.photos.model.CameraUploadsStatus
@@ -47,6 +50,9 @@ class MediaCameraUploadViewModel @Inject constructor(
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
     private val monitorCameraUploadShownUseCase: MonitorCameraUploadShownUseCase,
     private val setCameraUploadShownUseCase: SetCameraUploadShownUseCase,
+    private val monitorEnableCameraUploadBannerVisibilityUseCase: MonitorEnableCameraUploadBannerVisibilityUseCase,
+    private val resetEnableCameraUploadBannerVisibilityUseCase: ResetEnableCameraUploadBannerVisibilityUseCase,
+    private val setEnableCameraUploadBannerDismissedTimestampUseCase: SetEnableCameraUploadBannerDismissedTimestampUseCase,
 ) : ViewModel() {
 
     // Due to time constraint, this approach will be updated to the lazy approach in phase 2.
@@ -64,6 +70,7 @@ class MediaCameraUploadViewModel @Inject constructor(
     private fun startMonitoring() {
         monitorCameraUploadShownStatus()
         monitorCameraUploadsStatus()
+        monitorEnableCUBannerVisibility()
         syncCameraUploadsStatus()
         checkCameraUploadsTransferScreenEnabled()
         checkCameraUploadsPausedWarningBannerEnabled()
@@ -408,5 +415,31 @@ class MediaCameraUploadViewModel @Inject constructor(
             .onSuccess { isCameraUploadsEnabled ->
                 _uiState.update { it.copy(enableCameraUploadPageShowing = photos.isEmpty() && !isCameraUploadsEnabled) }
             }
+    }
+
+    private fun monitorEnableCUBannerVisibility() {
+        viewModelScope.launch {
+            monitorEnableCameraUploadBannerVisibilityUseCase.enableCameraUploadBannerVisibilityFlow
+                .catch { Timber.e(it, "Unable to monitor enable CU banner visibility") }
+                .collectLatest { isVisible ->
+                    val isCUEnabled = runCatching {
+                        isCameraUploadsEnabledUseCase()
+                    }.getOrDefault(defaultValue = false)
+                    _uiState.update { it.copy(shouldShowEnableCUBanner = isVisible && !isCUEnabled) }
+                    if (isVisible) {
+                        runCatching { resetEnableCameraUploadBannerVisibilityUseCase() }
+                            .onFailure {
+                                Timber.e(it, "Unable to reset enable CU banner visibility")
+                            }
+                    }
+                }
+        }
+    }
+
+    internal fun dismissEnableCUBanner() {
+        viewModelScope.launch {
+            runCatching { setEnableCameraUploadBannerDismissedTimestampUseCase() }
+                .onFailure { Timber.e(it, "Unable to set enable CU banner dismiss timestamp") }
+        }
     }
 }
