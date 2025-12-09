@@ -13,9 +13,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.gateway.DeviceGateway
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -31,12 +37,19 @@ class MediaTimelinePreferencesDataStoreTest {
             scope = CoroutineScope(UnconfinedTestDispatcher()),
             produceFile = { context.preferencesDataStoreFile(mediaTimelinePreferenceFileName) }
         )
+    private val deviceGateway: DeviceGateway = mock()
 
     @Before
     fun setup() {
         underTest = MediaTimelinePreferencesDataStore(
-            mediaTimelinePreferenceDataStore = mediaTimelinePreferenceDataStore
+            mediaTimelinePreferenceDataStore = mediaTimelinePreferenceDataStore,
+            deviceGateway = deviceGateway
         )
+    }
+
+    @After
+    fun tearDown() {
+        reset(deviceGateway)
     }
 
     @Test
@@ -52,6 +65,38 @@ class MediaTimelinePreferencesDataStoreTest {
 
         underTest.cameraUploadShownFlow.test {
             assertThat(expectMostRecentItem()).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that the enable CU banner is not dismissed by default`() = runTest {
+        underTest.enableCameraUploadBannerDismissedTimestamp.test {
+            assertThat(expectMostRecentItem()).isNull()
+        }
+    }
+
+    @Test
+    fun `test that the enable CU banner is successfully dismissed`() = runTest {
+        val timeInMillis = 123L
+        whenever(deviceGateway.now) doReturn timeInMillis
+
+        underTest.setEnableCameraUploadBannerDismissedTimestamp()
+
+        underTest.enableCameraUploadBannerDismissedTimestamp.test {
+            assertThat(expectMostRecentItem()).isEqualTo(timeInMillis)
+        }
+    }
+
+    @Test
+    fun `test that the enable CU banner dismiss timestamp is successfully reset`() = runTest {
+        val timeInMillis = 123L
+        whenever(deviceGateway.now) doReturn timeInMillis
+
+        underTest.setEnableCameraUploadBannerDismissedTimestamp()
+        underTest.resetEnableCameraUploadBannerDismissedTimestamp()
+
+        underTest.enableCameraUploadBannerDismissedTimestamp.test {
+            assertThat(expectMostRecentItem()).isNull()
         }
     }
 }

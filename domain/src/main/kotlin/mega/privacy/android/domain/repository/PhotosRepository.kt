@@ -78,7 +78,7 @@ interface PhotosRepository {
         folderId: NodeId,
         searchString: String = "",
         recursive: Boolean,
-        isFromFolderLink: Boolean = false
+        isFromFolderLink: Boolean = false,
     ): List<Photo>
 
     /**
@@ -236,4 +236,19 @@ interface PhotosRepository {
      * Set the CU has been shown in timeline screen.
      */
     suspend fun setCameraUploadShown()
+
+    /**
+     * Monitor the enable camera upload banner dismissed timestamp.
+     */
+    val enableCameraUploadBannerDismissedTimestamp: Flow<Long?>
+
+    /**
+     * Set the enable camera upload banner dismissed timestamp.
+     */
+    suspend fun setEnableCameraUploadBannerDismissedTimestamp()
+
+    /**
+     * Reset the enable camera upload banner dismissed timestamp.
+     */
+    suspend fun resetEnableCameraUploadBannerDismissedTimestamp()
 }

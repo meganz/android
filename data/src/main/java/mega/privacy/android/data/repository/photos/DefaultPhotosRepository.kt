@@ -763,7 +763,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     ): Photo? =
         withContext(ioDispatcher) {
             megaNodeFromChatMessageMapper(chatId, messageId, 0)?.let {
-                mapMegaNodeToPhoto(it, filterSvg = false) 
+                mapMegaNodeToPhoto(it, filterSvg = false)
             }
         }
 
@@ -1121,6 +1121,23 @@ internal class DefaultPhotosRepository @Inject constructor(
     override suspend fun setCameraUploadShown() {
         withContext(ioDispatcher) {
             mediaTimelinePreferencesGateway.setCameraUploadShown()
+        }
+    }
+
+    override val enableCameraUploadBannerDismissedTimestamp: Flow<Long?> =
+        mediaTimelinePreferencesGateway
+            .enableCameraUploadBannerDismissedTimestamp
+            .flowOn(ioDispatcher)
+
+    override suspend fun setEnableCameraUploadBannerDismissedTimestamp() {
+        withContext(ioDispatcher) {
+            mediaTimelinePreferencesGateway.setEnableCameraUploadBannerDismissedTimestamp()
+        }
+    }
+
+    override suspend fun resetEnableCameraUploadBannerDismissedTimestamp() {
+        withContext(ioDispatcher) {
+            mediaTimelinePreferencesGateway.resetEnableCameraUploadBannerDismissedTimestamp()
         }
     }
 

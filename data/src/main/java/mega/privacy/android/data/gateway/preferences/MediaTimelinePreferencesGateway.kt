@@ -7,4 +7,10 @@ internal interface MediaTimelinePreferencesGateway {
     val cameraUploadShownFlow: Flow<Boolean>
 
     suspend fun setCameraUploadShown()
+
+    val enableCameraUploadBannerDismissedTimestamp: Flow<Long?>
+
+    suspend fun setEnableCameraUploadBannerDismissedTimestamp()
+
+    suspend fun resetEnableCameraUploadBannerDismissedTimestamp()
 }
