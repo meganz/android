@@ -320,7 +320,7 @@ fun MediaMainScreen(
                             MenuActionWithClick(
                                 menuAction = MediaAppBarAction.CameraUpload(CameraUploadStatus.Default)
                             ) {
-                                // Todo: Handle Camera Upload action click
+                                //TODO: Handle Camera Upload action click
                             }
                         )
 
@@ -329,7 +329,7 @@ fun MediaMainScreen(
                                 if (currentTabIndex == MediaScreen.Videos.ordinal) {
                                     isVideosTabSearchBarVisible = true
                                 }
-                                // Todo: Handle Search action click
+                                //TODO: Handle Search action click
                             }
                         )
 
@@ -635,7 +635,7 @@ private fun MediaScreen.MediaContent(
 
         MediaScreen.Videos -> VideosTabRoute()
 
-        // Todo: Implement Playlists Screens
+        //TODO: Implement Playlists Screens
         else -> {
             Box(modifier) {
                 MegaText("Playlists Screen - To be implemented")

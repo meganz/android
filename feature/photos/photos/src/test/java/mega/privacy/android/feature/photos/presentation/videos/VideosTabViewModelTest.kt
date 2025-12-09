@@ -24,12 +24,17 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
+import mega.privacy.android.domain.usecase.videosection.GetSyncUploadsFolderIdsUseCase
 import mega.privacy.android.feature.photos.mapper.VideoUiEntityMapper
+import mega.privacy.android.feature.photos.presentation.videos.model.DurationFilterOption
+import mega.privacy.android.feature.photos.presentation.videos.model.LocationFilterOption
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
@@ -38,6 +43,7 @@ import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -51,6 +57,7 @@ class VideosTabViewModelTest {
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
+    private val getSyncUploadsFolderIdsUseCase = mock<GetSyncUploadsFolderIdsUseCase>()
     private val setCloudSortOrderUseCase = mock<SetCloudSortOrder>()
     private val nodeSortConfigurationUiMapper = mock<NodeSortConfigurationUiMapper>()
     private val monitorSortCloudOrderUseCase = mock<MonitorSortCloudOrderUseCase>()
@@ -61,6 +68,8 @@ class VideosTabViewModelTest {
         on { name }.thenReturn("video name")
         on { elementID }.thenReturn(1L)
     }
+
+    private val syncUploadsFolderIds = listOf(100L, 200L)
 
     @BeforeEach
     fun setUp() {
@@ -77,7 +86,6 @@ class VideosTabViewModelTest {
                     awaitCancellation()
                 }
             )
-
             whenever(monitorSortCloudOrderUseCase()).thenReturn(
                 flow {
                     emit(null)
@@ -108,6 +116,7 @@ class VideosTabViewModelTest {
             getCloudSortOrder = getCloudSortOrder,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
+            getSyncUploadsFolderIdsUseCase = getSyncUploadsFolderIdsUseCase,
             setCloudSortOrderUseCase = setCloudSortOrderUseCase,
             nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
             monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
@@ -122,6 +131,7 @@ class VideosTabViewModelTest {
             getCloudSortOrder,
             monitorNodeUpdatesUseCase,
             monitorOfflineNodeUpdatesUseCase,
+            getSyncUploadsFolderIdsUseCase,
             setCloudSortOrderUseCase,
             nodeSortConfigurationUiMapper,
             monitorSortCloudOrderUseCase
@@ -149,6 +159,8 @@ class VideosTabViewModelTest {
                 assertThat(actual.query).isNull()
                 assertThat(actual.highlightText).isEmpty()
                 assertThat(actual.selectedSortConfiguration).isEqualTo(NodeSortConfiguration.default)
+                assertThat(actual.locationSelectedFilterOption).isEqualTo(LocationFilterOption.AllLocations)
+                assertThat(actual.durationSelectedFilterOption).isEqualTo(DurationFilterOption.AllDurations)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -245,21 +257,6 @@ class VideosTabViewModelTest {
         }
     }
 
-    private fun createVideoUiEntity(
-        handle: Long,
-        parentHandle: Long = 50L,
-        name: String = "video name $handle",
-        duration: Duration = 1.minutes,
-        isSharedItems: Boolean = false,
-    ) = mock<VideoUiEntity> {
-        on { id }.thenReturn(NodeId(handle))
-        on { parentId }.thenReturn(NodeId(parentHandle))
-        on { this.name }.thenReturn(name)
-        on { elementID }.thenReturn(1L)
-        on { this.duration }.thenReturn(duration)
-        on { this.isSharedItems }.thenReturn(isSharedItems)
-    }
-
     @Test
     fun `test that uiState is correctly updated when setCloudSortOrder is invoked`() =
         runTest {
@@ -283,4 +280,160 @@ class VideosTabViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+
+    @ParameterizedTest(name = "by {0}")
+    @MethodSource("provideLocationOptions")
+    fun `test that setLocationSelectedFilterOption filters videos`(
+        locationFilterOption: LocationFilterOption,
+    ) =
+        runTest {
+            val cloudDriveVideo = createVideoUiEntity(handle = 1L, parentHandle = 50L)
+            val cameraUploadsVideo = createVideoUiEntity(handle = 2L, parentHandle = 100L)
+            val sharedVideo =
+                createVideoUiEntity(handle = 3L, parentHandle = 50L, isSharedItems = true)
+
+            val cloudDriveList = listOf(cloudDriveVideo)
+            val cameraUploadsList = listOf(cameraUploadsVideo)
+            val sharedList = listOf(sharedVideo)
+
+            val list = cloudDriveList + cameraUploadsList + sharedList
+
+            initVideosForFilter(videos = list)
+
+            underTest.setLocationSelectedFilterOption(locationFilterOption)
+
+            underTest.uiState.drop(1).test {
+                val actual = awaitItem() as VideosTabUiState.Data
+                assertThat(actual.locationSelectedFilterOption).isEqualTo(locationFilterOption)
+                assertThat(actual.allVideos).hasSize(
+                    when (locationFilterOption) {
+                        LocationFilterOption.AllLocations -> list.size
+                        LocationFilterOption.CloudDrive -> (cloudDriveList + sharedList).size
+                        LocationFilterOption.CameraUploads -> cameraUploadsList.size
+                        LocationFilterOption.SharedItems -> sharedList.size
+                    }
+                )
+                assertThat(actual.allVideos.map { it.id }).isEqualTo(
+                    when (locationFilterOption) {
+                        LocationFilterOption.AllLocations -> list
+                        LocationFilterOption.CloudDrive -> cloudDriveList + sharedList
+                        LocationFilterOption.CameraUploads -> cameraUploadsList
+                        LocationFilterOption.SharedItems -> sharedList
+                    }.map { it.id }
+                )
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    private fun provideLocationOptions(): List<LocationFilterOption> =
+        listOf(
+            LocationFilterOption.AllLocations,
+            LocationFilterOption.CloudDrive,
+            LocationFilterOption.CameraUploads,
+            LocationFilterOption.SharedItems
+        )
+
+    @ParameterizedTest(name = "by {0}")
+    @MethodSource("provideDurationOptions")
+    fun `test that setDurationSelectedFilterOption filters videos`(
+        durationFilterOption: DurationFilterOption,
+    ) =
+        runTest {
+            val video1Seconds = createVideoUiEntity(handle = 1L, duration = 1.seconds)
+            val video5Seconds = createVideoUiEntity(handle = 2L, duration = 5.seconds)
+            val video10Seconds = createVideoUiEntity(handle = 3L, duration = 10.seconds)
+            val video30Seconds = createVideoUiEntity(handle = 4L, duration = 30.seconds)
+            val video60Seconds = createVideoUiEntity(handle = 5L, duration = 60.seconds)
+            val video2Minutes = createVideoUiEntity(handle = 6L, duration = 2.minutes)
+            val video4Minutes = createVideoUiEntity(handle = 7L, duration = 4.minutes)
+            val video8Minutes = createVideoUiEntity(handle = 8L, duration = 8.minutes)
+            val video15Minutes = createVideoUiEntity(handle = 9L, duration = 15.minutes)
+            val video20Minutes = createVideoUiEntity(handle = 10L, duration = 20.minutes)
+            val video25Minutes = createVideoUiEntity(handle = 11L, duration = 25.minutes)
+            val video1Hour = createVideoUiEntity(handle = 12L, duration = 1.hours)
+            val video10Hour = createVideoUiEntity(handle = 13L, duration = 10.hours)
+
+            val lessThan10Seconds = listOf(video1Seconds, video5Seconds)
+            val between10And60Seconds = listOf(video10Seconds, video30Seconds, video60Seconds)
+            val between1And4 = listOf(video2Minutes, video4Minutes)
+            val between4And20 = listOf(video8Minutes, video15Minutes, video20Minutes)
+            val moreThan20 = listOf(video25Minutes, video1Hour, video10Hour)
+
+            val allVideos =
+                lessThan10Seconds + between10And60Seconds + between1And4 + between4And20 + moreThan20
+
+            initVideosForFilter(allVideos)
+
+            underTest.setDurationSelectedFilterOption(durationFilterOption)
+
+            underTest.uiState.drop(1).test {
+                val actual = awaitItem() as VideosTabUiState.Data
+                assertThat(actual.durationSelectedFilterOption).isEqualTo(durationFilterOption)
+                assertThat(actual.allVideos).hasSize(
+                    when (durationFilterOption) {
+                        DurationFilterOption.AllDurations -> allVideos.size
+                        DurationFilterOption.LessThan10Seconds -> lessThan10Seconds.size
+                        DurationFilterOption.Between10And60Seconds -> between10And60Seconds.size
+                        DurationFilterOption.Between1And4 -> between1And4.size
+                        DurationFilterOption.Between4And20 -> between4And20.size
+                        DurationFilterOption.MoreThan20 -> moreThan20.size
+                    }
+                )
+                assertThat(actual.allVideos.map { it.id }).isEqualTo(
+                    when (durationFilterOption) {
+                        DurationFilterOption.AllDurations -> allVideos
+                        DurationFilterOption.LessThan10Seconds -> lessThan10Seconds
+                        DurationFilterOption.Between10And60Seconds -> between10And60Seconds
+                        DurationFilterOption.Between1And4 -> between1And4
+                        DurationFilterOption.Between4And20 -> between4And20
+                        DurationFilterOption.MoreThan20 -> moreThan20
+                    }.map { it.id }
+                )
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    private fun provideDurationOptions(): List<DurationFilterOption> =
+        listOf(
+            DurationFilterOption.AllDurations,
+            DurationFilterOption.LessThan10Seconds,
+            DurationFilterOption.Between10And60Seconds,
+            DurationFilterOption.Between1And4,
+            DurationFilterOption.Between4And20,
+            DurationFilterOption.MoreThan20
+        )
+
+    private fun createVideoUiEntity(
+        handle: Long,
+        parentHandle: Long = 50L,
+        name: String = "video name $handle",
+        duration: Duration = 1.minutes,
+        isSharedItems: Boolean = false,
+    ) = mock<VideoUiEntity> {
+        on { id }.thenReturn(NodeId(handle))
+        on { parentId }.thenReturn(NodeId(parentHandle))
+        on { this.name }.thenReturn(name)
+        on { elementID }.thenReturn(1L)
+        on { this.duration }.thenReturn(duration)
+        on { this.isSharedItems }.thenReturn(isSharedItems)
+    }
+
+    private suspend fun initVideosForFilter(
+        videos: List<VideoUiEntity>,
+        syncUploadsFolderIds: List<Long> = this.syncUploadsFolderIds,
+    ) {
+        whenever(
+            getAllVideosUseCase(
+                searchQuery = anyOrNull(),
+                tag = anyOrNull(),
+                description = anyOrNull()
+            )
+        ).thenReturn(videos.map { mock() })
+        var index = 0
+        whenever(videoUiEntityMapper(any())).thenAnswer {
+            videos[index++ % videos.size]
+        }
+        whenever(getSyncUploadsFolderIdsUseCase()).thenReturn(syncUploadsFolderIds)
+    }
 }

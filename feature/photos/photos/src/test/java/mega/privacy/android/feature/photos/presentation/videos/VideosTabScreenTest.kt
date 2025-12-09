@@ -12,6 +12,8 @@ import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.feature.photos.components.DURATION_FILTER_BUTTON_TEXT_TEST_TAG
+import mega.privacy.android.feature.photos.components.LOCATION_FILTER_BUTTON_TEXT_TEST_TAG
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import org.junit.Rule
 import org.junit.Test
@@ -60,10 +62,11 @@ class VideosTabScreenTest {
         )
 
         VIDEO_TAB_LOADING_VIEW_TEST_TAG.assertIsDisplayedWithTag()
+        VIDEO_TAB_VIDEOS_FILTER_BUTTON_VIEW_TEST_TAG.assertIsDisplayedWithTag()
 
         listOf(
             VIDEO_TAB_EMPTY_VIEW_TEST_TAG,
-            VIDEO_TAB_ALL_VIDEOS_VIEW_TEST_TAG
+            VIDEO_TAB_ALL_VIDEOS_VIEW_TEST_TAG,
         ).assertIsNotDisplayedWithTag()
     }
 
@@ -76,6 +79,7 @@ class VideosTabScreenTest {
         )
 
         VIDEO_TAB_EMPTY_VIEW_TEST_TAG.assertIsDisplayedWithTag()
+        VIDEO_TAB_VIDEOS_FILTER_BUTTON_VIEW_TEST_TAG.assertIsDisplayedWithTag()
 
         listOf(
             VIDEO_TAB_LOADING_VIEW_TEST_TAG,
@@ -93,6 +97,7 @@ class VideosTabScreenTest {
         )
 
         VIDEO_TAB_ALL_VIDEOS_VIEW_TEST_TAG.assertIsDisplayedWithTag()
+        VIDEO_TAB_VIDEOS_FILTER_BUTTON_VIEW_TEST_TAG.assertIsDisplayedWithTag()
         SORT_ORDER_TAG.assertIsDisplayedWithTag()
 
         listOf(
@@ -102,6 +107,33 @@ class VideosTabScreenTest {
     }
 
     @Test
+    fun `test that Location VideosFilterBottomSheet is displayed after location filter button is clicked`() {
+        setComposeContent(
+            uiState = VideosTabUiState.Data()
+        )
+
+        composeTestRule.onNodeWithTag(
+            testTag = LOCATION_FILTER_BUTTON_TEXT_TEST_TAG,
+            useUnmergedTree = true
+        ).performClick()
+
+        VIDEO_TAB_VIDEOS_LOCATION_FILTER_BOTTOM_SHEET_TEST_TAG.assertIsDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that Duration VideosFilterBottomSheet is displayed after duration filter button is clicked`() {
+        setComposeContent(
+            uiState = VideosTabUiState.Data()
+        )
+
+        composeTestRule.onNodeWithTag(
+            testTag = DURATION_FILTER_BUTTON_TEXT_TEST_TAG,
+            useUnmergedTree = true
+        ).performClick()
+
+        VIDEO_TAB_VIDEOS_DURATION_FILTER_BOTTOM_SHEET_TEST_TAG.assertIsDisplayedWithTag()
+    }
+
     fun `test that SortBottomSheet is displayed correctly`() {
         val video = createVideoUiEntity(1L)
         val onSortNodes = mock<(NodeSortConfiguration) -> Unit>()

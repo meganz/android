@@ -26,7 +26,11 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
+import mega.privacy.android.domain.usecase.videosection.GetSyncUploadsFolderIdsUseCase
 import mega.privacy.android.feature.photos.mapper.VideoUiEntityMapper
+import mega.privacy.android.feature.photos.presentation.videos.model.DurationFilterOption
+import mega.privacy.android.feature.photos.presentation.videos.model.LocationFilterOption
+import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
 
@@ -38,12 +42,16 @@ class VideosTabViewModel @Inject constructor(
     private val getCloudSortOrder: GetCloudSortOrder,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
+    private val getSyncUploadsFolderIdsUseCase: GetSyncUploadsFolderIdsUseCase,
     private val setCloudSortOrderUseCase: SetCloudSortOrder,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
 ) : ViewModel() {
     private val triggerFlow = MutableStateFlow(false)
     private val queryFlow = MutableStateFlow<String?>(null)
+    private val locationFilterOptionFlow = MutableStateFlow(LocationFilterOption.AllLocations)
+    private val durationFilterOptionFlow = MutableStateFlow(DurationFilterOption.AllDurations)
+
     internal val uiState: StateFlow<VideosTabUiState> by lazy {
         triggerFlow.flatMapLatest {
             flow {
@@ -59,6 +67,8 @@ class VideosTabViewModel @Inject constructor(
                         monitorSortCloudOrderUseCase()
                     ).mapLatest {
                         val videoList = getVideoUIEntityList()
+                            .filterVideosByDuration()
+                            .filterVideosByLocation()
                         val sortOrder = getCloudSortOrder()
                         val sortOrderPair = nodeSortConfigurationUiMapper(sortOrder)
 
@@ -66,7 +76,9 @@ class VideosTabViewModel @Inject constructor(
                             allVideos = videoList,
                             sortOrder = sortOrder,
                             query = queryFlow.value,
-                            selectedSortConfiguration = sortOrderPair
+                            selectedSortConfiguration = sortOrderPair,
+                            locationSelectedFilterOption = locationFilterOptionFlow.value,
+                            durationSelectedFilterOption = durationFilterOptionFlow.value,
                         )
                     }.catch {
                         Timber.e(it)
@@ -83,12 +95,46 @@ class VideosTabViewModel @Inject constructor(
         triggerFlow.update { !it }
     }
 
-    private suspend fun getVideoUIEntityList() =
-        getAllVideosUseCase(
-            searchQuery = getCurrentSearchQuery(),
-            tag = getCurrentSearchQuery().removePrefix("#"),
-            description = getCurrentSearchQuery()
-        ).map { videoUiEntityMapper(it) }
+    private suspend fun getVideoUIEntityList() = getAllVideosUseCase(
+        searchQuery = getCurrentSearchQuery(),
+        tag = getCurrentSearchQuery().removePrefix("#"),
+        description = getCurrentSearchQuery()
+    ).map { videoUiEntityMapper(it) }
+
+    private suspend fun List<VideoUiEntity>.filterVideosByLocation(): List<VideoUiEntity> {
+        val syncUploadsFolderIds = getSyncUploadsFolderIdsUseCase()
+        return filter {
+            when (locationFilterOptionFlow.value) {
+                LocationFilterOption.AllLocations -> true
+                LocationFilterOption.CloudDrive -> it.parentId.longValue !in syncUploadsFolderIds
+                LocationFilterOption.CameraUploads -> it.parentId.longValue in syncUploadsFolderIds
+                LocationFilterOption.SharedItems -> it.isSharedItems
+            }
+        }
+    }
+
+    private fun List<VideoUiEntity>.filterVideosByDuration() =
+        filter {
+            val seconds = it.duration.inWholeSeconds
+            when (durationFilterOptionFlow.value) {
+                DurationFilterOption.AllDurations -> true
+                DurationFilterOption.LessThan10Seconds -> seconds < 10
+                DurationFilterOption.Between10And60Seconds -> seconds in 10..60
+                DurationFilterOption.Between1And4 -> seconds in 61..240
+                DurationFilterOption.Between4And20 -> seconds in 241..1200
+                DurationFilterOption.MoreThan20 -> seconds > 1200
+            }
+        }
+
+    internal fun setLocationSelectedFilterOption(locationFilterOption: LocationFilterOption) {
+        locationFilterOptionFlow.update { locationFilterOption }
+        triggerRefresh()
+    }
+
+    internal fun setDurationSelectedFilterOption(durationFilterOption: DurationFilterOption) {
+        durationFilterOptionFlow.update { durationFilterOption }
+        triggerRefresh()
+    }
 
     internal fun getCurrentSearchQuery() = queryFlow.value.orEmpty()
 

@@ -3,6 +3,8 @@ package mega.privacy.android.feature.photos.presentation.videos
 import androidx.compose.runtime.Stable
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.feature.photos.presentation.videos.model.DurationFilterOption
+import mega.privacy.android.feature.photos.presentation.videos.model.LocationFilterOption
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 
 
@@ -16,12 +18,16 @@ sealed interface VideosTabUiState {
      * @property allVideos the all video items
      * @property sortOrder the sort order
      * @property query the search query
+     * @property locationSelectedFilterOption the selected location filter option
+     * @property durationSelectedFilterOption the selected duration filter option
      * @property selectedSortConfiguration the selected sort configuration
      */
     data class Data(
         val allVideos: List<VideoUiEntity> = emptyList(),
         val sortOrder: SortOrder = SortOrder.ORDER_NONE,
         val query: String? = null,
+        val locationSelectedFilterOption: LocationFilterOption = LocationFilterOption.AllLocations,
+        val durationSelectedFilterOption: DurationFilterOption = DurationFilterOption.AllDurations,
         val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
     ) : VideosTabUiState {
         /**
