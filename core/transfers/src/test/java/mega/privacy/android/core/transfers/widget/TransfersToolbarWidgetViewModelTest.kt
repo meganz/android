@@ -100,7 +100,6 @@ class TransfersToolbarWidgetViewModelTest {
                 status = TransfersToolbarWidgetStatus.Transferring,
                 totalSizeAlreadyTransferred = totalSizeTransferred,
                 totalSizeToTransfer = totalSizeToTransfer,
-                isOnline = true,
                 isUserLoggedIn = true,
             )
 
@@ -115,21 +114,30 @@ class TransfersToolbarWidgetViewModelTest {
         }
 
     @Test
-    fun `test that isOnline ui state is updated when monitorConnectivityUseCase emits, skipping unstable offline`() =
+    fun `test that status reflects connectivity when monitorConnectivityUseCase emits, skipping unstable offline`() =
         runTest {
             initTest()
+            monitorTransfersStatusFlow.emit(
+                TransfersStatusInfo(
+                    totalSizeToTransfer = 10L,
+                    totalSizeTransferred = 5L,
+                    pendingUploads = 1,
+                    pendingDownloads = 1,
+                )
+            )
+
             underTest.state.test {
                 monitorConnectivityUseCaseFlow.emit(true)
-                assertThat(awaitItem().isOnline).isTrue()
+                assertThat(awaitItem().status).isEqualTo(TransfersToolbarWidgetStatus.Transferring)
                 monitorConnectivityUseCaseFlow.emit(false)
                 delay(waitTimeToShowOffline / 2)
                 monitorConnectivityUseCaseFlow.emit(true)
                 expectNoEvents() //short offline is skipped
                 monitorConnectivityUseCaseFlow.emit(false)
                 delay(waitTimeToShowOffline * 1.1)
-                assertThat(awaitItem().isOnline).isFalse() // long offline is not skipped
+                assertThat(awaitItem().status).isEqualTo(TransfersToolbarWidgetStatus.Error) // long offline is not skipped
                 monitorConnectivityUseCaseFlow.emit(true)
-                assertThat(awaitItem().isOnline).isTrue() // online is updated immediately
+                assertThat(awaitItem().status).isEqualTo(TransfersToolbarWidgetStatus.Transferring) // online is updated immediately
             }
         }
 

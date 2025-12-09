@@ -25,6 +25,7 @@ import mega.privacy.android.app.extensions.moveElement
 import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.COMPLETED_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.FAILED_TAB_INDEX
+import mega.privacy.android.core.transfers.widget.TransfersToolbarWidgetViewModel.Companion.waitTimeToShowOffline
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -32,10 +33,12 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.extension.skipUnstable
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.RetryChatUploadUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByUniqueIdUseCase
@@ -83,15 +86,16 @@ class TransfersViewModel @AssistedInject constructor(
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
     private val clearTransferErrorStatusUseCase: ClearTransferErrorStatusUseCase,
     private val getTransferByUniqueIdUseCase: GetTransferByUniqueIdUseCase,
-    private val isTransferInErrorStatusUseCase: IsTransferInErrorStatusUseCase,
-    @Assisted private val navKey: TransfersNavKey,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    isTransferInErrorStatusUseCase: IsTransferInErrorStatusUseCase,
+    @Assisted initialTab: TransfersNavKey.Tab?,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TransfersUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
-        val initialTabIndex = when (navKey.tab) {
+        val initialTabIndex = when (initialTab) {
             TransfersNavKey.Tab.Active -> ACTIVE_TAB_INDEX
             TransfersNavKey.Tab.Completed -> COMPLETED_TAB_INDEX
             TransfersNavKey.Tab.Failed -> FAILED_TAB_INDEX
@@ -107,6 +111,7 @@ class TransfersViewModel @AssistedInject constructor(
         monitorTransferOverQuota()
         monitorPausedTransfers()
         monitorCompletedTransfers()
+        monitorConnectivity()
     }
 
     private fun monitorActiveTransfers() {
@@ -230,6 +235,18 @@ class TransfersViewModel @AssistedInject constructor(
                     )
                 }
             }
+        }
+    }
+
+    private fun monitorConnectivity() {
+        viewModelScope.launch {
+            monitorConnectivityUseCase()
+                .skipUnstable(waitTimeToShowOffline, true) { it }
+                .collect { connected ->
+                    _uiState.update { state ->
+                        state.copy(noConnection = !connected)
+                    }
+                }
         }
     }
 
@@ -763,7 +780,7 @@ class TransfersViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(navKey: TransfersNavKey): TransfersViewModel
+        fun create(initialTab: TransfersNavKey.Tab?): TransfersViewModel
     }
 
     companion object {

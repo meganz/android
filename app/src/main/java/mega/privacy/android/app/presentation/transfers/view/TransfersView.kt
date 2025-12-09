@@ -2,6 +2,11 @@ package mega.privacy.android.app.presentation.transfers.view
 
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
@@ -25,6 +30,7 @@ import androidx.compose.ui.text.SpanStyle
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
+import mega.android.core.ui.components.prompt.ErrorPrompt
 import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.tabs.MegaScrollableTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
@@ -280,6 +286,18 @@ internal fun TransfersView(
                 beyondViewportPageCount = 1,
                 hideTabs = isInSelectTransfersMode,
                 pagerScrollEnabled = false,
+                fixedHeader = {
+                    AnimatedVisibility(
+                        uiState.noConnection,
+                        enter = enterPromptAnimation(),
+                        exit = exitPromptAnimation(),
+                    ) {
+                        ErrorPrompt(
+                            stringResource(sharedR.string.sync_no_network_state),
+                            forceRiceTopAppBar = true
+                        )
+                    }
+                },
                 cells = {
                     addTextTabWithScrollableContent(
                         tabItem = TabItems(stringResource(id = sharedR.string.transfers_section_tab_title_active_transfers)),
@@ -427,6 +445,9 @@ internal fun EmptyTransfersView(
         ),
     )
 }
+
+private fun enterPromptAnimation() = fadeIn() + expandVertically()
+private fun exitPromptAnimation() = fadeOut() + shrinkVertically()
 
 @Composable
 internal fun TransfersTopBar(

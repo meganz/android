@@ -51,6 +51,7 @@ import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOv
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -102,6 +103,7 @@ class TransfersViewModelTest {
     private val clearTransferErrorStatusUseCase = mock<ClearTransferErrorStatusUseCase>()
     private val getTransferByUniqueIdUseCase = mock<GetTransferByUniqueIdUseCase>()
     private val isTransferInErrorStatusUseCase = mock<IsTransferInErrorStatusUseCase>()
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
 
     private val originalPath = "originalPath"
     private val fileName = "File name"
@@ -175,6 +177,7 @@ class TransfersViewModelTest {
             clearTransferErrorStatusUseCase,
             getTransferByUniqueIdUseCase,
             isTransferInErrorStatusUseCase,
+            monitorConnectivityUseCase,
         )
         wheneverBlocking { monitorInProgressTransfersUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorStorageStateEventUseCase() } doReturn MutableStateFlow(
@@ -189,6 +192,7 @@ class TransfersViewModelTest {
             )
         }.thenReturn(emptyFlow())
         wheneverBlocking { isTransferInErrorStatusUseCase() }.thenReturn(false)
+        wheneverBlocking { monitorConnectivityUseCase() }.thenReturn(flowOf(true))
     }
 
     private fun initTestClass() {
@@ -213,8 +217,9 @@ class TransfersViewModelTest {
             cancelTransferByTagUseCase = cancelTransferByTagUseCase,
             clearTransferErrorStatusUseCase = clearTransferErrorStatusUseCase,
             getTransferByUniqueIdUseCase = getTransferByUniqueIdUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
             isTransferInErrorStatusUseCase = isTransferInErrorStatusUseCase,
-            navKey = TransfersNavKey(TransfersNavKey.Tab.Active),
+            initialTab = TransfersNavKey.Tab.Active,
         )
     }
 
@@ -309,6 +314,27 @@ class TransfersViewModelTest {
                 actual = awaitItem()
                 assertThat(actual.isTransferOverQuota).isFalse()
                 assertThat(actual.quotaWarning).isNull()
+            }
+        }
+
+    @Test
+    fun `test that MonitorConnectivityUseCase updates noConnection`() =
+        runTest {
+            val flow = MutableStateFlow(true)
+
+            whenever(monitorConnectivityUseCase()).thenReturn(flow)
+
+            initTestClass()
+
+            underTest.uiState.test {
+                var actual = awaitItem()
+                assertThat(actual.noConnection).isFalse()
+                flow.emit(false)
+                actual = awaitItem()
+                assertThat(actual.noConnection).isTrue()
+                flow.emit(true)
+                actual = awaitItem()
+                assertThat(actual.noConnection).isFalse()
             }
         }
 

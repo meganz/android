@@ -38,7 +38,7 @@ private fun TransferRoute(
 ) {
     val viewModel = hiltViewModel<TransfersViewModel, TransfersViewModel.Factory>(
         creationCallback = { factory ->
-            factory.create(args)
+            factory.create(args.tab)
         }
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

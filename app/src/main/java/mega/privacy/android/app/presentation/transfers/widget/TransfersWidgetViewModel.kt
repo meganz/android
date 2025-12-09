@@ -9,10 +9,13 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
+import mega.privacy.android.core.transfers.widget.TransfersToolbarWidgetViewModel.Companion.DEFAULT_SAMPLE_PERIOD
+import mega.privacy.android.core.transfers.widget.TransfersToolbarWidgetViewModel.Companion.waitTimeToShowOffline
 import mega.privacy.android.domain.entity.TransfersStatusInfo
 import mega.privacy.android.domain.extension.skipUnstable
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
@@ -23,7 +26,6 @@ import mega.privacy.android.domain.usecase.transfers.errorstatus.MonitorTransfer
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * ViewModel for managing transfers data.
@@ -51,14 +53,18 @@ class TransfersWidgetViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val samplePeriodFinal = samplePeriod ?: DEFAULT_SAMPLE_PERIOD
-            if (samplePeriodFinal > 0) {
-                monitorTransfersStatusUseCase().sample(samplePeriodFinal)
-            } else {
-                monitorTransfersStatusUseCase()
-            }
-                .catch { Timber.e(it) }
-                .collect { transfersInfo ->
-                    updateUiState(transfersInfo)
+            combine(
+                if (samplePeriodFinal > 0) {
+                    monitorTransfersStatusUseCase().sample(samplePeriodFinal)
+                } else {
+                    monitorTransfersStatusUseCase()
+                },
+                monitorConnectivityUseCase().skipUnstable(waitTimeToShowOffline, true) { it }
+            ) { transfersInfo, connected ->
+                transfersInfo to connected
+            }.catch { Timber.e(it) }
+                .collect { (transfersInfo, isOnline) ->
+                    updateUiState(transfersInfo, isOnline)
                 }
         }
         viewModelScope.launch {
@@ -67,16 +73,6 @@ class TransfersWidgetViewModel @Inject constructor(
                 .collect {
                     _state.update {
                         it.copy(lastTransfersCancelled = true)
-                    }
-                }
-        }
-        viewModelScope.launch {
-            monitorConnectivityUseCase()
-                .skipUnstable(waitTimeToShowOffline) { it }
-                .catch { Timber.e(it) }
-                .collect { online ->
-                    _state.update {
-                        it.copy(isOnline = online)
                     }
                 }
         }
@@ -128,12 +124,13 @@ class TransfersWidgetViewModel @Inject constructor(
      */
     private fun updateUiState(
         transfersStatusInfo: TransfersStatusInfo,
+        isOnline: Boolean,
     ) {
         val newTransferInfo = transfersInfoMapper(
             numPendingDownloadsNonBackground = transfersStatusInfo.pendingDownloads,
             numPendingUploads = transfersStatusInfo.pendingUploads,
             isTransferError = state.value.isTransferError,
-            isOnline = state.value.isOnline,
+            isOnline = isOnline,
             isTransferOverQuota = transfersStatusInfo.transferOverQuota,
             isStorageOverQuota = transfersStatusInfo.storageOverQuota,
             areTransfersPaused = transfersStatusInfo.paused,
@@ -149,10 +146,5 @@ class TransfersWidgetViewModel @Inject constructor(
                 lastTransfersCancelled = newLastTransfersCancelled,
             )
         }
-    }
-
-    companion object {
-        private const val DEFAULT_SAMPLE_PERIOD = 500L
-        internal val waitTimeToShowOffline = 30_000L.milliseconds
     }
 }
