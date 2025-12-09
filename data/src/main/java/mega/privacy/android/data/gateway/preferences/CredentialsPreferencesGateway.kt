@@ -16,6 +16,20 @@ internal interface CredentialsPreferencesGateway {
     suspend fun save(credentials: UserCredentials)
 
     /**
+     * Save session
+     *
+     * @param session
+     */
+    suspend fun saveSession(session: String)
+
+    /**
+     * Save my handle
+     *
+     * @param myHandle
+     */
+    suspend fun saveMyHandle(myHandle: String)
+
+    /**
      * Save first name
      *
      * @param firstName

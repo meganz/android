@@ -40,7 +40,6 @@ import mega.privacy.android.data.mapper.contact.UserChangeMapper
 import mega.privacy.android.data.mapper.contact.UserMapper
 import mega.privacy.android.data.mapper.contact.UserVisibilityMapper
 import mega.privacy.android.data.mapper.login.AccountSessionMapper
-import mega.privacy.android.data.mapper.login.UserCredentialsMapper
 import mega.privacy.android.data.mapper.settings.CookieSettingsIntMapper
 import mega.privacy.android.data.mapper.settings.CookieSettingsMapper
 import mega.privacy.android.data.model.GlobalUpdate
@@ -126,7 +125,6 @@ class DefaultAccountRepositoryTest {
     private val megaAchievementMapper = mock<MegaAchievementMapper>()
     private val achievementsOverviewMapper = mock<AchievementsOverviewMapper>()
     private val dbHandler = mock<DatabaseHandler>()
-    private val userCredentialsMapper = mock<UserCredentialsMapper>()
     private val accountSessionMapper = mock<AccountSessionMapper>()
     private val chatPreferencesGateway = mock<ChatPreferencesGateway>()
     private val callsPreferencesGateway = mock<CallsPreferencesGateway>()
@@ -202,7 +200,6 @@ class DefaultAccountRepositoryTest {
             achievementsOverviewMapper,
             dbHandler,
             myAccountCredentialsMapper,
-            userCredentialsMapper,
             accountSessionMapper,
             chatPreferencesGateway,
             callsPreferencesGateway,
@@ -246,7 +243,6 @@ class DefaultAccountRepositoryTest {
             dbHandler = { dbHandler },
             myAccountCredentialsMapper = myAccountCredentialsMapper,
             accountDetailMapper = mock(),
-            userCredentialsMapper = userCredentialsMapper,
             accountSessionMapper = accountSessionMapper,
             chatPreferencesGateway = chatPreferencesGateway,
             callsPreferencesGateway = callsPreferencesGateway,
@@ -885,13 +881,20 @@ class DefaultAccountRepositoryTest {
         }
 
     @Test
-    fun `test that MegaLocalStorageGateway is invoked for saving credentials and clearing ephemeral while saving credentials`() =
+    fun `test that credentialsPreferencesGateway is invoked for saving session and clearing ephemeral while saving credentials`() =
         runTest {
-            val credentials =
-                userCredentialsMapper("test@mega.io", "AFasdffW456sdfg", null, null, "1536456")
+            val email = "test@mega.io"
+            val session = "AFasdffW456sdfg"
+            val handle = 1536456L
+            val user = mock<MegaUser> {
+                on { this.email }.thenReturn(email)
+                on { this.handle }.thenReturn(handle)
+            }
+            whenever(megaApiGateway.myUser).thenReturn(user)
+            whenever(megaApiGateway.dumpSession).thenReturn(session)
             mockGetUserDataSuccess()
             underTest.saveAccountCredentials()
-            verify(credentialsPreferencesGateway).save(credentials)
+            verify(credentialsPreferencesGateway).saveSession(session)
             verify(ephemeralCredentialsGateway).clear()
         }
 
@@ -916,9 +919,31 @@ class DefaultAccountRepositoryTest {
         val email = "test@mega.io"
         val session = "AFasdffW456sdfg"
         val handle = 1536456L
+        val user = mock<MegaUser> {
+            on { this.email }.thenReturn(email)
+            on { this.handle }.thenReturn(handle)
+        }
+        whenever(megaApiGateway.myUser).thenReturn(user)
+        whenever(megaApiGateway.dumpSession).thenReturn(session)
         mockGetUserDataSuccess()
         assertThat(underTest.saveAccountCredentials())
             .isEqualTo(accountSessionMapper(email, session, handle))
+    }
+
+    @Test
+    fun `test that saveSession is not called when session is null`() = runTest {
+        val email = "test@mega.io"
+        val handle = 1536456L
+        val user = mock<MegaUser> {
+            on { this.email }.thenReturn(email)
+            on { this.handle }.thenReturn(handle)
+        }
+        whenever(megaApiGateway.myUser).thenReturn(user)
+        whenever(megaApiGateway.dumpSession).thenReturn(null)
+        mockGetUserDataSuccess()
+        underTest.saveAccountCredentials()
+        verify(credentialsPreferencesGateway, never()).saveSession(any())
+        verify(ephemeralCredentialsGateway).clear()
     }
 
     @Test
@@ -1656,6 +1681,35 @@ class DefaultAccountRepositoryTest {
         verify(appEventGateway).broadcastMiscState(MiscLoadedState.MethodCalled)
         verify(megaApiGateway).getUserData(any())
         assertThat(actual).isEqualTo(Unit)
+    }
+
+    @Test
+    fun `test that get user data saves email when accountEmail exists`() = runTest {
+        // Given
+        val email = "test@mega.io"
+        val megaErrorCode = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+        whenever(megaApiGateway.accountEmail).thenReturn(email)
+        whenever(
+            megaApiGateway.getUserData(
+                listener = any()
+            )
+        ).thenAnswer {
+            ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                api = mock(),
+                request = mock(),
+                error = megaErrorCode
+            )
+        }
+
+        // When
+        underTest.getUserData()
+
+        // Then
+        verify(appEventGateway).broadcastMiscState(MiscLoadedState.MethodCalled)
+        verify(megaApiGateway).getUserData(any())
+        verify(credentialsPreferencesGateway).saveEmail(email)
     }
 
     @ParameterizedTest(name = "when the sdk returns {0} error code which is not a success code")

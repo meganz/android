@@ -55,7 +55,6 @@ import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.contact.UserMapper
 import mega.privacy.android.data.mapper.login.AccountSessionMapper
-import mega.privacy.android.data.mapper.login.UserCredentialsMapper
 import mega.privacy.android.data.mapper.settings.CookieSettingsIntMapper
 import mega.privacy.android.data.mapper.settings.CookieSettingsMapper
 import mega.privacy.android.data.model.GlobalUpdate
@@ -126,7 +125,6 @@ import kotlin.coroutines.suspendCoroutine
  * @property megaAchievementMapper        [MegaAchievementMapper]
  * @property myAccountCredentialsMapper   [MyAccountCredentialsMapper]
  * @property accountDetailMapper          [AccountDetailMapper]
- * @property userCredentialsMapper        [UserCredentialsMapper]
  * @property accountSessionMapper         [AccountSessionMapper]
  * @property chatPreferencesGateway       [chatPreferencesGateway]
  * @property callsPreferencesGateway      [CallsPreferencesGateway]
@@ -161,7 +159,6 @@ internal class DefaultAccountRepository @Inject constructor(
     private val achievementsOverviewMapper: AchievementsOverviewMapper,
     private val myAccountCredentialsMapper: MyAccountCredentialsMapper,
     private val accountDetailMapper: AccountDetailMapper,
-    private val userCredentialsMapper: UserCredentialsMapper,
     private val accountSessionMapper: AccountSessionMapper,
     private val chatPreferencesGateway: ChatPreferencesGateway,
     private val callsPreferencesGateway: CallsPreferencesGateway,
@@ -574,12 +571,10 @@ internal class DefaultAccountRepository @Inject constructor(
             email = myUser.email
             myUserHandle = myUser.handle
         }
-
         val session = megaApiGateway.dumpSession
-        val credentials = userCredentialsMapper(email, session, null, null, myUserHandle.toString())
-        credentialsPreferencesGateway.get().save(credentials)
+        session?.let { credentialsPreferencesGateway.get().saveSession(it) }
+        myUserHandle?.let { credentialsPreferencesGateway.get().saveMyHandle(it.toString()) }
         ephemeralCredentialsGateway.get().clear()
-
         accountSessionMapper(email, session, myUserHandle)
     }
 
@@ -1140,7 +1135,7 @@ internal class DefaultAccountRepository @Inject constructor(
         }
     }
 
-    override suspend fun getUserData() = withContext(ioDispatcher) {
+    override suspend fun getUserData(): Unit = withContext(ioDispatcher) {
         broadcastMiscState(MiscLoadedState.MethodCalled)
         suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaRequestListenerInterface(
@@ -1160,6 +1155,9 @@ internal class DefaultAccountRepository @Inject constructor(
                 }
             )
             megaApiGateway.getUserData(listener = listener)
+        }
+        megaApiGateway.accountEmail?.let {
+            credentialsPreferencesGateway.get().saveEmail(it)
         }
     }
 
