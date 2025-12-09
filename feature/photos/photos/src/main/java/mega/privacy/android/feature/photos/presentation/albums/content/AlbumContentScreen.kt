@@ -30,7 +30,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -627,18 +626,9 @@ internal fun RemoveLinksDialog(
 ) {
     BasicDialog(
         modifier = Modifier.testTag(ALBUM_CONTENT_SCREEN_REMOVE_LINKS_DIALOG),
-        title = pluralStringResource(
-            id = sharedR.plurals.album_content_remove_links_dialog_title,
-            count = 1
-        ),
-        description = pluralStringResource(
-            id = sharedR.plurals.album_content_remove_links_dialog_description,
-            count = 1
-        ),
-        positiveButtonText = pluralStringResource(
-            id = sharedR.plurals.album_content_remove_links_dialog_positive_button,
-            count = 1
-        ),
+        title = stringResource(sharedR.string.album_content_remove_link_dialog_title),
+        description = stringResource(sharedR.string.album_content_remove_link_dialog_description),
+        positiveButtonText = stringResource(sharedR.string.general_remove),
         onPositiveButtonClicked = onConfirm,
         negativeButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
         onNegativeButtonClicked = onDismiss,

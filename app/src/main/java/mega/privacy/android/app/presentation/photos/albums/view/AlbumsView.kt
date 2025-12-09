@@ -501,18 +501,17 @@ fun RemoveLinksConfirmationDialog(
         Analytics.tracker.trackEvent(RemoveLinksConfirmationDialogEvent)
     }
     ConfirmationDialog(
-        title = pluralStringResource(
-            id = R.plurals.album_share_remove_links_dialog_title,
-            count = numLinks,
-        ),
-        text = pluralStringResource(
-            id = R.plurals.album_share_remove_links_dialog_body,
-            count = numLinks,
-        ),
-        confirmButtonText = pluralStringResource(
-            id = R.plurals.album_share_remove_links_dialog_button,
-            count = numLinks,
-        ),
+        title = if (numLinks == 1) {
+            stringResource(sharedR.string.album_content_remove_link_dialog_title)
+        } else {
+            stringResource(sharedR.string.album_content_remove_multiple_links_dialog_title)
+        },
+        text = if (numLinks == 1) {
+            stringResource(sharedR.string.album_content_remove_link_dialog_description)
+        } else {
+            stringResource(sharedR.string.album_content_remove_multiple_links_dialog_description)
+        },
+        confirmButtonText = stringResource(id = sharedR.string.general_remove),
         cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onConfirm = onRemove,
         onDismiss = onCancel,

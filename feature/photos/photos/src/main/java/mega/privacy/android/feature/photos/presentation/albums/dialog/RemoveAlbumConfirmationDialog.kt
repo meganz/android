@@ -2,7 +2,6 @@ package mega.privacy.android.feature.photos.presentation.albums.dialog
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -19,14 +18,16 @@ internal fun RemoveAlbumConfirmationDialog(
 ) {
     BasicDialog(
         modifier = modifier,
-        title = pluralStringResource(
-            id = sharedR.plurals.delete_album_confirmation_dialog_title,
-            count = size
-        ),
-        description = pluralStringResource(
-            id = sharedR.plurals.delete_album_confirmation_dialog_description,
-            count = size
-        ),
+        title = if (size == 1) {
+            stringResource(sharedR.string.delete_album_singular_confirmation_dialog_title)
+        } else {
+            stringResource(sharedR.string.delete_albums_multiple_confirmation_dialog_title,)
+        },
+        description = if (size == 1) {
+            stringResource(sharedR.string.delete_album_singular_confirmation_dialog_description,)
+        } else {
+            stringResource(sharedR.string.delete_albums_multiple_confirmation_dialog_description,)
+        },
         positiveButtonText = stringResource(sharedR.string.delete_album_confirmation_positive_button_text),
         onPositiveButtonClicked = onConfirm,
         negativeButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
