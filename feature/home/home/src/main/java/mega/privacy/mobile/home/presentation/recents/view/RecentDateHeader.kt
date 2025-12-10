@@ -1,4 +1,4 @@
-package mega.privacy.mobile.home.presentation.home.widget.recents.view
+package mega.privacy.mobile.home.presentation.recents.view
 
 import android.text.format.DateFormat
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.surface.ThemedSurface
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.TextColor
@@ -23,15 +24,17 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 internal fun RecentDateHeader(timestamp: Long) {
-    MegaText(
-        text = FormatRecentsDate(timestamp),
-        textColor = TextColor.Secondary,
-        style = MaterialTheme.typography.labelMedium,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .testTag(DATE_HEADER_TEST_TAG)
-    )
+    ThemedSurface {
+        MegaText(
+            text = FormatRecentsDate(timestamp),
+            textColor = TextColor.Secondary,
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .testTag(DATE_HEADER_TEST_TAG)
+        )
+    }
 }
 
 /**

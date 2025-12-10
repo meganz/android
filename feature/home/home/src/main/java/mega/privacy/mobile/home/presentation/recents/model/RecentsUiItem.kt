@@ -1,9 +1,11 @@
-package mega.privacy.mobile.home.presentation.home.widget.recents.model
+package mega.privacy.mobile.home.presentation.recents.model
 
 import androidx.annotation.DrawableRes
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.RecentActionBucket
+import mega.privacy.android.domain.entity.RecentActionsSharesType
+import mega.privacy.android.domain.entity.node.NodeSourceType
 
 /**
  * UI entity for a bucket in the recent actions list
@@ -36,4 +38,21 @@ data class RecentsUiItem(
     val bucket: RecentActionBucket,
     val isSingleNode: Boolean,
     val isSensitive: Boolean,
-)
+) {
+
+    /**
+     * Get the first node in the bucket
+     */
+    val firstNode
+        get() = bucket.nodes.firstOrNull()
+
+    /**
+     * Get the node source type based on the parent folder shares type
+     */
+    val nodeSourceType
+        get() = if (bucket.parentFolderSharesType == RecentActionsSharesType.INCOMING_SHARES) {
+            NodeSourceType.INCOMING_SHARES
+        } else {
+            NodeSourceType.CLOUD_DRIVE
+        }
+}

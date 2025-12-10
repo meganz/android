@@ -1,15 +1,15 @@
-package mega.privacy.mobile.home.presentation.home.widget.recents.model
+package mega.privacy.mobile.home.presentation.recents.model
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class RecentsWidgetUiStateTest {
+class RecentsUiStateTest {
 
     @Test
     fun `test that excludeSensitives is false when hidden nodes disabled`() {
-        val state = RecentsWidgetUiState(
+        val state = RecentsUiState(
             isHiddenNodesEnabled = false,
             showHiddenNodes = false
         )
@@ -19,7 +19,7 @@ class RecentsWidgetUiStateTest {
 
     @Test
     fun `test that excludeSensitives is false when hidden nodes enabled but showHiddenNodes is true`() {
-        val state = RecentsWidgetUiState(
+        val state = RecentsUiState(
             isHiddenNodesEnabled = true,
             showHiddenNodes = true
         )
@@ -29,7 +29,7 @@ class RecentsWidgetUiStateTest {
 
     @Test
     fun `test that excludeSensitives is true when hidden nodes enabled and showHiddenNodes is false`() {
-        val state = RecentsWidgetUiState(
+        val state = RecentsUiState(
             isHiddenNodesEnabled = true,
             showHiddenNodes = false
         )
@@ -39,7 +39,7 @@ class RecentsWidgetUiStateTest {
 
     @Test
     fun `test that isLoading is true when isNodesLoading is true`() {
-        val state = RecentsWidgetUiState(
+        val state = RecentsUiState(
             isNodesLoading = true,
             isHiddenNodeSettingsLoading = false
         )
@@ -49,7 +49,7 @@ class RecentsWidgetUiStateTest {
 
     @Test
     fun `test that isLoading is true when isHiddenNodeSettingsLoading is true`() {
-        val state = RecentsWidgetUiState(
+        val state = RecentsUiState(
             isNodesLoading = false,
             isHiddenNodeSettingsLoading = true
         )
@@ -59,7 +59,7 @@ class RecentsWidgetUiStateTest {
 
     @Test
     fun `test that isLoading is true when both loading flags are true`() {
-        val state = RecentsWidgetUiState(
+        val state = RecentsUiState(
             isNodesLoading = true,
             isHiddenNodeSettingsLoading = true
         )
@@ -69,7 +69,7 @@ class RecentsWidgetUiStateTest {
 
     @Test
     fun `test that isLoading is false when both loading flags are false`() {
-        val state = RecentsWidgetUiState(
+        val state = RecentsUiState(
             isNodesLoading = false,
             isHiddenNodeSettingsLoading = false
         )

@@ -1,4 +1,4 @@
-package mega.privacy.mobile.home.presentation.home.widget.recents.mapper
+package mega.privacy.mobile.home.presentation.recents.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.model.LocalizedText
@@ -12,12 +12,14 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.feature.home.R
 import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentActionTitleText
+import mega.privacy.mobile.home.presentation.recents.model.RecentActionTitleText
+import mega.privacy.mobile.home.presentation.recents.mapper.RecentActionUiItemMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RecentsUiItemMapperTest {
@@ -606,7 +608,7 @@ class RecentsUiItemMapperTest {
             mimeType.startsWith("video/") -> VideoFileTypeInfo(
                 mimeType,
                 extension,
-                kotlin.time.Duration.ZERO
+                Duration.ZERO
             )
 
             else -> TextFileTypeInfo(mimeType, extension)

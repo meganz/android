@@ -1,4 +1,4 @@
-package mega.privacy.mobile.home.presentation.home.widget.recents.view
+package mega.privacy.mobile.home.presentation.recents.view
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
@@ -36,8 +36,8 @@ import mega.privacy.android.core.nodecomponents.list.NodeLabelCircle
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsUiItem
-import mega.privacy.mobile.home.presentation.home.widget.recents.model.text
+import mega.privacy.mobile.home.presentation.recents.model.RecentsUiItem
+import mega.privacy.mobile.home.presentation.recents.model.text
 
 
 /**

@@ -1,7 +1,10 @@
-package mega.privacy.mobile.home.presentation.home.widget.recents
+package mega.privacy.mobile.home.presentation.recents
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -23,13 +26,13 @@ import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
-import mega.privacy.mobile.home.presentation.home.widget.recents.mapper.RecentActionUiItemMapper
-import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsWidgetUiState
+import mega.privacy.mobile.home.presentation.recents.mapper.RecentActionUiItemMapper
+import mega.privacy.mobile.home.presentation.recents.model.RecentsUiState
 import timber.log.Timber
-import javax.inject.Inject
 
-@HiltViewModel
-class RecentsWidgetViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = RecentsViewModel.Factory::class)
+class RecentsViewModel @AssistedInject constructor(
+    @Assisted private val maxBucketCount: Int,
     private val getRecentActionsUseCase: GetRecentActionsUseCase,
     private val recentActionUiItemMapper: RecentActionUiItemMapper,
     private val setHideRecentActivityUseCase: SetHideRecentActivityUseCase,
@@ -39,7 +42,7 @@ class RecentsWidgetViewModel @Inject constructor(
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(RecentsWidgetUiState())
+    private val _uiState = MutableStateFlow(RecentsUiState())
     val uiState = _uiState.asStateFlow()
     private var loadRecentsJob: Job? = null
 
@@ -56,7 +59,7 @@ class RecentsWidgetViewModel @Inject constructor(
             runCatching {
                 getRecentActionsUseCase(
                     excludeSensitives = uiState.value.excludeSensitives,
-                    maxBucketCount = RecentsWidgetConstants.MAX_BUCKETS
+                    maxBucketCount = maxBucketCount
                 ).map { recentActionUiItemMapper(it) }
             }.onSuccess { buckets ->
                 // Only update state if this coroutine not cancelled
@@ -158,11 +161,21 @@ class RecentsWidgetViewModel @Inject constructor(
             }
         }
     }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(maxBucketCount: Int): RecentsViewModel
+    }
 }
 
 object RecentsWidgetConstants {
     /**
      * Maximum number of recent action buckets to display in the widget
      */
-    const val MAX_BUCKETS = 4
+    const val WIDGET_MAX_BUCKETS = 4
+
+    /**
+     * Maximum number of recent action buckets to display in the full screen
+     */
+    const val SCREEN_MAX_BUCKETS = 500
 }

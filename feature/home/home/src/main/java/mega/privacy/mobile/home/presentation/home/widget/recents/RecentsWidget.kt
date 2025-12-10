@@ -29,7 +29,6 @@ import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.RecentActionBucket
-import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -38,17 +37,20 @@ import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.home.HomeWidget
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
-import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentActionTitleText
-import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsTimestampText
-import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsUiItem
-import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsWidgetUiState
-import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentDateHeader
-import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentsEmptyView
-import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentsHiddenView
-import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentsListItemView
-import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentsLoadingView
-import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentsOptionsBottomSheet
+import mega.privacy.android.navigation.destination.RecentsScreenNavKey
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentsWidgetHeader
+import mega.privacy.mobile.home.presentation.recents.RecentsViewModel
+import mega.privacy.mobile.home.presentation.recents.RecentsWidgetConstants
+import mega.privacy.mobile.home.presentation.recents.model.RecentActionTitleText
+import mega.privacy.mobile.home.presentation.recents.model.RecentsTimestampText
+import mega.privacy.mobile.home.presentation.recents.model.RecentsUiItem
+import mega.privacy.mobile.home.presentation.recents.model.RecentsUiState
+import mega.privacy.mobile.home.presentation.recents.view.RecentDateHeader
+import mega.privacy.mobile.home.presentation.recents.view.RecentsEmptyView
+import mega.privacy.mobile.home.presentation.recents.view.RecentsHiddenView
+import mega.privacy.mobile.home.presentation.recents.view.RecentsListItemView
+import mega.privacy.mobile.home.presentation.recents.view.RecentsLoadingView
+import mega.privacy.mobile.home.presentation.recents.view.RecentsOptionsBottomSheet
 import javax.inject.Inject
 
 class RecentsWidget @Inject constructor() : HomeWidget {
@@ -64,7 +66,9 @@ class RecentsWidget @Inject constructor() : HomeWidget {
         onNavigate: (NavKey) -> Unit,
         transferHandler: TransferHandler,
     ) {
-        val viewModel = hiltViewModel<RecentsWidgetViewModel>()
+        val viewModel = hiltViewModel<RecentsViewModel, RecentsViewModel.Factory> { factory ->
+            factory.create(maxBucketCount = RecentsWidgetConstants.WIDGET_MAX_BUCKETS)
+        }
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val coroutineScope = rememberCoroutineScope()
         val snackBarEventQueue = rememberSnackBarQueue()
@@ -82,6 +86,9 @@ class RecentsWidget @Inject constructor() : HomeWidget {
             onShowRecentActivity = viewModel::showRecentActivity,
             onUploadClicked = {
                 onNavigate(HomeFabOptionsBottomSheetNavKey)
+            },
+            onViewAllClicked = {
+                onNavigate(RecentsScreenNavKey)
             }
         )
 
@@ -114,12 +121,13 @@ class RecentsWidget @Inject constructor() : HomeWidget {
 
 @Composable
 fun RecentsView(
-    uiState: RecentsWidgetUiState,
+    uiState: RecentsUiState,
     onFileClicked: (TypedFileNode, NodeSourceType) -> Unit,
     onShowRecentActivity: () -> Unit,
     onWidgetOptionsClicked: () -> Unit,
     onUploadClicked: () -> Unit,
     modifier: Modifier = Modifier,
+    onViewAllClicked: () -> Unit,
 ) {
     Column(modifier = modifier) {
         RecentsWidgetHeader(
@@ -156,13 +164,9 @@ fun RecentsView(
                             item = item,
                             onItemClicked = {
                                 if (item.isSingleNode) {
-                                    val nodeSourceType =
-                                        if (item.bucket.parentFolderSharesType == RecentActionsSharesType.INCOMING_SHARES) {
-                                            NodeSourceType.INCOMING_SHARES
-                                        } else {
-                                            NodeSourceType.CLOUD_DRIVE
-                                        }
-                                    onFileClicked(item.bucket.nodes.first(), nodeSourceType)
+                                    item.firstNode?.let { node ->
+                                        onFileClicked(node, item.nodeSourceType)
+                                    }
                                 } else {
                                     // TODO: Handle bucket click
                                 }
@@ -174,11 +178,9 @@ fun RecentsView(
                     }
                 }
 
-                if (uiState.recentActionItems.size >= RecentsWidgetConstants.MAX_BUCKETS) {
+                if (uiState.recentActionItems.size >= RecentsWidgetConstants.WIDGET_MAX_BUCKETS) {
                     TextButton(
-                        onClick = {
-                            // TODO: Navigate to full recents screen
-                        },
+                        onClick = onViewAllClicked,
                         modifier = Modifier.testTag(RECENTS_VIEW_ALL_BUTTON_TEST_TAG),
                         contentPadding = PaddingValues(
                             horizontal = 16.dp,
@@ -206,56 +208,16 @@ internal const val RECENTS_VIEW_ALL_BUTTON_TEST_TAG = "recents_widget:view_all_b
 private fun RecentsViewPreview() {
     AndroidThemeForPreviews {
         RecentsView(
-            uiState = RecentsWidgetUiState(
-                recentActionItems = listOf(
-                    createMockRecentsUiItem(
-                        title = RecentActionTitleText.MediaBucketImagesOnly(5),
-                        parentFolderName = LocalizedText.Literal("Photos"),
-                        timestamp = System.currentTimeMillis() / 1000 - 3600,
-                        icon = IconPackR.drawable.ic_image_stack_medium_solid,
-                        isMediaBucket = true,
-                        shareIcon = IconPackR.drawable.ic_folder_incoming_medium_solid,
-                    ),
-                    createMockRecentsUiItem(
-                        title = RecentActionTitleText.SingleNode("Document.pdf"),
-                        parentFolderName = LocalizedText.Literal("Cloud Drive"),
-                        timestamp = System.currentTimeMillis() / 1000 - 207200,
-                        icon = IconPackR.drawable.ic_pdf_medium_solid,
-                        isFavourite = true,
-                        nodeLabel = NodeLabel.RED,
-                    ),
-                    createMockRecentsUiItem(
-                        title = RecentActionTitleText.RegularBucket("Presentation.pptx", 3),
-                        parentFolderName = LocalizedText.Literal("Work"),
-                        timestamp = System.currentTimeMillis() / 1000 - 207200,
-                        icon = IconPackR.drawable.ic_generic_medium_solid,
-                        isUpdate = true,
-                        updatedByText = LocalizedText.StringRes(
-                            R.string.update_action_bucket,
-                            listOf("John Doe")
-                        ),
-                        userName = "John Doe",
-                    ),
-                    createMockRecentsUiItem(
-                        title = RecentActionTitleText.SingleNode("Test.pptx"),
-                        parentFolderName = LocalizedText.Literal("Work"),
-                        timestamp = System.currentTimeMillis() / 1000 - 207200,
-                        icon = IconPackR.drawable.ic_generic_medium_solid,
-                        isUpdate = true,
-                        updatedByText = LocalizedText.StringRes(
-                            R.string.update_action_bucket,
-                            listOf("John Doe")
-                        ),
-                        userName = "John Doe",
-                    ),
-                ),
+            uiState = RecentsUiState(
+                recentActionItems = mockRecentsUiItemList(),
                 isNodesLoading = false,
                 isHiddenNodeSettingsLoading = false
             ),
             onFileClicked = { _, _ -> },
             onWidgetOptionsClicked = {},
             onShowRecentActivity = {},
-            onUploadClicked = {}
+            onUploadClicked = {},
+            onViewAllClicked = {}
         )
     }
 }
@@ -265,7 +227,7 @@ private fun RecentsViewPreview() {
 private fun RecentsHiddenViewPreview() {
     AndroidThemeForPreviews {
         RecentsView(
-            uiState = RecentsWidgetUiState(
+            uiState = RecentsUiState(
                 recentActionItems = emptyList(),
                 isNodesLoading = false,
                 isHideRecentsEnabled = true
@@ -273,7 +235,8 @@ private fun RecentsHiddenViewPreview() {
             onFileClicked = { _, _ -> },
             onWidgetOptionsClicked = {},
             onShowRecentActivity = {},
-            onUploadClicked = {}
+            onUploadClicked = {},
+            onViewAllClicked = {}
         )
     }
 }
@@ -283,7 +246,7 @@ private fun RecentsHiddenViewPreview() {
 private fun RecentsViewEmptyPreview() {
     AndroidThemeForPreviews {
         RecentsView(
-            uiState = RecentsWidgetUiState(
+            uiState = RecentsUiState(
                 recentActionItems = emptyList(),
                 isNodesLoading = false,
                 isHiddenNodeSettingsLoading = false
@@ -291,7 +254,8 @@ private fun RecentsViewEmptyPreview() {
             onFileClicked = { _, _ -> },
             onWidgetOptionsClicked = {},
             onShowRecentActivity = {},
-            onUploadClicked = {}
+            onUploadClicked = {},
+            onViewAllClicked = {}
         )
     }
 }
@@ -301,7 +265,7 @@ private fun RecentsViewEmptyPreview() {
 private fun RecentsViewLoadingPreview() {
     AndroidThemeForPreviews {
         RecentsView(
-            uiState = RecentsWidgetUiState(
+            uiState = RecentsUiState(
                 recentActionItems = emptyList(),
                 isNodesLoading = true,
                 isHiddenNodeSettingsLoading = true
@@ -309,12 +273,13 @@ private fun RecentsViewLoadingPreview() {
             onFileClicked = { _, _ -> },
             onWidgetOptionsClicked = {},
             onShowRecentActivity = {},
-            onUploadClicked = {}
+            onUploadClicked = {},
+            onViewAllClicked = {}
         )
     }
 }
 
-private fun createMockRecentsUiItem(
+internal fun createMockRecentsUiItem(
     title: RecentActionTitleText,
     parentFolderName: LocalizedText,
     timestamp: Long,
@@ -352,3 +317,47 @@ private fun createMockRecentsUiItem(
         isSensitive = false
     )
 }
+
+
+internal fun mockRecentsUiItemList() = listOf(
+    createMockRecentsUiItem(
+        title = RecentActionTitleText.MediaBucketImagesOnly(5),
+        parentFolderName = LocalizedText.Literal("Photos"),
+        timestamp = System.currentTimeMillis() / 1000 - 3600,
+        icon = IconPackR.drawable.ic_image_stack_medium_solid,
+        isMediaBucket = true,
+        shareIcon = IconPackR.drawable.ic_folder_incoming_medium_solid,
+    ),
+    createMockRecentsUiItem(
+        title = RecentActionTitleText.SingleNode("Document.pdf"),
+        parentFolderName = LocalizedText.Literal("Cloud Drive"),
+        timestamp = System.currentTimeMillis() / 1000 - 207203,
+        icon = IconPackR.drawable.ic_pdf_medium_solid,
+        isFavourite = true,
+        nodeLabel = NodeLabel.RED,
+    ),
+    createMockRecentsUiItem(
+        title = RecentActionTitleText.RegularBucket("Presentation.pptx", 3),
+        parentFolderName = LocalizedText.Literal("Work"),
+        timestamp = System.currentTimeMillis() / 1000 - 207202,
+        icon = IconPackR.drawable.ic_generic_medium_solid,
+        isUpdate = true,
+        updatedByText = LocalizedText.StringRes(
+            R.string.update_action_bucket,
+            listOf("John Doe")
+        ),
+        userName = "John Doe",
+    ),
+    createMockRecentsUiItem(
+        title = RecentActionTitleText.SingleNode("Test.pptx"),
+        parentFolderName = LocalizedText.Literal("Work"),
+        timestamp = System.currentTimeMillis() / 1000 - 207201,
+        icon = IconPackR.drawable.ic_generic_medium_solid,
+        isUpdate = true,
+        updatedByText = LocalizedText.StringRes(
+            R.string.update_action_bucket,
+            listOf("John Doe")
+        ),
+        userName = "John Doe",
+    ),
+)

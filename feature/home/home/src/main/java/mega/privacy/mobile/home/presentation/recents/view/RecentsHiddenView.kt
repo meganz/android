@@ -1,10 +1,9 @@
-package mega.privacy.mobile.home.presentation.home.widget.recents.view
+package mega.privacy.mobile.home.presentation.recents.view
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -15,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
@@ -28,9 +26,9 @@ import mega.privacy.android.icon.pack.R as IconPackR
 
 // TODO: Add all strings to resources/transifex once confirmed
 @Composable
-internal fun RecentsEmptyView(
+internal fun RecentsHiddenView(
     modifier: Modifier = Modifier,
-    onUploadClicked: () -> Unit,
+    onShowActivityClicked: () -> Unit,
 ) {
     Row(
         modifier = modifier
@@ -43,27 +41,24 @@ internal fun RecentsEmptyView(
                 .weight(1f),
         ) {
             MegaText(
-                text = "All your recent file and folder activity will appear here",
+                text = "Recents activity hidden",
                 style = AppTheme.typography.titleSmall,
                 textColor = TextColor.Secondary,
-                modifier = Modifier.testTag(RECENTS_EMPTY_TEXT_TEST_TAG)
+                modifier = Modifier.testTag(RECENTS_HIDDEN_TEXT_TEST_TAG)
             )
             TextButton(
-                onClick = onUploadClicked,
-                modifier = Modifier
-                    .defaultMinSize(minWidth = 30.dp)
-                    .testTag(RECENTS_UPLOAD_BUTTON_TEST_TAG),
+                onClick = onShowActivityClicked,
+                modifier = Modifier.testTag(RECENTS_HIDDEN_BUTTON_TEST_TAG),
                 contentPadding = PaddingValues(
                     horizontal = 0.dp,
                     vertical = 12.dp
                 )
             ) {
                 MegaText(
-                    text = "Upload",
+                    text = "Show activity",
                     style = AppTheme.typography.labelLarge.copy(
                         textDecoration = TextDecoration.Underline
-                    ),
-                    textAlign = TextAlign.Start
+                    )
                 )
             }
         }
@@ -76,15 +71,15 @@ internal fun RecentsEmptyView(
     }
 }
 
-internal const val RECENTS_EMPTY_TEXT_TEST_TAG = "recents_widget:empty_text"
-internal const val RECENTS_UPLOAD_BUTTON_TEST_TAG = "recents_widget:upload"
+internal const val RECENTS_HIDDEN_TEXT_TEST_TAG = "recents_widget:hidden_text"
+internal const val RECENTS_HIDDEN_BUTTON_TEST_TAG = "recents_widget:hidden_button"
 
 @CombinedThemePreviews
 @Composable
-private fun RecentsEmptyViewPreview() {
+private fun RecentsHiddenViewPreview() {
     AndroidThemeForPreviews {
-        RecentsEmptyView(
-            onUploadClicked = {}
+        RecentsHiddenView(
+            onShowActivityClicked = {}
         )
     }
 }

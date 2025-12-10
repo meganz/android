@@ -1,4 +1,4 @@
-package mega.privacy.mobile.home.presentation.home.widget.recents.model
+package mega.privacy.mobile.home.presentation.recents.model
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -6,6 +6,7 @@ import androidx.compose.ui.text.intl.Locale
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.ZoneId
+import java.util.Date
 
 /**
  * Represents timestamp that can be formatted to time and date strings in Composable
@@ -36,7 +37,7 @@ data class RecentsTimestampText(
             )
         }
         val instant = Instant.ofEpochSecond(timestamp)
-        val date = java.util.Date.from(instant)
+        val date = Date.from(instant)
         return dateFormat.format(date)
     }
 }

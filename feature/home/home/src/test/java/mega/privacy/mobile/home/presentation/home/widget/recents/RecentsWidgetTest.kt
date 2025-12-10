@@ -18,20 +18,20 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.mobile.home.presentation.home.widget.recents.RecentsWidgetConstants.MAX_BUCKETS
-import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentActionTitleText
-import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsTimestampText
-import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsUiItem
-import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsWidgetUiState
-import mega.privacy.mobile.home.presentation.home.widget.recents.view.DATE_HEADER_TEST_TAG
-import mega.privacy.mobile.home.presentation.home.widget.recents.view.FIRST_LINE_TEST_TAG
-import mega.privacy.mobile.home.presentation.home.widget.recents.view.RECENTS_EMPTY_TEXT_TEST_TAG
-import mega.privacy.mobile.home.presentation.home.widget.recents.view.RECENTS_HIDDEN_BUTTON_TEST_TAG
-import mega.privacy.mobile.home.presentation.home.widget.recents.view.RECENTS_HIDDEN_TEXT_TEST_TAG
-import mega.privacy.mobile.home.presentation.home.widget.recents.view.RECENTS_LOADING_TEST_TAG
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RECENTS_MENU_TEST_TAG
-import mega.privacy.mobile.home.presentation.home.widget.recents.view.RECENTS_UPLOAD_BUTTON_TEST_TAG
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.TITLE_TEST_TAG
+import mega.privacy.mobile.home.presentation.recents.RecentsWidgetConstants.WIDGET_MAX_BUCKETS
+import mega.privacy.mobile.home.presentation.recents.model.RecentActionTitleText
+import mega.privacy.mobile.home.presentation.recents.model.RecentsTimestampText
+import mega.privacy.mobile.home.presentation.recents.model.RecentsUiItem
+import mega.privacy.mobile.home.presentation.recents.model.RecentsUiState
+import mega.privacy.mobile.home.presentation.recents.view.DATE_HEADER_TEST_TAG
+import mega.privacy.mobile.home.presentation.recents.view.FIRST_LINE_TEST_TAG
+import mega.privacy.mobile.home.presentation.recents.view.RECENTS_EMPTY_TEXT_TEST_TAG
+import mega.privacy.mobile.home.presentation.recents.view.RECENTS_HIDDEN_BUTTON_TEST_TAG
+import mega.privacy.mobile.home.presentation.recents.view.RECENTS_HIDDEN_TEXT_TEST_TAG
+import mega.privacy.mobile.home.presentation.recents.view.RECENTS_LOADING_TEST_TAG
+import mega.privacy.mobile.home.presentation.recents.view.RECENTS_UPLOAD_BUTTON_TEST_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -48,7 +48,7 @@ class RecentsWidgetTest {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 RecentsView(
-                    uiState = RecentsWidgetUiState(
+                    uiState = RecentsUiState(
                         recentActionItems = emptyList(),
                         isNodesLoading = false,
                         isHiddenNodeSettingsLoading = false,
@@ -56,7 +56,8 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
-                    onUploadClicked = {}
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
                 )
             }
         }
@@ -82,7 +83,7 @@ class RecentsWidgetTest {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 RecentsView(
-                    uiState = RecentsWidgetUiState(
+                    uiState = RecentsUiState(
                         recentActionItems = listOf(item1, item2),
                         isNodesLoading = false,
                         isHiddenNodeSettingsLoading = false,
@@ -90,7 +91,8 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
-                    onUploadClicked = {}
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
                 )
             }
         }
@@ -123,7 +125,7 @@ class RecentsWidgetTest {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 RecentsView(
-                    uiState = RecentsWidgetUiState(
+                    uiState = RecentsUiState(
                         recentActionItems = listOf(item1, item2),
                         isNodesLoading = false,
                         isHiddenNodeSettingsLoading = false,
@@ -131,7 +133,8 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
-                    onUploadClicked = {}
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
                 )
             }
         }
@@ -158,7 +161,7 @@ class RecentsWidgetTest {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 RecentsView(
-                    uiState = RecentsWidgetUiState(
+                    uiState = RecentsUiState(
                         recentActionItems = listOf(item),
                         isNodesLoading = false,
                         isHiddenNodeSettingsLoading = false,
@@ -166,7 +169,8 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
-                    onUploadClicked = {}
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
                 )
             }
         }
@@ -203,7 +207,7 @@ class RecentsWidgetTest {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 RecentsView(
-                    uiState = RecentsWidgetUiState(
+                    uiState = RecentsUiState(
                         recentActionItems = listOf(item1, item2, item3),
                         isNodesLoading = false,
                         isHiddenNodeSettingsLoading = false,
@@ -211,7 +215,8 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
-                    onUploadClicked = {}
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
                 )
             }
         }
@@ -254,7 +259,7 @@ class RecentsWidgetTest {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 RecentsView(
-                    uiState = RecentsWidgetUiState(
+                    uiState = RecentsUiState(
                         recentActionItems = listOf(item1, item2, item3),
                         isNodesLoading = false,
                         isHiddenNodeSettingsLoading = false,
@@ -262,7 +267,8 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
-                    onUploadClicked = {}
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
                 )
             }
         }
@@ -295,7 +301,7 @@ class RecentsWidgetTest {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 RecentsView(
-                    uiState = RecentsWidgetUiState(
+                    uiState = RecentsUiState(
                         recentActionItems = listOf(item),
                         isNodesLoading = false,
                         isHiddenNodeSettingsLoading = false,
@@ -306,7 +312,8 @@ class RecentsWidgetTest {
                     },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
-                    onUploadClicked = {}
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
                 )
             }
         }
@@ -337,7 +344,7 @@ class RecentsWidgetTest {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 RecentsView(
-                    uiState = RecentsWidgetUiState(
+                    uiState = RecentsUiState(
                         recentActionItems = listOf(item),
                         isNodesLoading = false,
                         isHiddenNodeSettingsLoading = false,
@@ -348,7 +355,8 @@ class RecentsWidgetTest {
                     },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
-                    onUploadClicked = {}
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
                 )
             }
         }
@@ -380,7 +388,7 @@ class RecentsWidgetTest {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 RecentsView(
-                    uiState = RecentsWidgetUiState(
+                    uiState = RecentsUiState(
                         recentActionItems = listOf(item),
                         isNodesLoading = false,
                         isHiddenNodeSettingsLoading = false,
@@ -391,7 +399,50 @@ class RecentsWidgetTest {
                     },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
-                    onUploadClicked = {}
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
+                )
+            }
+        }
+
+        composeRule.waitForIdle()
+        composeRule.onAllNodesWithTag(FIRST_LINE_TEST_TAG, true)[0]
+            .performClick()
+
+        assertThat(clickedNode).isNull()
+        assertThat(clickedSourceType).isNull()
+    }
+
+    @Test
+    fun `test that onFileClicked is not called when firstNode is null for single node item`() {
+        var clickedNode: TypedFileNode? = null
+        var clickedSourceType: NodeSourceType? = null
+
+        val item = createMockRecentsUiItem(
+            title = RecentActionTitleText.SingleNode("Document.pdf"),
+            parentFolderName = LocalizedText.Literal("Cloud Drive"),
+            timestamp = System.currentTimeMillis() / 1000,
+            icon = IconPackR.drawable.ic_generic_medium_solid,
+            nodes = emptyList(), // Empty nodes list means firstNode will be null
+            parentFolderSharesType = RecentActionsSharesType.NONE,
+        )
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsView(
+                    uiState = RecentsUiState(
+                        recentActionItems = listOf(item),
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
+                    ),
+                    onFileClicked = { node, sourceType ->
+                        clickedNode = node
+                        clickedSourceType = sourceType
+                    },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
                 )
             }
         }
@@ -411,14 +462,15 @@ class RecentsWidgetTest {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 RecentsView(
-                    uiState = RecentsWidgetUiState(
+                    uiState = RecentsUiState(
                         recentActionItems = emptyList(),
                         isNodesLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = { optionsClicked = true },
                     onShowRecentActivity = {},
-                    onUploadClicked = {}
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
                 )
             }
         }
@@ -433,7 +485,7 @@ class RecentsWidgetTest {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 RecentsView(
-                    uiState = RecentsWidgetUiState(
+                    uiState = RecentsUiState(
                         recentActionItems = emptyList(),
                         isNodesLoading = false,
                         isHiddenNodeSettingsLoading = false,
@@ -442,7 +494,8 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
-                    onUploadClicked = {}
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
                 )
             }
         }
@@ -465,7 +518,7 @@ class RecentsWidgetTest {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 RecentsView(
-                    uiState = RecentsWidgetUiState(
+                    uiState = RecentsUiState(
                         recentActionItems = listOf(item),
                         isNodesLoading = false,
                         isHiddenNodeSettingsLoading = false,
@@ -474,7 +527,8 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
-                    onUploadClicked = {}
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
                 )
             }
         }
@@ -492,7 +546,7 @@ class RecentsWidgetTest {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 RecentsView(
-                    uiState = RecentsWidgetUiState(
+                    uiState = RecentsUiState(
                         recentActionItems = emptyList(),
                         isNodesLoading = false,
                         isHiddenNodeSettingsLoading = false,
@@ -501,7 +555,8 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = { showActivityClicked = true },
-                    onUploadClicked = {}
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
                 )
             }
         }
@@ -515,7 +570,7 @@ class RecentsWidgetTest {
     @Test
     fun `test that view all button is displayed when there are MAX_BUCKETS items`() {
         val timestamp = System.currentTimeMillis() / 1000
-        val items = (0..MAX_BUCKETS).map { index ->
+        val items = (0..WIDGET_MAX_BUCKETS).map { index ->
             createMockRecentsUiItem(
                 title = RecentActionTitleText.SingleNode("Document$index.pdf"),
                 parentFolderName = LocalizedText.Literal("Cloud Drive"),
@@ -527,7 +582,7 @@ class RecentsWidgetTest {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 RecentsView(
-                    uiState = RecentsWidgetUiState(
+                    uiState = RecentsUiState(
                         recentActionItems = items,
                         isNodesLoading = false,
                         isHiddenNodeSettingsLoading = false,
@@ -535,7 +590,8 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
-                    onUploadClicked = {}
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
                 )
             }
         }
@@ -560,7 +616,7 @@ class RecentsWidgetTest {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 RecentsView(
-                    uiState = RecentsWidgetUiState(
+                    uiState = RecentsUiState(
                         recentActionItems = items,
                         isNodesLoading = false,
                         isHiddenNodeSettingsLoading = false,
@@ -568,7 +624,8 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
-                    onUploadClicked = {}
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
                 )
             }
         }
@@ -593,7 +650,7 @@ class RecentsWidgetTest {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 RecentsView(
-                    uiState = RecentsWidgetUiState(
+                    uiState = RecentsUiState(
                         recentActionItems = items,
                         isNodesLoading = false,
                         isHideRecentsEnabled = true,
@@ -601,7 +658,8 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
-                    onUploadClicked = {}
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
                 )
             }
         }
@@ -616,7 +674,7 @@ class RecentsWidgetTest {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 RecentsView(
-                    uiState = RecentsWidgetUiState(
+                    uiState = RecentsUiState(
                         recentActionItems = emptyList(),
                         isNodesLoading = false,
                         isHiddenNodeSettingsLoading = false,
@@ -624,7 +682,8 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
-                    onUploadClicked = {}
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
                 )
             }
         }
@@ -640,7 +699,7 @@ class RecentsWidgetTest {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 RecentsView(
-                    uiState = RecentsWidgetUiState(
+                    uiState = RecentsUiState(
                         recentActionItems = emptyList(),
                         isNodesLoading = true,
                         isHiddenNodeSettingsLoading = false,
@@ -648,7 +707,8 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
-                    onUploadClicked = {}
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
                 )
             }
         }
@@ -669,7 +729,7 @@ class RecentsWidgetTest {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 RecentsView(
-                    uiState = RecentsWidgetUiState(
+                    uiState = RecentsUiState(
                         recentActionItems = listOf(item),
                         isNodesLoading = false,
                         isHiddenNodeSettingsLoading = false,
@@ -677,7 +737,8 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
-                    onUploadClicked = {}
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
                 )
             }
         }
@@ -694,7 +755,7 @@ class RecentsWidgetTest {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 RecentsView(
-                    uiState = RecentsWidgetUiState(
+                    uiState = RecentsUiState(
                         recentActionItems = emptyList(),
                         isNodesLoading = false,
                         isHiddenNodeSettingsLoading = false,
@@ -702,7 +763,8 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
-                    onUploadClicked = { uploadClicked = true }
+                    onUploadClicked = { uploadClicked = true },
+                    onViewAllClicked = {}
                 )
             }
         }
@@ -718,7 +780,7 @@ class RecentsWidgetTest {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 RecentsView(
-                    uiState = RecentsWidgetUiState(
+                    uiState = RecentsUiState(
                         recentActionItems = emptyList(),
                         isNodesLoading = false,
                         isHiddenNodeSettingsLoading = false,
@@ -727,7 +789,8 @@ class RecentsWidgetTest {
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
-                    onUploadClicked = {}
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
                 )
             }
         }
@@ -741,14 +804,15 @@ class RecentsWidgetTest {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 RecentsView(
-                    uiState = RecentsWidgetUiState(
+                    uiState = RecentsUiState(
                         recentActionItems = emptyList(),
                         isNodesLoading = true,
                     ),
                     onFileClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
-                    onUploadClicked = {}
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
                 )
             }
         }

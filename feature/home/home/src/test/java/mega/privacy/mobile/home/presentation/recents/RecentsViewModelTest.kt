@@ -1,4 +1,4 @@
-package mega.privacy.mobile.home.presentation.home.widget.recents
+package mega.privacy.mobile.home.presentation.recents
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import kotlin.time.Duration.Companion.milliseconds
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.TextFileTypeInfo
@@ -21,10 +20,10 @@ import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
-import mega.privacy.mobile.home.presentation.home.widget.recents.mapper.RecentActionUiItemMapper
-import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsTimestampText
-import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsUiItem
-import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsWidgetUiState
+import mega.privacy.mobile.home.presentation.recents.mapper.RecentActionUiItemMapper
+import mega.privacy.mobile.home.presentation.recents.model.RecentsTimestampText
+import mega.privacy.mobile.home.presentation.recents.model.RecentsUiItem
+import mega.privacy.mobile.home.presentation.recents.model.RecentsUiState
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -36,13 +35,14 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration.Companion.milliseconds
 
 @ExperimentalCoroutinesApi
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class RecentsWidgetViewModelTest {
+class RecentsViewModelTest {
 
-    private lateinit var underTest: RecentsWidgetViewModel
+    private lateinit var underTest: RecentsViewModel
 
     private val getRecentActionsUseCase = mock<GetRecentActionsUseCase>()
     private val recentActionUiItemMapper = mock<RecentActionUiItemMapper>()
@@ -96,7 +96,7 @@ class RecentsWidgetViewModelTest {
     }
 
     private fun initViewModel() {
-        underTest = RecentsWidgetViewModel(
+        underTest = RecentsViewModel(
             getRecentActionsUseCase = getRecentActionsUseCase,
             recentActionUiItemMapper = recentActionUiItemMapper,
             setHideRecentActivityUseCase = setHideRecentActivityUseCase,
@@ -104,6 +104,7 @@ class RecentsWidgetViewModelTest {
             monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
+            maxBucketCount = 4
         )
     }
 
@@ -271,6 +272,29 @@ class RecentsWidgetViewModelTest {
     }
 
     @Test
+    fun `test that maxBucketCount is passed to use case correctly`() = runTest {
+        val testMaxBucketCount = 10
+        whenever(getRecentActionsUseCase(any(), any())).thenReturn(emptyList())
+
+        underTest = RecentsViewModel(
+            getRecentActionsUseCase = getRecentActionsUseCase,
+            recentActionUiItemMapper = recentActionUiItemMapper,
+            setHideRecentActivityUseCase = setHideRecentActivityUseCase,
+            monitorHideRecentActivityUseCase = monitorHideRecentActivityUseCase,
+            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
+            maxBucketCount = testMaxBucketCount
+        )
+        advanceUntilIdle()
+
+        verify(getRecentActionsUseCase).invoke(
+            excludeSensitives = false,
+            maxBucketCount = testMaxBucketCount
+        )
+    }
+
+    @Test
     fun `test that recents are reloaded when excludeSensitives changes from false to true`() =
         runTest {
             whenever(getRecentActionsUseCase(any(), any())).thenReturn(emptyList())
@@ -327,7 +351,7 @@ class RecentsWidgetViewModelTest {
 
     @Test
     fun `test that isLoading is true when isNodesLoading is true`() = runTest {
-        val state = RecentsWidgetUiState(
+        val state = RecentsUiState(
             isNodesLoading = true,
             isHiddenNodeSettingsLoading = false
         )
@@ -336,7 +360,7 @@ class RecentsWidgetViewModelTest {
 
     @Test
     fun `test that isLoading is true when isHiddenNodeSettingsLoading is true`() = runTest {
-        val state = RecentsWidgetUiState(
+        val state = RecentsUiState(
             isNodesLoading = false,
             isHiddenNodeSettingsLoading = true
         )
@@ -345,7 +369,7 @@ class RecentsWidgetViewModelTest {
 
     @Test
     fun `test that isLoading is true when both loading flags are true`() = runTest {
-        val state = RecentsWidgetUiState(
+        val state = RecentsUiState(
             isNodesLoading = true,
             isHiddenNodeSettingsLoading = true
         )
@@ -354,7 +378,7 @@ class RecentsWidgetViewModelTest {
 
     @Test
     fun `test that isLoading is false when both loading flags are false`() = runTest {
-        val state = RecentsWidgetUiState(
+        val state = RecentsUiState(
             isNodesLoading = false,
             isHiddenNodeSettingsLoading = false
         )

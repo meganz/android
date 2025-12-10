@@ -1,4 +1,4 @@
-package mega.privacy.mobile.home.presentation.home.widget.recents.view
+package mega.privacy.mobile.home.presentation.recents.view
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState

@@ -1,4 +1,4 @@
-package mega.privacy.mobile.home.presentation.home.widget.recents.model
+package mega.privacy.mobile.home.presentation.recents.model
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.pluralStringResource

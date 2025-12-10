@@ -1,4 +1,4 @@
-package mega.privacy.mobile.home.presentation.home.widget.recents.view
+package mega.privacy.mobile.home.presentation.recents.view
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column

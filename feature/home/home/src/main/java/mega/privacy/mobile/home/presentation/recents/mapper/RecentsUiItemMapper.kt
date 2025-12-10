@@ -1,4 +1,4 @@
-package mega.privacy.mobile.home.presentation.home.widget.recents.mapper
+package mega.privacy.mobile.home.presentation.recents.mapper
 
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
@@ -7,9 +7,9 @@ import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.feature.home.R
 import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentActionTitleText
-import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsTimestampText
-import mega.privacy.mobile.home.presentation.home.widget.recents.model.RecentsUiItem
+import mega.privacy.mobile.home.presentation.recents.model.RecentActionTitleText
+import mega.privacy.mobile.home.presentation.recents.model.RecentsTimestampText
+import mega.privacy.mobile.home.presentation.recents.model.RecentsUiItem
 import javax.inject.Inject
 
 /**

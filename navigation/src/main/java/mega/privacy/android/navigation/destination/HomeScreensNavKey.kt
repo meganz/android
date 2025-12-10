@@ -8,6 +8,9 @@ import kotlinx.serialization.json.Json
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 
 @Serializable
+data object RecentsScreenNavKey : NavKey
+
+@Serializable
 data class HomeScreensNavKey(
     private val serialisedRoot: String?,
     private val serialisedDestinations: String?,

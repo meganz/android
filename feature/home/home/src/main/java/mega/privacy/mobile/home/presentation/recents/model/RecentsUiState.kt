@@ -1,4 +1,4 @@
-package mega.privacy.mobile.home.presentation.home.widget.recents.model
+package mega.privacy.mobile.home.presentation.recents.model
 
 /**
  * Recents widget UI state
@@ -10,7 +10,7 @@ package mega.privacy.mobile.home.presentation.home.widget.recents.model
  * @param showHiddenNodes true if hidden nodes should be shown
  * @param isHiddenNodeSettingsLoading true if loading due to hidden node settings change
  */
-data class RecentsWidgetUiState(
+data class RecentsUiState(
     val recentActionItems: List<RecentsUiItem> = emptyList(),
     val isNodesLoading: Boolean = true,
     val isHideRecentsEnabled: Boolean = false,
