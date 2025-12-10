@@ -269,7 +269,9 @@ class MegaActivity : ComponentActivity() {
                                 CompositionLocalProvider(
                                     LocalSnackBarHostState provides snackbarHostState
                                 ) {
-                                    SnackbarLifetimeController()
+                                    if (backStack.last() !is FetchingContentNavKey) {
+                                        SnackbarLifetimeController()
+                                    }
                                     NavDisplay(
                                         backStack = backStack,
                                         onBack = { navigationHandler.back() },
