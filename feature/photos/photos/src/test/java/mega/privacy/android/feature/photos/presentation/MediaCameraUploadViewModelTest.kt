@@ -15,6 +15,7 @@ import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.permisison.HasCameraUploadsPermissionUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorCameraUploadShownUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorEnableCameraUploadBannerVisibilityUseCase
@@ -61,6 +62,7 @@ class MediaCameraUploadViewModelTest {
         mock()
     private val setEnableCameraUploadBannerDismissedTimestampUseCase: SetEnableCameraUploadBannerDismissedTimestampUseCase =
         mock()
+    private val hasCameraUploadsPermissionUseCase: HasCameraUploadsPermissionUseCase = mock()
 
     private var cameraUploadsStatusFlow =
         MutableStateFlow<CameraUploadsStatusInfo>(CameraUploadsStatusInfo.Unknown)
@@ -90,7 +92,8 @@ class MediaCameraUploadViewModelTest {
             setCameraUploadShownUseCase = setCameraUploadShownUseCase,
             monitorEnableCameraUploadBannerVisibilityUseCase = monitorEnableCameraUploadBannerVisibilityUseCase,
             resetEnableCameraUploadBannerVisibilityUseCase = resetEnableCameraUploadBannerVisibilityUseCase,
-            setEnableCameraUploadBannerDismissedTimestampUseCase = setEnableCameraUploadBannerDismissedTimestampUseCase
+            setEnableCameraUploadBannerDismissedTimestampUseCase = setEnableCameraUploadBannerDismissedTimestampUseCase,
+            hasCameraUploadsPermissionUseCase = hasCameraUploadsPermissionUseCase
         )
     }
 
@@ -108,7 +111,8 @@ class MediaCameraUploadViewModelTest {
             setCameraUploadShownUseCase,
             monitorEnableCameraUploadBannerVisibilityUseCase,
             resetEnableCameraUploadBannerVisibilityUseCase,
-            setEnableCameraUploadBannerDismissedTimestampUseCase
+            setEnableCameraUploadBannerDismissedTimestampUseCase,
+            hasCameraUploadsPermissionUseCase
         )
     }
 
@@ -314,7 +318,9 @@ class MediaCameraUploadViewModelTest {
             whenever(
                 monitorEnableCameraUploadBannerVisibilityUseCase.enableCameraUploadBannerVisibilityFlow
             ) doReturn flowOf(true)
-            whenever(isCameraUploadsEnabledUseCase()) doReturn false
+            whenever(isCameraUploadsEnabledUseCase.monitorCameraUploadsEnabled) doReturn flowOf(
+                false
+            )
 
             underTest.uiState.test {
                 assertThat(expectMostRecentItem().shouldShowEnableCUBanner).isTrue()
@@ -327,7 +333,9 @@ class MediaCameraUploadViewModelTest {
             whenever(
                 monitorEnableCameraUploadBannerVisibilityUseCase.enableCameraUploadBannerVisibilityFlow
             ) doReturn flowOf(true)
-            whenever(isCameraUploadsEnabledUseCase()) doReturn false
+            whenever(isCameraUploadsEnabledUseCase.monitorCameraUploadsEnabled) doReturn flowOf(
+                false
+            )
 
             underTest.uiState.test { cancelAndConsumeRemainingEvents() }
             verify(resetEnableCameraUploadBannerVisibilityUseCase).invoke()
@@ -339,7 +347,7 @@ class MediaCameraUploadViewModelTest {
             whenever(
                 monitorEnableCameraUploadBannerVisibilityUseCase.enableCameraUploadBannerVisibilityFlow
             ) doReturn flowOf(true)
-            whenever(isCameraUploadsEnabledUseCase()) doReturn true
+            whenever(isCameraUploadsEnabledUseCase.monitorCameraUploadsEnabled) doReturn flowOf(true)
 
             underTest.uiState.test {
                 assertThat(expectMostRecentItem().shouldShowEnableCUBanner).isFalse()
@@ -352,7 +360,9 @@ class MediaCameraUploadViewModelTest {
             whenever(
                 monitorEnableCameraUploadBannerVisibilityUseCase.enableCameraUploadBannerVisibilityFlow
             ) doReturn flowOf(false)
-            whenever(isCameraUploadsEnabledUseCase()) doReturn false
+            whenever(isCameraUploadsEnabledUseCase.monitorCameraUploadsEnabled) doReturn flowOf(
+                false
+            )
 
             underTest.uiState.test {
                 assertThat(expectMostRecentItem().shouldShowEnableCUBanner).isFalse()
@@ -365,4 +375,104 @@ class MediaCameraUploadViewModelTest {
 
         verify(setEnableCameraUploadBannerDismissedTimestampUseCase).invoke()
     }
+
+    @Test
+    fun `test that the CU access is successfully limited when CU permissions are not granted`() =
+        runTest {
+            whenever(hasCameraUploadsPermissionUseCase()) doReturn false
+
+            underTest.checkCameraUploadsPermissions()
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().isCameraUploadsLimitedAccess).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that camera uploads warning menu is visible when CU permissions are not granted`() =
+        runTest {
+            whenever(hasCameraUploadsPermissionUseCase()) doReturn false
+            cameraUploadsStatusFlow.emit(
+                CameraUploadsStatusInfo.Finished(
+                    reason = CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
+                )
+            )
+            whenever(
+                getFeatureFlagValueUseCase(
+                    AppFeatures.CameraUploadsPausedWarningBanner
+                )
+            ) doReturn false
+
+            underTest.uiState.test {
+                underTest.checkCameraUploadsPermissions()
+
+                assertThat(expectMostRecentItem().showCameraUploadsWarning).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that camera uploads warning menu is visible when should show warning menu`() =
+        runTest {
+            whenever(hasCameraUploadsPermissionUseCase()) doReturn true
+            cameraUploadsStatusFlow.emit(
+                CameraUploadsStatusInfo.Finished(
+                    reason = CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
+                )
+            )
+            whenever(
+                getFeatureFlagValueUseCase(
+                    AppFeatures.CameraUploadsPausedWarningBanner
+                )
+            ) doReturn true
+
+            underTest.checkCameraUploadsPermissions()
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().showCameraUploadsWarning).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that camera uploads warning banner is visible when CU permissions are not granted`() =
+        runTest {
+            whenever(hasCameraUploadsPermissionUseCase()) doReturn false
+            cameraUploadsStatusFlow.emit(
+                CameraUploadsStatusInfo.Finished(
+                    reason = CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
+                )
+            )
+            whenever(
+                getFeatureFlagValueUseCase(
+                    AppFeatures.CameraUploadsPausedWarningBanner
+                )
+            ) doReturn false
+
+            underTest.uiState.test {
+                underTest.checkCameraUploadsPermissions()
+
+                assertThat(expectMostRecentItem().isWarningBannerShown).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that camera uploads warning banner is visible when should show warning banner`() =
+        runTest {
+            whenever(hasCameraUploadsPermissionUseCase()) doReturn true
+            cameraUploadsStatusFlow.emit(
+                CameraUploadsStatusInfo.Finished(
+                    reason = CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
+                )
+            )
+            whenever(
+                getFeatureFlagValueUseCase(
+                    AppFeatures.CameraUploadsPausedWarningBanner
+                )
+            ) doReturn true
+
+            underTest.checkCameraUploadsPermissions()
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().isWarningBannerShown).isTrue()
+            }
+        }
 }

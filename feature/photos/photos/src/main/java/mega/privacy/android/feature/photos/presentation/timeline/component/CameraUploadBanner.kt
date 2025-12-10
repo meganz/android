@@ -27,6 +27,7 @@ import mega.android.core.ui.components.LinkSpannedText
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.SpannedText
 import mega.android.core.ui.components.banner.InlineErrorBanner
+import mega.android.core.ui.components.banner.TopWarningBanner
 import mega.android.core.ui.components.divider.StrongDivider
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.model.MegaSpanStyle
@@ -55,16 +56,34 @@ import mega.privacy.mobile.analytics.event.FullStorageOverQuotaBannerUpgradeButt
 internal fun CameraUploadsBanner(
     bannerType: CameraUploadsBannerType,
     shouldShowEnableCUBanner: Boolean,
+    shouldShowCUWarningBanner: Boolean,
     onEnableCameraUploads: () -> Unit,
-    onDismissRequest: () -> Unit,
+    onDismissEnableCameraUploadsBanner: () -> Unit,
+    onChangeCameraUploadsPermissions: () -> Unit,
+    onDismissWarningBanner: () -> Unit,
 ) {
     when (bannerType) {
         CameraUploadsBannerType.EnableCameraUploads -> {
             if (shouldShowEnableCUBanner) {
                 EnableCameraUploadsBanner(
                     onEnableCUClick = onEnableCameraUploads,
-                    onDismissRequest = onDismissRequest
+                    onDismissRequest = onDismissEnableCameraUploadsBanner
                 )
+            }
+        }
+
+        CameraUploadsBannerType.NoFullAccess -> {
+            if (shouldShowCUWarningBanner) {
+                CameraUploadsNoFullAccessBanner(
+                    onClick = onChangeCameraUploadsPermissions,
+                    onClose = onDismissWarningBanner,
+                )
+            }
+        }
+
+        CameraUploadsBannerType.LowBattery -> {
+            if (shouldShowCUWarningBanner) {
+                LowBatteryPausedBanner(onClose = onDismissWarningBanner)
             }
         }
 
@@ -73,33 +92,19 @@ internal fun CameraUploadsBanner(
 }
 
 @Composable
-fun CameraUploadsNoFullAccessBanner(
+private fun CameraUploadsNoFullAccessBanner(
     onClick: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    BasicCameraUploadsBanner(
-        modifier = modifier
-            .clickable { onClick() }
-            .testTag(TIMELINE_CAMERA_UPLOADS_NO_FULL_ACCESS_BANNER_TEST_TAG),
-        statusIcon = R.drawable.ic_cu_status_warning,
-        title = stringResource(sharedR.string.camera_uploads_banner_complete_title),
-        description = stringResource(sharedR.string.camera_upload_no_full_access_banner_change_permissions_description),
-        spanStyles = mapOf(
-            SpanIndicator('A') to MegaSpanStyle.DefaultColorStyle(
-                SpanStyle(fontWeight = FontWeight.Bold)
-            )
-        ),
-        endIcon = {
-            MegaIcon(
-                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.X),
-                contentDescription = "Camera uploads banner end icon",
-                modifier = Modifier
-                    .size(24.dp)
-                    .clickable { onClose() },
-                tint = IconColor.Primary,
-            )
-        }
+    TopWarningBanner(
+        modifier = modifier.testTag(TIMELINE_CAMERA_UPLOADS_NO_FULL_ACCESS_BANNER_TEST_TAG),
+        title = null,
+        body = stringResource(sharedR.string.timeline_tab_cu_permission_warning_banner_description),
+        actionButtonText = stringResource(sharedR.string.timeline_tab_cu_permission_warning_banner_action),
+        showCancelButton = true,
+        onActionButtonClick = onClick,
+        onCancelButtonClick = onClose
     )
 }
 
@@ -138,13 +143,16 @@ internal fun DeviceChargingNotMetPausedBanner(
 }
 
 @Composable
-internal fun LowBatteryPausedBanner(modifier: Modifier = Modifier) {
-    BasicCameraUploadsBanner(
-        modifier = modifier
-            .testTag(TIMELINE_CAMERA_UPLOADS_LOW_BATTERY_BANNER_TEST_TAG),
-        statusIcon = R.drawable.ic_cu_status_warning,
-        title = stringResource(sharedR.string.camera_update_paused_warning_banner_title),
-        description = stringResource(sharedR.string.camera_update_low_battery_banner_description),
+private fun LowBatteryPausedBanner(
+    onClose: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    TopWarningBanner(
+        modifier = modifier.testTag(TIMELINE_CAMERA_UPLOADS_LOW_BATTERY_BANNER_TEST_TAG),
+        title = null,
+        body = stringResource(sharedR.string.timeline_tab_cu_battery_level_warning_banner_description),
+        showCancelButton = true,
+        onCancelButtonClick = onClose
     )
 }
 
@@ -403,7 +411,7 @@ private fun PreviewDeviceChargingNotMetPausedBanner() {
 @Composable
 private fun PreviewLowBatteryPausedBanner() {
     AndroidThemeForPreviews {
-        LowBatteryPausedBanner()
+        LowBatteryPausedBanner(onClose = {})
     }
 }
 

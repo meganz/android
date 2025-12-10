@@ -1909,4 +1909,10 @@
     <string name="can_only_join_one_call_error_message">Bu aramaya katılmak için mevcut aramanızı sonlandırmanız gerekiyor</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">Ara&#8230;</string>
+    <!-- Media timeline tab: CU permission waning banner action text -->
+    <string name="timeline_tab_cu_permission_warning_banner_action">Update permissions</string>
+    <!-- Media timeline tab: CU permission waning banner description -->
+    <string name="timeline_tab_cu_permission_warning_banner_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
+    <!-- Media timeline tab: CU battery level waning banner description -->
+    <string name="timeline_tab_cu_battery_level_warning_banner_description">Battery level too low. Charge device to start camera uploads.</string>
 </resources>

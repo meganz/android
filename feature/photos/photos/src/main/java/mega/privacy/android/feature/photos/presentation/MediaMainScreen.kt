@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
@@ -144,6 +145,13 @@ fun MediaMainRoute(
         }
     }
 
+    // Follow the same behavior as the existing code. We can improve this in phase 2.
+    LifecycleResumeEffect(Unit) {
+        mediaCameraUploadViewModel.resetCUButtonAndProgress()
+        mediaCameraUploadViewModel.checkCameraUploadsPermissions()
+        onPauseOrDispose {}
+    }
+
     NodeActionEventHandler(
         nodeOptionsActionViewModel = nodeOptionsActionViewModel,
         nameCollisionLauncher = nameCollisionLauncher,
@@ -219,7 +227,6 @@ fun MediaMainRoute(
         loadTimelineNextPage = timelineViewModel::loadNextPage,
         onTimelineApplyFilterClick = timelineViewModel::onFilterChange,
         setNavigationItemVisibility = setNavigationItemVisibility,
-        resetCUButtonAndProgress = mediaCameraUploadViewModel::resetCUButtonAndProgress,
         navigateToLegacyPhotoSelection = navigateToLegacyPhotoSelection,
         onTimelinePhotoSelected = timelineViewModel::onPhotoSelected,
         onAllTimelinePhotosSelected = timelineViewModel::onSelectAllPhotos,
@@ -244,6 +251,8 @@ fun MediaMainRoute(
         navigateToLegacyPhotosSearch = navigationHandler::navigate,
         onTransfer = onTransfer,
         navigationHandler = navigationHandler,
+        handleCameraUploadsPermissionsResult = mediaCameraUploadViewModel::handleCameraUploadsPermissionsResult,
+        updateIsWarningBannerShown = mediaCameraUploadViewModel::updateIsWarningBannerShown
     )
 }
 
@@ -263,7 +272,6 @@ fun MediaMainScreen(
     loadTimelineNextPage: () -> Unit,
     onTimelineApplyFilterClick: (request: TimelineFilterRequest) -> Unit,
     setNavigationItemVisibility: (Boolean) -> Unit,
-    resetCUButtonAndProgress: () -> Unit,
     navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
     navigateToLegacyPhotoSelection: (LegacyPhotoSelectionNavKey) -> Unit,
     navigateToLegacyPhotosSearch: (LegacyPhotosSearchNavKey) -> Unit,
@@ -278,6 +286,8 @@ fun MediaMainScreen(
     clearCameraUploadsChangePermissionsMessage: () -> Unit,
     onNavigateCameraUploadsSettings: () -> Unit,
     onDismissEnableCameraUploadsBanner: () -> Unit,
+    handleCameraUploadsPermissionsResult: () -> Unit,
+    updateIsWarningBannerShown: (value: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MediaMainViewModel = hiltViewModel(),
     videosTabViewModel: VideosTabViewModel = hiltViewModel(),
@@ -557,7 +567,6 @@ fun MediaMainScreen(
                                         showTimelineSortDialog = false
                                     },
                                     loadTimelineNextPage = loadTimelineNextPage,
-                                    resetCUButtonAndProgress = resetCUButtonAndProgress,
                                     onTimelinePhotoClick = {
                                         if (isTimelineInSelectionMode) {
                                             onTimelinePhotoSelected(it)
@@ -581,6 +590,8 @@ fun MediaMainScreen(
                                     onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
                                     onTransfer = onTransfer,
                                     navigationHandler = navigationHandler,
+                                    handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
+                                    updateIsWarningBannerShown = updateIsWarningBannerShown
                                 )
                             }
                         )
@@ -693,7 +704,6 @@ private fun MediaScreen.MediaContent(
     onTimelineSortDialogDismissed: () -> Unit,
     onTimelineSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
     loadTimelineNextPage: () -> Unit,
-    resetCUButtonAndProgress: () -> Unit,
     onTimelinePhotoClick: (node: PhotoNodeUiState) -> Unit,
     onTimelinePhotoSelected: (node: PhotoNodeUiState) -> Unit,
     clearCameraUploadsMessage: () -> Unit,
@@ -704,6 +714,8 @@ private fun MediaScreen.MediaContent(
     onDismissEnableCameraUploadsBanner: () -> Unit,
     navigationHandler: NavigationHandler,
     onTransfer: (TransferTriggerEvent) -> Unit,
+    handleCameraUploadsPermissionsResult: () -> Unit,
+    updateIsWarningBannerShown: (value: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     timelineContentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -728,10 +740,11 @@ private fun MediaScreen.MediaContent(
                 onGridSizeChange = onTimelineGridSizeChange,
                 onSortDialogDismissed = onTimelineSortDialogDismissed,
                 onSortOptionChange = onTimelineSortOptionChange,
-                resetCUButtonAndProgress = resetCUButtonAndProgress,
                 onPhotoClick = onTimelinePhotoClick,
                 onPhotoSelected = onTimelinePhotoSelected,
-                onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner
+                onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
+                handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
+                updateIsWarningBannerShown = updateIsWarningBannerShown
             )
         }
 
@@ -834,7 +847,6 @@ fun PhotosMainScreenPreview() {
             loadTimelineNextPage = {},
             onTimelineApplyFilterClick = {},
             setNavigationItemVisibility = {},
-            resetCUButtonAndProgress = {},
             navigateToLegacyPhotoSelection = {},
             onTimelinePhotoSelected = {},
             onAllTimelinePhotosSelected = {},
@@ -868,6 +880,8 @@ fun PhotosMainScreenPreview() {
                 override fun clearResult(key: String) {}
                 override fun <T> monitorResult(key: String): Flow<T?> = flowOf(null)
             },
+            handleCameraUploadsPermissionsResult = {},
+            updateIsWarningBannerShown = {}
         )
     }
 }

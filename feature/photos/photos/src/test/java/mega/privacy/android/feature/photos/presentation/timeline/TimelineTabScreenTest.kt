@@ -68,6 +68,8 @@ class TimelineTabScreenTest {
         onPhotoClick: (node: PhotoNodeUiState) -> Unit = {},
         onPhotoSelected: (node: PhotoNodeUiState) -> Unit = {},
         onDismissEnableCameraUploadsBanner: () -> Unit = {},
+        handleCameraUploadsPermissionsResult: () -> Unit = {},
+        updateIsWarningBannerShown: (value: Boolean) -> Unit = {},
     ) {
         setContent {
             TimelineTabScreen(
@@ -87,7 +89,9 @@ class TimelineTabScreenTest {
                 onSortOptionChange = onSortOptionChange,
                 onPhotoClick = onPhotoClick,
                 onPhotoSelected = onPhotoSelected,
-                onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner
+                onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
+                handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
+                updateIsWarningBannerShown = updateIsWarningBannerShown
             )
         }
     }

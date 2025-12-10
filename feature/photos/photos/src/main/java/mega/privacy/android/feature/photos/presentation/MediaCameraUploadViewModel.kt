@@ -9,6 +9,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -19,6 +20,7 @@ import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.permisison.HasCameraUploadsPermissionUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorCameraUploadShownUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorEnableCameraUploadBannerVisibilityUseCase
@@ -53,6 +55,7 @@ class MediaCameraUploadViewModel @Inject constructor(
     private val monitorEnableCameraUploadBannerVisibilityUseCase: MonitorEnableCameraUploadBannerVisibilityUseCase,
     private val resetEnableCameraUploadBannerVisibilityUseCase: ResetEnableCameraUploadBannerVisibilityUseCase,
     private val setEnableCameraUploadBannerDismissedTimestampUseCase: SetEnableCameraUploadBannerDismissedTimestampUseCase,
+    private val hasCameraUploadsPermissionUseCase: HasCameraUploadsPermissionUseCase,
 ) : ViewModel() {
 
     // Due to time constraint, this approach will be updated to the lazy approach in phase 2.
@@ -419,20 +422,21 @@ class MediaCameraUploadViewModel @Inject constructor(
 
     private fun monitorEnableCUBannerVisibility() {
         viewModelScope.launch {
-            monitorEnableCameraUploadBannerVisibilityUseCase.enableCameraUploadBannerVisibilityFlow
-                .catch { Timber.e(it, "Unable to monitor enable CU banner visibility") }
-                .collectLatest { isVisible ->
-                    val isCUEnabled = runCatching {
-                        isCameraUploadsEnabledUseCase()
-                    }.getOrDefault(defaultValue = false)
-                    _uiState.update { it.copy(shouldShowEnableCUBanner = isVisible && !isCUEnabled) }
-                    if (isVisible) {
-                        runCatching { resetEnableCameraUploadBannerVisibilityUseCase() }
-                            .onFailure {
-                                Timber.e(it, "Unable to reset enable CU banner visibility")
-                            }
-                    }
+            combine(
+                isCameraUploadsEnabledUseCase.monitorCameraUploadsEnabled,
+                monitorEnableCameraUploadBannerVisibilityUseCase.enableCameraUploadBannerVisibilityFlow,
+                ::Pair
+            ).catch {
+                Timber.e(it, "Unable to monitor enable CU banner visibility")
+            }.collectLatest { (isCUEnabled, isVisible) ->
+                _uiState.update { it.copy(shouldShowEnableCUBanner = isVisible && !isCUEnabled) }
+                if (isVisible) {
+                    runCatching { resetEnableCameraUploadBannerVisibilityUseCase() }
+                        .onFailure {
+                            Timber.e(it, "Unable to reset enable CU banner visibility")
+                        }
                 }
+            }
         }
     }
 
@@ -441,5 +445,14 @@ class MediaCameraUploadViewModel @Inject constructor(
             runCatching { setEnableCameraUploadBannerDismissedTimestampUseCase() }
                 .onFailure { Timber.e(it, "Unable to set enable CU banner dismiss timestamp") }
         }
+    }
+
+    internal fun checkCameraUploadsPermissions() {
+        val hasPermissions = hasCameraUploadsPermissionUseCase()
+        setCameraUploadsLimitedAccess(isLimitedAccess = !hasPermissions)
+        val showWarningMenu = !hasPermissions || shouldShowWarningMenu()
+        val showWarningBanner = !hasPermissions || shouldShowWarningBanner()
+        setCameraUploadsWarningMenu(isVisible = showWarningMenu)
+        updateIsWarningBannerShown(isShown = showWarningBanner)
     }
 }
