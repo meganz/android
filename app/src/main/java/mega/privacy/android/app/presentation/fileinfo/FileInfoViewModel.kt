@@ -80,6 +80,7 @@ import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarning
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.fileinfo.GetNodeLocationByIdUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
@@ -152,6 +153,7 @@ class FileInfoViewModel @Inject constructor(
     private val isBusinessAccountActiveUseCase: IsBusinessAccountActiveUseCase,
     private val isMasterBusinessAccountUseCase: IsMasterBusinessAccountUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val getNodeLocationByIdUseCase: GetNodeLocationByIdUseCase,
     @IoDispatcher private val iODispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -196,6 +198,8 @@ class FileInfoViewModel @Inject constructor(
      * Safer method to get the current node id. Use it instead of [nodeId] property
      */
     fun getCurrentNodeId() = if (this::typedNode.isInitialized) typedNode.id else null
+
+    fun getCurrentNodeParentId() = if (this::typedNode.isInitialized) typedNode.parentId else null
 
     private fun monitorBusinessAccountExpiry() {
         viewModelScope.launch {
@@ -837,6 +841,7 @@ class FileInfoViewModel @Inject constructor(
         updateOwner()
         updateOutShares()
         updateLocation()
+        updateNodeLocation()
         updateMapLocationInfo()
     }
 
@@ -915,6 +920,26 @@ class FileInfoViewModel @Inject constructor(
     private fun updateLocation() {
         updateState {
             it.copy(nodeLocationInfo = getNodeLocationInfo(typedNode))
+        }
+    }
+
+    private fun updateNodeLocation() {
+        viewModelScope.launch {
+            // Only update location if SingleActivity feature flag is enabled
+            val isSingleActivityEnabled = getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
+            if (!isSingleActivityEnabled) {
+                return@launch
+            }
+
+            runCatching {
+                getNodeLocationByIdUseCase(typedNode.id)
+            }.onSuccess { location ->
+                _uiState.update {
+                    it.copy(nodeLocation = location)
+                }
+            }.onFailure {
+                Timber.e("Failed to get node location: $it")
+            }
         }
     }
 

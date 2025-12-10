@@ -68,6 +68,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAva
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
+import mega.privacy.android.domain.entity.NodeLocation
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -179,7 +180,12 @@ class FileInfoActivity : BaseActivity() {
                     onTakeDownLinkClick = {
                         this@FileInfoActivity.launchUrl(it)
                     },
-                    onLocationClick = { this.navigateToLocation(uiState.nodeLocationInfo) },
+                    onLocationClick = {
+                        this.navigateToLocation(
+                            uiState.nodeLocationInfo,
+                            uiState.nodeLocation
+                        )
+                    },
                     availableOfflineChanged = { availableOffline ->
                         viewModel.availableOfflineChanged(availableOffline)
                     },
@@ -407,8 +413,18 @@ class FileInfoActivity : BaseActivity() {
         }
     }
 
-    private fun navigateToLocation(locationInfo: LocationInfo?) {
-        locationInfo?.let {
+    private fun navigateToLocation(
+        locationInfo: LocationInfo?,
+        nodeLocation: NodeLocation?,
+    ) {
+        nodeLocation?.let {
+            megaNavigator.handleFileInfoLocationClick(
+                context = this,
+                nodeId = viewModel.getCurrentNodeId() ?: return,
+                parentId = viewModel.getCurrentNodeParentId() ?: return,
+                nodeLocation = it
+            )
+        } ?: locationInfo?.let {
             handleLocationClick(this, adapterType, locationInfo)
         }
     }

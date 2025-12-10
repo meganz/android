@@ -26,6 +26,7 @@ import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
+import mega.privacy.android.domain.entity.NodeLocation
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
@@ -84,6 +85,7 @@ import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -155,6 +157,8 @@ internal class FileInfoViewModelTest {
     private val monitorAccountDetailsUseCase = mock<MonitorAccountDetailUseCase>()
     private val isMasterBusinessAccountUseCase = mock<IsMasterBusinessAccountUseCase>()
     private val isBusinessAccountActiveUseCase = mock<IsBusinessAccountActiveUseCase>()
+    private val getNodeLocationByIdUseCase =
+        mock<mega.privacy.android.domain.usecase.fileinfo.GetNodeLocationByIdUseCase>()
 
     private val typedFileNode: TypedFileNode = mock()
 
@@ -212,7 +216,8 @@ internal class FileInfoViewModelTest {
             previewFile,
             isMasterBusinessAccountUseCase,
             isBusinessAccountActiveUseCase,
-            monitorAccountDetailsUseCase
+            monitorAccountDetailsUseCase,
+            getNodeLocationByIdUseCase
         )
     }
 
@@ -260,6 +265,7 @@ internal class FileInfoViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailsUseCase,
             isMasterBusinessAccountUseCase = isMasterBusinessAccountUseCase,
             isBusinessAccountActiveUseCase = isBusinessAccountActiveUseCase,
+            getNodeLocationByIdUseCase = getNodeLocationByIdUseCase,
             iODispatcher = UnconfinedTestDispatcher()
         )
     }
@@ -284,6 +290,7 @@ internal class FileInfoViewModelTest {
             .thenReturn(File(null as File?, THUMB_URI))
         whenever(typedFileNode.name).thenReturn("File name")
         whenever(typedFileNode.id).thenReturn(nodeId)
+        whenever(typedFileNode.parentId).thenReturn(parentId)
         whenever(getNodeAccessPermission.invoke(nodeId)).thenReturn(AccessPermission.READ)
         whenever(getPreviewUseCase.invoke(any())).thenReturn(null)
         whenever(typedFileNode.thumbnailPath).thenReturn(null)
@@ -1337,6 +1344,14 @@ internal class FileInfoViewModelTest {
         Arguments.of(NodeChanges.Timestamp),
     )
 
+    private fun provideNodeLocations() = Stream.of(
+        Arguments.of(NodeLocation.CloudDriveRoot),
+        Arguments.of(NodeLocation.CloudDrive),
+        Arguments.of(NodeLocation.RubbishBin),
+        Arguments.of(NodeLocation.IncomingSharesRoot),
+        Arguments.of(NodeLocation.IncomingShares),
+    )
+
     private suspend fun mockFolder() = mock<TypedFolderNode> {
         on { id }.thenReturn(nodeId)
         on { name }.thenReturn("Folder name")
@@ -1353,5 +1368,75 @@ internal class FileInfoViewModelTest {
         private val parentId = NodeId(PARENT_NODE_HANDLE)
         private const val THUMB_URI = "/thumb"
         private const val PREVIEW_URI = "/preview"
+    }
+
+    @Test
+    fun `test that getCurrentNodeId returns node id when typedNode is initialized`() = runTest {
+        underTest.setNode(node.handle, true)
+        assertThat(underTest.getCurrentNodeId()).isEqualTo(nodeId)
+    }
+
+    @Test
+    fun `test that getCurrentNodeId returns null when typedNode is not initialized`() {
+        assertThat(underTest.getCurrentNodeId()).isNull()
+    }
+
+    @Test
+    fun `test that getCurrentNodeParentId returns parent id when typedNode is initialized`() =
+        runTest {
+            underTest.setNode(node.handle, true)
+            assertThat(underTest.getCurrentNodeParentId()).isEqualTo(parentId)
+        }
+
+    @Test
+    fun `test that getCurrentNodeParentId returns null when typedNode is not initialized`() {
+        assertThat(underTest.getCurrentNodeParentId()).isNull()
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideNodeLocations")
+    fun `test that nodeLocation is updated when SingleActivity feature flag is enabled`(
+        location: NodeLocation,
+    ) = runTest {
+        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(true)
+        whenever(getNodeLocationByIdUseCase(node.id)).thenReturn(location)
+
+        underTest.setNode(node.handle, true)
+
+        // Wait for state updates to complete
+        underTest.uiState.test {
+            // Skip initial state
+            awaitItem()
+            // Wait for the state with location
+            val state = awaitItem()
+            assertThat(state.nodeLocation).isEqualTo(location)
+        }
+    }
+
+    @Test
+    fun `test that nodeLocation is not updated when SingleActivity feature flag is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
+
+            underTest.setNode(node.handle, true)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.nodeLocation).isNull()
+            }
+            verify(getNodeLocationByIdUseCase, times(0)).invoke(any())
+        }
+
+    @Test
+    fun `test that nodeLocation update handles errors gracefully`() = runTest {
+        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(true)
+        whenever(getNodeLocationByIdUseCase(node.id)).thenThrow(RuntimeException("Error"))
+
+        underTest.setNode(node.handle, true)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.nodeLocation).isNull()
+        }
     }
 }

@@ -39,6 +39,7 @@ import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.node.NodeListMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
+import mega.privacy.android.data.mapper.node.NodeLocationMapper
 import mega.privacy.android.data.mapper.node.NodePathMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.node.TypedNodeMapper
@@ -137,6 +138,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val nodeLabelMapper: NodeLabelMapper,
     private val typedNodeMapper: TypedNodeMapper,
     private val nodePathMapper: NodePathMapper,
+    private val nodeLocationMapper: NodeLocationMapper,
 ) : NodeRepository {
 
     override suspend fun getNodeOutgoingShares(nodeId: NodeId) =
@@ -1374,4 +1376,17 @@ internal class NodeRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun getNodeLocationById(nodeId: NodeId) =
+        withContext(ioDispatcher) {
+            megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let { node ->
+                val rootParent = getRootParentNode(node.parentHandle) ?: node
+                nodeLocationMapper(
+                    node = node,
+                    rootParent = rootParent,
+                    getRootNode = { megaApiGateway.getRootNode() },
+                    getRubbishBinNode = { megaApiGateway.getRubbishBinNode() },
+                )
+            }
+        }
 }

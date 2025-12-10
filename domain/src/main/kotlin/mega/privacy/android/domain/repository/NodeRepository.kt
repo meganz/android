@@ -2,6 +2,7 @@ package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.FileTypeInfo
+import mega.privacy.android.domain.entity.NodeLocation
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.FolderTypeData
 import mega.privacy.android.domain.entity.NodeLabel
@@ -920,4 +921,12 @@ interface NodeRepository {
      * @return the full path of the node or null if the node is not found.
      */
     suspend fun getFullNodePathById(nodeId: NodeId): String?
+
+    /**
+     * Get node location by id
+     *
+     * @param nodeId The node id to determine location for
+     * @return The node location or null if the node is not found
+     */
+    suspend fun getNodeLocationById(nodeId: NodeId): NodeLocation?
 }

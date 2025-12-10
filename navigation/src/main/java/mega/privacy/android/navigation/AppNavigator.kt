@@ -8,6 +8,7 @@ import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.StringRes
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.NodeLocation
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
@@ -573,5 +574,20 @@ interface AppNavigator {
         folderId: NodeId,
         folderName: String,
         isFromFolderLink: Boolean,
+    )
+
+    /**
+     * Handle location click from file info
+     *
+     * @param context Context
+     * @param nodeId The node id to navigate to
+     * @param parentId The parent node id
+     * @param nodeLocation The node location type
+     */
+    fun handleFileInfoLocationClick(
+        context: Context,
+        nodeId: NodeId,
+        parentId: NodeId,
+        nodeLocation: NodeLocation,
     )
 }

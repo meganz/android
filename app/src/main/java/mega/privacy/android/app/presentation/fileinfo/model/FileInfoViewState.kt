@@ -4,6 +4,7 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.account.model.AccountDeactivatedStatus
 import mega.privacy.android.app.utils.LocationInfo
+import mega.privacy.android.domain.entity.NodeLocation
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactPermission
@@ -58,6 +59,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @property isPhoto true if the node is a photo (Image or Video)
  * @property accountDeactivatedStatus the status of the account if it's deactivated
  * @property leaveFolderNodeIds the list of node ids to be left
+ * @property nodeLocation the node location type for navigation
  */
 internal data class FileInfoViewState(
     val title: String = "",
@@ -102,6 +104,7 @@ internal data class FileInfoViewState(
     val accountDeactivatedStatus: AccountDeactivatedStatus? = null,
     val leaveFolderNodeIds: List<Long>? = null,
     val isDecrypted: Boolean = true,
+    val nodeLocation: NodeLocation? = null,
 ) {
 
     /**

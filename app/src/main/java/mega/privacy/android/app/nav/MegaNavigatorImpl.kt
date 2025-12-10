@@ -62,6 +62,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
+import mega.privacy.android.domain.entity.NodeLocation
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
@@ -86,11 +87,14 @@ import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.destination.AchievementNavKey
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.DeviceCenterNavKey
+import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
+import mega.privacy.android.navigation.destination.RubbishBinNavKey
 import mega.privacy.android.navigation.destination.SearchNodeNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
+import mega.privacy.android.navigation.destination.SharesNavKey
 import mega.privacy.android.navigation.destination.SyncListNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.destination.SyncSelectStopBackupDestinationNavKey
@@ -857,6 +861,51 @@ internal class MegaNavigatorImpl @Inject constructor(
             folderName = folderName,
             isOpenByMDIcon = true,
             isFromFolderLink = false
+        )
+    }
+
+    override fun handleFileInfoLocationClick(
+        context: Context,
+        nodeId: NodeId,
+        parentId: NodeId,
+        nodeLocation: NodeLocation,
+    ) {
+        val destination: NavKey = when (nodeLocation) {
+            NodeLocation.CloudDriveRoot -> {
+                DriveSyncNavKey(highlightedNodeHandle = nodeId.longValue)
+            }
+
+            NodeLocation.CloudDrive -> {
+                CloudDriveNavKey(
+                    nodeHandle = parentId.longValue,
+                    highlightedNodeHandle = nodeId.longValue
+                )
+            }
+
+            NodeLocation.RubbishBin -> {
+                RubbishBinNavKey(
+                    handle = parentId.longValue,
+                    highlightedNodeHandle = nodeId.longValue
+                )
+            }
+
+            NodeLocation.IncomingSharesRoot -> {
+                SharesNavKey
+            }
+
+            NodeLocation.IncomingShares -> {
+                CloudDriveNavKey(
+                    nodeHandle = parentId.longValue,
+                    highlightedNodeHandle = nodeId.longValue,
+                    nodeSourceType = NodeSourceType.INCOMING_SHARES
+                )
+            }
+        }
+
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = destination,
+            legacyNavigation = {},
         )
     }
 }
