@@ -112,7 +112,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.contract.VersionsFileActivityContract
-import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.contacts.ContactsActivity
@@ -160,6 +159,7 @@ import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragmentFactory
 import mega.privacy.android.app.myAccount.MyAccountActivity
+import mega.privacy.android.app.nav.MediaPlayerIntentMapper
 import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
 import mega.privacy.android.app.presentation.backups.BackupsFragment
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
@@ -180,6 +180,7 @@ import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDialogFragment
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType
@@ -197,6 +198,7 @@ import mega.privacy.android.app.presentation.node.NodeSourceTypeMapper
 import mega.privacy.android.app.presentation.notification.NotificationsFragment
 import mega.privacy.android.app.presentation.notification.model.NotificationNavigationHandler
 import mega.privacy.android.app.presentation.offline.offlinecompose.OfflineComposeFragment
+import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment
 import mega.privacy.android.app.presentation.photos.PhotosFragment
 import mega.privacy.android.app.presentation.photos.PhotosFragment.Companion.ACTION_SHOW_CU_PROGRESS_VIEW
@@ -235,6 +237,7 @@ import mega.privacy.android.app.service.push.MegaMessageService
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING
+import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -267,6 +270,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.RestoreNodeResultMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.sharedcomponents.serializable
@@ -299,7 +303,6 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.chat.IAmOnAnotherCallException
 import mega.privacy.android.domain.exception.chat.MeetingEndedException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
-import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
@@ -314,9 +317,12 @@ import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
 import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetView
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionBottomSheet
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionViewModel
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.LegacyImageViewerNavKey
+import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
+import mega.privacy.android.navigation.destination.LegacyPdfViewerNavKey
+import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import mega.privacy.android.navigation.settings.arguments.TargetPreference
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -331,7 +337,6 @@ import mega.privacy.mobile.analytics.event.OpenLinkMenuItemEvent
 import mega.privacy.mobile.analytics.event.SharedItemsScreenEvent
 import mega.privacy.mobile.analytics.event.StartMeetingNowPressedEvent
 import mega.privacy.mobile.analytics.event.SyncPromotionBottomSheetDismissedEvent
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
@@ -477,6 +482,12 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
     @Inject
     lateinit var nodeLabelBottomSheetDialogFragmentFactory: NodeLabelBottomSheetDialogFragmentFactory
+
+    @Inject
+    lateinit var mediaPlayerIntentMapper: MediaPlayerIntentMapper
+
+    @Inject
+    lateinit var nodeContentUriIntentMapper: NodeContentUriIntentMapper
 
     private lateinit var fabButton: FloatingActionButton
     private var pendingActionsBadge: View? = null
@@ -1684,36 +1695,13 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         // If drawerItem is null, then it will default to homepage
                         selectDrawerItemPending = drawerItem == null
                     } else if (intent.action == Constants.ACTION_OPEN_HANDLE_NODE) {
-                        val link = intent.dataString
-                        val s =
-                            link?.split("#".toRegex())?.dropLastWhile { it.isEmpty() }
-                                ?: emptyList()
-                        if (s.size > 1) {
-                            var nodeHandleLink = s[1]
-                            val sSlash = s[1].split("/".toRegex()).dropLastWhile { it.isEmpty() }
-                                .toTypedArray()
-                            if (sSlash.isNotEmpty()) {
-                                nodeHandleLink = sSlash[0]
-                            }
-                            val nodeHandleLinkLong: Long =
-                                MegaApiAndroid.base64ToHandle(nodeHandleLink)
-                            val nodeLink: MegaNode? = megaApi.getNodeByHandle(nodeHandleLinkLong)
-                            var pN: MegaNode? = megaApi.getParentNode(nodeLink)
-                            if (pN == null) {
-                                pN = megaApi.rootNode
-                            }
-                            pN?.handle?.let { fileBrowserViewModel.setFileBrowserHandle(it) }
-                            drawerItem = DrawerItem.CLOUD_DRIVE
-                            selectDrawerItem(drawerItem)
-                            selectDrawerItemPending = false
-                            val fileInfoIntent = Intent(this, FileInfoActivity::class.java)
-                            fileInfoIntent.putExtra("handle", nodeLink?.handle)
-                            fileInfoIntent.putExtra(Constants.NAME, nodeLink?.name)
-                            startActivity(fileInfoIntent)
-                        } else {
+                        intent.data?.let { uri -> viewModel.checkHandleLink(uri) } ?: run {
+                            Timber.w("Intent data is null. Open Cloud.")
                             drawerItem = DrawerItem.CLOUD_DRIVE
                             selectDrawerItem(drawerItem)
                         }
+                        intent.action = null
+                        intent = null
                     } else if (intent.action == Constants.ACTION_IMPORT_LINK_FETCH_NODES) {
                         intent.action = null
                         intent = null
@@ -1997,6 +1985,11 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             managerState.chatLinkContent?.let {
                 handleCheckLinkResult(it)
                 viewModel.markHandleCheckLinkResult()
+            }
+
+            managerState.handleLinkResult?.let {
+                handleHandleLinkResult(it)
+                viewModel.onConsumeHandleLinkResult()
             }
 
 
@@ -2621,7 +2614,10 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }
 
             else -> if (megaApi.isInRubbish(parentIntentN)) {
-                rubbishBinViewModel.setRubbishBinHandle(handleIntent)
+                rubbishBinViewModel.setRubbishBinHandle(
+                    handleIntent,
+                    highlightedNames = highlightedNames,
+                )
                 DrawerItem.RUBBISH_BIN
             } else if (megaApi.isInVault(parentIntentN)) {
                 backupsFragment?.updateBackupsHandle(handleIntent)
@@ -2788,6 +2784,14 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     drawerItem = DrawerItem.SHARED_ITEMS
                     viewModel.setSharesTab(SharesTab.INCOMING_TAB)
                     selectDrawerItem(drawerItem)
+                }
+
+                Constants.ACTION_OPEN_HANDLE_NODE -> {
+                    intent.data?.let { uri -> viewModel.checkHandleLink(uri) } ?: run {
+                        Timber.w("Intent data is null. Open Cloud.")
+                        drawerItem = DrawerItem.CLOUD_DRIVE
+                        selectDrawerItem(drawerItem)
+                    }
                 }
 
                 Constants.ACTION_OPEN_CONTACTS_SECTION -> {
@@ -7024,6 +7028,87 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
                 is MegaException -> onErrorLoadingPreview(e.errorCode)
             }
+        }
+    }
+
+    private fun handleHandleLinkResult(result: ManagerState.HandleLinkResult) {
+        with(result) {
+            previewNavKey?.let {
+                when (it) {
+                    is LegacyPdfViewerNavKey -> PdfViewerActivity.createIntent(
+                        context = this@ManagerActivity,
+                        nodeHandle = it.nodeHandle,
+                        nodeSourceType = it.nodeSourceType,
+                    ).also { intent ->
+                        nodeContentUriIntentMapper(
+                            intent = intent,
+                            content = (previewNavKey as LegacyPdfViewerNavKey).nodeContentUri,
+                            mimeType = previewNavKey.mimeType,
+                        )
+                    }
+
+                    is LegacyImageViewerNavKey -> ImagePreviewActivity.createIntent(
+                        context = this@ManagerActivity,
+                        fileNodeId = it.nodeHandle,
+                        parentNodeId = it.parentNodeHandle,
+                        nodeSourceType = it.nodeSourceType,
+                    ).also { intent ->
+                        intent?.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                    }
+
+                    is LegacyTextEditorNavKey -> TextEditorActivity.createIntent(
+                        context = this@ManagerActivity,
+                        nodeHandle = it.nodeHandle,
+                        mode = it.mode,
+                        nodeSourceType = it.nodeSourceType,
+                        fileName = it.fileName,
+                    ).also { intent ->
+                        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                    }
+
+                    is LegacyMediaPlayerNavKey -> mediaPlayerIntentMapper(
+                        context = this@ManagerActivity,
+                        contentUri = it.nodeContentUri,
+                        fileTypeInfo = it.fileTypeInfo,
+                        sortOrder = it.sortOrder,
+                        name = it.fileName,
+                        handle = it.fileHandle,
+                        parentHandle = it.parentHandle,
+                        isFolderLink = it.isFolderLink,
+                        viewType = it.nodeSourceType
+                    )
+
+                    else -> null
+                }?.let { intent -> startActivity(intent) }
+            }
+
+            val highlightedNames = highlightedNodeName?.let { listOf(it) } ?: emptyList()
+
+            incomingHandle?.let {
+                incomingSharesViewModel.setCurrentHandle(
+                    handle = it,
+                    highlightedNames = highlightedNames,
+                )
+                drawerItem = DrawerItem.SHARED_ITEMS
+            }
+
+            rubbishHandle?.let {
+                rubbishBinViewModel.setRubbishBinHandle(
+                    handle = it,
+                    highlightedNames = highlightedNames,
+                )
+                drawerItem = DrawerItem.RUBBISH_BIN
+            }
+
+            fileBrowserHandle?.let {
+                fileBrowserViewModel.setFileBrowserHandle(
+                    handle = it,
+                    highlightedNames = highlightedNames
+                )
+                drawerItem = DrawerItem.CLOUD_DRIVE
+            }
+
+            selectDrawerItem(drawerItem)
         }
     }
 
