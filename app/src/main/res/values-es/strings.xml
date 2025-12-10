@@ -685,9 +685,9 @@
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">Enhorabuena, tu nueva dirección de correo electrónico para esta cuenta MEGA es: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
-    <string name="invalid_string">Cannot be empty</string>
+    <string name="invalid_string">No puede estar vacío</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
-    <string name="invalid_input">Not a valid entry</string>
+    <string name="invalid_input">Entrada no válida</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Restablecer la contraseña</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
@@ -1414,7 +1414,7 @@
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">Cuota de almacenamiento agotada</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">Enlace inválido, solicita un nuevo enlace válido</string>
+    <string name="invalid_link">Invalid link. Please try again or request a new one.</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">Contraseña del enlace inválida</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->

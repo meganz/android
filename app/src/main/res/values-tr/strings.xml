@@ -1229,7 +1229,7 @@
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">Yalnızca HTTPS kullan</string>
     <!-- subtitle of the advanced setting to choose the use of https -->
-    <string name="setting_subtitle_use_https_only">Bu seçeneği yalnızca aktarımlarınız başlamazsa etkinleştirin. Normal koşullarda HTTP yeterlidir, çünkü tüm aktarımlar zaten şifrelenmiştir.</string>
+    <string name="setting_subtitle_use_https_only">Bu seçeneği yalnızca aktarımlarınız başlamazsa etkinleştirin. Normal şartlarda tüm aktarımlar zaten şifrelendiği için HTTP yeterlidir.</string>
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Nasıl işliyor?</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
@@ -1389,7 +1389,7 @@
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">Depolama kotası aşıldı</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">Geçersiz bağlantı, lütfen yeni bir geçerli bağlantı isteyin</string>
+    <string name="invalid_link">Geçersiz bağlantı. Lütfen tekrar deneyin veya yeni bir bağlantı isteyin.</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">Geçersiz bağlantı şifresi</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
@@ -1743,8 +1743,8 @@
     <string name="settings_file_management_file_versions_title">Dosya sürümleri</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
     <plurals name="settings_file_management_file_versions_subtitle">
-        <item quantity="one">%1$d dosya sürümü, toplam %2$s</item>
-        <item quantity="other">%1$d dosya sürümü, toplam %2$s</item>
+        <item quantity="one">%1$d dosya sürümü, toplamda %2$s yer kaplıyor</item>
+        <item quantity="other">%1$d dosya sürümü, toplamda %2$s yer kaplıyor</item>
     </plurals>
     <!-- Title of the section File management on Settings section -->
     <string name="settings_file_management_category">Dosya yönetimi</string>

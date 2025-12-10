@@ -1836,4 +1836,66 @@
     <string name="meeting_has_ended_dialog_view_chat_option">ミーティングチャットを見る</string>
     <!-- Title for the button to dismiss a dialog. -->
     <string name="general_dismiss_dialog">却下</string>
+    <!-- Timeline tab sorting title. This text will be displayed as the sort dialog title and the toolbar action menu, -->
+    <string name="timeline_tab_sort_by_text">ソートする</string>
+    <!-- Timeline tab sort files by date newest first -->
+    <string name="timeline_tab_sort_by_date_newest">最新</string>
+    <!-- Timeline tab sort files by date oldest first -->
+    <string name="timeline_tab_sort_by_date_oldest">最古</string>
+    <!-- Timeline filter title. This text will be displayed as the filter screen title and the toolbar action menu -->
+    <string name="timeline_tab_filter_text">絞り込み</string>
+    <!-- Timeline filter media type selection header. -->
+    <string name="timeline_tab_filter_media_type_selection_header">種類を選択</string>
+    <!-- Timeline filter type: All Media. -->
+    <string name="timeline_tab_filter_media_type_all_media">すべてのメディア</string>
+    <!-- Timeline filter media source selection header. -->
+    <string name="timeline_tab_filter_media_source_selection_header">以下の項目を表示する</string>
+    <!-- Timeline filter remember preferences toggle text. -->
+    <string name="timeline_tab_filter_remember_preferences">設定を記憶する</string>
+    <!-- Timeline filter apply filter button text. -->
+    <string name="timeline_tab_filter_apply_filter_button">フィルターを適用</string>
+    <!-- General label for invite contact contexts -->
+    <string name="general_invite_contact">連絡先を招待</string>
+    <!-- Contact found title for a dialog showing contact link info -->
+    <string name="contact_found_dialog_title">連絡先が見つかりました</string>
+    <!--Album content empty album layout title when an album content is empty-->
+    <string name="album_content_empty_album_title">空のアルバム</string>
+    <!--Album content action to add more items to the album-->
+    <string name="album_content_action_add_items">項目を追加</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="videos_tab_empty_hint_video">[B][/B][A]動画[/A][B]が見つかりません[/B]</string>
+    <!-- Action to remove items from the Favourites album -->
+    <string name="album_content_action_remove_favourites">お気に入りから削除</string>
+    <!-- Title of the empty screen when a folder is empty -->
+    <string name="context_empty_folder_title">このフォルダは空です</string>
+    <!-- Title of the empty screen when there are no items in the root Cloud Drive -->
+    <string name="context_empty_cloud_drive_title">クラウドドライブにはまだ何も入っていません</string>
+    <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
+    <string name="context_empty_cloud_drive_description">データはゼロ知識暗号化で安全に保管できます。</string>
+    <!-- Error shown when trying to confirm an account from a confirmation link and the app is already logged in -->
+    <string name="open_link_account_confirmation_error">すでに別のMEGAアカウントでログインしています。まずログアウトしてから、アカウント確認リンクをもう一度開いてください。</string>
+    <!-- error message shown when a chat link is invalid -->
+    <string name="invalid_chat_link_error_message">この会話は利用できなくなりました</string>
+    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
+    <string name="general_invalid_link">無効なリンクです。もう一度お試しいただくか、新しいリンクをリクエストしてください。</string>
+    <!-- Text of the dialog shown when you want to join a group call and you're already in another call-->
+    <string name="can_only_join_one_call_error_message">この通話に参加するには、現在の通話を終了する必要があります。</string>
+    <!-- Placeholder of the Search Bar -->
+    <string name="search_bar_placeholder_text">検索&#8230;</string>
+    <!-- Title for the album remove link confirmation dialog for singular link -->
+    <string name="album_content_remove_link_dialog_title">Remove link?</string>
+    <!-- Title for the album remove link confirmation dialog for multiple link -->
+    <string name="album_content_remove_multiple_links_dialog_title">リンクを削除しますか？</string>
+    <!-- Explanation text for the album remove link confirmation dialog -->
+    <string name="album_content_remove_link_dialog_description">People you shared this link with will lose access to the album</string>
+    <!-- Explanation text for the album remove multiple links confirmation dialog -->
+    <string name="album_content_remove_multiple_links_dialog_description">People you shared these links with will lose access to the albums</string>
+    <!-- Delete album confirmation title. -->
+    <string name="delete_album_singular_confirmation_dialog_title">アルバムを削除しますか？</string>
+    <!-- Delete albums confirmation title. -->
+    <string name="delete_albums_multiple_confirmation_dialog_title">アルバムを削除しますか？</string>
+    <!-- Delete album confirmation description. -->
+    <string name="delete_album_singular_confirmation_dialog_description">The contents of the album will not be deleted</string>
+    <!-- Delete albums confirmation description. -->
+    <string name="delete_albums_multiple_confirmation_dialog_description">The contents of the albums will not be deleted</string>
 </resources>

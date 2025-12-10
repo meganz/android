@@ -1716,13 +1716,11 @@
     <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="one">%1$s for the first %2$d month</item>
-        <item quantity="other">%1$s for the first %2$d months</item>
+        <item quantity="other"></item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one">%1$s for the first %2$d year</item>
-        <item quantity="other">%1$s for the first %2$d years</item>
+        <item quantity="other"></item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">Suite privasi MEGA</string>
@@ -1750,8 +1748,7 @@
     <string name="mega_pass_achievement_awarded_storage_text_permanent">Get %1$s of free storage when you start a MEGA&#160;Pass free trial, valid permanently</string>
     <!-- sentence to detail the figures of award achievement days left -->
     <plurals name="trial_awarded_achievement_days_left_text">
-        <item quantity="one">%1$d day left</item>
-        <item quantity="other">%1$d days left</item>
+        <item quantity="other"></item>
     </plurals>
     <!-- sentence to detail the figures of award achievement days left -->
     <plurals name="trial_awarded_achievement_days_left_detail_title">
@@ -1839,4 +1836,66 @@
     <string name="meeting_has_ended_dialog_view_chat_option">Lihat obrolan pertemuan</string>
     <!-- Title for the button to dismiss a dialog. -->
     <string name="general_dismiss_dialog">Abaikan</string>
+    <!-- Timeline tab sorting title. This text will be displayed as the sort dialog title and the toolbar action menu, -->
+    <string name="timeline_tab_sort_by_text">Urutkan berdasar</string>
+    <!-- Timeline tab sort files by date newest first -->
+    <string name="timeline_tab_sort_by_date_newest">terbaru</string>
+    <!-- Timeline tab sort files by date oldest first -->
+    <string name="timeline_tab_sort_by_date_oldest">Tertua</string>
+    <!-- Timeline filter title. This text will be displayed as the filter screen title and the toolbar action menu -->
+    <string name="timeline_tab_filter_text">Filter</string>
+    <!-- Timeline filter media type selection header. -->
+    <string name="timeline_tab_filter_media_type_selection_header">Pilih tipe</string>
+    <!-- Timeline filter type: All Media. -->
+    <string name="timeline_tab_filter_media_type_all_media">Semua media</string>
+    <!-- Timeline filter media source selection header. -->
+    <string name="timeline_tab_filter_media_source_selection_header">Tampilkan item dari</string>
+    <!-- Timeline filter remember preferences toggle text. -->
+    <string name="timeline_tab_filter_remember_preferences">Ingat preferensi</string>
+    <!-- Timeline filter apply filter button text. -->
+    <string name="timeline_tab_filter_apply_filter_button">Apply filter</string>
+    <!-- General label for invite contact contexts -->
+    <string name="general_invite_contact">Invite contact</string>
+    <!-- Contact found title for a dialog showing contact link info -->
+    <string name="contact_found_dialog_title">Contact found</string>
+    <!--Album content empty album layout title when an album content is empty-->
+    <string name="album_content_empty_album_title">Album kosong</string>
+    <!--Album content action to add more items to the album-->
+    <string name="album_content_action_add_items">Tambahkan item</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="videos_tab_empty_hint_video">[B]Tidak ada[/B] [A]video[/A] [B]ditemukan[/B]</string>
+    <!-- Action to remove items from the Favourites album -->
+    <string name="album_content_action_remove_favourites">Remove from Favourites</string>
+    <!-- Title of the empty screen when a folder is empty -->
+    <string name="context_empty_folder_title">This folder is empty</string>
+    <!-- Title of the empty screen when there are no items in the root Cloud Drive -->
+    <string name="context_empty_cloud_drive_title">Nothing in your cloud drive yet</string>
+    <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
+    <string name="context_empty_cloud_drive_description">Keep something safe with zero-knowledge encryption</string>
+    <!-- Error shown when trying to confirm an account from a confirmation link and the app is already logged in -->
+    <string name="open_link_account_confirmation_error">You’re already logged in with a different MEGA account. Log out first, then open the account confirmation link again.</string>
+    <!-- error message shown when a chat link is invalid -->
+    <string name="invalid_chat_link_error_message">Percakapan ini tidak lagi tersedia</string>
+    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
+    <string name="general_invalid_link">Invalid link. Please try again or request a new one.</string>
+    <!-- Text of the dialog shown when you want to join a group call and you're already in another call-->
+    <string name="can_only_join_one_call_error_message">To join this call you have to end your current call</string>
+    <!-- Placeholder of the Search Bar -->
+    <string name="search_bar_placeholder_text">Cari&#8230;</string>
+    <!-- Title for the album remove link confirmation dialog for singular link -->
+    <string name="album_content_remove_link_dialog_title">Remove link?</string>
+    <!-- Title for the album remove link confirmation dialog for multiple link -->
+    <string name="album_content_remove_multiple_links_dialog_title">Hapus tautan?</string>
+    <!-- Explanation text for the album remove link confirmation dialog -->
+    <string name="album_content_remove_link_dialog_description">People you shared this link with will lose access to the album</string>
+    <!-- Explanation text for the album remove multiple links confirmation dialog -->
+    <string name="album_content_remove_multiple_links_dialog_description">People you shared these links with will lose access to the albums</string>
+    <!-- Delete album confirmation title. -->
+    <string name="delete_album_singular_confirmation_dialog_title">Hapus album?</string>
+    <!-- Delete albums confirmation title. -->
+    <string name="delete_albums_multiple_confirmation_dialog_title">Hapus album?</string>
+    <!-- Delete album confirmation description. -->
+    <string name="delete_album_singular_confirmation_dialog_description">The contents of the album will not be deleted</string>
+    <!-- Delete albums confirmation description. -->
+    <string name="delete_albums_multiple_confirmation_dialog_description">The contents of the albums will not be deleted</string>
 </resources>

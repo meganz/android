@@ -419,7 +419,7 @@
     <!-- Step 4: instruction step no.4 Tap Cancel subscription on the account from the MEGA website from the mobile device-->
     <string name="account_cancellation_instructions_tap_cancel_subscription">4. Toccare [A]Annulla abbonamento[/A].</string>
     <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
-    <string name="sync_no_network_state">Nessuna connessione Internet</string>
+    <string name="sync_no_network_state">Nessuna connessione a Internet</string>
     <!-- Menu option to create a new folder in the file manager -->
     <string name="general_menu_create_new_folder">Nuova cartella</string>
     <!-- Create new folder dialog title -->
@@ -1893,7 +1893,7 @@
         <item quantity="other">Rimuovi i link</item>
     </plurals>
     <!-- Hint for password dialog -->
-    <string name="password_dialog_hint">Enter link password</string>
+    <string name="password_dialog_hint">Inserisci la password del link</string>
     <!-- Text for decrypt button -->
     <string name="general_decrypt">Continua</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
@@ -1934,4 +1934,66 @@
     <string name="meeting_has_ended_dialog_view_chat_option">Vedi la chat del meeting</string>
     <!-- Title for the button to dismiss a dialog. -->
     <string name="general_dismiss_dialog">Chiudi</string>
+    <!-- Timeline tab sorting title. This text will be displayed as the sort dialog title and the toolbar action menu, -->
+    <string name="timeline_tab_sort_by_text">Ordina per</string>
+    <!-- Timeline tab sort files by date newest first -->
+    <string name="timeline_tab_sort_by_date_newest">più recente</string>
+    <!-- Timeline tab sort files by date oldest first -->
+    <string name="timeline_tab_sort_by_date_oldest">più vecchio</string>
+    <!-- Timeline filter title. This text will be displayed as the filter screen title and the toolbar action menu -->
+    <string name="timeline_tab_filter_text">Filtro</string>
+    <!-- Timeline filter media type selection header. -->
+    <string name="timeline_tab_filter_media_type_selection_header">Scegli tipo</string>
+    <!-- Timeline filter type: All Media. -->
+    <string name="timeline_tab_filter_media_type_all_media">Tutti i media</string>
+    <!-- Timeline filter media source selection header. -->
+    <string name="timeline_tab_filter_media_source_selection_header">Mostra oggetti da</string>
+    <!-- Timeline filter remember preferences toggle text. -->
+    <string name="timeline_tab_filter_remember_preferences">Ricorda queste preferenze</string>
+    <!-- Timeline filter apply filter button text. -->
+    <string name="timeline_tab_filter_apply_filter_button">Apply filter</string>
+    <!-- General label for invite contact contexts -->
+    <string name="general_invite_contact">Invite contact</string>
+    <!-- Contact found title for a dialog showing contact link info -->
+    <string name="contact_found_dialog_title">Contact found</string>
+    <!--Album content empty album layout title when an album content is empty-->
+    <string name="album_content_empty_album_title">Svuota album</string>
+    <!--Album content action to add more items to the album-->
+    <string name="album_content_action_add_items">Aggiungi oggetti</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="videos_tab_empty_hint_video">[B]Nessun[/B] [A]video[/A] [B]trovato[/B]</string>
+    <!-- Action to remove items from the Favourites album -->
+    <string name="album_content_action_remove_favourites">Remove from Favourites</string>
+    <!-- Title of the empty screen when a folder is empty -->
+    <string name="context_empty_folder_title">Questa cartella è vuota</string>
+    <!-- Title of the empty screen when there are no items in the root Cloud Drive -->
+    <string name="context_empty_cloud_drive_title">Nothing in your cloud drive yet</string>
+    <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
+    <string name="context_empty_cloud_drive_description">Mantieni quello che vuoi al sicuro con la criptazione a conoscenza zero</string>
+    <!-- Error shown when trying to confirm an account from a confirmation link and the app is already logged in -->
+    <string name="open_link_account_confirmation_error">You’re already logged in with a different MEGA account. Log out first, then open the account confirmation link again.</string>
+    <!-- error message shown when a chat link is invalid -->
+    <string name="invalid_chat_link_error_message">Questa conversazione non è più disponibile</string>
+    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
+    <string name="general_invalid_link">Invalid link. Please try again or request a new one.</string>
+    <!-- Text of the dialog shown when you want to join a group call and you're already in another call-->
+    <string name="can_only_join_one_call_error_message">To join this call you have to end your current call</string>
+    <!-- Placeholder of the Search Bar -->
+    <string name="search_bar_placeholder_text">Cerca&#8230;</string>
+    <!-- Title for the album remove link confirmation dialog for singular link -->
+    <string name="album_content_remove_link_dialog_title">Rimuovere il link?</string>
+    <!-- Title for the album remove link confirmation dialog for multiple link -->
+    <string name="album_content_remove_multiple_links_dialog_title">Rimuovere i link?</string>
+    <!-- Explanation text for the album remove link confirmation dialog -->
+    <string name="album_content_remove_link_dialog_description">People you shared this link with will lose access to the album</string>
+    <!-- Explanation text for the album remove multiple links confirmation dialog -->
+    <string name="album_content_remove_multiple_links_dialog_description">People you shared these links with will lose access to the albums</string>
+    <!-- Delete album confirmation title. -->
+    <string name="delete_album_singular_confirmation_dialog_title">Eliminare l\’album?</string>
+    <!-- Delete albums confirmation title. -->
+    <string name="delete_albums_multiple_confirmation_dialog_title">Eliminare gli album?</string>
+    <!-- Delete album confirmation description. -->
+    <string name="delete_album_singular_confirmation_dialog_description">The contents of the album will not be deleted</string>
+    <!-- Delete albums confirmation description. -->
+    <string name="delete_albums_multiple_confirmation_dialog_description">The contents of the albums will not be deleted</string>
 </resources>

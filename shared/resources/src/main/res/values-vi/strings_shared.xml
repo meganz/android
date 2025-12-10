@@ -989,15 +989,15 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">Ẩn đi các tệp&#160;tin và thư&#160;mục quan&#160;trọng</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy in one easy step.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">Bạn có thể che giấu những tệp&#160;tin và thư&#160;mục nhạy&#160;cảm cho nhu&#160;cầu riêng&#160;tư với một bước đơn&#160;giản.</string>
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">Ra khỏi tầm nhìn</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
+    <string name="hidden_nodes_description_control_visibility">Chỉ có bạn mới có thể hiện lại những tệp&#160;tin đã ẩn, bằng cách thực&#160;hiện từng cái riêng&#160;lẻ hoặc tạm&#160;thời bật hiển&#160;thị các mục đã ẩn đi trong phần thiết&#160;đặt.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">Làm mờ để giữ riêng tư</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
+    <string name="hidden_nodes_description_visible_shared_files">Hiển&#160;thị các mục ẩn với ảnh thu&#160;nhỏ được làm mờ, để bạn có&#160;thể xác&#160;định từng cái mà không để lộ nội&#160;dung bên trong.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Luôn luôn giữ ảnh của bạn được an&#160;toàn</string>
     <!--Camera backup permission screen description-->
@@ -1697,7 +1697,7 @@
     <!-- The title of camera uploads paused warning banner -->
     <string name="camera_update_paused_warning_banner_title">Đăng tải camêra đã tạm dừng</string>
     <!-- The description of camera uploads device charging not met paused warning banner -->
-    <string name="camera_update_device_charging_not_met_banner_description">Uploads only happen while your device is charging. You can change this in Settings.</string>
+    <string name="camera_update_device_charging_not_met_banner_description">Phiên tải lên chỉ diễn ra khi thiết&#160;bị đang sạc. Bạn có thể thay đổi cái này trong Thiết&#160;Đặt.</string>
     <!-- The button text of camera uploads device charging not met paused warning banner -->
     <string name="camera_update_device_charging_not_met_banner_button_text">Thiết đặt</string>
     <!-- The description of camera uploads low battery paused warning banner -->
@@ -1716,13 +1716,11 @@
     <string name="campaign_name_special_offer">Ưu đãi đặc biệt: giảm giá %1$d%%</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="one">%1$s for the first %2$d month</item>
-        <item quantity="other">%1$s for the first %2$d months</item>
+        <item quantity="other"></item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one">%1$s for the first %2$d year</item>
-        <item quantity="other">%1$s for the first %2$d years</item>
+        <item quantity="other"></item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">Bộ trọn&#160;gói bảo&#160;mật MEGA</string>
@@ -1745,13 +1743,12 @@
     <!-- Error message for creating an album with a duplicate name -->
     <string name="album_name_exists_error_message">Đã có một album với tên này rồi. Nhập một tên khác.</string>
     <!-- sentence to detail the permanent awarded text related to VPN achievement -->
-    <string name="mega_vpn_achievement_awarded_storage_text_permanent">Get %1$s of free storage when you start a MEGA&#160;VPN free trial, valid permanently</string>
+    <string name="mega_vpn_achievement_awarded_storage_text_permanent">Nhận lấy %1$s cho không&#160;gian lưu&#160;trữ miễn&#160;phí khi bắt&#160;đầu hạn dùng thử MEGA&#160;VPN miễn&#160;phí, có giá&#160;trị vĩnh&#160;viễn</string>
     <!-- sentence to detail the permanent awarded text related to PWM achievement -->
     <string name="mega_pass_achievement_awarded_storage_text_permanent">Get %1$s of free storage when you start a MEGA&#160;Pass free trial, valid permanently</string>
     <!-- sentence to detail the figures of award achievement days left -->
     <plurals name="trial_awarded_achievement_days_left_text">
-        <item quantity="one">%1$d day left</item>
-        <item quantity="other">%1$d days left</item>
+        <item quantity="other"></item>
     </plurals>
     <!-- sentence to detail the figures of award achievement days left -->
     <plurals name="trial_awarded_achievement_days_left_detail_title">
@@ -1760,7 +1757,7 @@
     <!-- Discount label for first month singular -->
     <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
     <!-- Discount label for first year singular -->
-    <string name="label_first_time_in_years_full_singular">%1$s for the first year</string>
+    <string name="label_first_time_in_years_full_singular">%1$s cho năm đầu&#160;tiên</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the [A]settings[/A].</string>
     <!-- Dialog confirmation text for removing photos in an album -->
@@ -1839,4 +1836,66 @@
     <string name="meeting_has_ended_dialog_view_chat_option">Xem tin nhắn cuộc họp mặt</string>
     <!-- Title for the button to dismiss a dialog. -->
     <string name="general_dismiss_dialog">Bỏ qua</string>
+    <!-- Timeline tab sorting title. This text will be displayed as the sort dialog title and the toolbar action menu, -->
+    <string name="timeline_tab_sort_by_text">Xếp theo</string>
+    <!-- Timeline tab sort files by date newest first -->
+    <string name="timeline_tab_sort_by_date_newest">Mới nhất</string>
+    <!-- Timeline tab sort files by date oldest first -->
+    <string name="timeline_tab_sort_by_date_oldest">Cũ nhất</string>
+    <!-- Timeline filter title. This text will be displayed as the filter screen title and the toolbar action menu -->
+    <string name="timeline_tab_filter_text">Lọc</string>
+    <!-- Timeline filter media type selection header. -->
+    <string name="timeline_tab_filter_media_type_selection_header">Chọn dạng</string>
+    <!-- Timeline filter type: All Media. -->
+    <string name="timeline_tab_filter_media_type_all_media">Tất cả phương tiện số</string>
+    <!-- Timeline filter media source selection header. -->
+    <string name="timeline_tab_filter_media_source_selection_header">Hiện các mục từ</string>
+    <!-- Timeline filter remember preferences toggle text. -->
+    <string name="timeline_tab_filter_remember_preferences">Ghi&#160;nhớ các tùy&#160;chỉnh</string>
+    <!-- Timeline filter apply filter button text. -->
+    <string name="timeline_tab_filter_apply_filter_button">Apply filter</string>
+    <!-- General label for invite contact contexts -->
+    <string name="general_invite_contact">Invite contact</string>
+    <!-- Contact found title for a dialog showing contact link info -->
+    <string name="contact_found_dialog_title">Contact found</string>
+    <!--Album content empty album layout title when an album content is empty-->
+    <string name="album_content_empty_album_title">Album trống</string>
+    <!--Album content action to add more items to the album-->
+    <string name="album_content_action_add_items">Thêm mục</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="videos_tab_empty_hint_video">[B]Không có[/B] [A]videos[/A] [B]nào[/B]</string>
+    <!-- Action to remove items from the Favourites album -->
+    <string name="album_content_action_remove_favourites">Remove from Favourites</string>
+    <!-- Title of the empty screen when a folder is empty -->
+    <string name="context_empty_folder_title">This folder is empty</string>
+    <!-- Title of the empty screen when there are no items in the root Cloud Drive -->
+    <string name="context_empty_cloud_drive_title">Nothing in your cloud drive yet</string>
+    <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
+    <string name="context_empty_cloud_drive_description">Keep something safe with zero-knowledge encryption</string>
+    <!-- Error shown when trying to confirm an account from a confirmation link and the app is already logged in -->
+    <string name="open_link_account_confirmation_error">You’re already logged in with a different MEGA account. Log out first, then open the account confirmation link again.</string>
+    <!-- error message shown when a chat link is invalid -->
+    <string name="invalid_chat_link_error_message">Cuộc trò chuyện này không còn tồn tại nữa</string>
+    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
+    <string name="general_invalid_link">Invalid link. Please try again or request a new one.</string>
+    <!-- Text of the dialog shown when you want to join a group call and you're already in another call-->
+    <string name="can_only_join_one_call_error_message">To join this call you have to end your current call</string>
+    <!-- Placeholder of the Search Bar -->
+    <string name="search_bar_placeholder_text">Tìm kiếm&#8230;</string>
+    <!-- Title for the album remove link confirmation dialog for singular link -->
+    <string name="album_content_remove_link_dialog_title">Remove link?</string>
+    <!-- Title for the album remove link confirmation dialog for multiple link -->
+    <string name="album_content_remove_multiple_links_dialog_title">Loại&#160;bỏ các đường liên&#160;kết?</string>
+    <!-- Explanation text for the album remove link confirmation dialog -->
+    <string name="album_content_remove_link_dialog_description">People you shared this link with will lose access to the album</string>
+    <!-- Explanation text for the album remove multiple links confirmation dialog -->
+    <string name="album_content_remove_multiple_links_dialog_description">People you shared these links with will lose access to the albums</string>
+    <!-- Delete album confirmation title. -->
+    <string name="delete_album_singular_confirmation_dialog_title">Xóa album?</string>
+    <!-- Delete albums confirmation title. -->
+    <string name="delete_albums_multiple_confirmation_dialog_title">Xóa albums?</string>
+    <!-- Delete album confirmation description. -->
+    <string name="delete_album_singular_confirmation_dialog_description">The contents of the album will not be deleted</string>
+    <!-- Delete albums confirmation description. -->
+    <string name="delete_albums_multiple_confirmation_dialog_description">The contents of the albums will not be deleted</string>
 </resources>

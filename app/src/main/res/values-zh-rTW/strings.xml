@@ -1364,7 +1364,7 @@
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">超出空間配額</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">無效的連結，請申請一個新的有效連結</string>
+    <string name="invalid_link">連結無效。請重試或請求新的連結。</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">無效的連結密碼</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
@@ -3285,7 +3285,7 @@
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_title">媒體檢視</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">以圖像檢視方式開啟僅包含圖片或影片的資料夾。以縮圖檢視方式瀏覽媒體，並按日期篩選。</string>
+    <string name="settings_media_discovery_view_context">以網格檢視方式開啟僅包含圖片或影片的資料夾。以縮圖檢視方式瀏覽媒體，並按日期篩選。</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
     <string name="cloud_drive_media_discovery_banner_context">由於此資料夾僅包含圖片和影片，我們已經自動在媒體檢視中將其開啟。您可以透過更沉浸式的外觀享受您的影像內容。您可以在設定中停用此功能。</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->

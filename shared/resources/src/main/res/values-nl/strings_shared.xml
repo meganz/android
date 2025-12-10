@@ -1885,4 +1885,66 @@
     <string name="meeting_has_ended_dialog_view_chat_option">Vergaderingsgesprek weergeven</string>
     <!-- Title for the button to dismiss a dialog. -->
     <string name="general_dismiss_dialog">Afwijzen</string>
+    <!-- Timeline tab sorting title. This text will be displayed as the sort dialog title and the toolbar action menu, -->
+    <string name="timeline_tab_sort_by_text">Sorteren op</string>
+    <!-- Timeline tab sort files by date newest first -->
+    <string name="timeline_tab_sort_by_date_newest">Nieuwste</string>
+    <!-- Timeline tab sort files by date oldest first -->
+    <string name="timeline_tab_sort_by_date_oldest">Oudste</string>
+    <!-- Timeline filter title. This text will be displayed as the filter screen title and the toolbar action menu -->
+    <string name="timeline_tab_filter_text">Filter</string>
+    <!-- Timeline filter media type selection header. -->
+    <string name="timeline_tab_filter_media_type_selection_header">Kies type</string>
+    <!-- Timeline filter type: All Media. -->
+    <string name="timeline_tab_filter_media_type_all_media">Alle media</string>
+    <!-- Timeline filter media source selection header. -->
+    <string name="timeline_tab_filter_media_source_selection_header">Items weergeven van</string>
+    <!-- Timeline filter remember preferences toggle text. -->
+    <string name="timeline_tab_filter_remember_preferences">Voorkeuren onthouden</string>
+    <!-- Timeline filter apply filter button text. -->
+    <string name="timeline_tab_filter_apply_filter_button">Filter toepassen</string>
+    <!-- General label for invite contact contexts -->
+    <string name="general_invite_contact">Nodig contact op</string>
+    <!-- Contact found title for a dialog showing contact link info -->
+    <string name="contact_found_dialog_title">Contactpersoon gevonden</string>
+    <!--Album content empty album layout title when an album content is empty-->
+    <string name="album_content_empty_album_title">Leeg album</string>
+    <!--Album content action to add more items to the album-->
+    <string name="album_content_action_add_items">Items toevoegen</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="videos_tab_empty_hint_video">[B]Geen[/B] [A]video\’s[/A] [B]gevonden[/B]</string>
+    <!-- Action to remove items from the Favourites album -->
+    <string name="album_content_action_remove_favourites">Uit Favorieten verwijderen</string>
+    <!-- Title of the empty screen when a folder is empty -->
+    <string name="context_empty_folder_title">Deze map is leeg</string>
+    <!-- Title of the empty screen when there are no items in the root Cloud Drive -->
+    <string name="context_empty_cloud_drive_title">Nog niets op uw cloudschijf</string>
+    <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
+    <string name="context_empty_cloud_drive_description">Bewaar iets veilig met zero-knowledge codering</string>
+    <!-- Error shown when trying to confirm an account from a confirmation link and the app is already logged in -->
+    <string name="open_link_account_confirmation_error">U bent al ingelogd met een ander MEGA-account. Log eerst uit en open dan opnieuw de link voor de bevestiging van het account.</string>
+    <!-- error message shown when a chat link is invalid -->
+    <string name="invalid_chat_link_error_message">Dit gesprek is niet langer beschikbaar</string>
+    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
+    <string name="general_invalid_link">Ongeldige link. Probeer het opnieuw of vraag een nieuwe aan.</string>
+    <!-- Text of the dialog shown when you want to join a group call and you're already in another call-->
+    <string name="can_only_join_one_call_error_message">Om aan dit gesprek deel te nemen, moet u uw huidige gesprek beëindigen</string>
+    <!-- Placeholder of the Search Bar -->
+    <string name="search_bar_placeholder_text">Zoeken&#8230;</string>
+    <!-- Title for the album remove link confirmation dialog for singular link -->
+    <string name="album_content_remove_link_dialog_title">Link verwijderen?</string>
+    <!-- Title for the album remove link confirmation dialog for multiple link -->
+    <string name="album_content_remove_multiple_links_dialog_title">Links verwijderen?</string>
+    <!-- Explanation text for the album remove link confirmation dialog -->
+    <string name="album_content_remove_link_dialog_description">People you shared this link with will lose access to the album</string>
+    <!-- Explanation text for the album remove multiple links confirmation dialog -->
+    <string name="album_content_remove_multiple_links_dialog_description">People you shared these links with will lose access to the albums</string>
+    <!-- Delete album confirmation title. -->
+    <string name="delete_album_singular_confirmation_dialog_title">Album verwijderen?</string>
+    <!-- Delete albums confirmation title. -->
+    <string name="delete_albums_multiple_confirmation_dialog_title">Albums verwijderen?</string>
+    <!-- Delete album confirmation description. -->
+    <string name="delete_album_singular_confirmation_dialog_description">The contents of the album will not be deleted</string>
+    <!-- Delete albums confirmation description. -->
+    <string name="delete_albums_multiple_confirmation_dialog_description">The contents of the albums will not be deleted</string>
 </resources>

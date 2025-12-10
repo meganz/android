@@ -989,15 +989,15 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">ซ่อนไฟล์และโฟลเดอร์สำคัญ</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy in one easy step.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">คุณสามารถซ่อนไฟล์และโฟลเดอร์ส่วนตัวเพื่อความเป็นส่วนตัวได้ง่าย ๆ ในขั้นตอนเดียว</string>
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">แสดงไฟล์ที่ซ่อนอยู่</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
+    <string name="hidden_nodes_description_control_visibility">มีเพียงคุณเท่านั้นที่เปิดดูไฟล์ที่ซ่อนไว้ได้ โดยเลือกเปิดทีละไฟล์หรือแสดงรายการที่ซ่อนไว้ชั่วคราวผ่านการตั้งค่า</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">เบลอเพื่อความเป็นส่วนตัว</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
+    <string name="hidden_nodes_description_visible_shared_files">แสดงรายการที่ซ่อนอยู่โดยเบลอรูปขนาดย่อเพื่อให้คุณระบุไฟล์ได้โดยไม่ต้องเปิดเผยเนื้อหาภายใน</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">เก็บภาพถ่ายของคุณให้ปลอดภัยเสมอ</string>
     <!--Camera backup permission screen description-->
@@ -1703,31 +1703,29 @@
     <!-- The description of camera uploads low battery paused warning banner -->
     <string name="camera_update_low_battery_banner_description">การอัปโหลดหยุดชั่วคราวเนื่องจากแบตเตอรี่อ่อน กรุณาชาร์จอุปกรณ์เพื่อดำเนินการต่อ</string>
     <!-- The description of camera uploads network requirement not met paused warning banner -->
-    <string name="camera_update_network_requirement_not_met_banner_description">Camera uploads paused, connect to Wi-Fi or allow mobile data</string>
+    <string name="camera_update_network_requirement_not_met_banner_description">การอัปโหลดจากกล้องหยุดชั่วคราว กรุณาเชื่อมต่อ Wi-Fi หรืออนุญาตให้ใช้ข้อมูลมือถือ</string>
     <!-- The button text of camera uploads network requirement not met paused warning banner -->
     <string name="camera_update_network_requirement_not_met_banner_button_text">อนุญาตให้ใช้ข้อมูลมือถือ</string>
     <!-- Billing info with discount label -->
     <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s for %3$s</string>
     <!-- campaign name for Black Friday deal -->
-    <string name="campaign_name_black_friday">Black Friday deal: %1$d%% off</string>
+    <string name="campaign_name_black_friday">ดีล Black Friday ลด %1$d%%</string>
     <!-- campaign name for Cyber Monday deal -->
-    <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
+    <string name="campaign_name_cyber_monday">ดีล Cyber Monday ลด %1$d%%</string>
     <!-- campaign name for Special offer -->
-    <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
+    <string name="campaign_name_special_offer">ข้อเสนอพิเศษ ลด %1$d%%</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="one">%1$s for the first %2$d month</item>
-        <item quantity="other">%1$s for the first %2$d months</item>
+        <item quantity="other">%1$s ในช่วง %2$d เดือนแรก</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one">%1$s for the first %2$d year</item>
-        <item quantity="other">%1$s for the first %2$d years</item>
+        <item quantity="other">%1$s ในช่วง %2$d ปีแรก</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">ชุดความเป็นส่วนตัวของ MEGA</string>
     <!-- Message about savings on yearly plan in case it has discount -->
-    <string name="account_upgrade_account_label_save_at_least">Save at least 16% on a yearly plan</string>
+    <string name="account_upgrade_account_label_save_at_least">ประหยัดอย่างน้อย 16% เมื่อสมัครแผนรายปี</string>
     <!-- Add new album on Media screen dialog title -->
     <string name="media_add_new_album_dialog_title">กรอกชื่ออัลบั้ม</string>
     <!-- Add new album on Media screen dialog positive button text -->
@@ -1739,30 +1737,29 @@
     <!-- Title of raw album. -->
     <string name="system_album_raw_title">RAW</string>
     <!-- General error message to show when an invalid string is detected -->
-    <string name="general_invalid_string">Cannot be empty</string>
+    <string name="general_invalid_string">ห้ามเว้นว่าง</string>
     <!-- Error message for creating an album with a system albums name -->
     <string name="album_invalid_name_error_message">ไม่อนุญาตให้ใช้ชื่ออัลบั้มนี้ กรอกชื่ออื่น</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="album_name_exists_error_message">มีอัลบั้มที่ชื่อนี้อยู่แล้ว กรุณาใช้ชื่ออื่น</string>
     <!-- sentence to detail the permanent awarded text related to VPN achievement -->
-    <string name="mega_vpn_achievement_awarded_storage_text_permanent">Get %1$s of free storage when you start a MEGA&#160;VPN free trial, valid permanently</string>
+    <string name="mega_vpn_achievement_awarded_storage_text_permanent">รับพื้นที่จัดเก็บฟรี %1$s ถาวร เมื่อเริ่มทดลองใช้ MEGA&#160;VPN ฟรี</string>
     <!-- sentence to detail the permanent awarded text related to PWM achievement -->
-    <string name="mega_pass_achievement_awarded_storage_text_permanent">Get %1$s of free storage when you start a MEGA&#160;Pass free trial, valid permanently</string>
+    <string name="mega_pass_achievement_awarded_storage_text_permanent">รับพื้นที่จัดเก็บฟรี %1$s ถาวร เมื่อเริ่มทดลองใช้ MEGA&#160;Pass ฟรี</string>
     <!-- sentence to detail the figures of award achievement days left -->
     <plurals name="trial_awarded_achievement_days_left_text">
-        <item quantity="one">%1$d day left</item>
-        <item quantity="other">%1$d days left</item>
+        <item quantity="other">เหลืออีก %1$d วัน</item>
     </plurals>
     <!-- sentence to detail the figures of award achievement days left -->
     <plurals name="trial_awarded_achievement_days_left_detail_title">
         <item quantity="other">โบนัสจะหมดอายุภายใน %1$d วัน</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
+    <string name="label_first_time_in_months_full_singular">%1$s ในเดือนแรก</string>
     <!-- Discount label for first year singular -->
-    <string name="label_first_time_in_years_full_singular">%1$s for the first year</string>
+    <string name="label_first_time_in_years_full_singular">%1$s ในปีแรก</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
-    <string name="hidden_nodes_description_control_visibility_tag">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the [A]settings[/A].</string>
+    <string name="hidden_nodes_description_control_visibility_tag">มีเพียงคุณเท่านั้นที่เปิดดูไฟล์ที่ซ่อนไว้ได้ โดยเลือกเปิดทีละไฟล์หรือแสดงรายการที่ซ่อนไว้ชั่วคราวผ่าน[A]การตั้งค่า[/A]</string>
     <!-- Dialog confirmation text for removing photos in an album -->
     <string name="album_content_remove_photos_dialog_description">นำออกจากอัลบั้มหรือไม่</string>
     <!--Album content more options action description-->
@@ -1772,7 +1769,7 @@
     <!--Album content delete action description-->
     <string name="album_content_selection_action_delete_description">ลบ</string>
     <!-- Message shown when user tries to preview an undecrypted file -->
-    <string name="preview_not_available_undecrypted_files">Preview not available for undecrypted files</string>
+    <string name="preview_not_available_undecrypted_files">ไม่สามารถดูตัวอย่างไฟล์ที่ยังไม่ได้ถอดรหัสได้</string>
     <!-- Delete album confirmation dialog positive button text. -->
     <string name="delete_album_confirmation_positive_button_text">ลบ</string>
     <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
@@ -1786,7 +1783,7 @@
         <item quantity="other">อัลบั้มจะถูกลบออก แต่เนื้อหายังคงอยู่ในไทม์ไลน์ของคุณ</item>
     </plurals>
     <!-- External checkout button text -->
-    <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
+    <string name="external_checkout_button_text">ซื้อผ่านเว็บไซต์ของเรา (ประหยัดสูงสุด %1$.0f%%)</string>
     <!-- Title for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_title">
         <item quantity="other"></item>
@@ -1800,43 +1797,105 @@
         <item quantity="other">เอาลิงก์ออก</item>
     </plurals>
     <!-- Hint for password dialog -->
-    <string name="password_dialog_hint">Enter link password</string>
+    <string name="password_dialog_hint">กรุณากรอกรหัสผ่านของลิงก์</string>
     <!-- Text for decrypt button -->
     <string name="general_decrypt">ดำเนินการต่อ</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="password_dialog_error">รหัสผ่านลิงก์ไม่ถูกต้อง</string>
     <!-- Message of the Camera Uploads no full access warning banner in Photos -->
-    <string name="camera_upload_no_full_access_banner_change_permissions_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library. [A]Tap to change permissions.[/A]</string>
+    <string name="camera_upload_no_full_access_banner_change_permissions_description">เพื่อให้แน่ใจว่าเราจะเก็บทุกความทรงจำของคุณไว้ครบถ้วน MEGA จำเป็นต้องเข้าถึงคลังรูปภาพของคุณแบบเต็มที่ [A]แตะเพื่อเปลี่ยนสิทธิ์การอนุญาต[/A]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="camera_upload_banner_enable_cu_subtitle">Automatically back up your photos and videos to your Cloud drive</string>
+    <string name="camera_upload_banner_enable_cu_subtitle">สำรองรูปถ่ายและวิดีโอของคุณไปยังคลาวด์ไดร์ฟโดยอัตโนมัติ</string>
     <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
     <string name="onboarding_camera_upload_permission_enabled_message">เปิดใช้งานอัปโหลดจากกล้อง</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
-    <string name="general_alert_not_logged_in">You must be logged in to perform this action</string>
+    <string name="general_alert_not_logged_in">คุณต้องเข้าสู่ระบบก่อนจึงจะดำเนินการนี้ได้</string>
     <!-- camera uploads limited access -->
-    <string name="timeline_tab_camera_uploads_limited_access">MEGA has limited access to your photo library and can’t back up all your photos</string>
+    <string name="timeline_tab_camera_uploads_limited_access">MEGA มีสิทธิ์เข้าถึงคลังรูปภาพของคุณอย่างจำกัด จึงไม่สามารถสำรองรูปถ่ายทั้งหมดของคุณได้</string>
     <!-- menu item -->
     <string name="timeline_tab_file_properties_shared_folder_change_permissions">เปลี่ยนสิทธิ์</string>
     <!-- Timeline tab screen: Empty state no media found -->
     <string name="timeline_tab_empty_body_no_media_found">ไม่พบสื่อ</string>
     <!-- Timeline tab screen: Camera uploads disabled banner description. We show this banner when there is no photo available in timeline tab screen. -->
-    <string name="timeline_tab_enable_camera_uploads_banner_description">Camera uploads requires [A]full access[/A] to your photo library</string>
+    <string name="timeline_tab_enable_camera_uploads_banner_description">ฟีเจอร์อัปโหลดจากกล้องจำเป็นต้องใช้สิทธิ์เข้าถึงคลังรูปภาพของคุณแบบ[A]เต็มที่[/A]</string>
     <!-- Camera uploads completed info in TimelineTab screen. -->
     <plurals name="timeline_tab_camera_uploads_completed">
         <item quantity="other">การอัปโหลดจากกล้องเสร็จสมบูรณ์ มี %1$d ไฟล์ที่อัปโหลดแล้ว</item>
     </plurals>
     <!-- Timeline tab screen grid size menu title -->
-    <string name="timeline_tab_grid_size_menu_title">Grid size</string>
+    <string name="timeline_tab_grid_size_menu_title">ขนาดตาราง</string>
     <!-- Timeline tab screen compact grid size menu item -->
-    <string name="timeline_tab_grid_size_compact">Compact</string>
+    <string name="timeline_tab_grid_size_compact">กะทัดรัด</string>
     <!-- Timeline tab screen default grid size menu item -->
     <string name="timeline_tab_grid_size_default">ค่าเริ่มต้น</string>
     <!-- Timeline tab screen large grid size menu item -->
-    <string name="timeline_tab_grid_size_large">Large</string>
+    <string name="timeline_tab_grid_size_large">ใหญ่</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended_dialog_title">สิ้นสุดการประชุมแล้ว</string>
     <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
     <string name="meeting_has_ended_dialog_view_chat_option">ดูแชทการประชุม</string>
     <!-- Title for the button to dismiss a dialog. -->
     <string name="general_dismiss_dialog">ละทิ้ง</string>
+    <!-- Timeline tab sorting title. This text will be displayed as the sort dialog title and the toolbar action menu, -->
+    <string name="timeline_tab_sort_by_text">เรียงตาม</string>
+    <!-- Timeline tab sort files by date newest first -->
+    <string name="timeline_tab_sort_by_date_newest">ใหม่สุด</string>
+    <!-- Timeline tab sort files by date oldest first -->
+    <string name="timeline_tab_sort_by_date_oldest">เก่าสุด</string>
+    <!-- Timeline filter title. This text will be displayed as the filter screen title and the toolbar action menu -->
+    <string name="timeline_tab_filter_text">ตัวกรอง</string>
+    <!-- Timeline filter media type selection header. -->
+    <string name="timeline_tab_filter_media_type_selection_header">เลือกประเภท</string>
+    <!-- Timeline filter type: All Media. -->
+    <string name="timeline_tab_filter_media_type_all_media">สื่อทั้งหมด</string>
+    <!-- Timeline filter media source selection header. -->
+    <string name="timeline_tab_filter_media_source_selection_header">แสดงรายการจาก</string>
+    <!-- Timeline filter remember preferences toggle text. -->
+    <string name="timeline_tab_filter_remember_preferences">จำตัวเลือกการกำหนดลักษณะนี้ไว้</string>
+    <!-- Timeline filter apply filter button text. -->
+    <string name="timeline_tab_filter_apply_filter_button">Apply filter</string>
+    <!-- General label for invite contact contexts -->
+    <string name="general_invite_contact">Invite contact</string>
+    <!-- Contact found title for a dialog showing contact link info -->
+    <string name="contact_found_dialog_title">Contact found</string>
+    <!--Album content empty album layout title when an album content is empty-->
+    <string name="album_content_empty_album_title">อัลบั้มว่างเปล่า</string>
+    <!--Album content action to add more items to the album-->
+    <string name="album_content_action_add_items">เพิ่มรายการ</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="videos_tab_empty_hint_video">[B]ไม่[/B][B]พบ[/B][A]วิดีโอ[/A]</string>
+    <!-- Action to remove items from the Favourites album -->
+    <string name="album_content_action_remove_favourites">Remove from Favourites</string>
+    <!-- Title of the empty screen when a folder is empty -->
+    <string name="context_empty_folder_title">โฟลเดอร์นี้ว่างเปล่า</string>
+    <!-- Title of the empty screen when there are no items in the root Cloud Drive -->
+    <string name="context_empty_cloud_drive_title">Nothing in your cloud drive yet</string>
+    <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
+    <string name="context_empty_cloud_drive_description">เก็บรักษาข้อมูลให้ปลอดภัยด้วยการเข้ารหัสวิธีซีโร่-นอว์เลจ</string>
+    <!-- Error shown when trying to confirm an account from a confirmation link and the app is already logged in -->
+    <string name="open_link_account_confirmation_error">You’re already logged in with a different MEGA account. Log out first, then open the account confirmation link again.</string>
+    <!-- error message shown when a chat link is invalid -->
+    <string name="invalid_chat_link_error_message">การสนทนานี้ไม่สามารถใช้งานได้อีกต่อไป</string>
+    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
+    <string name="general_invalid_link">Invalid link. Please try again or request a new one.</string>
+    <!-- Text of the dialog shown when you want to join a group call and you're already in another call-->
+    <string name="can_only_join_one_call_error_message">To join this call you have to end your current call</string>
+    <!-- Placeholder of the Search Bar -->
+    <string name="search_bar_placeholder_text">ค้นหา&#8230;</string>
+    <!-- Title for the album remove link confirmation dialog for singular link -->
+    <string name="album_content_remove_link_dialog_title">Remove link?</string>
+    <!-- Title for the album remove link confirmation dialog for multiple link -->
+    <string name="album_content_remove_multiple_links_dialog_title">ลบลิงก์หรือไม่</string>
+    <!-- Explanation text for the album remove link confirmation dialog -->
+    <string name="album_content_remove_link_dialog_description">People you shared this link with will lose access to the album</string>
+    <!-- Explanation text for the album remove multiple links confirmation dialog -->
+    <string name="album_content_remove_multiple_links_dialog_description">People you shared these links with will lose access to the albums</string>
+    <!-- Delete album confirmation title. -->
+    <string name="delete_album_singular_confirmation_dialog_title">ลบอัลบั้มหรือไม่</string>
+    <!-- Delete albums confirmation title. -->
+    <string name="delete_albums_multiple_confirmation_dialog_title">ลบอัลบั้มหรือไม่</string>
+    <!-- Delete album confirmation description. -->
+    <string name="delete_album_singular_confirmation_dialog_description">The contents of the album will not be deleted</string>
+    <!-- Delete albums confirmation description. -->
+    <string name="delete_albums_multiple_confirmation_dialog_description">The contents of the albums will not be deleted</string>
 </resources>

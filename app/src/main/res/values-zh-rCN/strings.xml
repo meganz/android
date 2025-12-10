@@ -1364,7 +1364,7 @@
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">已超出存储空间上限</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">链接无效，请获取一个新的有效链接</string>
+    <string name="invalid_link">链接无效。请重试或申请一个新的。</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">链接密码无效</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->

@@ -1389,7 +1389,7 @@
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">Opslag tegoed overschreden</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">Ongeldige link, vraag om een nieuwe geldige link</string>
+    <string name="invalid_link">Ongeldige link. Probeer het opnieuw of vraag een nieuwe aan.</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">Ongeldig link wachtwoord</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->

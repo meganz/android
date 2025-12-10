@@ -1439,7 +1439,7 @@
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">Przekroczono limit miejsca</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">Link nieprawidłowy, poproś o prawidłowy link</string>
+    <string name="invalid_link">Nieprawidłowy link. Spróbuj ponownie lub poproś o nowy.</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">Nieprawidłowe hasło do łącza</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->

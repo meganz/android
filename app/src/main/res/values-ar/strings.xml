@@ -1489,7 +1489,7 @@
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">تم تجاوز مساحة التخزين المتاحة</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">رابط غير متوفر، الرجاء طلب رابط جديد صالح</string>
+    <string name="invalid_link">Invalid link. Please try again or request a new one.</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">كلمة مرور الرابط غير صالحة</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->

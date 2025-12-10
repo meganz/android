@@ -1823,17 +1823,79 @@
         <item quantity="other">相机上传完成，%1$d个文件已上传</item>
     </plurals>
     <!-- Timeline tab screen grid size menu title -->
-    <string name="timeline_tab_grid_size_menu_title">Grid size</string>
+    <string name="timeline_tab_grid_size_menu_title">网格大小</string>
     <!-- Timeline tab screen compact grid size menu item -->
-    <string name="timeline_tab_grid_size_compact">Compact</string>
+    <string name="timeline_tab_grid_size_compact">紧凑</string>
     <!-- Timeline tab screen default grid size menu item -->
     <string name="timeline_tab_grid_size_default">默认</string>
     <!-- Timeline tab screen large grid size menu item -->
-    <string name="timeline_tab_grid_size_large">Large</string>
+    <string name="timeline_tab_grid_size_large">宽大</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended_dialog_title">会议已结束</string>
     <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
     <string name="meeting_has_ended_dialog_view_chat_option">查看会议聊天</string>
     <!-- Title for the button to dismiss a dialog. -->
     <string name="general_dismiss_dialog">忽略</string>
+    <!-- Timeline tab sorting title. This text will be displayed as the sort dialog title and the toolbar action menu, -->
+    <string name="timeline_tab_sort_by_text">排序</string>
+    <!-- Timeline tab sort files by date newest first -->
+    <string name="timeline_tab_sort_by_date_newest">从新到旧</string>
+    <!-- Timeline tab sort files by date oldest first -->
+    <string name="timeline_tab_sort_by_date_oldest">从旧到新</string>
+    <!-- Timeline filter title. This text will be displayed as the filter screen title and the toolbar action menu -->
+    <string name="timeline_tab_filter_text">过滤</string>
+    <!-- Timeline filter media type selection header. -->
+    <string name="timeline_tab_filter_media_type_selection_header">选择类型</string>
+    <!-- Timeline filter type: All Media. -->
+    <string name="timeline_tab_filter_media_type_all_media">所有媒体</string>
+    <!-- Timeline filter media source selection header. -->
+    <string name="timeline_tab_filter_media_source_selection_header">显示来自以下的项目</string>
+    <!-- Timeline filter remember preferences toggle text. -->
+    <string name="timeline_tab_filter_remember_preferences">记住偏好设置</string>
+    <!-- Timeline filter apply filter button text. -->
+    <string name="timeline_tab_filter_apply_filter_button">应用筛选器</string>
+    <!-- General label for invite contact contexts -->
+    <string name="general_invite_contact">邀请联系人</string>
+    <!-- Contact found title for a dialog showing contact link info -->
+    <string name="contact_found_dialog_title">已找到联系人</string>
+    <!--Album content empty album layout title when an album content is empty-->
+    <string name="album_content_empty_album_title">空相册</string>
+    <!--Album content action to add more items to the album-->
+    <string name="album_content_action_add_items">添加项目</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="videos_tab_empty_hint_video">[B]未[/B][B]找到[/B][A]视频[/A]</string>
+    <!-- Action to remove items from the Favourites album -->
+    <string name="album_content_action_remove_favourites">从收藏中移除</string>
+    <!-- Title of the empty screen when a folder is empty -->
+    <string name="context_empty_folder_title">这个文件夹是空的</string>
+    <!-- Title of the empty screen when there are no items in the root Cloud Drive -->
+    <string name="context_empty_cloud_drive_title">您的云盘中还没有任何内容</string>
+    <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
+    <string name="context_empty_cloud_drive_description">使用零知识加密保护数据的安全</string>
+    <!-- Error shown when trying to confirm an account from a confirmation link and the app is already logged in -->
+    <string name="open_link_account_confirmation_error">您已经使用不同的MEGA帐户登录了。请先登出，然后再次打开帐户确认链接。</string>
+    <!-- error message shown when a chat link is invalid -->
+    <string name="invalid_chat_link_error_message">此对话已不可用</string>
+    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
+    <string name="general_invalid_link">链接无效。请重试或申请一个新的。</string>
+    <!-- Text of the dialog shown when you want to join a group call and you're already in another call-->
+    <string name="can_only_join_one_call_error_message">要加入此次通话，您必须结束当前的通话</string>
+    <!-- Placeholder of the Search Bar -->
+    <string name="search_bar_placeholder_text">搜索&#8230;</string>
+    <!-- Title for the album remove link confirmation dialog for singular link -->
+    <string name="album_content_remove_link_dialog_title">Remove link?</string>
+    <!-- Title for the album remove link confirmation dialog for multiple link -->
+    <string name="album_content_remove_multiple_links_dialog_title">移除链接?</string>
+    <!-- Explanation text for the album remove link confirmation dialog -->
+    <string name="album_content_remove_link_dialog_description">People you shared this link with will lose access to the album</string>
+    <!-- Explanation text for the album remove multiple links confirmation dialog -->
+    <string name="album_content_remove_multiple_links_dialog_description">People you shared these links with will lose access to the albums</string>
+    <!-- Delete album confirmation title. -->
+    <string name="delete_album_singular_confirmation_dialog_title">是否删除相册？</string>
+    <!-- Delete albums confirmation title. -->
+    <string name="delete_albums_multiple_confirmation_dialog_title">是否删除相册？</string>
+    <!-- Delete album confirmation description. -->
+    <string name="delete_album_singular_confirmation_dialog_description">The contents of the album will not be deleted</string>
+    <!-- Delete albums confirmation description. -->
+    <string name="delete_albums_multiple_confirmation_dialog_description">The contents of the albums will not be deleted</string>
 </resources>

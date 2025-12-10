@@ -271,7 +271,7 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">Supprimer le lien</string>
     <!-- Title alert before leaving a share. -->
-    <string name="alert_leave_share">Laisser le dossier</string>
+    <string name="alert_leave_share">Quitter le dossier</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">Supprimer le partage</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -585,7 +585,7 @@
     <!-- Caption of a title, in the context of “About MEGA” or “About us” -->
     <string name="settings_about">À propos</string>
     <!-- Preference screen item action button -->
-    <string name="settings_about_privacy_policy">Politique de protection des renseignements personnels</string>
+    <string name="settings_about_privacy_policy">Politique de confidentialité</string>
     <!--  -->
     <string name="settings_about_terms_of_service">Conditions générales d’utilisation</string>
     <!-- App means “Application” -->
@@ -1238,7 +1238,7 @@
     <!-- title of the section for unlocked storage quota -->
     <string name="unlocked_storage_title">Quota d’espace de stockage</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_referral_bonuses">Invitez des personnes sur MEGA</string>
+    <string name="title_referral_bonuses">Inviter sur MEGA</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">Installer notre appli mobile</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
@@ -1414,7 +1414,7 @@
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">Le quota d’espace de stockage a été dépassé</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">Le lien est invalide, veuillez demander un nouveau lien valide</string>
+    <string name="invalid_link">Invalid link. Please try again or request a new one.</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">Le mot de passe du lien est erroné</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->

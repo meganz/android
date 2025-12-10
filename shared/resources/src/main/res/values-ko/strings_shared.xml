@@ -1790,7 +1790,7 @@
     </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="delete_album_confirmation_dialog_description">
-        <item quantity="other">사진첩이 삭제되지만 항목들은 연표에 남게 됩니다.</item>
+        <item quantity="other"></item>
     </plurals>
     <!-- External checkout button text -->
     <string name="external_checkout_button_text">우리 웹사이트에서 구매 (최대 %1$.0f%% 절약)</string>
@@ -1800,11 +1800,11 @@
     </plurals>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_description">
-        <item quantity="other">이 링크를 공유 받은 사람들이 사진첩에 접근하지 못 하게 됩니다.</item>
+        <item quantity="other"></item>
     </plurals>
     <!-- Remove button for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_positive_button">
-        <item quantity="other">링크 제거</item>
+        <item quantity="other"></item>
     </plurals>
     <!-- Hint for password dialog -->
     <string name="password_dialog_hint">링크 암호 입력</string>
@@ -1846,4 +1846,66 @@
     <string name="meeting_has_ended_dialog_view_chat_option">회의 대화 보기</string>
     <!-- Title for the button to dismiss a dialog. -->
     <string name="general_dismiss_dialog">해제</string>
+    <!-- Timeline tab sorting title. This text will be displayed as the sort dialog title and the toolbar action menu, -->
+    <string name="timeline_tab_sort_by_text">정렬 기준</string>
+    <!-- Timeline tab sort files by date newest first -->
+    <string name="timeline_tab_sort_by_date_newest">최신순</string>
+    <!-- Timeline tab sort files by date oldest first -->
+    <string name="timeline_tab_sort_by_date_oldest">오래된 순</string>
+    <!-- Timeline filter title. This text will be displayed as the filter screen title and the toolbar action menu -->
+    <string name="timeline_tab_filter_text">필터</string>
+    <!-- Timeline filter media type selection header. -->
+    <string name="timeline_tab_filter_media_type_selection_header">유형 선택</string>
+    <!-- Timeline filter type: All Media. -->
+    <string name="timeline_tab_filter_media_type_all_media">모든 미디어</string>
+    <!-- Timeline filter media source selection header. -->
+    <string name="timeline_tab_filter_media_source_selection_header">다음의 항목 보기</string>
+    <!-- Timeline filter remember preferences toggle text. -->
+    <string name="timeline_tab_filter_remember_preferences">설정 기억하기</string>
+    <!-- Timeline filter apply filter button text. -->
+    <string name="timeline_tab_filter_apply_filter_button">필터 적용</string>
+    <!-- General label for invite contact contexts -->
+    <string name="general_invite_contact">연락처 초대</string>
+    <!-- Contact found title for a dialog showing contact link info -->
+    <string name="contact_found_dialog_title">연락처 찾음</string>
+    <!--Album content empty album layout title when an album content is empty-->
+    <string name="album_content_empty_album_title">빈 사진첩</string>
+    <!--Album content action to add more items to the album-->
+    <string name="album_content_action_add_items">항목 추가</string>
+    <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
+    <string name="videos_tab_empty_hint_video">[A]동영상[/A][B]이[/B] [B]없습니다[/B]</string>
+    <!-- Action to remove items from the Favourites album -->
+    <string name="album_content_action_remove_favourites">즐겨찾기에서 제거</string>
+    <!-- Title of the empty screen when a folder is empty -->
+    <string name="context_empty_folder_title">이 폴더는 비어있습니다</string>
+    <!-- Title of the empty screen when there are no items in the root Cloud Drive -->
+    <string name="context_empty_cloud_drive_title">아직 클라우드 드라이브에 아무 것도 없습니다</string>
+    <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
+    <string name="context_empty_cloud_drive_description">영지식 암호화로 안전하게 보관하세요</string>
+    <!-- Error shown when trying to confirm an account from a confirmation link and the app is already logged in -->
+    <string name="open_link_account_confirmation_error">이미 다른 MEGA 계정으로 로그인하셨습니다. 로그아웃하고 계정 확인 링크를 다시 여세요.</string>
+    <!-- error message shown when a chat link is invalid -->
+    <string name="invalid_chat_link_error_message">이 대화는 더 이상 유효하지 않습니다</string>
+    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
+    <string name="general_invalid_link">유효하지 않은 링크. 다시 시도하거나 새 것을 요청하세요.</string>
+    <!-- Text of the dialog shown when you want to join a group call and you're already in another call-->
+    <string name="can_only_join_one_call_error_message">이 통화에 참여하려면 현재 통화를 마쳐야합니다</string>
+    <!-- Placeholder of the Search Bar -->
+    <string name="search_bar_placeholder_text">검색&#8230;</string>
+    <!-- Title for the album remove link confirmation dialog for singular link -->
+    <string name="album_content_remove_link_dialog_title">Remove link?</string>
+    <!-- Title for the album remove link confirmation dialog for multiple link -->
+    <string name="album_content_remove_multiple_links_dialog_title">링크를 제거할까요?</string>
+    <!-- Explanation text for the album remove link confirmation dialog -->
+    <string name="album_content_remove_link_dialog_description">People you shared this link with will lose access to the album</string>
+    <!-- Explanation text for the album remove multiple links confirmation dialog -->
+    <string name="album_content_remove_multiple_links_dialog_description">People you shared these links with will lose access to the albums</string>
+    <!-- Delete album confirmation title. -->
+    <string name="delete_album_singular_confirmation_dialog_title">사진첩을 삭제할까요?</string>
+    <!-- Delete albums confirmation title. -->
+    <string name="delete_albums_multiple_confirmation_dialog_title">앨범을 삭제할까요?</string>
+    <!-- Delete album confirmation description. -->
+    <string name="delete_album_singular_confirmation_dialog_description">The contents of the album will not be deleted</string>
+    <!-- Delete albums confirmation description. -->
+    <string name="delete_albums_multiple_confirmation_dialog_description">The contents of the albums will not be deleted</string>
 </resources>
