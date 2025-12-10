@@ -7,6 +7,7 @@ import androidx.work.WorkInfo
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -59,6 +60,7 @@ import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -99,8 +101,13 @@ class CameraUploadsRepositoryImplTest {
     private val cameraUploadsStatusInfoMapper: CameraUploadsStatusInfoMapper = mock()
     private val inProgressTransferMapper: InProgressTransferMapper = mock()
 
+    private var monitorCameraUploadsEnabled = MutableStateFlow(false)
+
     @BeforeAll
     fun setUp() {
+        whenever(
+            cameraUploadsSettingsPreferenceGateway.monitorCameraUploadsEnabled
+        ) doReturn monitorCameraUploadsEnabled
         underTest = CameraUploadsRepositoryImpl(
             localStorageGateway = localStorageGateway,
             megaApiGateway = megaApiGateway,
@@ -779,6 +786,17 @@ class CameraUploadsRepositoryImplTest {
                 underTest.updateCameraUploadsInProgressTransfers(listOf(transfer, notCUTransfer))
 
                 assertThat(awaitItem()).containsExactly(uniqueId, inProgressTransfer)
+            }
+        }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that the correct value is returned for camera upload enablement`(isEnabled: Boolean) =
+        runTest {
+            monitorCameraUploadsEnabled.emit(isEnabled)
+
+            underTest.monitorCameraUploadsEnabled.test {
+                assertThat(expectMostRecentItem()).isEqualTo(isEnabled)
             }
         }
 }

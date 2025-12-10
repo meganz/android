@@ -22,6 +22,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
@@ -357,5 +358,17 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
         decryptData.stub { onBlocking { invoke(any()) }.thenReturn(chargingRequired.toString()) }
 
         assertThat(underTest.isChargingRequiredToUploadContent()).isEqualTo(chargingRequired)
+    }
+
+    @ParameterizedTest(name = "is camera uploads enabled in flow: {0}")
+    @ValueSource(booleans = [true, false])
+    internal fun `test that the camera uploads enabled state is decrypted when retrieved via flow`(
+        isCameraUploadsEnabled: Boolean,
+    ) = runTest {
+        decryptData.stub { onBlocking { invoke(any()) } doReturn isCameraUploadsEnabled.toString() }
+
+        underTest.monitorCameraUploadsEnabled.test {
+            assertThat(expectMostRecentItem()).isEqualTo(isCameraUploadsEnabled)
+        }
     }
 }
