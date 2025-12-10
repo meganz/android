@@ -65,4 +65,30 @@ internal class PermissionRepositoryImpl @Inject constructor(
         uiPreferencesGateway
             .monitorNotificationPermissionShownTimestamp()
             .flowOn(ioDispatcher)
+
+    override fun hasCameraUploadsPermission(): Boolean {
+        val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            arrayOf(
+                Manifest.permission.POST_NOTIFICATIONS,
+                permissionGateway.getImagePermissionByVersion(),
+                permissionGateway.getVideoPermissionByVersion(),
+                permissionGateway.getPartialMediaPermission(),
+            )
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arrayOf(
+                Manifest.permission.POST_NOTIFICATIONS,
+                permissionGateway.getImagePermissionByVersion(),
+                permissionGateway.getVideoPermissionByVersion()
+            )
+        } else {
+            arrayOf(
+                permissionGateway.getImagePermissionByVersion(),
+                permissionGateway.getVideoPermissionByVersion()
+            )
+        }
+        val hasMediaPermissions = permissionGateway.hasPermissions(*permissions)
+        return hasMediaPermissions.also {
+            Timber.d("Device has required CU permissions $it")
+        }
+    }
 }

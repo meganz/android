@@ -1,5 +1,6 @@
 package mega.privacy.android.data.repository
 
+import android.Manifest
 import android.os.Build
 import android.os.Environment
 import app.cash.turbine.test
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -185,6 +187,108 @@ class PermissionRepositoryTest {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             val result = permissionRepository.hasNotificationPermission()
             assertThat(result).isTrue()
+        }
+    }
+
+    @Test
+    fun `test hasCameraUploadsPermission returns true when permissions are granted on Android 34 and above`() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            whenever(
+                permissionGateway.hasPermissions(
+                    Manifest.permission.POST_NOTIFICATIONS,
+                    permissionGateway.getImagePermissionByVersion(),
+                    permissionGateway.getVideoPermissionByVersion(),
+                    permissionGateway.getPartialMediaPermission(),
+                )
+            ) doReturn true
+
+            val result = permissionRepository.hasCameraUploadsPermission()
+
+            assertThat(result).isTrue()
+        }
+    }
+
+    @Test
+    fun `test hasCameraUploadsPermission returns false when permissions are not granted on Android 34 and above`() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            whenever(
+                permissionGateway.hasPermissions(
+                    Manifest.permission.POST_NOTIFICATIONS,
+                    permissionGateway.getImagePermissionByVersion(),
+                    permissionGateway.getVideoPermissionByVersion(),
+                    permissionGateway.getPartialMediaPermission(),
+                )
+            ) doReturn false
+
+            val result = permissionRepository.hasCameraUploadsPermission()
+
+            assertThat(result).isFalse()
+        }
+    }
+
+    @Test
+    fun `test hasCameraUploadsPermission returns true when permissions are granted on Android 33 and above`() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            whenever(
+                permissionGateway.hasPermissions(
+                    Manifest.permission.POST_NOTIFICATIONS,
+                    permissionGateway.getImagePermissionByVersion(),
+                    permissionGateway.getVideoPermissionByVersion()
+                )
+            ) doReturn true
+
+            val result = permissionRepository.hasCameraUploadsPermission()
+
+            assertThat(result).isTrue()
+        }
+    }
+
+    @Test
+    fun `test hasCameraUploadsPermission returns false when permissions are not granted on Android 33 and above`() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            whenever(
+                permissionGateway.hasPermissions(
+                    Manifest.permission.POST_NOTIFICATIONS,
+                    permissionGateway.getImagePermissionByVersion(),
+                    permissionGateway.getVideoPermissionByVersion()
+                )
+            ) doReturn false
+
+            val result = permissionRepository.hasCameraUploadsPermission()
+
+            assertThat(result).isFalse()
+        }
+    }
+
+    @Test
+    fun `test hasCameraUploadsPermission returns true when permissions are granted on Android pre 33`() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            whenever(
+                permissionGateway.hasPermissions(
+                    permissionGateway.getImagePermissionByVersion(),
+                    permissionGateway.getVideoPermissionByVersion()
+                )
+            ) doReturn true
+
+            val result = permissionRepository.hasCameraUploadsPermission()
+
+            assertThat(result).isTrue()
+        }
+    }
+
+    @Test
+    fun `test hasCameraUploadsPermission returns false when permissions are not granted on Android pre 33`() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            whenever(
+                permissionGateway.hasPermissions(
+                    permissionGateway.getImagePermissionByVersion(),
+                    permissionGateway.getVideoPermissionByVersion()
+                )
+            ) doReturn false
+
+            val result = permissionRepository.hasCameraUploadsPermission()
+
+            assertThat(result).isFalse()
         }
     }
 

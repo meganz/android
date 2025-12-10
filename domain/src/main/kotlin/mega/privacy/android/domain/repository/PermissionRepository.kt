@@ -43,4 +43,9 @@ interface PermissionRepository {
      * Monitor the last timestamp when the notification permission was shown
      */
     suspend fun monitorNotificationPermissionShownTimestamp(): Flow<Long?>
+
+    /**
+     * Has CU permission
+     */
+    fun hasCameraUploadsPermission(): Boolean
 }
