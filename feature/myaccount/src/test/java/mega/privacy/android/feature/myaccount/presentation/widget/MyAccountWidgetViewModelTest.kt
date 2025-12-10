@@ -15,7 +15,7 @@ import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.AccountStorageDetail
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
-import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
+import mega.privacy.android.domain.usecase.GetUserFirstNameUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -48,7 +48,7 @@ class MyAccountWidgetViewModelTest {
 
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val monitorStorageStateUseCase = mock<MonitorStorageStateUseCase>()
-    private val getUserFullNameUseCase = mock<GetUserFullNameUseCase>()
+    private val getUserFirstNameUseCase = mock<GetUserFirstNameUseCase>()
     private val monitorUserUpdates = mock<MonitorUserUpdates>()
     private val monitorMyAvatarFile = mock<MonitorMyAvatarFile>()
     private val getMyAvatarFileUseCase = mock<GetMyAvatarFileUseCase>()
@@ -61,7 +61,7 @@ class MyAccountWidgetViewModelTest {
         reset(
             monitorAccountDetailUseCase,
             monitorStorageStateUseCase,
-            getUserFullNameUseCase,
+            getUserFirstNameUseCase,
             monitorUserUpdates,
             monitorMyAvatarFile,
             getMyAvatarFileUseCase,
@@ -78,7 +78,7 @@ class MyAccountWidgetViewModelTest {
         initUnderTest()
 
         val initialState = underTest.uiState.value
-        assertThat(initialState.isLoading).isFalse() // isLoading is set to false after account data loads
+        assertThat(initialState.isLoading).isTrue() // isLoading is set to false after account data loads
         assertThat(initialState.name).isNull() // Name is loaded in init
         assertThat(initialState.avatarFile).isNull()
         assertThat(initialState.avatarColor).isNull() // Color is loaded
@@ -403,9 +403,9 @@ class MyAccountWidgetViewModelTest {
         )
 
         if (userFullNameThrows != null) {
-            whenever(getUserFullNameUseCase(forceRefresh = false)).thenThrow(userFullNameThrows)
+            whenever(getUserFirstNameUseCase(forceRefresh = false)).thenThrow(userFullNameThrows)
         } else {
-            whenever(getUserFullNameUseCase(forceRefresh = false)).thenReturn(
+            whenever(getUserFirstNameUseCase(forceRefresh = false)).thenReturn(
                 userFullName ?: "Test User"
             )
         }
@@ -441,7 +441,7 @@ class MyAccountWidgetViewModelTest {
         underTest = MyAccountWidgetViewModel(
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             monitorStorageStateUseCase = monitorStorageStateUseCase,
-            getUserFullNameUseCase = getUserFullNameUseCase,
+            getUserFirstNameUseCase = getUserFirstNameUseCase,
             monitorUserUpdates = monitorUserUpdates,
             monitorMyAvatarFile = monitorMyAvatarFile,
             getMyAvatarFileUseCase = getMyAvatarFileUseCase,

@@ -8,6 +8,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.indicators.ProgressBarIndicator
+import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.SupportColor
@@ -35,9 +36,10 @@ fun MyAccountHorizontalProgressBar(
     ProgressBarIndicator(
         modifier = modifier
             .fillMaxWidth()
-            .height(4.dp),
+            .height(2.dp),
         progressPercentage = progress.coerceIn(0f, 100f),
-        supportColor = supportColor
+        supportColor = supportColor,
+        surfaceColor = SurfaceColor.Surface3
     )
 }
 

@@ -29,4 +29,6 @@
     <string name="label_file_size_peta_byte">%s&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_exa_byte">%s&#160;EB</string>
+    <!-- General Hi -->
+    <string name="general_hi">Hi</string>
 </resources>

@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onStart
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
-import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
+import mega.privacy.android.domain.usecase.GetUserFirstNameUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -30,7 +30,7 @@ import javax.inject.Inject
 class MyAccountWidgetViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
-    private val getUserFullNameUseCase: GetUserFullNameUseCase,
+    private val getUserFirstNameUseCase: GetUserFirstNameUseCase,
     private val monitorUserUpdates: MonitorUserUpdates,
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
@@ -62,7 +62,7 @@ class MyAccountWidgetViewModel @Inject constructor(
             val storageDetail = accountDetail.storageDetail
             val usedPercentage = storageDetail?.usedPercentage ?: 0
             val userName =
-                runCatching { getUserFullNameUseCase(forceRefresh = false) }.getOrNull() ?: ""
+                runCatching { getUserFirstNameUseCase(forceRefresh = false) }.getOrNull() ?: ""
             val avatarColor = runCatching { getMyAvatarColorUseCase() }.getOrNull()
 
             MyAccountWidgetUiState(
