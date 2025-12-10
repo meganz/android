@@ -9,7 +9,7 @@ import mega.privacy.android.navigation.contract.DefaultIconBadge
 import mega.privacy.android.navigation.contract.DefaultNumberBadge
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import mega.privacy.android.navigation.destination.AchievementNavKey
-import mega.privacy.android.navigation.destination.ChatsNavKey
+import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.ContactsNavKey
 import mega.privacy.android.navigation.destination.DeviceCenterNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsNavKey
@@ -56,7 +56,7 @@ class ChatItem(
     getNumUnreadChatsUseCase: GetNumUnreadChatsUseCase,
     monitorOngoingCallUseCase: MonitorOngoingCallUseCase,
 ) : NavDrawerItem.Account(
-    destination = ChatsNavKey(),
+    destination = ChatListNavKey(),
     icon = IconPack.Medium.Thin.Outline.MessageChatCircle,
     title = sharedR.string.general_chat,
     badge = combine(

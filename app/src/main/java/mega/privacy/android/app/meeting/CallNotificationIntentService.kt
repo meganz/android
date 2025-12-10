@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity
-import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
+import mega.privacy.android.app.presentation.meeting.chat.ChatActivity
 import mega.privacy.android.app.utils.CallUtil.clearIncomingCallNotification
 import mega.privacy.android.app.utils.CallUtil.openMeetingInProgress
 import mega.privacy.android.app.utils.CallUtil.openMeetingRinging
@@ -443,7 +443,7 @@ class CallNotificationIntentService : Service() {
      * @param chatId    Meeting's Chat ID
      */
     private fun openChatRoom(chatId: Long) {
-        val intent = Intent(applicationContext, ChatHostActivity::class.java).apply {
+        val intent = Intent(applicationContext, ChatActivity::class.java).apply {
             putExtra(Constants.CHAT_ID, chatId)
             action = Constants.ACTION_CHAT_SHOW_MESSAGES
             flags = Intent.FLAG_ACTIVITY_NEW_TASK

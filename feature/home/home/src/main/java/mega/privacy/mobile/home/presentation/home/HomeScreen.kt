@@ -54,7 +54,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
-import mega.privacy.android.navigation.destination.ChatsNavKey
+import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.SearchNodeNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
@@ -125,7 +125,7 @@ internal fun HomeScreen(
                 )
 
                 HomeFabOption.NewChat -> navigationHandler.navigate(
-                    ChatsNavKey(createNewChat = true)
+                    ChatListNavKey(createNewChat = true)
                 )
             }
             navigationHandler.clearResult(HomeFabOptionsBottomSheetNavKey.KEY)

@@ -20,7 +20,7 @@ import mega.privacy.android.feature.home.R
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.home.HomeWidget
-import mega.privacy.android.navigation.destination.ChatsNavKey
+import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.FavouritesNavKey
 import mega.privacy.android.navigation.destination.OfflineNavKey
 import mega.privacy.android.navigation.destination.VideoSectionNavKey
@@ -87,7 +87,7 @@ private fun HomeChips(
             selected = false,
             leadingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.MessageChatCircle),
             onClick = {
-                onNavigate(ChatsNavKey())
+                onNavigate(ChatListNavKey())
             },
         )
 

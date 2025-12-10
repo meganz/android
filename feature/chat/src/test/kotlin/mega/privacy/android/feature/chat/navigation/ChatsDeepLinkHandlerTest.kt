@@ -22,8 +22,8 @@ import mega.privacy.android.domain.usecase.chat.link.GetChatLinkContentUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
-import mega.privacy.android.navigation.destination.ChatsNavKey
 import mega.privacy.android.navigation.destination.LegacyMeetingNavKey
 import mega.privacy.android.navigation.destination.LegacyOpenLinkAfterFetchNodes
 import mega.privacy.android.navigation.destination.LegacyWaitingRoomNavKey
@@ -105,7 +105,7 @@ class ChatsDeepLinkHandlerTest {
         val actual = underTest.getNavKeysInternal(uri, NEW_MESSAGE_CHAT_LINK, isLoggedIn)
 
         if (isLoggedIn) {
-            assertThat(actual).containsExactly(ChatsNavKey())
+            assertThat(actual).containsExactly(ChatListNavKey())
             verifyNoInteractions(snackbarEventQueue)
         } else {
             assertThat(actual).isEmpty()

@@ -21,8 +21,8 @@ import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseC
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
-import mega.privacy.android.navigation.destination.ChatsNavKey
 import mega.privacy.android.navigation.destination.LegacyMeetingNavKey
 import mega.privacy.android.navigation.destination.LegacyOpenLinkAfterFetchNodes
 import mega.privacy.android.navigation.destination.LegacyWaitingRoomNavKey
@@ -49,7 +49,7 @@ class ChatsDeepLinkHandler @Inject constructor(
         uri: Uri,
         regexPatternType: RegexPatternType?,
     ): List<NavKey>? = when (regexPatternType) {
-        NEW_MESSAGE_CHAT_LINK -> listOf(ChatsNavKey())
+        NEW_MESSAGE_CHAT_LINK -> listOf(ChatListNavKey())
         else -> null
     }
 

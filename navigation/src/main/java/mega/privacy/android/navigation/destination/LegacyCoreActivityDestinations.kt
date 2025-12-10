@@ -55,7 +55,7 @@ data class ChatNavKey(
  */
 @Serializable
 @Parcelize
-data class ChatsNavKey(
+data class ChatListNavKey(
     val createNewChat: Boolean = false,
 ) : NavKey, Parcelable
 
