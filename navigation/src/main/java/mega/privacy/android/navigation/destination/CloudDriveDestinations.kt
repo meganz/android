@@ -5,6 +5,7 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 
 /**
@@ -56,7 +57,12 @@ data class DriveSyncNavKey(
 @Serializable
 data object FavouritesNavKey : NavKey
 
+/**
+ * @isOverQuota whether the user is over quota (red) or near quota (orange)
+ * @overQuotaAlert whether to show the over quota alert dialog or just reminder dialog
+ */
 @Serializable
 data class OverQuotaDialogNavKey(
     val isOverQuota: Boolean,
-) : NavKey
+    val overQuotaAlert: Boolean = true,
+) : DialogNavKey
