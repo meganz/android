@@ -40,7 +40,7 @@ class LegacyCoreActivityFeatureGraph(
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
         { navigationHandler, transferHandler ->
             overDiskQuotaPaywallWarning(navigationHandler::back)
-            upgradeAccount(navigationHandler::back)
+            upgradeAccount(navigationHandler::remove)
             myAccount(navigationHandler::back)
             achievement(navigationHandler::back)
             webDestinations(navigationHandler::back)

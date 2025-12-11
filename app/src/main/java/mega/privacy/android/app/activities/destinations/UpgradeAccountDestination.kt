@@ -8,7 +8,7 @@ import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountAc
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 
-fun EntryProviderScope<NavKey>.upgradeAccount(removeDestination: () -> Unit) {
+fun EntryProviderScope<NavKey>.upgradeAccount(removeDestination: (NavKey) -> Unit) {
     entry<UpgradeAccountNavKey>(
         metadata = transparentMetadata()
     ) { key ->
@@ -26,7 +26,7 @@ fun EntryProviderScope<NavKey>.upgradeAccount(removeDestination: () -> Unit) {
             }
 
             // Immediately pop this destination from the back stack
-            removeDestination()
+            removeDestination(key)
         }
     }
 }

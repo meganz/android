@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.permission.OnboardingPermissionsCheckR
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.notifications.ShouldShowNotificationReminderUseCase
 import mega.privacy.android.domain.usecase.permisison.CheckOnboardingPermissionsUseCase
+import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -49,7 +50,10 @@ class OnboardingPermissionInitialiserTest {
             }
 
             underTest("session", true)
-            verify(navigationEventQueue).emit(PermissionScreensNavKey(false))
+            verify(navigationEventQueue).emit(
+                PermissionScreensNavKey(false),
+                priority = NavPriority.Priority(9)
+            )
         }
 
     @Test
@@ -82,7 +86,10 @@ class OnboardingPermissionInitialiserTest {
             }
 
             underTest("session", true)
-            verify(navigationEventQueue).emit(PermissionScreensNavKey(onlyShowNotificationPermission = true))
+            verify(navigationEventQueue).emit(
+                PermissionScreensNavKey(onlyShowNotificationPermission = true),
+                priority = NavPriority.Priority(9)
+            )
         }
 
     @Test
