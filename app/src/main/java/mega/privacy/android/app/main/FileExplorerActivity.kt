@@ -1493,7 +1493,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             putBoolean("importFileF", importFileF)
             putInt("importFragmentSelected", importFragmentSelected)
             putString("action", action)
-            chatExplorerFragment?.let {
+            chatExplorerFragment?.takeIf { it.isAdded }?.let {
                 supportFragmentManager.putFragment(this, "chatExplorerFragment", it)
             }
             putString("querySearch", querySearch)
