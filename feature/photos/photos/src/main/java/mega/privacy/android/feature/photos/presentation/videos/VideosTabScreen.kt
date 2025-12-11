@@ -64,9 +64,9 @@ fun VideosTabRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     VideosTabScreen(
         uiState = uiState,
-        onClick = { _, _ -> },
+        onClick = viewModel::onItemClicked,
+        onLongClick = viewModel::onItemLongClicked,
         onMenuClick = {},
-        onLongClick = { _, _ -> },
         locationOptionSelected = viewModel::setLocationSelectedFilterOption,
         durationOptionSelected = viewModel::setDurationSelectedFilterOption,
         onSortNodes = viewModel::setCloudSortOrder
@@ -77,9 +77,9 @@ fun VideosTabRoute(
 @Composable
 internal fun VideosTabScreen(
     uiState: VideosTabUiState,
-    onClick: (item: VideoUiEntity, index: Int) -> Unit,
+    onClick: (item: VideoUiEntity) -> Unit,
+    onLongClick: (item: VideoUiEntity) -> Unit,
     onMenuClick: (VideoUiEntity) -> Unit,
-    onLongClick: (item: VideoUiEntity, index: Int) -> Unit,
     onSortNodes: (NodeSortConfiguration) -> Unit,
     modifier: Modifier = Modifier,
     locationOptionSelected: (LocationFilterOption) -> Unit = {},
@@ -131,14 +131,14 @@ internal fun VideosTabScreen(
             )
 
             is VideosTabUiState.Data -> {
-                if (uiState.allVideos.isEmpty()) {
+                if (uiState.allVideoEntities.isEmpty()) {
                     MegaEmptyView(
                         modifier = Modifier.testTag(VIDEO_TAB_EMPTY_VIEW_TEST_TAG),
                         text = stringResource(id = sharedR.string.videos_tab_empty_hint_video),
                         imagePainter = painterResource(id = iconPackR.drawable.ic_video_glass)
                     )
                 } else {
-                    val items = uiState.allVideos
+                    val items = uiState.allVideoEntities
                     FastScrollLazyColumn(
                         state = lazyListState,
                         totalItems = items.size,
@@ -190,9 +190,9 @@ internal fun VideosTabScreen(
                                 thumbnailData = ThumbnailRequest(videoItem.id),
                                 nodeAvailableOffline = videoItem.nodeAvailableOffline,
                                 highlightText = uiState.highlightText,
-                                onClick = { onClick(videoItem, it) },
+                                onClick = { onClick(videoItem) },
                                 onMenuClick = { onMenuClick(videoItem) },
-                                onLongClick = { onLongClick(videoItem, it) },
+                                onLongClick = { onLongClick(videoItem) },
                                 isSensitive = false,
                             )
                         }

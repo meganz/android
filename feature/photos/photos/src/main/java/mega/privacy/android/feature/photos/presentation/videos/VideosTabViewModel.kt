@@ -20,6 +20,7 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMa
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -51,6 +52,7 @@ class VideosTabViewModel @Inject constructor(
     private val queryFlow = MutableStateFlow<String?>(null)
     private val locationFilterOptionFlow = MutableStateFlow(LocationFilterOption.AllLocations)
     private val durationFilterOptionFlow = MutableStateFlow(DurationFilterOption.AllDurations)
+    private val selectedVideoIdsFlow = MutableStateFlow<List<Long>>(emptyList())
 
     internal val uiState: StateFlow<VideosTabUiState> by lazy {
         triggerFlow.flatMapLatest {
@@ -64,21 +66,32 @@ class VideosTabViewModel @Inject constructor(
                             }
                         },
                         monitorOfflineNodeUpdatesUseCase(),
-                        monitorSortCloudOrderUseCase()
+                        monitorSortCloudOrderUseCase(),
+                        selectedVideoIdsFlow,
                     ).mapLatest {
-                        val videoList = getVideoUIEntityList()
+                        val videoNodes = getVideoNodeList()
                             .filterVideosByDuration()
                             .filterVideosByLocation()
+                        val uiEntities = videoNodes.map {
+                            videoUiEntityMapper(it).copy(
+                                isSelected = it.id.longValue in selectedVideoIdsFlow.value
+                            )
+                        }
                         val sortOrder = getCloudSortOrder()
                         val sortOrderPair = nodeSortConfigurationUiMapper(sortOrder)
+                        val selectedNodes = videoNodes.filter {
+                            it.id.longValue in selectedVideoIdsFlow.value
+                        }
 
                         VideosTabUiState.Data(
-                            allVideos = videoList,
+                            allVideoEntities = uiEntities,
+                            allVideoNodes = videoNodes,
                             sortOrder = sortOrder,
                             query = queryFlow.value,
                             selectedSortConfiguration = sortOrderPair,
                             locationSelectedFilterOption = locationFilterOptionFlow.value,
                             durationSelectedFilterOption = durationFilterOptionFlow.value,
+                            selectedTypedNodes = selectedNodes,
                         )
                     }.catch {
                         Timber.e(it)
@@ -95,25 +108,27 @@ class VideosTabViewModel @Inject constructor(
         triggerFlow.update { !it }
     }
 
-    private suspend fun getVideoUIEntityList() = getAllVideosUseCase(
-        searchQuery = getCurrentSearchQuery(),
-        tag = getCurrentSearchQuery().removePrefix("#"),
-        description = getCurrentSearchQuery()
-    ).map { videoUiEntityMapper(it) }
 
-    private suspend fun List<VideoUiEntity>.filterVideosByLocation(): List<VideoUiEntity> {
+    private suspend fun getVideoNodeList() =
+        getAllVideosUseCase(
+            searchQuery = getCurrentSearchQuery(),
+            tag = getCurrentSearchQuery().removePrefix("#"),
+            description = getCurrentSearchQuery()
+        )
+
+    private suspend fun List<TypedVideoNode>.filterVideosByLocation(): List<TypedVideoNode> {
         val syncUploadsFolderIds = getSyncUploadsFolderIdsUseCase()
         return filter {
             when (locationFilterOptionFlow.value) {
                 LocationFilterOption.AllLocations -> true
                 LocationFilterOption.CloudDrive -> it.parentId.longValue !in syncUploadsFolderIds
                 LocationFilterOption.CameraUploads -> it.parentId.longValue in syncUploadsFolderIds
-                LocationFilterOption.SharedItems -> it.isSharedItems
+                LocationFilterOption.SharedItems -> it.exportedData != null || it.isOutShared
             }
         }
     }
 
-    private fun List<VideoUiEntity>.filterVideosByDuration() =
+    private fun List<TypedVideoNode>.filterVideosByDuration() =
         filter {
             val seconds = it.duration.inWholeSeconds
             when (durationFilterOptionFlow.value) {
@@ -154,5 +169,37 @@ class VideosTabViewModel @Inject constructor(
                 Timber.e(it, "Failed to set cloud sort order")
             }
         }
+    }
+
+    internal fun onItemClicked(item: VideoUiEntity) {
+        if (selectedVideoIdsFlow.value.isNotEmpty()) {
+            toggleItemSelection(item = item)
+        }
+    }
+
+    internal fun onItemLongClicked(item: VideoUiEntity) {
+        toggleItemSelection(item = item)
+    }
+
+    private fun toggleItemSelection(item: VideoUiEntity) {
+        val updatedSelectedIds = selectedVideoIdsFlow.value.toMutableList()
+        if (item.id.longValue in updatedSelectedIds) {
+            updatedSelectedIds -= item.id.longValue
+        } else {
+            updatedSelectedIds += item.id.longValue
+        }
+        selectedVideoIdsFlow.update { updatedSelectedIds }
+    }
+
+    internal fun selectAllVideos() {
+        if (uiState.value is VideosTabUiState.Data) {
+            val allIds =
+                (uiState.value as VideosTabUiState.Data).allVideoEntities.map { it.id.longValue }
+            selectedVideoIdsFlow.update { allIds }
+        }
+    }
+
+    internal fun clearSelection() {
+        selectedVideoIdsFlow.update { emptyList() }
     }
 }

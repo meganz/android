@@ -27,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
@@ -40,11 +41,14 @@ import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
+import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
+import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
 import mega.privacy.android.core.nodecomponents.menu.menuaction.CopyMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.GetLinkMenuAction
@@ -57,6 +61,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.photos.model.FilterMediaSource
@@ -90,6 +95,7 @@ import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKe
 import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.navigation.destination.MediaTimelinePhotoPreviewNavKey
+import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.TimelineHideNodeMenuItemEvent
@@ -109,14 +115,18 @@ fun MediaMainRoute(
     timelineViewModel: TimelineTabViewModel = hiltViewModel(),
     mediaCameraUploadViewModel: MediaCameraUploadViewModel = hiltViewModel(),
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
+    videosTabViewModel: VideosTabViewModel = hiltViewModel(),
 ) {
     val timelineTabUiState by timelineViewModel.uiState.collectAsStateWithLifecycle()
     val timelineTabActionUiState by timelineViewModel.actionUiState.collectAsStateWithLifecycle()
     val timelineFilterUiState by timelineViewModel.filterUiState.collectAsStateWithLifecycle()
     val mediaCameraUploadUiState by mediaCameraUploadViewModel.uiState.collectAsStateWithLifecycle()
+    val videosTabUiState by videosTabViewModel.uiState.collectAsStateWithLifecycle()
+    val megaNavigator = rememberMegaNavigator()
     val nodeActionHandler = rememberNodeActionHandler(
         viewModel = nodeOptionsActionViewModel,
-        navigationHandler = navigationHandler
+        navigationHandler = navigationHandler,
+        megaNavigator = megaNavigator
     )
     val snackBarEventQueue = rememberSnackBarQueue()
     val megaResultContract = rememberMegaResultContract()
@@ -139,7 +149,18 @@ fun MediaMainRoute(
             scope.launch {
                 snackBarEventQueue.queueMessage(it)
             }
-        }
+        },
+        onActionFinished = {
+            if (videosTabUiState is VideosTabUiState.Data) {
+                val state = videosTabUiState as VideosTabUiState.Data
+                if (state.selectedTypedNodes.isNotEmpty()) {
+                    videosTabViewModel.clearSelection()
+                }
+            }
+        },
+        onNavigateToRenameNav = {
+            navigationHandler.navigate(it)
+        },
     )
 
     LaunchedEffect(
@@ -215,7 +236,8 @@ fun MediaMainRoute(
         onNavigateCameraUploadsSettings = {
             onNavigateToCameraUploadsSettings(LegacySettingsCameraUploadsActivityNavKey)
         },
-        onDismissEnableCameraUploadsBanner = mediaCameraUploadViewModel::dismissEnableCUBanner
+        onDismissEnableCameraUploadsBanner = mediaCameraUploadViewModel::dismissEnableCUBanner,
+        nodeActionHandle = nodeActionHandler
     )
 }
 
@@ -224,6 +246,7 @@ fun MediaMainScreen(
     timelineTabUiState: TimelineTabUiState,
     timelineTabActionUiState: TimelineTabActionUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
+    nodeActionHandle: NodeActionHandler,
     timelineFilterUiState: TimelineFilterUiState,
     actionHandler: (MenuAction, List<TypedNode>) -> Unit,
     setEnableCUPage: (Boolean) -> Unit,
@@ -249,6 +272,7 @@ fun MediaMainScreen(
     modifier: Modifier = Modifier,
     viewModel: MediaMainViewModel = hiltViewModel(),
     videosTabViewModel: VideosTabViewModel = hiltViewModel(),
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
 ) {
     var currentTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showTimelineSortDialog by rememberSaveable { mutableStateOf(false) }
@@ -264,9 +288,15 @@ fun MediaMainScreen(
     }
     var showBottomSheetActions by rememberSaveable { mutableStateOf(false) }
 
+    val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val videosTabUiState by videosTabViewModel.uiState.collectAsStateWithLifecycle()
     var isVideosTabSearchBarVisible by rememberSaveable { mutableStateOf(false) }
     var videosTabQuery by rememberSaveable { mutableStateOf<String?>(null) }
+
+    var selectedVideoCount by rememberSaveable { mutableIntStateOf(0) }
+    var areAllVideosSelected by rememberSaveable { mutableStateOf(false) }
+    var isVideosSelectionMode by rememberSaveable { mutableStateOf(false) }
+    var selectedVideoNodes by remember { mutableStateOf(emptyList<TypedNode>()) }
 
     // Handling back handler for timeline filter
     BackHandler(enabled = showTimelineFilter) {
@@ -294,12 +324,33 @@ fun MediaMainScreen(
         }
     }
 
+    BackHandler(isVideosSelectionMode) {
+        if (isVideosSelectionMode) {
+            videosTabViewModel.clearSelection()
+        }
+    }
+
+    LaunchedEffect(isVideosSelectionMode) {
+        setNavigationItemVisibility(!isVideosSelectionMode)
+    }
+
     LaunchedEffect(videosTabUiState) {
         if (videosTabUiState is VideosTabUiState.Data) {
+            val state = videosTabUiState as VideosTabUiState.Data
             videosTabViewModel.getCurrentSearchQuery().let {
                 if (it != videosTabQuery) {
                     videosTabQuery = it
                 }
+            }
+            if (selectedVideoCount != state.selectedTypedNodes.size) {
+                selectedVideoNodes = state.selectedTypedNodes
+                selectedVideoCount = state.selectedTypedNodes.size
+                areAllVideosSelected = selectedVideoCount == state.allVideoEntities.size
+                isVideosSelectionMode = state.selectedTypedNodes.isNotEmpty()
+                nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
+                    selectedNodes = state.selectedTypedNodes.toSet(),
+                    nodeSourceType = NodeSourceType.CLOUD_DRIVE
+                )
             }
         }
     }
@@ -322,8 +373,13 @@ fun MediaMainScreen(
                     onCancelSelectionClicked = onClearTimelinePhotosSelection
                 )
 
-                currentTabIndex == MediaScreen.Videos.ordinal && isVideosTabSearchBarVisible ->
+                isVideosTabSearchBarVisible || isVideosSelectionMode ->
                     VideosTabToolbar(
+                        count = selectedVideoCount,
+                        isAllSelected = areAllVideosSelected,
+                        isSelectionMode = isVideosSelectionMode,
+                        onSelectAllClicked = videosTabViewModel::selectAllVideos,
+                        onCancelSelectionClicked = videosTabViewModel::clearSelection,
                         searchQuery = videosTabQuery,
                         updateSearchQuery = videosTabViewModel::searchQuery,
                         onSearchingModeChanged = { isSearching ->
@@ -436,6 +492,15 @@ fun MediaMainScreen(
                     }
                 }
             )
+
+            NodeSelectionModeBottomBar(
+                availableActions = nodeOptionsActionUiState.availableActions,
+                visibleActions = nodeOptionsActionUiState.visibleActions,
+                visible = nodeOptionsActionUiState.visibleActions.isNotEmpty() && isVideosSelectionMode,
+                nodeActionHandler = nodeActionHandle,
+                selectedNodes = selectedVideoNodes,
+                isSelecting = false
+            )
         }
     ) { paddingValues ->
         MegaScrollableTabRow(
@@ -443,7 +508,7 @@ fun MediaMainScreen(
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding()),
             beyondViewportPageCount = 1,
-            hideTabs = isTimelineInSelectionMode,
+            hideTabs = isTimelineInSelectionMode || isVideosSelectionMode,
             pagerScrollEnabled = true,
             initialSelectedIndex = currentTabIndex,
             onTabSelected = { index ->
@@ -459,7 +524,7 @@ fun MediaMainScreen(
                                 MediaContent(
                                     modifier = Modifier.fillMaxSize(),
                                     timelineContentPadding = PaddingValues(
-                                        bottom = if (isTimelineInSelectionMode) {
+                                        bottom = if (isTimelineInSelectionMode || isVideosSelectionMode) {
                                             paddingValues.calculateBottomPadding()
                                         } else {
                                             50.dp
@@ -683,6 +748,8 @@ private fun NodeActionEventHandler(
     nameCollisionLauncher: ManagedActivityResultLauncher<ArrayList<NameCollision>, String?>,
     onTransfer: (TransferTriggerEvent) -> Unit,
     onShowSnackBar: (message: String) -> Unit,
+    onActionFinished: () -> Unit = {},
+    onNavigateToRenameNav: (NavKey) -> Unit = {},
 ) {
     val context = LocalContext.current
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
@@ -690,7 +757,10 @@ private fun NodeActionEventHandler(
     EventEffect(
         event = nodeActionState.downloadEvent,
         onConsumed = nodeOptionsActionViewModel::markDownloadEventConsumed,
-        action = onTransfer
+        action = { event ->
+            onTransfer(event)
+            onActionFinished()
+        }
     )
 
     EventEffect(
@@ -698,6 +768,7 @@ private fun NodeActionEventHandler(
         onConsumed = nodeOptionsActionViewModel::onInfoToShowEventConsumed,
         action = { info ->
             onShowSnackBar(info.get(context))
+            onActionFinished()
         }
     )
 
@@ -715,6 +786,16 @@ private fun NodeActionEventHandler(
                     else -> Timber.d("Not implemented")
                 }
             }
+            onActionFinished()
+        }
+    )
+
+    EventEffect(
+        event = nodeActionState.renameNodeRequestEvent,
+        onConsumed = nodeOptionsActionViewModel::resetRenameNodeRequest,
+        action = { nodeId ->
+            onNavigateToRenameNav(RenameNodeDialogNavKey(nodeId = nodeId.longValue))
+            onActionFinished()
         }
     )
 }
@@ -748,7 +829,8 @@ fun PhotosMainScreenPreview() {
             onChangeCameraUploadsPermissions = {},
             clearCameraUploadsChangePermissionsMessage = {},
             onNavigateCameraUploadsSettings = {},
-            onDismissEnableCameraUploadsBanner = {}
+            onDismissEnableCameraUploadsBanner = {},
+            nodeActionHandle = rememberNodeActionHandler(),
         )
     }
 }

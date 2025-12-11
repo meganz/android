@@ -37,9 +37,9 @@ class VideosTabScreenTest {
 
     private fun setComposeContent(
         uiState: VideosTabUiState = VideosTabUiState.Data(),
-        onClick: (item: VideoUiEntity, index: Int) -> Unit = { _, _ -> },
+        onClick: (item: VideoUiEntity) -> Unit = {},
         onMenuClick: (VideoUiEntity) -> Unit = {},
-        onLongClick: (item: VideoUiEntity, index: Int) -> Unit = { _, _ -> },
+        onLongClick: (item: VideoUiEntity) -> Unit = {},
         onSortNodes: (NodeSortConfiguration) -> Unit = {},
         modifier: Modifier = Modifier,
     ) {
@@ -74,7 +74,7 @@ class VideosTabScreenTest {
     fun `test that empty view is displayed as expected`() {
         setComposeContent(
             uiState = VideosTabUiState.Data(
-                allVideos = emptyList()
+                allVideoEntities = emptyList()
             )
         )
 
@@ -92,7 +92,7 @@ class VideosTabScreenTest {
         val video = createVideoUiEntity(1L)
         setComposeContent(
             uiState = VideosTabUiState.Data(
-                allVideos = listOf(video)
+                allVideoEntities = listOf(video)
             )
         )
 
@@ -139,7 +139,7 @@ class VideosTabScreenTest {
         val onSortNodes = mock<(NodeSortConfiguration) -> Unit>()
         setComposeContent(
             uiState = VideosTabUiState.Data(
-                allVideos = listOf(video),
+                allVideoEntities = listOf(video),
             ),
             onSortNodes = onSortNodes
         )
