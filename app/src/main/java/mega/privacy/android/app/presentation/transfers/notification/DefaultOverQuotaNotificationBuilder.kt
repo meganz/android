@@ -8,6 +8,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.data.facade.AccountInfoFacade
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
@@ -23,6 +24,7 @@ import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.GetBandwidthOverQuotaDelayUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaAccountDetails
@@ -97,11 +99,25 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
         return builder.build()
     }
 
-    private fun storageOverQuotaNotification(): Notification = with(context) {
+    private suspend fun storageOverQuotaNotification(): Notification = with(context) {
         val contentText = getString(R.string.download_show_info)
         val message = getString(R.string.overquota_alert_title)
-        val intent = Intent(this, ManagerActivity::class.java)
-        intent.action = Constants.ACTION_OVERQUOTA_STORAGE
+        val pendingIntent = if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
+            MegaActivity.getPendingIntentWithExtraDestination(
+                context = applicationContext,
+                navKey = OverQuotaDialogNavKey(isOverQuota = true),
+            )
+        } else {
+            val intent = Intent(this, ManagerActivity::class.java)
+            intent.action = Constants.ACTION_OVERQUOTA_STORAGE
+
+            PendingIntent.getActivity(
+                applicationContext,
+                0,
+                intent,
+                PendingIntent.FLAG_IMMUTABLE
+            )
+        }
         val builder = NotificationCompat.Builder(
             context,
             Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID,
@@ -109,12 +125,7 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
             setSmallIcon(iconPackR.drawable.ic_stat_notify)
             color = ContextCompat.getColor(this@with, R.color.red_600_red_300)
             setContentIntent(
-                PendingIntent.getActivity(
-                    applicationContext,
-                    0,
-                    intent,
-                    PendingIntent.FLAG_IMMUTABLE
-                )
+                pendingIntent
             )
             setAutoCancel(true).setTicker(contentText)
             setContentTitle(message).setContentText(contentText)

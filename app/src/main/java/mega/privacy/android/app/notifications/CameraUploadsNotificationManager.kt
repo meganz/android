@@ -12,6 +12,7 @@ import androidx.core.app.NotificationCompat
 import androidx.work.ForegroundInfo
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.photos.PhotosFragment.Companion.ACTION_SHOW_CU_PROGRESS_VIEW
 import mega.privacy.android.app.presentation.settings.SettingsActivity
@@ -30,6 +31,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSize
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -296,18 +298,27 @@ class CameraUploadsNotificationManager @Inject constructor(
     /**
      *  Display a notification in case the cloud storage does not have enough space
      */
-    private fun showStorageOverQuotaNotification() {
+    private suspend fun showStorageOverQuotaNotification() {
+        val pendingIntent = if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
+            MegaActivity.getPendingIntentWithExtraDestination(
+                context = context,
+                navKey = OverQuotaDialogNavKey(isOverQuota = true),
+            )
+        } else {
+            val intent = Intent(context, ManagerActivity::class.java)
+            intent.action = ACTION_OVER_QUOTA_STORAGE
+
+            PendingIntent.getActivity(
+                context,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        }
         val notification = createNotification(
             title = context.getString(R.string.overquota_alert_title),
             content = context.getString(R.string.download_show_info),
-            intent = PendingIntent.getActivity(
-                context,
-                0,
-                Intent(context, ManagerActivity::class.java).apply {
-                    action = ACTION_OVER_QUOTA_STORAGE
-                },
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            ),
+            intent = pendingIntent,
         )
         notificationManager.notify(OVER_STORAGE_QUOTA_NOTIFICATION_ID, notification)
     }

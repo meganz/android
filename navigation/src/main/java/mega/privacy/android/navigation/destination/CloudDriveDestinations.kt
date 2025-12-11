@@ -62,7 +62,8 @@ data object FavouritesNavKey : NavKey
  * @overQuotaAlert whether to show the over quota alert dialog or just reminder dialog
  */
 @Serializable
+@Parcelize
 data class OverQuotaDialogNavKey(
     val isOverQuota: Boolean,
     val overQuotaAlert: Boolean = true,
-) : DialogNavKey
+) : DialogNavKey, Parcelable
