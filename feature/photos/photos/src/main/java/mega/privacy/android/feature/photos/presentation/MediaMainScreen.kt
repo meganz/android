@@ -94,6 +94,7 @@ import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
+import mega.privacy.android.navigation.destination.LegacyPhotosSearchNavKey
 import mega.privacy.android.navigation.destination.MediaTimelinePhotoPreviewNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
@@ -237,7 +238,8 @@ fun MediaMainRoute(
             onNavigateToCameraUploadsSettings(LegacySettingsCameraUploadsActivityNavKey)
         },
         onDismissEnableCameraUploadsBanner = mediaCameraUploadViewModel::dismissEnableCUBanner,
-        nodeActionHandle = nodeActionHandler
+        nodeActionHandle = nodeActionHandler,
+        navigateToLegacyPhotosSearch = navigationHandler::navigate
     )
 }
 
@@ -258,6 +260,7 @@ fun MediaMainScreen(
     resetCUButtonAndProgress: () -> Unit,
     navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
     navigateToLegacyPhotoSelection: (LegacyPhotoSelectionNavKey) -> Unit,
+    navigateToLegacyPhotosSearch: (LegacyPhotosSearchNavKey) -> Unit,
     onTimelinePhotoSelected: (nodes: PhotoNodeUiState) -> Unit,
     onAllTimelinePhotosSelected: () -> Unit,
     onClearTimelinePhotosSelection: () -> Unit,
@@ -406,7 +409,8 @@ fun MediaMainScreen(
                                 if (currentTabIndex == MediaScreen.Videos.ordinal) {
                                     isVideosTabSearchBarVisible = true
                                 }
-                                //TODO: Handle Search action click
+
+                                navigateToLegacyPhotosSearch(LegacyPhotosSearchNavKey)
                             }
                         )
 
@@ -831,6 +835,7 @@ fun PhotosMainScreenPreview() {
             onNavigateCameraUploadsSettings = {},
             onDismissEnableCameraUploadsBanner = {},
             nodeActionHandle = rememberNodeActionHandler(),
+            navigateToLegacyPhotosSearch = {},
         )
     }
 }

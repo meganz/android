@@ -71,26 +71,28 @@ private typealias PhotoDownload =
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MediaSearchScreenM3(
-    photosSearchViewModel: PhotosSearchViewModel,
+    state: PhotosSearchState,
     photoDownloaderViewModel: PhotoDownloaderViewModel,
     onOpenAlbum: (Album) -> Unit,
     onOpenImagePreviewScreen: (Photo) -> Unit,
     onShowMoreMenu: (NodeId) -> Unit,
     onCloseScreen: () -> Unit,
+    updateQuery: (String) -> Unit,
+    updateSelectedQuery: (String?) -> Unit,
+    updateRecentQueries: (String) -> Unit,
+    searchPhotos: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val state by photosSearchViewModel.state.collectAsStateWithLifecycle()
-
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier,
         topBar = {
             PhotosSearchTopBar(
                 query = state.query,
                 selectedQuery = state.selectedQuery,
-                onUpdateQuery = photosSearchViewModel::updateQuery,
-                onSelectedQueryRead = { photosSearchViewModel.updateSelectedQuery(null) },
-                onSaveQuery = photosSearchViewModel::updateRecentQueries,
-                onSearch = photosSearchViewModel::search,
+                onUpdateQuery = updateQuery,
+                onSelectedQueryRead = { updateSelectedQuery(null) },
+                onSaveQuery = updateRecentQueries,
+                onSearch = searchPhotos,
                 onCloseScreen = onCloseScreen,
             )
         },
@@ -115,8 +117,8 @@ fun MediaSearchScreenM3(
                                 .padding(paddingValues),
                             recentQueries = recentQueries,
                             onSelectQuery = { query ->
-                                photosSearchViewModel.updateSelectedQuery(query)
-                                photosSearchViewModel.search(query)
+                                updateSelectedQuery(query)
+                                searchPhotos(query)
                             },
                         )
                     }

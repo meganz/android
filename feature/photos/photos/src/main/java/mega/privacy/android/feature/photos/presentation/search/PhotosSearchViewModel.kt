@@ -2,27 +2,36 @@ package mega.privacy.android.feature.photos.presentation.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.Lazy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.RetrievePhotosRecentQueriesUseCase
 import mega.privacy.android.domain.usecase.SavePhotosRecentQueriesUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.photos.MonitorTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.photos.mapper.AlbumTitleStringMapper
+import mega.privacy.android.feature.photos.mapper.UIAlbumMapper
 import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
+import mega.privacy.android.feature.photos.provider.AlbumsDataProvider
+import mega.privacy.android.feature.photos.provider.PhotosCache
+import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -35,6 +44,10 @@ class PhotosSearchViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val albumsProvider: Lazy<Set<@JvmSuppressWildcards AlbumsDataProvider>>,
+    private val uiAlbumMapper: UIAlbumMapper,
+    private val monitorTimelinePhotosUseCase: Lazy<MonitorTimelinePhotosUseCase>,
 ) : ViewModel() {
     private val _state: MutableStateFlow<PhotosSearchState> = MutableStateFlow(PhotosSearchState())
 
@@ -42,28 +55,79 @@ class PhotosSearchViewModel @Inject constructor(
 
     private var showHiddenItems: Boolean = false
 
-    fun initialize(
-        albumsFlow: Flow<List<UIAlbum>>,
-        photosFlow: Flow<List<Photo>>,
-    ) {
-        albumsFlow
-            .onEach(::updateAlbums)
-            .launchIn(viewModelScope)
+    init {
+        monitorAccountDetail()
+        monitorShowHiddenItems()
+        getSingleActivityEnabled()
+    }
 
-        photosFlow
-            .onEach(::updatePhotos)
-            .launchIn(viewModelScope)
-
-        retrieveQueries()
-
+    private fun monitorAccountDetail() {
         monitorAccountDetailUseCase()
             .onEach(::handleAccountDetails)
             .launchIn(viewModelScope)
+    }
 
+    private fun monitorShowHiddenItems() {
         monitorShowHiddenItemsUseCase()
             .onEach(::handleHiddenItemsVisibility)
             .launchIn(viewModelScope)
     }
+
+    private fun getSingleActivityEnabled() {
+        viewModelScope.launch {
+            runCatching { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) }
+                .onSuccess { isEnabled ->
+                    _state.update {
+                        it.copy(isSingleActivityEnabled = isEnabled)
+                    }
+
+                    initialize(isEnabled)
+                }
+        }
+    }
+
+    private fun initialize(isSingleActivityEnabled: Boolean) {
+        monitorAlbums(isSingleActivityEnabled)
+        monitorPhotos(isSingleActivityEnabled)
+        retrieveQueries()
+    }
+
+    private fun monitorAlbums(isSingleActivityEnabled: Boolean) {
+        val albumsFlow = if (isSingleActivityEnabled) {
+            createSingleActivityAlbumsFlow()
+        } else {
+            PhotosCache.albumsFlow
+        }
+
+        albumsFlow
+            .onEach(::updateAlbums)
+            .launchIn(viewModelScope)
+    }
+
+    private fun createSingleActivityAlbumsFlow() = combine(
+        flows = albumsProvider.get()
+            .sortedBy { it.order }
+            .map { it.monitorAlbums() },
+        transform = { albums -> albums.toList().flatten() }
+    ).map { albums -> albums.map(uiAlbumMapper::invoke) }
+
+    private fun monitorPhotos(isSingleActivityEnabled: Boolean) {
+        val photosFlow = if (isSingleActivityEnabled) {
+            createSingleActivityPhotosFlow()
+        } else {
+            PhotosCache.photosFlow
+        }
+
+        photosFlow
+            .onEach(::updatePhotos)
+            .launchIn(viewModelScope)
+    }
+
+    private fun createSingleActivityPhotosFlow() =
+        monitorTimelinePhotosUseCase
+            .get()
+            .invoke(TimelinePhotosRequest(isPaginationEnabled = false))
+            .map { result -> result.allPhotos.map { it.photo } }
 
     private fun updateAlbums(albums: List<UIAlbum>) {
         _state.update {

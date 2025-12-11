@@ -19,6 +19,7 @@ import mega.privacy.android.app.presentation.photos.SelectAlbumPhotosContract
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumType
+import mega.privacy.android.app.presentation.photos.search.PhotosSearchActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
@@ -31,6 +32,7 @@ import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavK
 import mega.privacy.android.navigation.destination.LegacyAlbumImportNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
+import mega.privacy.android.navigation.destination.LegacyPhotosSearchNavKey
 import mega.privacy.android.navigation.destination.MediaTimelinePhotoPreviewNavKey
 
 fun EntryProviderScope<NavKey>.legacyAlbumCoverSelection(
@@ -217,6 +219,22 @@ fun EntryProviderScope<NavKey>.legacySettingsCameraUploadsActivityNavKey(removeD
         LaunchedEffect(Unit) {
             val intent = Intent(context, SettingsCameraUploadsActivity::class.java)
             context.startActivity(intent)
+            // Immediately pop this destination from the back stack
+            removeDestination()
+        }
+    }
+}
+
+fun EntryProviderScope<NavKey>.legacyPhotosSearch(
+    removeDestination: () -> Unit,
+) {
+    entry<LegacyPhotosSearchNavKey> {
+        val context = LocalContext.current
+
+        LaunchedEffect(Unit) {
+            val intent = Intent(context, PhotosSearchActivity::class.java)
+            context.startActivity(intent)
+
             // Immediately pop this destination from the back stack
             removeDestination()
         }

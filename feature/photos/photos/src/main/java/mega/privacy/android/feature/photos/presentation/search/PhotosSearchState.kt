@@ -17,4 +17,5 @@ data class PhotosSearchState(
     val isSearchingAlbums: Boolean = false,
     val accountType: AccountType? = null,
     val isBusinessAccountExpired: Boolean = false,
+    val isSingleActivityEnabled: Boolean? = null
 )

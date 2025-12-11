@@ -21,7 +21,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,15 +43,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import kotlinx.coroutines.delay
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
-import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
-import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.transfers.widget.TransfersWidget
 import mega.privacy.android.core.R as coreR
@@ -61,12 +57,15 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.feature.photos.presentation.search.PhotosSearchViewModel
+import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
+import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
+import mega.privacy.android.feature.photos.presentation.search.PhotosSearchState
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.legacy.core.ui.controls.appbar.ExpandedSearchAppBar
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.text.HighlightedText
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
@@ -76,26 +75,28 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 internal fun PhotosSearchScreen(
-    photosSearchViewModel: PhotosSearchViewModel,
+    state: PhotosSearchState,
     photoDownloaderViewModel: PhotoDownloaderViewModel,
     scaffoldState: ScaffoldState,
     onOpenAlbum: (Album) -> Unit,
     onOpenImagePreviewScreen: (Photo) -> Unit,
     onShowMoreMenu: (NodeId) -> Unit,
     onCloseScreen: () -> Unit,
+    updateQuery: (String) -> Unit,
+    updateSelectedQuery: (String?) -> Unit,
+    updateRecentQueries: (String) -> Unit,
+    searchPhotos: (String) -> Unit
 ) {
-    val state by photosSearchViewModel.state.collectAsStateWithLifecycle()
-
-    Scaffold(
+    MegaScaffold(
         scaffoldState = scaffoldState,
         topBar = {
             PhotosSearchTopBar(
                 query = state.query,
                 selectedQuery = state.selectedQuery,
-                onUpdateQuery = photosSearchViewModel::updateQuery,
-                onSelectedQueryRead = { photosSearchViewModel.updateSelectedQuery(null) },
-                onSaveQuery = photosSearchViewModel::updateRecentQueries,
-                onSearch = photosSearchViewModel::search,
+                onUpdateQuery = updateQuery,
+                onSelectedQueryRead = { updateSelectedQuery(null) },
+                onSaveQuery = updateRecentQueries,
+                onSearch = searchPhotos,
                 onCloseScreen = onCloseScreen,
             )
         },
@@ -122,8 +123,8 @@ internal fun PhotosSearchScreen(
                                 .padding(paddingValues),
                             recentQueries = state.recentQueries,
                             onSelectQuery = { query ->
-                                photosSearchViewModel.updateSelectedQuery(query)
-                                photosSearchViewModel.search(query)
+                                updateSelectedQuery(query)
+                                searchPhotos(query)
                             },
                         )
                     }
@@ -158,7 +159,6 @@ internal fun PhotosSearchScreen(
 
 @Composable
 private fun PhotosSearchTopBar(
-    modifier: Modifier = Modifier,
     query: String,
     selectedQuery: String?,
     onUpdateQuery: (String) -> Unit,
@@ -166,6 +166,7 @@ private fun PhotosSearchTopBar(
     onSaveQuery: (String) -> Unit,
     onSearch: (String) -> Unit,
     onCloseScreen: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     var text by rememberSaveable { mutableStateOf("") }
 
@@ -199,9 +200,9 @@ private fun PhotosSearchTopBar(
 
 @Composable
 private fun PhotosSearchEmptyState(
-    modifier: Modifier = Modifier,
     title: String,
     description: String,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
@@ -235,9 +236,9 @@ private fun PhotosSearchEmptyState(
 
 @Composable
 private fun PhotosSearchRecentQuery(
-    modifier: Modifier = Modifier,
     recentQueries: List<String>,
     onSelectQuery: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     LazyColumn(
         modifier = modifier,
@@ -289,7 +290,6 @@ private fun PhotosSearchRecentQuery(
 
 @Composable
 private fun PhotosSearchContent(
-    modifier: Modifier = Modifier,
     query: String,
     photos: List<Photo>,
     albums: List<UIAlbum>,
@@ -299,6 +299,7 @@ private fun PhotosSearchContent(
     onClickPhoto: (Photo) -> Unit,
     onClickAlbum: (Album) -> Unit,
     onClickMenu: (NodeId) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     LazyColumn(
         modifier = modifier,
@@ -394,13 +395,13 @@ private fun PhotosSearchContent(
 
 @Composable
 private fun AlbumCard(
-    modifier: Modifier = Modifier,
     query: String,
     album: UIAlbum,
     accountType: AccountType?,
     isBusinessAccountExpired: Boolean,
     onDownloadPhoto: PhotoDownload,
     onClick: (Album) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val isLight = MaterialTheme.colors.isLight
@@ -474,7 +475,6 @@ private fun AlbumCard(
 
 @Composable
 private fun PhotoCard(
-    modifier: Modifier = Modifier,
     query: String,
     photo: Photo,
     accountType: AccountType?,
@@ -482,6 +482,7 @@ private fun PhotoCard(
     onDownloadPhoto: PhotoDownload,
     onClick: (Photo) -> Unit,
     onClickMenu: (NodeId) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
 
