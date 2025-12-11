@@ -128,7 +128,10 @@ class ChatsDeepLinkHandler @Inject constructor(
                         }
 
                         is MeetingEndedException -> {
-                            listOf(MeetingHasEndedDialogNavKey(false, e.chatId))
+                            val chatRoom = runCatching { getChatRoomUseCase(e.chatId) }.getOrNull()
+                            listOf(
+                                MeetingHasEndedDialogNavKey(chatRoom?.let { e.chatId })
+                            )
                         }
 
                         else -> {
@@ -154,25 +157,28 @@ class ChatsDeepLinkHandler @Inject constructor(
     ) = listOfNotNull(
         call?.let {
             when (call.status) {
-                ChatCallStatus.UserNoPresent,
+                ChatCallStatus.UserNoPresent -> answerCall(chatId)
                 ChatCallStatus.Connecting,
                 ChatCallStatus.Joining,
                 ChatCallStatus.InProgress,
-                    -> answerCall(chatId)
+                    -> openCall(call, false)
 
-                else -> getScheduledMeetingByChatUseCase(chatId)?.first()?.schedId?.let { schedIdWr ->
-                    startMeetingInWaitingRoomChatUseCase(
-                        chatId = chatId,
-                        schedIdWr = schedIdWr,
-                        enabledVideo = false,
-                        enabledAudio = true
-                    )?.let { call ->
-                        call.chatId.takeIf { it != -1L }?.let { openCall(call, false) }
-                    }
-                }
+                else -> startMeetingWithWaitingRoomAsHost(chatId)
+            }
+        } ?: startMeetingWithWaitingRoomAsHost(chatId)
+    )
+
+    private suspend fun startMeetingWithWaitingRoomAsHost(chatId: Long) =
+        getScheduledMeetingByChatUseCase(chatId)?.first()?.schedId?.let { schedIdWr ->
+            startMeetingInWaitingRoomChatUseCase(
+                chatId = chatId,
+                schedIdWr = schedIdWr,
+                enabledVideo = false,
+                enabledAudio = true
+            )?.let { call ->
+                call.chatId.takeIf { it != -1L }?.let { openCall(call, false) }
             }
         }
-    )
 
     private suspend fun answerCall(chatId: Long) =
         answerChatCallUseCase(chatId = chatId, video = false, audio = true)?.let { call ->

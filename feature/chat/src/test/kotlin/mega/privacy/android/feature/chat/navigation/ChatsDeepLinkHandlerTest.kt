@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.chat.ChatLinkContent
 import mega.privacy.android.domain.entity.chat.ChatRoom
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.exception.chat.IAmOnAnotherCallException
 import mega.privacy.android.domain.exception.chat.MeetingEndedException
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
@@ -317,7 +318,7 @@ class ChatsDeepLinkHandlerTest {
         }
 
         @Test
-        fun `test that waiting room host answers call when call is in progress`() = runTest {
+        fun `test that waiting room host opens the call when call is in progress`() = runTest {
 
             val uri = mock<Uri> {
                 on { this.toString() } doReturn uriString
@@ -349,22 +350,84 @@ class ChatsDeepLinkHandlerTest {
                     isGuest = false,
                     hasLocalVideo = false,
                     isOutgoing = false,
-                    answer = true,
+                    answer = false,
                 ),
             )
+            val schedIdWr = 1234L
+            val scheduledMeeting = mock<ChatScheduledMeeting> {
+                on { schedId } doReturn schedIdWr
+            }
 
             whenever(getChatLinkContentUseCase(uriString)).thenReturn(meetingLink)
             whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
             whenever(getChatCallUseCase(chatId)).thenReturn(call)
+            whenever(getScheduledMeetingByChatUseCase(chatId))
+                .thenReturn(listOf(scheduledMeeting))
             whenever(
-                answerChatCallUseCase(
+                startMeetingInWaitingRoomChatUseCase(
                     chatId = chatId,
-                    video = false,
-                    audio = true
+                    schedIdWr = schedIdWr,
+                    enabledVideo = false,
+                    enabledAudio = true
                 )
-            ).thenReturn(
-                answeredCall
+            ).thenReturn(answeredCall)
+            whenever(isEphemeralPlusPlusUseCase()).thenReturn(false)
+
+            val actual = underTest.getNavKeys(uri, CHAT_LINK, true)
+
+            assertThat(actual).containsExactly(expectedNavKey)
+        }
+
+        @Test
+        fun `test that waiting room host starts the call when call is null`() = runTest {
+
+            val uri = mock<Uri> {
+                on { this.toString() } doReturn uriString
+            }
+            val chatId = 123L
+            val callId = 789L
+            val meetingLink = createMeetingLink(
+                chatHandle = chatId,
+                isWaitingRoom = true,
             )
+            val chatRoom = createChatRoom(
+                chatId = chatId,
+                ownPrivilege = ChatRoomPermission.Moderator,
+                isWaitingRoom = true,
+            )
+            val startedCall = createChatCall(
+                chatId = chatId,
+                callId = callId,
+                isOutgoing = false,
+            )
+            val expectedNavKey = LegacyMeetingNavKey(
+                chatId = chatId,
+                meetingInfo = MeetingNavKeyInfo.OpenCall(
+                    callId = callId,
+                    isGuest = false,
+                    hasLocalVideo = false,
+                    isOutgoing = false,
+                    answer = false,
+                ),
+            )
+            val schedIdWr = 1234L
+            val scheduledMeeting = mock<ChatScheduledMeeting> {
+                on { schedId } doReturn schedIdWr
+            }
+
+            whenever(getChatLinkContentUseCase(uriString)).thenReturn(meetingLink)
+            whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+            whenever(getChatCallUseCase(chatId)).thenReturn(null)
+            whenever(getScheduledMeetingByChatUseCase(chatId))
+                .thenReturn(listOf(scheduledMeeting))
+            whenever(
+                startMeetingInWaitingRoomChatUseCase(
+                    chatId = chatId,
+                    schedIdWr = schedIdWr,
+                    enabledVideo = false,
+                    enabledAudio = true
+                )
+            ).thenReturn(startedCall)
             whenever(isEphemeralPlusPlusUseCase()).thenReturn(false)
 
             val actual = underTest.getNavKeys(uri, CHAT_LINK, true)
@@ -475,16 +538,13 @@ class ChatsDeepLinkHandlerTest {
         }
 
         @Test
-        fun `test that meeting ended dialog nav key is returned when MeetingEndedException is thrown`() =
+        fun `test that meeting ended dialog nav key is returned when MeetingEndedException is thrown and chat does not exist`() =
             runTest {
                 val uri = mock<Uri> {
                     on { this.toString() } doReturn uriString
                 }
                 val chatId = 123L
-                val expectedNavKey = MeetingHasEndedDialogNavKey(
-                    isFromGuest = false,
-                    chatId = chatId,
-                )
+                val expectedNavKey = MeetingHasEndedDialogNavKey(null)
 
                 whenever(getChatLinkContentUseCase(uriString)).thenThrow(
                     MeetingEndedException(
@@ -492,11 +552,36 @@ class ChatsDeepLinkHandlerTest {
                         chatId = chatId,
                     )
                 )
+                whenever(getChatRoomUseCase(chatId)) doReturn null
 
                 val actual = underTest.getNavKeys(uri, CHAT_LINK, true)
 
                 assertThat(actual).containsExactly(expectedNavKey)
             }
+
+        @Test
+        fun `test that meeting ended dialog nav key is returned when MeetingEndedException is thrown and chat exist`() =
+            runTest {
+                val uri = mock<Uri> {
+                    on { this.toString() } doReturn uriString
+                }
+                val chatId = 123L
+                val chat = mock<ChatRoom>()
+                val expectedNavKey = MeetingHasEndedDialogNavKey(chatId)
+
+                whenever(getChatLinkContentUseCase(uriString)).thenThrow(
+                    MeetingEndedException(
+                        link = uriString,
+                        chatId = chatId,
+                    )
+                )
+                whenever(getChatRoomUseCase(chatId)) doReturn chat
+
+                val actual = underTest.getNavKeys(uri, CHAT_LINK, true)
+
+                assertThat(actual).containsExactly(expectedNavKey)
+            }
+
 
         @ParameterizedTest
         @ValueSource(booleans = [true, false])
