@@ -3,8 +3,13 @@ package mega.privacy.android.app.menu.presentation
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.badge.NotificationBadge
@@ -160,8 +164,7 @@ fun MenuHomeScreenUi(
             state = listState,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .animateContentSize(),
+                .padding(horizontal = 16.dp),
             contentPadding = paddingValues.excludingBottomPadding(),
         )
         {
@@ -216,7 +219,6 @@ fun MenuHomeScreenUi(
 
                         // Scroll to bottom only when expanding
                         if (!wasExpanded) {
-                            delay(100)
                             val itemCount = listState.layoutInfo.totalItemsCount
                             if (itemCount > 0) {
                                 listState.animateScrollToItem(itemCount - 1)
@@ -226,23 +228,31 @@ fun MenuHomeScreenUi(
                 })
                 Spacer(modifier = Modifier.height(16.dp))
             }
+            item {
+                AnimatedVisibility(
+                    visible = isPrivacySuiteExpanded,
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        uiState.privacySuiteItems.values.forEach { item ->
+                            PrivacySuiteItem(
+                                item = item,
+                                onNavigate = {
+                                    item.appPackage?.let { appPackage ->
+                                        openInSpecificApp(
+                                            context = context,
+                                            link = item.link,
+                                            packageName = appPackage
+                                        )
+                                    } ?: context.launchUrl(item.link)
+                                }
+                            )
 
-            if (isPrivacySuiteExpanded) {
-                items(
-                    items = uiState.privacySuiteItems.values.toList()
-                ) { item ->
-                    PrivacySuiteItem(
-                        item = item,
-                        onNavigate = {
-                            item.appPackage?.let { appPackage ->
-                                openInSpecificApp(
-                                    context = context,
-                                    link = item.link,
-                                    packageName = appPackage
-                                )
-                            } ?: context.launchUrl(item.link)
                         }
-                    )
+                    }
                 }
             }
 
