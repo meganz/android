@@ -3,10 +3,12 @@ package mega.privacy.android.feature.photos.presentation.videos
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,20 +25,28 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
+import mega.android.core.ui.components.sheets.MegaModalBottomSheet
+import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.list.NodeHeaderItem
 import mega.privacy.android.core.nodecomponents.list.NodeLabelCircle
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.list.TagsRow
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeSortOption
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetRoute
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
+import mega.privacy.android.core.sharedcomponents.node.rememberNodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.photos.components.VideoItemView
 import mega.privacy.android.feature.photos.components.VideosFilterButtonView
 import mega.privacy.android.feature.photos.presentation.videos.model.DurationFilterOption
@@ -45,6 +55,7 @@ import mega.privacy.android.feature.photos.presentation.videos.model.LocationFil
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import mega.privacy.android.feature.photos.presentation.videos.view.VideosFilterBottomSheet
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.DurationFilterAllDurationsClickedEvent
 import mega.privacy.mobile.analytics.event.DurationFilterBetween10and60SecondsClickedEvent
@@ -59,6 +70,8 @@ import mega.privacy.mobile.analytics.event.LocationFilterSharedItemClickedEvent
 
 @Composable
 fun VideosTabRoute(
+    navigationHandler: NavigationHandler,
+    onTransfer: (TransferTriggerEvent) -> Unit,
     viewModel: VideosTabViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -66,10 +79,11 @@ fun VideosTabRoute(
         uiState = uiState,
         onClick = viewModel::onItemClicked,
         onLongClick = viewModel::onItemLongClicked,
-        onMenuClick = {},
         locationOptionSelected = viewModel::setLocationSelectedFilterOption,
         durationOptionSelected = viewModel::setDurationSelectedFilterOption,
-        onSortNodes = viewModel::setCloudSortOrder
+        onSortNodes = viewModel::setCloudSortOrder,
+        onTransfer = onTransfer,
+        navigationHandler = navigationHandler
     )
 }
 
@@ -79,11 +93,18 @@ internal fun VideosTabScreen(
     uiState: VideosTabUiState,
     onClick: (item: VideoUiEntity) -> Unit,
     onLongClick: (item: VideoUiEntity) -> Unit,
-    onMenuClick: (VideoUiEntity) -> Unit,
     onSortNodes: (NodeSortConfiguration) -> Unit,
+    navigationHandler: NavigationHandler,
+    onTransfer: (TransferTriggerEvent) -> Unit,
     modifier: Modifier = Modifier,
     locationOptionSelected: (LocationFilterOption) -> Unit = {},
     durationOptionSelected: (DurationFilterOption) -> Unit = {},
+    onDismissNodeOptionsBottomSheet: () -> Unit = {},
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
+    nodeActionHandler: NodeActionHandler = rememberNodeActionHandler(
+        navigationHandler = navigationHandler,
+        viewModel = nodeOptionsActionViewModel
+    ),
 ) {
     val lazyListState = rememberLazyListState()
     val durationInSecondsTextMapper = remember { DurationInSecondsTextMapper() }
@@ -101,6 +122,17 @@ internal fun VideosTabScreen(
     var selectedDurationFilterOption by remember { mutableStateOf(DurationFilterOption.AllDurations) }
     var isAllLocations by rememberSaveable { mutableStateOf(true) }
     var isAllDurations by rememberSaveable { mutableStateOf(true) }
+
+    var visibleNodeOptionId by rememberNodeId(null)
+    val nodeOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+
+    LaunchedEffect(visibleNodeOptionId) {
+        if (visibleNodeOptionId != null) {
+            nodeOptionSheetState.show()
+        } else {
+            nodeOptionSheetState.hide()
+        }
+    }
 
     Column(modifier = modifier) {
         VideosFilterButtonView(
@@ -191,9 +223,37 @@ internal fun VideosTabScreen(
                                 nodeAvailableOffline = videoItem.nodeAvailableOffline,
                                 highlightText = uiState.highlightText,
                                 onClick = { onClick(videoItem) },
-                                onMenuClick = { onMenuClick(videoItem) },
+                                onMenuClick = { visibleNodeOptionId = videoItem.id },
                                 onLongClick = { onLongClick(videoItem) },
                                 isSensitive = false,
+                            )
+                        }
+                    }
+
+                    // Todo: We will remove this, and replace it with NavigationHandler
+                    // Temporary solution to show node options bottom sheet, because navigation file
+                    // is not yet implemented in node-components module.
+                    visibleNodeOptionId?.let { nodeId ->
+                        MegaModalBottomSheet(
+                            modifier = Modifier.statusBarsPadding(),
+                            sheetState = nodeOptionSheetState,
+                            onDismissRequest = {
+                                visibleNodeOptionId = null
+                                onDismissNodeOptionsBottomSheet()
+                            },
+                            bottomSheetBackground = MegaModalBottomSheetBackground.Surface1
+                        ) {
+                            NodeOptionsBottomSheetRoute(
+                                navigationHandler = navigationHandler,
+                                onDismiss = {
+                                    visibleNodeOptionId = null
+                                    onDismissNodeOptionsBottomSheet()
+                                },
+                                nodeId = nodeId.longValue,
+                                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                                onTransfer = onTransfer,
+                                actionHandler = nodeActionHandler,
+                                nodeOptionsActionViewModel = nodeOptionsActionViewModel,
                             )
                         }
                     }

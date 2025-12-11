@@ -29,6 +29,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
@@ -239,7 +241,9 @@ fun MediaMainRoute(
         },
         onDismissEnableCameraUploadsBanner = mediaCameraUploadViewModel::dismissEnableCUBanner,
         nodeActionHandle = nodeActionHandler,
-        navigateToLegacyPhotosSearch = navigationHandler::navigate
+        navigateToLegacyPhotosSearch = navigationHandler::navigate,
+        onTransfer = onTransfer,
+        navigationHandler = navigationHandler,
     )
 }
 
@@ -249,6 +253,8 @@ fun MediaMainScreen(
     timelineTabActionUiState: TimelineTabActionUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     nodeActionHandle: NodeActionHandler,
+    navigationHandler: NavigationHandler,
+    onTransfer: (TransferTriggerEvent) -> Unit,
     timelineFilterUiState: TimelineFilterUiState,
     actionHandler: (MenuAction, List<TypedNode>) -> Unit,
     setEnableCUPage: (Boolean) -> Unit,
@@ -572,7 +578,9 @@ fun MediaMainScreen(
                                     onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
                                     clearCameraUploadsChangePermissionsMessage = clearCameraUploadsChangePermissionsMessage,
                                     onNavigateCameraUploadsSettings = onNavigateCameraUploadsSettings,
-                                    onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner
+                                    onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
+                                    onTransfer = onTransfer,
+                                    navigationHandler = navigationHandler,
                                 )
                             }
                         )
@@ -694,6 +702,8 @@ private fun MediaScreen.MediaContent(
     clearCameraUploadsChangePermissionsMessage: () -> Unit,
     onNavigateCameraUploadsSettings: () -> Unit,
     onDismissEnableCameraUploadsBanner: () -> Unit,
+    navigationHandler: NavigationHandler,
+    onTransfer: (TransferTriggerEvent) -> Unit,
     modifier: Modifier = Modifier,
     timelineContentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -735,7 +745,10 @@ private fun MediaScreen.MediaContent(
             )
         }
 
-        MediaScreen.Videos -> VideosTabRoute()
+        MediaScreen.Videos -> VideosTabRoute(
+            onTransfer = onTransfer,
+            navigationHandler = navigationHandler
+        )
 
         //TODO: Implement Playlists Screens
         else -> {
@@ -836,6 +849,25 @@ fun PhotosMainScreenPreview() {
             onDismissEnableCameraUploadsBanner = {},
             nodeActionHandle = rememberNodeActionHandler(),
             navigateToLegacyPhotosSearch = {},
+            onTransfer = {},
+            navigationHandler = object : NavigationHandler {
+                override fun back() {}
+                override fun remove(navKey: NavKey) {}
+                override fun navigate(destination: NavKey) {}
+                override fun navigate(destinations: List<NavKey>) {}
+                override fun backTo(destination: NavKey, inclusive: Boolean) {}
+                override fun navigateAndClearBackStack(destination: NavKey) {}
+                override fun navigateAndClearTo(
+                    destination: NavKey,
+                    newParent: NavKey,
+                    inclusive: Boolean,
+                ) {
+                }
+
+                override fun <T> returnResult(key: String, value: T) {}
+                override fun clearResult(key: String) {}
+                override fun <T> monitorResult(key: String): Flow<T?> = flowOf(null)
+            },
         )
     }
 }

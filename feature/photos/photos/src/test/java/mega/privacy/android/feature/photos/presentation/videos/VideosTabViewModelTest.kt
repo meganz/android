@@ -302,21 +302,15 @@ class VideosTabViewModelTest {
             val list = cloudDriveList + cameraUploadsList + sharedList
 
             initVideosForFilter(videos = list)
+            underTest.setLocationSelectedFilterOption(locationFilterOption)
+            advanceUntilIdle()
 
             underTest.uiState.test {
                 // Wait for initial Loading state
                 val loadingState = awaitItem()
                 assertThat(loadingState).isInstanceOf(VideosTabUiState.Loading::class.java)
 
-                // Wait for initial Data state
-                val initialDataState = awaitItem() as VideosTabUiState.Data
-                assertThat(initialDataState.allVideoEntities).isNotEmpty()
-
-                underTest.setLocationSelectedFilterOption(locationFilterOption)
-
-                val newLoadingState = awaitItem()
-                assertThat(newLoadingState).isInstanceOf(VideosTabUiState.Loading::class.java)
-
+                // Then wait for the updated Data state with filtered results
                 val actual = awaitItem() as VideosTabUiState.Data
                 assertThat(actual.locationSelectedFilterOption).isEqualTo(locationFilterOption)
                 assertThat(actual.allVideoEntities).hasSize(
@@ -377,21 +371,15 @@ class VideosTabViewModelTest {
                 lessThan10Seconds + between10And60Seconds + between1And4 + between4And20 + moreThan20
 
             initVideosForFilter(allVideos)
+            underTest.setDurationSelectedFilterOption(durationFilterOption)
+            advanceUntilIdle()
 
             underTest.uiState.test {
                 // Wait for initial Loading state
                 val loadingState = awaitItem()
                 assertThat(loadingState).isInstanceOf(VideosTabUiState.Loading::class.java)
 
-                // Wait for initial Data state
-                val initialDataState = awaitItem() as VideosTabUiState.Data
-                assertThat(initialDataState.allVideoEntities).isNotEmpty()
-
-                underTest.setDurationSelectedFilterOption(durationFilterOption)
-
-                val newLoadingState = awaitItem()
-                assertThat(newLoadingState).isInstanceOf(VideosTabUiState.Loading::class.java)
-
+                // Then wait for the updated Data state with filtered results
                 val actual = awaitItem() as VideosTabUiState.Data
                 assertThat(actual.durationSelectedFilterOption).isEqualTo(durationFilterOption)
                 assertThat(actual.allVideoEntities).hasSize(
