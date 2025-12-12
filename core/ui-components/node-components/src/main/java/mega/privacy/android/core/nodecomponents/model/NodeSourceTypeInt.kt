@@ -14,4 +14,6 @@ object NodeSourceTypeInt {
     const val AUDIO_BROWSE_ADAPTER: Int = 2028
     const val DOCUMENTS_BROWSE_ADAPTER: Int = 2030
     const val FAVOURITES_ADAPTER: Int = 2039
+    const val SEARCH_BY_ADAPTER: Int = 2018
+    const val VIDEO_BROWSE_ADAPTER: Int = 2032
 }

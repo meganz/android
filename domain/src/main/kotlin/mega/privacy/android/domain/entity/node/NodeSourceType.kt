@@ -63,7 +63,17 @@ enum class NodeSourceType {
     /**
      * When node source is offline
      */
-    OFFLINE
+    OFFLINE,
+
+    /**
+     * When node source is Videos tab
+     */
+    VIDEOS,
+
+    /**
+     * When node source is Search results
+     */
+    SEARCH,
 }
 
 /**

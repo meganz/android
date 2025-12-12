@@ -24,6 +24,8 @@ class NodeSourceTypeToViewTypeMapper @Inject constructor() {
         NodeSourceType.FAVOURITES -> NodeSourceTypeInt.FAVOURITES_ADAPTER
         NodeSourceType.DOCUMENTS -> NodeSourceTypeInt.DOCUMENTS_BROWSE_ADAPTER
         NodeSourceType.AUDIO -> NodeSourceTypeInt.AUDIO_BROWSE_ADAPTER
+        NodeSourceType.VIDEOS -> NodeSourceTypeInt.VIDEO_BROWSE_ADAPTER
+        NodeSourceType.SEARCH -> NodeSourceTypeInt.SEARCH_BY_ADAPTER
         NodeSourceType.OTHER, NodeSourceType.OFFLINE -> null
     }
 }
