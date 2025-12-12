@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.StringRes
+import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
@@ -373,7 +374,7 @@ interface AppNavigator {
     fun openImageViewerForOfflineNode(
         context: Context,
         node: NodeId,
-        path: String
+        path: String,
     )
 
     /**
@@ -553,11 +554,27 @@ interface AppNavigator {
      * @param context The context
      * @param bundle Optional bundle containing extras to be added to the intent
      */
+    @Deprecated("This function will be removed after SingleActivity flag goes live. Note that any calls to it while the flag is enabled will result in an exception")
     fun openManagerActivity(
         context: Context,
         data: Uri? = null,
         action: String? = null,
         bundle: Bundle? = null,
+    )
+
+    /**
+     * Open Manager Activity
+     *
+     * @param context The context
+     * @param bundle Optional bundle containing extras to be added to the intent
+     */
+    fun openManagerActivity(
+        context: Context,
+        data: Uri? = null,
+        action: String? = null,
+        bundle: Bundle? = null,
+        flags: Int? = null,
+        singleActivityDestination: NavKey,
     )
 
     /**

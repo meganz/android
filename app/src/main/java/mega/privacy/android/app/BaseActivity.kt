@@ -102,9 +102,9 @@ import mega.privacy.android.domain.usecase.network.MonitorSslVerificationFailedU
 import mega.privacy.android.domain.usecase.setting.MonitorCookieSettingsSavedUseCase
 import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
 import mega.privacy.android.feature_flags.AppFeatures
-import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
 import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
+import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.shared.resources.R as sharedR
@@ -902,16 +902,12 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      */
     open fun navigateToUpgradeAccount() {
         lifecycleScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-                megaNavigator.openUpgradeAccount(
-                    this@BaseActivity, source = UpgradeAccountSource.UNKNOWN
-                )
-            } else {
-                val intent = Intent(this@BaseActivity, ManagerActivity::class.java)
-                intent.action = ACTION_SHOW_UPGRADE_ACCOUNT
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(intent)
-            }
+            megaNavigator.openManagerActivity(
+                context = this@BaseActivity,
+                action = ACTION_SHOW_UPGRADE_ACCOUNT,
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK,
+                singleActivityDestination = UpgradeAccountNavKey(source = UpgradeAccountSource.UNKNOWN)
+            )
         }
     }
 
@@ -1181,17 +1177,12 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      */
     protected fun launchOverQuota() {
         lifecycleScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-                megaNavigator.launchMegaActivityIfNeeded(this@BaseActivity).also {
-                    appDialogEventQueue.emit(AppDialogEvent(OverQuotaDialogNavKey(true)))
-                }
-            } else {
-                startActivity(
-                    Intent(this@BaseActivity, ManagerActivity::class.java)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        .setAction(ACTION_OVERQUOTA_STORAGE)
-                )
-            }
+            megaNavigator.openManagerActivity(
+                context = this@BaseActivity,
+                action = ACTION_OVERQUOTA_STORAGE,
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP,
+                singleActivityDestination = OverQuotaDialogNavKey(true)
+            )
             finish()
         }
     }
@@ -1201,17 +1192,12 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      */
     protected fun launchPreOverQuota() {
         lifecycleScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-                megaNavigator.launchMegaActivityIfNeeded(this@BaseActivity).also {
-                    appDialogEventQueue.emit(AppDialogEvent(OverQuotaDialogNavKey(false)))
-                }
-            } else {
-                startActivity(
-                    Intent(this@BaseActivity, ManagerActivity::class.java)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        .setAction(ACTION_PRE_OVERQUOTA_STORAGE)
-                )
-            }
+            megaNavigator.openManagerActivity(
+                context = this@BaseActivity,
+                action = ACTION_PRE_OVERQUOTA_STORAGE,
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP,
+                singleActivityDestination = OverQuotaDialogNavKey(false)
+            )
             finish()
         }
     }

@@ -20,6 +20,7 @@ class CustomLintRegistry : IssueRegistry() {
             SnackbarDetector.ISSUE,
             ShowSnackbarDetector.ISSUE,
             ScaffoldDetector.ISSUE,
+            ManagerActivityIntentDetector.ISSUE,
         )
 
     override val api: Int = CURRENT_API
