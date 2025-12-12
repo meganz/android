@@ -17,11 +17,13 @@ interface RecentActionsRepository {
      * interactions during the last 30 days and maximum 500 nodes. So they are set by default.
      *
      * @param excludeSensitives exclude sensitive nodes
+     * @param maxBucketCount maximum number of buckets
      *
      * @return a list of recent actions.
      */
     suspend fun getRecentActions(
         excludeSensitives: Boolean,
+        maxBucketCount: Int,
     ): List<RecentActionBucketUnTyped>
 
     /**
@@ -31,4 +33,19 @@ interface RecentActionsRepository {
      * @return [NodeInfoForRecentActions]
      */
     suspend fun getNodeInfo(nodeId: NodeId): NodeInfoForRecentActions?
+
+    /**
+     * Gets a single recent action bucket by its identifier.
+     *
+     * This method is optimized to only fetch nodes for the matching bucket,
+     * avoiding unnecessary node fetching for all buckets.
+     *
+     * @param bucketIdentifier The unique identifier of the bucket
+     * @param excludeSensitives Exclude sensitive nodes
+     * @return The matching [RecentActionBucketUnTyped] or null if not found
+     */
+    suspend fun getRecentActionBucketByIdentifier(
+        bucketIdentifier: String,
+        excludeSensitives: Boolean,
+    ): RecentActionBucketUnTyped?
 }

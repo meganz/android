@@ -293,6 +293,7 @@ internal fun createMockRecentsUiItem(
     nodeLabel: NodeLabel? = null,
 ): RecentsUiItem {
     val mockBucket = RecentActionBucket(
+        identifier = "bucket_$timestamp",
         timestamp = timestamp,
         userEmail = "test@example.com",
         parentNodeId = NodeId(1L),

@@ -9,9 +9,12 @@ import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import javax.inject.Inject
 
 /**
- * Get a list of recent actions
+ * Get a single recent action bucket by its identifier
+ *
+ * This use case is optimized to fetch and process only the matching bucket,
+ * avoiding unnecessary processing of all buckets.
  */
-class GetRecentActionsUseCase @Inject constructor(
+class GetRecentActionBucketByIdUseCase @Inject constructor(
     private val recentActionsRepository: RecentActionsRepository,
     private val getCurrentUserEmail: GetCurrentUserEmail,
     private val contactsRepository: ContactsRepository,
@@ -19,19 +22,20 @@ class GetRecentActionsUseCase @Inject constructor(
 ) {
 
     /**
-     * Get a list of recent actions
+     * Get a single recent action bucket by identifier
      *
+     * @param bucketIdentifier The unique identifier of the bucket
      * @param excludeSensitives Exclude sensitive nodes
-     * @return a list of recent actions
+     * @return The matching [RecentActionBucket] or null if not found
      */
     suspend operator fun invoke(
+        bucketIdentifier: String,
         excludeSensitives: Boolean,
-        maxBucketCount: Int = 500,
-    ): List<RecentActionBucket> = coroutineScope {
-        val recentActionsDeferred = async {
-            recentActionsRepository.getRecentActions(
+    ): RecentActionBucket? = coroutineScope {
+        val matchingBucketDeferred = async {
+            recentActionsRepository.getRecentActionBucketByIdentifier(
+                bucketIdentifier = bucketIdentifier,
                 excludeSensitives = excludeSensitives,
-                maxBucketCount = maxBucketCount,
             )
         }
         val visibleContactsDeferred = async { contactsRepository.getAllContactsName() }
@@ -39,12 +43,14 @@ class GetRecentActionsUseCase @Inject constructor(
 
         val visibleContacts = visibleContactsDeferred.await()
         val currentUserEmail = currentUserEmailDeferred.await()
-        val buckets = recentActionsDeferred.await()
+        val matchingBucket = matchingBucketDeferred.await()
+            ?: return@coroutineScope null
 
         typedRecentActionBucketMapper(
-            buckets = buckets,
+            buckets = listOf(matchingBucket),
             visibleContacts = visibleContacts,
             currentUserEmail = currentUserEmail,
-        ).filter { it.nodes.isNotEmpty() } // Filter out again as filterIsInstance inside map may return empty list
+        ).firstOrNull()
     }
 }
+

@@ -846,6 +846,7 @@ class RecentsWidgetTest {
         isSensitive: Boolean = false,
     ): RecentsUiItem {
         val mockBucket = RecentActionBucket(
+            identifier = "id1",
             timestamp = timestamp,
             userEmail = "test@example.com",
             parentNodeId = NodeId(1L),

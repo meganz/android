@@ -30,25 +30,25 @@ internal class DefaultRecentActionsRepository @Inject constructor(
 
     override suspend fun getRecentActions(
         excludeSensitives: Boolean,
+        maxBucketCount: Int,
     ) = withContext(ioDispatcher) {
         runCatching {
-            val list = getMegaRecentAction(
-                excludeSensitives = excludeSensitives
-            ).map {
-                megaApiGateway.copyBucket(it).let { bucket ->
+            val list = getMegaRecentAction(excludeSensitives = excludeSensitives)
+                .take(maxBucketCount)
+                .map { bucket ->
                     bucket to megaApiGateway.getNodesFromMegaNodeList(bucket.nodes)
+                }.mapAsync {
+                    recentActionBucketMapper(
+                        identifier = generateIdentifier(it.first),
+                        megaRecentActionBucket = it.first,
+                        megaNodes = it.second
+                    )
                 }
-            }.mapAsync {
-                recentActionBucketMapper(
-                    megaRecentActionBucket = it.first,
-                    megaNodes = it.second
-                )
-            }
             return@withContext list
         }.onFailure {
             Timber.e(it)
         }
-        return@withContext emptyList<RecentActionBucketUnTyped>()
+        return@withContext emptyList()
     }
 
     override suspend fun getNodeInfo(nodeId: NodeId) = withContext(ioDispatcher) {
@@ -58,6 +58,23 @@ internal class DefaultRecentActionsRepository @Inject constructor(
                 isPendingShare = megaApiGateway.isPendingShare(it)
             )
         }
+    }
+
+    override suspend fun getRecentActionBucketByIdentifier(
+        bucketIdentifier: String,
+        excludeSensitives: Boolean,
+    ): RecentActionBucketUnTyped? = withContext(ioDispatcher) {
+        val matchingBucket = getMegaRecentAction(excludeSensitives = excludeSensitives)
+            .firstOrNull { bucket ->
+                generateIdentifier(bucket) == bucketIdentifier
+            } ?: return@withContext null
+        val megaNodes = megaApiGateway.getNodesFromMegaNodeList(matchingBucket.nodes)
+
+        recentActionBucketMapper(
+            identifier = generateIdentifier(matchingBucket),
+            megaRecentActionBucket = matchingBucket,
+            megaNodes = megaNodes
+        )
     }
 
     private suspend fun getMegaRecentAction(
@@ -70,8 +87,17 @@ internal class DefaultRecentActionsRepository @Inject constructor(
                 }
                 megaApiGateway.getRecentActionsAsync(DAYS, MAX_NODES, excludeSensitives, listener)
             }
-            recentActionsMapper(result)
+            recentActionsMapper(result).map {
+                megaApiGateway.copyBucket(it)
+            }
         }
+
+    /**
+     * Generate identifier from bucket properties
+     * For example: m_true-u_false-t_1713248239-ue_ht@mega.co.nz-pni_100124500130291
+     */
+    private fun generateIdentifier(bucket: MegaRecentActionBucket): String =
+        "m_${bucket.isMedia}-u_${bucket.isUpdate}-t_${bucket.timestamp}-ue_${bucket.userEmail}-pni_${bucket.parentHandle}"
 
     companion object {
         /**

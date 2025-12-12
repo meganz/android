@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
 /**
  * RecentActionBucketUnTyped
  *
+ * @property identifier An unique identifier generated based on the data of the bucket, it can be used to identify a bucket from recent actions list
  * @property timestamp
  * @property userEmail
  * @property parentNodeId
@@ -14,6 +15,7 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
  * @property nodes
  */
 data class RecentActionBucketUnTyped(
+    val identifier: String,
     val timestamp: Long,
     val userEmail: String,
     val parentNodeId: NodeId,

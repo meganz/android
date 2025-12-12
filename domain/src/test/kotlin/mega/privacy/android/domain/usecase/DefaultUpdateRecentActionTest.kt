@@ -32,8 +32,11 @@ class DefaultUpdateRecentActionTest {
         timestamp: Long,
         parentNodeId: NodeId,
         userEmail: String,
-    ): RecentActionBucket =
-        RecentActionBucket(
+    ): RecentActionBucket {
+        val identifier =
+            "m_$isMedia-u_$isUpdate-t_$timestamp-ue_$userEmail-pni_${parentNodeId.longValue}"
+        return RecentActionBucket(
+            identifier = identifier,
             isMedia = isMedia,
             isUpdate = isUpdate,
             timestamp = timestamp,
@@ -41,6 +44,7 @@ class DefaultUpdateRecentActionTest {
             userEmail = userEmail,
             nodes = emptyList(),
         )
+    }
 
     @Test
     fun `test that is same bucket return true if two buckets have same properties`() = runTest {

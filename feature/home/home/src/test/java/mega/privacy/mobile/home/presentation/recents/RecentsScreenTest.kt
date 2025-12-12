@@ -364,6 +364,7 @@ class RecentsScreenTest {
         parentNodeId: NodeId = NodeId(1L),
     ): RecentsUiItem {
         val mockBucket = RecentActionBucket(
+            identifier = "$timestamp $isUpdate",
             timestamp = timestamp,
             userEmail = "test@example.com",
             parentNodeId = parentNodeId,
