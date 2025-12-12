@@ -104,6 +104,7 @@ internal fun TimelineTabRoute(
     onDismissEnableCameraUploadsBanner: () -> Unit,
     handleCameraUploadsPermissionsResult: () -> Unit,
     updateIsWarningBannerShown: (value: Boolean) -> Unit,
+    onTabsVisibilityChange: (shouldHide: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -128,7 +129,8 @@ internal fun TimelineTabRoute(
         onPhotoSelected = onPhotoSelected,
         onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
         handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
-        updateIsWarningBannerShown = updateIsWarningBannerShown
+        updateIsWarningBannerShown = updateIsWarningBannerShown,
+        onTabsVisibilityChange = onTabsVisibilityChange
     )
 }
 
@@ -153,6 +155,7 @@ internal fun TimelineTabScreen(
     onDismissEnableCameraUploadsBanner: () -> Unit,
     handleCameraUploadsPermissionsResult: () -> Unit,
     updateIsWarningBannerShown: (value: Boolean) -> Unit,
+    onTabsVisibilityChange: (shouldHide: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -280,6 +283,20 @@ internal fun TimelineTabScreen(
                     bannerType = cuBannerType,
                     mediaCameraUploadUiState = mediaCameraUploadUiState
                 )
+    }
+
+    LaunchedEffect(
+        isGridScrollingDown,
+        isGridScrolledToEnd,
+        isGridScrolledToTop,
+        isListScrollingDown,
+        isListScrolledToEnd,
+        isListScrolledToTop
+    ) {
+        val shouldShowTabs = if (selectedTimePeriod == PhotoModificationTimePeriod.All) {
+            isGridScrolledToTop || (!isGridScrollingDown && !isGridScrolledToEnd)
+        } else isListScrolledToTop || (!isListScrollingDown && !isListScrolledToEnd)
+        onTabsVisibilityChange(!shouldShowTabs)
     }
 
     if (showTimelineSortDialog) {
@@ -739,7 +756,8 @@ private fun TimelineTabScreenPreview() {
             onPhotoSelected = {},
             onDismissEnableCameraUploadsBanner = {},
             handleCameraUploadsPermissionsResult = {},
-            updateIsWarningBannerShown = {}
+            updateIsWarningBannerShown = {},
+            onTabsVisibilityChange = {}
         )
     }
 }

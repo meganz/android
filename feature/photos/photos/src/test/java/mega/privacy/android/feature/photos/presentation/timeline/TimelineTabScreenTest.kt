@@ -70,6 +70,7 @@ class TimelineTabScreenTest {
         onDismissEnableCameraUploadsBanner: () -> Unit = {},
         handleCameraUploadsPermissionsResult: () -> Unit = {},
         updateIsWarningBannerShown: (value: Boolean) -> Unit = {},
+        onTabsVisibilityChange: (shouldHide: Boolean) -> Unit = {},
     ) {
         setContent {
             TimelineTabScreen(
@@ -91,7 +92,8 @@ class TimelineTabScreenTest {
                 onPhotoSelected = onPhotoSelected,
                 onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
                 handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
-                updateIsWarningBannerShown = updateIsWarningBannerShown
+                updateIsWarningBannerShown = updateIsWarningBannerShown,
+                onTabsVisibilityChange = onTabsVisibilityChange
             )
         }
     }

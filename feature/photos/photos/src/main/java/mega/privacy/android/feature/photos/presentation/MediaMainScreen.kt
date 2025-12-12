@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +24,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,6 +37,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.tabs.MegaScrollableTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
@@ -43,6 +46,7 @@ import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
@@ -67,11 +71,11 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.feature.photos.model.CameraUploadsStatus
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLegacyPhotosSource
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.MediaAppBarAction
-import mega.privacy.android.feature.photos.model.MediaAppBarAction.CameraUpload.CameraUploadStatus
 import mega.privacy.android.feature.photos.model.MediaScreen
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.TimelineGridSize
@@ -83,6 +87,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSort
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSortOptions.Companion.toLegacySort
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabViewModel
+import mega.privacy.android.feature.photos.presentation.timeline.component.CameraUploadStatusToolbarAction
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineFilterView
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineTabActionBottomSheet
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
@@ -91,13 +96,14 @@ import mega.privacy.android.feature.photos.presentation.videos.VideosTabRoute
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabUiState
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabViewModel
 import mega.privacy.android.feature.photos.presentation.videos.view.VideosTabToolbar
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
-import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotosSearchNavKey
+import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.navigation.destination.MediaTimelinePhotoPreviewNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
@@ -252,6 +258,7 @@ fun MediaMainRoute(
         onTransfer = onTransfer,
         navigationHandler = navigationHandler,
         handleCameraUploadsPermissionsResult = mediaCameraUploadViewModel::handleCameraUploadsPermissionsResult,
+        setCameraUploadsMessage = mediaCameraUploadViewModel::setCameraUploadsMessage,
         updateIsWarningBannerShown = mediaCameraUploadViewModel::updateIsWarningBannerShown
     )
 }
@@ -287,6 +294,7 @@ fun MediaMainScreen(
     onNavigateCameraUploadsSettings: () -> Unit,
     onDismissEnableCameraUploadsBanner: () -> Unit,
     handleCameraUploadsPermissionsResult: () -> Unit,
+    setCameraUploadsMessage: (message: String) -> Unit,
     updateIsWarningBannerShown: (value: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MediaMainViewModel = hiltViewModel(),
@@ -316,6 +324,15 @@ fun MediaMainScreen(
     var areAllVideosSelected by rememberSaveable { mutableStateOf(false) }
     var isVideosSelectionMode by rememberSaveable { mutableStateOf(false) }
     var selectedVideoNodes by remember { mutableStateOf(emptyList<TypedNode>()) }
+    var shouldHideTabs by remember { mutableStateOf(false) }
+
+    val isCuWarningStatusVisible = mediaCameraUploadUiState.showCameraUploadsWarning
+    val isCuDefaultStatusVisible =
+        mediaCameraUploadUiState.enableCameraUploadButtonShowing && !isCuWarningStatusVisible
+    val isCuPausedStatusVisible =
+        mediaCameraUploadUiState.showCameraUploadsPaused && !isCuDefaultStatusVisible
+    val isCuCompleteStatusVisible =
+        mediaCameraUploadUiState.showCameraUploadsComplete && !isCuDefaultStatusVisible
 
     // Handling back handler for timeline filter
     BackHandler(enabled = showTimelineFilter) {
@@ -412,14 +429,63 @@ fun MediaMainScreen(
                 else -> MegaTopAppBar(
                     navigationType = AppBarNavigationType.None,
                     title = stringResource(sharedResR.string.media_feature_title),
-                    actions = buildList {
-                        add(
-                            MenuActionWithClick(
-                                menuAction = MediaAppBarAction.CameraUpload(CameraUploadStatus.Default),
-                                onClick = onNavigateCameraUploadsSettings
-                            )
-                        )
+                    subtitle = when {
+                        isCuPausedStatusVisible -> {
+                            stringResource(id = sharedResR.string.camera_uploads_notification_title_paused_warning)
+                        }
 
+                        isCuCompleteStatusVisible -> {
+                            stringResource(id = sharedResR.string.media_main_screen_camera_uploads_up_to_date_toolbar_subtitle)
+                        }
+
+                        mediaCameraUploadUiState.cameraUploadsStatus == CameraUploadsStatus.Sync -> {
+                            stringResource(id = sharedResR.string.camera_uploads_banner_checking_uploads_text)
+                        }
+
+                        mediaCameraUploadUiState.cameraUploadsStatus == CameraUploadsStatus.Uploading -> {
+                            if (mediaCameraUploadUiState.cameraUploadsProgress == 1F) {
+                                stringResource(id = sharedResR.string.camera_uploads_banner_complete_title)
+                            } else {
+                                pluralStringResource(
+                                    id = sharedResR.plurals.camera_uploads_tranfer_top_bar_subtitle,
+                                    count = mediaCameraUploadUiState.pending,
+                                    mediaCameraUploadUiState.pending,
+                                )
+                            }
+                        }
+
+                        else -> null
+                    },
+                    trailingIcons = {
+                        if (currentTabIndex == MediaScreen.Timeline.ordinal) {
+                            val isFilterApplied =
+                                timelineFilterUiState.mediaType != FilterMediaType.ALL_MEDIA || timelineFilterUiState.mediaSource != FilterMediaSource.AllPhotos
+                            if (isFilterApplied) {
+                                MegaIcon(
+                                    modifier = Modifier
+                                        .clickable { showTimelineFilter = true }
+                                        .padding(end = 24.dp),
+                                    imageVector = IconPack.Medium.Thin.Outline.Filter,
+                                    tint = IconColor.Primary
+                                )
+                            }
+
+                            CameraUploadStatusToolbarAction(
+                                modifier = Modifier.padding(end = 14.dp),
+                                isCuWarningStatusVisible = isCuWarningStatusVisible,
+                                isCuDefaultStatusVisible = isCuDefaultStatusVisible,
+                                isCuPausedStatusVisible = isCuPausedStatusVisible,
+                                isCuCompleteStatusVisible = isCuCompleteStatusVisible,
+                                isCUPausedWarningBannerEnabled = mediaCameraUploadUiState.isCUPausedWarningBannerEnabled,
+                                cameraUploadsStatus = mediaCameraUploadUiState.cameraUploadsStatus,
+                                cameraUploadsProgress = mediaCameraUploadUiState.cameraUploadsProgress,
+                                setCameraUploadsMessage = setCameraUploadsMessage,
+                                updateIsWarningBannerShown = updateIsWarningBannerShown,
+                                onNavigateCameraUploadsSettings = onNavigateCameraUploadsSettings
+                            )
+                        }
+                    },
+                    actions = buildList {
                         add(
                             MenuActionWithClick(menuAction = MediaAppBarAction.Search) {
                                 if (currentTabIndex == MediaScreen.Videos.ordinal) {
@@ -432,16 +498,6 @@ fun MediaMainScreen(
 
                         // Menu actions for timeline tab
                         if (currentTabIndex == MediaScreen.Timeline.ordinal) {
-                            val isFilterApplied =
-                                timelineFilterUiState.mediaType != FilterMediaType.ALL_MEDIA || timelineFilterUiState.mediaSource != FilterMediaSource.AllPhotos
-                            if (isFilterApplied) {
-                                add(
-                                    MenuActionWithClick(menuAction = MediaAppBarAction.Filter) {
-                                        showTimelineFilter = true
-                                    }
-                                )
-                            }
-
                             add(
                                 MenuActionWithClick(menuAction = MediaAppBarAction.FilterSecondary) {
                                     showTimelineFilter = true
@@ -528,7 +584,7 @@ fun MediaMainScreen(
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding()),
             beyondViewportPageCount = 1,
-            hideTabs = isTimelineInSelectionMode || isVideosSelectionMode,
+            hideTabs = isTimelineInSelectionMode || isVideosSelectionMode || shouldHideTabs,
             pagerScrollEnabled = true,
             initialSelectedIndex = currentTabIndex,
             onTabSelected = { index ->
@@ -591,7 +647,8 @@ fun MediaMainScreen(
                                     onTransfer = onTransfer,
                                     navigationHandler = navigationHandler,
                                     handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
-                                    updateIsWarningBannerShown = updateIsWarningBannerShown
+                                    updateIsWarningBannerShown = updateIsWarningBannerShown,
+                                    onTabsVisibilityChange = { shouldHideTabs = it }
                                 )
                             }
                         )
@@ -716,6 +773,7 @@ private fun MediaScreen.MediaContent(
     onTransfer: (TransferTriggerEvent) -> Unit,
     handleCameraUploadsPermissionsResult: () -> Unit,
     updateIsWarningBannerShown: (value: Boolean) -> Unit,
+    onTabsVisibilityChange: (shouldHide: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     timelineContentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -744,7 +802,8 @@ private fun MediaScreen.MediaContent(
                 onPhotoSelected = onTimelinePhotoSelected,
                 onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
                 handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
-                updateIsWarningBannerShown = updateIsWarningBannerShown
+                updateIsWarningBannerShown = updateIsWarningBannerShown,
+                onTabsVisibilityChange = onTabsVisibilityChange
             )
         }
 
@@ -881,6 +940,7 @@ fun PhotosMainScreenPreview() {
                 override fun <T> monitorResult(key: String): Flow<T?> = flowOf(null)
             },
             handleCameraUploadsPermissionsResult = {},
+            setCameraUploadsMessage = {},
             updateIsWarningBannerShown = {}
         )
     }
