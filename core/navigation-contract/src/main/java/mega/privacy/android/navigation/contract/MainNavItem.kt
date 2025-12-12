@@ -17,20 +17,6 @@ interface MainNavItem {
     val preferredSlot: PreferredSlot
     val availableOffline: Boolean
     val analyticsEventIdentifier: NavigationEventIdentifier
-
-    companion object {
-        /**
-         * Comparator that sorts [MainNavItem] by their [preferredSlot].
-         * Items with [PreferredSlot.Ordered] are sorted by slot number (ascending),
-         * and items with [PreferredSlot.Last] are placed at the end.
-         */
-        val preferredSlotComparator: Comparator<MainNavItem> = compareBy { navItem ->
-            when (val slot = navItem.preferredSlot) {
-                is PreferredSlot.Ordered -> slot.slot
-                is PreferredSlot.Last -> Int.MAX_VALUE
-            }
-        }
-    }
 }
 
 sealed interface MainNavItemBadge {
@@ -66,5 +52,12 @@ data class DefaultIconBadge(
 }
 
 fun Iterable<MainNavItem>.sortedByPreferredSlot(): List<MainNavItem> {
-    return sortedWith(MainNavItem.preferredSlotComparator)
+    return sortedWith(
+        compareBy { navItem ->
+            when (val slot = navItem.preferredSlot) {
+                is PreferredSlot.Ordered -> slot.slot
+                is PreferredSlot.Last -> Int.MAX_VALUE
+            }
+        }
+    )
 }

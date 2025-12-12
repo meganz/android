@@ -4,7 +4,6 @@ import androidx.navigation3.runtime.NavKey
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -114,7 +113,7 @@ class StartScreenViewModelTest {
             val mainNavItems = setOf(
                 firstMainNavItem,
                 mock<MainNavItem> { on { preferredSlot } doReturn PreferredSlot.Ordered(2) },
-                mock<MainNavItem> { on { preferredSlot } doReturn PreferredSlot.Last },
+                mock<MainNavItem> { on { preferredSlot } doReturn PreferredSlot.Ordered(3) },
             )
             initViewModel(mainNavItems)
 
@@ -178,33 +177,34 @@ class StartScreenViewModelTest {
                 }
             }
 
-            // Stub mapper before initializing ViewModel to avoid flow timeout
-            if (singleActivityFlagEnabled) {
-                val option = mock<StartScreenOption<NavKey>>()
-                startScreenDestinationOptionMapper.stub {
-                    on { invoke(any()) } doReturn option
-                }
-
-                val preferenceFlow = MutableStateFlow<StartScreenDestinationPreference?>(null)
-                monitorStartScreenPreferenceDestinationUseCase.stub {
-                    on { invoke() } doReturn preferenceFlow
-                }
-            } else {
-                val preferenceFlow = MutableStateFlow<StartScreen>(StartScreen.Home)
-                monitorStartScreenPreference.stub {
-                    on { invoke() } doReturn preferenceFlow
-                }
+            monitorStartScreenPreferenceDestinationUseCase.stub {
+                on { invoke() } doReturn
+                        flow {
+                            emit(null)
+                            awaitCancellation()
+                        }
             }
 
             initViewModel(mainNavItems)
 
             if (singleActivityFlagEnabled) {
+                val option = mock<StartScreenOption<NavKey>>()
+                startScreenDestinationOptionMapper.stub {
+                    on { invoke(any()) } doReturn option
+                }
                 underTest.state
                     .filterIsInstance<StartScreenSettingsState.Data>()
                     .test {
                         assertThat(awaitItem().options).hasSize(expectedCount)
                     }
             } else {
+                monitorStartScreenPreference.stub {
+                    on { invoke() } doReturn
+                            flow {
+                                emit(StartScreen.Home)
+                                awaitCancellation()
+                            }
+                }
                 underTest.state
                     .filterIsInstance<StartScreenSettingsState.LegacyData>()
                     .test {
@@ -280,7 +280,7 @@ class StartScreenViewModelTest {
     }
 
     @Test
-    fun `test that nav items are sorted by preferred slot when single activity flag is enabled`() =
+    fun `test that nav items are sorted by preferred slot and Last items are filtered out when single activity flag is enabled`() =
         runTest {
             getFeatureFlagValueUseCase.stub {
                 onBlocking { invoke(AppFeatures.SingleActivity) } doReturn true
@@ -325,9 +325,6 @@ class StartScreenViewModelTest {
             val navKeySlot5 = mock<MainNavItemNavKey> {
                 on { toString() } doReturn "slot5"
             }
-            val navKeyLast = mock<MainNavItemNavKey> {
-                on { toString() } doReturn "last"
-            }
 
             val optionSlot1 = mock<StartScreenOption<NavKey>> {
                 on { startScreen } doReturn navKeySlot1
@@ -341,15 +338,11 @@ class StartScreenViewModelTest {
             val optionSlot5 = mock<StartScreenOption<NavKey>> {
                 on { startScreen } doReturn navKeySlot5
             }
-            val optionLast = mock<StartScreenOption<NavKey>> {
-                on { startScreen } doReturn navKeyLast
-            }
 
             whenever(startScreenDestinationOptionMapper(navItemSlot1)).thenReturn(optionSlot1)
             whenever(startScreenDestinationOptionMapper(navItemSlot2)).thenReturn(optionSlot2)
             whenever(startScreenDestinationOptionMapper(navItemSlot3)).thenReturn(optionSlot3)
             whenever(startScreenDestinationOptionMapper(navItemSlot5)).thenReturn(optionSlot5)
-            whenever(startScreenDestinationOptionMapper(navItemLast)).thenReturn(optionLast)
 
             monitorStartScreenPreferenceDestinationUseCase.stub {
                 on { invoke() } doReturn flow {
@@ -366,13 +359,12 @@ class StartScreenViewModelTest {
                     val state = awaitItem()
                     val options = state.options
 
-                    // Verify order: slot1, slot2, slot3, slot5, last
-                    assertThat(options).hasSize(5)
+                    // Verify order: slot1, slot2, slot3, slot5 (Last item should be filtered out)
+                    assertThat(options).hasSize(4)
                     assertThat(options[0].startScreen.toString()).isEqualTo("slot1")
                     assertThat(options[1].startScreen.toString()).isEqualTo("slot2")
                     assertThat(options[2].startScreen.toString()).isEqualTo("slot3")
                     assertThat(options[3].startScreen.toString()).isEqualTo("slot5")
-                    assertThat(options[4].startScreen.toString()).isEqualTo("last")
                 }
         }
 
