@@ -123,8 +123,8 @@ internal class MegaNavigatorImpl @Inject constructor(
 
     private fun navigateForSingleActivity(
         context: Context,
-        singleActivityDestination: NavKey,
-        legacyNavigation: () -> Unit,
+        singleActivityDestination: NavKey?,
+        legacyNavigation: suspend () -> Unit,
     ) {
         applicationScope.launch {
             runCatching { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) }
@@ -133,7 +133,7 @@ internal class MegaNavigatorImpl @Inject constructor(
                 }.onSuccess { singleActivity ->
                     if (singleActivity) {
                         launchMegaActivityIfNeeded(context)
-                        navigationQueue.emit(singleActivityDestination)
+                        singleActivityDestination?.let { navigationQueue.emit(it) }
                     } else {
                         legacyNavigation()
                     }
@@ -844,30 +844,32 @@ internal class MegaNavigatorImpl @Inject constructor(
         action: String?,
         bundle: Bundle?,
         flags: Int?,
-        singleActivityDestination: NavKey,
+        singleActivityDestination: NavKey?,
+        onIntentCreated: suspend (Intent) -> Intent,
     ) {
         navigateForSingleActivity(
             context = context,
-            singleActivityDestination = singleActivityDestination
+            singleActivityDestination = singleActivityDestination,
         ) {
-            navigateToManagerActivity(context, action, data, bundle, flags)
+            navigateToManagerActivity(context, action, data, bundle, flags, onIntentCreated)
         }
     }
 
     @SuppressLint("ManagerActivityIntent")
-    private fun navigateToManagerActivity(
+    private suspend fun navigateToManagerActivity(
         context: Context,
         action: String?,
         data: Uri?,
         bundle: Bundle?,
         flags: Int? = null,
+        onIntentCreated: suspend (Intent) -> Intent = { it },
     ) {
         val intent = Intent(context, ManagerActivity::class.java)
         intent.action = action
         intent.data = data
         flags?.let { intent.flags = it }
         bundle?.let { intent.putExtras(it) }
-        context.startActivity(intent)
+        context.startActivity(onIntentCreated(intent))
     }
 
     override fun openMediaDiscoveryActivity(

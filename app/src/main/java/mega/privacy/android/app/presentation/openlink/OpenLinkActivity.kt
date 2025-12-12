@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.openlink
 
+import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -112,6 +113,7 @@ import javax.inject.Inject
  * Open link activity
  */
 @AndroidEntryPoint
+@SuppressLint("ManagerActivityIntent") // This is a legacy class that already handles single activity navigation
 class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoadedCallback {
 
     /**

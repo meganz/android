@@ -563,10 +563,15 @@ interface AppNavigator {
     )
 
     /**
-     * Open Manager Activity
+     * Open Manager Activity if Single activity feature flag is false, otherwise it opens the single activity destination in MegaActivity.
      *
      * @param context The context
+     * @param data
+     * @param action
      * @param bundle Optional bundle containing extras to be added to the intent
+     * @param flags
+     * @param singleActivityDestination the destination of Single activity. It can be null, in this case MegaActivity will be opened without any specific destination
+     * @param onIntentCreated callback that allows further configuration of the created intent before starting the ManagerActivity
      */
     fun openManagerActivity(
         context: Context,
@@ -574,7 +579,8 @@ interface AppNavigator {
         action: String? = null,
         bundle: Bundle? = null,
         flags: Int? = null,
-        singleActivityDestination: NavKey,
+        singleActivityDestination: NavKey?,
+        onIntentCreated: suspend (Intent) -> Intent = { it },
     )
 
     /**
