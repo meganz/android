@@ -1019,12 +1019,13 @@
     <!-- Button to set a value -->
     <string name="hint_minutes">minutos</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string-array name="settings_status_entries">
-        <item>Conectado</item>
-        <item>Ausente</item>
-        <item>Ocupado</item>
-        <item>Sin conexión</item>
-    </string-array>
+    <string name="settings_chat_status_online">Conectado</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_away">Ausente</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_busy">Ocupado</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_offline">Sin conexión</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">Activar</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1413,8 +1414,6 @@
     <string name="tab_received_requests">Solicitudes recibidas</string>
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">Cuota de almacenamiento agotada</string>
-    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">Invalid link. Please try again or request a new one.</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">Contraseña del enlace inválida</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
@@ -1502,12 +1501,13 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Calidad de vídeo</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
-    <string-array name="settings_chat_upload_quality_entries">
-        <item>Baja</item>
-        <item>Media</item>
-        <item>Alta</item>
-        <item>Original</item>
-    </string-array>
+    <string name="settings_chat_upload_quality_low">Baja</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_medium">Media</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_high">Alta</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_original">Original</string>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Llamada perdida</string>
     <!-- Refers to a location of file -->
@@ -3019,9 +3019,9 @@
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Solo lectura</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_share_permission_text">Esta carpeta se puede compartir exclusivamente en “solo lectura”. Al tratarse de una carpeta de backup, cualquier cambio en su contenido podría desactivar el backup.</string>
+    <string name="backup_share_permission_text">Esta carpeta se puede compartir exclusivamente en \“solo lectura\“. Al tratarse de una carpeta de backup, cualquier cambio en su contenido podría desactivar el backup.</string>
     <!-- Share multi backup folders, show below warning message -->
-    <string name="backup_multi_share_permission_text">Estas carpetas se puede compartir exclusivamente en “solo lectura”. Al tratarse de carpetas de backup, cualquier cambio en su contenido podría desactivar el backup.</string>
+    <string name="backup_multi_share_permission_text">Estas carpetas se puede compartir exclusivamente en \“solo lectura\“. Al tratarse de carpetas de backup, cualquier cambio en su contenido podría desactivar el backup.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
     <string name="backup_share_with_root_permission_text">Algunas carpetas compartidas son carpetas de respaldo y de solo lectura. ¿Quieres continuar?</string>
     <!-- Title of the button when you want to answer a one to one call -->
@@ -4096,13 +4096,19 @@
         <item quantity="many">No se han podido copiar %1$d de elementos</item>
         <item quantity="other">No se han podido copiar %1$d elementos</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">Se ha copiado %1$d elemento,&#160;</item>
         <item quantity="many">Se ha copiado %1$d de elementos,&#160;</item>
         <item quantity="other">Se han copiado %1$d elementos,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">no se ha podido copiar %1$d elemento</item>
         <item quantity="many">no se han podido copiar %1$d de elementos</item>

@@ -1004,12 +1004,13 @@
     <!-- Button to set a value -->
     <string name="hint_minutes">dakika</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string-array name="settings_status_entries">
-        <item>Çevrim içi</item>
-        <item>Uzakta</item>
-        <item>Meşgul</item>
-        <item>Çevrim dışı</item>
-    </string-array>
+    <string name="settings_chat_status_online">Çevrim içi</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_away">Uzakta</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_busy">Meşgul</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_offline">Çevrim dışı</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">Etkinleştir</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1474,12 +1475,13 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Video kalitesi</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
-    <string-array name="settings_chat_upload_quality_entries">
-        <item>Düşük</item>
-        <item>Orta</item>
-        <item>Yüksek</item>
-        <item>Orijinal</item>
-    </string-array>
+    <string name="settings_chat_upload_quality_low">Düşük</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_medium">Orta</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_high">Yüksek</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_original">Orijinal</string>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Cevapsız arama</string>
     <!-- Refers to a location of file -->
@@ -3932,12 +3934,18 @@
         <item quantity="one">%1$d öğe kopyalanamadı</item>
         <item quantity="other">%1$d öğe kopyalanamadı</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">%1$d öğe kopyalandı,&#160;</item>
         <item quantity="other">%1$d öğe kopyalandı,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">%1$d öğe kopyalanamadı</item>
         <item quantity="other">%1$d öğe kopyalanamadı</item>

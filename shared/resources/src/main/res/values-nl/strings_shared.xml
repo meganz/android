@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">Onvoldoende opslagruimte op uw apparaat</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">Er is een onbekende fout opgetreden. Neem contact op support@mega.io.</string>
+    <string name="general_sync_message_unknown_error">Er is een onbekende fout opgetreden. Neem contact op support&#64;mega.io.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">De map kan niet worden gesynchroniseerd of er kan geen back-up van worden gemaakt omdat de MEGA-map zich in de Prullenbak bevindt</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -665,8 +665,8 @@
     <string name="album_add_to_media">Toevoegen aan</string>
     <!-- Add to album success message -->
     <plurals name="album_add_to_message">
-        <item quantity="one">Toegevoegd aan  “%1$s”</item>
-        <item quantity="other">%2$d items toegevoegd naar  “%1$s”</item>
+        <item quantity="one">Toegevoegd aan “%1$s”</item>
+        <item quantity="other">%2$d items toegevoegd naar “%1$s”</item>
     </plurals>
     <!-- Name for a general button which action is "Open" something -->
     <string name="general_open_button">Openen</string>
@@ -709,10 +709,6 @@
     <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%s[/A] [B]de tijd van de vergadering bijgewerkt naar[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
     <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] [B]annuleerde de vergadering die was gepland voor[/B]</string>
-    <!-- Title of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_title">Want MEGA without the ads?</string>
-    <!-- Description of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_description">Upgrade to a Pro plan with plenty of storage and more. Our Pro plans start at just %1$s a month.</string>
     <!-- The Generous storage label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_generous_storage_label">Gulle opslag</string>
     <!-- The Generous storage description in the ads free introduction screen -->
@@ -859,7 +855,7 @@
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">%1$sopslaan naar Cloud drive...</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
-    <string name="device_center_list_view_item_status_uploading">Uploaden\u2026</string>
+    <string name="device_center_list_view_item_status_uploading">Uploaden&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
     <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% uploaden...</string>
     <!-- The name of the Device or Folder Status which signifies that it is inactive -->
@@ -1180,7 +1176,7 @@
     <!-- text of how it works for mega pass free trial in achivements section -->
     <string name="text_how_it_works_mega_pass_free_trial">Installeer de MEGA&#160;Pass-applicatie, log in met uw MEGA-account en uw gratis proefperiode starten. Uw bonusopslag wordt automatisch toegevoegd na het starten van uw gratis proefperiode.</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">U heeft %1$s extra opslagruimte ontvangen voor het starten van een MEGA&#160; VPN  gratis proefversie</string>
+    <string name="text_received_mega_vpn_free_trial">U heeft %1$s extra opslagruimte ontvangen voor het starten van een MEGA&#160; VPN gratis proefversie</string>
     <!-- text of received mega pass free trial in achivements section -->
     <string name="text_received_mega_pass_free_trial">U heeft %1$s extra opslagruimte ontvangen voor het starten van een MEGA&#160;Pass gratis proefversie</string>
     <!-- Sync change root path title-->
@@ -1467,11 +1463,6 @@
         <item quantity="one">Link verwijderd</item>
         <item quantity="other">Links verwijderd</item>
     </plurals>
-    <!-- Warning that appears prior to remove links of files. Plural. -->
-    <plurals name="remove_links_warning_text">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
     <string name="context_share_correctly_removed">Toegang verwijderd</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1487,11 +1478,6 @@
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="one">Deze map wordt gedeeld met %1$d neem contact op. Stoppen met delen?</item>
         <item quantity="other">Deze map wordt gedeeld met %1$d contacten. Stoppen met delen?</item>
-    </plurals>
-    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <plurals name="alert_remove_several_shares">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
     </plurals>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
     <string name="figures_storage_referrals_achievements_text">%1$s extra opslag voor elke uitnodiging, geldig voor %2$d dagen</string>
@@ -1570,11 +1556,6 @@
     <string name="transfers_retry_failed_snackbar_message">Kan overdrachten niet opnieuw starten</string>
     <!-- Action for the Snackbar when retry failed on failed transfers tab. -->
     <string name="transfers_retry_failed_snackbar_action">Opnieuw proberen</string>
-    <!-- Snackbar message when retry success on failed transfers tab. -->
-    <plurals name="transfers_retry_feedback_snackbar_message">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">Hersteld naar %s</string>
     <!-- success message when moving a node -->
@@ -1745,8 +1726,6 @@
     <string name="camera_update_network_requirement_not_met_banner_description">Camera-uploads zijn gepauzeerd, verbinding maken met wifi of mobiele gegevens toestaan</string>
     <!-- The button text of camera uploads network requirement not met paused warning banner -->
     <string name="camera_update_network_requirement_not_met_banner_button_text">Mobiele gegevens toestaan</string>
-    <!-- Billing info with discount label -->
-    <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s for %3$s</string>
     <!-- campaign name for Black Friday deal -->
     <string name="campaign_name_black_friday">Black Friday-deal: %1$d%% korting</string>
     <!-- campaign name for Cyber Monday deal -->
@@ -1817,11 +1796,6 @@
     <string name="delete_album_confirmation_positive_button_text">Verwijderen</string>
     <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
     <string name="delete_singular_album_confirmation_message">“%s” verwijderd</string>
-    <!-- Delete albums confirmation title. -->
-    <plurals name="delete_album_confirmation_dialog_title">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="delete_album_confirmation_dialog_description">
         <item quantity="one">Album wordt verwijderd maar de inhoud blijft in uw Tijdlijn.</item>
@@ -1829,11 +1803,6 @@
     </plurals>
     <!-- External checkout button text -->
     <string name="external_checkout_button_text">Koop op onze website (Bespaar tot %1$.0f%%)</string>
-    <!-- Title for the album remove link(s) confirmation dialog -->
-    <plurals name="album_content_remove_links_dialog_title">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_description">
         <item quantity="one">Mensen met wie u deze link hebt gedeeld, raken de toegang tot het album kwijt.</item>
@@ -1931,20 +1900,4 @@
     <string name="can_only_join_one_call_error_message">Om aan dit gesprek deel te nemen, moet u uw huidige gesprek beëindigen</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">Zoeken&#8230;</string>
-    <!-- Title for the album remove link confirmation dialog for singular link -->
-    <string name="album_content_remove_link_dialog_title">Link verwijderen?</string>
-    <!-- Title for the album remove link confirmation dialog for multiple link -->
-    <string name="album_content_remove_multiple_links_dialog_title">Links verwijderen?</string>
-    <!-- Explanation text for the album remove link confirmation dialog -->
-    <string name="album_content_remove_link_dialog_description">People you shared this link with will lose access to the album</string>
-    <!-- Explanation text for the album remove multiple links confirmation dialog -->
-    <string name="album_content_remove_multiple_links_dialog_description">People you shared these links with will lose access to the albums</string>
-    <!-- Delete album confirmation title. -->
-    <string name="delete_album_singular_confirmation_dialog_title">Album verwijderen?</string>
-    <!-- Delete albums confirmation title. -->
-    <string name="delete_albums_multiple_confirmation_dialog_title">Albums verwijderen?</string>
-    <!-- Delete album confirmation description. -->
-    <string name="delete_album_singular_confirmation_dialog_description">The contents of the album will not be deleted</string>
-    <!-- Delete albums confirmation description. -->
-    <string name="delete_albums_multiple_confirmation_dialog_description">The contents of the albums will not be deleted</string>
 </resources>

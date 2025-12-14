@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">L’espace de stockage est insuffisant sur votre appareil</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">Un erreur inconnue est survenue. Contactez support@mega.io.</string>
+    <string name="general_sync_message_unknown_error">Un erreur inconnue est survenue. Contactez support&#64;mega.io.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">Le dossier ne peut ni être synchronisé ni sauvegardé, car le dossier MEGA est dans la Corbeille</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -143,7 +143,7 @@
     <!-- Error message when the playlist name already exists -->
     <string name="video_section_playlists_error_message_playlist_name_exists">Une liste de lecture du même nom existe déjà. Saisissez un nom différent.</string>
     <!-- Delete playlist dialog title of the video section playlists tab -->
-    <string name="video_section_playlists_delete_playlist_dialog_title">Supprimer la liste de lecture ?</string>
+    <string name="video_section_playlists_delete_playlist_dialog_title">Supprimer la liste de lecture ?</string>
     <!-- Delete button title of the video section playlists tab delete playlist dialog -->
     <string name="video_section_playlists_delete_playlist_dialog_delete_button">Supprimer</string>
     <!-- Text that indicates that there’s no playlist to show. -->
@@ -151,7 +151,7 @@
     <!-- Delete option title of the video section playlist bottom sheet -->
     <string name="video_section_playlist_bottom_sheet_option_title_delete">Supprimer la liste de lecture</string>
     <!-- Remove videos dialog title of the video section playlist detail -->
-    <string name="video_section_playlist_detail_remove_videos_dialog_title">Supprimer de la liste de lecture ?</string>
+    <string name="video_section_playlist_detail_remove_videos_dialog_title">Supprimer de la liste de lecture ?</string>
     <!-- Remove button title of the video section playlist detail remove videos dialog -->
     <string name="video_section_playlist_detail_remove_videos_dialog_remove_button">Supprimer</string>
     <!-- Play all button title of the video section playlist detail -->
@@ -227,7 +227,7 @@
         <item quantity="other">Partager des liens</item>
     </plurals>
     <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads. Please do not modify the %s placeholder as it will be replaced by the name of the folder where the files will be downloaded-->
-    <string name="transfers_dialog_save_download_location_title">Enregistrer tous vos fichiers téléchargés dans&#160;«%1$s»&#160;?</string>
+    <string name="transfers_dialog_save_download_location_title">Enregistrer tous vos fichiers téléchargés dans «%1$s» ?</string>
     <!-- Option to use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_always_here_option">Toujours télécharger ici</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
@@ -375,7 +375,7 @@
     <!-- Title shown when cancelling the current plan in the instructions screen, informing the user about the account is not managed by google -->
     <string name="account_cancellation_instructions_not_managed_by_google">Votre abonnement n’est pas géré par Google.</string>
     <!-- Message shown when cancelling the current plan in the instructions screen, informing the user about how to cancel subscription -->
-    <string name="account_cancellation_instructions_message_apple_description">En effet, vous vous êtes abonné à MEGA auprès d’Apple. Pour annuler votre abonnement, vous devez&#160;:</string>
+    <string name="account_cancellation_instructions_message_apple_description">En effet, vous vous êtes abonné à MEGA auprès d’Apple. Pour annuler votre abonnement, vous devez :</string>
     <!-- Label for the subscription managed by App Store on Cancellation instructions screen-->
     <string name="account_cancellation_instructions_ios_device">Sur un appareil iOS</string>
     <!-- Step 1: instruction step no.1 to Open the settings App to cancel the subscription from iOS device-->
@@ -395,9 +395,9 @@
     <!-- Title shown when needing to reactivate the subscription using a web browser -->
     <string name="account_cancellation_instructions_reactivation_web_browser_needed">Vous devez réactiver votre abonnement en utilisant un navigateur Web</string>
     <!-- Message shown when reactivating the current plan in the instructions screen, informing the user about how to reactivate the subscription -->
-    <string name="account_cancellation_instructions_reactivation_web_browser_description">En effet, vous vous êtes abonné à MEGA dans votre navigateur Web. Pour réactiver votre abonnement, vous devez&#160;:</string>
+    <string name="account_cancellation_instructions_reactivation_web_browser_description">En effet, vous vous êtes abonné à MEGA dans votre navigateur Web. Pour réactiver votre abonnement, vous devez :</string>
     <!-- Description explaining why the subscription needs to be canceled using a web browser -->
-    <string name="account_cancellation_instructions_web_browser_description">En effet, vous vous êtes abonné à MEGA dans votre navigateur Web. Pour annuler votre abonnement, vous devez&#160;:</string>
+    <string name="account_cancellation_instructions_web_browser_description">En effet, vous vous êtes abonné à MEGA dans votre navigateur Web. Pour annuler votre abonnement, vous devez :</string>
     <!-- Label for cancellation instructions on a computer -->
     <string name="account_cancellation_instructions_on_computer">Sur un ordinateur</string>
     <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
@@ -446,20 +446,20 @@
     <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">Ne fermez pas l’appli. Si vous la fermez, les transferts qui ne sont pas encore dans la file d’attente seront perdus.</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
     <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
-        <item quantity="one">%1$d&#160;dossier</item>
+        <item quantity="one">%1$d dossier</item>
         <item quantity="many">%1$d de dossiers</item>
-        <item quantity="other">%1$d&#160;dossiers</item>
+        <item quantity="other">%1$d dossiers</item>
     </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is creating the folders. This message will inform how many folders are already created together with the total amount of folders that will be created. Example: "1/134 folder" or "48/134 folders" -->
     <plurals name="transfers_scanning_folders_dialog_creating_folders_subtitle">
-        <item quantity="one">%1$d/%2$d&#160;dossier</item>
-        <item quantity="many">%1$d/%2$d&#160;dossiers</item>
-        <item quantity="other">%1$d/%2$d&#160;dossiers</item>
+        <item quantity="one">%1$d/%2$d dossier</item>
+        <item quantity="many">%1$d/%2$d dossiers</item>
+        <item quantity="other">%1$d/%2$d dossiers</item>
     </plurals>
     <!-- Title of the clear debris item displayed in the sync settings menu -->
     <string name="settings_sync_clear_debris_item_title">Vider .debris (cache local)</string>
     <!-- Title of the dialog shown when user clicks to clear debris from settings menu -->
-    <string name="settings_sync_clear_debris_dialog_title">Nettoyer les débris ?</string>
+    <string name="settings_sync_clear_debris_dialog_title">Nettoyer les débris ?</string>
     <!-- Body of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_body">Les sauvegardes des versions précédentes de vos fichiers synchronisés seront irrémédiablement supprimées de votre appareil.\n\nParcourez le dossier .debris de votre appareil local pour décider si vous devez restaurer quelque chose.</string>
     <!-- Continue button of the dialog shown when user clicks to clear debris from settings menu -->
@@ -468,16 +468,16 @@
     <string name="settings_sync_debris_cleared_message">Le dossier .debris a été vidé</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
     <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
-        <item quantity="one">%1$s et %2$d&#160;fichier ont été trouvés</item>
+        <item quantity="one">%1$s et %2$d fichier ont été trouvés</item>
         <item quantity="many">%1$s et %2$d de fichiers ont été trouvés</item>
-        <item quantity="other">%1$s et %2$d&#160;fichiers ont été trouvés</item>
+        <item quantity="other">%1$s et %2$d fichiers ont été trouvés</item>
     </plurals>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Annulation des transferts&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">Les demandes doivent comporter au moins 10&#160;caractères</string>
+    <string name="report_issue_error_minimum_characters">Les demandes doivent comporter au moins 10 caractères</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">Décrivez le problème en 10&#160;caractères, au moins</string>
+    <string name="report_issue_description_placeholder_message">Décrivez le problème en 10 caractères, au moins</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">Assurer la confidentialité des conversations</string>
     <!--Subtitle text from Recent Chat screen empty view-->
@@ -495,11 +495,11 @@
     <!-- Share hidden folders description -->
     <string name="share_hidden_folders_description">Des éléments cachés sont présents dans un ou plusieurs de ces dossiers. Partager les dossiers implique que les éléments cachés seront visibles par les personnes avec qui vous les partagez. Les éléments resteront cachés dans votre Disque nuagique.</string>
     <!-- Title shown at the top of the survey screen when cancelling the subscription -->
-    <string name="account_cancel_subscription_survey_title">Nous sommes désolés de vous voir partir. Pouvez-vous nous indiquer pourquoi vous annulez votre abonnement ?</string>
+    <string name="account_cancel_subscription_survey_title">Nous sommes désolés de vous voir partir. Pouvez-vous nous indiquer pourquoi vous annulez votre abonnement ?</string>
     <!-- Message explaining the immediate effect of subscription cancellation -->
-    <string name="account_cancel_subscription_survey_cancellation_message">Votre abonnement sera annulé immédiatement et votre compte sera transformé en compte MEGA gratuit après expiration de votre abonnement actuel. Note&#160;: l’annulation de votre abonnement ne supprimera pas votre compte.</string>
+    <string name="account_cancel_subscription_survey_cancellation_message">Votre abonnement sera annulé immédiatement et votre compte sera transformé en compte MEGA gratuit après expiration de votre abonnement actuel. Note : l’annulation de votre abonnement ne supprimera pas votre compte.</string>
     <!-- Warning message shown in a red box when no reason is selected -->
-    <string name="account_cancel_subscription_survey_no_reason_selected">Pourquoi avez-vous annulé votre abonnement ?</string>
+    <string name="account_cancel_subscription_survey_no_reason_selected">Pourquoi avez-vous annulé votre abonnement ?</string>
     <!-- Option in the survey indicating that the plan is too expensive -->
     <string name="account_cancel_subscription_survey_option_expensive">J’ai trouvé mon abonnement trop cher</string>
     <!-- Option in the survey indicating that the user can no longer afford the plan -->
@@ -579,7 +579,7 @@
     <!-- Label for the button or menu option to add a backup -->
     <string name="device_center_add_backup_button_option">Ajouter une sauvegarde</string>
     <!-- Title of the share meeting link bottom panel -->
-    <string name="meetings_share_link_bottom_sheet_title">Réunion confirmée&#160;: invitez d\’autres personnes à y participer</string>
+    <string name="meetings_share_link_bottom_sheet_title">Réunion confirmée : invitez d\’autres personnes à y participer</string>
     <!-- Button text of the send meeting link to chat -->
     <string name="meetings_share_link_bottom_sheet_button_send_link_chat">Envoyez un lien pour dialoguer en ligne</string>
     <!-- Button text of the share meeting link -->
@@ -599,7 +599,7 @@
     <!-- Backup title for toolbar when inside new backup screen -->
     <string name="sync_add_new_backup_toolbar_title">Sauvegarde</string>
     <!-- Text for the header of the screen to add a new backup folder -->
-    <string name="sync_add_new_backup_header_text">Ajoutez un dossier de sauvegarde&#160;:</string>
+    <string name="sync_add_new_backup_header_text">Ajoutez un dossier de sauvegarde :</string>
     <!-- Text to indicate the type of sync in the card header when adding a new backup folder -->
     <string name="sync_add_new_backup_card_sync_type_text">Sauvegarde</string>
     <!-- Text for the label to select the device folder or source for a new backup folder -->
@@ -609,7 +609,7 @@
     <!-- Backup text for the the button to begin backup -->
     <string name="sync_add_new_backup_proceed_button_label">Sauvegarde</string>
     <!-- Title of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
-    <string name="sync_backup_access_storage_permission_dialog_title">Autoriser MEGA à accéder à tous les fichiers&#160;?</string>
+    <string name="sync_backup_access_storage_permission_dialog_title">Autoriser MEGA à accéder à tous les fichiers ?</string>
     <!-- Message of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
     <string name="sync_backup_access_storage_permission_dialog_message">Pour sauvegarder vos fichiers, MEGA doit accéder aux fichiers et aux dossiers de votre appareil. Vos données sont toujours en sécurité chez nous.</string>
     <!-- Text for the warning banner displayed if try to create a new backup but storage permission has not been granted. The placeholders are to underline text -->
@@ -621,7 +621,7 @@
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_do_not_show_again_button">Ne plus afficher</string>
     <!-- Title of the dialog to confirm stop a sync -->
-    <string name="sync_stop_sync_confirm_dialog_title">Arrêter la synchronisation&#160;?</string>
+    <string name="sync_stop_sync_confirm_dialog_title">Arrêter la synchronisation ?</string>
     <!-- Message of the dialog to confirm stop a sync -->
     <string name="sync_stop_sync_confirm_dialog_message">Cela arrêtera le processus de synchronisation entre les deux dossiers mais ne supprimera pas les dossiers.</string>
     <!-- Label for the button to stop a sync -->
@@ -676,9 +676,9 @@
     <string name="album_add_to_media">Ajouter à</string>
     <!-- Add to album success message -->
     <plurals name="album_add_to_message">
-        <item quantity="one">Ajouté à&#160;»%1$s»</item>
-        <item quantity="many">Ajouté %2$d éléments à&#160;»%1$s»</item>
-        <item quantity="other">Ajouté %2$d éléments à&#160;»%1$s»</item>
+        <item quantity="one">Ajouté à »%1$s»</item>
+        <item quantity="many">Ajouté %2$d éléments à »%1$s»</item>
+        <item quantity="other">Ajouté %2$d éléments à »%1$s»</item>
     </plurals>
     <!-- Name for a general button which action is "Open" something -->
     <string name="general_open_button">Ouvrir</string>
@@ -694,7 +694,7 @@
     <string name="video_to_playlist_add_button">Ajouter</string>
     <!-- The success Message when adding the video to the playlists from the video section. -->
     <plurals name="video_section_playlists_add_to_playlists_successfully_message">
-        <item quantity="one">1 élément a été ajouté à&#160;»%1$s»</item>
+        <item quantity="one">1 élément a été ajouté à »%1$s»</item>
         <item quantity="many">1 élément a été ajouté à %1$d liste de lecture</item>
         <item quantity="other">1 élément a été ajouté à %1$d liste de lecture</item>
     </plurals>
@@ -722,10 +722,6 @@
     <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%s[/A] [B]a mis à jour l\’heure de la réunion à[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
     <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] [B]a annulé la réunion prévue pour[/B]</string>
-    <!-- Title of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_title">Want MEGA without the ads?</string>
-    <!-- Description of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_description">Upgrade to a Pro plan with plenty of storage and more. Our Pro plans start at just %1$s a month.</string>
     <!-- The Generous storage label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_generous_storage_label">Espace de stockage généreux</string>
     <!-- The Generous storage description in the ads free introduction screen -->
@@ -777,7 +773,7 @@
     <!-- Notification action for download final notification. It will open the file explorer activity to show the destination folder -->
     <string name="transfers_notification_location_action">Localiser</string>
     <!-- Notification content for download final notification in case of a single file downloaded. -->
-    <string name="transfers_notification_title_single_download">Téléchargé&#160;«%1$s»</string>
+    <string name="transfers_notification_title_single_download">Téléchargé «%1$s»</string>
     <!-- Label for the button or menu option to add a new backup -->
     <string name="device_center_sync_add_new_backup_button_option">Ajouter une nouvelle sauvegarde</string>
     <!-- Notification content for download final notification in case of a single file downloaded to preview. -->
@@ -785,7 +781,7 @@
     <!-- Notification action for download final notification. It will open a dialog with installed apps which can open the file -->
     <string name="transfers_notification_preview_action">Aperçu</string>
     <!-- Title for the OS dialog shown with available apps to open a file -->
-    <string name="open_with_os_dialog_title">Ouvrir&#160;«%1$s» avec</string>
+    <string name="open_with_os_dialog_title">Ouvrir «%1$s» avec</string>
     <!-- The Scan Confirmation screen error message shown when the new filename does not contain the file extension that was selected -->
     <string name="document_scanning_settings_missing_file_extension_error_message">Extension de fichier manquante (%s)</string>
     <!-- The Scan Confirmation screen error message shown when the filename does not end with the expected file extension -->
@@ -795,12 +791,12 @@
     <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
     <string name="alert_larger_file_preview">MEGA récupérera une copie temporaire de ce fichier afin que vous puissiez le prévisualiser. Il ne sera ni enregistré ni disponible en dehors de l\’application. %1$s sera téléchargé.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
-    <string name="login_completing_operation">Finalisation de l\’opération&#160;: %1$d%%</string>
+    <string name="login_completing_operation">Finalisation de l\’opération : %1$d%%</string>
     <!-- Add to album files existed message -->
     <plurals name="album_add_to_files_existed">
-        <item quantity="one">Ce fichier existe déjà dans&#160;«%1$s» et ne peut pas être ajouté à nouveau</item>
-        <item quantity="many">Ces fichiers existent déjà dans&#160;«%1$s» et ne peut pas être ajouté à nouveau</item>
-        <item quantity="other">Ces fichiers existent déjà dans&#160;«%1$s» et ne peut pas être ajouté à nouveau</item>
+        <item quantity="one">Ce fichier existe déjà dans «%1$s» et ne peut pas être ajouté à nouveau</item>
+        <item quantity="many">Ces fichiers existent déjà dans «%1$s» et ne peut pas être ajouté à nouveau</item>
+        <item quantity="other">Ces fichiers existent déjà dans «%1$s» et ne peut pas être ajouté à nouveau</item>
     </plurals>
     <!--Content on the Multi-Factor Authentication Login page -->
     <string name="multi_factor_auth_login_verification_content">Saisissez le code à six chiffres généré par votre appli d’authentification.</string>
@@ -819,7 +815,7 @@
     <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
     <string name="transfers_preview_paused_dialog_title">Les transferts sont mis en pause</string>
     <!-- Message for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
-    <string name="transfers_preview_paused_dialog_text">Pour prévisualiser&#160;«%1$s» vous devrez reprendre les transferts suspendus</string>
+    <string name="transfers_preview_paused_dialog_text">Pour prévisualiser «%1$s» vous devrez reprendre les transferts suspendus</string>
     <!--SD Card text shown as title in FileStorage screen -->
     <string name="general_sd_card">Carte SD</string>
     <!--The title of the Login page-->
@@ -835,7 +831,7 @@
     <!--Message to be shown to the user when login fails due to multiple failed attempts-->
     <string name="login_too_many_attempts_error_message">Vous avez tenté de vous connecter trop de fois. Veuillez attendre et réessayer.</string>
     <!--The footer text to be shown where a user can sign up if they do not have a MEGA account-->
-    <string name="login_page_sign_up_action_footer_text">N’avez-vous pas de compte MEGA ? [A]Inscrivez-vous[/A]</string>
+    <string name="login_page_sign_up_action_footer_text">N’avez-vous pas de compte MEGA ? [A]Inscrivez-vous[/A]</string>
     <!-- Title of setting Two-Factor Authentication -->
     <string name="settings_2fa">Authentification à deux facteurs</string>
     <!-- email label -->
@@ -845,7 +841,7 @@
     <!-- Login button -->
     <string name="login_text">Se connecter</string>
     <!--The text where user forgot their password and will navigate to reset it-->
-    <string name="login_page_forgot_password_text">Mot de passe oublié ?</string>
+    <string name="login_page_forgot_password_text">Mot de passe oublié ?</string>
     <!-- Sync state up to date -->
     <string name="sync_list_sync_state_disabled">Désactivée</string>
     <!-- Name of the Camera uploads feature -->
@@ -868,9 +864,9 @@
     <string name="chat_note_to_self_chat_first_message_header">Gardez-le pour vous</string>
     <!-- Add to album some files exist message -->
     <plurals name="album_add_to_files_exist_message">
-        <item quantity="one">1 fichier ajouté à&#160;«%1$s». Les fichiers dupliqués ne peuvent pas être ajoutés à nouveau.</item>
-        <item quantity="many">%2$d fichiers ajoutés à&#160;«%1$s». Les fichiers dupliqués ne peuvent pas être ajoutés à nouveau.</item>
-        <item quantity="other">%2$d fichiers ajoutés à&#160;«%1$s». Les fichiers dupliqués ne peuvent pas être ajoutés à nouveau.</item>
+        <item quantity="one">1 fichier ajouté à «%1$s». Les fichiers dupliqués ne peuvent pas être ajoutés à nouveau.</item>
+        <item quantity="many">%2$d fichiers ajoutés à «%1$s». Les fichiers dupliqués ne peuvent pas être ajoutés à nouveau.</item>
+        <item quantity="other">%2$d fichiers ajoutés à «%1$s». Les fichiers dupliqués ne peuvent pas être ajoutés à nouveau.</item>
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">Enregistrement %1$s vers Disque nuagique&#8230;</string>
@@ -899,9 +895,9 @@
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">Votre compte a été résilié en raison du non-respect des Conditions générales d’utilisation de MEGA.\nVous ne pourrez pas accéder à vos données stockées de nouveau ni être autorisé à créer un nouveau compte MEGA.</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
-    <string name="error_business_disabled">Votre compte a été désactivé par la personne qui l’administre. Contactez l’administrateur de votre compte Pour&#160;entreprise pour obtenir plus de précisions.</string>
+    <string name="error_business_disabled">Votre compte a été désactivé par la personne qui l’administre. Contactez l’administrateur de votre compte Pour entreprise pour obtenir plus de précisions.</string>
     <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
-    <string name="error_business_removed">Votre compte a été supprimé par votre administrateur. Veuillez contacter l’administrateur de votre compte Pour&#160;entreprise pour plus de précisions.</string>
+    <string name="error_business_removed">Votre compte a été supprimé par votre administrateur. Veuillez contacter l’administrateur de votre compte Pour entreprise pour plus de précisions.</string>
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">Confirmation par courriel</string>
     <!--The Content of the Email Confirmation page-->
@@ -911,7 +907,7 @@
     <!-- General change email address -->
     <string name="general_change_email_address">Changer l’adresse courriel</string>
     <!-- Title for the cancel registration dialog -->
-    <string name="email_confirmation_dialog_cancel_registration_title">Annuler la création du compte ?</string>
+    <string name="email_confirmation_dialog_cancel_registration_title">Annuler la création du compte ?</string>
     <!-- Content for the cancel registration dialog -->
     <string name="email_confirmation_dialog_cancel_registration_content">Le processus d’inscription sera annulé.</string>
     <!-- Text for the "Yes, cancel" button in the cancel registration dialog -->
@@ -975,7 +971,7 @@
     <!--Sign Up page password hint to suggest a password with at least one number or special character-->
     <string name="sign_up_password_hint_number_or_special_character">Au moins un chiffre ou caractère spécial.</string>
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
-    <string name="sign_up_already_have_account_login_link_text">Avez-vous déjà un compte MEGA ? [A]Connectez-vous[/A]</string>
+    <string name="sign_up_already_have_account_login_link_text">Avez-vous déjà un compte MEGA ? [A]Connectez-vous[/A]</string>
     <!-- Text shown in the fake preview screen -->
     <string name="transfers_fake_preview_text">Chargement du fichier...</string>
     <!-- Title or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
@@ -1005,7 +1001,7 @@
     <!-- USP Carousel page 2 title-->
     <string name="carousel_page_title_slide_2">Gardez chaque souvenir en sécurité</string>
     <!-- USP Carousel page 2 description-->
-    <string name="carousel_page_description_slide_2">Grâce aux téléversements automatiques de l\’appareil photo sur MEGA&#160;Cloud et à un espace de stockage généreux, vous ne perdrez jamais vos précieux souvenirs</string>
+    <string name="carousel_page_description_slide_2">Grâce aux téléversements automatiques de l\’appareil photo sur MEGA Cloud et à un espace de stockage généreux, vous ne perdrez jamais vos précieux souvenirs</string>
     <!-- USP Carousel page 3 title-->
     <string name="carousel_page_title_slide_3">Vos données. Votre espace.</string>
     <!-- USP Carousel page 3 description-->
@@ -1017,7 +1013,7 @@
     <!-- Create account label-->
     <string name="general_label_create_account">S\’inscrire</string>
     <!-- The new feature hidden nodes feature -->
-    <string name="hidden_nodes_new_feature">Nouvelle fonction&#160;: fichiers et dossiers cachés</string>
+    <string name="hidden_nodes_new_feature">Nouvelle fonction : fichiers et dossiers cachés</string>
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">Cacher les fichiers et dossiers importants</string>
     <!-- Hidden nodes description: hide files and folders feature -->
@@ -1033,7 +1029,7 @@
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Gardez vos photos en sécurité, en permanence</string>
     <!--Camera backup permission screen description-->
-    <string name="camera_backup_permission_screen_description">Vos souvenirs sont importants\n\nLes téléversements de l\’appareil photo sauvegardent automatiquement vos photos et vidéos sur votre disque MEGA&#160;Cloud, pour que vous n\’ayez jamais à vous soucier de les perdre.</string>
+    <string name="camera_backup_permission_screen_description">Vos souvenirs sont importants\n\nLes téléversements de l\’appareil photo sauvegardent automatiquement vos photos et vidéos sur votre disque MEGA Cloud, pour que vous n\’ayez jamais à vous soucier de les perdre.</string>
     <!--Camera backup permission banner text to explain why the camera backup permission is needed-->
     <string name="camera_backup_permission_banner_info_description">Les téléversements de l\’appareil photo nécessitent un [A]accès complet[/A] à la galerie photos de votre appareil.</string>
     <!--Button text to request camera backup permission-->
@@ -1053,7 +1049,7 @@
     <!-- Text of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
     <string name="general_sync_warning_lost_wifi_text">Reconnectez-vous au Wi-Fi pour reprendre.</string>
     <!-- Subtitle of link unavailable reasons, shown in folder and file link screen -->
-    <string name="general_link_unavailable_subtitle">Les raisons suivantes pourraient en être la cause&#160;:</string>
+    <string name="general_link_unavailable_subtitle">Les raisons suivantes pourraient en être la cause :</string>
     <!-- Bullet point shown when link is unavailable due to invalid URL -->
     <string name="general_link_unavailable_invalid_url">URL invalide, le lien auquel vous essayez d\’accéder n\’existe pas</string>
     <!-- Bullet point shown when link is unavailable due to expiration -->
@@ -1107,7 +1103,7 @@
     <!-- Button text for Free Plan card -->
     <string name="free_plan_card_button">Commencer gratuitement</string>
     <!-- Section title for the features list -->
-    <string name="pro_plan_features_section_title">Vous obtiendrez&#160;:</string>
+    <string name="pro_plan_features_section_title">Vous obtiendrez :</string>
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">Espace de stockage généreux</string>
     <!-- Description for generous storage feature with placeholder -->
@@ -1275,13 +1271,13 @@
     <!-- Message shown when uploading edited image as a new file -->
     <string name="photo_editor_upload_message">Téléversement des modifications sous un nouveau fichier</string>
     <!-- Dialog title asking user to discard changes -->
-    <string name="general_dialog_title_discard_changes">Abandonner les changements ?</string>
+    <string name="general_dialog_title_discard_changes">Abandonner les changements ?</string>
     <!-- Dialog title asking user to disable camera uploads -->
-    <string name="settings_camera_uploads_disable_warning">Désactiver les téléversements de l’appareil photo&#160;?</string>
+    <string name="settings_camera_uploads_disable_warning">Désactiver les téléversements de l’appareil photo ?</string>
     <!-- Sync settings change message prefix -->
-    <string name="settings_sync_message_prefix">Synchronisation changée en&#160;:</string>
+    <string name="settings_sync_message_prefix">Synchronisation changée en :</string>
     <!--Title of playback position dialog that is displayed when audio has playback position history. -->
-    <string name="audio_playback_position_dialog_title">Reprendre la lecture ?</string>
+    <string name="audio_playback_position_dialog_title">Reprendre la lecture ?</string>
     <!--Message of playback position dialog that is displayed when audio has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
     <string name="audio_playback_position_dialog_message">«&#160;%1$s&#160;» reprendra à %2$s</string>
     <!--Resume of playback position dialog for playing audio from the playback position history. -->
@@ -1488,12 +1484,6 @@
         <item quantity="many">Les liens ont été supprimés</item>
         <item quantity="other">Les liens ont été supprimés</item>
     </plurals>
-    <!-- Warning that appears prior to remove links of files. Plural. -->
-    <plurals name="remove_links_warning_text">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
     <string name="context_share_correctly_removed">Accès supprimé</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1511,12 +1501,6 @@
         <item quantity="one">Ce dossier est partagé avec %1$d contact. Arrêter le partage ?</item>
         <item quantity="many">Ce dossier est partagé avec %1$d contacts. Arrêter le partage ?</item>
         <item quantity="other">Ce dossier est partagé avec %1$d contacts. Arrêter le partage ?</item>
-    </plurals>
-    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <plurals name="alert_remove_several_shares">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
     </plurals>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
     <string name="figures_storage_referrals_achievements_text">%1$s d\’espace de stockage supplémentaire pour chaque invitation, valable pendant %2$d jours</string>
@@ -1600,12 +1584,6 @@
     <string name="transfers_retry_failed_snackbar_message">Impossible de redémarrer les transferts</string>
     <!-- Action for the Snackbar when retry failed on failed transfers tab. -->
     <string name="transfers_retry_failed_snackbar_action">Réessayer</string>
-    <!-- Snackbar message when retry success on failed transfers tab. -->
-    <plurals name="transfers_retry_feedback_snackbar_message">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">Restauré vers %s</string>
     <!-- success message when moving a node -->
@@ -1784,8 +1762,6 @@
     <string name="camera_update_network_requirement_not_met_banner_description">Téléversements de l\’appareil photo suspendus, connectez-vous au Wi-Fi ou autorisez les données mobiles</string>
     <!-- The button text of camera uploads network requirement not met paused warning banner -->
     <string name="camera_update_network_requirement_not_met_banner_button_text">Autoriser l\’utilisation des données mobiles</string>
-    <!-- Billing info with discount label -->
-    <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s for %3$s</string>
     <!-- campaign name for Black Friday deal -->
     <string name="campaign_name_black_friday">Offre Black Friday : %1$d%% de réduction</string>
     <!-- campaign name for Cyber Monday deal -->
@@ -1847,7 +1823,7 @@
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Vous seul pouvez afficher les fichiers cachés, soit individuellement, soit en affichant temporairement les éléments cachés depuis les [A]paramètres[/A].</string>
     <!-- Dialog confirmation text for removing photos in an album -->
-    <string name="album_content_remove_photos_dialog_description">Supprimer de l’album ?</string>
+    <string name="album_content_remove_photos_dialog_description">Supprimer de l’album ?</string>
     <!--Album content more options action description-->
     <string name="album_content_selection_action_more_description">Plus</string>
     <!--Album content select album cover action description-->
@@ -1860,12 +1836,6 @@
     <string name="delete_album_confirmation_positive_button_text">Supprimer</string>
     <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
     <string name="delete_singular_album_confirmation_message">«&#160;%s&#160;» a été supprimé</string>
-    <!-- Delete albums confirmation title. -->
-    <plurals name="delete_album_confirmation_dialog_title">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="delete_album_confirmation_dialog_description">
         <item quantity="one">L’album sera supprimé, mais son contenu restera dans votre Vue chronologique.</item>
@@ -1874,12 +1844,6 @@
     </plurals>
     <!-- External checkout button text -->
     <string name="external_checkout_button_text">Acheter sur notre site web (Économisez jusqu\’à %1$.0f%%)</string>
-    <!-- Title for the album remove link(s) confirmation dialog -->
-    <plurals name="album_content_remove_links_dialog_title">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_description">
         <item quantity="one">Les personnes avec qui vous avez partagé ce lien perdront l’accès à l’album.</item>
@@ -1950,50 +1914,18 @@
     <string name="timeline_tab_filter_media_source_selection_header">Source des éléments à afficher</string>
     <!-- Timeline filter remember preferences toggle text. -->
     <string name="timeline_tab_filter_remember_preferences">Mémoriser les préférences</string>
-    <!-- Timeline filter apply filter button text. -->
-    <string name="timeline_tab_filter_apply_filter_button">Apply filter</string>
-    <!-- General label for invite contact contexts -->
-    <string name="general_invite_contact">Invite contact</string>
-    <!-- Contact found title for a dialog showing contact link info -->
-    <string name="contact_found_dialog_title">Contact found</string>
     <!--Album content empty album layout title when an album content is empty-->
     <string name="album_content_empty_album_title">L’album est vide</string>
     <!--Album content action to add more items to the album-->
     <string name="album_content_action_add_items">Ajouter des éléments</string>
     <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
     <string name="videos_tab_empty_hint_video">[B]Aucune[/B] [A]vidéo[/A] [B]n’a été trouvée[/B]</string>
-    <!-- Action to remove items from the Favourites album -->
-    <string name="album_content_action_remove_favourites">Remove from Favourites</string>
     <!-- Title of the empty screen when a folder is empty -->
     <string name="context_empty_folder_title">Ce dossier est vide</string>
-    <!-- Title of the empty screen when there are no items in the root Cloud Drive -->
-    <string name="context_empty_cloud_drive_title">Nothing in your cloud drive yet</string>
     <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
     <string name="context_empty_cloud_drive_description">Protégez vos données grâce au chiffrement à divulgation nulle de connaissance</string>
-    <!-- Error shown when trying to confirm an account from a confirmation link and the app is already logged in -->
-    <string name="open_link_account_confirmation_error">You’re already logged in with a different MEGA account. Log out first, then open the account confirmation link again.</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link_error_message">Cette conversation n’est plus disponible</string>
-    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="general_invalid_link">Invalid link. Please try again or request a new one.</string>
-    <!-- Text of the dialog shown when you want to join a group call and you're already in another call-->
-    <string name="can_only_join_one_call_error_message">To join this call you have to end your current call</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">Recherche&#8230;</string>
-    <!-- Title for the album remove link confirmation dialog for singular link -->
-    <string name="album_content_remove_link_dialog_title">Supprimer le lien ?</string>
-    <!-- Title for the album remove link confirmation dialog for multiple link -->
-    <string name="album_content_remove_multiple_links_dialog_title">Supprimer les liens ?</string>
-    <!-- Explanation text for the album remove link confirmation dialog -->
-    <string name="album_content_remove_link_dialog_description">People you shared this link with will lose access to the album</string>
-    <!-- Explanation text for the album remove multiple links confirmation dialog -->
-    <string name="album_content_remove_multiple_links_dialog_description">People you shared these links with will lose access to the albums</string>
-    <!-- Delete album confirmation title. -->
-    <string name="delete_album_singular_confirmation_dialog_title">Supprimer l’album ?</string>
-    <!-- Delete albums confirmation title. -->
-    <string name="delete_albums_multiple_confirmation_dialog_title">Supprimer les albums ?</string>
-    <!-- Delete album confirmation description. -->
-    <string name="delete_album_singular_confirmation_dialog_description">The contents of the album will not be deleted</string>
-    <!-- Delete albums confirmation description. -->
-    <string name="delete_albums_multiple_confirmation_dialog_description">The contents of the albums will not be deleted</string>
 </resources>

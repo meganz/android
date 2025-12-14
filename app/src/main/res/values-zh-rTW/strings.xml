@@ -989,12 +989,13 @@
     <!-- Button to set a value -->
     <string name="hint_minutes">分鐘</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string-array name="settings_status_entries">
-        <item>在線</item>
-        <item>離開</item>
-        <item>忙碌</item>
-        <item>離線</item>
-    </string-array>
+    <string name="settings_chat_status_online">在線</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_away">離開</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_busy">忙碌</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_offline">離線</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">啟用</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1446,12 +1447,13 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">影片品質</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
-    <string-array name="settings_chat_upload_quality_entries">
-        <item>低</item>
-        <item>普通</item>
-        <item>高</item>
-        <item>原始的</item>
-    </string-array>
+    <string name="settings_chat_upload_quality_low">低</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_medium">普通</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_high">高</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_original">原始的</string>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">未接來電</string>
     <!-- Refers to a location of file -->
@@ -3768,11 +3770,17 @@
     <plurals name="general_copy_snackbar_fail">
         <item quantity="other">無法複製%1$d個項月</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="other">已複製%1$d個項目，&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="other">無法複製%1$d個項目</item>
     </plurals>

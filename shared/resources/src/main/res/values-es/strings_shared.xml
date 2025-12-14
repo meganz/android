@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">No hay suficiente espacio de almacenamiento en su dispositivo</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">Se ha producido un error. Ponte en contacto con support@mega.io.</string>
+    <string name="general_sync_message_unknown_error">Se ha producido un error. Ponte en contacto con support&#64;mega.io.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">Los archivos de esta carpeta no se pueden sincronizar ni se puede hacer un backup porque la carpeta de MEGA está en la Papelera</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -127,15 +127,15 @@
     <!-- All Duration option of the video section duration filter  -->
     <string name="video_section_videos_duration_option_all_duration">Todas las duraciones</string>
     <!-- Less than 10 seconds option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_less_than_10_seconds">Menos de 10&#160;segundos</string>
+    <string name="video_section_videos_duration_option_less_than_10_seconds">Menos de 10 segundos</string>
     <!-- Between 10 and 60 seconds option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_between_10_and_60_seconds">De 10 a 60&#160;segundos</string>
+    <string name="video_section_videos_duration_option_between_10_and_60_seconds">De 10 a 60 segundos</string>
     <!-- Between 1 and 4 minutes option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_between_1_and_4_minutes">De 1 a 4&#160;minutos</string>
+    <string name="video_section_videos_duration_option_between_1_and_4_minutes">De 1 a 4 minutos</string>
     <!-- Between 4 and 20 minutes option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_between_4_and_20_minutes">De 4 a 20&#160;minutos</string>
+    <string name="video_section_videos_duration_option_between_4_and_20_minutes">De 4 a 20 minutos</string>
     <!-- More than 20 minutes option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_more_than_20_minutes">Más de 20&#160;minutos</string>
+    <string name="video_section_videos_duration_option_more_than_20_minutes">Más de 20 minutos</string>
     <!-- Create playlist dialog title of the video section playlists tab -->
     <string name="video_section_playlists_create_playlist_dialog_title">Introducir el nombre de la lista de reproducción</string>
     <!-- Rename playlist dialog title of the video section playlists tab -->
@@ -162,15 +162,15 @@
     <string name="video_section_video_selected_top_bar_title">Elegir archivos</string>
     <!-- Message when deleting the playlists of the video section playlists tab. %1$d will be replaced the number of deleted playlists -->
     <plurals name="video_section_playlists_delete_playlists_message">
-        <item quantity="one">Se ha eliminado %1$d&#160;lista de reproducción</item>
+        <item quantity="one">Se ha eliminado %1$d lista de reproducción</item>
         <item quantity="many">Se han eliminado %1$d de listas de reproducción</item>
-        <item quantity="other">Se han eliminado %1$d&#160;listas de reproducción</item>
+        <item quantity="other">Se han eliminado %1$d listas de reproducción</item>
     </plurals>
     <!-- Message when adding the videos to the video section playlist -->
     <plurals name="video_section_playlist_detail_add_videos_message">
-        <item quantity="one">Se ha añadido %1$d&#160;elemento a “%2$s”</item>
+        <item quantity="one">Se ha añadido %1$d elemento a “%2$s”</item>
         <item quantity="many">Se han añadido %1$d de elementos a “%2$s”</item>
-        <item quantity="other">Se han añadido %1$d&#160;elementos a “%2$s”</item>
+        <item quantity="other">Se han añadido %1$d elementos a “%2$s”</item>
     </plurals>
     <!-- Message when removing the videos to the video section playlist -->
     <plurals name="video_section_playlist_detail_remove_videos_message">
@@ -180,9 +180,9 @@
     </plurals>
     <!-- Text of the video section playlist detail video number -->
     <plurals name="video_section_playlist_detail_video_number">
-        <item quantity="one">%1$d&#160;vídeo</item>
+        <item quantity="one">%1$d vídeo</item>
         <item quantity="many">%1$d de vídeos</item>
-        <item quantity="other">%1$d&#160;vídeos</item>
+        <item quantity="other">%1$d vídeos</item>
     </plurals>
     <!-- Warning shown when the user clicks on a web link and there is no app available at the moment for opening it. -->
     <string name="chat_click_link_in_message_intent_not_available">Es posible que no tengas instalada una aplicación que pueda abrir esta página web</string>
@@ -722,10 +722,6 @@
     <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%s[/A] [B]ha actualizado la hora de la reunión a[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
     <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] [B]ha cancelado la reunión programada para el[/B]</string>
-    <!-- Title of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_title">Want MEGA without the ads?</string>
-    <!-- Description of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_description">Upgrade to a Pro plan with plenty of storage and more. Our Pro plans start at just %1$s a month.</string>
     <!-- The Generous storage label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_generous_storage_label">Almacenamiento generoso</string>
     <!-- The Generous storage description in the ads free introduction screen -->
@@ -1020,16 +1016,10 @@
     <string name="hidden_nodes_new_feature">Nueva característica: archivos y carpetas ocultos</string>
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">Oculta archivos y carpetas importantes</string>
-    <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy in one easy step.</string>
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">Elementos ocultos</string>
-    <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">Difuminar para mayor privacidad</string>
-    <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Mantén tus fotos seguras, siempre</string>
     <!--Camera backup permission screen description-->
@@ -1153,7 +1143,7 @@
     <!-- Maybe later button text in the choose account screen-->
     <string name="choose_account_screen_maybe_later_button_text">Quizás más tarde</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_label_save_up_to">Ahorra hasta un 16&#160;% con el cobro anual</string>
+    <string name="account_upgrade_account_label_save_up_to">Ahorra hasta un 16 % con el cobro anual</string>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
     <string name="choose_account_screen_storage_label">%1$s de almacenamiento</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
@@ -1420,9 +1410,9 @@
     <string name="video_section_playlists_video_empty">Vacío</string>
     <!-- Text of video count of playlist in Video Section -->
     <plurals name="video_section_playlists_video_count">
-        <item quantity="one">%1$d&#160;vídeo</item>
+        <item quantity="one">%1$d vídeo</item>
         <item quantity="many">%1$d de vídeos</item>
-        <item quantity="other">%1$d&#160;vídeos</item>
+        <item quantity="other">%1$d vídeos</item>
     </plurals>
     <!-- Stop Backup confirmation dialog Move explanation -->
     <string name="sync_stop_backup_confirm_dialog_move_explanation">Mueve esta carpeta a la Nube para tener acceso completo a tus datos. Ya dejará de tener backups.</string>
@@ -1488,12 +1478,6 @@
         <item quantity="many">Enlaces eliminados</item>
         <item quantity="other">Enlaces eliminados</item>
     </plurals>
-    <!-- Warning that appears prior to remove links of files. Plural. -->
-    <plurals name="remove_links_warning_text">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
     <string name="context_share_correctly_removed">Acceso revocado</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1511,12 +1495,6 @@
         <item quantity="one">Esta carpeta se ha compartido con %1$d contacto. ¿Dejar de compartir?</item>
         <item quantity="many">Esta carpeta se ha compartido con %1$d de contactos. ¿Dejar de compartir?</item>
         <item quantity="other">Esta carpeta se ha compartido con %1$d contactos. ¿Dejar de compartir?</item>
-    </plurals>
-    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <plurals name="alert_remove_several_shares">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
     </plurals>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
     <string name="figures_storage_referrals_achievements_text">%1$s de almacenamiento adicional por cada invitación, válido durante %2$d días</string>
@@ -1600,12 +1578,6 @@
     <string name="transfers_retry_failed_snackbar_message">No se pueden reiniciar las transferencias</string>
     <!-- Action for the Snackbar when retry failed on failed transfers tab. -->
     <string name="transfers_retry_failed_snackbar_action">Reintentar</string>
-    <!-- Snackbar message when retry success on failed transfers tab. -->
-    <plurals name="transfers_retry_feedback_snackbar_message">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">Restaurado a %s</string>
     <!-- success message when moving a node -->
@@ -1780,34 +1752,10 @@
     <string name="camera_update_device_charging_not_met_banner_button_text">Ajustes</string>
     <!-- The description of camera uploads low battery paused warning banner -->
     <string name="camera_update_low_battery_banner_description">Las subidas están pausadas por batería baja. Carga tu dispositivo para continuar.</string>
-    <!-- The description of camera uploads network requirement not met paused warning banner -->
-    <string name="camera_update_network_requirement_not_met_banner_description">Camera uploads paused, connect to Wi-Fi or allow mobile data</string>
     <!-- The button text of camera uploads network requirement not met paused warning banner -->
     <string name="camera_update_network_requirement_not_met_banner_button_text">Permitir datos móviles</string>
-    <!-- Billing info with discount label -->
-    <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s for %3$s</string>
-    <!-- campaign name for Black Friday deal -->
-    <string name="campaign_name_black_friday">Black Friday deal: %1$d%% off</string>
-    <!-- campaign name for Cyber Monday deal -->
-    <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
-    <!-- campaign name for Special offer -->
-    <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
-    <!-- Label for first time period in days full format -->
-    <plurals name="label_first_time_in_months_full">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
-    </plurals>
-    <!-- Label for first time period in years full format -->
-    <plurals name="label_first_time_in_years_full">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">Privacidad con MEGA</string>
-    <!-- Message about savings on yearly plan in case it has discount -->
-    <string name="account_upgrade_account_label_save_at_least">Save at least 16% on a yearly plan</string>
     <!-- Add new album on Media screen dialog title -->
     <string name="media_add_new_album_dialog_title">Introducir el nombre del álbum</string>
     <!-- Add new album on Media screen dialog positive button text -->
@@ -1824,28 +1772,12 @@
     <string name="album_invalid_name_error_message">Este nombre no está permitido. Introducir un nombre diferente.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="album_name_exists_error_message">Ya existe un álbum con este nombre. Introducir un nombre diferente.</string>
-    <!-- sentence to detail the permanent awarded text related to VPN achievement -->
-    <string name="mega_vpn_achievement_awarded_storage_text_permanent">Get %1$s of free storage when you start a MEGA&#160;VPN free trial, valid permanently</string>
-    <!-- sentence to detail the permanent awarded text related to PWM achievement -->
-    <string name="mega_pass_achievement_awarded_storage_text_permanent">Get %1$s of free storage when you start a MEGA&#160;Pass free trial, valid permanently</string>
-    <!-- sentence to detail the figures of award achievement days left -->
-    <plurals name="trial_awarded_achievement_days_left_text">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- sentence to detail the figures of award achievement days left -->
     <plurals name="trial_awarded_achievement_days_left_detail_title">
         <item quantity="one">El bono caducará en %1$d día.</item>
         <item quantity="many">El bono caducará en %1$d días.</item>
         <item quantity="other">El bono caducará en %1$d días</item>
     </plurals>
-    <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
-    <!-- Discount label for first year singular -->
-    <string name="label_first_time_in_years_full_singular">%1$s for the first year</string>
-    <!-- Hidden nodes description: control visibility feature with tag -->
-    <string name="hidden_nodes_description_control_visibility_tag">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the [A]settings[/A].</string>
     <!-- Dialog confirmation text for removing photos in an album -->
     <string name="album_content_remove_photos_dialog_description">¿Eliminar del álbum?</string>
     <!--Album content more options action description-->
@@ -1854,31 +1786,15 @@
     <string name="album_content_selection_action_select_album_cover_description">Seleccionar la portada del álbum</string>
     <!--Album content delete action description-->
     <string name="album_content_selection_action_delete_description">Eliminar</string>
-    <!-- Message shown when user tries to preview an undecrypted file -->
-    <string name="preview_not_available_undecrypted_files">Preview not available for undecrypted files</string>
     <!-- Delete album confirmation dialog positive button text. -->
     <string name="delete_album_confirmation_positive_button_text">Eliminar</string>
     <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
     <string name="delete_singular_album_confirmation_message">“%s” ha sido eliminado</string>
-    <!-- Delete albums confirmation title. -->
-    <plurals name="delete_album_confirmation_dialog_title">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="delete_album_confirmation_dialog_description">
         <item quantity="one">El álbum se eliminará, pero su contenido permanecerá en tu Cronología.</item>
         <item quantity="many">Los álbumes se eliminarán, pero su contenido permanecerá en tu Cronología.</item>
         <item quantity="other">Los álbumes se eliminarán, pero su contenido permanecerá en tu Cronología.</item>
-    </plurals>
-    <!-- External checkout button text -->
-    <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
-    <!-- Title for the album remove link(s) confirmation dialog -->
-    <plurals name="album_content_remove_links_dialog_title">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
     </plurals>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_description">
@@ -1892,42 +1808,24 @@
         <item quantity="many">Eliminar enlaces</item>
         <item quantity="other">Eliminar enlaces</item>
     </plurals>
-    <!-- Hint for password dialog -->
-    <string name="password_dialog_hint">Enter link password</string>
     <!-- Text for decrypt button -->
     <string name="general_decrypt">Continuar</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="password_dialog_error">Contraseña del enlace inválida</string>
-    <!-- Message of the Camera Uploads no full access warning banner in Photos -->
-    <string name="camera_upload_no_full_access_banner_change_permissions_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library. [A]Tap to change permissions.[/A]</string>
-    <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="camera_upload_banner_enable_cu_subtitle">Automatically back up your photos and videos to your Cloud drive</string>
     <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
     <string name="onboarding_camera_upload_permission_enabled_message">Subidas de la cámara activadas</string>
-    <!-- Alert to inform the user that have to be logged in to perform the action -->
-    <string name="general_alert_not_logged_in">You must be logged in to perform this action</string>
-    <!-- camera uploads limited access -->
-    <string name="timeline_tab_camera_uploads_limited_access">MEGA has limited access to your photo library and can’t back up all your photos</string>
     <!-- menu item -->
     <string name="timeline_tab_file_properties_shared_folder_change_permissions">Cambiar permisos</string>
     <!-- Timeline tab screen: Empty state no media found -->
     <string name="timeline_tab_empty_body_no_media_found">No hay ni imágenes ni vídeos</string>
-    <!-- Timeline tab screen: Camera uploads disabled banner description. We show this banner when there is no photo available in timeline tab screen. -->
-    <string name="timeline_tab_enable_camera_uploads_banner_description">Camera uploads requires [A]full access[/A] to your photo library</string>
     <!-- Camera uploads completed info in TimelineTab screen. -->
     <plurals name="timeline_tab_camera_uploads_completed">
         <item quantity="one">Subidas de la cámara completadas, %1$d archivo subido</item>
         <item quantity="many">Subidas de la cámara completadas, %1$d de archivos subidos</item>
         <item quantity="other">Subidas de la cámara completadas, %1$d archivos subidos</item>
     </plurals>
-    <!-- Timeline tab screen grid size menu title -->
-    <string name="timeline_tab_grid_size_menu_title">Grid size</string>
-    <!-- Timeline tab screen compact grid size menu item -->
-    <string name="timeline_tab_grid_size_compact">Compact</string>
     <!-- Timeline tab screen default grid size menu item -->
     <string name="timeline_tab_grid_size_default">Predeterminado</string>
-    <!-- Timeline tab screen large grid size menu item -->
-    <string name="timeline_tab_grid_size_large">Large</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended_dialog_title">La reunión ha terminado</string>
     <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
@@ -1950,50 +1848,14 @@
     <string name="timeline_tab_filter_media_source_selection_header">Mostrar elementos desde</string>
     <!-- Timeline filter remember preferences toggle text. -->
     <string name="timeline_tab_filter_remember_preferences">Recordar preferencias</string>
-    <!-- Timeline filter apply filter button text. -->
-    <string name="timeline_tab_filter_apply_filter_button">Apply filter</string>
-    <!-- General label for invite contact contexts -->
-    <string name="general_invite_contact">Invite contact</string>
-    <!-- Contact found title for a dialog showing contact link info -->
-    <string name="contact_found_dialog_title">Contact found</string>
     <!--Album content empty album layout title when an album content is empty-->
     <string name="album_content_empty_album_title">Álbum vacío</string>
     <!--Album content action to add more items to the album-->
     <string name="album_content_action_add_items">Añadir elementos</string>
     <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
     <string name="videos_tab_empty_hint_video">[B]No[/B] [B]hay[/B] [A]vídeos[/A]</string>
-    <!-- Action to remove items from the Favourites album -->
-    <string name="album_content_action_remove_favourites">Remove from Favourites</string>
-    <!-- Title of the empty screen when a folder is empty -->
-    <string name="context_empty_folder_title">This folder is empty</string>
-    <!-- Title of the empty screen when there are no items in the root Cloud Drive -->
-    <string name="context_empty_cloud_drive_title">Nothing in your cloud drive yet</string>
-    <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
-    <string name="context_empty_cloud_drive_description">Keep something safe with zero-knowledge encryption</string>
-    <!-- Error shown when trying to confirm an account from a confirmation link and the app is already logged in -->
-    <string name="open_link_account_confirmation_error">You’re already logged in with a different MEGA account. Log out first, then open the account confirmation link again.</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link_error_message">Esta conversación ya no está disponible</string>
-    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="general_invalid_link">Invalid link. Please try again or request a new one.</string>
-    <!-- Text of the dialog shown when you want to join a group call and you're already in another call-->
-    <string name="can_only_join_one_call_error_message">To join this call you have to end your current call</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">Buscar&#8230;</string>
-    <!-- Title for the album remove link confirmation dialog for singular link -->
-    <string name="album_content_remove_link_dialog_title">¿Eliminar enlace?</string>
-    <!-- Title for the album remove link confirmation dialog for multiple link -->
-    <string name="album_content_remove_multiple_links_dialog_title">¿Eliminar enlaces?</string>
-    <!-- Explanation text for the album remove link confirmation dialog -->
-    <string name="album_content_remove_link_dialog_description">People you shared this link with will lose access to the album</string>
-    <!-- Explanation text for the album remove multiple links confirmation dialog -->
-    <string name="album_content_remove_multiple_links_dialog_description">People you shared these links with will lose access to the albums</string>
-    <!-- Delete album confirmation title. -->
-    <string name="delete_album_singular_confirmation_dialog_title">¿Eliminar el álbum?</string>
-    <!-- Delete albums confirmation title. -->
-    <string name="delete_albums_multiple_confirmation_dialog_title">¿Eliminar los álbumes?</string>
-    <!-- Delete album confirmation description. -->
-    <string name="delete_album_singular_confirmation_dialog_description">The contents of the album will not be deleted</string>
-    <!-- Delete albums confirmation description. -->
-    <string name="delete_albums_multiple_confirmation_dialog_description">The contents of the albums will not be deleted</string>
 </resources>

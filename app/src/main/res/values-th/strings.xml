@@ -989,12 +989,13 @@
     <!-- Button to set a value -->
     <string name="hint_minutes">นาที</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string-array name="settings_status_entries">
-        <item>ออนไลน์</item>
-        <item>ว่าง</item>
-        <item>ไม่ว่าง</item>
-        <item>ออฟไลน์</item>
-    </string-array>
+    <string name="settings_chat_status_online">ออนไลน์</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_away">ว่าง</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_busy">ไม่ว่าง</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_offline">ออฟไลน์</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">เปิดการใช้งาน</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1363,8 +1364,6 @@
     <string name="tab_received_requests">รับคำขอ</string>
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">เกินโควต้าพื้นที่จัดเก็บ</string>
-    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">Invalid link. Please try again or request a new one.</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">รหัสผ่านลิงก์ไม่ถูกต้อง</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
@@ -1446,12 +1445,13 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">คุณภาพวีดีโอ</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
-    <string-array name="settings_chat_upload_quality_entries">
-        <item>ต่ำ</item>
-        <item>ปานกลาง</item>
-        <item>สูง</item>
-        <item>ต้นฉบับ</item>
-    </string-array>
+    <string name="settings_chat_upload_quality_low">ต่ำ</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_medium">ปานกลาง</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_high">สูง</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_original">ต้นฉบับ</string>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">สายที่ไม่ได้รับ</string>
     <!-- Refers to a location of file -->
@@ -3199,7 +3199,7 @@
     <!-- Title of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_title">[B]ไม่มีรายการใน[/B][A]สำรองข้อมูล[/A]</string>
     <!-- Description of the Backups feature when no Backup files or folders exist -->
-    <string name="backups_empty_state_body">นี่คือที่จัดเก็บไฟล์และโฟลเดอร์สำหรับสำรองข้อมูล รายการที่สำรองไว้ของคุณเป็นแบบ “อ่านอย่างเดียว” เพื่อป้องกันไม่ให้ถูกแก้ไขโดยไม่ได้ตั้งใจในไดรฟ์ระบบคลาวด์ของคุณ\nคุณสามารถสำรองข้อมูลไฟล์ต่าง ๆ ได้จากคอมพิวเตอร์ของคุณไปยัง MEGA โดยใช้แอปเดสก์ท็อปของเรา</string>
+    <string name="backups_empty_state_body">นี่คือที่จัดเก็บไฟล์และโฟลเดอร์สำหรับสำรองข้อมูล รายการที่สำรองไว้ของคุณเป็นแบบ \“อ่านอย่างเดียว\“ เพื่อป้องกันไม่ให้ถูกแก้ไขโดยไม่ได้ตั้งใจในไดรฟ์ระบบคลาวด์ของคุณ\nคุณสามารถสำรองข้อมูลไฟล์ต่าง ๆ ได้จากคอมพิวเตอร์ของคุณไปยัง MEGA โดยใช้แอปเดสก์ท็อปของเรา</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">บัญชี MEGA ของคุณถูกระงับชั่วคราว เนื่องจากมีการร้องเรียนเรื่องการละเมิดลิขสิทธิ์ซ้ำหลายครั้ง หมายความว่าคุณไม่สามารถเข้าถึงบัญชีหรือข้อมูลใด ๆ ภายในบัญชีของคุณได้\nตรวจสอบกล่องจดหมายอีเมลของคุณเพื่อดูข้อมูลเพิ่มเติมเกี่ยวกับวิธีการยื่นเรื่องโต้แย้ง</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -3768,11 +3768,17 @@
     <plurals name="general_copy_snackbar_fail">
         <item quantity="other">มี %1$d รายการที่คัดลอกไม่ได้</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="other">คัดลอก %1$d รายการแล้ว&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="other">และมีอีก %1$d รายการที่คัดลอกไม่ได้</item>
     </plurals>
@@ -3948,10 +3954,6 @@
     <string name="dialog_taken_down_folder_title">ไม่สามารถเปิดโฟลเดอร์ได้</string>
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">ไม่สามารถเปิดไฟล์ได้</string>
-    <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_description">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
-    <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
-    <string name="dialog_taken_down_file_description">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
     <!-- Text of the button to show the dialog to update to pro -->
     <string name="general_pro_only">Pro เท่านั้น</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
@@ -4541,7 +4543,7 @@
     <!-- Hidden nodes show items -->
     <string name="hidden_nodes_show_items">แสดงรายการที่ถูกซ่อนไว้</string>
     <!-- Hidden nodes show items description -->
-    <string name="hidden_nodes_show_items_description">รายการที่ซ่อนอยู่ทั้งหมดจะแสดงเป็นภาพเบลอเพื่อแสดงสถานะ “ซ่อนอยู่“</string>
+    <string name="hidden_nodes_show_items_description">รายการที่ซ่อนอยู่ทั้งหมดจะแสดงเป็นภาพเบลอเพื่อแสดงสถานะ \“ซ่อนอยู่\“</string>
     <!-- Button text for photo option in camera screen -->
     <string name="camera_photo_button">รูปภาพ</string>
     <!--  -->
