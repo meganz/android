@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">Niewystarczająca ilość miejsca na urządzeniu</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">Wystąpił nieznany błąd. Skontaktuj się z support@mega.io.</string>
+    <string name="general_sync_message_unknown_error">Wystąpił nieznany błąd. Skontaktuj się z support&#64;mega.io.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">Nie można synchronizować ani utworzyć kopii zapasowej katalogu, ponieważ katalog MEGA znajduje się w koszu</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -176,7 +176,7 @@
     </plurals>
     <!-- Message when removing the videos to the video section playlist -->
     <plurals name="video_section_playlist_detail_remove_videos_message">
-        <item quantity="one">Usunięto %1$d element od “%2$s”</item>
+        <item quantity="one">Usunięto %1$d element od \“%2$s”</item>
         <item quantity="few">Usunięto %1$d elementy z”%2$s”</item>
         <item quantity="many">Usunięto %1$d elementy z”%2$s”</item>
         <item quantity="other">Usunięto %1$d elementy z”%2$s”</item>
@@ -735,10 +735,6 @@
     <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%s[/A] [B]zaktualizowano czas spotkania na[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
     <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] [B]odwołano spotkanie zaplanowane na[/B]</string>
-    <!-- Title of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_title">Want MEGA without the ads?</string>
-    <!-- Description of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_description">Upgrade to a Pro plan with plenty of storage and more. Our Pro plans start at just %1$s a month.</string>
     <!-- The Generous storage label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_generous_storage_label">Pojemna pamięć</string>
     <!-- The Generous storage description in the ads free introduction screen -->
@@ -829,7 +825,7 @@
         <item quantity="one">”%1$s” został usunięty z kolejki</item>
         <item quantity="few">Usunięto %2$d element z kolejki</item>
         <item quantity="many">Usunięto %2$d element z kolejki</item>
-        <item quantity="other">Usunięto %2$d elementy z kolejki</item>
+        <item quantity="other">Usunięto %2$d element z kolejki</item>
     </plurals>
     <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
     <string name="transfers_preview_paused_dialog_title">Przelewy są wstrzymane</string>
@@ -891,7 +887,7 @@
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">Zapisywanie %1$s na Dysku w chmurze&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
-    <string name="device_center_list_view_item_status_uploading">Wgrywanie\u2026</string>
+    <string name="device_center_list_view_item_status_uploading">Wgrywanie&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
     <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% wgrywanie...</string>
     <!-- The name of the Device or Folder Status which signifies that it is inactive -->
@@ -1300,7 +1296,7 @@
     <!--Title of playback position dialog that is displayed when audio has playback position history. -->
     <string name="audio_playback_position_dialog_title">Wznowić dźwięk?</string>
     <!--Message of playback position dialog that is displayed when audio has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
-    <string name="audio_playback_position_dialog_message">“%1$s” zostanie wznowione od %2$s.</string>
+    <string name="audio_playback_position_dialog_message">\“%1$s\“ zostanie wznowione od %2$s.</string>
     <!--Resume of playback position dialog for playing audio from the playback position history. -->
     <string name="audio_playback_position_dialog_resume_button">Wznów</string>
     <!--Resume of playback position dialog for playing audio from beginning. -->
@@ -1344,7 +1340,7 @@
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">Usuń ulubione</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_remove_link_menu">Usuń&#160;link</string>
+    <string name="context_remove_link_menu">Usuń link</string>
     <!-- Menu option to delete one or multiple selected items. -->
     <string name="general_remove">Usuń</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -1509,13 +1505,6 @@
         <item quantity="many">Linki usunięte</item>
         <item quantity="other">Linki usunięte</item>
     </plurals>
-    <!-- Warning that appears prior to remove links of files. Plural. -->
-    <plurals name="remove_links_warning_text">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
     <string name="context_share_correctly_removed">Dostęp usunięty</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1535,13 +1524,6 @@
         <item quantity="few">Ten katalog jest udostępniony %1$d kontaktom. Wstrzymać udostępnianie?</item>
         <item quantity="many">Ten katalog jest udostępniony %1$d kontaktom. Wstrzymać udostępnianie?</item>
         <item quantity="other">Ten katalog jest udostępniony %1$d kontaktom. Wstrzymać udostępnianie?</item>
-    </plurals>
-    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <plurals name="alert_remove_several_shares">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
     </plurals>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
     <string name="figures_storage_referrals_achievements_text">%1$s dodatkowej pojemności za każde zaproszenie, ważne przez %2$d dni</string>
@@ -1604,10 +1586,10 @@
     </plurals>
     <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
-        <item quantity="one">nie udało się&#160;opuścić %1$d udostępnionego katalogu</item>
-        <item quantity="few">nie udało się&#160;opuścić %1$d udostępnionych katalogów</item>
-        <item quantity="many">nie udało się&#160;opuścić %1$d udostępnionych katalogów</item>
-        <item quantity="other">nie udało się&#160;opuścić %1$d udostępnionych katalogów</item>
+        <item quantity="one">nie udało się opuścić %1$d udostępnionego katalogu</item>
+        <item quantity="few">nie udało się opuścić %1$d udostępnionych katalogów</item>
+        <item quantity="many">nie udało się opuścić %1$d udostępnionych katalogów</item>
+        <item quantity="other">nie udało się opuścić %1$d udostępnionych katalogów</item>
     </plurals>
     <!-- confirmation message before leaving some incoming shared folders -->
     <plurals name="confirmation_leave_share_folder">
@@ -1823,8 +1805,6 @@
     <string name="camera_update_network_requirement_not_met_banner_description">Przesyłanie z kamery pauza, połącz się z Wi-Fi lub zezwól na dane mobilne</string>
     <!-- The button text of camera uploads network requirement not met paused warning banner -->
     <string name="camera_update_network_requirement_not_met_banner_button_text">Zezwól na dane mobilne</string>
-    <!-- Billing info with discount label -->
-    <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s for %3$s</string>
     <!-- campaign name for Black Friday deal -->
     <string name="campaign_name_black_friday">Oferta na Black Friday: %1$d%% zniżki</string>
     <!-- campaign name for Cyber Monday deal -->
@@ -1903,13 +1883,6 @@
     <string name="delete_album_confirmation_positive_button_text">Usuń</string>
     <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
     <string name="delete_singular_album_confirmation_message">“%s” usunięty</string>
-    <!-- Delete albums confirmation title. -->
-    <plurals name="delete_album_confirmation_dialog_title">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="delete_album_confirmation_dialog_description">
         <item quantity="one">Album zostanie usunięty, ale jego zawartość pozostanie na Twojej Osi czasu.</item>
@@ -1919,13 +1892,6 @@
     </plurals>
     <!-- External checkout button text -->
     <string name="external_checkout_button_text">Kup na naszej stronie (oszczędź do %1$.0f%%)</string>
-    <!-- Title for the album remove link(s) confirmation dialog -->
-    <plurals name="album_content_remove_links_dialog_title">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_description">
         <item quantity="one">Osoby, którym udostępniłeś ten link, utracą dostęp do albumu.</item>
@@ -1936,8 +1902,8 @@
     <!-- Remove button for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_positive_button">
         <item quantity="one">Usuń link</item>
-        <item quantity="few">Usuń&#160;linki</item>
-        <item quantity="many">Usuń&#160;linki</item>
+        <item quantity="few">Usuń linki</item>
+        <item quantity="many">Usuń linki</item>
         <item quantity="other">Usuń linki</item>
     </plurals>
     <!-- Hint for password dialog -->
@@ -2029,20 +1995,4 @@
     <string name="can_only_join_one_call_error_message">Aby dołączyć do tego połączenia, musisz zakończyć bieżące połączenie.</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">Szukaj&#8230;</string>
-    <!-- Title for the album remove link confirmation dialog for singular link -->
-    <string name="album_content_remove_link_dialog_title">Usunąć link?</string>
-    <!-- Title for the album remove link confirmation dialog for multiple link -->
-    <string name="album_content_remove_multiple_links_dialog_title">Usunąć linki?</string>
-    <!-- Explanation text for the album remove link confirmation dialog -->
-    <string name="album_content_remove_link_dialog_description">People you shared this link with will lose access to the album</string>
-    <!-- Explanation text for the album remove multiple links confirmation dialog -->
-    <string name="album_content_remove_multiple_links_dialog_description">People you shared these links with will lose access to the albums</string>
-    <!-- Delete album confirmation title. -->
-    <string name="delete_album_singular_confirmation_dialog_title">Usunąć album?</string>
-    <!-- Delete albums confirmation title. -->
-    <string name="delete_albums_multiple_confirmation_dialog_title">Usunąć albumy?</string>
-    <!-- Delete album confirmation description. -->
-    <string name="delete_album_singular_confirmation_dialog_description">The contents of the album will not be deleted</string>
-    <!-- Delete albums confirmation description. -->
-    <string name="delete_albums_multiple_confirmation_dialog_description">The contents of the albums will not be deleted</string>
 </resources>

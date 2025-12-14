@@ -1019,12 +1019,13 @@
     <!-- Button to set a value -->
     <string name="hint_minutes">minuti</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string-array name="settings_status_entries">
-        <item>Online</item>
-        <item>Assente</item>
-        <item>Occupato</item>
-        <item>Offline</item>
-    </string-array>
+    <string name="settings_chat_status_online">Online</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_away">Assente</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_busy">Occupato</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_offline">Offline</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">Attiva</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1413,8 +1414,6 @@
     <string name="tab_received_requests">Richieste ricevute</string>
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">Quota di archiviazione superata</string>
-    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">Invalid link. Please try again or request a new one.</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">Password del link non valida</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
@@ -1502,12 +1501,13 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Qualità dei video</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
-    <string-array name="settings_chat_upload_quality_entries">
-        <item>Bassa</item>
-        <item>Media</item>
-        <item>Alta</item>
-        <item>Originale</item>
-    </string-array>
+    <string name="settings_chat_upload_quality_low">Bassa</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_medium">Media</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_high">Alta</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_original">Originale</string>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Chiamata persa</string>
     <!-- Refers to a location of file -->
@@ -3301,13 +3301,13 @@
         <item quantity="other">Partecipanti: %s</item>
     </plurals>
     <!-- Chat log message when the permissions for a user has been changed to read-onl -->
-    <string name="chat_chat_room_message_permissions_changed_to_read_only">L\’utente [A]%1$s[/A][B] è stato impostato come “di sola lettura” da [/B][A]%2$s[/A]</string>
+    <string name="chat_chat_room_message_permissions_changed_to_read_only">L\’utente [A]%1$s[/A][B] è stato impostato come \“di sola lettura\“ da [/B][A]%2$s[/A]</string>
     <!-- Chat log message when the permissions for a user has been changed to standard -->
     <string name="chat_chat_room_message_permissions_changed_to_standard">[/B][A]%2$s[/A] ha impostato [A]%1$s[/A][B] come partecipante standard</string>
     <!-- Chat log message when the permissions for a user has been changed to host -->
     <string name="chat_chat_room_message_permissions_changed_to_host">L\’utente [A]%1$s[/A][B] è stato impostato come host da [/B][A]%2$s[/A]</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
-    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">L\’utente %1$s  è stato impostato come “di sola lettura” da %2$s</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">L\’utente %1$s  è stato impostato come \“di sola lettura\“ da %2$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
     <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s ha impostato %1$s come partecipante standard</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
@@ -4096,13 +4096,19 @@
         <item quantity="many">Impossibile copiare %1$d di oggetti</item>
         <item quantity="other">Impossibile copiare %1$d oggetti</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">%1$d oggetto copiato,&#160;</item>
         <item quantity="many">%1$d di oggetti copiati,&#160;</item>
         <item quantity="other">%1$d oggetti copiati,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">impossibile copiare %1$d oggetto</item>
         <item quantity="many">impossibile copiare %1$d oggetti</item>

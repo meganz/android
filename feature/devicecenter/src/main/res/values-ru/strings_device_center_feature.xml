@@ -17,7 +17,7 @@
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents -->
     <string name="device_center_list_view_item_status_updating">Обновление&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents with a percentage completion -->
-    <string name="device_center_list_view_item_status_updating_with_progress">%1$d&#160;%% обновлено&#8230;</string>
+    <string name="device_center_list_view_item_status_updating_with_progress">%1$d %% обновлено&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is disabled -->
     <string name="device_center_list_view_item_status_disabled">Отключено</string>
     <!-- The name of the Device or Folder Status which signifies that the backup procedure has been paused -->

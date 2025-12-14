@@ -676,8 +676,6 @@
     <string name="email_changed">Địa chỉ e-mail cho tài khoản đã được thay đổi thành công, và là: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
     <string name="invalid_string">Không thể để trống</string>
-    <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
-    <string name="invalid_input">Not a valid entry</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Đặt lại mật khẩu</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
@@ -989,12 +987,13 @@
     <!-- Button to set a value -->
     <string name="hint_minutes">phút</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string-array name="settings_status_entries">
-        <item>Trực tuyến</item>
-        <item>Vắng mặt</item>
-        <item>Bận</item>
-        <item>Ngoại Tuyến</item>
-    </string-array>
+    <string name="settings_chat_status_online">Trực tuyến</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_away">Vắng mặt</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_busy">Bận</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_offline">Ngoại Tuyến</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">Bật</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1363,8 +1362,6 @@
     <string name="tab_received_requests">Yêu cầu đã nhận</string>
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">Vượt mức giới hạn lưu trữ</string>
-    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">Invalid link. Please try again or request a new one.</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">Mật khẩu cho liên kết này không đúng</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
@@ -1446,12 +1443,13 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Chất Lượng Video</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
-    <string-array name="settings_chat_upload_quality_entries">
-        <item>Thấp</item>
-        <item>Thường</item>
-        <item>Cao</item>
-        <item>Nguyên gốc</item>
-    </string-array>
+    <string name="settings_chat_upload_quality_low">Thấp</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_medium">Thường</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_high">Cao</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_original">Nguyên gốc</string>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Cuộc gọi nhỡ</string>
     <!-- Refers to a location of file -->
@@ -2151,13 +2149,13 @@
     <!-- Subtitle of the call screen when the call is on hold -->
     <string name="call_on_hold">Cuộc gọi hiện tạm dừng</string>
     <!-- The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other. -->
-    <string name="hold_and_answer_call_incoming">Trả lời &amp;amp; Tạm dừng cuộc hiện tại</string>
+    <string name="hold_and_answer_call_incoming">Trả lời &amp; Tạm dừng cuộc hiện tại</string>
     <!-- The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other. -->
     <string name="hold_and_join_call_incoming">Tham gia và tạm dừng cuộc hiện tại</string>
     <!-- The text of the notification button that is displayed when I receive a individual call and hang the current one and answer the other. -->
-    <string name="end_and_answer_call_incoming">Trả lời &amp;amp; Kết thúc cuộc hiện tại</string>
+    <string name="end_and_answer_call_incoming">Trả lời &amp; Kết thúc cuộc hiện tại</string>
     <!-- The text of the notification button that is displayed when I receive a group call and hand the current one and answer the other. -->
-    <string name="end_and_join_call_incoming">Tham gia &amp;amp; Kết thúc cuộc hiện tại</string>
+    <string name="end_and_join_call_incoming">Tham gia &amp; Kết thúc cuộc hiện tại</string>
     <!-- when trying to download a file that is already downloaded in the device and has to copy in another path -->
     <string name="copy_already_downloaded">Tệp tin đã được tải xuống từ trước. Bản sao đã được tạo ra ở vị trí đã chọn.</string>
     <!-- Title of the dialog shown when you want to join a group call -->
@@ -2173,7 +2171,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">Mời thêm tên liên lạc và để bắt đầu trò chuyện thông qua MEGA và được bảo mật mạnh mẽ.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Xin chào, tham&#160;gia với tôi trên MEGA và tận&#160;hưởng không&#160;gian lưu&#160;trữ &amp;amp; công&#160;cụ giao&#160;tiếp được mã hóa miễn&#160;phí và an&#160;toàn. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Xin chào, tham&#160;gia với tôi trên MEGA và tận&#160;hưởng không&#160;gian lưu&#160;trữ &amp; công&#160;cụ giao&#160;tiếp được mã hóa miễn&#160;phí và an&#160;toàn. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Không có liên kết chát nào cả.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3768,11 +3766,17 @@
     <plurals name="general_copy_snackbar_fail">
         <item quantity="other">Đã không sao&#160;chép được %1$d mục</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="other">Đã sao&#160;chép %1$d mục,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="other">không sao&#160;chép được %1$d mục</item>
     </plurals>

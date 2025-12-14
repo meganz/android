@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">Spațiu de stocare insuficient pe dispozitiv</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">A apărut o eroare necunoscută. Contactați support@mega.io.</string>
+    <string name="general_sync_message_unknown_error">A apărut o eroare necunoscută. Contactați support&#64;mega.io.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">Folderul nu poate fi sincronizat sau backup-uite, deoarece folderul MEGA se află în Coșul de gunoi</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -127,11 +127,11 @@
     <!-- All Duration option of the video section duration filter  -->
     <string name="video_section_videos_duration_option_all_duration">Toate duratele</string>
     <!-- Less than 10 seconds option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_less_than_10_seconds">Mai puțin de 10&#160;secunde</string>
+    <string name="video_section_videos_duration_option_less_than_10_seconds">Mai puțin de 10 secunde</string>
     <!-- Between 10 and 60 seconds option of the video section duration filter  -->
     <string name="video_section_videos_duration_option_between_10_and_60_seconds">Între 10 și 60 de secunde</string>
     <!-- Between 1 and 4 minutes option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_between_1_and_4_minutes">Între 1 și 4&#160;minute</string>
+    <string name="video_section_videos_duration_option_between_1_and_4_minutes">Între 1 și 4 minute</string>
     <!-- Between 4 and 20 minutes option of the video section duration filter  -->
     <string name="video_section_videos_duration_option_between_4_and_20_minutes">Între 4 și 20 de minute</string>
     <!-- More than 20 minutes option of the video section duration filter  -->
@@ -162,14 +162,14 @@
     <string name="video_section_video_selected_top_bar_title">Alegeți fișiere</string>
     <!-- Message when deleting the playlists of the video section playlists tab. %1$d will be replaced the number of deleted playlists -->
     <plurals name="video_section_playlists_delete_playlists_message">
-        <item quantity="one">%1$d&#160;listă de redare a fost ștearsă</item>
-        <item quantity="few">%1$d&#160;liste de redare au fost șterse</item>
+        <item quantity="one">%1$d listă de redare a fost ștearsă</item>
+        <item quantity="few">%1$d liste de redare au fost șterse</item>
         <item quantity="other">%1$d de liste de redare au fost șterse</item>
     </plurals>
     <!-- Message when adding the videos to the video section playlist -->
     <plurals name="video_section_playlist_detail_add_videos_message">
-        <item quantity="one">%1$d&#160;a fost adăugat la „%2$s”</item>
-        <item quantity="few">%1$d&#160;elemente au fost adăugate la „%2$s”</item>
+        <item quantity="one">%1$d a fost adăugat la „%2$s”</item>
+        <item quantity="few">%1$d elemente au fost adăugate la „%2$s”</item>
         <item quantity="other">%1$d de elemente au fost adăugate la „%2$s”</item>
     </plurals>
     <!-- Message when removing the videos to the video section playlist -->
@@ -180,8 +180,8 @@
     </plurals>
     <!-- Text of the video section playlist detail video number -->
     <plurals name="video_section_playlist_detail_video_number">
-        <item quantity="one">%1$d&#160;videoclip</item>
-        <item quantity="few">%1$d&#160;videoclipuri</item>
+        <item quantity="one">%1$d videoclip</item>
+        <item quantity="few">%1$d videoclipuri</item>
         <item quantity="other">%1$d de videoclipuri</item>
     </plurals>
     <!-- Warning shown when the user clicks on a web link and there is no app available at the moment for opening it. -->
@@ -210,8 +210,8 @@
     </plurals>
     <!-- String which indicates the number of folders contained into a device/folder -->
     <plurals name="info_num_folders">
-        <item quantity="one">%1$d&#160;folder</item>
-        <item quantity="few">%1$d&#160;foldere</item>
+        <item quantity="one">%1$d folder</item>
+        <item quantity="few">%1$d foldere</item>
         <item quantity="other">%1$d de foldere</item>
     </plurals>
     <!-- First part of string, which indicates the content of a device/folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
@@ -261,7 +261,7 @@
     <!-- Label for new low-tier plan Essential. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_essential_label">MEGA&#160;Essential</string>
     <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
-    <string name="settings_camera_uploads_upload_only_while_charging_option_body">Încărcările vor fi întrerupte până când începeți să încărcați dispozitivul. Încărcările vor rămâne în continuare întrerupte dacă bateria este sub 20&#160;%.</string>
+    <string name="settings_camera_uploads_upload_only_while_charging_option_body">Încărcările vor fi întrerupte până când începeți să încărcați dispozitivul. Încărcările vor rămâne în continuare întrerupte dacă bateria este sub 20 %.</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">Adăugați o nouă sincronizare</string>
     <!-- Text for the Sync solved issues chip -->
@@ -347,7 +347,7 @@
     <!-- Row label for call and meeting duration in the comparison table -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration">Durata apelului și întâlnirii</string>
     <!-- Call and meeting duration limit in the free plan -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Până la 1&#160;oră</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Până la 1 oră</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">Nelimitată</string>
     <!-- Row label for call and meeting participants in the comparison table -->
@@ -446,14 +446,14 @@
     <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">Nu închide aplicația. Dacă o închizi, transferurile care nu sunt încă în coadă vor fi pierdute.</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
     <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
-        <item quantity="one">%1$d&#160;folder</item>
-        <item quantity="few">%1$d&#160;foldere</item>
+        <item quantity="one">%1$d folder</item>
+        <item quantity="few">%1$d foldere</item>
         <item quantity="other">%1$d de foldere</item>
     </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is creating the folders. This message will inform how many folders are already created together with the total amount of folders that will be created. Example: "1/134 folder" or "48/134 folders" -->
     <plurals name="transfers_scanning_folders_dialog_creating_folders_subtitle">
-        <item quantity="one">%1$d/%2$d&#160;folder</item>
-        <item quantity="few">%1$d/%2$d&#160;foldere</item>
+        <item quantity="one">%1$d/%2$d folder</item>
+        <item quantity="few">%1$d/%2$d foldere</item>
         <item quantity="other">%1$d/%2$d de foldere</item>
     </plurals>
     <!-- Title of the clear debris item displayed in the sync settings menu -->
@@ -468,16 +468,16 @@
     <string name="settings_sync_debris_cleared_message">Folderul .debris a fost șters</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
     <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
-        <item quantity="one">Au fost găsite %1$s și %2$d&#160;fișier.</item>
-        <item quantity="few">Au fost găsite %1$s și %2$d&#160;fișiere.</item>
+        <item quantity="one">Au fost găsite %1$s și %2$d fișier.</item>
+        <item quantity="few">Au fost găsite %1$s și %2$d fișiere.</item>
         <item quantity="other">Au fost găsite %1$s și %2$d de fișiere.</item>
     </plurals>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Se anulează transferurile&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">Întrebările trebuie să aibă cel puțin 10&#160;caractere</string>
+    <string name="report_issue_error_minimum_characters">Întrebările trebuie să aibă cel puțin 10 caractere</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">Descrieți problema cu cel puțin 10&#160;caractere</string>
+    <string name="report_issue_description_placeholder_message">Descrieți problema cu cel puțin 10 caractere</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">Păstrați conversațiile private</string>
     <!--Subtitle text from Recent Chat screen empty view-->
@@ -722,10 +722,6 @@
     <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%s[/A] [B]a actualizat ora întâlnirii la[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
     <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] [B]a anulat întâlnirea programată pentru[/B]</string>
-    <!-- Title of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_title">Want MEGA without the ads?</string>
-    <!-- Description of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_description">Upgrade to a Pro plan with plenty of storage and more. Our Pro plans start at just %1$s a month.</string>
     <!-- The Generous storage label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_generous_storage_label">Spațiu de stocare generos</string>
     <!-- The Generous storage description in the ads free introduction screen -->
@@ -1153,7 +1149,7 @@
     <!-- Maybe later button text in the choose account screen-->
     <string name="choose_account_screen_maybe_later_button_text">Poate mai târziu</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_label_save_up_to">Economisiți până la 16&#160;% cu facturarea anuală</string>
+    <string name="account_upgrade_account_label_save_up_to">Economisiți până la 16 % cu facturarea anuală</string>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
     <string name="choose_account_screen_storage_label">%1$s spațiu de stocare</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
@@ -1420,8 +1416,8 @@
     <string name="video_section_playlists_video_empty">Golește</string>
     <!-- Text of video count of playlist in Video Section -->
     <plurals name="video_section_playlists_video_count">
-        <item quantity="one">%1$d&#160;videoclip</item>
-        <item quantity="few">%1$d&#160;videoclipuri</item>
+        <item quantity="one">%1$d videoclip</item>
+        <item quantity="few">%1$d videoclipuri</item>
         <item quantity="other">%1$d de videoclipuri</item>
     </plurals>
     <!-- Stop Backup confirmation dialog Move explanation -->
@@ -1488,12 +1484,6 @@
         <item quantity="few">Linkuri eliminate</item>
         <item quantity="other">Linkuri eliminate</item>
     </plurals>
-    <!-- Warning that appears prior to remove links of files. Plural. -->
-    <plurals name="remove_links_warning_text">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
     <string name="context_share_correctly_removed">Accesul a fost eliminat</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1511,12 +1501,6 @@
         <item quantity="one">Acest folder este partajat cu %1$d contact. Nu mai partajați?</item>
         <item quantity="few">Acest folder este partajat cu %1$d contacte. Nu mai partajați?</item>
         <item quantity="other">Acest folder este partajat cu %1$d contacte. Nu mai partajați?</item>
-    </plurals>
-    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <plurals name="alert_remove_several_shares">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="other"></item>
     </plurals>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
     <string name="figures_storage_referrals_achievements_text">%1$s spațiu de stocare suplimentar pentru fiecare invitație, valabil pentru %2$d de zile</string>
@@ -1600,12 +1584,6 @@
     <string name="transfers_retry_failed_snackbar_message">Imposibil de repornit transferurile</string>
     <!-- Action for the Snackbar when retry failed on failed transfers tab. -->
     <string name="transfers_retry_failed_snackbar_action">Reîncearcă</string>
-    <!-- Snackbar message when retry success on failed transfers tab. -->
-    <plurals name="transfers_retry_feedback_snackbar_message">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">Restaurat în %s</string>
     <!-- success message when moving a node -->
@@ -1784,14 +1762,12 @@
     <string name="camera_update_network_requirement_not_met_banner_description">Încărcările camerelor au fost întrerupte, se conectează la Wi-Fi sau permite datele mobile</string>
     <!-- The button text of camera uploads network requirement not met paused warning banner -->
     <string name="camera_update_network_requirement_not_met_banner_button_text">Permiteți datele mobile</string>
-    <!-- Billing info with discount label -->
-    <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s for %3$s</string>
     <!-- campaign name for Black Friday deal -->
-    <string name="campaign_name_black_friday">Ofertă de Black Friday: reducere de %1$d&#160;%%</string>
+    <string name="campaign_name_black_friday">Ofertă de Black Friday: reducere de %1$d %%</string>
     <!-- campaign name for Cyber Monday deal -->
-    <string name="campaign_name_cyber_monday">Ofertă Cyber Monday: reducere de %1$d&#160;%%</string>
+    <string name="campaign_name_cyber_monday">Ofertă Cyber Monday: reducere de %1$d %%</string>
     <!-- campaign name for Special offer -->
-    <string name="campaign_name_special_offer">Oferta speciala: reducere de %1$d&#160;%%</string>
+    <string name="campaign_name_special_offer">Oferta speciala: reducere de %1$d %%</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
         <item quantity="one">%1$s pentru primul %2$d lună</item>
@@ -1807,7 +1783,7 @@
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGA suite de confidențialitate</string>
     <!-- Message about savings on yearly plan in case it has discount -->
-    <string name="account_upgrade_account_label_save_at_least">Economisiți cel puțin 16&#160;% la un abonament anual</string>
+    <string name="account_upgrade_account_label_save_at_least">Economisiți cel puțin 16 % la un abonament anual</string>
     <!-- Add new album on Media screen dialog title -->
     <string name="media_add_new_album_dialog_title">Introduceți numele albumului</string>
     <!-- Add new album on Media screen dialog positive button text -->
@@ -1860,12 +1836,6 @@
     <string name="delete_album_confirmation_positive_button_text">Ștergeți</string>
     <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
     <string name="delete_singular_album_confirmation_message">„%s” a fost ștearsă</string>
-    <!-- Delete albums confirmation title. -->
-    <plurals name="delete_album_confirmation_dialog_title">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="delete_album_confirmation_dialog_description">
         <item quantity="one">Albumul va fi șters, însă conținutul lui va rămâne în Cronologie.</item>
@@ -1874,12 +1844,6 @@
     </plurals>
     <!-- External checkout button text -->
     <string name="external_checkout_button_text">Cumpărați pe site-ul nostru web (Economisiți până la %1$.0f%%)</string>
-    <!-- Title for the album remove link(s) confirmation dialog -->
-    <plurals name="album_content_remove_links_dialog_title">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_description">
         <item quantity="one">Persoanele cu care ați partajat acest link vor pierde accesul la album.</item>
@@ -1916,8 +1880,8 @@
     <string name="timeline_tab_enable_camera_uploads_banner_description">Este nevoie de încărcări de camere [A]acces complet[/A] în biblioteca foto a dispozitivului</string>
     <!-- Camera uploads completed info in TimelineTab screen. -->
     <plurals name="timeline_tab_camera_uploads_completed">
-        <item quantity="one">Încărcări cameră complete, %1$d&#160;fișier încărcat</item>
-        <item quantity="few">Încărcări cameră complete, %1$d&#160;fișiere încărcate</item>
+        <item quantity="one">Încărcări cameră complete, %1$d fișier încărcat</item>
+        <item quantity="few">Încărcări cameră complete, %1$d fișiere încărcate</item>
         <item quantity="other">Încărcări cameră complete, %1$d de fișiere încărcate</item>
     </plurals>
     <!-- Timeline tab screen grid size menu title -->
@@ -1950,50 +1914,18 @@
     <string name="timeline_tab_filter_media_source_selection_header">Afișează elemente din</string>
     <!-- Timeline filter remember preferences toggle text. -->
     <string name="timeline_tab_filter_remember_preferences">Amintiți-vă preferințele</string>
-    <!-- Timeline filter apply filter button text. -->
-    <string name="timeline_tab_filter_apply_filter_button">Apply filter</string>
-    <!-- General label for invite contact contexts -->
-    <string name="general_invite_contact">Invite contact</string>
-    <!-- Contact found title for a dialog showing contact link info -->
-    <string name="contact_found_dialog_title">Contact found</string>
     <!--Album content empty album layout title when an album content is empty-->
     <string name="album_content_empty_album_title">Album gol</string>
     <!--Album content action to add more items to the album-->
     <string name="album_content_action_add_items">Adăugați elemente</string>
     <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
     <string name="videos_tab_empty_hint_video">[B]Niciun[/B] [A]video[/A] [B]găsit[/B]</string>
-    <!-- Action to remove items from the Favourites album -->
-    <string name="album_content_action_remove_favourites">Remove from Favourites</string>
     <!-- Title of the empty screen when a folder is empty -->
     <string name="context_empty_folder_title">Acest folder este gol</string>
-    <!-- Title of the empty screen when there are no items in the root Cloud Drive -->
-    <string name="context_empty_cloud_drive_title">Nothing in your cloud drive yet</string>
     <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
     <string name="context_empty_cloud_drive_description">Păstrați ceva în siguranță cu criptare cu cunoștință zero</string>
-    <!-- Error shown when trying to confirm an account from a confirmation link and the app is already logged in -->
-    <string name="open_link_account_confirmation_error">You’re already logged in with a different MEGA account. Log out first, then open the account confirmation link again.</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link_error_message">Această conversație nu mai este disponibilă</string>
-    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="general_invalid_link">Invalid link. Please try again or request a new one.</string>
-    <!-- Text of the dialog shown when you want to join a group call and you're already in another call-->
-    <string name="can_only_join_one_call_error_message">To join this call you have to end your current call</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">Caută&#8230;</string>
-    <!-- Title for the album remove link confirmation dialog for singular link -->
-    <string name="album_content_remove_link_dialog_title">Eliminați linkul?</string>
-    <!-- Title for the album remove link confirmation dialog for multiple link -->
-    <string name="album_content_remove_multiple_links_dialog_title">Eliminați link-urile?</string>
-    <!-- Explanation text for the album remove link confirmation dialog -->
-    <string name="album_content_remove_link_dialog_description">People you shared this link with will lose access to the album</string>
-    <!-- Explanation text for the album remove multiple links confirmation dialog -->
-    <string name="album_content_remove_multiple_links_dialog_description">People you shared these links with will lose access to the albums</string>
-    <!-- Delete album confirmation title. -->
-    <string name="delete_album_singular_confirmation_dialog_title">Ștergi albumul?</string>
-    <!-- Delete albums confirmation title. -->
-    <string name="delete_albums_multiple_confirmation_dialog_title">Ștergi albumele?</string>
-    <!-- Delete album confirmation description. -->
-    <string name="delete_album_singular_confirmation_dialog_description">The contents of the album will not be deleted</string>
-    <!-- Delete albums confirmation description. -->
-    <string name="delete_albums_multiple_confirmation_dialog_description">The contents of the albums will not be deleted</string>
 </resources>
