@@ -4,6 +4,8 @@ package mega.privacy.android.core.nodecomponents.sheet.nodeactions
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -46,35 +48,40 @@ internal fun NodeMoreOptionsBottomSheet(
         modifier = modifier,
         onDismissRequest = onDismissRequest
     ) {
-        actions.distinct().forEach { action ->
-            FlexibleLineListItem(
-                modifier = Modifier
-                    .testTag(action.testTag),
-                title = action.getDescription(),
-                titleTextColor = action.getTextColor(),
-                leadingElement = {
-                    NodeActionIcon(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .size(24.dp),
-                        action = action,
-                        contentDescription = action.getDescription()
-                    )
-                },
-                trailingElement = {
-                    if (action is HideMenuAction) {
-                        HelpIcon(
+        LazyColumn {
+            items(
+                items = actions,
+                key = { action -> action.testTag }
+            ) { action ->
+                FlexibleLineListItem(
+                    modifier = Modifier
+                        .testTag(action.testTag),
+                    title = action.getDescription(),
+                    titleTextColor = action.getTextColor(),
+                    leadingElement = {
+                        NodeActionIcon(
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .size(24.dp),
                             action = action,
-                            contentDescription = "Help for ${action.getDescription()}",
-                            onHelpClicked = onHelpClicked
+                            contentDescription = action.getDescription()
                         )
-                    }
-                },
-                onClickListener = {
-                    onActionPressed?.invoke(action)
-                },
-                enableClick = action.enabled
-            )
+                    },
+                    trailingElement = {
+                        if (action is HideMenuAction) {
+                            HelpIcon(
+                                action = action,
+                                contentDescription = "Help for ${action.getDescription()}",
+                                onHelpClicked = onHelpClicked
+                            )
+                        }
+                    },
+                    onClickListener = {
+                        onActionPressed?.invoke(action)
+                    },
+                    enableClick = action.enabled
+                )
+            }
         }
     }
 }
