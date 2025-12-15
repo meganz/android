@@ -41,7 +41,10 @@ internal fun RecentDateHeader(timestamp: Long) {
  * Format date from timestamp for header
  */
 @Composable
-private fun FormatRecentsDate(timestamp: Long): String {
+internal fun FormatRecentsDate(
+    timestamp: Long,
+    dateFormatPattern: String = "EEEE, d MMM yyyy"
+): String {
     val locale = Locale.current.platformLocale
     val zoneId = remember { ZoneId.systemDefault() }
     val timestampInstant = Instant.ofEpochSecond(timestamp)
@@ -53,7 +56,7 @@ private fun FormatRecentsDate(timestamp: Long): String {
         DateTimeFormatter.ofPattern(
             DateFormat.getBestDateTimePattern(
                 locale,
-                "EEEE, d MMM yyyy"
+                dateFormatPattern
             )
         ).withLocale(locale)
     }

@@ -11,6 +11,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -37,6 +38,7 @@ import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.home.HomeWidget
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.navigation.destination.RecentsBucketScreenNavKey
 import mega.privacy.android.navigation.destination.RecentsScreenNavKey
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentsWidgetHeader
 import mega.privacy.mobile.home.presentation.recents.RecentsViewModel
@@ -75,12 +77,23 @@ class RecentsWidget @Inject constructor() : HomeWidget {
         val snackBarHostState = LocalSnackBarHostState.current
         var openedFileNode by remember { mutableStateOf<Pair<TypedFileNode, NodeSourceType>?>(null) }
         var showOptionsBottomSheet by rememberSaveable { mutableStateOf(false) }
-
+        val context = LocalContext.current
         RecentsView(
             uiState = uiState,
             modifier = modifier,
             onFileClicked = { node, source ->
                 openedFileNode = node to source
+            },
+            onBucketClicked = { item ->
+                onNavigate(
+                    RecentsBucketScreenNavKey(
+                        identifier = item.bucket.identifier,
+                        folderName = item.parentFolderName.get(context),
+                        nodeSourceType = item.nodeSourceType,
+                        timestamp = item.bucket.timestamp,
+                        fileCount = item.bucket.nodes.size,
+                    )
+                )
             },
             onWidgetOptionsClicked = { showOptionsBottomSheet = true },
             onShowRecentActivity = viewModel::showRecentActivity,
@@ -123,6 +136,7 @@ class RecentsWidget @Inject constructor() : HomeWidget {
 fun RecentsView(
     uiState: RecentsUiState,
     onFileClicked: (TypedFileNode, NodeSourceType) -> Unit,
+    onBucketClicked: (RecentsUiItem) -> Unit = {},
     onShowRecentActivity: () -> Unit,
     onWidgetOptionsClicked: () -> Unit,
     onUploadClicked: () -> Unit,
@@ -168,7 +182,7 @@ fun RecentsView(
                                         onFileClicked(node, item.nodeSourceType)
                                     }
                                 } else {
-                                    // TODO: Handle bucket click
+                                    onBucketClicked(item)
                                 }
                             },
                             onMenuClicked = {

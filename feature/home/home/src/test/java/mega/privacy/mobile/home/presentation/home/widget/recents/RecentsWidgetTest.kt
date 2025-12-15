@@ -381,7 +381,7 @@ class RecentsWidgetTest {
             timestamp = System.currentTimeMillis() / 1000,
             icon = IconPackR.drawable.ic_image_stack_medium_solid,
             isMediaBucket = true,
-            nodes = listOf(mockNode),
+            nodes = listOf(mockNode, mockNode),
             parentFolderSharesType = RecentActionsSharesType.NONE,
         )
 
@@ -453,6 +453,51 @@ class RecentsWidgetTest {
 
         assertThat(clickedNode).isNull()
         assertThat(clickedSourceType).isNull()
+    }
+
+    @Test
+    fun `test that onBucketClicked is called with correct item when regular bucket item is clicked`() {
+        val mockNode1 = createMockTypedFileNode(name = "File1.pdf")
+        val mockNode2 = createMockTypedFileNode(name = "File2.pdf")
+        val mockNode3 = createMockTypedFileNode(name = "File3.pdf")
+        var clickedItem: RecentsUiItem? = null
+
+        val item = createMockRecentsUiItem(
+            title = RecentActionTitleText.RegularBucket("Presentation.pptx", 3),
+            parentFolderName = LocalizedText.Literal("Work"),
+            timestamp = System.currentTimeMillis() / 1000,
+            icon = IconPackR.drawable.ic_generic_medium_solid,
+            isMediaBucket = false,
+            nodes = listOf(mockNode1, mockNode2, mockNode3),
+            parentFolderSharesType = RecentActionsSharesType.NONE,
+        )
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsView(
+                    uiState = RecentsUiState(
+                        recentActionItems = listOf(item),
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
+                    ),
+                    onFileClicked = { _, _ -> },
+                    onBucketClicked = { clickedItem = it },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
+                )
+            }
+        }
+
+        composeRule.waitForIdle()
+        composeRule.onAllNodesWithTag(FIRST_LINE_TEST_TAG, true)[0]
+            .performClick()
+
+        assertThat(clickedItem).isNotNull()
+        assertThat(clickedItem).isEqualTo(item)
+        assertThat(clickedItem?.bucket?.identifier).isEqualTo(item.bucket.identifier)
+        assertThat(clickedItem?.bucket?.nodes).hasSize(3)
     }
 
     @Test
@@ -845,6 +890,7 @@ class RecentsWidgetTest {
         parentFolderSharesType: RecentActionsSharesType = RecentActionsSharesType.NONE,
         isSensitive: Boolean = false,
     ): RecentsUiItem {
+        val isSingleNode = nodes.size == 1
         val mockBucket = RecentActionBucket(
             identifier = "id1",
             timestamp = timestamp,
@@ -868,7 +914,7 @@ class RecentsWidgetTest {
             isFavourite = isFavourite,
             nodeLabel = nodeLabel,
             bucket = mockBucket,
-            isSingleNode = !isMediaBucket,
+            isSingleNode = isSingleNode,
             isSensitive = isSensitive
         )
     }

@@ -30,7 +30,9 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.feature.home.R
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.navigation.destination.RecentsBucketScreenNavKey
 import mega.privacy.mobile.home.presentation.home.widget.recents.mockRecentsUiItemList
+import mega.privacy.mobile.home.presentation.recents.model.RecentsUiItem
 import mega.privacy.mobile.home.presentation.recents.model.RecentsUiState
 import mega.privacy.mobile.home.presentation.recents.view.RecentsEmptyView
 import mega.privacy.mobile.home.presentation.recents.view.RecentsHiddenView
@@ -72,6 +74,17 @@ fun RecentsScreen(
             onFileClicked = { node, source ->
                 openedFileNode = node to source
             },
+            onBucketClicked = { item ->
+                onNavigate(
+                    RecentsBucketScreenNavKey(
+                        identifier = item.bucket.identifier,
+                        folderName = item.bucket.parentFolderName,
+                        nodeSourceType = item.nodeSourceType,
+                        timestamp = item.bucket.timestamp,
+                        fileCount = item.bucket.nodes.size,
+                    )
+                )
+            },
             onShowRecentActivity = viewModel::showRecentActivity,
             onUploadClicked = {
                 onNavigate(HomeFabOptionsBottomSheetNavKey)
@@ -109,6 +122,7 @@ fun RecentsScreen(
 internal fun RecentsScreenContent(
     uiState: RecentsUiState,
     onFileClicked: (TypedFileNode, NodeSourceType) -> Unit,
+    onBucketClicked: (RecentsUiItem) -> Unit,
     onShowRecentActivity: () -> Unit,
     onUploadClicked: () -> Unit,
     modifier: Modifier = Modifier,
@@ -140,7 +154,8 @@ internal fun RecentsScreenContent(
             RecentsLazyListView(
                 items = uiState.recentActionItems,
                 modifier = modifier,
-                onFileClicked = onFileClicked
+                onFileClicked = onFileClicked,
+                onBucketClicked = onBucketClicked,
             )
         }
     }
@@ -157,6 +172,7 @@ private fun RecentsScreenContentPreview() {
                 isHiddenNodeSettingsLoading = false
             ),
             onFileClicked = { _, _ -> },
+            onBucketClicked = { },
             onShowRecentActivity = {},
             onUploadClicked = {},
         )
@@ -174,6 +190,7 @@ private fun RecentsScreenContentEmptyPreview() {
                 isHiddenNodeSettingsLoading = false
             ),
             onFileClicked = { _, _ -> },
+            onBucketClicked = { },
             onShowRecentActivity = {},
             onUploadClicked = {},
         )
@@ -191,6 +208,7 @@ private fun RecentsScreenContentLoadingPreview() {
                 isHiddenNodeSettingsLoading = false
             ),
             onFileClicked = { _, _ -> },
+            onBucketClicked = { },
             onShowRecentActivity = {},
             onUploadClicked = {},
         )

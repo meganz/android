@@ -67,6 +67,7 @@ class RecentsScreenTest {
                     onFileClicked = { _, _ -> },
                     onShowRecentActivity = {},
                     onUploadClicked = {},
+                    onBucketClicked = {}
                 )
             }
         }
@@ -90,6 +91,7 @@ class RecentsScreenTest {
                     onFileClicked = { _, _ -> },
                     onShowRecentActivity = {},
                     onUploadClicked = {},
+                    onBucketClicked = {}
                 )
             }
         }
@@ -116,6 +118,7 @@ class RecentsScreenTest {
                     onFileClicked = { _, _ -> },
                     onShowRecentActivity = { showActivityClicked = true },
                     onUploadClicked = {},
+                    onBucketClicked = {}
                 )
             }
         }
@@ -139,6 +142,7 @@ class RecentsScreenTest {
                     onFileClicked = { _, _ -> },
                     onShowRecentActivity = {},
                     onUploadClicked = {},
+                    onBucketClicked = {}
                 )
             }
         }
@@ -162,6 +166,7 @@ class RecentsScreenTest {
                     onFileClicked = { _, _ -> },
                     onShowRecentActivity = {},
                     onUploadClicked = {},
+                    onBucketClicked = {}
                 )
             }
         }
@@ -190,6 +195,7 @@ class RecentsScreenTest {
                     onFileClicked = { _, _ -> },
                     onShowRecentActivity = {},
                     onUploadClicked = {},
+                    onBucketClicked = {}
                 )
             }
         }
@@ -212,6 +218,7 @@ class RecentsScreenTest {
                     onFileClicked = { _, _ -> },
                     onShowRecentActivity = {},
                     onUploadClicked = {},
+                    onBucketClicked = {}
                 )
             }
         }
@@ -233,6 +240,7 @@ class RecentsScreenTest {
                     onFileClicked = { _, _ -> },
                     onShowRecentActivity = {},
                     onUploadClicked = {},
+                    onBucketClicked = {}
                 )
             }
         }
@@ -256,6 +264,7 @@ class RecentsScreenTest {
                     onFileClicked = { _, _ -> },
                     onShowRecentActivity = {},
                     onUploadClicked = { uploadClicked = true },
+                    onBucketClicked = {}
                 )
             }
         }
@@ -287,6 +296,7 @@ class RecentsScreenTest {
                     onFileClicked = { _, _ -> },
                     onShowRecentActivity = {},
                     onUploadClicked = {},
+                    onBucketClicked = {}
                 )
             }
         }
@@ -326,6 +336,7 @@ class RecentsScreenTest {
                     },
                     onShowRecentActivity = {},
                     onUploadClicked = {},
+                    onBucketClicked = {}
                 )
             }
         }
