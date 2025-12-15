@@ -341,6 +341,7 @@ private fun PhotoNodeBody(
                     }
                 }
 
+                is DownloadPhotoResult.Idle -> PhotosNodeThumbnailData.Loading
                 else -> PhotosNodeThumbnailData.Placeholder(imageResId = node.defaultIcon)
             }
         )
