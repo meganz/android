@@ -894,7 +894,7 @@ class FileInfoViewModel @Inject constructor(
                         }
                     }
                 }.onFailure {
-                    Timber.w("Exception getting folder tree info.", it)
+                    Timber.w(it, "Exception getting folder tree info.")
                 }
             }
         }
