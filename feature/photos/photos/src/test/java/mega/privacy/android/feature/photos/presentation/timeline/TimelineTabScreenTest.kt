@@ -10,6 +10,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
+import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
+import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -60,7 +62,7 @@ class TimelineTabScreenTest {
         onChangeCameraUploadsPermissions: () -> Unit = {},
         clearCameraUploadsChangePermissionsMessage: () -> Unit = {},
         loadNextPage: () -> Unit = {},
-        onNavigateCameraUploadsSettings: () -> Unit = {},
+        onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit = {},
         setEnableCUPage: (Boolean) -> Unit = {},
         onGridSizeChange: (value: TimelineGridSize) -> Unit = {},
         onSortDialogDismissed: () -> Unit = {},
@@ -71,6 +73,7 @@ class TimelineTabScreenTest {
         handleCameraUploadsPermissionsResult: () -> Unit = {},
         updateIsWarningBannerShown: (value: Boolean) -> Unit = {},
         onTabsVisibilityChange: (shouldHide: Boolean) -> Unit = {},
+        onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit = {},
     ) {
         setContent {
             TimelineTabScreen(
@@ -83,7 +86,7 @@ class TimelineTabScreenTest {
                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
                 clearCameraUploadsChangePermissionsMessage = clearCameraUploadsChangePermissionsMessage,
                 loadNextPage = loadNextPage,
-                onNavigateCameraUploadsSettings = onNavigateCameraUploadsSettings,
+                onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
                 setEnableCUPage = setEnableCUPage,
                 onGridSizeChange = onGridSizeChange,
                 onSortDialogDismissed = onSortDialogDismissed,
@@ -93,7 +96,8 @@ class TimelineTabScreenTest {
                 onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
                 handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
                 updateIsWarningBannerShown = updateIsWarningBannerShown,
-                onTabsVisibilityChange = onTabsVisibilityChange
+                onTabsVisibilityChange = onTabsVisibilityChange,
+                onNavigateToUpgradeAccount = onNavigateToUpgradeAccount
             )
         }
     }

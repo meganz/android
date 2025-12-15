@@ -65,6 +65,7 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
             onTransfer = onTransfer,
             onNavigateToAddToAlbum = navigationHandler::navigate,
             onNavigateToCameraUploadsSettings = navigationHandler::navigate,
+            onNavigateToUpgradeAccount = navigationHandler::navigate,
         )
     }
 }

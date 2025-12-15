@@ -21,6 +21,7 @@ import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivit
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumType
 import mega.privacy.android.app.presentation.photos.search.PhotosSearchActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SHOW_HOW_TO_UPLOAD_PROMPT
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumLink
@@ -31,8 +32,8 @@ import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKe
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumImportNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
-import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotosSearchNavKey
+import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.navigation.destination.MediaTimelinePhotoPreviewNavKey
 
 fun EntryProviderScope<NavKey>.legacyAlbumCoverSelection(
@@ -217,7 +218,12 @@ fun EntryProviderScope<NavKey>.legacySettingsCameraUploadsActivityNavKey(removeD
     entry<LegacySettingsCameraUploadsActivityNavKey> { args ->
         val context = LocalContext.current
         LaunchedEffect(Unit) {
-            val intent = Intent(context, SettingsCameraUploadsActivity::class.java)
+            val intent = Intent(context, SettingsCameraUploadsActivity::class.java).apply {
+                putExtra(
+                    INTENT_EXTRA_KEY_SHOW_HOW_TO_UPLOAD_PROMPT,
+                    args.isShowHowToUploadPrompt
+                )
+            }
             context.startActivity(intent)
             // Immediately pop this destination from the back stack
             removeDestination()

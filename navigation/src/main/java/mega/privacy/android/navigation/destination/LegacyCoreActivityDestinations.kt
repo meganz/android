@@ -253,4 +253,6 @@ data class LegacyOpenLinkAfterFetchNodes(val link: String) : NavKey
 data object LegacyPhotosSearchNavKey : NavKey
 
 @Serializable
-data object LegacySettingsCameraUploadsActivityNavKey : NavKey
+data class LegacySettingsCameraUploadsActivityNavKey(
+    val isShowHowToUploadPrompt: Boolean = false,
+) : NavKey

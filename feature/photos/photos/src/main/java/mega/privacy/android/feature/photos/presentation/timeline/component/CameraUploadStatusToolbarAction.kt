@@ -20,7 +20,7 @@ internal fun CameraUploadStatusToolbarAction(
     cameraUploadsProgress: Float,
     setCameraUploadsMessage: (message: String) -> Unit,
     updateIsWarningBannerShown: (value: Boolean) -> Unit,
-    onNavigateCameraUploadsSettings: () -> Unit,
+    onNavigateToCameraUploadsSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -37,7 +37,7 @@ internal fun CameraUploadStatusToolbarAction(
             CameraUploadsStatusIcon(
                 modifier = modifier.testTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_DEFAULT_TAG),
                 type = CameraUploadsStatusType.Default,
-                onClick = onNavigateCameraUploadsSettings
+                onClick = onNavigateToCameraUploadsSettings
             )
         }
 

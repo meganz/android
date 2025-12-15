@@ -65,7 +65,7 @@ class CameraUploadStatusToolbarActionTest {
             setAction(
                 isCuWarningStatusVisible = false,
                 isCuDefaultStatusVisible = true,
-                onNavigateCameraUploadsSettings = onNavigateCameraUploadsSettings
+                onNavigateToCameraUploadsSettings = onNavigateCameraUploadsSettings
             )
 
             onNodeWithTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_DEFAULT_TAG).performClick()
@@ -200,7 +200,7 @@ class CameraUploadStatusToolbarActionTest {
         cameraUploadsProgress: Float = 0F,
         setCameraUploadsMessage: (message: String) -> Unit = {},
         updateIsWarningBannerShown: (value: Boolean) -> Unit = {},
-        onNavigateCameraUploadsSettings: () -> Unit = {},
+        onNavigateToCameraUploadsSettings: () -> Unit = {},
     ) {
         setContent {
             CameraUploadStatusToolbarAction(
@@ -213,7 +213,7 @@ class CameraUploadStatusToolbarActionTest {
                 cameraUploadsProgress = cameraUploadsProgress,
                 setCameraUploadsMessage = setCameraUploadsMessage,
                 updateIsWarningBannerShown = updateIsWarningBannerShown,
-                onNavigateCameraUploadsSettings = onNavigateCameraUploadsSettings
+                onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings
             )
         }
     }

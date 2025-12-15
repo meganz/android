@@ -81,6 +81,8 @@ import mega.privacy.android.feature.photos.presentation.timeline.component.Timel
 import mega.privacy.android.feature.photos.presentation.timeline.model.CameraUploadsBannerType
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
+import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
+import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
@@ -94,7 +96,7 @@ internal fun TimelineTabRoute(
     onChangeCameraUploadsPermissions: () -> Unit,
     clearCameraUploadsChangePermissionsMessage: () -> Unit,
     loadNextPage: () -> Unit,
-    onNavigateCameraUploadsSettings: () -> Unit,
+    onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
     setEnableCUPage: (Boolean) -> Unit,
     onGridSizeChange: (value: TimelineGridSize) -> Unit,
     onSortDialogDismissed: () -> Unit,
@@ -105,6 +107,7 @@ internal fun TimelineTabRoute(
     handleCameraUploadsPermissionsResult: () -> Unit,
     updateIsWarningBannerShown: (value: Boolean) -> Unit,
     onTabsVisibilityChange: (shouldHide: Boolean) -> Unit,
+    onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -120,7 +123,7 @@ internal fun TimelineTabRoute(
         onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
         clearCameraUploadsChangePermissionsMessage = clearCameraUploadsChangePermissionsMessage,
         loadNextPage = loadNextPage,
-        onNavigateCameraUploadsSettings = onNavigateCameraUploadsSettings,
+        onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
         setEnableCUPage = setEnableCUPage,
         onGridSizeChange = onGridSizeChange,
         onSortDialogDismissed = onSortDialogDismissed,
@@ -130,7 +133,8 @@ internal fun TimelineTabRoute(
         onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
         handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
         updateIsWarningBannerShown = updateIsWarningBannerShown,
-        onTabsVisibilityChange = onTabsVisibilityChange
+        onTabsVisibilityChange = onTabsVisibilityChange,
+        onNavigateToUpgradeAccount = onNavigateToUpgradeAccount
     )
 }
 
@@ -145,7 +149,7 @@ internal fun TimelineTabScreen(
     onChangeCameraUploadsPermissions: () -> Unit,
     clearCameraUploadsChangePermissionsMessage: () -> Unit,
     loadNextPage: () -> Unit,
-    onNavigateCameraUploadsSettings: () -> Unit,
+    onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
     setEnableCUPage: (Boolean) -> Unit,
     onGridSizeChange: (value: TimelineGridSize) -> Unit,
     onSortDialogDismissed: () -> Unit,
@@ -156,6 +160,7 @@ internal fun TimelineTabScreen(
     handleCameraUploadsPermissionsResult: () -> Unit,
     updateIsWarningBannerShown: (value: Boolean) -> Unit,
     onTabsVisibilityChange: (shouldHide: Boolean) -> Unit,
+    onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -312,7 +317,11 @@ internal fun TimelineTabScreen(
         showEnableCUPage -> {
             EnableCameraUploadsContent(
                 modifier = modifier.padding(horizontal = 16.dp),
-                onEnable = onNavigateCameraUploadsSettings
+                onEnable = {
+                    onNavigateToCameraUploadsSettings(
+                        LegacySettingsCameraUploadsActivityNavKey()
+                    )
+                }
             )
         }
 
@@ -354,13 +363,25 @@ internal fun TimelineTabScreen(
                         monthsCardPhotos = uiState.monthsCardPhotos,
                     )
                 },
-                onEnableCameraUploads = onNavigateCameraUploadsSettings,
                 onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
                 onChangeCameraUploadsPermissions = {
                     val cameraUploadsPermissions = getCameraUploadsPermissions()
                     cameraUploadsPermissionsLauncher.launch(cameraUploadsPermissions)
                 },
-                onDismissWarningBanner = { updateIsWarningBannerShown(false) }
+                onDismissWarningBanner = { updateIsWarningBannerShown(false) },
+                onNavigateToCameraUploadsSettings = {
+                    onNavigateToCameraUploadsSettings(
+                        LegacySettingsCameraUploadsActivityNavKey()
+                    )
+                },
+                onNavigateMobileDataSetting = {
+                    onNavigateToCameraUploadsSettings(
+                        LegacySettingsCameraUploadsActivityNavKey(isShowHowToUploadPrompt = true)
+                    )
+                },
+                onNavigateToUpgradeScreen = {
+                    onNavigateToUpgradeAccount(UpgradeAccountNavKey())
+                },
             )
         }
     }
@@ -425,10 +446,12 @@ private fun TimelineTabContent(
     onPhotoClick: (node: PhotoNodeUiState) -> Unit,
     onPhotoSelected: (node: PhotoNodeUiState) -> Unit,
     onPhotosNodeListCardClick: (photo: PhotosNodeListCard) -> Unit,
-    onEnableCameraUploads: () -> Unit,
     onDismissEnableCameraUploadsBanner: () -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
     onDismissWarningBanner: () -> Unit,
+    onNavigateToCameraUploadsSettings: () -> Unit,
+    onNavigateMobileDataSetting: () -> Unit,
+    onNavigateToUpgradeScreen: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -458,10 +481,13 @@ private fun TimelineTabContent(
                                 bannerType = bannerType,
                                 shouldShowEnableCUBanner = shouldShowEnableCUBanner,
                                 shouldShowCUWarningBanner = shouldShowCUWarningBanner,
-                                onEnableCameraUploads = onEnableCameraUploads,
+                                onEnableCameraUploads = onNavigateToCameraUploadsSettings,
                                 onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
                                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
-                                onDismissWarningBanner = onDismissWarningBanner
+                                onDismissWarningBanner = onDismissWarningBanner,
+                                onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
+                                onNavigateMobileDataSetting = onNavigateMobileDataSetting,
+                                onNavigateUpgradeScreen = onNavigateToUpgradeScreen,
                             )
                         }
                     }
@@ -486,10 +512,13 @@ private fun TimelineTabContent(
                                 bannerType = bannerType,
                                 shouldShowEnableCUBanner = shouldShowEnableCUBanner,
                                 shouldShowCUWarningBanner = shouldShowCUWarningBanner,
-                                onEnableCameraUploads = onEnableCameraUploads,
+                                onEnableCameraUploads = onNavigateToCameraUploadsSettings,
                                 onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
                                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
-                                onDismissWarningBanner = onDismissWarningBanner
+                                onDismissWarningBanner = onDismissWarningBanner,
+                                onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
+                                onNavigateMobileDataSetting = onNavigateMobileDataSetting,
+                                onNavigateUpgradeScreen = onNavigateToUpgradeScreen,
                             )
                         }
                     }
@@ -748,7 +777,7 @@ private fun TimelineTabScreenPreview() {
             clearCameraUploadsChangePermissionsMessage = {},
             loadNextPage = {},
             setEnableCUPage = {},
-            onNavigateCameraUploadsSettings = {},
+            onNavigateToCameraUploadsSettings = {},
             onGridSizeChange = {},
             onSortDialogDismissed = {},
             onSortOptionChange = {},
@@ -757,7 +786,8 @@ private fun TimelineTabScreenPreview() {
             onDismissEnableCameraUploadsBanner = {},
             handleCameraUploadsPermissionsResult = {},
             updateIsWarningBannerShown = {},
-            onTabsVisibilityChange = {}
+            onTabsVisibilityChange = {},
+            onNavigateToUpgradeAccount = {}
         )
     }
 }

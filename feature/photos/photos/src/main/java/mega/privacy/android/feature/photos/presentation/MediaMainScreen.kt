@@ -105,6 +105,7 @@ import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotosSearchNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.navigation.destination.MediaTimelinePhotoPreviewNavKey
+import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -122,6 +123,7 @@ fun MediaMainRoute(
     onTransfer: (TransferTriggerEvent) -> Unit,
     onNavigateToAddToAlbum: (key: LegacyAddToAlbumActivityNavKey) -> Unit,
     onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
+    onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     timelineViewModel: TimelineTabViewModel = hiltViewModel(),
     mediaCameraUploadViewModel: MediaCameraUploadViewModel = hiltViewModel(),
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
@@ -249,9 +251,7 @@ fun MediaMainRoute(
         clearCameraUploadsChangePermissionsMessage = {
             mediaCameraUploadViewModel.showCameraUploadsChangePermissionsMessage(false)
         },
-        onNavigateCameraUploadsSettings = {
-            onNavigateToCameraUploadsSettings(LegacySettingsCameraUploadsActivityNavKey)
-        },
+        onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
         onDismissEnableCameraUploadsBanner = mediaCameraUploadViewModel::dismissEnableCUBanner,
         nodeActionHandle = nodeActionHandler,
         navigateToLegacyPhotosSearch = navigationHandler::navigate,
@@ -259,7 +259,8 @@ fun MediaMainRoute(
         navigationHandler = navigationHandler,
         handleCameraUploadsPermissionsResult = mediaCameraUploadViewModel::handleCameraUploadsPermissionsResult,
         setCameraUploadsMessage = mediaCameraUploadViewModel::setCameraUploadsMessage,
-        updateIsWarningBannerShown = mediaCameraUploadViewModel::updateIsWarningBannerShown
+        updateIsWarningBannerShown = mediaCameraUploadViewModel::updateIsWarningBannerShown,
+        onNavigateToUpgradeAccount = onNavigateToUpgradeAccount
     )
 }
 
@@ -291,11 +292,12 @@ fun MediaMainScreen(
     clearCameraUploadsCompletedMessage: () -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
     clearCameraUploadsChangePermissionsMessage: () -> Unit,
-    onNavigateCameraUploadsSettings: () -> Unit,
+    onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
     onDismissEnableCameraUploadsBanner: () -> Unit,
     handleCameraUploadsPermissionsResult: () -> Unit,
     setCameraUploadsMessage: (message: String) -> Unit,
     updateIsWarningBannerShown: (value: Boolean) -> Unit,
+    onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MediaMainViewModel = hiltViewModel(),
     videosTabViewModel: VideosTabViewModel = hiltViewModel(),
@@ -481,7 +483,11 @@ fun MediaMainScreen(
                                 cameraUploadsProgress = mediaCameraUploadUiState.cameraUploadsProgress,
                                 setCameraUploadsMessage = setCameraUploadsMessage,
                                 updateIsWarningBannerShown = updateIsWarningBannerShown,
-                                onNavigateCameraUploadsSettings = onNavigateCameraUploadsSettings
+                                onNavigateToCameraUploadsSettings = {
+                                    onNavigateToCameraUploadsSettings(
+                                        LegacySettingsCameraUploadsActivityNavKey()
+                                    )
+                                }
                             )
                         }
                     },
@@ -642,13 +648,14 @@ fun MediaMainScreen(
                                     clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
                                     onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
                                     clearCameraUploadsChangePermissionsMessage = clearCameraUploadsChangePermissionsMessage,
-                                    onNavigateCameraUploadsSettings = onNavigateCameraUploadsSettings,
+                                    onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
                                     onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
                                     onTransfer = onTransfer,
                                     navigationHandler = navigationHandler,
                                     handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
                                     updateIsWarningBannerShown = updateIsWarningBannerShown,
-                                    onTabsVisibilityChange = { shouldHideTabs = it }
+                                    onTabsVisibilityChange = { shouldHideTabs = it },
+                                    onNavigateToUpgradeAccount = onNavigateToUpgradeAccount
                                 )
                             }
                         )
@@ -767,13 +774,14 @@ private fun MediaScreen.MediaContent(
     clearCameraUploadsCompletedMessage: () -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
     clearCameraUploadsChangePermissionsMessage: () -> Unit,
-    onNavigateCameraUploadsSettings: () -> Unit,
+    onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
     onDismissEnableCameraUploadsBanner: () -> Unit,
     navigationHandler: NavigationHandler,
     onTransfer: (TransferTriggerEvent) -> Unit,
     handleCameraUploadsPermissionsResult: () -> Unit,
     updateIsWarningBannerShown: (value: Boolean) -> Unit,
     onTabsVisibilityChange: (shouldHide: Boolean) -> Unit,
+    onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     modifier: Modifier = Modifier,
     timelineContentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -793,7 +801,7 @@ private fun MediaScreen.MediaContent(
                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
                 clearCameraUploadsChangePermissionsMessage = clearCameraUploadsChangePermissionsMessage,
                 loadNextPage = loadTimelineNextPage,
-                onNavigateCameraUploadsSettings = onNavigateCameraUploadsSettings,
+                onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
                 setEnableCUPage = setEnableCUPage,
                 onGridSizeChange = onTimelineGridSizeChange,
                 onSortDialogDismissed = onTimelineSortDialogDismissed,
@@ -803,7 +811,8 @@ private fun MediaScreen.MediaContent(
                 onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
                 handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
                 updateIsWarningBannerShown = updateIsWarningBannerShown,
-                onTabsVisibilityChange = onTabsVisibilityChange
+                onTabsVisibilityChange = onTabsVisibilityChange,
+                onNavigateToUpgradeAccount = onNavigateToUpgradeAccount
             )
         }
 
@@ -916,7 +925,7 @@ fun PhotosMainScreenPreview() {
             clearCameraUploadsCompletedMessage = {},
             onChangeCameraUploadsPermissions = {},
             clearCameraUploadsChangePermissionsMessage = {},
-            onNavigateCameraUploadsSettings = {},
+            onNavigateToCameraUploadsSettings = {},
             onDismissEnableCameraUploadsBanner = {},
             nodeActionHandle = rememberNodeActionHandler(),
             navigateToLegacyPhotosSearch = {},
@@ -941,7 +950,8 @@ fun PhotosMainScreenPreview() {
             },
             handleCameraUploadsPermissionsResult = {},
             setCameraUploadsMessage = {},
-            updateIsWarningBannerShown = {}
+            updateIsWarningBannerShown = {},
+            onNavigateToUpgradeAccount = {},
         )
     }
 }
