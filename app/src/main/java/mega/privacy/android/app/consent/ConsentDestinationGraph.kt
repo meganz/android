@@ -14,7 +14,7 @@ data object ConsentDialogDestinations : AppDialogDestinations {
                 onDialogHandled = onHandled,
             )
             adConsentDialogDestination(
-                navigateBack = navigationHandler::back,
+                remove = navigationHandler::remove,
                 onDialogHandled = onHandled,
             )
         }

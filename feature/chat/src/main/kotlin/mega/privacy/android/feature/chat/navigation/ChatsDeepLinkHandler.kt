@@ -21,8 +21,8 @@ import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseC
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
-import mega.privacy.android.navigation.destination.ChatsNavKey
 import mega.privacy.android.navigation.destination.LegacyMeetingNavKey
 import mega.privacy.android.navigation.destination.LegacyOpenLinkAfterFetchNodes
 import mega.privacy.android.navigation.destination.LegacyWaitingRoomNavKey
@@ -49,7 +49,7 @@ class ChatsDeepLinkHandler @Inject constructor(
         uri: Uri,
         regexPatternType: RegexPatternType?,
     ): List<NavKey>? = when (regexPatternType) {
-        NEW_MESSAGE_CHAT_LINK -> listOf(ChatsNavKey())
+        NEW_MESSAGE_CHAT_LINK -> listOf(ChatListNavKey())
         else -> null
     }
 
@@ -128,7 +128,10 @@ class ChatsDeepLinkHandler @Inject constructor(
                         }
 
                         is MeetingEndedException -> {
-                            listOf(MeetingHasEndedDialogNavKey(false, e.chatId))
+                            val chatRoom = runCatching { getChatRoomUseCase(e.chatId) }.getOrNull()
+                            listOf(
+                                MeetingHasEndedDialogNavKey(chatRoom?.let { e.chatId })
+                            )
                         }
 
                         else -> {
@@ -154,25 +157,28 @@ class ChatsDeepLinkHandler @Inject constructor(
     ) = listOfNotNull(
         call?.let {
             when (call.status) {
-                ChatCallStatus.UserNoPresent,
+                ChatCallStatus.UserNoPresent -> answerCall(chatId)
                 ChatCallStatus.Connecting,
                 ChatCallStatus.Joining,
                 ChatCallStatus.InProgress,
-                    -> answerCall(chatId)
+                    -> openCall(call, false)
 
-                else -> getScheduledMeetingByChatUseCase(chatId)?.first()?.schedId?.let { schedIdWr ->
-                    startMeetingInWaitingRoomChatUseCase(
-                        chatId = chatId,
-                        schedIdWr = schedIdWr,
-                        enabledVideo = false,
-                        enabledAudio = true
-                    )?.let { call ->
-                        call.chatId.takeIf { it != -1L }?.let { openCall(call, false) }
-                    }
-                }
+                else -> startMeetingWithWaitingRoomAsHost(chatId)
+            }
+        } ?: startMeetingWithWaitingRoomAsHost(chatId)
+    )
+
+    private suspend fun startMeetingWithWaitingRoomAsHost(chatId: Long) =
+        getScheduledMeetingByChatUseCase(chatId)?.first()?.schedId?.let { schedIdWr ->
+            startMeetingInWaitingRoomChatUseCase(
+                chatId = chatId,
+                schedIdWr = schedIdWr,
+                enabledVideo = false,
+                enabledAudio = true
+            )?.let { call ->
+                call.chatId.takeIf { it != -1L }?.let { openCall(call, false) }
             }
         }
-    )
 
     private suspend fun answerCall(chatId: Long) =
         answerChatCallUseCase(chatId = chatId, video = false, audio = true)?.let { call ->

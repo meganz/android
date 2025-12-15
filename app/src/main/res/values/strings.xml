@@ -1003,13 +1003,14 @@
     <string name="button_set">Set</string>
     <!-- Button to set a value -->
     <string name="hint_minutes">minutes</string>
-    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string-array name="settings_status_entries">
-        <item>Online</item>
-        <item>Away</item>
-        <item>Busy</item>
-        <item>Offline</item>
-    </string-array>
+    <!-- In chat settings, the option of chat status setting is Online   -->
+    <string name="settings_chat_status_online">Online</string>
+    <!-- In chat settings, the option of chat status setting is Away -->
+    <string name="settings_chat_status_away">Away</string>
+    <!-- In chat settings, the option of chat status setting is Busy -->
+    <string name="settings_chat_status_busy">Busy</string>
+    <!-- In chat settings, the option of chat status setting is Offline -->
+    <string name="settings_chat_status_offline">Offline</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">Enable</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1473,13 +1474,14 @@
     <string name="settings_chat_upload_quality">Video quality</string>
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Video quality</string>
-    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
-    <string-array name="settings_chat_upload_quality_entries">
-        <item>Low</item>
-        <item>Medium</item>
-        <item>High</item>
-        <item>Original</item>
-    </string-array>
+    <!-- Option Low for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_low">Low</string>
+    <!-- Option Medium for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_medium">Medium</string>
+    <!-- Option High for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_high">High</string>
+    <!-- Option Original for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_original">Original</string>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Missed call</string>
     <!-- Refers to a location of file -->

@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">พื้นที่เก็บข้อมูลในอุปกรณ์ของคุณไม่เพียงพอ</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ ติดต่อ support@mega.io</string>
+    <string name="general_sync_message_unknown_error">เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ ติดต่อ support&#64;mega.io</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">ไม่สามารถซิงค์หรือสำรองข้อมูลโฟลเดอร์ได้ เนื่องจากโฟลเดอร์ MEGA อยู่ในถังขยะ</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -696,10 +696,6 @@
     <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%s[/A] [B]ได้ปรับเปลี่ยนเวลาของการประชุมเป็น[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
     <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] [B]ได้ยกเลิกการประชุมใน[/B]</string>
-    <!-- Title of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_title">Want MEGA without the ads?</string>
-    <!-- Description of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_description">Upgrade to a Pro plan with plenty of storage and more. Our Pro plans start at just %1$s a month.</string>
     <!-- The Generous storage label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_generous_storage_label">พื้นที่เก็บข้อมูลจุได้ไม่อั้น</string>
     <!-- The Generous storage description in the ads free introduction screen -->
@@ -1446,10 +1442,6 @@
     <plurals name="context_link_removal_success">
         <item quantity="other">เอาลิงก์ออกแล้ว</item>
     </plurals>
-    <!-- Warning that appears prior to remove links of files. Plural. -->
-    <plurals name="remove_links_warning_text">
-        <item quantity="other"></item>
-    </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
     <string name="context_share_correctly_removed">ยกเลิกการเข้าถึงแล้ว</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1463,10 +1455,6 @@
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="other">โฟลเดอร์นี้ถูกแชร์กับผู้ติดต่อ %1$d ราย ต้องการหยุดการแชร์หรือไม่</item>
-    </plurals>
-    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <plurals name="alert_remove_several_shares">
-        <item quantity="other"></item>
     </plurals>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
     <string name="figures_storage_referrals_achievements_text">ได้พื้นที่เก็บข้อมูลเพิ่ม %1$s สำหรับการเชิญแต่ละครั้ง มีอายุ %2$d วัน</string>
@@ -1540,10 +1528,6 @@
     <string name="transfers_retry_failed_snackbar_message">เริ่มการถ่ายโอนใหม่ไม่สำเร็จ</string>
     <!-- Action for the Snackbar when retry failed on failed transfers tab. -->
     <string name="transfers_retry_failed_snackbar_action">ลองใหม่</string>
-    <!-- Snackbar message when retry success on failed transfers tab. -->
-    <plurals name="transfers_retry_feedback_snackbar_message">
-        <item quantity="other"></item>
-    </plurals>
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">คืนค่าไปที่ %s</string>
     <!-- success message when moving a node -->
@@ -1706,8 +1690,6 @@
     <string name="camera_update_network_requirement_not_met_banner_description">การอัปโหลดจากกล้องหยุดชั่วคราว กรุณาเชื่อมต่อ Wi-Fi หรืออนุญาตให้ใช้ข้อมูลมือถือ</string>
     <!-- The button text of camera uploads network requirement not met paused warning banner -->
     <string name="camera_update_network_requirement_not_met_banner_button_text">อนุญาตให้ใช้ข้อมูลมือถือ</string>
-    <!-- Billing info with discount label -->
-    <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s for %3$s</string>
     <!-- campaign name for Black Friday deal -->
     <string name="campaign_name_black_friday">ดีล Black Friday ลด %1$d%%</string>
     <!-- campaign name for Cyber Monday deal -->
@@ -1774,20 +1756,12 @@
     <string name="delete_album_confirmation_positive_button_text">ลบ</string>
     <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
     <string name="delete_singular_album_confirmation_message">ลบ “%s” ออกแล้ว</string>
-    <!-- Delete albums confirmation title. -->
-    <plurals name="delete_album_confirmation_dialog_title">
-        <item quantity="other"></item>
-    </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="delete_album_confirmation_dialog_description">
         <item quantity="other">อัลบั้มจะถูกลบออก แต่เนื้อหายังคงอยู่ในไทม์ไลน์ของคุณ</item>
     </plurals>
     <!-- External checkout button text -->
     <string name="external_checkout_button_text">ซื้อผ่านเว็บไซต์ของเรา (ประหยัดสูงสุด %1$.0f%%)</string>
-    <!-- Title for the album remove link(s) confirmation dialog -->
-    <plurals name="album_content_remove_links_dialog_title">
-        <item quantity="other"></item>
-    </plurals>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_description">
         <item quantity="other">คนที่คุณแชร์ลิงก์เหล่านี้ด้วยจะไม่สามารถเข้าถึงอัลบั้มได้</item>
@@ -1852,50 +1826,24 @@
     <string name="timeline_tab_filter_media_source_selection_header">แสดงรายการจาก</string>
     <!-- Timeline filter remember preferences toggle text. -->
     <string name="timeline_tab_filter_remember_preferences">จำตัวเลือกการกำหนดลักษณะนี้ไว้</string>
-    <!-- Timeline filter apply filter button text. -->
-    <string name="timeline_tab_filter_apply_filter_button">Apply filter</string>
-    <!-- General label for invite contact contexts -->
-    <string name="general_invite_contact">Invite contact</string>
-    <!-- Contact found title for a dialog showing contact link info -->
-    <string name="contact_found_dialog_title">Contact found</string>
     <!--Album content empty album layout title when an album content is empty-->
     <string name="album_content_empty_album_title">อัลบั้มว่างเปล่า</string>
     <!--Album content action to add more items to the album-->
     <string name="album_content_action_add_items">เพิ่มรายการ</string>
     <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
     <string name="videos_tab_empty_hint_video">[B]ไม่[/B][B]พบ[/B][A]วิดีโอ[/A]</string>
-    <!-- Action to remove items from the Favourites album -->
-    <string name="album_content_action_remove_favourites">Remove from Favourites</string>
     <!-- Title of the empty screen when a folder is empty -->
     <string name="context_empty_folder_title">โฟลเดอร์นี้ว่างเปล่า</string>
-    <!-- Title of the empty screen when there are no items in the root Cloud Drive -->
-    <string name="context_empty_cloud_drive_title">Nothing in your cloud drive yet</string>
     <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
     <string name="context_empty_cloud_drive_description">เก็บรักษาข้อมูลให้ปลอดภัยด้วยการเข้ารหัสวิธีซีโร่-นอว์เลจ</string>
-    <!-- Error shown when trying to confirm an account from a confirmation link and the app is already logged in -->
-    <string name="open_link_account_confirmation_error">You’re already logged in with a different MEGA account. Log out first, then open the account confirmation link again.</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link_error_message">การสนทนานี้ไม่สามารถใช้งานได้อีกต่อไป</string>
-    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="general_invalid_link">Invalid link. Please try again or request a new one.</string>
-    <!-- Text of the dialog shown when you want to join a group call and you're already in another call-->
-    <string name="can_only_join_one_call_error_message">To join this call you have to end your current call</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">ค้นหา&#8230;</string>
-    <!-- Title for the album remove link confirmation dialog for singular link -->
-    <string name="album_content_remove_link_dialog_title">Remove link?</string>
-    <!-- Title for the album remove link confirmation dialog for multiple link -->
-    <string name="album_content_remove_multiple_links_dialog_title">ลบลิงก์หรือไม่</string>
-    <!-- Explanation text for the album remove link confirmation dialog -->
-    <string name="album_content_remove_link_dialog_description">People you shared this link with will lose access to the album</string>
-    <!-- Explanation text for the album remove multiple links confirmation dialog -->
-    <string name="album_content_remove_multiple_links_dialog_description">People you shared these links with will lose access to the albums</string>
-    <!-- Delete album confirmation title. -->
-    <string name="delete_album_singular_confirmation_dialog_title">ลบอัลบั้มหรือไม่</string>
-    <!-- Delete albums confirmation title. -->
-    <string name="delete_albums_multiple_confirmation_dialog_title">ลบอัลบั้มหรือไม่</string>
-    <!-- Delete album confirmation description. -->
-    <string name="delete_album_singular_confirmation_dialog_description">The contents of the album will not be deleted</string>
-    <!-- Delete albums confirmation description. -->
-    <string name="delete_albums_multiple_confirmation_dialog_description">The contents of the albums will not be deleted</string>
+    <!-- Media timeline tab: CU permission waning banner action text -->
+    <string name="timeline_tab_cu_permission_warning_banner_action">Update permissions</string>
+    <!-- Media timeline tab: CU permission waning banner description -->
+    <string name="timeline_tab_cu_permission_warning_banner_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
+    <!-- Media timeline tab: CU battery level waning banner description -->
+    <string name="timeline_tab_cu_battery_level_warning_banner_description">Battery level too low. Charge device to start camera uploads.</string>
 </resources>

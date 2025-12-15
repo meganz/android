@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">Unzureichender Speicherplatz auf Ihrem Gerät</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">Ein unbekannter Fehler ist aufgetreten. Wenden Sie sich an support@mega.io.</string>
+    <string name="general_sync_message_unknown_error">Ein unbekannter Fehler ist aufgetreten. Wenden Sie sich an support&#64;mega.io.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">Der Ordner kann nicht synchronisiert oder gesichert werden, da sich der MEGA-Ordner im Papierkorb befindet</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -253,7 +253,7 @@
     <!-- Label for new low-tier plan Essential. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_essential_label">MEGA&#160;Essential</string>
     <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
-    <string name="settings_camera_uploads_upload_only_while_charging_option_body">Die Uploads werden pausiert, bis Sie Ihr Gerät an ein Ladegerät anschließen. Die Uploads bleiben auch dann pausiert, wenn der Ladestand weniger als 20&#160;% beträgt.</string>
+    <string name="settings_camera_uploads_upload_only_while_charging_option_body">Die Uploads werden pausiert, bis Sie Ihr Gerät an ein Ladegerät anschließen. Die Uploads bleiben auch dann pausiert, wenn der Ladestand weniger als 20 % beträgt.</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">Neue Synchronisierung hinzufügen</string>
     <!-- Text for the Sync solved issues chip -->
@@ -709,10 +709,6 @@
     <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%s[/A] [B]hat die Uhrzeit des Meetings geändert in[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
     <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] [B]hat folgendes Meeting abgesagt:[/B]</string>
-    <!-- Title of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_title">Want MEGA without the ads?</string>
-    <!-- Description of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_description">Upgrade to a Pro plan with plenty of storage and more. Our Pro plans start at just %1$s a month.</string>
     <!-- The Generous storage label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_generous_storage_label">Großzügiger Speicherplatz</string>
     <!-- The Generous storage description in the ads free introduction screen -->
@@ -861,7 +857,7 @@
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">Upload...</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
-    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d %% hochgeladen&#8230;</string>
+    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d %% hochgeladen&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is inactive -->
     <string name="device_center_list_view_item_status_inactive">Inaktiv</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
@@ -1467,11 +1463,6 @@
         <item quantity="one">Link entfernt</item>
         <item quantity="other">Links entfernt</item>
     </plurals>
-    <!-- Warning that appears prior to remove links of files. Plural. -->
-    <plurals name="remove_links_warning_text">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
     <string name="context_share_correctly_removed">Zugriff entfernt</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1487,11 +1478,6 @@
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="one">Dieser Ordner ist für %1$d Kontakt freigegeben. Freigabe beenden?</item>
         <item quantity="other">Dieser Ordner ist für %1$d Kontakte freigegeben. Freigabe beenden?</item>
-    </plurals>
-    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <plurals name="alert_remove_several_shares">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
     </plurals>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
     <string name="figures_storage_referrals_achievements_text">%1$s zusätzlicher Speicherplatz für jede Einladung, gültig für %2$d Tage</string>
@@ -1570,11 +1556,6 @@
     <string name="transfers_retry_failed_snackbar_message">Transfers konnten nicht neu gestartet werden</string>
     <!-- Action for the Snackbar when retry failed on failed transfers tab. -->
     <string name="transfers_retry_failed_snackbar_action">Wiederholen</string>
-    <!-- Snackbar message when retry success on failed transfers tab. -->
-    <plurals name="transfers_retry_feedback_snackbar_message">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">Wiederherstellung nach %s erfolgreich</string>
     <!-- success message when moving a node -->
@@ -1745,14 +1726,12 @@
     <string name="camera_update_network_requirement_not_met_banner_description">Kamera-Uploads pausiert – stellen Sie eine WLAN-Verbindung her oder erlauben Sie die Nutzung mobiler Daten</string>
     <!-- The button text of camera uploads network requirement not met paused warning banner -->
     <string name="camera_update_network_requirement_not_met_banner_button_text">Mobile Daten verwenden</string>
-    <!-- Billing info with discount label -->
-    <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s for %3$s</string>
     <!-- campaign name for Black Friday deal -->
-    <string name="campaign_name_black_friday">Black-Friday-Deal: %1$d %% gespart</string>
+    <string name="campaign_name_black_friday">Black-Friday-Deal: %1$d %% gespart</string>
     <!-- campaign name for Cyber Monday deal -->
-    <string name="campaign_name_cyber_monday">Cyber-Monday-Deal: %1$d %% gespart</string>
+    <string name="campaign_name_cyber_monday">Cyber-Monday-Deal: %1$d %% gespart</string>
     <!-- campaign name for Special offer -->
-    <string name="campaign_name_special_offer">Sonderaktion: %1$d %% gespart</string>
+    <string name="campaign_name_special_offer">Sonderaktion: %1$d %% gespart</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
         <item quantity="one">%1$s für den %2$d. Monat</item>
@@ -1766,7 +1745,7 @@
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGA-Datenschutz-Suite</string>
     <!-- Message about savings on yearly plan in case it has discount -->
-    <string name="account_upgrade_account_label_save_at_least">Sparen Sie mindestens 16 % bei einem Jahrespaket</string>
+    <string name="account_upgrade_account_label_save_at_least">Sparen Sie mindestens 16 % bei einem Jahrespaket</string>
     <!-- Add new album on Media screen dialog title -->
     <string name="media_add_new_album_dialog_title">Albumnamen eingeben</string>
     <!-- Add new album on Media screen dialog positive button text -->
@@ -1817,23 +1796,13 @@
     <string name="delete_album_confirmation_positive_button_text">Löschen</string>
     <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
     <string name="delete_singular_album_confirmation_message">„%s“ wurde gelöscht</string>
-    <!-- Delete albums confirmation title. -->
-    <plurals name="delete_album_confirmation_dialog_title">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="delete_album_confirmation_dialog_description">
         <item quantity="one">Das Album wird gelöscht, aber sein Inhalt bleibt in Ihrer Zeitleiste.</item>
         <item quantity="other">Die Alben werden gelöscht, aber ihre Inhalte bleiben in Ihrer Zeitleiste.</item>
     </plurals>
     <!-- External checkout button text -->
-    <string name="external_checkout_button_text">Auf unserer Website kaufen (Sie sparen bis zu %1$.0f %%)</string>
-    <!-- Title for the album remove link(s) confirmation dialog -->
-    <plurals name="album_content_remove_links_dialog_title">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
-    </plurals>
+    <string name="external_checkout_button_text">Auf unserer Website kaufen (Sie sparen bis zu %1$.0f %%)</string>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_description">
         <item quantity="one">Die Personen, mit denen Sie diesen Link geteilt haben, können nicht mehr auf das Album zugreifen.</item>
@@ -1871,14 +1840,8 @@
         <item quantity="one">Kamera-Uploads abgeschlossen, %1$d Datei hochgeladen</item>
         <item quantity="other">Kamera-Uploads abgeschlossen, %1$d Dateien hochgeladen</item>
     </plurals>
-    <!-- Timeline tab screen grid size menu title -->
-    <string name="timeline_tab_grid_size_menu_title">Grid size</string>
-    <!-- Timeline tab screen compact grid size menu item -->
-    <string name="timeline_tab_grid_size_compact">Compact</string>
     <!-- Timeline tab screen default grid size menu item -->
     <string name="timeline_tab_grid_size_default">Standard</string>
-    <!-- Timeline tab screen large grid size menu item -->
-    <string name="timeline_tab_grid_size_large">Large</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended_dialog_title">Das Meeting wurde beendet</string>
     <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
@@ -1901,50 +1864,20 @@
     <string name="timeline_tab_filter_media_source_selection_header">Inhalte anzeigen von</string>
     <!-- Timeline filter remember preferences toggle text. -->
     <string name="timeline_tab_filter_remember_preferences">Einstellungen merken</string>
-    <!-- Timeline filter apply filter button text. -->
-    <string name="timeline_tab_filter_apply_filter_button">Apply filter</string>
-    <!-- General label for invite contact contexts -->
-    <string name="general_invite_contact">Invite contact</string>
-    <!-- Contact found title for a dialog showing contact link info -->
-    <string name="contact_found_dialog_title">Contact found</string>
     <!--Album content empty album layout title when an album content is empty-->
     <string name="album_content_empty_album_title">Das Album ist leer</string>
     <!--Album content action to add more items to the album-->
     <string name="album_content_action_add_items">Elemente hinzufügen</string>
     <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
     <string name="videos_tab_empty_hint_video">[B]Keine[/B] [A]Videos[/A] [B]vorhanden[/B]</string>
-    <!-- Action to remove items from the Favourites album -->
-    <string name="album_content_action_remove_favourites">Remove from Favourites</string>
-    <!-- Title of the empty screen when a folder is empty -->
-    <string name="context_empty_folder_title">This folder is empty</string>
-    <!-- Title of the empty screen when there are no items in the root Cloud Drive -->
-    <string name="context_empty_cloud_drive_title">Nothing in your cloud drive yet</string>
-    <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
-    <string name="context_empty_cloud_drive_description">Keep something safe with zero-knowledge encryption</string>
-    <!-- Error shown when trying to confirm an account from a confirmation link and the app is already logged in -->
-    <string name="open_link_account_confirmation_error">You’re already logged in with a different MEGA account. Log out first, then open the account confirmation link again.</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link_error_message">Diese Unterhaltung ist nicht mehr verfügbar</string>
-    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="general_invalid_link">Invalid link. Please try again or request a new one.</string>
-    <!-- Text of the dialog shown when you want to join a group call and you're already in another call-->
-    <string name="can_only_join_one_call_error_message">To join this call you have to end your current call</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">Suche&#8230;</string>
-    <!-- Title for the album remove link confirmation dialog for singular link -->
-    <string name="album_content_remove_link_dialog_title">Link entfernen?</string>
-    <!-- Title for the album remove link confirmation dialog for multiple link -->
-    <string name="album_content_remove_multiple_links_dialog_title">Links entfernen?</string>
-    <!-- Explanation text for the album remove link confirmation dialog -->
-    <string name="album_content_remove_link_dialog_description">People you shared this link with will lose access to the album</string>
-    <!-- Explanation text for the album remove multiple links confirmation dialog -->
-    <string name="album_content_remove_multiple_links_dialog_description">People you shared these links with will lose access to the albums</string>
-    <!-- Delete album confirmation title. -->
-    <string name="delete_album_singular_confirmation_dialog_title">Album löschen?</string>
-    <!-- Delete albums confirmation title. -->
-    <string name="delete_albums_multiple_confirmation_dialog_title">Alben löschen?</string>
-    <!-- Delete album confirmation description. -->
-    <string name="delete_album_singular_confirmation_dialog_description">The contents of the album will not be deleted</string>
-    <!-- Delete albums confirmation description. -->
-    <string name="delete_albums_multiple_confirmation_dialog_description">The contents of the albums will not be deleted</string>
+    <!-- Media timeline tab: CU permission waning banner action text -->
+    <string name="timeline_tab_cu_permission_warning_banner_action">Update permissions</string>
+    <!-- Media timeline tab: CU permission waning banner description -->
+    <string name="timeline_tab_cu_permission_warning_banner_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
+    <!-- Media timeline tab: CU battery level waning banner description -->
+    <string name="timeline_tab_cu_battery_level_warning_banner_description">Battery level too low. Charge device to start camera uploads.</string>
 </resources>

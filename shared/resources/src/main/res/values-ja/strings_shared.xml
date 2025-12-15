@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">デバイスのストレージ容量が不十分です</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">不明なエラーが発生しました。support@mega.ioにご連絡ください。</string>
+    <string name="general_sync_message_unknown_error">不明なエラーが発生しました。support&#64;mega.ioにご連絡ください。</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">MEGAフォルダはごみ箱にあるため、フォルダを同期またはバックアップできません</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -245,7 +245,7 @@
     <!-- Label for new low-tier plan Essential. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_essential_label">MEGA&#160;Essential</string>
     <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
-    <string name="settings_camera_uploads_upload_only_while_charging_option_body">デバイスの充電を開始するまで、アップロードは一時停止されます。バッテリー残量が20&#160;%未満の場合も、アップロードは一時停止されたままになります。</string>
+    <string name="settings_camera_uploads_upload_only_while_charging_option_body">デバイスの充電を開始するまで、アップロードは一時停止されます。バッテリー残量が20 %未満の場合も、アップロードは一時停止されたままになります。</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">新しい同期を追加する</string>
     <!-- Text for the Sync solved issues chip -->
@@ -696,10 +696,6 @@
     <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%1$s[/A][B]さんがミーティングの時間を以下のように更新しました：[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
     <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A][B]さんが以下のように予定されていたミーティングをキャンセルしました：[/B]</string>
-    <!-- Title of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_title">Want MEGA without the ads?</string>
-    <!-- Description of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_description">Upgrade to a Pro plan with plenty of storage and more. Our Pro plans start at just %1$s a month.</string>
     <!-- The Generous storage label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_generous_storage_label">豊富なストレージ</string>
     <!-- The Generous storage description in the ads free introduction screen -->
@@ -1446,10 +1442,6 @@
     <plurals name="context_link_removal_success">
         <item quantity="other">リンクが削除されました</item>
     </plurals>
-    <!-- Warning that appears prior to remove links of files. Plural. -->
-    <plurals name="remove_links_warning_text">
-        <item quantity="other"></item>
-    </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
     <string name="context_share_correctly_removed">アクセスが削除されました</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1463,10 +1455,6 @@
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="other">このフォルダは%1$d件の連絡先と共有されています。共有を停止しますか？</item>
-    </plurals>
-    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <plurals name="alert_remove_several_shares">
-        <item quantity="other"></item>
     </plurals>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
     <string name="figures_storage_referrals_achievements_text">ご招待ごとに%1$sの追加ストレージが付与されます。有効期間は%2$d日間です。</string>
@@ -1706,8 +1694,6 @@
     <string name="camera_update_network_requirement_not_met_banner_description">カメラのアップロードが一時停止されました。Wi-Fiに接続するか、モバイルデータを許可してください</string>
     <!-- The button text of camera uploads network requirement not met paused warning banner -->
     <string name="camera_update_network_requirement_not_met_banner_button_text">モバイルデータを許可</string>
-    <!-- Billing info with discount label -->
-    <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s for %3$s</string>
     <!-- campaign name for Black Friday deal -->
     <string name="campaign_name_black_friday">ブラックフライデーセール：%1$d%%OFF</string>
     <!-- campaign name for Cyber Monday deal -->
@@ -1774,20 +1760,12 @@
     <string name="delete_album_confirmation_positive_button_text">削除</string>
     <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
     <string name="delete_singular_album_confirmation_message">「%s」が削除されました</string>
-    <!-- Delete albums confirmation title. -->
-    <plurals name="delete_album_confirmation_dialog_title">
-        <item quantity="other"></item>
-    </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="delete_album_confirmation_dialog_description">
         <item quantity="other">アルバムは削除されますが、その内容はタイムラインに残ります。</item>
     </plurals>
     <!-- External checkout button text -->
     <string name="external_checkout_button_text">当社のウェブサイトで購入（最大 %1$.0f%%ご節約）</string>
-    <!-- Title for the album remove link(s) confirmation dialog -->
-    <plurals name="album_content_remove_links_dialog_title">
-        <item quantity="other"></item>
-    </plurals>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_description">
         <item quantity="other">これらのリンクを共有した人は、それらのアルバムにアクセスできなくなります。</item>
@@ -1882,20 +1860,10 @@
     <string name="can_only_join_one_call_error_message">この通話に参加するには、現在の通話を終了する必要があります。</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">検索&#8230;</string>
-    <!-- Title for the album remove link confirmation dialog for singular link -->
-    <string name="album_content_remove_link_dialog_title">Remove link?</string>
-    <!-- Title for the album remove link confirmation dialog for multiple link -->
-    <string name="album_content_remove_multiple_links_dialog_title">リンクを削除しますか？</string>
-    <!-- Explanation text for the album remove link confirmation dialog -->
-    <string name="album_content_remove_link_dialog_description">People you shared this link with will lose access to the album</string>
-    <!-- Explanation text for the album remove multiple links confirmation dialog -->
-    <string name="album_content_remove_multiple_links_dialog_description">People you shared these links with will lose access to the albums</string>
-    <!-- Delete album confirmation title. -->
-    <string name="delete_album_singular_confirmation_dialog_title">アルバムを削除しますか？</string>
-    <!-- Delete albums confirmation title. -->
-    <string name="delete_albums_multiple_confirmation_dialog_title">アルバムを削除しますか？</string>
-    <!-- Delete album confirmation description. -->
-    <string name="delete_album_singular_confirmation_dialog_description">The contents of the album will not be deleted</string>
-    <!-- Delete albums confirmation description. -->
-    <string name="delete_albums_multiple_confirmation_dialog_description">The contents of the albums will not be deleted</string>
+    <!-- Media timeline tab: CU permission waning banner action text -->
+    <string name="timeline_tab_cu_permission_warning_banner_action">Update permissions</string>
+    <!-- Media timeline tab: CU permission waning banner description -->
+    <string name="timeline_tab_cu_permission_warning_banner_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
+    <!-- Media timeline tab: CU battery level waning banner description -->
+    <string name="timeline_tab_cu_battery_level_warning_banner_description">Battery level too low. Charge device to start camera uploads.</string>
 </resources>

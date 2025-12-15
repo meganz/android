@@ -23,6 +23,7 @@ import mega.privacy.mobile.home.presentation.recents.model.RecentsUiItem
 fun RecentsLazyListView(
     items: List<RecentsUiItem>,
     onFileClicked: (TypedFileNode, NodeSourceType) -> Unit,
+    onBucketClicked: (RecentsUiItem) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val grouped = remember(items) {
@@ -50,7 +51,7 @@ fun RecentsLazyListView(
                                 onFileClicked(node, item.nodeSourceType)
                             }
                         } else {
-                            // TODO: Handle bucket click
+                            onBucketClicked(item)
                         }
                     },
                     onMenuClicked = {
@@ -69,6 +70,7 @@ private fun RecentsLazyListViewPreview() {
         RecentsLazyListView(
             items = mockRecentsUiItemList(),
             onFileClicked = { _, _ -> },
+            onBucketClicked = { },
         )
     }
 }

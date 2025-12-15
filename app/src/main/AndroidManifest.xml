@@ -378,7 +378,7 @@
             android:name=".presentation.contact.invite.InviteContactActivity"
             android:windowSoftInputMode="adjustNothing" />
         <activity
-            android:name=".presentation.meeting.chat.ChatHostActivity"
+            android:name=".presentation.meeting.chat.ChatActivity"
             android:launchMode="singleTask"
             android:theme="@style/Theme.Mega"
             android:windowSoftInputMode="stateHidden|adjustResize" />

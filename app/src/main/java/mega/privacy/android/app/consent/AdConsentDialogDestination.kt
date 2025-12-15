@@ -6,22 +6,23 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
-import androidx.navigation3.scene.DialogSceneStrategy
+import androidx.navigation3.runtime.NavKey
 import com.google.android.ump.UserMessagingPlatform
 import de.palm.composestateevents.EventEffect
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.consent.model.AdsConsentState
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
+import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 
 @Serializable
 data object AdConsentDialog : DialogNavKey
 
 fun EntryProviderScope<DialogNavKey>.adConsentDialogDestination(
-    navigateBack: () -> Unit,
+    remove: (NavKey) -> Unit,
     onDialogHandled: () -> Unit,
 ) {
     entry<AdConsentDialog>(
-        metadata = DialogSceneStrategy.dialog()
+        metadata = transparentMetadata()
     ) {
         val viewModel = hiltViewModel<AdsConsentViewModel>()
         val uiState by viewModel.state.collectAsStateWithLifecycle()
@@ -52,7 +53,7 @@ fun EntryProviderScope<DialogNavKey>.adConsentDialogDestination(
 
                 EventEffect(
                     event = state.adConsentHandledEvent,
-                    onConsumed = navigateBack,
+                    onConsumed = { remove(it) },
                 ) {
                     viewModel.onAdConsentHandled()
                     onDialogHandled()
@@ -60,7 +61,7 @@ fun EntryProviderScope<DialogNavKey>.adConsentDialogDestination(
 
                 EventEffect(
                     event = state.adFeatureDisabled,
-                    onConsumed = navigateBack
+                    onConsumed = { remove(it) }
                 ) {
                     onDialogHandled()
                 }

@@ -12,6 +12,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -510,7 +511,8 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                     startActivity(
                         Intent(this, ManagerActivity::class.java)
                             .setAction(ACTION_OPEN_HANDLE_NODE)
-                            .setData(Uri.parse(url))
+                            .addFlags(FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                            .setData(url?.toUri())
                     )
                     finish()
                 } else {

@@ -87,6 +87,7 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
@@ -147,6 +148,7 @@ import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteOldestCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
+import mega.privacy.android.feature.clouddrive.navigation.CloudDriveDeepLinkHandler
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
@@ -370,6 +372,9 @@ class ManagerViewModelTest {
     private val legacyState = mock<LegacyPsaGlobalState>()
     private val appScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
 
+    private val cloudDriveDeepLinkHandler: CloudDriveDeepLinkHandler = mock()
+    private val getRubbishBinNodeUseCase: GetRubbishNodeUseCase = mock()
+
     private fun initViewModel() {
         underTest = ManagerViewModel(
             monitorNodeUpdatesUseCase = mock {
@@ -465,7 +470,9 @@ class ManagerViewModelTest {
             monitorAccountDetailUseCase = mock {
                 on { invoke() }.thenReturn(monitorAccountDetailFakeFlow)
             },
-            fcmManager = fcmManager
+            fcmManager = fcmManager,
+            cloudDriveDeepLinkHandler = cloudDriveDeepLinkHandler,
+            getRubbishNodeUseCase = getRubbishBinNodeUseCase,
         )
     }
 

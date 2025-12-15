@@ -1,18 +1,16 @@
 package mega.privacy.android.app.appstate.global.initialisation.postlogin
 
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.usecase.account.ShouldShowUpgradeAccountUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.login.GetLastRegisteredEmailUseCase
-import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
+import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
@@ -27,9 +25,6 @@ class OnboardingPaymentInitialiserTest {
     private val getCurrentUserEmail = mock<GetCurrentUserEmail>()
     private val getLastRegisteredEmailUseCase = mock<GetLastRegisteredEmailUseCase>()
     private val navigationEventQueue = mock<NavigationEventQueue>()
-    private val monitorFetchNodesFinishUseCase = mock<MonitorFetchNodesFinishUseCase> {
-        on { invoke() } doReturn flowOf(true)
-    }
 
     @BeforeAll
     fun setUp() {
@@ -38,7 +33,6 @@ class OnboardingPaymentInitialiserTest {
             getCurrentUserEmail = getCurrentUserEmail,
             getLastRegisteredEmailUseCase = getLastRegisteredEmailUseCase,
             navigationEventQueue = navigationEventQueue,
-            monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase
         )
     }
 
@@ -100,7 +94,8 @@ class OnboardingPaymentInitialiserTest {
             UpgradeAccountNavKey(
                 isNewAccount = true,
                 isUpgrade = false
-            )
+            ),
+            priority = NavPriority.Priority(10)
         )
     }
 
@@ -129,7 +124,8 @@ class OnboardingPaymentInitialiserTest {
                 UpgradeAccountNavKey(
                     isNewAccount = false,
                     isUpgrade = false
-                )
+                ),
+                priority = NavPriority.Priority(10)
             )
         }
 

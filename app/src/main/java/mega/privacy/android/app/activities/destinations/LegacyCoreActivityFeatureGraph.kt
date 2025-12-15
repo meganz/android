@@ -40,7 +40,7 @@ class LegacyCoreActivityFeatureGraph(
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
         { navigationHandler, transferHandler ->
             overDiskQuotaPaywallWarning(navigationHandler::back)
-            upgradeAccount(navigationHandler::back)
+            upgradeAccount(navigationHandler::remove)
             myAccount(navigationHandler::back)
             achievement(navigationHandler::back)
             webDestinations(navigationHandler::back)
@@ -78,6 +78,7 @@ class LegacyCoreActivityFeatureGraph(
                 rtcAudioManagerGateway
             )
             legacyWaitingRoomScreen(navigationHandler::back, megaChatRequestHandler, chatManagement)
+            legacyPhotosSearch(navigationHandler::back)
             legacySettingsCameraUploadsActivityNavKey(navigationHandler::back)
         }
 }

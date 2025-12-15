@@ -16,20 +16,18 @@ import mega.privacy.android.shared.resources.R
  */
 @Composable
 fun MeetingHasEndedDialog(
-    isFromGuest: Boolean,
+    doesChatExist: Boolean,
     onDismiss: () -> Unit,
     onShowChat: () -> Unit,
 ) {
     BasicDialog(
         modifier = Modifier.testTag(MEETING_HAS_ENDED_DIALOG_TAG),
         description = stringResource(id = R.string.meeting_has_ended_dialog_title),
-        positiveButtonText = stringResource(id = if (isFromGuest) R.string.general_ok else R.string.meeting_has_ended_dialog_view_chat_option),
-        negativeButtonText = if (isFromGuest) null else stringResource(R.string.general_dismiss_dialog),
+        positiveButtonText = stringResource(id = if (doesChatExist) R.string.meeting_has_ended_dialog_view_chat_option else R.string.general_ok),
+        negativeButtonText = if (doesChatExist) stringResource(R.string.general_dismiss_dialog) else null,
         onPositiveButtonClicked = {
             onDismiss()
-            if (!isFromGuest) {
-                onShowChat()
-            }
+            onShowChat()
         },
         onNegativeButtonClicked = onDismiss,
         onDismiss = onDismiss,
@@ -41,7 +39,7 @@ fun MeetingHasEndedDialog(
 @Composable
 private fun CannotVerifyContactDialogPreview() {
     AndroidThemeForPreviews {
-        MeetingHasEndedDialog(isFromGuest = false, {}, {})
+        MeetingHasEndedDialog(doesChatExist = false, {}, {})
     }
 }
 
@@ -50,7 +48,7 @@ private fun CannotVerifyContactDialogPreview() {
 @Composable
 private fun CannotVerifyContactDialogGuestPreview() {
     AndroidThemeForPreviews {
-        MeetingHasEndedDialog(isFromGuest = true, {}, {})
+        MeetingHasEndedDialog(doesChatExist = true, {}, {})
     }
 }
 

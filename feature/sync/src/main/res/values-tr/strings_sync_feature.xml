@@ -4,8 +4,6 @@
     <string name="sync_toolbar_title">Senkronizasyon</string>
     <!-- Sync text for the the button to begin sync-->
     <string name="sync_button_label">Senkronize et</string>
-    <!-- Sync text of sync-->
-    <string name="sync">Sync</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
     <string name="sync_storage_permission_banner">MEGA’nın yerel klasörünüzü senkronize edebilmesi için cihazınızın depolama alanına erişmesi gerekiyor. Erişime izin vermek için buraya dokunun.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->

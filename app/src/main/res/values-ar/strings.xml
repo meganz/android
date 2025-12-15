@@ -1064,12 +1064,13 @@
     <!-- Button to set a value -->
     <string name="hint_minutes">دقائق</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string-array name="settings_status_entries">
-        <item>متصل بالانترنت</item>
-        <item>بعيد</item>
-        <item>مشغول</item>
-        <item>غير متصل بالانترنت</item>
-    </string-array>
+    <string name="settings_chat_status_online">متصل بالانترنت</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_away">بعيد</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_busy">مشغول</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_offline">غير متصل بالانترنت</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">تمكين</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1488,8 +1489,6 @@
     <string name="tab_received_requests">الطلبات المستلمة</string>
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">تم تجاوز مساحة التخزين المتاحة</string>
-    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">Invalid link. Please try again or request a new one.</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">كلمة مرور الرابط غير صالحة</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
@@ -1586,12 +1585,13 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">جودة الفيديو</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
-    <string-array name="settings_chat_upload_quality_entries">
-        <item>منخفضة</item>
-        <item>متوسطة</item>
-        <item>عالية</item>
-        <item>الأصلية</item>
-    </string-array>
+    <string name="settings_chat_upload_quality_low">منخفضة</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_medium">متوسطة</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_high">عالية</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_original">الأصلية</string>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">مكالمة فائتة</string>
     <!-- Refers to a location of file -->
@@ -4588,7 +4588,10 @@
         <item quantity="many">تعذر نسخ %1$d عنصراً</item>
         <item quantity="other">تعذر نسخ %1$d عنصر</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="zero">تم نسخ %1$d عنصر،&#160;</item>
         <item quantity="one">تم نسخ %1$d عنصر،&#160;</item>
@@ -4597,7 +4600,10 @@
         <item quantity="many">تم نسخ %1$d عنصراً،&#160;</item>
         <item quantity="other">تم نسخ %1$d عنصر،&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="zero">تعذر نسخ %1$d عنصر</item>
         <item quantity="one">تعذر نسخ %1$d عنصر</item>
@@ -4878,10 +4884,6 @@
     <string name="dialog_taken_down_folder_title">لا يمكن فتح المجلد</string>
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">لا يمكن فتح الملف</string>
-    <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_description">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
-    <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
-    <string name="dialog_taken_down_file_description">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
     <!-- Text of the button to show the dialog to update to pro -->
     <string name="general_pro_only">برو Pro فقط</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
@@ -5276,15 +5278,15 @@
     <!-- Message after selected albums are deleted (singular) -->
     <string name="photos_album_deleted_message_singular">تم حذف ”%s“ ألبوم</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
-    <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s في انتظار الانضمام إلى ”%2$s”.</string>
+    <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s في انتظار الانضمام إلى ”%2$s\“.</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
-        <item quantity="zero">%1$d مشارك ينتظرون الانضمام إلى ”%2$s”.</item>
-        <item quantity="one">%1$d مشارك ينتظر الانضمام إلى ”%2$s”.</item>
-        <item quantity="two">%1$d مشاركان ينتظران الانضمام إلى ”%2$s”.</item>
-        <item quantity="few">%1$d مشاركون ينتظرون الانضمام إلى ”%2$s”.</item>
-        <item quantity="many">%1$d مشاركاً ينتظرون الانضمام إلى ”%2$s”.</item>
-        <item quantity="other">%1$d مشارك ينتظرون الانضمام إلى ”%2$s”.</item>
+        <item quantity="zero">%1$d مشارك ينتظرون الانضمام إلى ”%2$s\“.</item>
+        <item quantity="one">%1$d مشارك ينتظر الانضمام إلى ”%2$s\“.</item>
+        <item quantity="two">%1$d مشاركان ينتظران الانضمام إلى ”%2$s\“.</item>
+        <item quantity="few">%1$d مشاركون ينتظرون الانضمام إلى ”%2$s\“.</item>
+        <item quantity="many">%1$d مشاركاً ينتظرون الانضمام إلى ”%2$s\“.</item>
+        <item quantity="other">%1$d مشارك ينتظرون الانضمام إلى ”%2$s\“.</item>
     </plurals>
     <!-- Title of video option of snapshot-->
     <string name="media_player_video_option_snapshot_title">التقاط</string>

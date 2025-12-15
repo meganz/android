@@ -67,7 +67,6 @@ import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUs
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
@@ -143,7 +142,6 @@ internal class FileInfoViewModelTest {
     private val getAvailableNodeActionsUseCase: GetAvailableNodeActionsUseCase = mock()
     private val monitorChatOnlineStatusUseCase = mock<MonitorChatOnlineStatusUseCase>()
     private val clipboardGateway = mock<ClipboardGateway>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getPrimarySyncHandleUseCase = mock<GetPrimarySyncHandleUseCase>()
     private val getSecondarySyncHandleUseCase = mock<GetSecondarySyncHandleUseCase>()
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
@@ -205,7 +203,6 @@ internal class FileInfoViewModelTest {
             getAvailableNodeActionsUseCase,
             monitorChatOnlineStatusUseCase,
             clipboardGateway,
-            getFeatureFlagValueUseCase,
             getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase,
             isCameraUploadsEnabledUseCase,
@@ -253,7 +250,6 @@ internal class FileInfoViewModelTest {
             nodeActionMapper = nodeActionMapper,
             monitorChatOnlineStatusUseCase = monitorChatOnlineStatusUseCase,
             clipboardGateway = clipboardGateway,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase = getSecondarySyncHandleUseCase,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,

@@ -1019,12 +1019,13 @@
     <!-- Button to set a value -->
     <string name="hint_minutes">minutos</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string-array name="settings_status_entries">
-        <item>Online</item>
-        <item>Ausente</item>
-        <item>Ocupado</item>
-        <item>Offline</item>
-    </string-array>
+    <string name="settings_chat_status_online">Online</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_away">Ausente</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_busy">Ocupado</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_offline">Offline</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">Ativar</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1413,8 +1414,6 @@
     <string name="tab_received_requests">Solicitações recebidas</string>
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">Cota de armazenamento excedida</string>
-    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">Invalid link. Please try again or request a new one.</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">A senha do link é inválida</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
@@ -1502,12 +1501,13 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Qualidade dos vídeos</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
-    <string-array name="settings_chat_upload_quality_entries">
-        <item>Baixa</item>
-        <item>Média</item>
-        <item>Alta</item>
-        <item>Original</item>
-    </string-array>
+    <string name="settings_chat_upload_quality_low">Baixa</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_medium">Média</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_high">Alta</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_original">Original</string>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Chamada perdida</string>
     <!-- Refers to a location of file -->
@@ -4096,13 +4096,19 @@
         <item quantity="many">Não foi possível copiar %1$d de itens</item>
         <item quantity="other">Não foi possível copiar %1$d itens</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">%1$d item foi copiado, &#160;</item>
         <item quantity="many">%1$d de itens foram copiados, &#160;</item>
         <item quantity="other">%1$d itens foram copiados, &#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">mas não foi possível copiar %1$d item</item>
         <item quantity="many">mas não foi possível copiar %1$d de itens</item>

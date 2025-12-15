@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -41,6 +42,7 @@ import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistor
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
+import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallStatus
@@ -68,6 +70,7 @@ import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
@@ -134,8 +137,18 @@ import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteOldestCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
+import mega.privacy.android.feature.clouddrive.navigation.CloudDriveDeepLinkHandler
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.DriveSyncNavKey
+import mega.privacy.android.navigation.destination.HomeScreensNavKey
+import mega.privacy.android.navigation.destination.LegacyImageViewerNavKey
+import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
+import mega.privacy.android.navigation.destination.LegacyPdfViewerNavKey
+import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
+import mega.privacy.android.navigation.destination.RubbishBinNavKey
+import mega.privacy.android.navigation.destination.SharesNavKey
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -287,6 +300,8 @@ class ManagerViewModel @Inject constructor(
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val fcmManager: FcmManager,
+    private val cloudDriveDeepLinkHandler: CloudDriveDeepLinkHandler,
+    private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
     @ApplicationScope private val appScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -1231,8 +1246,12 @@ class ManagerViewModel @Inject constructor(
         NodeSourceType.RUBBISH_BIN -> rubbishBinParentHandle
         NodeSourceType.BACKUPS -> backupsParentHandle
         NodeSourceType.FAVOURITES -> favouritesParentHandle
-        NodeSourceType.DOCUMENTS -> MegaApiJava.INVALID_HANDLE
-        NodeSourceType.AUDIO -> MegaApiJava.INVALID_HANDLE
+        NodeSourceType.DOCUMENTS,
+        NodeSourceType.AUDIO,
+        NodeSourceType.VIDEOS,
+        NodeSourceType.SEARCH,
+            -> MegaApiJava.INVALID_HANDLE
+
         NodeSourceType.HOME, NodeSourceType.OTHER, NodeSourceType.OFFLINE -> getRootNodeUseCase()?.id?.longValue
             ?: MegaApiJava.INVALID_HANDLE
     }
@@ -1531,6 +1550,75 @@ class ManagerViewModel @Inject constructor(
      */
     fun onConsumeShowHomeFabOptionsBottomSheet() =
         _state.update { it.copy(showHomeFabOptionsBottomSheet = false) }
+
+
+    fun checkHandleLink(uri: Uri) {
+        viewModelScope.launch {
+            cloudDriveDeepLinkHandler.getNavKeys(
+                uri = uri,
+                regexPatternType = RegexPatternType.HANDLE_LINK,
+                isLoggedIn = true
+            )?.let { navKeys ->
+                val (parentHandle, highlightedNodeHandle, previewNavKey) =
+                    when (val lastNavKey = navKeys.last()) {
+                        is LegacyPdfViewerNavKey,
+                        is LegacyImageViewerNavKey,
+                        is LegacyTextEditorNavKey,
+                        is LegacyMediaPlayerNavKey,
+                            -> {
+                            val penultimateNavKey = navKeys[navKeys.size - 2]
+                            val result =
+                                getParentNodeHandleAndHighlightedNodeHandle(penultimateNavKey)
+
+                            Triple(result.first, result.second, lastNavKey)
+                        }
+
+                        else -> {
+                            val result = getParentNodeHandleAndHighlightedNodeHandle(lastNavKey)
+                            Triple(result.first, result.second, null)
+                        }
+                    }
+                val highlightedNodeName = highlightedNodeHandle?.let {
+                    runCatching { getNodeByIdUseCase(NodeId(it)) }.getOrNull()?.name
+                }
+                val handleLinkResult = ManagerState.HandleLinkResult(
+                    highlightedNodeHandle = highlightedNodeHandle,
+                    highlightedNodeName = highlightedNodeName,
+                    previewNavKey = previewNavKey,
+                ).let { result ->
+                    when (navKeys.first()) {
+                        is RubbishBinNavKey -> result.copy(rubbishHandle = parentHandle)
+                        is SharesNavKey -> result.copy(incomingHandle = parentHandle)
+                        else -> result.copy(fileBrowserHandle = parentHandle)
+                    }
+                }
+
+                _state.update { state -> state.copy(handleLinkResult = handleLinkResult) }
+            }
+        }
+    }
+
+    fun onConsumeHandleLinkResult() {
+        _state.update { state -> state.copy(handleLinkResult = null) }
+    }
+
+    private suspend fun getParentNodeHandleAndHighlightedNodeHandle(navKey: NavKey) =
+        when (navKey) {
+            is HomeScreensNavKey -> (navKey.root as? DriveSyncNavKey)?.let {
+                val parentHandle = (navKey.destinations?.last() as? CloudDriveNavKey)?.nodeHandle
+                    ?: runCatching { getRootNodeUseCase() }.getOrNull()?.id?.longValue
+
+                parentHandle to it.highlightedNodeHandle
+            } ?: (null to null)
+
+            is RubbishBinNavKey -> (navKey.handle
+                ?: runCatching { getRubbishNodeUseCase() }.getOrNull()?.id?.longValue)?.let { parentHandle ->
+                parentHandle to navKey.highlightedNodeHandle
+            } ?: (null to null)
+
+            is CloudDriveNavKey -> navKey.nodeHandle to navKey.highlightedNodeHandle
+            else -> null to null
+        }
 
     internal companion object {
         internal const val IS_FIRST_LOGIN_KEY = "EXTRA_FIRST_LOGIN"

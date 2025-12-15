@@ -191,6 +191,20 @@ alwaysApply: true
 - **ViewModel Tests**: Test ViewModels with mocked use case dependencies
 - **Mapper Tests**: Test data mappers for all transformation scenarios
 
+### Test Helper Functions
+- **initViewModel Pattern**: Use parameterized helper functions with default values to reduce duplication
+  ```kotlin
+  private fun initViewModel(maxBucketCount: Int = 4) {
+      underTest = RecentsViewModel(
+          getRecentActionsUseCase = getRecentActionsUseCase,
+          // ... other dependencies
+          maxBucketCount = maxBucketCount
+      )
+  }
+  ```
+- **Try to use helper functions**: Don't manually create ViewModels in tests unless necessary; use `initViewModel()` with default values
+- **Custom parameters**: Pass parameters when needed (e.g., `initViewModel(maxBucketCount = 10)`)
+
 ### Test Modules
 - **Core Test**: Shared test utilities and extensions
 - **Core UI Test**: UI testing utilities and components

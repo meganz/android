@@ -1,10 +1,11 @@
 package mega.privacy.android.app.presentation.manager.model
 
+import androidx.navigation3.runtime.NavKey
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
+import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.domain.entity.chat.ChatLinkContent
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -73,5 +74,16 @@ data class ManagerState(
     val uploadEvent: StateEventWithContent<TransferTriggerEvent.StartUpload> = consumed(),
     val gmsDocumentScanner: GmsDocumentScanner? = null,
     val documentScanningError: DocumentScanningError? = null,
-    val showHomeFabOptionsBottomSheet: Boolean = false
-)
+    val showHomeFabOptionsBottomSheet: Boolean = false,
+    val handleLinkResult: HandleLinkResult? = null,
+) {
+
+    data class HandleLinkResult(
+        val incomingHandle: Long? = null,
+        val rubbishHandle: Long? = null,
+        val fileBrowserHandle: Long? = null,
+        val highlightedNodeHandle: Long? = null,
+        val highlightedNodeName: String? = null,
+        val previewNavKey: NavKey? = null,
+    )
+}

@@ -5,6 +5,7 @@ import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginIn
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.notifications.ShouldShowNotificationReminderUseCase
 import mega.privacy.android.domain.usecase.permisison.CheckOnboardingPermissionsUseCase
+import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import timber.log.Timber
 import javax.inject.Inject
@@ -26,7 +27,8 @@ class OnboardingPermissionInitialiser @Inject constructor(
                         navigationEventQueue.emit(
                             PermissionScreensNavKey(
                                 onlyShowNotificationPermission = result.onlyShowNotificationPermission
-                            )
+                            ),
+                            priority = NavPriority.Priority(9)
                         )
                     }
             } else {
@@ -35,7 +37,8 @@ class OnboardingPermissionInitialiser @Inject constructor(
                     navigationEventQueue.emit(
                         PermissionScreensNavKey(
                             onlyShowNotificationPermission = true
-                        )
+                        ),
+                        priority = NavPriority.Priority(9)
                     )
                 }
             }

@@ -6,6 +6,7 @@ import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.mobile.home.presentation.configuration.homeConfigurationScreen
+import mega.privacy.mobile.home.presentation.recents.bucket.recentsBucketScreen
 import mega.privacy.mobile.home.presentation.recents.recentsScreen
 
 class HomeFeatureGraph : FeatureDestination {
@@ -16,6 +17,11 @@ class HomeFeatureGraph : FeatureDestination {
             )
 
             recentsScreen(
+                navigationHandler = navigationHandler,
+                transferHandler = transferHandler
+            )
+
+            recentsBucketScreen(
                 navigationHandler = navigationHandler,
                 transferHandler = transferHandler
             )

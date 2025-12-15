@@ -68,7 +68,7 @@ import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActiv
 import mega.privacy.android.app.presentation.meeting.NoteToSelfChatViewModel
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingManagementViewModel
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity
-import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
+import mega.privacy.android.app.presentation.meeting.chat.ChatActivity
 import mega.privacy.android.app.presentation.meeting.model.ShareLinkOption
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
@@ -145,7 +145,7 @@ class ChatTabsFragment : Fragment() {
     private val viewModel by viewModels<ChatTabsViewModel>()
     private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>()
     private val noteToSelfChatViewModel by viewModels<NoteToSelfChatViewModel>()
-    private val isNewSingleActivity by lazy { activity is ChatHostActivity }
+    private val isNewSingleActivity by lazy { activity is ChatActivity }
 
     private val bluetoothPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGrant ->
@@ -440,7 +440,7 @@ class ChatTabsFragment : Fragment() {
 
         collectFlows()
 
-        val createNewChat = arguments?.getBoolean(ChatHostActivity.CREATE_NEW_CHAT, false) ?: false
+        val createNewChat = arguments?.getBoolean(ChatActivity.CREATE_NEW_CHAT, false) ?: false
         if (createNewChat && savedInstanceState == null) {
             startConversationLauncher.launch(
                 Intent(
@@ -448,7 +448,7 @@ class ChatTabsFragment : Fragment() {
                     StartConversationActivity::class.java
                 )
             )
-            arguments?.remove(ChatHostActivity.CREATE_NEW_CHAT)
+            arguments?.remove(ChatActivity.CREATE_NEW_CHAT)
         }
 
         viewLifecycleOwner.collectFlow(viewModel.getState(), Lifecycle.State.RESUMED) { state ->
@@ -712,7 +712,7 @@ class ChatTabsFragment : Fragment() {
                 )
             } else {
                 (activity as? ManagerActivity?)?.onCreateMeeting()
-                    ?: (activity as? ChatHostActivity?)?.onCreateMeeting()
+                    ?: (activity as? ChatActivity?)?.onCreateMeeting()
             }
 
         } else {

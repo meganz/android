@@ -83,6 +83,8 @@ class GetSortOrderByNodeSourceTypeUseCaseTest {
         Arguments.of(NodeSourceType.FAVOURITES, mockCloudSortOrder),
         Arguments.of(NodeSourceType.OUTGOING_SHARES, mockCloudSortOrder),
         Arguments.of(NodeSourceType.OTHER, mockCloudSortOrder),
+        Arguments.of(NodeSourceType.VIDEOS, mockCloudSortOrder),
+        Arguments.of(NodeSourceType.SEARCH, mockCloudSortOrder),
         Arguments.of(NodeSourceType.OFFLINE, mockOfflineSortOrder),
     )
 

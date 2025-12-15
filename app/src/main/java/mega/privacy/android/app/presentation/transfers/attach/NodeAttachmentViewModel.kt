@@ -14,6 +14,10 @@ import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.GetNodesToAttachUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachContactsUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactHandleUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.navigation.destination.ChatNavKey
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -28,6 +32,8 @@ class NodeAttachmentViewModel @Inject constructor(
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val getContactHandleUseCase: GetContactHandleUseCase,
     private val attachContactsUseCase: AttachContactsUseCase,
+    private val navigationEventQueue: NavigationEventQueue,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(NodeAttachmentUiState())
 
@@ -163,6 +169,20 @@ class NodeAttachmentViewModel @Inject constructor(
     fun markEventHandled() {
         _uiState.update { state ->
             state.copy(event = null)
+        }
+    }
+
+    fun navigateToChat(chatId: Long) {
+        viewModelScope.launch {
+            runCatching {
+                if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
+                    navigationEventQueue.emit(ChatNavKey(chatId = chatId, action = null))
+                } else {
+                    _uiState.update { state ->
+                        state.copy(event = NodeAttachmentEvent.NavigateToChatLegacy(chatId))
+                    }
+                }
+            }.onFailure { Timber.e(it) }
         }
     }
 }

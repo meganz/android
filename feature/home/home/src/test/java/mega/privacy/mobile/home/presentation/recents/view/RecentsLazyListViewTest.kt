@@ -152,6 +152,7 @@ class RecentsLazyListViewTest {
         isSensitive: Boolean = false,
     ): RecentsUiItem {
         val mockBucket = RecentActionBucket(
+            identifier = "$timestamp $userName $isMediaBucket",
             timestamp = timestamp,
             userEmail = "test@example.com",
             parentNodeId = NodeId(1L),

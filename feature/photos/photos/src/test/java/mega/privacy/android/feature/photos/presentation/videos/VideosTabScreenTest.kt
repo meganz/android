@@ -7,14 +7,20 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.list.SORT_ORDER_TAG
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.photos.components.DURATION_FILTER_BUTTON_TEXT_TEST_TAG
 import mega.privacy.android.feature.photos.components.LOCATION_FILTER_BUTTON_TEXT_TEST_TAG
+import mega.privacy.android.feature.photos.presentation.videos.model.DurationFilterOption
+import mega.privacy.android.feature.photos.presentation.videos.model.LocationFilterOption
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
+import mega.privacy.android.navigation.contract.NavigationHandler
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,20 +43,32 @@ class VideosTabScreenTest {
 
     private fun setComposeContent(
         uiState: VideosTabUiState = VideosTabUiState.Data(),
-        onClick: (item: VideoUiEntity, index: Int) -> Unit = { _, _ -> },
-        onMenuClick: (VideoUiEntity) -> Unit = {},
-        onLongClick: (item: VideoUiEntity, index: Int) -> Unit = { _, _ -> },
+        onClick: (item: VideoUiEntity) -> Unit = {},
+        onLongClick: (item: VideoUiEntity) -> Unit = {},
         onSortNodes: (NodeSortConfiguration) -> Unit = {},
         modifier: Modifier = Modifier,
+        navigationHandler: NavigationHandler = mock(),
+        onTransfer: (TransferTriggerEvent) -> Unit = {},
+        locationOptionSelected: (LocationFilterOption) -> Unit = {},
+        durationOptionSelected: (DurationFilterOption) -> Unit = {},
+        onDismissNodeOptionsBottomSheet: () -> Unit = {},
+        nodeOptionsActionViewModel: NodeOptionsActionViewModel = mock(),
+        nodeActionHandler: NodeActionHandler = mock()
     ) {
         composeTestRule.setContent {
             VideosTabScreen(
                 uiState = uiState,
                 modifier = modifier,
                 onClick = onClick,
-                onMenuClick = onMenuClick,
                 onLongClick = onLongClick,
-                onSortNodes = onSortNodes
+                onSortNodes = onSortNodes,
+                navigationHandler = navigationHandler,
+                onTransfer = onTransfer,
+                locationOptionSelected = locationOptionSelected,
+                durationOptionSelected = durationOptionSelected,
+                onDismissNodeOptionsBottomSheet = onDismissNodeOptionsBottomSheet,
+                nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+                nodeActionHandler = nodeActionHandler
             )
         }
     }
@@ -74,7 +92,7 @@ class VideosTabScreenTest {
     fun `test that empty view is displayed as expected`() {
         setComposeContent(
             uiState = VideosTabUiState.Data(
-                allVideos = emptyList()
+                allVideoEntities = emptyList()
             )
         )
 
@@ -92,7 +110,7 @@ class VideosTabScreenTest {
         val video = createVideoUiEntity(1L)
         setComposeContent(
             uiState = VideosTabUiState.Data(
-                allVideos = listOf(video)
+                allVideoEntities = listOf(video)
             )
         )
 
@@ -139,7 +157,7 @@ class VideosTabScreenTest {
         val onSortNodes = mock<(NodeSortConfiguration) -> Unit>()
         setComposeContent(
             uiState = VideosTabUiState.Data(
-                allVideos = listOf(video),
+                allVideoEntities = listOf(video),
             ),
             onSortNodes = onSortNodes
         )

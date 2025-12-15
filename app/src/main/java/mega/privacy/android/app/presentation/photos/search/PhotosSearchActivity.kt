@@ -31,8 +31,6 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
-import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
-import mega.privacy.android.app.presentation.photos.PhotosCache
 import mega.privacy.android.app.presentation.search.model.navigation.removeNodeLinkDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.cannotOpenFileDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.changeLabelBottomSheetNavigation
@@ -63,6 +61,9 @@ import mega.privacy.android.domain.entity.photos.Album.RawAlbum
 import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
+import mega.privacy.android.feature.photos.presentation.search.MediaSearchScreenM3
 import mega.privacy.android.feature.photos.presentation.search.PhotosSearchViewModel
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
@@ -82,6 +83,9 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
     @Inject
     lateinit var listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper
 
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
     private val photosSearchViewModel: PhotosSearchViewModel by viewModels()
 
     private val photoDownloaderViewModel: PhotoDownloaderViewModel by viewModels()
@@ -98,10 +102,6 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        photosSearchViewModel.initialize(
-            albumsFlow = PhotosCache.albumsFlow,
-            photosFlow = PhotosCache.photosFlow,
-        )
 
         val bottomSheetActionHandler = NodeActionHandler(this, nodeActionsViewModel)
 
@@ -112,6 +112,7 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
                 val navController = rememberNavController(bottomSheetNavigator)
                 val scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState)
                 val nodeActionState by nodeActionsViewModel.state.collectAsStateWithLifecycle()
+                val state by photosSearchViewModel.state.collectAsStateWithLifecycle()
 
                 MegaBottomSheetLayout(
                     bottomSheetNavigator = bottomSheetNavigator,
@@ -122,19 +123,52 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
                             startDestination = searchRoute,
                         ) {
                             composable(searchRoute) {
-                                PhotosSearchScreen(
-                                    photosSearchViewModel = photosSearchViewModel,
-                                    photoDownloaderViewModel = photoDownloaderViewModel,
-                                    scaffoldState = scaffoldState,
-                                    onOpenAlbum = ::openAlbum,
-                                    onOpenImagePreviewScreen = ::openImagePreview,
-                                    onShowMoreMenu = { nodeId ->
-                                        val route =
-                                            "$nodeBottomSheetRoute/${nodeId.longValue}/${NodeSourceType.OTHER.name}"
-                                        navController.navigate(route)
-                                    },
-                                    onCloseScreen = ::finish,
-                                )
+                                when (state.isSingleActivityEnabled) {
+                                    true -> {
+                                        MediaSearchScreenM3(
+                                            state = state,
+                                            photoDownloaderViewModel = photoDownloaderViewModel,
+                                            onOpenAlbum = ::openAlbum,
+                                            onOpenImagePreviewScreen = ::openImagePreview,
+                                            onShowMoreMenu = { nodeId ->
+                                                val route =
+                                                    "$nodeBottomSheetRoute/${nodeId.longValue}/${NodeSourceType.OTHER.name}"
+                                                navController.navigate(route)
+                                            },
+                                            updateQuery = photosSearchViewModel::updateQuery,
+                                            updateSelectedQuery = {
+                                                photosSearchViewModel.updateSelectedQuery(null)
+                                            },
+                                            updateRecentQueries = photosSearchViewModel::updateRecentQueries,
+                                            searchPhotos = photosSearchViewModel::search,
+                                            onCloseScreen = ::finish,
+                                        )
+                                    }
+
+                                    false -> {
+                                        PhotosSearchScreen(
+                                            state = state,
+                                            photoDownloaderViewModel = photoDownloaderViewModel,
+                                            scaffoldState = scaffoldState,
+                                            onOpenAlbum = ::openAlbum,
+                                            onOpenImagePreviewScreen = ::openImagePreview,
+                                            onShowMoreMenu = { nodeId ->
+                                                val route =
+                                                    "$nodeBottomSheetRoute/${nodeId.longValue}/${NodeSourceType.OTHER.name}"
+                                                navController.navigate(route)
+                                            },
+                                            updateQuery = photosSearchViewModel::updateQuery,
+                                            updateSelectedQuery = {
+                                                photosSearchViewModel.updateSelectedQuery(null)
+                                            },
+                                            updateRecentQueries = photosSearchViewModel::updateRecentQueries,
+                                            searchPhotos = photosSearchViewModel::search,
+                                            onCloseScreen = ::finish,
+                                        )
+                                    }
+
+                                    else -> {}
+                                }
                             }
 
                             nodeBottomSheetNavigation(
@@ -154,7 +188,7 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
 
                             changeLabelBottomSheetNavigation(navController)
 
-                            renameDialogNavigation(navHostController = navController,)
+                            renameDialogNavigation(navHostController = navController)
 
                             changeNodeExtensionDialogNavigation(navController)
 

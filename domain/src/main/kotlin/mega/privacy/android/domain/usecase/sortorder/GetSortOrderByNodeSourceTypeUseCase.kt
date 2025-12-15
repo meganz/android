@@ -37,6 +37,8 @@ class GetSortOrderByNodeSourceTypeUseCase @Inject constructor(
             NodeSourceType.FAVOURITES,
             NodeSourceType.OUTGOING_SHARES,
             NodeSourceType.OTHER,
+            NodeSourceType.VIDEOS,
+            NodeSourceType.SEARCH,
                 -> getCloudSortOrder()
 
             NodeSourceType.OFFLINE -> getOfflineSortOrder()

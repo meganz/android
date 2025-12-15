@@ -20,7 +20,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.components.TwoLineCheckPreference
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.listeners.SetAttrUserListener
 import mega.privacy.android.app.presentation.extensions.title
@@ -92,6 +91,15 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
         statusChatListPreference =
             findPreference<ListPreference?>(SettingsConstants.KEY_CHAT_STATUS)?.apply {
                 onPreferenceChangeListener = this@SettingsChatFragment
+                // Set entries (display strings)
+                entries = arrayOf(
+                    getString(R.string.settings_chat_status_online),
+                    getString(R.string.settings_chat_status_away),
+                    getString(R.string.settings_chat_status_busy),
+                    getString(R.string.settings_chat_status_offline),
+                )
+                // Set entryValues (persisted values)
+                entryValues = resources.getStringArray(R.array.settings_chat_status_values)
             }
 
         autoAwaySwitch =
@@ -120,6 +128,15 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
         chatAttachmentsChatListPreference =
             findPreference<ListPreference?>(SettingsConstants.KEY_CHAT_SEND_ORIGINALS)?.apply {
                 onPreferenceChangeListener = this@SettingsChatFragment
+                // Set entries (display strings)
+                entries = arrayOf(
+                    getString(R.string.settings_chat_upload_quality_low),
+                    getString(R.string.settings_chat_upload_quality_medium),
+                    getString(R.string.settings_chat_upload_quality_high),
+                    getString(R.string.settings_chat_upload_quality_original),
+                )
+                // Set entryValues (numeric values for persistence)
+                entryValues = resources.getStringArray(R.array.settings_chat_upload_quality_values)
                 setValueIndex(dbH.chatVideoQuality)
                 summary = chatAttachmentsChatListPreference?.entry
             }

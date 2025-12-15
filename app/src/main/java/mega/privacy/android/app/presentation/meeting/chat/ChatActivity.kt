@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.commit
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
 import mega.privacy.android.app.presentation.chat.list.ChatTabsFragment
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
@@ -15,6 +14,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openChatFragment
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.JoinMeetingPressedEvent
 import mega.privacy.mobile.analytics.event.StartMeetingNowPressedEvent
 
@@ -22,7 +22,7 @@ import mega.privacy.mobile.analytics.event.StartMeetingNowPressedEvent
  * Host Activity for new chat room
  */
 @AndroidEntryPoint
-class ChatHostActivity : AppCompatActivity(), MeetingBottomSheetDialogActionListener {
+class ChatActivity : AppCompatActivity(), MeetingBottomSheetDialogActionListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

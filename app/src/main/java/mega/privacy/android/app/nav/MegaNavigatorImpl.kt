@@ -1,5 +1,6 @@
 package mega.privacy.android.app.nav
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -29,7 +30,7 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
+import mega.privacy.android.app.presentation.meeting.chat.ChatActivity
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivity
@@ -205,7 +206,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         isOverQuota: Int?,
         flags: Int,
     ): Intent {
-        val intent = Intent(context, ChatHostActivity::class.java).apply {
+        val intent = Intent(context, ChatActivity::class.java).apply {
             this.action = action
             putExtra(EXTRA_ACTION, action)
             text?.let { putExtra(Constants.SHOW_SNACKBAR, text) }
@@ -510,11 +511,14 @@ internal class MegaNavigatorImpl @Inject constructor(
             context = context,
             singleActivityDestination = CloudDriveNavKey(nodeHandle = handle)
         ) {
-            context.startActivity(
-                Intent(context, ManagerActivity::class.java)
-                    .setAction(ACTION_OPEN_SYNC_MEGA_FOLDER)
-                    .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
-                    .putExtra(INTENT_EXTRA_KEY_HANDLE, handle)
+            navigateToManagerActivity(
+                context = context,
+                action = ACTION_OPEN_SYNC_MEGA_FOLDER,
+                data = null,
+                bundle = Bundle().apply {
+                    putLong(INTENT_EXTRA_KEY_HANDLE, handle)
+                },
+                flags = FLAG_ACTIVITY_CLEAR_TOP
             )
         }
 
@@ -525,10 +529,12 @@ internal class MegaNavigatorImpl @Inject constructor(
             context = context,
             singleActivityDestination = DeviceCenterNavKey
         ) {
-            context.startActivity(
-                Intent(context, ManagerActivity::class.java)
-                    .setAction(ACTION_OPEN_DEVICE_CENTER)
-                    .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
+            navigateToManagerActivity(
+                context = context,
+                action = ACTION_OPEN_DEVICE_CENTER,
+                data = null,
+                bundle = null,
+                flags = FLAG_ACTIVITY_CLEAR_TOP
             )
         }
     }
@@ -836,15 +842,34 @@ internal class MegaNavigatorImpl @Inject constructor(
         }
     }
 
+    override fun openManagerActivity(
+        context: Context,
+        data: Uri?,
+        action: String?,
+        bundle: Bundle?,
+        flags: Int?,
+        singleActivityDestination: NavKey,
+    ) {
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = singleActivityDestination
+        ) {
+            navigateToManagerActivity(context, action, data, bundle, flags)
+        }
+    }
+
+    @SuppressLint("ManagerActivityIntent")
     private fun navigateToManagerActivity(
         context: Context,
         action: String?,
         data: Uri?,
         bundle: Bundle?,
+        flags: Int? = null,
     ) {
         val intent = Intent(context, ManagerActivity::class.java)
         intent.action = action
         intent.data = data
+        flags?.let { intent.flags = it }
         bundle?.let { intent.putExtras(it) }
         context.startActivity(intent)
     }

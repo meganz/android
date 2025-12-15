@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">Ruang penyimpanan tidak mencukupi di perangkat anda</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">Terjadi kesalahan yang tidak diketahui. Kontak support@mega.io.</string>
+    <string name="general_sync_message_unknown_error">Terjadi kesalahan yang tidak diketahui. Kontak support&#64;mega.io.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">Folder tidak dapat disinkronkan atau dicadangkan karena folder MEGA ada di tempat sampah</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -696,10 +696,6 @@
     <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%s[/A] [B]memperbarui waktu pertemuan untuk[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
     <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] [B]membatalkan pertemuan yang dijadwalkan untuk[/B]</string>
-    <!-- Title of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_title">Want MEGA without the ads?</string>
-    <!-- Description of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_description">Upgrade to a Pro plan with plenty of storage and more. Our Pro plans start at just %1$s a month.</string>
     <!-- The Generous storage label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_generous_storage_label">Penyimpanan murah hati</string>
     <!-- The Generous storage description in the ads free introduction screen -->
@@ -988,16 +984,10 @@
     <string name="hidden_nodes_new_feature">Fitur baru: File dan folder tersembunyi</string>
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">Sembunyikan file dan folder penting</string>
-    <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy in one easy step.</string>
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">Tidak terlihat</string>
-    <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the settings.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">Blur untuk privasi</string>
-    <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Show hidden items with their thumbnails blurred, so you can identify them without exposing their contents.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Jaga foto anda tetap aman, selalu</string>
     <!--Camera backup permission screen description-->
@@ -1446,10 +1436,6 @@
     <plurals name="context_link_removal_success">
         <item quantity="other">Tautan dihapus</item>
     </plurals>
-    <!-- Warning that appears prior to remove links of files. Plural. -->
-    <plurals name="remove_links_warning_text">
-        <item quantity="other"></item>
-    </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
     <string name="context_share_correctly_removed">Akses dihapus</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1463,10 +1449,6 @@
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="other">Folder ini dibagikan dengan %1$d kontak. Berhenti berbagi?</item>
-    </plurals>
-    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <plurals name="alert_remove_several_shares">
-        <item quantity="other"></item>
     </plurals>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
     <string name="figures_storage_referrals_achievements_text">%1$s penyimpanan tambahan untuk setiap undangan, berlaku untuk %2$d hari</string>
@@ -1540,10 +1522,6 @@
     <string name="transfers_retry_failed_snackbar_message">Tidak dapat memulai ulang transfer</string>
     <!-- Action for the Snackbar when retry failed on failed transfers tab. -->
     <string name="transfers_retry_failed_snackbar_action">Ulangi</string>
-    <!-- Snackbar message when retry success on failed transfers tab. -->
-    <plurals name="transfers_retry_feedback_snackbar_message">
-        <item quantity="other"></item>
-    </plurals>
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">Dipulihkan ke %s</string>
     <!-- success message when moving a node -->
@@ -1696,36 +1674,12 @@
     <string name="action_sort_by_share_created">Bagikan Dibuat</string>
     <!-- The title of camera uploads paused warning banner -->
     <string name="camera_update_paused_warning_banner_title">Unggahan kamera dijeda</string>
-    <!-- The description of camera uploads device charging not met paused warning banner -->
-    <string name="camera_update_device_charging_not_met_banner_description">Uploads only happen while your device is charging. You can change this in Settings.</string>
     <!-- The button text of camera uploads device charging not met paused warning banner -->
     <string name="camera_update_device_charging_not_met_banner_button_text">Pengaturan</string>
-    <!-- The description of camera uploads low battery paused warning banner -->
-    <string name="camera_update_low_battery_banner_description">Uploads are paused due to low battery. Charge your device to continue.</string>
-    <!-- The description of camera uploads network requirement not met paused warning banner -->
-    <string name="camera_update_network_requirement_not_met_banner_description">Camera uploads paused, connect to Wi-Fi or allow mobile data</string>
     <!-- The button text of camera uploads network requirement not met paused warning banner -->
     <string name="camera_update_network_requirement_not_met_banner_button_text">Izinkan data seluler</string>
-    <!-- Billing info with discount label -->
-    <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s for %3$s</string>
-    <!-- campaign name for Black Friday deal -->
-    <string name="campaign_name_black_friday">Black Friday deal: %1$d%% off</string>
-    <!-- campaign name for Cyber Monday deal -->
-    <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
-    <!-- campaign name for Special offer -->
-    <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
-    <!-- Label for first time period in days full format -->
-    <plurals name="label_first_time_in_months_full">
-        <item quantity="other"></item>
-    </plurals>
-    <!-- Label for first time period in years full format -->
-    <plurals name="label_first_time_in_years_full">
-        <item quantity="other"></item>
-    </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">Suite privasi MEGA</string>
-    <!-- Message about savings on yearly plan in case it has discount -->
-    <string name="account_upgrade_account_label_save_at_least">Save at least 16% on a yearly plan</string>
     <!-- Add new album on Media screen dialog title -->
     <string name="media_add_new_album_dialog_title">Masukkan nama album</string>
     <!-- Add new album on Media screen dialog positive button text -->
@@ -1736,30 +1690,14 @@
     <string name="system_album_gif_title">GIFs</string>
     <!-- Title of raw album. -->
     <string name="system_album_raw_title">RAW</string>
-    <!-- General error message to show when an invalid string is detected -->
-    <string name="general_invalid_string">Cannot be empty</string>
     <!-- Error message for creating an album with a system albums name -->
     <string name="album_invalid_name_error_message">Nama album ini tidak diizinkan. Masukkan nama yang berbeda.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="album_name_exists_error_message">Album dengan nama ini sudah ada. Masukkan nama yang berbeda.</string>
-    <!-- sentence to detail the permanent awarded text related to VPN achievement -->
-    <string name="mega_vpn_achievement_awarded_storage_text_permanent">Get %1$s of free storage when you start a MEGA&#160;VPN free trial, valid permanently</string>
-    <!-- sentence to detail the permanent awarded text related to PWM achievement -->
-    <string name="mega_pass_achievement_awarded_storage_text_permanent">Get %1$s of free storage when you start a MEGA&#160;Pass free trial, valid permanently</string>
-    <!-- sentence to detail the figures of award achievement days left -->
-    <plurals name="trial_awarded_achievement_days_left_text">
-        <item quantity="other"></item>
-    </plurals>
     <!-- sentence to detail the figures of award achievement days left -->
     <plurals name="trial_awarded_achievement_days_left_detail_title">
         <item quantity="other">Bonus kedaluwarsa dalam %1$d hari</item>
     </plurals>
-    <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
-    <!-- Discount label for first year singular -->
-    <string name="label_first_time_in_years_full_singular">%1$s for the first year</string>
-    <!-- Hidden nodes description: control visibility feature with tag -->
-    <string name="hidden_nodes_description_control_visibility_tag">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the [A]settings[/A].</string>
     <!-- Dialog confirmation text for removing photos in an album -->
     <string name="album_content_remove_photos_dialog_description">Hapus dari album?</string>
     <!--Album content more options action description-->
@@ -1768,25 +1706,13 @@
     <string name="album_content_selection_action_select_album_cover_description">Pilih sampul album</string>
     <!--Album content delete action description-->
     <string name="album_content_selection_action_delete_description">Hapus</string>
-    <!-- Message shown when user tries to preview an undecrypted file -->
-    <string name="preview_not_available_undecrypted_files">Preview not available for undecrypted files</string>
     <!-- Delete album confirmation dialog positive button text. -->
     <string name="delete_album_confirmation_positive_button_text">Hapus</string>
     <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
     <string name="delete_singular_album_confirmation_message">“%s” dihapus</string>
-    <!-- Delete albums confirmation title. -->
-    <plurals name="delete_album_confirmation_dialog_title">
-        <item quantity="other"></item>
-    </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="delete_album_confirmation_dialog_description">
         <item quantity="other">Album akan dihapus tetapi kontennya akan tetap ada di Timeline anda.</item>
-    </plurals>
-    <!-- External checkout button text -->
-    <string name="external_checkout_button_text">Buy on our website (Save up to %1$.0f%%)</string>
-    <!-- Title for the album remove link(s) confirmation dialog -->
-    <plurals name="album_content_remove_links_dialog_title">
-        <item quantity="other"></item>
     </plurals>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_description">
@@ -1796,40 +1722,22 @@
     <plurals name="album_content_remove_links_dialog_positive_button">
         <item quantity="other">Hapus tautan</item>
     </plurals>
-    <!-- Hint for password dialog -->
-    <string name="password_dialog_hint">Enter link password</string>
     <!-- Text for decrypt button -->
     <string name="general_decrypt">Lanjutkan</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="password_dialog_error">Tautan kata sandi tidak valid</string>
-    <!-- Message of the Camera Uploads no full access warning banner in Photos -->
-    <string name="camera_upload_no_full_access_banner_change_permissions_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library. [A]Tap to change permissions.[/A]</string>
-    <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="camera_upload_banner_enable_cu_subtitle">Automatically back up your photos and videos to your Cloud drive</string>
     <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
     <string name="onboarding_camera_upload_permission_enabled_message">Unggahan Kamera teraktifkan</string>
-    <!-- Alert to inform the user that have to be logged in to perform the action -->
-    <string name="general_alert_not_logged_in">You must be logged in to perform this action</string>
-    <!-- camera uploads limited access -->
-    <string name="timeline_tab_camera_uploads_limited_access">MEGA has limited access to your photo library and can’t back up all your photos</string>
     <!-- menu item -->
     <string name="timeline_tab_file_properties_shared_folder_change_permissions">Ganti izin</string>
     <!-- Timeline tab screen: Empty state no media found -->
     <string name="timeline_tab_empty_body_no_media_found">Tidak ada media ditemukan</string>
-    <!-- Timeline tab screen: Camera uploads disabled banner description. We show this banner when there is no photo available in timeline tab screen. -->
-    <string name="timeline_tab_enable_camera_uploads_banner_description">Camera uploads requires [A]full access[/A] to your photo library</string>
     <!-- Camera uploads completed info in TimelineTab screen. -->
     <plurals name="timeline_tab_camera_uploads_completed">
         <item quantity="other">Unggahan kamera selesai, %1$d file diunggah</item>
     </plurals>
-    <!-- Timeline tab screen grid size menu title -->
-    <string name="timeline_tab_grid_size_menu_title">Grid size</string>
-    <!-- Timeline tab screen compact grid size menu item -->
-    <string name="timeline_tab_grid_size_compact">Compact</string>
     <!-- Timeline tab screen default grid size menu item -->
     <string name="timeline_tab_grid_size_default">Default</string>
-    <!-- Timeline tab screen large grid size menu item -->
-    <string name="timeline_tab_grid_size_large">Large</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended_dialog_title">Pertemuan telah berakhir</string>
     <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
@@ -1852,50 +1760,20 @@
     <string name="timeline_tab_filter_media_source_selection_header">Tampilkan item dari</string>
     <!-- Timeline filter remember preferences toggle text. -->
     <string name="timeline_tab_filter_remember_preferences">Ingat preferensi</string>
-    <!-- Timeline filter apply filter button text. -->
-    <string name="timeline_tab_filter_apply_filter_button">Apply filter</string>
-    <!-- General label for invite contact contexts -->
-    <string name="general_invite_contact">Invite contact</string>
-    <!-- Contact found title for a dialog showing contact link info -->
-    <string name="contact_found_dialog_title">Contact found</string>
     <!--Album content empty album layout title when an album content is empty-->
     <string name="album_content_empty_album_title">Album kosong</string>
     <!--Album content action to add more items to the album-->
     <string name="album_content_action_add_items">Tambahkan item</string>
     <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
     <string name="videos_tab_empty_hint_video">[B]Tidak ada[/B] [A]video[/A] [B]ditemukan[/B]</string>
-    <!-- Action to remove items from the Favourites album -->
-    <string name="album_content_action_remove_favourites">Remove from Favourites</string>
-    <!-- Title of the empty screen when a folder is empty -->
-    <string name="context_empty_folder_title">This folder is empty</string>
-    <!-- Title of the empty screen when there are no items in the root Cloud Drive -->
-    <string name="context_empty_cloud_drive_title">Nothing in your cloud drive yet</string>
-    <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
-    <string name="context_empty_cloud_drive_description">Keep something safe with zero-knowledge encryption</string>
-    <!-- Error shown when trying to confirm an account from a confirmation link and the app is already logged in -->
-    <string name="open_link_account_confirmation_error">You’re already logged in with a different MEGA account. Log out first, then open the account confirmation link again.</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link_error_message">Percakapan ini tidak lagi tersedia</string>
-    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="general_invalid_link">Invalid link. Please try again or request a new one.</string>
-    <!-- Text of the dialog shown when you want to join a group call and you're already in another call-->
-    <string name="can_only_join_one_call_error_message">To join this call you have to end your current call</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">Cari&#8230;</string>
-    <!-- Title for the album remove link confirmation dialog for singular link -->
-    <string name="album_content_remove_link_dialog_title">Remove link?</string>
-    <!-- Title for the album remove link confirmation dialog for multiple link -->
-    <string name="album_content_remove_multiple_links_dialog_title">Hapus tautan?</string>
-    <!-- Explanation text for the album remove link confirmation dialog -->
-    <string name="album_content_remove_link_dialog_description">People you shared this link with will lose access to the album</string>
-    <!-- Explanation text for the album remove multiple links confirmation dialog -->
-    <string name="album_content_remove_multiple_links_dialog_description">People you shared these links with will lose access to the albums</string>
-    <!-- Delete album confirmation title. -->
-    <string name="delete_album_singular_confirmation_dialog_title">Hapus album?</string>
-    <!-- Delete albums confirmation title. -->
-    <string name="delete_albums_multiple_confirmation_dialog_title">Hapus album?</string>
-    <!-- Delete album confirmation description. -->
-    <string name="delete_album_singular_confirmation_dialog_description">The contents of the album will not be deleted</string>
-    <!-- Delete albums confirmation description. -->
-    <string name="delete_albums_multiple_confirmation_dialog_description">The contents of the albums will not be deleted</string>
+    <!-- Media timeline tab: CU permission waning banner action text -->
+    <string name="timeline_tab_cu_permission_warning_banner_action">Update permissions</string>
+    <!-- Media timeline tab: CU permission waning banner description -->
+    <string name="timeline_tab_cu_permission_warning_banner_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
+    <!-- Media timeline tab: CU battery level waning banner description -->
+    <string name="timeline_tab_cu_battery_level_warning_banner_description">Battery level too low. Charge device to start camera uploads.</string>
 </resources>

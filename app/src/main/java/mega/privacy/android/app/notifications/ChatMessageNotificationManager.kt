@@ -32,8 +32,8 @@ import mega.privacy.android.domain.entity.notifications.ChatMessageNotificationD
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
-import mega.privacy.android.navigation.destination.ChatsNavKey
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.toFormattedText
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
@@ -98,7 +98,7 @@ class ChatMessageNotificationManager @Inject constructor(
         val pendingIntent = if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
             MegaActivity.getPendingIntentWithExtraDestinations(
                 context,
-                listOf(ChatsNavKey(), ChatNavKey(chat.chatId, null))
+                listOf(ChatListNavKey(), ChatNavKey(chat.chatId, null))
             )
         } else {
             val intent = Intent(context, ManagerActivity::class.java).apply {

@@ -674,10 +674,6 @@
     <string name="change_email_not_logged_in">Anda harus masuk untuk menyelesaikan perubahan e-mail anda. Harap masuk kembali dengan alamat e-mail anda saat ini, lalu ketuk lagi tautan konfirmasi anda.</string>
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">Selamat, alamat e-mail baru anda untuk akun MEGA ini adalah: %1$s</string>
-    <!-- Error when the user leaves empty the password field -->
-    <string name="invalid_string">Cannot be empty</string>
-    <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
-    <string name="invalid_input">Not a valid entry</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Ubah sandi</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
@@ -989,12 +985,13 @@
     <!-- Button to set a value -->
     <string name="hint_minutes">menit</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string-array name="settings_status_entries">
-        <item>Online</item>
-        <item>Sedang pergi</item>
-        <item>Sibuk</item>
-        <item>Offline</item>
-    </string-array>
+    <string name="settings_chat_status_online">Online</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_away">Sedang pergi</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_busy">Sibuk</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="settings_chat_status_offline">Offline</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">Nyalakan</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1363,8 +1360,6 @@
     <string name="tab_received_requests">Permintaan diterima</string>
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">Kuota penyimpanan terlewati</string>
-    <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">Invalid link. Please try again or request a new one.</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">Tautan kata sandi tidak valid</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
@@ -1446,12 +1441,13 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Kualitas video</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
-    <string-array name="settings_chat_upload_quality_entries">
-        <item>Rendah</item>
-        <item>Menengah</item>
-        <item>Tinggi</item>
-        <item>Asli</item>
-    </string-array>
+    <string name="settings_chat_upload_quality_low">Rendah</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_medium">Menengah</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_high">Tinggi</string>
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
+    <string name="settings_chat_upload_quality_original">Asli</string>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Panggilan tidak terjawab</string>
     <!-- Refers to a location of file -->
@@ -3768,11 +3764,17 @@
     <plurals name="general_copy_snackbar_fail">
         <item quantity="other">Tidak dapat menyalin %1$d barang</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="other">Menyalin %1$d barang,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="other">tidak dapat menyalin %1$d barang</item>
     </plurals>
@@ -3948,10 +3950,6 @@
     <string name="dialog_taken_down_folder_title">Tidak dapat membuka folder</string>
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">Tidak bisa membuka berkas</string>
-    <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_description">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
-    <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
-    <string name="dialog_taken_down_file_description">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
     <!-- Text of the button to show the dialog to update to pro -->
     <string name="general_pro_only">Hanya pro</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->

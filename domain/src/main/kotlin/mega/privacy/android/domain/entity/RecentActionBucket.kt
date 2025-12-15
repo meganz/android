@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 /**
  * RecentActionBucket
  *
+ * @property identifier An unique identifier based on the data of the bucket, it can be used to identify a bucket
  * @property timestamp
  * @property userEmail
  * @property parentNodeId
@@ -17,9 +18,9 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
  * @property parentFolderSharesType
  * @property currentUserIsOwner
  * @property isKeyVerified
- * @property identifier An unique identifier generated based on the data of the bucket, it can be used to identify a bucket from recent actions list
  */
 data class RecentActionBucket(
+    val identifier: String,
     val timestamp: Long,
     val userEmail: String,
     val parentNodeId: NodeId,
@@ -32,13 +33,7 @@ data class RecentActionBucket(
     val currentUserIsOwner: Boolean = false,
     val isKeyVerified: Boolean = false,
     val isNodeKeyDecrypted: Boolean = true
-) {
-    /**
-     * Generated sample identifier: m_true-u_false-t_1713248239-ue_ht@mega.co.nz-pni_100124500130291
-     */
-    val identifier: String =
-        "m_$isMedia-u_$isUpdate-t_$timestamp-ue_$userEmail-pni_${parentNodeId.longValue}"
-}
+)
 
 /**
  * Shares type of the parent folder of a node in the recent actions

@@ -104,12 +104,12 @@ class PendingBackStackNavigationHandler(
             }
 
             currentAuthStatus.isLoggedIn.not() && destinations.last() !is NoSessionNavKey -> {
-                backstack.pending = destinations
+                backstack.pending += destinations
                 if (backstack.isEmpty()) backstack.add(defaultLoginDestination)
             }
 
             currentAuthStatus is AuthStatus.LoggedIn && destinations.last() !is NoNodeNavKey && hasRootNode.not() -> {
-                backstack.pending = destinations
+                backstack.pending += destinations
                 val fetchNodesDestinationOrLogin =
                     currentFetchNodesDestinationOrNull(currentAuthStatus) ?: defaultLoginDestination
                 if (backstack.lastOrNull() != fetchNodesDestinationOrLogin) backstack.add(

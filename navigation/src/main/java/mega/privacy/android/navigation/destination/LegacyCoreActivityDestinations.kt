@@ -55,7 +55,7 @@ data class ChatNavKey(
  */
 @Serializable
 @Parcelize
-data class ChatsNavKey(
+data class ChatListNavKey(
     val createNewChat: Boolean = false,
 ) : NavKey, Parcelable
 
@@ -248,6 +248,9 @@ data class LegacyAddToAlbumActivityNavKey(
 
 @Serializable
 data class LegacyOpenLinkAfterFetchNodes(val link: String) : NavKey
+
+@Serializable
+data object LegacyPhotosSearchNavKey : NavKey
 
 @Serializable
 data object LegacySettingsCameraUploadsActivityNavKey : NavKey

@@ -11,6 +11,15 @@ import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 data object RecentsScreenNavKey : NavKey
 
 @Serializable
+data class RecentsBucketScreenNavKey(
+    val identifier: String,
+    val folderName: String,
+    val nodeSourceType: mega.privacy.android.domain.entity.node.NodeSourceType,
+    val timestamp: Long,
+    val fileCount: Int,
+) : NavKey
+
+@Serializable
 data class HomeScreensNavKey(
     private val serialisedRoot: String?,
     private val serialisedDestinations: String?,

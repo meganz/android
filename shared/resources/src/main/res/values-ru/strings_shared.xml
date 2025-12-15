@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">Недостаточно места для хранения на вашем устройстве</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">Произошла неизвестная ошибка. Напишите на support@mega.io.</string>
+    <string name="general_sync_message_unknown_error">Произошла неизвестная ошибка. Напишите на support&#64;mega.io.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">Папку невозможно синхронизировать или создать её резервную копию, так как папка MEGA находится в Корзине</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -165,21 +165,21 @@
         <item quantity="one">Удалён %1$d плейлист</item>
         <item quantity="few">Удалено %1$d плейлиста</item>
         <item quantity="many">Удалено %1$d плейлистов</item>
-        <item quantity="other">Удалено %1$d плейлиста</item>
+        <item quantity="other">Удалено %1$d плейлистов</item>
     </plurals>
     <!-- Message when adding the videos to the video section playlist -->
     <plurals name="video_section_playlist_detail_add_videos_message">
         <item quantity="one">%1$d элемент добавлен в «%2$s»</item>
         <item quantity="few">%1$d элемента добавлено в «%2$s»</item>
         <item quantity="many">%1$d элементов добавлено в «%2$s»</item>
-        <item quantity="other">%1$d элемента добавлено в «%2$s»</item>
+        <item quantity="other">%1$d элементов добавлено в «%2$s»</item>
     </plurals>
     <!-- Message when removing the videos to the video section playlist -->
     <plurals name="video_section_playlist_detail_remove_videos_message">
         <item quantity="one">Из «%2$s» удалён %1$d элемент</item>
         <item quantity="few">Из «%2$s» удалено %1$d элемента</item>
         <item quantity="many">Из «%2$s» удалено %1$d элементов</item>
-        <item quantity="other">Из «%2$s» удалено %1$d элемента</item>
+        <item quantity="other">Из «%2$s» удалено %1$d элементов</item>
     </plurals>
     <!-- Text of the video section playlist detail video number -->
     <plurals name="video_section_playlist_detail_video_number">
@@ -211,21 +211,21 @@
         <item quantity="one">%1$d файл</item>
         <item quantity="few">%1$d файла</item>
         <item quantity="many">%1$d файлов</item>
-        <item quantity="other">%1$d файла</item>
+        <item quantity="other">%1$d файлов</item>
     </plurals>
     <!-- String which indicates the number of folders contained into a device/folder -->
     <plurals name="info_num_folders">
         <item quantity="one">%1$d папка</item>
         <item quantity="few">%1$d папки</item>
         <item quantity="many">%1$d папок</item>
-        <item quantity="other">%1$d папки</item>
+        <item quantity="other">%1$d папок</item>
     </plurals>
     <!-- First part of string, which indicates the content of a device/folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="info_num_folders_and_files">
         <item quantity="one">%1$d папка&#160;·&#160;</item>
         <item quantity="few">%1$d папки&#160;·&#160;</item>
         <item quantity="many">%1$d папок&#160;·&#160;</item>
-        <item quantity="other">%1$d папки&#160;·&#160;</item>
+        <item quantity="other">%1$d папок&#160;·&#160;</item>
     </plurals>
     <!-- Text of button label or title of the screen to share only one or several links -->
     <plurals name="label_share_links">
@@ -457,14 +457,14 @@
         <item quantity="one">%1$d папка</item>
         <item quantity="few">%1$d папки</item>
         <item quantity="many">%1$d папок</item>
-        <item quantity="other">%1$d папки</item>
+        <item quantity="other">%1$d папок</item>
     </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is creating the folders. This message will inform how many folders are already created together with the total amount of folders that will be created. Example: "1/134 folder" or "48/134 folders" -->
     <plurals name="transfers_scanning_folders_dialog_creating_folders_subtitle">
         <item quantity="one">%1$d папка из %2$d</item>
         <item quantity="few">%1$d папки из %2$d</item>
         <item quantity="many">%1$d папок из %2$d</item>
-        <item quantity="other">%1$d папки из %2$d</item>
+        <item quantity="other">%1$d папок из %2$d</item>
     </plurals>
     <!-- Title of the clear debris item displayed in the sync settings menu -->
     <string name="settings_sync_clear_debris_item_title">Очистить .debris (локальный кеш)</string>
@@ -481,7 +481,7 @@
         <item quantity="one">Найдены %1$s и %2$d файл.</item>
         <item quantity="few">Найдены %1$s и %2$d файла.</item>
         <item quantity="many">Найдены %1$s и %2$d файлов.</item>
-        <item quantity="other">Найдены %1$s и %2$d файла.</item>
+        <item quantity="other">Найдены %1$s и %2$d файлов.</item>
     </plurals>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Отмена передач&#8230;</string>
@@ -690,7 +690,7 @@
         <item quantity="one">Добавлено в «%1$s»</item>
         <item quantity="few">%2$d элемента добавлено в «%1$s»</item>
         <item quantity="many">%2$d элементов добавлено в «%1$s»</item>
-        <item quantity="other">%2$d элемента добавлено в «%1$s»</item>
+        <item quantity="other">%2$d элементов добавлено в «%1$s»</item>
     </plurals>
     <!-- Name for a general button which action is "Open" something -->
     <string name="general_open_button">Открыть</string>
@@ -709,7 +709,7 @@
         <item quantity="one">1 элемент добавлен в «%1$s»</item>
         <item quantity="few">1 элемент добавлен в %1$d плейлиста</item>
         <item quantity="many">1 элемент добавлен в %1$d плейлистов</item>
-        <item quantity="other">1 элемент добавлен в %1$d плейлиста</item>
+        <item quantity="other">1 элемент добавлен в %1$d плейлистов</item>
     </plurals>
     <!-- Name for a general label which action is "Select" something -->
     <string name="general_select">Выбрать</string>
@@ -735,10 +735,6 @@
     <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%s[/A] [B]изменил время встречи на[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
     <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] [B]отменил встречу, запланированную на[/B]</string>
-    <!-- Title of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_title">Want MEGA without the ads?</string>
-    <!-- Description of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_description">Upgrade to a Pro plan with plenty of storage and more. Our Pro plans start at just %1$s a month.</string>
     <!-- The Generous storage label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_generous_storage_label">Выгодный объём</string>
     <!-- The Generous storage description in the ads free introduction screen -->
@@ -829,7 +825,7 @@
         <item quantity="one">«%1$s» удалён из очереди</item>
         <item quantity="few">%2$d элемента удалены из очереди</item>
         <item quantity="many">%2$d элементов удалено из очереди</item>
-        <item quantity="other">%2$d элемента удалено из очереди</item>
+        <item quantity="other">%2$d элементов удалено из очереди</item>
     </plurals>
     <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
     <string name="transfers_preview_paused_dialog_title">Передачи приостановлены</string>
@@ -886,7 +882,7 @@
         <item quantity="one">1 файл добавлен в «%1$s». Дубликаты файлов нельзя добавить ещё раз.</item>
         <item quantity="few">%2$d файла добавлены в «%1$s». Дубликаты файлов нельзя добавить ещё раз.</item>
         <item quantity="many">%2$d файлов добавлено в «%1$s». Дубликаты файлов нельзя добавить ещё раз.</item>
-        <item quantity="other">%2$d файла добавлено в «%1$s». Дубликаты файлов нельзя добавить ещё раз.</item>
+        <item quantity="other">%2$d файлов добавлено в «%1$s». Дубликаты файлов нельзя добавить ещё раз.</item>
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">Сохранение %1$s на Облачном диске&#8230;</string>
@@ -1169,7 +1165,7 @@
     <!-- Maybe later button text in the choose account screen-->
     <string name="choose_account_screen_maybe_later_button_text">Может, позже</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_label_save_up_to">Сэкономьте до 16&#160;% при годовой оплате</string>
+    <string name="account_upgrade_account_label_save_up_to">Сэкономьте до 16 % при годовой оплате</string>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
     <string name="choose_account_screen_storage_label">%1$s на диске</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
@@ -1183,7 +1179,7 @@
         <item quantity="one">Показан %1$d элемент</item>
         <item quantity="few">Показано %1$d элемента</item>
         <item quantity="many">Показано %1$d элементов</item>
-        <item quantity="other">Показано %1$d элемента</item>
+        <item quantity="other">Показано %1$d элементов</item>
     </plurals>
     <!-- Title for secure slideshow mode tutorial -->
     <string name="slideshow_tutorial_title">Безопасное воспроизведение слайд-шоу</string>
@@ -1487,7 +1483,7 @@
         <item quantity="one">%1$d пользователь приглашён, но один или несколько пользователей уже пригласили вас</item>
         <item quantity="few">%1$d пользователя приглашено, но один или несколько пользователей уже пригласили вас</item>
         <item quantity="many">%1$d пользователей приглашено, но один или несколько пользователей уже пригласили вас</item>
-        <item quantity="other">%1$d пользователя приглашено, но один или несколько пользователей уже пригласили вас</item>
+        <item quantity="other">%1$d пользователей приглашено, но один или несколько пользователей уже пригласили вас</item>
     </plurals>
     <!--  Error shown when the user tries to resend the sign up link multiple times at once. -->
     <string name="resend_signup_link_error">Письмо уже отправлено. Пожалуйста, подождите несколько минут, прежде чем попробовать снова.</string>
@@ -1509,13 +1505,6 @@
         <item quantity="many">Ссылки удалены</item>
         <item quantity="other">Ссылки удалены</item>
     </plurals>
-    <!-- Warning that appears prior to remove links of files. Plural. -->
-    <plurals name="remove_links_warning_text">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
     <string name="context_share_correctly_removed">Доступ закрыт</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -1527,21 +1516,14 @@
         <item quantity="one">Не удалось закрыть доступ %1$d контакту.</item>
         <item quantity="few">Не удалось закрыть доступ %1$d контактам.</item>
         <item quantity="many">Не удалось закрыть доступ %1$d контактам.</item>
-        <item quantity="other">Не удалось закрыть доступ для %1$d контакта.</item>
+        <item quantity="other">Не удалось закрыть доступ %1$d контактам.</item>
     </plurals>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="one">К этой папке открыт доступ %1$d контакту. Закрыть доступ?</item>
         <item quantity="few">К этой папке открыт доступ %1$d контактам. Закрыть доступ?</item>
         <item quantity="many">К этой папке открыт доступ %1$d контактам. Закрыть доступ?</item>
-        <item quantity="other">К этой папке открыт доступ %1$d контакта. Закрыть доступ?</item>
-    </plurals>
-    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <plurals name="alert_remove_several_shares">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="other">К этой папке открыт доступ %1$d контактам. Закрыть доступ?</item>
     </plurals>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
     <string name="figures_storage_referrals_achievements_text">%1$s дополнительного хранилища за каждое приглашение на %2$d дней</string>
@@ -1586,28 +1568,28 @@
         <item quantity="one">Покинута %1$d общая папка</item>
         <item quantity="few">Покинуты %1$d общие папки</item>
         <item quantity="many">Покинуто %1$d общих папок</item>
-        <item quantity="other">Покинуто %1$d общей папки</item>
+        <item quantity="other">Покинуто %1$d общих папок</item>
     </plurals>
     <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
         <item quantity="one">Не удалось покинуть %1$d общую папку</item>
         <item quantity="few">Не удалось покинуть %1$d общие папки</item>
         <item quantity="many">Не удалось покинуть %1$d общих папок</item>
-        <item quantity="other">Не удалось покинуть %1$d общей папки</item>
+        <item quantity="other">Не удалось покинуть %1$d общих папок</item>
     </plurals>
     <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
         <item quantity="one">Покинута %1$d общая папка,&#160;</item>
         <item quantity="few">Покинуты %1$d общие папки,&#160;</item>
         <item quantity="many">Покинуто %1$d общих папок,&#160;</item>
-        <item quantity="other">Покинуто %1$d общей папки,&#160;</item>
+        <item quantity="other">Покинуто %1$d общих папок,&#160;</item>
     </plurals>
     <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
         <item quantity="one">не удалось покинуть %1$d общую папку</item>
         <item quantity="few">не удалось покинуть %1$d общие папки</item>
         <item quantity="many">не удалось покинуть %1$d общих папок</item>
-        <item quantity="other">не удалось покинуть %1$d общей папки</item>
+        <item quantity="other">не удалось покинуть %1$d общих папок</item>
     </plurals>
     <!-- confirmation message before leaving some incoming shared folders -->
     <plurals name="confirmation_leave_share_folder">
@@ -1630,13 +1612,6 @@
     <string name="transfers_retry_failed_snackbar_message">Не удалось возобновить передачи</string>
     <!-- Action for the Snackbar when retry failed on failed transfers tab. -->
     <string name="transfers_retry_failed_snackbar_action">Повторить попытку</string>
-    <!-- Snackbar message when retry success on failed transfers tab. -->
-    <plurals name="transfers_retry_feedback_snackbar_message">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">Восстановлено в %s</string>
     <!-- success message when moving a node -->
@@ -1648,28 +1623,28 @@
         <item quantity="one">%d элемент восстановлен</item>
         <item quantity="few">%d элемента восстановлено</item>
         <item quantity="many">%d элементов восстановлено</item>
-        <item quantity="other">%d элемента восстановлено</item>
+        <item quantity="other">%d элементов восстановлено</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
         <item quantity="one">%d элемент не был удалён</item>
         <item quantity="few">%d элемента не было удалено</item>
         <item quantity="many">%d элементов не было удалено</item>
-        <item quantity="other">%d элемента не было удалено</item>
+        <item quantity="other">%d элементов не было удалено</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
         <item quantity="one">1 элемент восстановлен, но ещё %d не восстановлен. Попробуйте ещё раз позже.</item>
         <item quantity="few">1 элемент восстановлен, но ещё %d элемента не восстановлено. Попробуйте ещё раз позже.</item>
         <item quantity="many">1 элемент восстановлен, но ещё %d элементов не восстановлено. Попробуйте ещё раз позже.</item>
-        <item quantity="other">1 элемент восстановлен, но ещё %d элемента не восстановлено. Попробуйте ещё раз позже.</item>
+        <item quantity="other">1 элемент восстановлен, но ещё %d элементов не восстановлено. Попробуйте ещё раз позже.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
         <item quantity="one">%d элемент восстановлен, но ещё 1 не восстановлен. Попробуйте ещё раз позже.</item>
         <item quantity="few">%d элемента восстановлено, но 1 элемент не восстановлен. Попробуйте ещё раз позже.</item>
         <item quantity="many">%d элементов восстановлено, но 1 элемент не восстановлен. Попробуйте ещё раз позже.</item>
-        <item quantity="other">%d элемента восстановлено, но 1 элемент не восстановлен. Попробуйте ещё раз позже.</item>
+        <item quantity="other">%d элементов восстановлено, но 1 элемент не восстановлен. Попробуйте ещё раз позже.</item>
     </plurals>
     <!-- category in sort by action to sort by name -->
     <string name="action_sort_by_name">Имя</string>
@@ -1740,21 +1715,21 @@
         <item quantity="one">Покинута %1$d общая папка, но из одной или нескольких выйти не удалось</item>
         <item quantity="few">Покинуты %1$d общие папки, но из одной или нескольких выйти не удалось</item>
         <item quantity="many">Покинуто %1$d общих папок, но из одной или нескольких выйти не удалось</item>
-        <item quantity="other">Покинуто %1$d общей папки, но из одной или нескольких выйти не удалось</item>
+        <item quantity="other">Покинуто %1$d общих папок, но из одной или нескольких выйти не удалось</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="node_restored_from_rubbish_bin_success_message">
         <item quantity="one">%d элемент восстановлен</item>
         <item quantity="few">%d элемента восстановлено</item>
         <item quantity="many">%d элементов восстановлено</item>
-        <item quantity="other">%d элемента восстановлено</item>
+        <item quantity="other">%d элементов восстановлено</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="node_restored_from_rubbish_bin_error_message">
         <item quantity="one">%d элемент не был удалён</item>
         <item quantity="few">%d элемента не было удалено</item>
         <item quantity="many">%d элементов не было удалено</item>
-        <item quantity="other">%d элемента не было удалено</item>
+        <item quantity="other">%d элементов не было удалено</item>
     </plurals>
     <!--header for the Camera Uploads transfer in progress items -->
     <string name="camera_uploads_tranfer_header_in_progress">Выполняется</string>
@@ -1771,7 +1746,7 @@
         <item quantity="one">Загрузка: остался %1$d элемент</item>
         <item quantity="few">Загрузка: осталось %1$d элемента</item>
         <item quantity="many">Загрузка: осталось %1$d элементов</item>
-        <item quantity="other">Загрузка: осталось %1$d элемента</item>
+        <item quantity="other">Загрузка: осталось %1$d элементов</item>
     </plurals>
     <!-- Text of the button to start a video call -->
     <string name="start_video_call_button_text">Видео</string>
@@ -1823,8 +1798,6 @@
     <string name="camera_update_network_requirement_not_met_banner_description">Загрузки из камеры приостановлены. Подключитесь к Wi-Fi или разрешите передачу мобильных данных</string>
     <!-- The button text of camera uploads network requirement not met paused warning banner -->
     <string name="camera_update_network_requirement_not_met_banner_button_text">Разрешить передачу мобильных данных</string>
-    <!-- Billing info with discount label -->
-    <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s for %3$s</string>
     <!-- campaign name for Black Friday deal -->
     <string name="campaign_name_black_friday">Предложение на Чёрную пятницу: скидка %1$d%%</string>
     <!-- campaign name for Cyber Monday deal -->
@@ -1836,14 +1809,14 @@
         <item quantity="one">%1$s за первый %2$d месяц</item>
         <item quantity="few">%1$s за первые %2$d месяца</item>
         <item quantity="many">%1$s за первые %2$d месяцев</item>
-        <item quantity="other">%1$s за первые %2$d месяца</item>
+        <item quantity="other">%1$s за первые %2$d месяцев</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
         <item quantity="one">%1$s за первый %2$d год</item>
         <item quantity="few">%1$s за первые %2$d года</item>
         <item quantity="many">%1$s за первые %2$d лет</item>
-        <item quantity="other">%1$s за первые %2$d года</item>
+        <item quantity="other">%1$s за первые %2$d лет</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">Комплекс конфиденциальности MEGA</string>
@@ -1874,14 +1847,14 @@
         <item quantity="one">Остался %1$d день</item>
         <item quantity="few">Осталось %1$d дня</item>
         <item quantity="many">Осталось %1$d дней</item>
-        <item quantity="other">Осталось %1$d дня</item>
+        <item quantity="other">Осталось %1$d дней</item>
     </plurals>
     <!-- sentence to detail the figures of award achievement days left -->
     <plurals name="trial_awarded_achievement_days_left_detail_title">
         <item quantity="one">Бонус истекает через %1$d день</item>
         <item quantity="few">Бонус истекает через %1$d дня</item>
         <item quantity="many">Бонус истекает через %1$d дней</item>
-        <item quantity="other">Бонус истекает через %1$d дня</item>
+        <item quantity="other">Бонус истекает через %1$d дней</item>
     </plurals>
     <!-- Discount label for first month singular -->
     <string name="label_first_time_in_months_full_singular">%1$s за первый месяц</string>
@@ -1903,13 +1876,6 @@
     <string name="delete_album_confirmation_positive_button_text">Удалить</string>
     <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
     <string name="delete_singular_album_confirmation_message">Удалён альбом «%s»</string>
-    <!-- Delete albums confirmation title. -->
-    <plurals name="delete_album_confirmation_dialog_title">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="delete_album_confirmation_dialog_description">
         <item quantity="one">Альбом будет удалён, но его содержимое останется на «Временной шкале».</item>
@@ -1919,13 +1885,6 @@
     </plurals>
     <!-- External checkout button text -->
     <string name="external_checkout_button_text">Купить на нашем сайте (экономия до %1$.0f%%)</string>
-    <!-- Title for the album remove link(s) confirmation dialog -->
-    <plurals name="album_content_remove_links_dialog_title">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
-    </plurals>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_description">
         <item quantity="one">Люди, с которыми вы поделились этой ссылкой, потеряют доступ к альбому.</item>
@@ -1967,7 +1926,7 @@
         <item quantity="one">Загрузка из камеры завершена, загружен %1$d файл</item>
         <item quantity="few">Загрузка из камеры завершена, загружено %1$d файла</item>
         <item quantity="many">Загрузка из камеры завершена, загружено %1$d файлов</item>
-        <item quantity="other">Загрузка из камеры завершена, загружено %1$d файла</item>
+        <item quantity="other">Загрузка из камеры завершена, загружено %1$d файлов</item>
     </plurals>
     <!-- Timeline tab screen grid size menu title -->
     <string name="timeline_tab_grid_size_menu_title">Размер сетки</string>
@@ -2029,20 +1988,10 @@
     <string name="can_only_join_one_call_error_message">Чтобы присоединиться к этому звонку, вы должны завершить текущий</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">Поиск&#8230;</string>
-    <!-- Title for the album remove link confirmation dialog for singular link -->
-    <string name="album_content_remove_link_dialog_title">Удалить ссылку?</string>
-    <!-- Title for the album remove link confirmation dialog for multiple link -->
-    <string name="album_content_remove_multiple_links_dialog_title">Удалить ссылки?</string>
-    <!-- Explanation text for the album remove link confirmation dialog -->
-    <string name="album_content_remove_link_dialog_description">People you shared this link with will lose access to the album</string>
-    <!-- Explanation text for the album remove multiple links confirmation dialog -->
-    <string name="album_content_remove_multiple_links_dialog_description">People you shared these links with will lose access to the albums</string>
-    <!-- Delete album confirmation title. -->
-    <string name="delete_album_singular_confirmation_dialog_title">Удалить альбом?</string>
-    <!-- Delete albums confirmation title. -->
-    <string name="delete_albums_multiple_confirmation_dialog_title">Удалить альбомы?</string>
-    <!-- Delete album confirmation description. -->
-    <string name="delete_album_singular_confirmation_dialog_description">The contents of the album will not be deleted</string>
-    <!-- Delete albums confirmation description. -->
-    <string name="delete_albums_multiple_confirmation_dialog_description">The contents of the albums will not be deleted</string>
+    <!-- Media timeline tab: CU permission waning banner action text -->
+    <string name="timeline_tab_cu_permission_warning_banner_action">Update permissions</string>
+    <!-- Media timeline tab: CU permission waning banner description -->
+    <string name="timeline_tab_cu_permission_warning_banner_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
+    <!-- Media timeline tab: CU battery level waning banner description -->
+    <string name="timeline_tab_cu_battery_level_warning_banner_description">Battery level too low. Charge device to start camera uploads.</string>
 </resources>

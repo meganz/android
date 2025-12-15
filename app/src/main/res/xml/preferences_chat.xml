@@ -15,8 +15,6 @@
     <androidx.preference.ListPreference
         android:key="settings_chat_list_status"
         android:title="@string/set_status_option_label"
-        android:entries="@array/settings_status_entries"
-        android:entryValues="@array/settings_chat_status_values"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
@@ -68,8 +66,6 @@
     <androidx.preference.ListPreference
         android:key="settings_chat_send_originals"
         android:title="@string/settings_chat_upload_quality"
-        android:entries="@array/settings_chat_upload_quality_entries"
-        android:entryValues="@array/settings_chat_upload_quality_values"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />

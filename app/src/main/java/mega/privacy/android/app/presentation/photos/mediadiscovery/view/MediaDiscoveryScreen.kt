@@ -17,6 +17,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -102,6 +103,18 @@ fun MediaDiscoveryScreen(
             showFilterDialog = false
         }
     )
+
+    LaunchedEffect(uiState.scrollStartIndex) {
+        if (uiState.scrollStartIndex > 0) {
+            val startIndex = if (uiState.selectedTimeBarTab == TimeBarTab.All) {
+                uiState.scrollStartIndex
+            } else {
+                // Since CardListView has two headers, the index needs to be incremented by 2.
+                uiState.scrollStartIndex + 2
+            }
+            lazyGridState.animateScrollToItem(startIndex)
+        }
+    }
 
     MegaScaffold(
         modifier = Modifier.systemBarsPadding(),

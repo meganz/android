@@ -161,8 +161,12 @@ class LegacyRubbishBinViewModel @Inject constructor(
      * Set the current rubbish bin handle to the UI state
      *
      * @param handle the id of the current rubbish bin parent handle to set
+     * @param highlightedNames the list of names of the nodes we want to highlight
      */
-    fun setRubbishBinHandle(handle: Long) = viewModelScope.launch {
+    fun setRubbishBinHandle(
+        handle: Long,
+        highlightedNames: List<String>? = null,
+    ) = viewModelScope.launch {
         val nodeHandle = if (handle == _state.value.rubbishBinHandle) INVALID_HANDLE else handle
         val handleStack =
             _state.value.openedFolderNodeHandles
@@ -176,7 +180,7 @@ class LegacyRubbishBinViewModel @Inject constructor(
                 nodeList = emptyList(),
             )
         }
-        refreshNodes()
+        refreshNodes(highlightedNames)
     }
 
     fun resetScrollPosition() {
@@ -197,11 +201,16 @@ class LegacyRubbishBinViewModel @Inject constructor(
      *
      * @return a List of Rubbish Bin Nodes
      */
-    fun refreshNodes() {
+    fun refreshNodes(
+        highlightedNames: List<String>? = null,
+    ) {
         viewModelScope.launch {
             runCatching {
                 val nodeList =
-                    getNodeUiItems(getRubbishBinNodeChildrenUseCase(_state.value.currentHandle))
+                    getNodeUiItems(
+                        getRubbishBinNodeChildrenUseCase(_state.value.currentHandle),
+                        highlightedNames,
+                    )
                 val parentHandle =
                     getParentNodeUseCase(NodeId(_state.value.currentHandle))?.id?.longValue
                 _state.update {
@@ -228,11 +237,19 @@ class LegacyRubbishBinViewModel @Inject constructor(
     /**
      * This will map list of [Node] to [NodeUIItem]
      */
-    private fun getNodeUiItems(nodeList: List<TypedNode>): List<NodeUIItem<TypedNode>> {
+    private fun getNodeUiItems(
+        nodeList: List<TypedNode>,
+        highlightedNames: List<String>? = null,
+    ): List<NodeUIItem<TypedNode>> {
         val existingNodeList = _state.value.nodeList
+        val existingHighlightedIds = existingNodeList
+            .filter { it.isHighlighted }
+            .map { it.node.id }
         return nodeList.mapIndexed { index, it ->
             val isSelected =
                 state.value.selectedNodes.any { selectedNode -> it.id == selectedNode.id }
+            val isHighlighted = existingHighlightedIds.contains(it.id)
+                    || highlightedNames?.contains(it.name) == true
             val fileDuration = if (it is FileNode) {
                 fileDurationMapper(it.type)?.let { durationInSecondsTextMapper(it) }
             } else null
@@ -240,7 +257,8 @@ class LegacyRubbishBinViewModel @Inject constructor(
                 node = it,
                 isSelected = if (existingNodeList.size > index) isSelected else false,
                 isInvisible = if (existingNodeList.size > index) existingNodeList[index].isInvisible else false,
-                fileDuration = fileDuration
+                fileDuration = fileDuration,
+                isHighlighted = isHighlighted,
             )
         }
     }

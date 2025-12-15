@@ -17,8 +17,7 @@ import mega.privacy.android.navigation.destination.ChatNavKey
  */
 @Serializable
 data class MeetingHasEndedDialogNavKey(
-    val isFromGuest: Boolean,
-    val chatId: Long,
+    val chatId: Long?,
 ) : NoSessionNavKey.Optional, DialogNavKey
 
 data object MeetingHasEndedDialogDestinations : AppDialogDestinations {
@@ -45,12 +44,16 @@ fun EntryProviderScope<DialogNavKey>.meetingHasEndedDialog(
         )
     ) { key ->
         MeetingHasEndedDialog(
-            isFromGuest = key.isFromGuest,
+            doesChatExist = key.chatId != null,
             onDismiss = {
                 navigateBack()
                 onDialogHandled()
             },
-            onShowChat = { navigate(ChatNavKey(key.chatId, ACTION_CHAT_SHOW_MESSAGES)) },
+            onShowChat = {
+                key.chatId?.let {
+                    navigate(ChatNavKey(it, ACTION_CHAT_SHOW_MESSAGES))
+                }
+            },
         )
     }
 }

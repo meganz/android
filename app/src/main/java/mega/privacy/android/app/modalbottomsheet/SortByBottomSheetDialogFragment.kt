@@ -69,12 +69,14 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     NodeSourceType.BACKUPS,
                     NodeSourceType.DOCUMENTS,
                     NodeSourceType.AUDIO,
+                    NodeSourceType.VIDEOS,
+                    NodeSourceType.SEARCH,
                         -> ORDER_CLOUD
 
                     NodeSourceType.FAVOURITES -> ORDER_FAVOURITES
                     NodeSourceType.OUTGOING_SHARES -> ORDER_OUTGOING_SHARES
                     NodeSourceType.INCOMING_SHARES,
-                    NodeSourceType.OTHER, NodeSourceType.OFFLINE
+                    NodeSourceType.OTHER, NodeSourceType.OFFLINE,
                         -> ORDER_OTHERS
                 }
             )

@@ -30,11 +30,14 @@ class RecentActionBucketMapperTest {
 
     @Test
     fun `test that mapper returns correct value`() = runTest {
+        val identifier = "m_false-u_true-t_12-ue_something@email.com-pni_1"
         val actual = underTest.invoke(
-            recentActionBucket,
-            listOf(mock(), mock())
+            identifier = identifier,
+            megaRecentActionBucket = recentActionBucket,
+            megaNodes = listOf(mock(), mock())
         )
         assertThat(actual).isInstanceOf(RecentActionBucketUnTyped::class.java)
+        assertThat(actual.identifier).isEqualTo(identifier)
         assertThat(actual.timestamp).isEqualTo(recentActionBucket.timestamp)
         assertThat(actual.userEmail).isEqualTo(recentActionBucket.userEmail)
         assertThat(actual.parentNodeId.longValue).isEqualTo(recentActionBucket.parentHandle)

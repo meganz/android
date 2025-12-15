@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.recentactions.view.previewdataprov
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionBucketUiEntity
-import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
@@ -55,6 +54,7 @@ internal class SampleRecentActionDataProvider :
     )
 
     private val recentBucket1 = RecentActionBucket(
+        identifier = "bucket1",
         timestamp = System.currentTimeMillis() / 1000,
         userEmail = "user1@mail.com",
         parentNodeId = NodeId(1L),

@@ -2,7 +2,6 @@ package mega.privacy.android.feature.chat.dialog
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -28,7 +27,7 @@ class MeetingHasEndedDialogTest {
 
     @Test
     fun `test that dialog description is shown`() {
-        initComposeTestRule(isFromGuest = false)
+        initComposeTestRule(doesChatExist = false)
 
         composeTestRule.onNodeWithText(
             context.getString(R.string.meeting_has_ended_dialog_title)
@@ -36,8 +35,8 @@ class MeetingHasEndedDialogTest {
     }
 
     @Test
-    fun `test that only OK button is shown when isFromGuest is true`() {
-        initComposeTestRule(isFromGuest = true)
+    fun `test that only OK button is shown when doesChatExist is false`() {
+        initComposeTestRule(doesChatExist = false)
 
         with(composeTestRule) {
             onNodeWithText(context.getString(R.string.general_ok)).assertIsDisplayed()
@@ -49,8 +48,8 @@ class MeetingHasEndedDialogTest {
     }
 
     @Test
-    fun `test that both View Chat and Dismiss buttons are shown when isFromGuest is false`() {
-        initComposeTestRule(isFromGuest = false)
+    fun `test that both View Chat and Dismiss buttons are shown when doesChatExist is true`() {
+        initComposeTestRule(doesChatExist = true)
 
         with(composeTestRule) {
             onNodeWithText(context.getString(R.string.meeting_has_ended_dialog_view_chat_option))
@@ -62,18 +61,18 @@ class MeetingHasEndedDialogTest {
     }
 
     @Test
-    fun `test that onDismiss is called but not onShowChat when isFromGuest is true and OK button is clicked`() {
-        initComposeTestRule(isFromGuest = true)
+    fun `test that onDismiss is called and onShowChat when doesChatExist is false and OK button is clicked`() {
+        initComposeTestRule(doesChatExist = false)
 
         composeTestRule.onNodeWithText(context.getString(R.string.general_ok)).performClick()
 
         verify(onDismiss).invoke()
-        verifyNoInteractions(onShowChat)
+        verify(onShowChat).invoke()
     }
 
     @Test
-    fun `test that both onDismiss and onShowChat are called when isFromGuest is false and View Chat button is clicked`() {
-        initComposeTestRule(isFromGuest = false)
+    fun `test that both onDismiss and onShowChat are called when doesChatExist is true and View Chat button is clicked`() {
+        initComposeTestRule(doesChatExist = true)
 
         composeTestRule.onNodeWithText(
             context.getString(R.string.meeting_has_ended_dialog_view_chat_option)
@@ -84,8 +83,8 @@ class MeetingHasEndedDialogTest {
     }
 
     @Test
-    fun `test that only onDismiss is called when isFromGuest is false and Dismiss button is clicked`() {
-        initComposeTestRule(isFromGuest = false)
+    fun `test that only onDismiss is called when doesChatExist is true and Dismiss button is clicked`() {
+        initComposeTestRule(doesChatExist = true)
 
         composeTestRule.onNodeWithText(
             context.getString(R.string.general_dismiss_dialog)
@@ -95,10 +94,10 @@ class MeetingHasEndedDialogTest {
         verifyNoInteractions(onShowChat)
     }
 
-    private fun initComposeTestRule(isFromGuest: Boolean) {
+    private fun initComposeTestRule(doesChatExist: Boolean) {
         composeTestRule.setContent {
             MeetingHasEndedDialog(
-                isFromGuest = isFromGuest,
+                doesChatExist = doesChatExist,
                 onDismiss = onDismiss,
                 onShowChat = onShowChat
             )

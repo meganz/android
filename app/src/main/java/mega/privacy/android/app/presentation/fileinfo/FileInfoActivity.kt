@@ -9,7 +9,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.SnackbarResult
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -35,7 +34,6 @@ import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityCo
 import mega.privacy.android.app.activities.contract.SelectUsersToShareActivityContract
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.interfaces.ActionBackupListener
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -232,26 +230,9 @@ class FileInfoActivity : BaseActivity() {
                     snackBarHostState = snackBarHostState,
                 )
                 NodeAttachmentView(
-                    nodeAttachmentViewModel
-                ) { message, chatId ->
-                    coroutineScope.launch {
-                        val result = snackBarHostState.showAutoDurationSnackbar(
-                            message = message.ifBlank { getString(R.string.sent_as_message) },
-                            actionLabel = getString(R.string.action_see)
-                        )
-                        if (result == SnackbarResult.ActionPerformed) {
-                            startActivity(
-                                Intent(this@FileInfoActivity, ManagerActivity::class.java).apply {
-                                    action = Constants.ACTION_CHAT_NOTIFICATION_MESSAGE
-                                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                                    putExtra(Constants.CHAT_ID, chatId)
-                                    putExtra(Constants.EXTRA_MOVE_TO_CHAT_SECTION, true)
-                                },
-                            )
-                            finish()
-                        }
-                    }
-                }
+                    viewModel = nodeAttachmentViewModel,
+                    snackbarHostState = snackBarHostState,
+                )
             }
         }
     }

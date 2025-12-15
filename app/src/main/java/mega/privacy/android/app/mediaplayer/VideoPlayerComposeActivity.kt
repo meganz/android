@@ -50,7 +50,6 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.interfaces.ActionNodeCallback
-import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
@@ -307,7 +306,7 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
 
                 NodeAttachmentView(
                     viewModel = nodeAttachmentViewModel,
-                    showMessage = ::showSnackbarWithChat
+                    snackbarHostState = scaffoldState.snackbarHostState,
                 )
 
                 if (showBlockedDialog) {

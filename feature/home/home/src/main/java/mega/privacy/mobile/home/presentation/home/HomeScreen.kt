@@ -32,7 +32,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
-import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
@@ -54,7 +53,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
-import mega.privacy.android.navigation.destination.ChatsNavKey
+import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.SearchNodeNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
@@ -125,7 +124,7 @@ internal fun HomeScreen(
                 )
 
                 HomeFabOption.NewChat -> navigationHandler.navigate(
-                    ChatsNavKey(createNewChat = true)
+                    ChatListNavKey(createNewChat = true)
                 )
             }
             navigationHandler.clearResult(HomeFabOptionsBottomSheetNavKey.KEY)
@@ -187,7 +186,7 @@ internal fun HomeScreen(
                         .padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
-                    MegaText(text = "Home Screen Loading")
+                    // Blank screen
                 }
             }
         }
