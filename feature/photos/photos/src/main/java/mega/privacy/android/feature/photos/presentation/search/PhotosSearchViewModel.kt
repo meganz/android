@@ -145,7 +145,10 @@ class PhotosSearchViewModel @Inject constructor(
 
     fun updateQuery(query: String) {
         _state.update {
-            it.copy(query = query)
+            it.copy(
+                query = query,
+                contentState = updateContentState()
+            )
         }
     }
 
@@ -157,6 +160,7 @@ class PhotosSearchViewModel @Inject constructor(
                 isSearchingPhotos = true,
                 albums = it.albums.takeIf { query.isNotBlank() }.orEmpty(),
                 isSearchingAlbums = true,
+                contentState = updateContentState()
             )
         }
 
@@ -177,6 +181,7 @@ class PhotosSearchViewModel @Inject constructor(
             it.copy(
                 albums = albums,
                 isSearchingAlbums = false,
+                contentState = updateContentState()
             )
         }
     }
@@ -205,6 +210,7 @@ class PhotosSearchViewModel @Inject constructor(
             it.copy(
                 photos = photos,
                 isSearchingPhotos = false,
+                contentState = updateContentState()
             )
         }
     }
@@ -214,7 +220,10 @@ class PhotosSearchViewModel @Inject constructor(
 
         val recentQueries = (listOf(query) + _state.value.recentQueries).toSet().take(6)
         _state.update {
-            it.copy(recentQueries = recentQueries)
+            it.copy(
+                recentQueries = recentQueries,
+                contentState = updateContentState()
+            )
         }
     }
 
@@ -248,11 +257,15 @@ class PhotosSearchViewModel @Inject constructor(
                 it.copy(
                     isInitializing = false,
                     recentQueries = queries,
+                    contentState = updateContentState()
                 )
             }
         }.onFailure { throwable ->
             _state.update {
-                it.copy(isInitializing = false)
+                it.copy(
+                    isInitializing = false,
+                    contentState = updateContentState()
+                )
             }
             Timber.e(throwable)
         }
@@ -264,6 +277,25 @@ class PhotosSearchViewModel @Inject constructor(
             savePhotosRecentQueriesUseCase(queries)
         }.onFailure {
             Timber.e(it)
+        }
+    }
+
+    /**
+     * Updates the content state based on the current state properties.
+     */
+    private fun updateContentState(): MediaContentState {
+        val state = this.state.value
+
+        return when {
+            state.query.isBlank() && state.recentQueries.isEmpty() -> MediaContentState.WelcomeEmpty
+            state.query.isBlank() -> MediaContentState.RecentQueries
+
+            state.albums.isEmpty()
+                    && !state.isSearchingAlbums
+                    && state.photos.isEmpty()
+                    && !state.isSearchingPhotos -> MediaContentState.NoResults
+
+            else -> MediaContentState.SearchResults
         }
     }
 }

@@ -269,6 +269,7 @@ class UIAlbumMapperTest {
         assertThat(result.videoCount).isEqualTo(0)
         assertThat(result.coverPhoto).isEqualTo(cover)
         assertThat(result.defaultCover).isEqualTo(cover)
+        assertThat(result.isExported).isEqualTo(true)
 
         val expectedUserAlbum = Album.UserAlbum(
             id = albumId,
@@ -300,6 +301,7 @@ class UIAlbumMapperTest {
         assertThat(result.title).isEqualTo(AlbumTitle.StringTitle(title))
         assertThat(result.coverPhoto).isNull()
         assertThat(result.defaultCover).isNull()
+        assertThat(result.isExported).isEqualTo(false)
 
         val expectedUserAlbum = Album.UserAlbum(
             id = albumId,

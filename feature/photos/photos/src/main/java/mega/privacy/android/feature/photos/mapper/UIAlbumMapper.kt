@@ -72,7 +72,8 @@ class UIAlbumMapper @Inject constructor() {
                     creationTime = album.creationTime,
                     modificationTime = album.modificationTime,
                     isExported = album.isExported
-                )
+                ),
+                isExported = album.isExported
             )
         }
     }

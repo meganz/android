@@ -8,5 +8,6 @@ import mega.privacy.android.feature.photos.model.PhotoUiState
 data class AlbumUiState(
     val mediaAlbum: MediaAlbum,
     val title: String,
-    val cover: PhotoUiState? = null
+    val isExported: Boolean,
+    val cover: PhotoUiState? = null,
 )

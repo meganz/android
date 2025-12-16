@@ -23,4 +23,5 @@ data class UIAlbum(
     val videoCount: Int,
     val coverPhoto: Photo?,
     val defaultCover: Photo? = null,
+    val isExported: Boolean = false
 )
