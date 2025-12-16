@@ -11,6 +11,7 @@ import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.nav.MediaPlayerIntentMapper
 import mega.privacy.android.app.presentation.chat.navigation.chatLegacyDestination
 import mega.privacy.android.app.presentation.chat.navigation.chatListLegacyDestination
+import mega.privacy.android.app.getLink.navigation.getLinkLegacyDestination
 import mega.privacy.android.app.presentation.contact.navigation.contactsLegacyDestination
 import mega.privacy.android.app.presentation.filelink.legacyFileLinkScreen
 import mega.privacy.android.app.presentation.folderlink.legacyFolderLinkScreen
@@ -56,6 +57,7 @@ class LegacyCoreActivityFeatureGraph(
             legacyFileLinkScreen(navigationHandler::back)
             legacyExportRecoveryKeyScreen(navigationHandler::back)
             legacyFolderLinkScreen(navigationHandler::back)
+            getLinkLegacyDestination(navigationHandler::back)
             chatListLegacyDestination(navigationHandler::back)
             legacyAlbumCoverSelection(navigationHandler::returnResult)
             legacyAlbumPhotosSelection(navigationHandler::back, navigationHandler::returnResult)

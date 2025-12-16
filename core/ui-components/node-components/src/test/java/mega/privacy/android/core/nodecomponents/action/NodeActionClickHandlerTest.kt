@@ -748,7 +748,7 @@ class NodeActionClickHandlerTest {
 
         verify(mockMegaNavigator).openGetLinkActivity(
             context = mockContext,
-            handle = 123L
+            123L
         )
     }
 
@@ -762,7 +762,8 @@ class NodeActionClickHandlerTest {
 
         verify(mockMegaNavigator).openGetLinkActivity(
             context = mockContext,
-            handles = longArrayOf(123L, 456L)
+            123L,
+            456L
         )
     }
 
@@ -1082,7 +1083,7 @@ class NodeActionClickHandlerTest {
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockMegaNavigator).openGetLinkActivity(any(), anyLong())
+        verify(mockMegaNavigator).openGetLinkActivity(any<Context>(), anyLong())
     }
 
     // UnhideAction Tests
@@ -1251,7 +1252,7 @@ class NodeActionClickHandlerTest {
 
         action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
 
-        verify(mockMegaNavigator).openGetLinkActivity(any<Context>(), any<LongArray>())
+        verify(mockMegaNavigator).openGetLinkActivity(any<Context>(), anyLong(), anyLong())
     }
 
     // RemoveLinkAction Tests (already exists, but adding multiple nodes test)

@@ -16,7 +16,7 @@ class GetLinkActionClickHandler @Inject constructor(
     override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
         megaNavigator.openGetLinkActivity(
             context = provider.context,
-            handle = node.id.longValue
+            node.id.longValue
         )
     }
 
@@ -27,7 +27,7 @@ class GetLinkActionClickHandler @Inject constructor(
     ) {
         megaNavigator.openGetLinkActivity(
             context = provider.context,
-            handles = nodes.map { it.id.longValue }.toLongArray()
+            *nodes.map { it.id.longValue }.toLongArray()
         )
     }
 }

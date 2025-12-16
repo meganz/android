@@ -256,3 +256,13 @@ data object LegacyPhotosSearchNavKey : NavKey
 data class LegacySettingsCameraUploadsActivityNavKey(
     val isShowHowToUploadPrompt: Boolean = false,
 ) : NavKey
+
+/**
+ * Navigation key for GetLinkActivity that handles legacy navigation.
+ *
+ * @param handles List of node handles to get their links. If empty, the navigation destination will skip launching the Activity.
+ */
+@Serializable
+data class GetLinkNavKey(
+    val handles: List<Long> = emptyList(),
+) : NavKey

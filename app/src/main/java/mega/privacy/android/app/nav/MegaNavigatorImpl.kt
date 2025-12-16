@@ -88,6 +88,7 @@ import mega.privacy.android.navigation.destination.AchievementNavKey
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.DeviceCenterNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
+import mega.privacy.android.navigation.destination.GetLinkNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
 import mega.privacy.android.navigation.destination.SearchNodeNavKey
@@ -99,6 +100,7 @@ import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.navigation.settings.SettingsNavigator
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -643,18 +645,26 @@ internal class MegaNavigatorImpl @Inject constructor(
         context.startActivity(textFileIntent)
     }
 
-    override fun openGetLinkActivity(context: Context, handle: Long) {
-        context.startActivity(
-            Intent(context, GetLinkActivity::class.java)
-                .putExtra(Constants.HANDLE, handle)
-        )
-    }
+    override fun openGetLinkActivity(context: Context, vararg handles: Long) {
+        if (handles.isEmpty()) {
+            Timber.e("openGetLinkActivity: No handles provided, aborting operation.")
+            return
+        }
 
-    override fun openGetLinkActivity(context: Context, handles: LongArray) {
-        context.startActivity(
-            Intent(context, GetLinkActivity::class.java)
-                .putExtra(Constants.HANDLE_LIST, handles)
-        )
+        val handlesList = handles.toList()
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = GetLinkNavKey(handles = handlesList)
+        ) {
+            val intent = Intent(context, GetLinkActivity::class.java).apply {
+                if (handles.size == 1) {
+                    putExtra(Constants.HANDLE, handles[0])
+                } else {
+                    putExtra(Constants.HANDLE_LIST, longArrayOf(*handles))
+                }
+            }
+            context.startActivity(intent)
+        }
     }
 
     override fun openFileInfoActivity(context: Context, handle: Long) {

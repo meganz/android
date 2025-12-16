@@ -398,22 +398,11 @@ interface AppNavigator {
      * Open Get Link Activity
      *
      * @param context Context
-     * @param handle Node handle
+     * @param handles Node handles (single or multiple)
      */
     fun openGetLinkActivity(
         context: Context,
-        handle: Long,
-    )
-
-    /**
-     * Open Get Link Activity
-     *
-     * @param context Context
-     * @param handles Node handles
-     */
-    fun openGetLinkActivity(
-        context: Context,
-        handles: LongArray,
+        vararg handles: Long,
     )
 
     /**
