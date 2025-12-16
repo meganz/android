@@ -888,49 +888,4 @@ internal class MegaNavigatorImpl @Inject constructor(
             isFromFolderLink = false
         )
     }
-
-    override fun handleFileInfoLocationClick(
-        context: Context,
-        nodeId: NodeId,
-        parentId: NodeId,
-        nodeLocation: NodeLocation,
-    ) {
-        val destination: NavKey = when (nodeLocation) {
-            NodeLocation.CloudDriveRoot -> {
-                DriveSyncNavKey(highlightedNodeHandle = nodeId.longValue)
-            }
-
-            NodeLocation.CloudDrive -> {
-                CloudDriveNavKey(
-                    nodeHandle = parentId.longValue,
-                    highlightedNodeHandle = nodeId.longValue
-                )
-            }
-
-            NodeLocation.RubbishBin -> {
-                RubbishBinNavKey(
-                    handle = parentId.longValue,
-                    highlightedNodeHandle = nodeId.longValue
-                )
-            }
-
-            NodeLocation.IncomingSharesRoot -> {
-                SharesNavKey
-            }
-
-            NodeLocation.IncomingShares -> {
-                CloudDriveNavKey(
-                    nodeHandle = parentId.longValue,
-                    highlightedNodeHandle = nodeId.longValue,
-                    nodeSourceType = NodeSourceType.INCOMING_SHARES
-                )
-            }
-        }
-
-        navigateForSingleActivity(
-            context = context,
-            singleActivityDestination = destination,
-            legacyNavigation = {},
-        )
-    }
 }

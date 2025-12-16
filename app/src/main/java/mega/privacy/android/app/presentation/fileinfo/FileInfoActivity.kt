@@ -18,6 +18,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineDispatcher
@@ -71,9 +72,15 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.DriveSyncNavKey
+import mega.privacy.android.navigation.destination.RubbishBinNavKey
+import mega.privacy.android.navigation.destination.SharesNavKey
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
@@ -108,6 +115,9 @@ class FileInfoActivity : BaseActivity() {
 
     @Inject
     lateinit var megaNavigator: MegaNavigator
+
+    @Inject
+    lateinit var navigationQueue: NavigationEventQueue
 
     private lateinit var selectContactForShareFolderLauncher: ActivityResultLauncher<NodeId>
     private lateinit var versionHistoryLauncher: ActivityResultLauncher<Long>
@@ -398,15 +408,60 @@ class FileInfoActivity : BaseActivity() {
         locationInfo: LocationInfo?,
         nodeLocation: NodeLocation?,
     ) {
+        val nodeId = viewModel.getCurrentNodeId()
+        val parentId = viewModel.getCurrentNodeParentId()
         nodeLocation?.let {
-            megaNavigator.handleFileInfoLocationClick(
-                context = this,
-                nodeId = viewModel.getCurrentNodeId() ?: return,
-                parentId = viewModel.getCurrentNodeParentId() ?: return,
-                nodeLocation = it
-            )
+            val destination: NavKey? = getDestination(nodeLocation, nodeId, parentId)
+            lifecycleScope.launch {
+                destination?.let { navigationQueue.emit(destination) }
+                finish()
+            }
         } ?: locationInfo?.let {
             handleLocationClick(this, adapterType, locationInfo)
+        }
+    }
+
+    private fun getDestination(
+        nodeLocation: NodeLocation,
+        nodeId: NodeId?,
+        parentId: NodeId?,
+    ): NavKey? = when (nodeLocation) {
+        NodeLocation.CloudDriveRoot -> {
+            nodeId?.let {
+                DriveSyncNavKey(highlightedNodeHandle = nodeId.longValue)
+            }
+        }
+
+        NodeLocation.CloudDrive -> {
+            parentId?.let {
+                CloudDriveNavKey(
+                    nodeHandle = parentId.longValue,
+                    highlightedNodeHandle = nodeId?.longValue ?: -1L
+                )
+            }
+        }
+
+        NodeLocation.RubbishBin -> {
+            parentId?.let {
+                RubbishBinNavKey(
+                    handle = parentId.longValue,
+                    highlightedNodeHandle = nodeId?.longValue ?: -1L
+                )
+            }
+        }
+
+        NodeLocation.IncomingSharesRoot -> {
+            SharesNavKey
+        }
+
+        NodeLocation.IncomingShares -> {
+            parentId?.let {
+                CloudDriveNavKey(
+                    nodeHandle = parentId.longValue,
+                    highlightedNodeHandle = nodeId?.longValue ?: -1L,
+                    nodeSourceType = NodeSourceType.INCOMING_SHARES
+                )
+            }
         }
     }
 
