@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.transfers.view.sheet
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -239,7 +240,7 @@ fun CompletedTransferActionsBottomSheet(
             onViewInFolderSingleActivity(viewInFolderEvent, navigationHandler)
         } else {
             activity?.let { activity ->
-                onViewInFolder(viewInFolderEvent, activity)
+                onViewInFolderLegacy(viewInFolderEvent, activity)
             }
         }
         onDismissSheet()
@@ -310,7 +311,8 @@ private fun onOpenWith(
     }
 }
 
-private fun onViewInFolder(
+@SuppressLint("ManagerActivityIntent")
+private fun onViewInFolderLegacy(
     viewInFolderEvent: ViewInFolderEvent.Found,
     activity: Activity,
 ) {

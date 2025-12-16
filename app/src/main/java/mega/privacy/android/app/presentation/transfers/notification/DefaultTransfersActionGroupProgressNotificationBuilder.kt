@@ -23,10 +23,9 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isOfflineDownload
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
@@ -38,7 +37,7 @@ import javax.inject.Inject
 class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor(
     @ApplicationContext private val context: Context,
     private val actionGroupNotificationDestinationMapper: ActionGroupNotificationDestinationMapper,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val megaNavigator: MegaNavigator,
 ) : TransfersActionGroupProgressNotificationBuilder {
 
     override suspend fun invoke(
@@ -100,7 +99,7 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
         )
         val actionPendingIntent = if (!isPreviewDownload) {
             TransfersActivity.getPendingIntentForTransfersSection(
-                getFeatureFlagValueUseCase(AppFeatures.SingleActivity),
+                megaNavigator,
                 context,
                 TransfersNavKey.Tab.Active,
             )

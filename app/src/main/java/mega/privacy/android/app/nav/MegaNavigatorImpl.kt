@@ -1,6 +1,8 @@
 package mega.privacy.android.app.nav
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -871,7 +873,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         bundle: Bundle?,
         flags: Int?,
         singleActivityDestination: NavKey?,
-        onIntentCreated: suspend (Intent) -> Intent,
+        onIntentCreated: (suspend (Intent) -> Unit)?,
     ) {
         navigateForSingleActivity(
             context = context,
@@ -881,6 +883,17 @@ internal class MegaNavigatorImpl @Inject constructor(
         }
     }
 
+    override suspend fun getPendingIntentConsideringSingleActivity(
+        context: Context,
+        legacyActivityClass: Class<out Activity>,
+        createPendingIntent: (Intent) -> PendingIntent,
+        singleActivityPendingIntent: () -> PendingIntent,
+    ): PendingIntent = if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
+        singleActivityPendingIntent()
+    } else {
+        createPendingIntent(Intent(context, legacyActivityClass))
+    }
+
     @SuppressLint("ManagerActivityIntent")
     private suspend fun navigateToManagerActivity(
         context: Context,
@@ -888,14 +901,15 @@ internal class MegaNavigatorImpl @Inject constructor(
         data: Uri?,
         bundle: Bundle?,
         flags: Int? = null,
-        onIntentCreated: suspend (Intent) -> Intent = { it },
+        onIntentCreated: (suspend (Intent) -> Unit)? = null,
     ) {
         val intent = Intent(context, ManagerActivity::class.java)
         intent.action = action
         intent.data = data
         flags?.let { intent.flags = it }
         bundle?.let { intent.putExtras(it) }
-        context.startActivity(onIntentCreated(intent))
+        onIntentCreated?.invoke(intent)
+        context.startActivity(intent)
     }
 
     override fun openMediaDiscoveryActivity(

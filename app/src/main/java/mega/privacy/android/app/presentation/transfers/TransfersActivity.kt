@@ -26,6 +26,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.TransfersNavKey
+import mega.privacy.android.navigation.getPendingIntentConsideringSingleActivity
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
@@ -101,22 +102,6 @@ class TransfersActivity : AppCompatActivity() {
         private const val EXTRA_TAB = "TAB"
 
         /**
-         * Get the Intent to open the [TransfersActivity] in the active tab
-         */
-        private fun getActiveTabIntent(context: Context): Intent =
-            Intent(context, TransfersActivity::class.java).apply {
-                putExtra(EXTRA_TAB, TransfersNavKey.Tab.Active.name)
-            }
-
-        /**
-         * Get the Intent to open the [TransfersActivity] in the completed tab
-         */
-        private fun getCompletedTabIntent(context: Context): Intent =
-            Intent(context, TransfersActivity::class.java).apply {
-                putExtra(EXTRA_TAB, TransfersNavKey.Tab.Completed.name)
-            }
-
-        /**
          * Get the Intent to open the [TransfersActivity] in the default tab (failed tab if the transfer are in error status, active tab otherwise)
          */
         fun getIntent(context: Context): Intent =
@@ -128,26 +113,30 @@ class TransfersActivity : AppCompatActivity() {
          * Once the [SingleActivity] feature flag is removed this activity will be removed as well and
          * we can replace calls to this method with calls to the mapper
          */
-        fun getPendingIntentForTransfersSection(
-            singleActivity: Boolean,
+        suspend fun getPendingIntentForTransfersSection(
+            megaNavigator: MegaNavigator,
             context: Context,
             tab: TransfersNavKey.Tab? = null,
-        ): PendingIntent = if (singleActivity) {
-            MegaActivity.getPendingIntentWithExtraDestination(
+        ): PendingIntent =
+            megaNavigator.getPendingIntentConsideringSingleActivity<TransfersActivity>(
                 context = context,
-                navKey = TransfersNavKey(tab),
-            )
-        } else {
-            PendingIntent.getActivity(
-                context,
-                System.currentTimeMillis().toInt(),
-                when (tab) {
-                    TransfersNavKey.Tab.Active -> getActiveTabIntent(context)
-                    TransfersNavKey.Tab.Completed -> getCompletedTabIntent(context)
-                    else -> getIntent(context)
+                createPendingIntent = { intent ->
+                    if (tab != null) {
+                        intent.putExtra(EXTRA_TAB, tab.name)
+                    }
+                    PendingIntent.getActivity(
+                        context,
+                        System.currentTimeMillis().toInt(),
+                        intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    )
                 },
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                singleActivityPendingIntent = {
+                    MegaActivity.getPendingIntentWithExtraDestination(
+                        context = context,
+                        navKey = TransfersNavKey(tab),
+                    )
+                }
             )
-        }
     }
 }

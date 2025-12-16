@@ -1,6 +1,7 @@
 package mega.privacy.android.navigation
 
 import android.app.Activity
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -569,8 +570,26 @@ interface AppNavigator {
         bundle: Bundle? = null,
         flags: Int? = null,
         singleActivityDestination: NavKey?,
-        onIntentCreated: suspend (Intent) -> Intent = { it },
+        onIntentCreated: (suspend (Intent) -> Unit)? = null,
     )
+
+    /**
+     * Get a PendingIntent considering the SingleActivity feature flag.
+     * If SingleActivity is enabled, returns the PendingIntent created by singleActivityPendingIntent.
+     * Otherwise, creates an Intent for the legacy activity and uses createPendingIntent to create the PendingIntent.
+     *
+     * @param context The Context
+     * @param legacyActivityClass The Activity class to create the Intent for when SingleActivity is disabled
+     * @param createPendingIntent A lambda that creates a PendingIntent from an Intent
+     * @param singleActivityPendingIntent A lambda that creates the PendingIntent to use when SingleActivity is enabled
+     * @return The appropriate PendingIntent based on the feature flag
+     */
+    suspend fun getPendingIntentConsideringSingleActivity(
+        context: Context,
+        legacyActivityClass: Class<out Activity>,
+        createPendingIntent: (Intent) -> PendingIntent,
+        singleActivityPendingIntent: () -> PendingIntent,
+    ): PendingIntent
 
     /**
      * Open Media Discovery Activity
@@ -587,3 +606,23 @@ interface AppNavigator {
         isFromFolderLink: Boolean,
     )
 }
+
+/**
+ * Get a PendingIntent considering the SingleActivity feature flag using reified generics.
+ *
+ * @param T The Activity class to create the Intent for when SingleActivity is disabled
+ * @param context The Context
+ * @param createPendingIntent A lambda that creates a PendingIntent from an Intent
+ * @param singleActivityPendingIntent A lambda that creates the PendingIntent to use when SingleActivity is enabled
+ * @return The appropriate PendingIntent based on the feature flag
+ */
+suspend inline fun <reified T : Activity> AppNavigator.getPendingIntentConsideringSingleActivity(
+    context: Context,
+    noinline createPendingIntent: (Intent) -> PendingIntent,
+    noinline singleActivityPendingIntent: () -> PendingIntent,
+): PendingIntent = getPendingIntentConsideringSingleActivity(
+    context = context,
+    legacyActivityClass = T::class.java,
+    createPendingIntent = createPendingIntent,
+    singleActivityPendingIntent = singleActivityPendingIntent,
+)
