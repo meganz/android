@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -28,7 +27,6 @@ import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerDetai
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
 import mega.privacy.android.app.presentation.login.model.AccountBlockedUiState
 import mega.privacy.android.app.presentation.login.model.LoginError
-import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.login.model.RkLink
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -49,6 +47,7 @@ import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorLoggedOutFromAnotherLocationUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.ResendVerificationEmailUseCase
 import mega.privacy.android.domain.usecase.account.ResumeCreateAccountUseCase
 import mega.privacy.android.domain.usecase.account.SetLoggedOutFromAnotherLocationUseCase
@@ -66,7 +65,6 @@ import mega.privacy.android.domain.usecase.login.FastLoginUseCase
 import mega.privacy.android.domain.usecase.login.FetchNodesUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.GetLastRegisteredEmailUseCase
-import mega.privacy.android.domain.usecase.login.GetSessionUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutUseCase
 import mega.privacy.android.domain.usecase.login.LoginUseCase
 import mega.privacy.android.domain.usecase.login.LoginWith2FAUseCase
@@ -125,7 +123,8 @@ internal class LoginViewModelTest {
         mock { onBlocking { invoke(any()) }.thenReturn(false) }
     private val resetChatSettingsUseCase: ResetChatSettingsUseCase = mock()
     private val getAccountCredentialsUseCase: GetAccountCredentialsUseCase = mock()
-    private val getSessionUseCase: GetSessionUseCase = mock()
+    private val monitorUserCredentialsFlow = MutableSharedFlow<UserCredentials?>()
+    private val monitorUserCredentialsUseCase: MonitorUserCredentialsUseCase = mock()
     private val hasPreferencesUseCase: HasPreferencesUseCase = mock()
     private val hasCameraSyncEnabledUseCase: HasCameraSyncEnabledUseCase = mock()
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase = mock()
@@ -188,10 +187,8 @@ internal class LoginViewModelTest {
     private val getUserDataUseCase: GetUserDataUseCase = mock()
 
     @BeforeEach
-    fun setUp() {
-        runBlocking {
-            stubCommon()
-        }
+    fun setUp() = runTest {
+        stubCommon()
         underTest = LoginViewModel(
             applicationScope = applicationScope,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
@@ -200,7 +197,7 @@ internal class LoginViewModelTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             resetChatSettingsUseCase = resetChatSettingsUseCase,
             getAccountCredentialsUseCase = getAccountCredentialsUseCase,
-            getSessionUseCase = getSessionUseCase,
+            monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
             hasPreferencesUseCase = hasPreferencesUseCase,
             hasCameraSyncEnabledUseCase = hasCameraSyncEnabledUseCase,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
@@ -258,9 +255,19 @@ internal class LoginViewModelTest {
             true
         )
         whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
-        whenever(getSessionUseCase()).thenReturn(null)
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
         whenever(monitorEphemeralCredentialsUseCase()).thenReturn(emptyFlow())
+        whenever(monitorUserCredentialsUseCase()).thenReturn(monitorUserCredentialsFlow)
+        // Emit initial value to match test expectations (isAlreadyLoggedIn = true)
+        monitorUserCredentialsFlow.emit(
+            UserCredentials(
+                email = null,
+                session = "initialSession",
+                firstName = null,
+                lastName = null,
+                myHandle = null
+            )
+        )
         whenever(rootNodeExistsUseCase()).thenReturn(false)
         whenever(hasPreferencesUseCase()).thenReturn(false)
         whenever(hasCameraSyncEnabledUseCase()).thenReturn(false)
@@ -324,7 +331,7 @@ internal class LoginViewModelTest {
                 assertThat(loginException).isNull()
                 assertThat(ongoingTransfersExist).isNull()
                 assertThat(isPendingToFinishActivity).isFalse()
-                assertThat(isPendingToShowFragment).isEqualTo(triggered(LoginScreen.Tour))
+                assertThat(isPendingToShowFragment).isEqualTo(consumed())
                 assertThat(isCheckingSignupLink).isFalse()
                 assertThat(snackbarMessage).isInstanceOf(consumed().javaClass)
                 assertThat(isFirstTimeLaunch).isFalse()
@@ -687,9 +694,7 @@ internal class LoginViewModelTest {
     @Test
     fun `test that resumeTransfersForNotLoggedInInstanceUseCase is invoked when there is no session`() =
         runTest {
-            whenever(getSessionUseCase()) doReturn null
-            stubCommon()
-
+            monitorUserCredentialsFlow.emit(null)
             advanceUntilIdle()
 
             verify(resumeTransfersForNotLoggedInInstanceUseCase).invoke()
@@ -698,8 +703,15 @@ internal class LoginViewModelTest {
     @Test
     fun `test that resumeTransfersForNotLoggedInInstanceUseCase is not invoked when there is session`() =
         runTest {
-            whenever(getSessionUseCase()) doReturn "session"
-
+            monitorUserCredentialsFlow.emit(
+                UserCredentials(
+                    email = null,
+                    session = "session",
+                    firstName = null,
+                    lastName = null,
+                    myHandle = null
+                )
+            )
             advanceUntilIdle()
 
             verifyNoInteractions(resumeTransfersForNotLoggedInInstanceUseCase)
@@ -773,16 +785,16 @@ internal class LoginViewModelTest {
     @Test
     fun `test that openRecoveryUrlEvent is not triggered until the feature flags are loaded`() =
         runTest {
-
             underTest.state.test {
-                assertThat(awaitItem().miscFlagLoaded).isFalse()
-                assertThat(awaitItem().openRecoveryUrlEvent).isInstanceOf(
+                val item = awaitItem()
+                assertThat(item.miscFlagLoaded).isFalse()
+                assertThat(item.openRecoveryUrlEvent).isInstanceOf(
                     StateEventWithContentConsumed::class.java
                 )
                 underTest.onForgotPassword()
                 this.expectNoEvents()
-
                 monitorMiscLoadedFlow.emit(true)
+                advanceUntilIdle()
                 assertThat(awaitItem().miscFlagLoaded).isTrue()
                 assertThat(awaitItem().openRecoveryUrlEvent).isInstanceOf(
                     StateEventWithContentTriggered::class.java
