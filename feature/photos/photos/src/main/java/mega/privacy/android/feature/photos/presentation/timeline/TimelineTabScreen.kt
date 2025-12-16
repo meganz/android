@@ -31,7 +31,6 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -46,7 +45,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -94,8 +92,6 @@ internal fun TimelineTabRoute(
     selectedTimePeriod: PhotoModificationTimePeriod,
     clearCameraUploadsMessage: () -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
-    onChangeCameraUploadsPermissions: () -> Unit,
-    clearCameraUploadsChangePermissionsMessage: () -> Unit,
     loadNextPage: () -> Unit,
     onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
     setEnableCUPage: (Boolean) -> Unit,
@@ -123,8 +119,6 @@ internal fun TimelineTabRoute(
         selectedTimePeriod = selectedTimePeriod,
         clearCameraUploadsMessage = clearCameraUploadsMessage,
         clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
-        onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
-        clearCameraUploadsChangePermissionsMessage = clearCameraUploadsChangePermissionsMessage,
         loadNextPage = loadNextPage,
         onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
         setEnableCUPage = setEnableCUPage,
@@ -151,8 +145,6 @@ internal fun TimelineTabScreen(
     selectedTimePeriod: PhotoModificationTimePeriod,
     clearCameraUploadsMessage: () -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
-    onChangeCameraUploadsPermissions: () -> Unit,
-    clearCameraUploadsChangePermissionsMessage: () -> Unit,
     loadNextPage: () -> Unit,
     onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
     setEnableCUPage: (Boolean) -> Unit,
@@ -170,7 +162,6 @@ internal fun TimelineTabScreen(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    val context = LocalContext.current
     val resource = LocalResources.current
     val snackBarHostState = LocalSnackBarHostState.current
 
@@ -246,21 +237,6 @@ internal fun TimelineTabScreen(
             )
         }
         clearCameraUploadsCompletedMessage()
-    }
-
-    LaunchedEffect(mediaCameraUploadUiState.showCameraUploadsChangePermissionsMessage) {
-        if (mediaCameraUploadUiState.showCameraUploadsChangePermissionsMessage) {
-            snackBarHostState?.showAutoDurationSnackbar(
-                message = context.getString(sharedR.string.timeline_tab_camera_uploads_limited_access),
-                actionLabel = context.getString(sharedR.string.timeline_tab_file_properties_shared_folder_change_permissions),
-            )?.let {
-                when (it) {
-                    SnackbarResult.Dismissed -> Unit
-                    SnackbarResult.ActionPerformed -> onChangeCameraUploadsPermissions()
-                }
-            }
-            clearCameraUploadsChangePermissionsMessage()
-        }
     }
 
     LaunchedEffect(lazyGridState) {
@@ -778,8 +754,6 @@ private fun TimelineTabScreenPreview() {
             selectedTimePeriod = PhotoModificationTimePeriod.All,
             clearCameraUploadsMessage = {},
             clearCameraUploadsCompletedMessage = {},
-            onChangeCameraUploadsPermissions = {},
-            clearCameraUploadsChangePermissionsMessage = {},
             loadNextPage = {},
             setEnableCUPage = {},
             onNavigateToCameraUploadsSettings = {},
