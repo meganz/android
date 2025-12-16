@@ -17,6 +17,7 @@ import javax.inject.Inject
  */
 class RecentActionUiItemMapper @Inject constructor(
     private val fileTypeIconMapper: FileTypeIconMapper,
+    private val recentsParentFolderNameMapper: RecentsParentFolderNameMapper,
 ) {
 
     /**
@@ -45,7 +46,7 @@ class RecentActionUiItemMapper @Inject constructor(
             shareIcon = IconPackR.drawable.ic_folder_users_small_solid.takeIf {
                 item.parentFolderSharesType != RecentActionsSharesType.NONE
             },
-            parentFolderName = getParentFolderName(item),
+            parentFolderName = recentsParentFolderNameMapper(item),
             timestampText = RecentsTimestampText(item.timestamp),
             isMediaBucket = isMediaBucket,
             isUpdate = item.isUpdate,
@@ -97,15 +98,6 @@ class RecentActionUiItemMapper @Inject constructor(
     }
 
 
-    private fun getParentFolderName(item: RecentActionBucket) = if (item.isNodeKeyDecrypted) {
-        when (item.parentFolderName) {
-            CLOUD_DRIVE_FOLDER_NAME -> LocalizedText.StringRes(R.string.section_cloud_drive)
-            else -> LocalizedText.Literal(item.parentFolderName)
-        }
-    } else {
-        LocalizedText.StringRes(R.string.shared_items_verify_credentials_undecrypted_folder)
-    }
-
     private fun getUpdatedByText(item: RecentActionBucket) = if (!item.currentUserIsOwner) {
         val stringResId = if (item.isUpdate) {
             R.string.update_action_bucket
@@ -117,5 +109,3 @@ class RecentActionUiItemMapper @Inject constructor(
         null
     }
 }
-
-private const val CLOUD_DRIVE_FOLDER_NAME = "Cloud Drive"

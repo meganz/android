@@ -55,7 +55,7 @@ fun RecentsBucketScreen(
             timestamp = uiState.timestamp,
             dateFormatPattern = "d MMM yyyy"
         )
-    } · ${uiState.folderName}"
+    } · ${uiState.parentFolderName.text}"
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         topBar = {

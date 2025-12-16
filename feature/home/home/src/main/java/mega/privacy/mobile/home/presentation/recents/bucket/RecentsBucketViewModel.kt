@@ -10,10 +10,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionBucketByIdUseCase
 import mega.privacy.mobile.home.presentation.recents.bucket.model.RecentsBucketUiState
+import mega.privacy.mobile.home.presentation.recents.mapper.RecentsParentFolderNameMapper
 import timber.log.Timber
 
 /**
@@ -24,13 +26,14 @@ class RecentsBucketViewModel @AssistedInject constructor(
     @Assisted val args: Args,
     private val getRecentActionBucketByIdUseCase: GetRecentActionBucketByIdUseCase,
     private val nodeUiItemMapper: NodeUiItemMapper,
+    private val recentsParentFolderNameMapper: RecentsParentFolderNameMapper,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
         RecentsBucketUiState(
             fileCount = args.fileCount,
             timestamp = args.timestamp,
-            folderName = args.folderName,
+            parentFolderName = LocalizedText.Literal(args.folderName)
         )
     )
     val uiState = _uiState.asStateFlow()
@@ -51,13 +54,14 @@ class RecentsBucketViewModel @AssistedInject constructor(
                         nodeList = bucket.nodes,
                         nodeSourceType = args.nodeSourceType,
                     )
+                    val parentFolderName = recentsParentFolderNameMapper(bucket)
                     _uiState.update {
                         it.copy(
                             isLoading = false,
                             nodeUiItems = nodeUiItems,
                             fileCount = bucket.nodes.size,
                             timestamp = bucket.timestamp,
-                            folderName = bucket.parentFolderName, // TODO: handle isNodeKeyDecrypted
+                            parentFolderName = parentFolderName,
                         )
                     }
                 } else {

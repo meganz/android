@@ -13,7 +13,6 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.feature.home.R
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.mobile.home.presentation.recents.model.RecentActionTitleText
-import mega.privacy.mobile.home.presentation.recents.mapper.RecentActionUiItemMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -25,6 +24,8 @@ import kotlin.time.Duration
 class RecentsUiItemMapperTest {
 
     private val fileTypeIconMapper: FileTypeIconMapper = mock()
+    private val recentsParentFolderNameMapper: RecentsParentFolderNameMapper =
+        RecentsParentFolderNameMapper()
     private lateinit var underTest: RecentActionUiItemMapper
 
     @BeforeEach
@@ -36,7 +37,7 @@ class RecentsUiItemMapperTest {
         whenever(fileTypeIconMapper("png")).thenReturn(IconPackR.drawable.ic_generic_medium_solid)
         whenever(fileTypeIconMapper("mp4")).thenReturn(IconPackR.drawable.ic_generic_medium_solid)
         whenever(fileTypeIconMapper("")).thenReturn(IconPackR.drawable.ic_generic_medium_solid)
-        underTest = RecentActionUiItemMapper(fileTypeIconMapper)
+        underTest = RecentActionUiItemMapper(fileTypeIconMapper, recentsParentFolderNameMapper)
     }
 
     @Test
