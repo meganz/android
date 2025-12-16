@@ -50,6 +50,9 @@ class PendingBackStackNavigationHandler(
             backstack.removeLastOrNull()
         }
         if (backstack.isEmpty()) backstack.add(newDestination)
+        // show non-required destinations immediately
+        backstack.addAll(backstack.pending.filter { it is NoSessionNavKey })
+        backstack.pending = backstack.pending.filterNot { it is NoSessionNavKey }
         logBackStack("removeAuthRequiredDestinations")
         return authRequiredDestinations
     }
@@ -100,6 +103,7 @@ class PendingBackStackNavigationHandler(
         Timber.d("PendingBackStackNavigationHandler::navigate $destinations")
         when {
             destinations.last() is NoSessionNavKey.Mandatory && currentAuthStatus.isLoggedIn -> {
+                backstack.pending += destinations
                 if (backstack.isEmpty()) navigate(defaultLandingScreen)
             }
 
@@ -289,7 +293,8 @@ class PendingBackStackNavigationHandler(
 
     private fun printBackStack(): String = backstack.joinToString("\n\t") { it.toString() }
 
-    private fun printPendingItems(): String = backstack.pending.joinToString("\n\t") { it.toString() }
+    private fun printPendingItems(): String =
+        backstack.pending.joinToString("\n\t") { it.toString() }
 
     sealed interface AuthStatus {
         val isLoggedIn: Boolean

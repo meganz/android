@@ -8,7 +8,7 @@ package mega.privacy.android.navigation.contract.navkey
 sealed interface NoSessionNavKey : NoNodeNavKey {
 
     /**
-     * We can still navigate to this screen if the user is logged in
+     * We can still navigate to this screen if the user is logged out
      */
     interface Optional : NoSessionNavKey
 
