@@ -91,6 +91,7 @@ internal fun TimelineTabRoute(
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     timelineFilterUiState: TimelineFilterUiState,
     showTimelineSortDialog: Boolean,
+    selectedTimePeriod: PhotoModificationTimePeriod,
     clearCameraUploadsMessage: () -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
@@ -108,6 +109,7 @@ internal fun TimelineTabRoute(
     updateIsWarningBannerShown: (value: Boolean) -> Unit,
     onTabsVisibilityChange: (shouldHide: Boolean) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
+    onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -118,6 +120,7 @@ internal fun TimelineTabRoute(
         timelineFilterUiState = timelineFilterUiState,
         mediaCameraUploadUiState = mediaCameraUploadUiState,
         showTimelineSortDialog = showTimelineSortDialog,
+        selectedTimePeriod = selectedTimePeriod,
         clearCameraUploadsMessage = clearCameraUploadsMessage,
         clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
         onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
@@ -134,7 +137,8 @@ internal fun TimelineTabRoute(
         handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
         updateIsWarningBannerShown = updateIsWarningBannerShown,
         onTabsVisibilityChange = onTabsVisibilityChange,
-        onNavigateToUpgradeAccount = onNavigateToUpgradeAccount
+        onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
+        onPhotoTimePeriodSelected = onPhotoTimePeriodSelected
     )
 }
 
@@ -144,6 +148,7 @@ internal fun TimelineTabScreen(
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     timelineFilterUiState: TimelineFilterUiState,
     showTimelineSortDialog: Boolean,
+    selectedTimePeriod: PhotoModificationTimePeriod,
     clearCameraUploadsMessage: () -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
@@ -161,6 +166,7 @@ internal fun TimelineTabScreen(
     updateIsWarningBannerShown: (value: Boolean) -> Unit,
     onTabsVisibilityChange: (shouldHide: Boolean) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
+    onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -176,7 +182,6 @@ internal fun TimelineTabScreen(
     val isListScrollingDown by lazyListState.isScrollingDown()
     val isListScrolledToEnd by lazyListState.isScrolledToEnd()
     val isListScrolledToTop by lazyListState.isScrolledToTop()
-    var selectedTimePeriod by rememberSaveable { mutableStateOf(PhotoModificationTimePeriod.All) }
     val shouldShowTimePeriodSelector by remember(selectedTimePeriod) {
         derivedStateOf {
             if (selectedTimePeriod == PhotoModificationTimePeriod.All) {
@@ -349,13 +354,12 @@ internal fun TimelineTabScreen(
                 selectedTimePeriod = selectedTimePeriod,
                 shouldShowTimePeriodSelector = shouldShowTimePeriodSelector,
                 bannerType = cuBannerType,
-                onPhotoTimePeriodSelected = { selectedTimePeriod = it },
+                onPhotoTimePeriodSelected = onPhotoTimePeriodSelected,
                 onGridSizeChange = onGridSizeChange,
                 onPhotoClick = onPhotoClick,
                 onPhotoSelected = onPhotoSelected,
                 onPhotosNodeListCardClick = { photo ->
-                    selectedTimePeriod =
-                        PhotoModificationTimePeriod.entries[selectedTimePeriod.ordinal + 1]
+                    onPhotoTimePeriodSelected(PhotoModificationTimePeriod.entries[selectedTimePeriod.ordinal + 1])
                     shouldScrollToIndex = calculateScrollIndex(
                         photo = photo,
                         displayedPhotos = uiState.displayedPhotos,
@@ -771,6 +775,7 @@ private fun TimelineTabScreenPreview() {
             mediaCameraUploadUiState = MediaCameraUploadUiState(),
             timelineFilterUiState = TimelineFilterUiState(),
             showTimelineSortDialog = false,
+            selectedTimePeriod = PhotoModificationTimePeriod.All,
             clearCameraUploadsMessage = {},
             clearCameraUploadsCompletedMessage = {},
             onChangeCameraUploadsPermissions = {},
@@ -787,7 +792,8 @@ private fun TimelineTabScreenPreview() {
             handleCameraUploadsPermissionsResult = {},
             updateIsWarningBannerShown = {},
             onTabsVisibilityChange = {},
-            onNavigateToUpgradeAccount = {}
+            onNavigateToUpgradeAccount = {},
+            onPhotoTimePeriodSelected = {}
         )
     }
 }

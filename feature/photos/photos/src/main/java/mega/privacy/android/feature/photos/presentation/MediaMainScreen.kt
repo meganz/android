@@ -90,6 +90,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabView
 import mega.privacy.android.feature.photos.presentation.timeline.component.CameraUploadStatusToolbarAction
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineFilterView
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineTabActionBottomSheet
+import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineSelectionMenuAction
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabRoute
@@ -316,6 +317,15 @@ fun MediaMainScreen(
         derivedStateOf { timelineTabUiState.selectedPhotoCount == timelineTabUiState.displayedPhotos.size }
     }
     var showBottomSheetActions by rememberSaveable { mutableStateOf(false) }
+    var selectedTimePeriod by rememberSaveable { mutableStateOf(PhotoModificationTimePeriod.All) }
+    val shouldShowTimelineActions by remember(
+        selectedTimePeriod,
+        mediaCameraUploadUiState.enableCameraUploadPageShowing
+    ) {
+        derivedStateOf {
+            selectedTimePeriod == PhotoModificationTimePeriod.All && !mediaCameraUploadUiState.enableCameraUploadPageShowing
+        }
+    }
 
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val videosTabUiState by videosTabViewModel.uiState.collectAsStateWithLifecycle()
@@ -503,7 +513,7 @@ fun MediaMainScreen(
                         )
 
                         // Menu actions for timeline tab
-                        if (currentTabIndex == MediaScreen.Timeline.ordinal) {
+                        if (currentTabIndex == MediaScreen.Timeline.ordinal && shouldShowTimelineActions) {
                             add(
                                 MenuActionWithClick(menuAction = MediaAppBarAction.FilterSecondary) {
                                     showTimelineFilter = true
@@ -515,6 +525,19 @@ fun MediaMainScreen(
                                     MenuActionWithClick(menuAction = MediaAppBarAction.SortBy) {
                                         showTimelineSortDialog = true
                                     }
+                                )
+                            }
+
+                            if (!mediaCameraUploadUiState.enableCameraUploadButtonShowing) {
+                                add(
+                                    MenuActionWithClick(
+                                        menuAction = MediaAppBarAction.CameraUploadsSettings,
+                                        onClick = {
+                                            onNavigateToCameraUploadsSettings(
+                                                LegacySettingsCameraUploadsActivityNavKey()
+                                            )
+                                        }
+                                    )
                                 )
                             }
                         }
@@ -617,6 +640,7 @@ fun MediaMainScreen(
                                     timelineFilterUiState = timelineFilterUiState,
                                     mediaCameraUploadUiState = mediaCameraUploadUiState,
                                     showTimelineSortDialog = showTimelineSortDialog,
+                                    selectedTimePeriod = selectedTimePeriod,
                                     navigateToAlbumContent = navigateToAlbumContent,
                                     navigateToLegacyPhotoSelection = navigateToLegacyPhotoSelection,
                                     setEnableCUPage = setEnableCUPage,
@@ -655,7 +679,8 @@ fun MediaMainScreen(
                                     handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
                                     updateIsWarningBannerShown = updateIsWarningBannerShown,
                                     onTabsVisibilityChange = { shouldHideTabs = it },
-                                    onNavigateToUpgradeAccount = onNavigateToUpgradeAccount
+                                    onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
+                                    onPhotoTimePeriodSelected = { selectedTimePeriod = it }
                                 )
                             }
                         )
@@ -761,6 +786,7 @@ private fun MediaScreen.MediaContent(
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     timelineFilterUiState: TimelineFilterUiState,
     showTimelineSortDialog: Boolean,
+    selectedTimePeriod: PhotoModificationTimePeriod,
     navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
     navigateToLegacyPhotoSelection: (LegacyPhotoSelectionNavKey) -> Unit,
     setEnableCUPage: (Boolean) -> Unit,
@@ -782,6 +808,7 @@ private fun MediaScreen.MediaContent(
     updateIsWarningBannerShown: (value: Boolean) -> Unit,
     onTabsVisibilityChange: (shouldHide: Boolean) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
+    onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
     modifier: Modifier = Modifier,
     timelineContentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -796,6 +823,7 @@ private fun MediaScreen.MediaContent(
                 mediaCameraUploadUiState = mediaCameraUploadUiState,
                 timelineFilterUiState = timelineFilterUiState,
                 showTimelineSortDialog = showTimelineSortDialog,
+                selectedTimePeriod = selectedTimePeriod,
                 clearCameraUploadsMessage = clearCameraUploadsMessage,
                 clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
@@ -812,7 +840,8 @@ private fun MediaScreen.MediaContent(
                 handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
                 updateIsWarningBannerShown = updateIsWarningBannerShown,
                 onTabsVisibilityChange = onTabsVisibilityChange,
-                onNavigateToUpgradeAccount = onNavigateToUpgradeAccount
+                onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
+                onPhotoTimePeriodSelected = onPhotoTimePeriodSelected
             )
         }
 

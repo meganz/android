@@ -10,6 +10,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
+import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import org.junit.Rule
@@ -57,6 +58,7 @@ class TimelineTabScreenTest {
         mediaCameraUploadUiState: MediaCameraUploadUiState = MediaCameraUploadUiState(),
         timelineFilterUiState: TimelineFilterUiState = TimelineFilterUiState(),
         showTimelineSortDialog: Boolean = false,
+        selectedTimePeriod: PhotoModificationTimePeriod = PhotoModificationTimePeriod.All,
         clearCameraUploadsMessage: () -> Unit = {},
         clearCameraUploadsCompletedMessage: () -> Unit = {},
         onChangeCameraUploadsPermissions: () -> Unit = {},
@@ -74,6 +76,7 @@ class TimelineTabScreenTest {
         updateIsWarningBannerShown: (value: Boolean) -> Unit = {},
         onTabsVisibilityChange: (shouldHide: Boolean) -> Unit = {},
         onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit = {},
+        onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit = {},
     ) {
         setContent {
             TimelineTabScreen(
@@ -81,6 +84,7 @@ class TimelineTabScreenTest {
                 mediaCameraUploadUiState = mediaCameraUploadUiState,
                 timelineFilterUiState = timelineFilterUiState,
                 showTimelineSortDialog = showTimelineSortDialog,
+                selectedTimePeriod = selectedTimePeriod,
                 clearCameraUploadsMessage = clearCameraUploadsMessage,
                 clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
@@ -97,7 +101,8 @@ class TimelineTabScreenTest {
                 handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
                 updateIsWarningBannerShown = updateIsWarningBannerShown,
                 onTabsVisibilityChange = onTabsVisibilityChange,
-                onNavigateToUpgradeAccount = onNavigateToUpgradeAccount
+                onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
+                onPhotoTimePeriodSelected = onPhotoTimePeriodSelected
             )
         }
     }
