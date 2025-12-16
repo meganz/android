@@ -23,6 +23,7 @@ import mega.privacy.android.app.OpenPasswordLinkActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.appstate.MegaActivity
+import mega.privacy.android.app.appstate.MegaActivity.Companion.ACTION_DEEP_LINKS
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityOpenLinkBinding
 import mega.privacy.android.app.di.isAdaptiveLayoutEnabled
@@ -242,12 +243,15 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                     }
                     viewModel.onResetPasswordLinkResultConsumed()
                 }
-                if (deepLinkDestinationsAddedEvent) {
-                    val intent = MegaActivity.getIntent(
+                if (navigateToSingleActivity) {
+                    MegaActivity.getIntent(
                         this@OpenLinkActivity,
-                    )
-                    startActivity(intent)
-                    finish()
+                        action = ACTION_DEEP_LINKS,
+                    ).also { intent ->
+                        intent.data = this@OpenLinkActivity.intent.data
+                        startActivity(intent)
+                        finish()
+                    }
                 }
             }
         }

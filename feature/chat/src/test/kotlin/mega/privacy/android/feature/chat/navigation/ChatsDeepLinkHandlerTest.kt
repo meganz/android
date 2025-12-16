@@ -25,8 +25,8 @@ import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChat
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.destination.DeepLinksAfterFetchNodesDialogNavKey
 import mega.privacy.android.navigation.destination.LegacyMeetingNavKey
-import mega.privacy.android.navigation.destination.LegacyOpenLinkAfterFetchNodes
 import mega.privacy.android.navigation.destination.LegacyWaitingRoomNavKey
 import mega.privacy.android.navigation.destination.MeetingNavKeyInfo
 import mega.privacy.android.navigation.destination.WaitingRoomNavKeyInfo
@@ -149,7 +149,14 @@ class ChatsDeepLinkHandlerTest {
                 underTest.getNavKeysInternal(uri, CHAT_LINK, isLoggedIn)
 
             if (isLoggedIn) {
-                assertThat(actual).isEqualTo(listOf(LegacyOpenLinkAfterFetchNodes(uriString)))
+                assertThat(actual).isEqualTo(
+                    listOf(
+                        DeepLinksAfterFetchNodesDialogNavKey(
+                            deepLink = uriString,
+                            regexPatternType = CHAT_LINK,
+                        )
+                    )
+                )
                 verifyNoInteractions(snackbarEventQueue)
             } else {
                 assertThat(actual).isEmpty()

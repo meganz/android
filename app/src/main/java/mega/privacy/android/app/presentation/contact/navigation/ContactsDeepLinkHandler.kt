@@ -13,7 +13,7 @@ import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.ContactsNavKey
 import mega.privacy.android.navigation.destination.ContactsNavKey.NavType
-import mega.privacy.android.navigation.destination.LegacyOpenLinkAfterFetchNodes
+import mega.privacy.android.navigation.destination.DeepLinksAfterFetchNodesDialogNavKey
 import mega.privacy.android.navigation.destination.WebSiteNavKey
 import javax.inject.Inject
 
@@ -42,7 +42,13 @@ class ContactsDeepLinkHandler @Inject constructor(
         CONTACT_LINK -> catchWithEmptyListAndLog {
             when {
                 !isLoggedIn -> listOf(ContactLinkDialogNavKey(ContactLinkQueryResult()))
-                !rootNodeExistsUseCase() -> listOf(LegacyOpenLinkAfterFetchNodes(uri.toString()))
+                !rootNodeExistsUseCase() -> listOf(
+                    DeepLinksAfterFetchNodesDialogNavKey(
+                        deepLink = uri.toString(),
+                        regexPatternType = CONTACT_LINK,
+                    )
+                )
+
                 else -> contactLinkQueryFromLinkUseCase(uri.toString())?.let {
                     listOf(ContactLinkDialogNavKey(it))
                 } ?: listOf(WebSiteNavKey(uri.toString()))

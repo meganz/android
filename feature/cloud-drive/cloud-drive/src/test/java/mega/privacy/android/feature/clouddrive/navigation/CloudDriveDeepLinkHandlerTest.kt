@@ -21,9 +21,9 @@ import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.DeepLinksAfterFetchNodesDialogNavKey
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
-import mega.privacy.android.navigation.destination.LegacyOpenLinkAfterFetchNodes
 import mega.privacy.android.navigation.destination.LegacyPdfViewerNavKey
 import mega.privacy.android.navigation.destination.RubbishBinNavKey
 import mega.privacy.android.shared.resources.R as sharedR
@@ -108,7 +108,14 @@ class CloudDriveDeepLinkHandlerTest {
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
         if (isLoggedIn) {
-            assertThat(actual).isEqualTo(listOf(LegacyOpenLinkAfterFetchNodes(uriString)))
+            assertThat(actual).isEqualTo(
+                listOf(
+                    DeepLinksAfterFetchNodesDialogNavKey(
+                        deepLink = uriString,
+                        regexPatternType = RegexPatternType.HANDLE_LINK,
+                    )
+                )
+            )
             verifyNoInteractions(snackbarEventQueue)
         } else {
             assertThat(actual).isEmpty()

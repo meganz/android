@@ -264,9 +264,6 @@ data class LegacyAddToAlbumActivityNavKey(
 }
 
 @Serializable
-data class LegacyOpenLinkAfterFetchNodes(val link: String) : NavKey
-
-@Serializable
 data object LegacyPhotosSearchNavKey : NavKey
 
 @Serializable

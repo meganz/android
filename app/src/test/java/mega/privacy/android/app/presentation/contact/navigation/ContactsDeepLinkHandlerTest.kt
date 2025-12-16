@@ -13,7 +13,7 @@ import mega.privacy.android.domain.usecase.contact.ContactLinkQueryFromLinkUseCa
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.ContactsNavKey
 import mega.privacy.android.navigation.destination.ContactsNavKey.NavType
-import mega.privacy.android.navigation.destination.LegacyOpenLinkAfterFetchNodes
+import mega.privacy.android.navigation.destination.DeepLinksAfterFetchNodesDialogNavKey
 import mega.privacy.android.navigation.destination.WebSiteNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.BeforeAll
@@ -94,7 +94,14 @@ class ContactsDeepLinkHandlerTest {
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.CONTACT_LINK, isLoggedIn)
 
         if (isLoggedIn) {
-            assertThat(actual).isEqualTo(listOf(LegacyOpenLinkAfterFetchNodes(uriString)))
+            assertThat(actual).isEqualTo(
+                listOf(
+                    DeepLinksAfterFetchNodesDialogNavKey(
+                        deepLink = uriString,
+                        regexPatternType = CONTACT_LINK,
+                    )
+                )
+            )
             verifyNoInteractions(snackbarEventQueue)
         } else {
             assertThat(actual).isEmpty()

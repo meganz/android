@@ -277,8 +277,8 @@ class PendingBackStackNavigationHandler(
     }
 
     fun displayDialog(dialogDestination: NavKey) {
-        if (backstack.pending.isNotEmpty() || backstack.base.isEmpty()) {
-            backstack.pending = backstack.pending + dialogDestination
+        if (backstack.base.isEmpty()) {
+            backstack.pending += dialogDestination
         } else {
             navigate(dialogDestination)
         }

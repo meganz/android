@@ -71,7 +71,6 @@ class LegacyCoreActivityFeatureGraph(
             legacyAlbumContentPreview(navigationHandler::back)
             legacyMediaTimelinePhotoPreview(navigationHandler::back)
             legacyAddToAlbumActivityNavKey(navigationHandler::returnResult)
-            legacyOpenLinkAfterFetchNodes(navigationHandler::back)
             legacyMeetingScreen(
                 navigationHandler::back,
                 megaChatRequestHandler,

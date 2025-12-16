@@ -19,9 +19,9 @@ import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.DeepLinksAfterFetchNodesDialogNavKey
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
-import mega.privacy.android.navigation.destination.LegacyOpenLinkAfterFetchNodes
 import mega.privacy.android.navigation.destination.RubbishBinNavKey
 import mega.privacy.android.navigation.destination.SharesNavKey
 import javax.inject.Inject
@@ -49,7 +49,13 @@ class CloudDriveDeepLinkHandler @Inject constructor(
         RegexPatternType.HANDLE_LINK -> catchWithEmptyListAndLog {
             when {
                 !isLoggedIn -> listOf(HomeScreensNavKey(DriveSyncNavKey()))
-                !rootNodeExistsUseCase() -> listOf(LegacyOpenLinkAfterFetchNodes(uri.toString()))
+                !rootNodeExistsUseCase() -> listOf(
+                    DeepLinksAfterFetchNodesDialogNavKey(
+                        deepLink = uri.toString(),
+                        regexPatternType = RegexPatternType.HANDLE_LINK,
+                    )
+                )
+
                 else -> {
                     val node = uri.extractNodeHandleBase64FromUri()
                         ?.let { getNodeIdFromBase64UseCase(it) }?.longValue?.let { handle ->

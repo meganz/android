@@ -81,14 +81,15 @@ import mega.privacy.android.app.presentation.security.check.PasscodeCheckViewMod
 import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.sharedcomponents.snackbar.SnackbarLifetimeController
 import mega.privacy.android.core.sharedcomponents.parcelable
+import mega.privacy.android.core.sharedcomponents.snackbar.SnackbarLifetimeController
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.transparent.TransparentSceneStrategy
+import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import timber.log.Timber
 import javax.inject.Inject
@@ -132,13 +133,25 @@ class MegaActivity : ComponentActivity() {
         consumeIntentDestinations()
     }
 
-    private fun consumeActions() {
-        if (intent.action == Constants.ACTION_REFRESH) {
-            globalStateViewModel.refreshSession(RefreshEvent.Refresh)
-            intent.action = null
-        } else if (intent.action == Constants.ACTION_REFRESH_API_SERVER) {
-            globalStateViewModel.refreshSession(RefreshEvent.ChangeEnvironment)
-            intent.action = null
+    private suspend fun consumeActions() {
+        when (intent.action) {
+            Constants.ACTION_REFRESH -> {
+                globalStateViewModel.refreshSession(RefreshEvent.Refresh)
+                intent.action = null
+            }
+
+            Constants.ACTION_REFRESH_API_SERVER -> {
+                globalStateViewModel.refreshSession(RefreshEvent.ChangeEnvironment)
+                intent.action = null
+            }
+
+            ACTION_DEEP_LINKS -> {
+                intent.dataString?.let { data ->
+                    navigationEventQueue.emit(DeepLinksDialogNavKey(data))
+                    intent.action = null
+                    intent.data = null
+                }
+            }
         }
     }
 
@@ -411,15 +424,15 @@ class MegaActivity : ComponentActivity() {
         /**
          * Get Intent to open this activity with Single top and clear top flags
          */
-        fun getIntent(context: Context, warningMessage: String? = null) = Intent(
-            context,
-            MegaActivity::class.java
-        ).apply {
-            warningMessage?.let {
+        fun getIntent(context: Context, action: String? = null, warningMessage: String? = null) =
+            Intent(
+                context,
+                MegaActivity::class.java
+            ).apply {
+                this.action = action
                 putExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE, warningMessage)
+                flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
             }
-            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }
 
         /**
          * Get a pending intent to open this activity with the specified warning message
@@ -470,16 +483,16 @@ class MegaActivity : ComponentActivity() {
             putParcelableArrayListExtra(EXTRA_NAV_KEYS, ArrayList(navKeys))
         }
 
-        private fun Intent.getDestinations(): List<NavKey>? {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        private fun Intent.getDestinations(): List<NavKey>? =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 getParcelableArrayListExtra(EXTRA_NAV_KEYS, NavKey::class.java)
             } else {
                 @Suppress("DEPRECATION")
                 getParcelableArrayListExtra(EXTRA_NAV_KEYS)
             }
-        }
 
         private const val EXTRA_NAV_KEYS = "navKeys"
+        internal const val ACTION_DEEP_LINKS = "deepLinks"
     }
 }
 
