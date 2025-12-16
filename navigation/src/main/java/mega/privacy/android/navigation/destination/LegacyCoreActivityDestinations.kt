@@ -40,12 +40,29 @@ data class ContactsNavKey(val navType: NavType = NavType.List) : NavKey {
     }
 }
 
+/**
+ * Navigation key for ChatHostActivity
+ * Supports all variations of intent extras used to launch ChatHostActivity
+ *
+ * @param chatId Chat ID to open (required if openChatList is false)
+ * @param action Intent action string (e.g., ACTION_CHAT_SHOW_MESSAGES)
+ * @param link Chat link if opened from a link
+ * @param snackbarText Text to show in snackbar
+ * @param messageId Message ID
+ * @param isOverQuota Over quota indicator
+ * @param openChatList True to open chat list instead of specific chat
+ * @param createNewChat True if the Chat List screen should open with the Create New Chat flow
+ * @param flags Intent flags (e.g., FLAG_ACTIVITY_NEW_TASK, FLAG_ACTIVITY_CLEAR_TOP)
+ */
 @Serializable
 @Parcelize
 data class ChatNavKey(
     val chatId: Long,
-    val action: String?,
+    val action: String? = null,
     val link: String? = null,
+    val snackbarText: String? = null,
+    val messageId: Long? = null,
+    val isOverQuota: Int? = null,
 ) : NoSessionNavKey.Optional, Parcelable
 
 /**

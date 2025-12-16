@@ -85,6 +85,7 @@ import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.destination.AchievementNavKey
+import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.DeviceCenterNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
@@ -171,17 +172,29 @@ internal class MegaNavigatorImpl @Inject constructor(
         isOverQuota: Int?,
         flags: Int,
     ) {
-        val intent = getChatActivityIntent(
+        navigateForSingleActivity(
             context = context,
-            action = action,
-            link = link,
-            text = text,
-            chatId = chatId,
-            messageId = messageId,
-            isOverQuota = isOverQuota,
-            flags = flags
-        )
-        context.startActivity(intent)
+            singleActivityDestination = ChatNavKey(
+                chatId = chatId,
+                action = action,
+                link = link,
+                snackbarText = text,
+                messageId = messageId,
+                isOverQuota = isOverQuota,
+            )
+        ) {
+            val intent = getChatActivityIntent(
+                context = context,
+                action = action,
+                link = link,
+                text = text,
+                chatId = chatId,
+                messageId = messageId,
+                isOverQuota = isOverQuota,
+                flags = flags
+            )
+            context.startActivity(intent)
+        }
     }
 
     override fun openUpgradeAccount(context: Context, source: UpgradeAccountSource) {
@@ -209,9 +222,12 @@ internal class MegaNavigatorImpl @Inject constructor(
             putExtra(EXTRA_ACTION, action)
             text?.let { putExtra(Constants.SHOW_SNACKBAR, text) }
             putExtra(Constants.CHAT_ID, chatId)
-            messageId?.let { putExtra("ID_MSG", messageId) }
-            isOverQuota?.let { putExtra("IS_OVERQUOTA", isOverQuota) }
-            if (flags > 0) setFlags(flags)
+            messageId?.let { putExtra(Constants.ID_MSG, messageId) }
+            isOverQuota?.let { putExtra(Constants.IS_OVERQUOTA, isOverQuota) }
+            // Use setFlags for consistency with ChatHostDestination
+            if (flags > 0) {
+                setFlags(flags)
+            }
         }
         link?.let {
             intent.putExtra(EXTRA_LINK, it)

@@ -17,6 +17,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.JoinMeetingPressedEvent
 import mega.privacy.mobile.analytics.event.StartMeetingNowPressedEvent
+import timber.log.Timber
 
 /**
  * Host Activity for new chat room
@@ -29,6 +30,7 @@ class ChatActivity : AppCompatActivity(), MeetingBottomSheetDialogActionListener
         enableEdgeToEdge()
         if (savedInstanceState == null) {
             val isOpenChatList = intent.getBooleanExtra(OPEN_CHAT_LIST, false)
+            Timber.d("ChatHostActivity.onCreate: isOpenChatList=$isOpenChatList, intent.action=${intent.action}")
             supportFragmentManager.commit {
                 if (isOpenChatList) {
                     replace(
