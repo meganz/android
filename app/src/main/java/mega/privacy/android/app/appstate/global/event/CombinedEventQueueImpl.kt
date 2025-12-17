@@ -42,7 +42,7 @@ class CombinedEventQueueImpl(
         get() = queueChannel.events
 
 
-    override suspend fun emit(navKeys: List<NavKey>, priority: NavPriority) {
+    override suspend fun emit(navKeys: List<NavKey>, priority: NavPriority, isSingleTop: Boolean) {
         Timber.d("Emit navigation events: $navKeys")
 
         val pendingNavKeys = mutableListOf<NavKey>()
@@ -51,7 +51,10 @@ class CombinedEventQueueImpl(
                 if (pendingNavKeys.isNotEmpty()) {
                     queueChannel.add(
                         QueuedEvent(
-                            event = NavigationQueueEvent(keys = pendingNavKeys.toList()),
+                            event = NavigationQueueEvent(
+                                keys = pendingNavKeys.toList(),
+                                isSingleTop = isSingleTop
+                            ),
                             priority = priority,
                             timestamp = getTime()
                         )
@@ -74,7 +77,7 @@ class CombinedEventQueueImpl(
         if (pendingNavKeys.isNotEmpty()) {
             queueChannel.add(
                 QueuedEvent(
-                    event = NavigationQueueEvent(keys = pendingNavKeys),
+                    event = NavigationQueueEvent(keys = pendingNavKeys, isSingleTop = isSingleTop),
                     priority = priority,
                     timestamp = getTime()
                 )
@@ -82,8 +85,8 @@ class CombinedEventQueueImpl(
         }
     }
 
-    override suspend fun emit(navKey: NavKey, priority: NavPriority) =
-        emit(listOf(navKey), priority)
+    override suspend fun emit(navKey: NavKey, priority: NavPriority, isSingleTop: Boolean) =
+        emit(listOf(navKey), priority, isSingleTop)
 
     override suspend fun emit(
         event: AppDialogEvent,

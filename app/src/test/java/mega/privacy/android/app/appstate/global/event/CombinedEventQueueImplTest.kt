@@ -193,6 +193,66 @@ class CombinedEventQueueImplTest {
         }
     }
 
+    @Test
+    fun `test that isSingleTop is set to true for single key`() = runTest {
+        mockTimeProvider()
+        val key = TestKey1
+        underTest.emit(key, isSingleTop = true)
+
+        val actual = underTest.events.tryReceive().getOrNull()?.invoke() as? NavigationQueueEvent
+        assertThat(actual).isNotNull()
+        assertThat(actual?.keys).isEqualTo(listOf(key))
+        assertThat(actual?.isSingleTop).isTrue()
+    }
+
+    @Test
+    fun `test that isSingleTop is set to false for single key by default`() = runTest {
+        mockTimeProvider()
+        val key = TestKey1
+        underTest.emit(key)
+
+        val actual = underTest.events.tryReceive().getOrNull()?.invoke() as? NavigationQueueEvent
+        assertThat(actual).isNotNull()
+        assertThat(actual?.keys).isEqualTo(listOf(key))
+        assertThat(actual?.isSingleTop).isFalse()
+    }
+
+    @Test
+    fun `test that isSingleTop is set to true for list of keys`() = runTest {
+        mockTimeProvider()
+        val keys = listOf(TestKey1, TestKey2(0))
+        underTest.emit(keys, isSingleTop = true)
+
+        val actual = underTest.events.tryReceive().getOrNull()?.invoke() as? NavigationQueueEvent
+        assertThat(actual).isNotNull()
+        assertThat(actual?.keys).isEqualTo(keys)
+        assertThat(actual?.isSingleTop).isTrue()
+    }
+
+    @Test
+    fun `test that isSingleTop is set to false for list of keys by default`() = runTest {
+        mockTimeProvider()
+        val keys = listOf(TestKey1, TestKey2(0))
+        underTest.emit(keys)
+
+        val actual = underTest.events.tryReceive().getOrNull()?.invoke() as? NavigationQueueEvent
+        assertThat(actual).isNotNull()
+        assertThat(actual?.keys).isEqualTo(keys)
+        assertThat(actual?.isSingleTop).isFalse()
+    }
+
+    @Test
+    fun `test that isSingleTop is set to false explicitly`() = runTest {
+        mockTimeProvider()
+        val key = TestKey1
+        underTest.emit(key, isSingleTop = false)
+
+        val actual = underTest.events.tryReceive().getOrNull()?.invoke() as? NavigationQueueEvent
+        assertThat(actual).isNotNull()
+        assertThat(actual?.keys).isEqualTo(listOf(key))
+        assertThat(actual?.isSingleTop).isFalse()
+    }
+
     private fun mockTimeProvider(firstTime: Long = 0L, vararg times: Long = longArrayOf(0L)) {
         whenever(timeProvider()).thenReturn(firstTime, *times.toTypedArray())
     }

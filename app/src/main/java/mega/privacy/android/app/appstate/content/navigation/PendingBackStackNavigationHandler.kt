@@ -284,6 +284,8 @@ class PendingBackStackNavigationHandler(
         }
     }
 
+    fun peekBackStack(): List<NavKey> = backstack.toList()
+
     private fun logBackStack(callingFunction: String) {
         val line = "\n*******************\n"
         Timber.d(

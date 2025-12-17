@@ -374,7 +374,12 @@ class MegaActivity : ComponentActivity() {
                                 ) {
                                     when (it) {
                                         is NavigationQueueEvent -> {
-                                            navigationHandler.navigate(it.keys)
+                                            if (!it.isSingleTop
+                                                || navigationHandler.peekBackStack()
+                                                    .takeLast(it.keys.size) != it.keys
+                                            ) {
+                                                navigationHandler.navigate(it.keys)
+                                            }
                                         }
 
                                         is AppDialogEvent -> {
