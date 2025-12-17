@@ -27,7 +27,6 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.FolderTreeInfo
-import mega.privacy.android.domain.entity.NodeLocation
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
@@ -1347,14 +1346,6 @@ internal class FileInfoViewModelTest {
         Arguments.of(NodeChanges.Name),
         Arguments.of(NodeChanges.Tags),
         Arguments.of(NodeChanges.Timestamp),
-    )
-
-    private fun provideNodeLocations() = Stream.of(
-        Arguments.of(NodeLocation.CloudDriveRoot),
-        Arguments.of(NodeLocation.CloudDrive),
-        Arguments.of(NodeLocation.RubbishBin),
-        Arguments.of(NodeLocation.IncomingSharesRoot),
-        Arguments.of(NodeLocation.IncomingShares),
     )
 
     private suspend fun mockFolder() = mock<TypedFolderNode> {
