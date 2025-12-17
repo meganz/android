@@ -24,6 +24,7 @@ sealed interface VideosTabUiState {
      * @property durationSelectedFilterOption the selected duration filter option
      * @property selectedSortConfiguration the selected sort configuration
      * @property selectedTypedNodes the selected typed node list
+     * @property showHiddenItems whether to show hidden items
      */
     data class Data(
         val allVideoEntities: List<VideoUiEntity> = emptyList(),
@@ -33,7 +34,8 @@ sealed interface VideosTabUiState {
         val locationSelectedFilterOption: LocationFilterOption = LocationFilterOption.AllLocations,
         val durationSelectedFilterOption: DurationFilterOption = DurationFilterOption.AllDurations,
         val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
-        val selectedTypedNodes: List<TypedNode> = emptyList()
+        val selectedTypedNodes: List<TypedNode> = emptyList(),
+        val showHiddenItems: Boolean = false
     ) : VideosTabUiState {
         /**
          * The highlight text for search by tags or description

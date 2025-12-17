@@ -23,8 +23,10 @@ import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import mega.privacy.android.domain.usecase.videosection.GetSyncUploadsFolderIdsUseCase
 import mega.privacy.android.feature.photos.mapper.VideoUiEntityMapper
@@ -37,6 +39,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
@@ -63,6 +66,8 @@ class VideosTabViewModelTest {
     private val setCloudSortOrderUseCase = mock<SetCloudSortOrder>()
     private val nodeSortConfigurationUiMapper = mock<NodeSortConfigurationUiMapper>()
     private val monitorSortCloudOrderUseCase = mock<MonitorSortCloudOrderUseCase>()
+    private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
+    private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
 
     private val expectedId = NodeId(1L)
     private val expectedVideo = mock<VideoUiEntity> {
@@ -107,6 +112,18 @@ class VideosTabViewModelTest {
             whenever(nodeSortConfigurationUiMapper(any(), any())).thenReturn(
                 NodeSortConfiguration.default
             )
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(
+                flow {
+                    emit(true)
+                    awaitCancellation()
+                }
+            )
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(
+                flow {
+                    emit(false)
+                    awaitCancellation()
+                }
+            )
         }
         initUnderTest()
     }
@@ -122,6 +139,8 @@ class VideosTabViewModelTest {
             setCloudSortOrderUseCase = setCloudSortOrderUseCase,
             nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
             monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
         )
     }
 
@@ -136,7 +155,9 @@ class VideosTabViewModelTest {
             getSyncUploadsFolderIdsUseCase,
             setCloudSortOrderUseCase,
             nodeSortConfigurationUiMapper,
-            monitorSortCloudOrderUseCase
+            monitorSortCloudOrderUseCase,
+            monitorShowHiddenItemsUseCase,
+            monitorHiddenNodesEnabledUseCase,
         )
     }
 
@@ -492,12 +513,82 @@ class VideosTabViewModelTest {
             assertThat(actual.selectedTypedNodes).isEmpty()
         }
 
+    @ParameterizedTest(name = "when the showHiddenItems is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that uiState is updated correctly`(
+        showHiddenItems: Boolean,
+    ) = runTest {
+        val video1 = createVideoUiEntity(handle = 1L, isSensitiveInherited = true)
+        val video2 = createVideoUiEntity(handle = 2L, isMarkedSensitive = true)
+        val video3 = createVideoUiEntity(handle = 3L)
+        val video4 = createVideoUiEntity(handle = 4L)
+
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(
+            flow {
+                emit(showHiddenItems)
+                awaitCancellation()
+            }
+        )
+        initUnderTest()
+        initVideosForFilter(videos = listOf(video1, video2, video3, video4))
+
+        val actual = underTest.uiState
+            .filterIsInstance<VideosTabUiState.Data>()
+            .first { it.allVideoEntities.isNotEmpty() }
+
+        assertThat(actual.allVideoEntities).isNotEmpty()
+        assertThat(actual.showHiddenItems).isEqualTo(showHiddenItems)
+        assertThat(actual.allVideoEntities).hasSize(
+            if (showHiddenItems) {
+                4
+            } else {
+                2
+            }
+        )
+        if (showHiddenItems) {
+            assertThat(actual.allVideoEntities.map { it.id }).containsExactly(
+                video1.id,
+                video2.id,
+                video3.id,
+                video4.id
+            )
+        } else {
+            assertThat(actual.allVideoEntities.map { it.id }).containsExactly(
+                video3.id,
+                video4.id
+            )
+        }
+    }
+
+    @ParameterizedTest(name = " and monitorHiddenNodesEnabledUseCase {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that case that showHiddenItems is updated correctly`(
+        hiddenNodeEnabled: Boolean
+    ) = runTest {
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(
+            flow {
+                emit(hiddenNodeEnabled)
+                awaitCancellation()
+            }
+        )
+        initUnderTest()
+
+        val actual = underTest.uiState
+            .filterIsInstance<VideosTabUiState.Data>()
+            .first { it.allVideoEntities.isNotEmpty() }
+
+        assertThat(actual.allVideoEntities).isNotEmpty()
+        assertThat(actual.showHiddenItems).isEqualTo(!hiddenNodeEnabled)
+    }
+
     private fun createVideoUiEntity(
         handle: Long,
         parentHandle: Long = 50L,
         name: String = "video name $handle",
         duration: Duration = 1.minutes,
         isSharedItems: Boolean = false,
+        isMarkedSensitive: Boolean = false,
+        isSensitiveInherited: Boolean = false,
     ) = VideoUiEntity(
         id = NodeId(handle),
         name = name,
@@ -507,16 +598,20 @@ class VideosTabViewModelTest {
         isSharedItems = isSharedItems,
         size = 100L,
         fileTypeInfo = VideoFileTypeInfo("video", "mp4", duration),
+        isMarkedSensitive = isMarkedSensitive,
+        isSensitiveInherited = isSensitiveInherited
     )
 
     private fun createTypedVideoNode(
-        videoUiEntity: VideoUiEntity
+        videoUiEntity: VideoUiEntity,
     ) = mock<TypedVideoNode> {
         on { id }.thenReturn(videoUiEntity.id)
         on { name }.thenReturn(videoUiEntity.name)
         on { parentId }.thenReturn(videoUiEntity.parentId)
         on { duration }.thenReturn(videoUiEntity.duration)
         on { isOutShared }.thenReturn(videoUiEntity.isSharedItems)
+        on { isMarkedSensitive }.thenReturn(videoUiEntity.isMarkedSensitive)
+        on { isSensitiveInherited }.thenReturn(videoUiEntity.isSensitiveInherited)
     }
 
     private suspend fun initVideosForFilter(

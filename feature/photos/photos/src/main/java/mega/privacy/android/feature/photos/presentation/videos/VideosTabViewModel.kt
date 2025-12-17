@@ -6,14 +6,17 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
@@ -24,8 +27,10 @@ import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import mega.privacy.android.domain.usecase.videosection.GetSyncUploadsFolderIdsUseCase
 import mega.privacy.android.feature.photos.mapper.VideoUiEntityMapper
@@ -47,12 +52,19 @@ class VideosTabViewModel @Inject constructor(
     private val setCloudSortOrderUseCase: SetCloudSortOrder,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
+    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
 ) : ViewModel() {
     private val triggerFlow = MutableStateFlow(false)
     private val queryFlow = MutableStateFlow<String?>(null)
     private val locationFilterOptionFlow = MutableStateFlow(LocationFilterOption.AllLocations)
     private val durationFilterOptionFlow = MutableStateFlow(DurationFilterOption.AllDurations)
     private val selectedVideoIdsFlow = MutableStateFlow<List<Long>>(emptyList())
+    private val showHiddenItemsFlow = observeShowHiddenItemsState().stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
+        false
+    )
 
     internal val uiState: StateFlow<VideosTabUiState> by lazy {
         triggerFlow.flatMapLatest {
@@ -68,10 +80,12 @@ class VideosTabViewModel @Inject constructor(
                         monitorOfflineNodeUpdatesUseCase(),
                         monitorSortCloudOrderUseCase(),
                         selectedVideoIdsFlow,
+                        showHiddenItemsFlow,
                     ).mapLatest {
                         val videoNodes = getVideoNodeList()
                             .filterVideosByDuration()
                             .filterVideosByLocation()
+                            .filterNonSensitiveItems(showHiddenItemsFlow.value)
                         val uiEntities = videoNodes.map {
                             videoUiEntityMapper(it).copy(
                                 isSelected = it.id.longValue in selectedVideoIdsFlow.value
@@ -92,6 +106,7 @@ class VideosTabViewModel @Inject constructor(
                             locationSelectedFilterOption = locationFilterOptionFlow.value,
                             durationSelectedFilterOption = durationFilterOptionFlow.value,
                             selectedTypedNodes = selectedNodes,
+                            showHiddenItems = showHiddenItemsFlow.value
                         )
                     }.catch {
                         Timber.e(it)
@@ -141,6 +156,13 @@ class VideosTabViewModel @Inject constructor(
             }
         }
 
+    private fun List<TypedVideoNode>.filterNonSensitiveItems(showHiddenItems: Boolean) =
+        if (showHiddenItems) {
+            this
+        } else {
+            filterNot { it.isMarkedSensitive || it.isSensitiveInherited }
+        }
+
     internal fun setLocationSelectedFilterOption(locationFilterOption: LocationFilterOption) {
         locationFilterOptionFlow.update { locationFilterOption }
         triggerRefresh()
@@ -170,6 +192,16 @@ class VideosTabViewModel @Inject constructor(
             }
         }
     }
+
+    private fun observeShowHiddenItemsState() =
+        combine(
+            monitorHiddenNodesEnabledUseCase()
+                .catch { Timber.e(it) },
+            monitorShowHiddenItemsUseCase()
+                .catch { Timber.e(it) },
+        ) { isHiddenNodesEnabled, showHiddenItems ->
+            showHiddenItems || !isHiddenNodesEnabled
+        }
 
     internal fun onItemClicked(item: VideoUiEntity) {
         if (selectedVideoIdsFlow.value.isNotEmpty()) {

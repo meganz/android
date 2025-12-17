@@ -225,7 +225,8 @@ internal fun VideosTabScreen(
                                 onClick = { onClick(videoItem) },
                                 onMenuClick = { visibleNodeOptionId = videoItem.id },
                                 onLongClick = { onLongClick(videoItem) },
-                                isSensitive = false,
+                                isSensitive = uiState.showHiddenItems &&
+                                        (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited),
                             )
                         }
                     }
