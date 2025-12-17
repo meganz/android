@@ -295,3 +295,8 @@ data class LegacySettingsCameraUploadsActivityNavKey(
 data class GetLinkNavKey(
     val handles: List<Long> = emptyList(),
 ) : NavKey
+
+@Serializable
+data class InviteContactNavKey(
+    val isFromAchievement: Boolean = false,
+) : NavKey

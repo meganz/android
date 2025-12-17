@@ -93,6 +93,7 @@ import mega.privacy.android.navigation.destination.DeviceCenterNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import mega.privacy.android.navigation.destination.GetLinkNavKey
 import mega.privacy.android.navigation.destination.ManageChatHistoryNavKey
+import mega.privacy.android.navigation.destination.InviteContactNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
 import mega.privacy.android.navigation.destination.SearchNodeNavKey
@@ -277,7 +278,10 @@ internal class MegaNavigatorImpl @Inject constructor(
     }
 
     override fun openInviteContactActivity(context: Context, isFromAchievement: Boolean) {
-        applicationScope.launch {
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = InviteContactNavKey(isFromAchievement = isFromAchievement)
+        ) {
             val intent = Intent(context, InviteContactActivity::class.java).apply {
                 putExtra(InviteContactViewModel.KEY_FROM, isFromAchievement)
             }
