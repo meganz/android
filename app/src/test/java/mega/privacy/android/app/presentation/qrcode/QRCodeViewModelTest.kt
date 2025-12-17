@@ -7,6 +7,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
@@ -16,19 +17,21 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
 import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
-import mega.privacy.android.core.nodecomponents.scanner.BarcodeScanResult
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.core.nodecomponents.scanner.BarcodeScanResult
+import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.data.mapper.transfer.TransfersActionGroupFinishNotificationBuilder
 import mega.privacy.android.data.worker.AreNotificationsEnabledUseCase
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
 import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.CopyToClipBoard
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
@@ -36,15 +39,15 @@ import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.qr.GetQRCodeFileUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
-import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.file.DoesUriPathHaveSufficientSpaceUseCase
+import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
+import mega.privacy.android.domain.usecase.file.SaveFileToDestinationUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.DeleteQRCodeUseCase
 import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.ResetContactLinkUseCase
-import mega.privacy.android.domain.usecase.qrcode.ScanMediaFileUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -82,13 +85,13 @@ class QRCodeViewModelTest {
     private val avatarContentMapper = mock<AvatarContentMapper>()
     private val myQRCodeTextErrorMapper = mock<MyQRCodeTextErrorMapper>()
     private val scannerHandler = mock<ScannerHandler>()
-    private val getCurrentUserEmail = mock<GetCurrentUserEmail>()
     private val doesUriPathHaveSufficientSpaceUseCase =
         mock<DoesUriPathHaveSufficientSpaceUseCase>()
-    private val scanMediaFileUseCase = mock<ScanMediaFileUseCase>()
     private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
     private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase>()
     private val checkFileNameCollisionsUseCase = mock<CheckFileNameCollisionsUseCase>()
+    private val saveFileToDestinationUseCase = mock<SaveFileToDestinationUseCase>()
+    private val getPathByDocumentContentUriUseCase = mock<GetPathByDocumentContentUriUseCase>()
     private val context = mock<Context>()
     private val areNotificationsEnabledUseCase: AreNotificationsEnabledUseCase = mock()
     private val notificationManager: NotificationManagerCompat = mock()
@@ -115,12 +118,12 @@ class QRCodeViewModelTest {
             avatarContentMapper = avatarContentMapper,
             myQRCodeTextErrorMapper = myQRCodeTextErrorMapper,
             scannerHandler = scannerHandler,
-            getCurrentUserEmail = getCurrentUserEmail,
             doesUriPathHaveSufficientSpaceUseCase = doesUriPathHaveSufficientSpaceUseCase,
-            scanMediaFileUseCase = scanMediaFileUseCase,
             getRootNodeUseCase = getRootNodeUseCase,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             checkFileNameCollisionsUseCase = checkFileNameCollisionsUseCase,
+            saveFileToDestinationUseCase = saveFileToDestinationUseCase,
+            getPathByDocumentContentUriUseCase = getPathByDocumentContentUriUseCase,
             areNotificationsEnabledUseCase = areNotificationsEnabledUseCase,
             notificationManager = notificationManager,
             transfersActionGroupFinishNotificationBuilder = transfersActionGroupFinishNotificationBuilder,
@@ -371,8 +374,11 @@ class QRCodeViewModelTest {
 
     @Test
     fun `test that state is updated correctly if a file upload needs to start`() = runTest {
-        val file = mock<File>()
-        val message = "message"
+        val file = mock<File> {
+            on { absolutePath }.thenReturn("/test/path/qr_code.png")
+            on { name }.thenReturn("qr_code.png")
+        }
+        val message = "Uploading qr_code.png"
         val parentHandle = 123L
         val expected = triggered(
             TransferTriggerEvent.StartUpload.Files(
@@ -387,6 +393,109 @@ class QRCodeViewModelTest {
             awaitItem()
             underTest.uploadFile(file, parentHandle)
             assertThat(awaitItem()).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    fun `test that saveToFileSystem shows error when QR file is null`() = runTest {
+        whenever(getQRCodeFileUseCase()).thenReturn(null)
+        val expected = R.string.error_download_qr
+
+        underTest.uiState.map { it.resultMessage }.test {
+            awaitItem()
+            underTest.saveToFileSystem(UriPath("/test/destination"))
+            val result = awaitItem()
+            assertThat(((result as? StateEventWithContentTriggered)?.content)?.first)
+                .isEqualTo(expected)
+        }
+    }
+
+    @Test
+    fun `test that saveToFileSystem shows error when QR file throws exception`() = runTest {
+        whenever(getQRCodeFileUseCase()).thenThrow(RuntimeException("failed"))
+        val expected = R.string.error_download_qr
+
+        underTest.uiState.map { it.resultMessage }.test {
+            awaitItem()
+            underTest.saveToFileSystem(UriPath("/test/destination"))
+            val result = awaitItem()
+            assertThat(((result as? StateEventWithContentTriggered)?.content)?.first)
+                .isEqualTo(expected)
+        }
+    }
+
+    @Test
+    fun `test that saveToFileSystem shows error when insufficient space`() = runTest {
+        val size = 1000L
+        val qrFile = mock<File> {
+            on { length() }.thenReturn(size)
+        }
+        val destinationUri = UriPath("/test/destination")
+        whenever(getQRCodeFileUseCase()).thenReturn(qrFile)
+        whenever(doesUriPathHaveSufficientSpaceUseCase(destinationUri, size)).thenReturn(false)
+        val expected = R.string.error_not_enough_free_space
+
+        underTest.uiState.map { it.resultMessage }.test {
+            awaitItem()
+            underTest.saveToFileSystem(destinationUri)
+            val result = awaitItem()
+            assertThat(((result as? StateEventWithContentTriggered)?.content)?.first)
+                .isEqualTo(expected)
+        }
+    }
+
+
+    @Test
+    fun `test that saveToFileSystem saves file successfully`() = runTest {
+        val size = 1000L
+        val qrFile = mock<File> {
+            on { length() }.thenReturn(size)
+            on { name }.thenReturn("qr_code.png")
+        }
+        val destinationUri =
+            UriPath("content://com.android.externalstorage.documents/tree/primary%3ADownload")
+        val displayPath = "/storage/emulated/0/Download"
+        whenever(getQRCodeFileUseCase()).thenReturn(qrFile)
+        whenever(doesUriPathHaveSufficientSpaceUseCase(destinationUri, size)).thenReturn(true)
+        whenever(getPathByDocumentContentUriUseCase(destinationUri.value)).thenReturn(
+            displayPath
+        )
+        whenever(areNotificationsEnabledUseCase()).thenReturn(true)
+
+        underTest.uiState.map { it.resultMessage }.test {
+            awaitItem()
+            underTest.saveToFileSystem(destinationUri)
+            val result = awaitItem()
+            assertThat(((result as? StateEventWithContentTriggered)?.content)?.first).isEqualTo(
+                R.string.success_download_qr
+            )
+            assertThat(((result as? StateEventWithContentTriggered)?.content)?.second?.singleOrNull())
+                .isEqualTo(displayPath)
+        }
+    }
+
+    @Test
+    fun `test that saveToFileSystem handles IOException correctly`() = runTest {
+        val qrFile = mock<File> {
+            on { length() }.thenReturn(1000L)
+        }
+        val destinationUri = UriPath("/test/destination")
+        whenever(getQRCodeFileUseCase()).thenReturn(qrFile)
+        whenever(doesUriPathHaveSufficientSpaceUseCase(destinationUri, 1000L)).thenReturn(true)
+        whenever(getPathByDocumentContentUriUseCase(destinationUri.value)).thenReturn("/test/path")
+        whenever(saveFileToDestinationUseCase(any(), any())).thenAnswer {
+            throw java.io.IOException(
+                "IO Error"
+            )
+        }
+        val expected = R.string.general_error
+
+        underTest.uiState.map { it.resultMessage }.test {
+            awaitItem()
+            underTest.saveToFileSystem(destinationUri)
+            val result = awaitItem()
+            assertThat(((result as? StateEventWithContentTriggered)?.content)?.first)
+                .isEqualTo(expected)
         }
     }
 }

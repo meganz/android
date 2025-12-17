@@ -11,12 +11,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.extensions.getState
@@ -25,7 +23,6 @@ import mega.privacy.android.app.presentation.qrcode.model.QRCodeUIState
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.ConstantsUrl.megaUrl
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.nodecomponents.scanner.BarcodeScanResult
 import mega.privacy.android.core.nodecomponents.scanner.BarcodeScannerModuleIsNotInstalled
 import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
@@ -46,22 +43,20 @@ import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.qr.GetQRCodeFileUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
-import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.Companion.MEGA_APP_DOMAIN_NAME
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.Companion.MEGA_NZ_DOMAIN_NAME
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.file.DoesUriPathHaveSufficientSpaceUseCase
+import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
+import mega.privacy.android.domain.usecase.file.SaveFileToDestinationUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.DeleteQRCodeUseCase
 import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.ResetContactLinkUseCase
-import mega.privacy.android.domain.usecase.qrcode.ScanMediaFileUseCase
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.IOException
 import javax.inject.Inject
 
@@ -83,9 +78,7 @@ class QRCodeViewModel @Inject constructor(
     private val avatarContentMapper: AvatarContentMapper,
     private val myQRCodeTextErrorMapper: MyQRCodeTextErrorMapper,
     private val scannerHandler: ScannerHandler,
-    private val getCurrentUserEmail: GetCurrentUserEmail,
     private val doesUriPathHaveSufficientSpaceUseCase: DoesUriPathHaveSufficientSpaceUseCase,
-    private val scanMediaFileUseCase: ScanMediaFileUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val checkFileNameCollisionsUseCase: CheckFileNameCollisionsUseCase,
@@ -93,6 +86,8 @@ class QRCodeViewModel @Inject constructor(
     private val areNotificationsEnabledUseCase: AreNotificationsEnabledUseCase,
     private val notificationManager: NotificationManagerCompat,
     private val transfersActionGroupFinishNotificationBuilder: TransfersActionGroupFinishNotificationBuilder,
+    private val saveFileToDestinationUseCase: SaveFileToDestinationUseCase,
+    private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(QRCodeUIState())
@@ -366,45 +361,38 @@ class QRCodeViewModel @Inject constructor(
     /**
      * Save file to selected path on the device
      */
-    fun saveToFileSystem(parentPath: String) {
+    fun saveToFileSystem(parentPath: UriPath) {
         viewModelScope.launch {
-            val myEmail = getCurrentUserEmail()
-            val qrFile = getQRCodeFileUseCase()
+            val qrFile = runCatching { getQRCodeFileUseCase() }
+                .onFailure { Timber.e(it) }
+                .getOrNull()
 
             if (qrFile == null) {
                 setResultMessage(R.string.error_download_qr)
                 return@launch
             }
 
-            if (!doesUriPathHaveSufficientSpaceUseCase(UriPath(parentPath), qrFile.length())) {
+            if (
+                runCatching { doesUriPathHaveSufficientSpaceUseCase(parentPath, qrFile.length()) }
+                    .onFailure { Timber.e(it) }
+                    .getOrDefault(true)
+                    .not()
+            ) {
                 setResultMessage(R.string.error_not_enough_free_space)
                 return@launch
             }
 
-            val fileName = "$myEmail$QR_IMAGE_FILE_NAME"
-            val newQrFile = File(parentPath, fileName)
-
-            // For Android 11+ device, force to refresh MediaStore. Otherwise it is possible
-            // that target file cannot be written.
-            if (Util.isAndroid11OrUpper()) {
-                scanMediaFileUseCase(arrayOf(newQrFile.absolutePath), arrayOf(MIME_TYPE_IMAGE))
-            }
-
             try {
-                withContext(Dispatchers.IO) {
-                    newQrFile.createNewFile()
-                    val src = FileInputStream(qrFile).channel
-                    val dst = FileOutputStream(newQrFile, false).channel
-                    dst.transferFrom(src, 0, src.size())
-                    src.close()
-                    dst.close()
-                    setResultMessage(R.string.success_download_qr, arrayOf(parentPath))
-                    showQrCodeSavedSuccessfullyNotification(
-                        destination = parentPath,
-                        fileName = fileName,
-                        bytes = newQrFile.length()
-                    )
-                }
+                val displayPath = runCatching {
+                    getPathByDocumentContentUriUseCase(parentPath.value)
+                }.getOrNull() ?: parentPath.value
+                saveFileToDestinationUseCase(qrFile, parentPath)
+                setResultMessage(R.string.success_download_qr, arrayOf(displayPath))
+                showQrCodeSavedSuccessfullyNotification(
+                    destination = displayPath,
+                    fileName = qrFile.name,
+                    bytes = qrFile.length()
+                )
             } catch (e: IOException) {
                 Timber.e(e)
                 setResultMessage(R.string.general_error)
@@ -539,8 +527,6 @@ class QRCodeViewModel @Inject constructor(
     }
 
     companion object {
-        private const val QR_IMAGE_FILE_NAME = "QR_code_image.jpg"
-        private const val MIME_TYPE_IMAGE = "image/jpeg"
         private const val QR_CODE_SAVED_SUCCESSFULLY_NOTIFICATION_ID = 6
     }
 }
