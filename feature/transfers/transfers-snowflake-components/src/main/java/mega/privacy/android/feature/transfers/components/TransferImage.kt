@@ -84,7 +84,7 @@ private fun TransferFileType(
 internal fun LeadingIndicator(
     isDownload: Boolean,
     modifier: Modifier = Modifier,
-    isOverQuota: Boolean = false,
+    hasIssues: Boolean = false,
     isError: Boolean = false,
 ) = Icon(
     modifier = modifier
@@ -96,7 +96,7 @@ internal fun LeadingIndicator(
     painter = rememberVectorPainter(if (isDownload) IconPack.Small.Thin.Outline.ArrowDown else IconPack.Small.Thin.Outline.ArrowUp),
     contentDescription = null,
     tint = when {
-        isOverQuota -> DSTokens.colors.indicator.yellow
+        hasIssues -> DSTokens.colors.indicator.yellow
         isError -> DSTokens.colors.support.error
         else -> DSTokens.colors.icon.primary
     },
@@ -134,7 +134,7 @@ private fun LeadingIndicatorOverquotaPreview(
     AndroidThemeForPreviews {
         LeadingIndicator(
             isDownload = isDownload,
-            isOverQuota = true,
+            hasIssues = true,
         )
     }
 }
