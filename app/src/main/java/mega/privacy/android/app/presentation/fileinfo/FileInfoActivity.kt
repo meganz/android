@@ -76,9 +76,11 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
+import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.RubbishBinNavKey
 import mega.privacy.android.navigation.destination.SharesNavKey
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -413,7 +415,7 @@ class FileInfoActivity : BaseActivity() {
         nodeLocation?.let {
             val destination: NavKey? = getDestination(nodeLocation, nodeId, parentId)
             lifecycleScope.launch {
-                destination?.let { navigationQueue.emit(destination) }
+                destination?.let { navigationQueue.emit(destination, NavPriority.Default, true) }
                 finish()
             }
         } ?: locationInfo?.let {
@@ -428,7 +430,7 @@ class FileInfoActivity : BaseActivity() {
     ): NavKey? = when (nodeLocation) {
         NodeLocation.CloudDriveRoot -> {
             nodeId?.let {
-                DriveSyncNavKey(highlightedNodeHandle = nodeId.longValue)
+                HomeScreensNavKey(DriveSyncNavKey(highlightedNodeHandle = nodeId.longValue))
             }
         }
 
@@ -439,6 +441,10 @@ class FileInfoActivity : BaseActivity() {
                     highlightedNodeHandle = nodeId?.longValue ?: -1L
                 )
             }
+        }
+
+        NodeLocation.RubbishBinRoot -> {
+            RubbishBinNavKey()
         }
 
         NodeLocation.RubbishBin -> {

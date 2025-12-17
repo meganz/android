@@ -139,32 +139,62 @@ class NodeLocationMapperTest {
         }
 
     @Test
-    fun `test that returns RubbishBin when root parent is rubbish bin node`() = runTest {
-        val rubbishBinNode = mock<MegaNode> {
-            on { handle } doReturn rubbishBinNodeHandle
-        }
-        val node = mock<MegaNode> {
-            on { isInShare } doReturn false
-            on { handle } doReturn nodeHandle
-            on { parentHandle } doReturn nodeParentHandle
-        }
-        val rootParent = mock<MegaNode> {
-            on { isInShare } doReturn false
-            on { handle } doReturn rubbishBinNodeHandle
+    fun `test that returns RubbishBinRoot when root parent is rubbish bin node and node parent is root parent`() =
+        runTest {
+            val rubbishBinNode = mock<MegaNode> {
+                on { handle } doReturn rubbishBinNodeHandle
+            }
+            val node = mock<MegaNode> {
+                on { isInShare } doReturn false
+                on { handle } doReturn nodeHandle
+                on { parentHandle } doReturn rubbishBinNodeHandle
+            }
+            val rootParent = mock<MegaNode> {
+                on { isInShare } doReturn false
+                on { handle } doReturn rubbishBinNodeHandle
+            }
+
+            whenever(getRootNode()).thenReturn(null)
+            whenever(getRubbishBinNode()).thenReturn(rubbishBinNode)
+
+            val result = underTest(
+                node = node,
+                rootParent = rootParent,
+                getRootNode = getRootNode,
+                getRubbishBinNode = getRubbishBinNode,
+            )
+
+            assertThat(result).isEqualTo(NodeLocation.RubbishBinRoot)
         }
 
-        whenever(getRootNode()).thenReturn(null)
-        whenever(getRubbishBinNode()).thenReturn(rubbishBinNode)
+    @Test
+    fun `test that returns RubbishBin when root parent is rubbish bin node but node parent is not root parent`() =
+        runTest {
+            val rubbishBinNode = mock<MegaNode> {
+                on { handle } doReturn rubbishBinNodeHandle
+            }
+            val node = mock<MegaNode> {
+                on { isInShare } doReturn false
+                on { handle } doReturn nodeHandle
+                on { parentHandle } doReturn nodeParentHandle
+            }
+            val rootParent = mock<MegaNode> {
+                on { isInShare } doReturn false
+                on { handle } doReturn rubbishBinNodeHandle
+            }
 
-        val result = underTest(
-            node = node,
-            rootParent = rootParent,
-            getRootNode = getRootNode,
-            getRubbishBinNode = getRubbishBinNode,
-        )
+            whenever(getRootNode()).thenReturn(null)
+            whenever(getRubbishBinNode()).thenReturn(rubbishBinNode)
 
-        assertThat(result).isEqualTo(NodeLocation.RubbishBin)
-    }
+            val result = underTest(
+                node = node,
+                rootParent = rootParent,
+                getRootNode = getRootNode,
+                getRubbishBinNode = getRubbishBinNode,
+            )
+
+            assertThat(result).isEqualTo(NodeLocation.RubbishBin)
+        }
 
     @Test
     fun `test that returns CloudDrive as default when no other conditions match`() = runTest {

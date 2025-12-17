@@ -42,7 +42,12 @@ class NodeLocationMapper @Inject constructor() {
         }
 
         rootParent.handle == getRubbishBinNode()?.handle -> {
-            NodeLocation.RubbishBin
+            val isNodeInRubbishBinRoot = node.parentHandle == rootParent.handle
+            if (isNodeInRubbishBinRoot) {
+                NodeLocation.RubbishBinRoot
+            } else {
+                NodeLocation.RubbishBin
+            }
         }
 
         else -> {
