@@ -135,6 +135,12 @@ data class OfflineInfoNavKey(val handle: String) : NavKey
 data class FileInfoNavKey(val handle: Long) : NavKey
 
 @Serializable
+data class AuthenticityCredentialsNavKey(
+    val email: String,
+    val isIncomingShares: Boolean,
+) : NavKey
+
+@Serializable
 @Parcelize
 data object SyncListNavKey : NavKey, Parcelable
 

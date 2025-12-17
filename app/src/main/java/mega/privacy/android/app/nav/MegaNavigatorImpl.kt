@@ -87,6 +87,7 @@ import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.destination.AchievementNavKey
+import mega.privacy.android.navigation.destination.AuthenticityCredentialsNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.DeviceCenterNavKey
@@ -760,13 +761,21 @@ internal class MegaNavigatorImpl @Inject constructor(
         email: String,
         isIncomingShares: Boolean,
     ) {
-        context.startActivity(
-            AuthenticityCredentialsActivity.getIntent(
-                context = context,
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = AuthenticityCredentialsNavKey(
                 email = email,
                 isIncomingShares = isIncomingShares
             )
-        )
+        ) {
+            context.startActivity(
+                AuthenticityCredentialsActivity.getIntent(
+                    context = context,
+                    email = email,
+                    isIncomingShares = isIncomingShares
+                )
+            )
+        }
     }
 
     override fun launchUrl(context: Context?, url: String?) {
