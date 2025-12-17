@@ -122,9 +122,9 @@ private fun BasicPhotosNode(
 ) {
     Box(
         modifier = modifier
+            .aspectRatio(1f)
             .conditional(isSelected) {
                 Modifier
-                    .aspectRatio(1f)
                     .border(
                         width = 2.dp,
                         color = DSTokens.colors.border.strongSelected,

@@ -147,7 +147,7 @@ fun NodeGridViewItem(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .alpha(1f.takeIf { !isSensitive } ?: 0.5f)
+            .alpha(if (isSensitive) 0.5f else 1f)
             .clip(DSTokens.shapes.extraSmall)
             .background(
                 when {

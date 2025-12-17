@@ -2,6 +2,8 @@ package mega.privacy.android.core.nodecomponents.list
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,6 +30,7 @@ import mega.android.core.ui.R
 import mega.android.core.ui.modifiers.conditional
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.tokens.theme.DSTokens
 
 
 /**
@@ -52,63 +55,80 @@ fun NodeThumbnailView(
     layoutType: ThumbnailLayoutType = ThumbnailLayoutType.Grid,
 ) {
     if (data == null) {
-        // Show default image when no data is provided
-        Image(
-            painter = painterResource(id = defaultImage),
-            contentDescription = contentDescription,
-            modifier = modifier
-                .size(layoutType.placeholderSize)
-                .testTag(NODE_THUMBNAIL_PLACEHOLDER_TAG),
-            contentScale = ContentScale.Fit,
-        )
-        return
-    }
+        if (layoutType == ThumbnailLayoutType.MediaGrid) {
+            // For media grid, show solid color placeholder while loading
+            Box(
+                modifier = Modifier
+                    .background(DSTokens.colors.background.surface2)
+                    .fillMaxSize()
+                    .testTag(NODE_THUMBNAIL_SHIMMER_TAG)
+            )
+        } else {
+            // Show default image when no data is provided for list and node grid type
+            Image(
+                painter = painterResource(id = defaultImage),
+                contentDescription = contentDescription,
+                modifier = modifier
+                    .size(layoutType.placeholderSize)
+                    .testTag(NODE_THUMBNAIL_PLACEHOLDER_TAG),
+                contentScale = ContentScale.Fit,
+            )
+        }
+    } else {
+        val context = LocalContext.current
+        val imageRequest = remember(data, context) {
+            ImageRequest.Builder(context)
+                .data(data)
+                .crossfade(true)
+                .error(defaultImage)
+                .apply {
+                    if (layoutType == ThumbnailLayoutType.List) {
+                        placeholder(defaultImage)
+                    }
+                }
+                .build()
+        }
+        val painter = rememberAsyncImagePainter(imageRequest)
+        val state by painter.state.collectAsStateWithLifecycle()
+        val shimmerColor = DSTokens.colors.background.surface2
+        val imageModifier = remember(state, blurImage, layoutType) {
+            when {
+                state is AsyncImagePainter.State.Success -> {
+                    modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(layoutType.cornerRadius))
+                        .conditional(blurImage) {
+                            blur(16.dp)
+                        }
+                        .testTag(NODE_THUMBNAIL_IMAGE_TAG)
+                }
 
-    val context = LocalContext.current
-    val imageRequest = remember(data, context) {
-        ImageRequest.Builder(context)
-            .data(data)
-            .crossfade(true)
-            .error(defaultImage)
-            .apply {
-                if (layoutType == ThumbnailLayoutType.List) {
-                    placeholder(defaultImage)
+                state is AsyncImagePainter.State.Loading && layoutType == ThumbnailLayoutType.MediaGrid -> {
+                    modifier
+                        .background(shimmerColor)
+                        .fillMaxSize()
+                        .testTag(NODE_THUMBNAIL_SHIMMER_TAG)
+                }
+
+                else -> {
+                    modifier
+                        .size(layoutType.placeholderSize)
+                        .testTag(NODE_THUMBNAIL_PLACEHOLDER_TAG)
                 }
             }
-            .build()
-    }
-    val painter = rememberAsyncImagePainter(imageRequest)
-    val state by painter.state.collectAsStateWithLifecycle()
-    val imageModifier = remember(state, blurImage, layoutType) {
-        when (state) {
-            is AsyncImagePainter.State.Success -> {
-                modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(4.dp))
-                    .conditional(blurImage) {
-                        blur(16.dp)
-                    }
-                    .testTag(NODE_THUMBNAIL_IMAGE_TAG)
-            }
-
-            else -> {
-                modifier
-                    .size(layoutType.placeholderSize)
-                    .testTag(NODE_THUMBNAIL_PLACEHOLDER_TAG)
-            }
         }
-    }
 
-    Image(
-        painter = painter,
-        contentDescription = contentDescription,
-        modifier = imageModifier,
-        contentScale = if (state is AsyncImagePainter.State.Success) {
-            contentScale
-        } else {
-            ContentScale.Fit
-        }
-    )
+        Image(
+            painter = painter,
+            contentDescription = contentDescription,
+            modifier = imageModifier,
+            contentScale = if (state is AsyncImagePainter.State.Success) {
+                contentScale
+            } else {
+                ContentScale.Fit
+            }
+        )
+    }
 }
 
 /**
@@ -116,16 +136,22 @@ fun NodeThumbnailView(
  *
  * @property placeholderSize The size of the placeholder/error icon in Dp
  */
-sealed class ThumbnailLayoutType(val placeholderSize: Dp) {
-    object Grid : ThumbnailLayoutType(72.dp)
+sealed class ThumbnailLayoutType(
+    val placeholderSize: Dp,
+    val cornerRadius: Dp,
+) {
+    object MediaGrid : ThumbnailLayoutType(72.dp, 0.dp)
 
-    object List : ThumbnailLayoutType(32.dp)
+    object Grid : ThumbnailLayoutType(72.dp, 4.dp)
+
+    object List : ThumbnailLayoutType(32.dp, 4.dp)
 }
 
 /**
  * Test tags for NodeThumbnailView components
  */
 const val NODE_THUMBNAIL_PLACEHOLDER_TAG = "node_thumbnail_placeholder"
+const val NODE_THUMBNAIL_SHIMMER_TAG = "node_thumbnail_shimmer"
 const val NODE_THUMBNAIL_IMAGE_TAG = "node_thumbnail_image"
 
 @CombinedThemePreviews
@@ -163,4 +189,15 @@ private fun NodeThumbnailViewGridWithDataPreview() {
         defaultImage = mega.privacy.android.icon.pack.R.drawable.illustration_notification_permission,
         layoutType = ThumbnailLayoutType.Grid
     )
-} 
+}
+
+@CombinedThemePreviews
+@Composable
+private fun NodeThumbnailViewMediaGridWithDataPreview() {
+    NodeThumbnailView(
+        contentDescription = "Thumbnail",
+        data = "https://www.mega.com/favicon.ico",
+        defaultImage = mega.privacy.android.icon.pack.R.drawable.illustration_notification_permission,
+        layoutType = ThumbnailLayoutType.MediaGrid
+    )
+}

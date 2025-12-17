@@ -115,12 +115,11 @@ fun RecentsListItemView(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .alpha(1f.takeIf { !isSensitive } ?: 0.5f)
+            .alpha(if (isSensitive) 0.5f else 1f)
             .clickable {
                 onItemClicked()
             }
-            .padding(horizontal = 12.dp, vertical = 8.dp)
-            .alpha(1f.takeIf { !isSensitive } ?: 0.5f),
+            .padding(horizontal = 12.dp, vertical = 8.dp),
     ) {
         Image(
             modifier = Modifier
