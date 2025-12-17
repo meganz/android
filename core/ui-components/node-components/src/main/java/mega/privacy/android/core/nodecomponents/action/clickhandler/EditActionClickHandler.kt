@@ -21,5 +21,6 @@ class EditActionClickHandler @Inject constructor(
             mode = TextEditorMode.Edit,
             nodeSourceType = NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
         )
+        provider.viewModel.dismiss()
     }
 }

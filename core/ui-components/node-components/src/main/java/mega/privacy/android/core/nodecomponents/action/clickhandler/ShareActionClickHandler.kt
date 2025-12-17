@@ -75,6 +75,8 @@ class ShareActionClickHandler @Inject constructor(
                         )
                     }
                 }
+
+                provider.viewModel.dismiss()
             }
         }
     }
@@ -152,6 +154,8 @@ class ShareActionClickHandler @Inject constructor(
                         )
                     }
                 }
+
+                provider.viewModel.dismiss()
             }
         }
     }

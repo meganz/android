@@ -19,10 +19,10 @@ import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
-import mega.privacy.android.core.sharedcomponents.node.rememberNodeId
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -59,8 +59,6 @@ fun CloudDriveScreen(
         viewModel = nodeOptionsActionViewModel,
         megaNavigator = megaNavigator,
     )
-    // Controls the visibility of the Node Options Bottom Sheet on CloudDriveContent
-    var visibleNodeOptionId by rememberNodeId(null)
 
     BackHandler(enabled = uiState.isInSelectionMode) {
         viewModel.processAction(DeselectAllItems)
@@ -98,7 +96,15 @@ fun CloudDriveScreen(
                                 MenuActionWithClick(
                                     CommonAppBarAction.More
                                 ) {
-                                    visibleNodeOptionId = uiState.currentFolderId
+                                    val folderId = uiState.currentFolderId.longValue
+                                    if (folderId != -1L) {
+                                        navigationHandler.navigate(
+                                            NodeOptionsBottomSheetNavKey(
+                                                nodeHandle = folderId,
+                                                nodeSourceType = uiState.nodeSourceType
+                                            )
+                                        )
+                                    }
                                 }
                             )
                         }
@@ -136,9 +142,6 @@ fun CloudDriveScreen(
                 onTransfer = onTransfer,
                 onSortNodes = viewModel::setCloudSortOrder,
                 nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-                nodeActionHandler = nodeActionHandler,
-                visibleParentNodeOptionId = visibleNodeOptionId,
-                onDismissNodeOptionsBottomSheet = { visibleNodeOptionId = null }
             )
         }
     )

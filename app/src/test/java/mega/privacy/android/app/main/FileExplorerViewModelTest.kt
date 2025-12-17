@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -14,7 +15,10 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.document.DocumentEntity
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -25,6 +29,7 @@ import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetPathUseCas
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.file.GetDocumentsFromSharedUrisUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -59,6 +64,9 @@ internal class FileExplorerViewModelTest {
     private val getDocumentsFromSharedUrisUseCase = mock<GetDocumentsFromSharedUrisUseCase>()
     private var savedStateHandle = SavedStateHandle(mapOf())
     private val getFolderTypeByHandleUseCase = mock<GetFolderTypeByHandleUseCase>()
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase> {
+        on { invoke() }.thenReturn(kotlinx.coroutines.flow.emptyFlow())
+    }
 
     private fun initViewModel() {
         underTest = FileExplorerViewModel(
@@ -74,7 +82,8 @@ internal class FileExplorerViewModelTest {
             monitorShowHiddenItemsUseCase = mock(),
             getDocumentsFromSharedUrisUseCase = getDocumentsFromSharedUrisUseCase,
             savedStateHandle = savedStateHandle,
-            getFolderTypeByHandleUseCase = getFolderTypeByHandleUseCase
+            getFolderTypeByHandleUseCase = getFolderTypeByHandleUseCase,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
         )
     }
 
@@ -89,8 +98,11 @@ internal class FileExplorerViewModelTest {
             getNodeByIdUseCase,
             sendChatAttachmentsUseCase,
             getDocumentsFromSharedUrisUseCase,
-            getFolderTypeByHandleUseCase
+            getFolderTypeByHandleUseCase,
+            monitorNodeUpdatesUseCase
         )
+        // Set default behavior for monitorNodeUpdatesUseCase
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(kotlinx.coroutines.flow.emptyFlow())
     }
 
     /**
@@ -419,4 +431,46 @@ internal class FileExplorerViewModelTest {
         Arguments.of(FolderType.ChildBackup),
         Arguments.of(FolderType.Sync),
     )
+
+    @Test
+    fun `test that initial node updated event state is consumed`() = runTest {
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(kotlinx.coroutines.flow.emptyFlow())
+        initViewModel()
+
+        underTest.uiState.test {
+            val initial = awaitItem()
+            assertThat(initial.nodeUpdatedEvent).isEqualTo(consumed)
+        }
+    }
+
+    @Test
+    fun `test that node updated event is triggered when monitorNodeUpdatesUseCase emits`() =
+        runTest {
+            val mockNode = mock<Node>()
+            val nodeChanges = listOf(NodeChanges.Name)
+            val nodeUpdate = NodeUpdate(mapOf(mockNode to nodeChanges))
+
+            whenever(monitorNodeUpdatesUseCase()).thenReturn(
+                kotlinx.coroutines.flow.flowOf(
+                    nodeUpdate
+                )
+            )
+            initViewModel()
+            testScheduler.advanceUntilIdle()
+            assertThat(underTest.uiState.value.nodeUpdatedEvent).isEqualTo(triggered)
+        }
+
+    @Test
+    fun `test that node updated event can be consumed`() = runTest {
+        val mockNode = mock<Node>()
+        val nodeChanges = listOf(NodeChanges.Name, NodeChanges.Parent, NodeChanges.Attributes)
+        val nodeUpdate = NodeUpdate(mapOf(mockNode to nodeChanges))
+
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(kotlinx.coroutines.flow.flowOf(nodeUpdate))
+        initViewModel()
+        testScheduler.advanceUntilIdle()
+        assertThat(underTest.uiState.value.nodeUpdatedEvent).isEqualTo(triggered)
+        underTest.consumeNodeUpdate()
+        assertThat(underTest.uiState.value.nodeUpdatedEvent).isEqualTo(consumed)
+    }
 }

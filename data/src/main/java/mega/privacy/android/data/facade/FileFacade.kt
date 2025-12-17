@@ -71,6 +71,7 @@ import java.nio.file.attribute.BasicFileAttributes
 import java.util.Stack
 import javax.inject.Inject
 import kotlin.Result.Companion.failure
+import kotlin.Result.Companion.success
 import kotlin.coroutines.coroutineContext
 import kotlin.math.sqrt
 import kotlin.time.ExperimentalTime
@@ -1217,7 +1218,10 @@ internal class FileFacade @Inject constructor(
         lastAsFolder: Boolean,
     ): UriPath? {
         return createChildrenFiles(parentUri, children, createIfMissing, lastAsFolder).getOrElse {
-            Timber.e(it, "Failed to create children files at $parentUri with children: $children")
+            Timber.w(
+                it.message,
+                "Failed to create children files at $parentUri with children: $children"
+            )
             null
         }
     }
@@ -1310,7 +1314,7 @@ internal class FileFacade @Inject constructor(
             currentDocument = nextDocument
         }
 
-        return Result.success(UriPath(currentDocument.uri.toString()))
+        return success(UriPath(currentDocument.uri.toString()))
     }
 
     private companion object {

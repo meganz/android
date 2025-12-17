@@ -15,7 +15,6 @@ import mega.privacy.android.navigation.contract.NavigationHandler
  * Bottom sheet click handler
  */
 data class BottomSheetClickHandler(
-    val onDismiss: () -> Unit,
     val actionHandler: NodeActionHandler,
     val navigationHandler: NavigationHandler,
     val coroutineScope: CoroutineScope,
@@ -66,9 +65,8 @@ interface NodeBottomSheetMenuItem<T : MenuActionWithIcon> {
     fun getOnClickFunction(
         node: TypedNode,
         handler: BottomSheetClickHandler
-    ): () -> Unit = {
+    ) = {
         handler.actionHandler(menuAction, node)
-        handler.onDismiss()
     }
 
     /**

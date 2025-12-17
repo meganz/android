@@ -173,7 +173,7 @@ fun NodeListViewItem(
 ) {
     GenericListItem(
         modifier = modifier
-            .alpha(1f.takeIf { !isSensitive } ?: 0.5f)
+            .alpha(if (isSensitive) 0.5f else 1f)
             .conditional(isHighlighted) {
                 background(DSTokens.colors.background.surface2)
             }

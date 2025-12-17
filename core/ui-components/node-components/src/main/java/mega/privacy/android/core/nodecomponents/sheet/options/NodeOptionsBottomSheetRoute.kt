@@ -25,6 +25,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.SnackbarAttributes
@@ -41,10 +42,12 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.text
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.isSharedSource
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.megaActivityResultContract
 import timber.log.Timber
 
@@ -56,6 +59,9 @@ fun NodeOptionsBottomSheetRoute(
     nodeId: Long,
     nodeSourceType: NodeSourceType,
     onTransfer: (TransferTriggerEvent) -> Unit,
+    onNavigate: (NavKey) -> Unit = {},
+    onRename: (NodeId) -> Unit = {},
+    onCollisionResult: (NodeNameCollisionsResult) -> Unit = {},
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
     actionHandler: NodeActionHandler = rememberNodeActionHandler(
         navigationHandler = navigationHandler,
@@ -77,10 +83,9 @@ fun NodeOptionsBottomSheetRoute(
                 contactIds,
                 nodeHandles
             )
-        } ?: run {
-            onDismiss()
         }
     }
+    val snackbarQueue = rememberSnackBarQueue()
 
     LaunchedEffect(Unit) {
         keyboardController?.hide()
@@ -90,10 +95,7 @@ fun NodeOptionsBottomSheetRoute(
     EventEffect(
         event = nodeOptionActionState.downloadEvent,
         onConsumed = nodeOptionsActionViewModel::markDownloadEventConsumed,
-        action = {
-            onTransfer(it)
-            onDismiss()
-        }
+        action = onTransfer
     )
 
     EventEffect(
@@ -116,15 +118,38 @@ fun NodeOptionsBottomSheetRoute(
         event = nodeOptionActionState.contactsData,
         onConsumed = nodeOptionsActionViewModel::markShareFolderAccessDialogShown,
         action = { (contactData, isFromBackups, nodeHandles) ->
-            navigationHandler.navigate(
+            onNavigate(
                 ShareFolderAccessDialogNavKey(
                     nodes = nodeHandles,
                     contacts = contactData.joinToString(separator = ","),
                     isFromBackups = isFromBackups
                 )
             )
-            onDismiss()
         },
+    )
+
+    EventEffect(
+        event = nodeOptionActionState.navigationEvent,
+        onConsumed = nodeOptionsActionViewModel::resetNavigationEvent,
+        action = onNavigate
+    )
+
+    EventEffect(
+        event = nodeOptionActionState.dismissEvent,
+        onConsumed = nodeOptionsActionViewModel::resetDismiss,
+        action = onDismiss
+    )
+
+    EventEffect(
+        event = nodeOptionActionState.renameNodeRequestEvent,
+        onConsumed = nodeOptionsActionViewModel::resetRenameNodeRequest,
+        action = onRename
+    )
+
+    EventEffect(
+        event = nodeOptionActionState.nodeNameCollisionsResult,
+        onConsumed = nodeOptionsActionViewModel::markHandleNodeNameCollisionResult,
+        action = onCollisionResult
     )
 
     NodeOptionsBottomSheetContent(
@@ -145,7 +170,7 @@ fun NodeOptionsBottomSheetRoute(
             nodeIds = shareNodeHandles.map { NodeId(it) },
             onDismiss = {
                 shareNodeHandles = emptyList()
-                onDismiss()
+                //onDismiss()
             },
             onConfirm = { nodes ->
                 val handles = nodes.map { it.id.longValue }.toLongArray()
@@ -228,7 +253,6 @@ internal fun NodeOptionsBottomSheetContent(
             items(actions) { item ->
                 item.control(
                     BottomSheetClickHandler(
-                        onDismiss = onDismiss,
                         actionHandler = actionHandler,
                         navigationHandler = navigationHandler,
                         coroutineScope = coroutineScope,

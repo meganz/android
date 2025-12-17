@@ -23,7 +23,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @property selectedFailedTransfersIds List of selected failed or cancelled transfers. If not null, even empty, indicates selected mode is on.
  * @property startEvent event to start a new transfer
  * @property transfersPendingToCancel Map of transfers pending to cancel from swipe gesture.
- * @property noConnection true if there is no Internet connection
+ * @property hasInternetConnection true if there is Internet connection
  */
 data class TransfersUiState(
     val selectedTab: Int = ACTIVE_TAB_INDEX,
@@ -39,7 +39,7 @@ data class TransfersUiState(
     val selectedFailedTransfersIds: List<Int>? = null,
     val startEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     val transfersPendingToCancel: Map<Long, TransferPendingToCancel> = emptyMap(),
-    val noConnection: Boolean = false,
+    val hasInternetConnection: Boolean = true,
 ) {
 
     /**

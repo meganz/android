@@ -28,7 +28,7 @@ class RemoveLinkActionClickHandler @Inject constructor(
     }
 
     private fun removeLinks(nodes: List<Long>, provider: NodeActionProvider) {
-        provider.navigationHandler?.navigate(
+        provider.viewModel.navigateWithNavKey(
             RemoveNodeLinkDialogNavKey(
                 nodes = nodeHandlesToJsonMapper(nodes)
             )

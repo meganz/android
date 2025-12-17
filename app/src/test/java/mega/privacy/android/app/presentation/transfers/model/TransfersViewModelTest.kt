@@ -318,7 +318,7 @@ class TransfersViewModelTest {
         }
 
     @Test
-    fun `test that MonitorConnectivityUseCase updates noConnection`() =
+    fun `test that MonitorConnectivityUseCase updates hasInternetConnection`() =
         runTest {
             val flow = MutableStateFlow(true)
 
@@ -328,13 +328,13 @@ class TransfersViewModelTest {
 
             underTest.uiState.test {
                 var actual = awaitItem()
-                assertThat(actual.noConnection).isFalse()
+                assertThat(actual.hasInternetConnection).isTrue()
                 flow.emit(false)
                 actual = awaitItem()
-                assertThat(actual.noConnection).isTrue()
+                assertThat(actual.hasInternetConnection).isFalse()
                 flow.emit(true)
                 actual = awaitItem()
-                assertThat(actual.noConnection).isFalse()
+                assertThat(actual.hasInternetConnection).isTrue()
             }
         }
 

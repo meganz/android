@@ -38,7 +38,7 @@ class ActiveTransferItemTest {
                 progress = progress,
                 speed = speed,
                 isPaused = false,
-                isOverQuota = false,
+                hasIssues = false,
                 areTransfersPaused = false,
             )
         )
@@ -70,7 +70,7 @@ class ActiveTransferItemTest {
                 progress = progress,
                 speed = speed,
                 isPaused = true,
-                isOverQuota = false,
+                hasIssues = false,
                 areTransfersPaused = false,
             )
         )
@@ -102,7 +102,7 @@ class ActiveTransferItemTest {
                 progress = progress,
                 speed = speed,
                 isPaused = true,
-                isOverQuota = false,
+                hasIssues = false,
                 areTransfersPaused = false,
                 isSelected = true,
             )
@@ -127,7 +127,7 @@ class ActiveTransferItemTest {
                     progress = progress,
                     speed = speed,
                     isPaused = isPaused,
-                    isOverQuota = isOverQuota,
+                    hasIssues = hasIssues,
                     isSelected = isSelected,
                     enableSwipeToDismiss = true,
                     areTransfersPaused = areTransfersPaused,

@@ -2,6 +2,7 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveShareMenuAction
+import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -13,7 +14,7 @@ import javax.inject.Inject
  */
 class RemoveShareBottomSheetMenuItem @Inject constructor(
     override val menuAction: RemoveShareMenuAction,
-    private val isOutShareUseCase: IsOutShareUseCase
+    private val isOutShareUseCase: IsOutShareUseCase,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,

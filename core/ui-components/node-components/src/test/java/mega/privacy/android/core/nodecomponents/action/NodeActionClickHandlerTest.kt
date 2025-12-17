@@ -3,12 +3,14 @@ package mega.privacy.android.core.nodecomponents.action
 import android.content.Context
 import androidx.activity.result.ActivityResultLauncher
 import androidx.navigation3.runtime.NavKey
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.menu.MenuAction
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.core.nodecomponents.action.clickhandler.AvailableOfflineActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.CopyActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.DeletePermanentActionClickHandler
@@ -72,7 +74,6 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VerifyMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VersionsMenuAction
-import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
@@ -100,11 +101,11 @@ import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNod
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.After
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyBoolean
 import org.mockito.ArgumentMatchers.anyList
 import org.mockito.ArgumentMatchers.anyLong
@@ -118,9 +119,8 @@ import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@ExtendWith(CoroutineMainDispatcherExtension::class)
+@RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalCoroutinesApi::class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NodeActionClickHandlerTest {
     private val testScope = TestScope(UnconfinedTestDispatcher())
     private val mockContext = mock<Context>()
@@ -196,7 +196,10 @@ class NodeActionClickHandlerTest {
         hiddenNodesOnboardingLauncher = mockHiddenNodesOnboardingLauncher
     )
 
-    @BeforeEach
+    @get:Rule
+    val analyticsRule = AnalyticsTestRule()
+
+    @Before
     fun setUp() {
         // Reset mocks
         whenever(mockNodeHandlesToJsonMapper(any<List<Long>>())).thenReturn("test-json")
@@ -216,7 +219,7 @@ class NodeActionClickHandlerTest {
         }
     }
 
-    @AfterEach
+    @After
     fun resetMocks() {
         reset(
             mockContext,
@@ -704,7 +707,7 @@ class NodeActionClickHandlerTest {
             action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
             verify(mockNodeHandlesToJsonMapper).invoke(listOf(123L))
-            verify(mockNavigationHandler).navigate(
+            verify(mockSingleNodeActionProvider.viewModel).navigateWithNavKey(
                 MoveToRubbishOrDeleteDialogArgs(
                     isInRubbish = false,
                     nodeHandles = listOf(123L)
@@ -722,7 +725,7 @@ class NodeActionClickHandlerTest {
             action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
 
             verify(mockNodeHandlesToJsonMapper).invoke(listOf(123L, 456L))
-            verify(mockNavigationHandler).navigate(
+            verify(mockMultipleNodesActionProvider.viewModel).navigateWithNavKey(
                 MoveToRubbishOrDeleteDialogArgs(
                     isInRubbish = false,
                     nodeHandles = listOf(123L, 456L)
@@ -785,7 +788,7 @@ class NodeActionClickHandlerTest {
             action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
             verify(mockNodeHandlesToJsonMapper).invoke(listOf(123L))
-            verify(mockNavigationHandler).navigate(
+            verify(mockMultipleNodesActionProvider.viewModel).navigateWithNavKey(
                 MoveToRubbishOrDeleteDialogArgs(
                     isInRubbish = true,
                     nodeHandles = listOf(123L)
@@ -803,7 +806,7 @@ class NodeActionClickHandlerTest {
             action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
 
             verify(mockNodeHandlesToJsonMapper).invoke(listOf(123L, 456L))
-            verify(mockNavigationHandler).navigate(
+            verify(mockMultipleNodesActionProvider.viewModel).navigateWithNavKey(
                 MoveToRubbishOrDeleteDialogArgs(
                     isInRubbish = true,
                     nodeHandles = listOf(123L, 456L)
@@ -828,7 +831,7 @@ class NodeActionClickHandlerTest {
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockNavigationHandler).navigate(any<NavKey>())
+        verify(mockMultipleNodesActionProvider.viewModel).navigateWithNavKey(any<NavKey>())
     }
 
     // ManageShareFolderAction Tests
@@ -959,7 +962,7 @@ class NodeActionClickHandlerTest {
 
             action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-            verify(mockNavigationHandler).navigate(any<NavKey>())
+            verify(mockMultipleNodesActionProvider.viewModel).navigateWithNavKey(any<NavKey>())
         }
 
     @Test
@@ -1170,7 +1173,7 @@ class NodeActionClickHandlerTest {
             action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
             verify(mockNodeHandlesToJsonMapper).invoke(listOf(123L))
-            verify(mockNavigationHandler).navigate(
+            verify(mockMultipleNodesActionProvider.viewModel).navigateWithNavKey(
                 LeaveShareDialogNavKey(handles = "test-json")
             )
         }
@@ -1185,7 +1188,7 @@ class NodeActionClickHandlerTest {
             action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
 
             verify(mockNodeHandlesToJsonMapper).invoke(listOf(123L, 456L))
-            verify(mockNavigationHandler).navigate(
+            verify(mockMultipleNodesActionProvider.viewModel).navigateWithNavKey(
                 LeaveShareDialogNavKey(handles = "test-json")
             )
         }
@@ -1437,7 +1440,7 @@ class NodeActionClickHandlerTest {
 
         action.handle(menuAction, mockFolderNode, mockSingleNodeActionProvider)
 
-        verify(mockNavigationHandler).navigate(
+        verify(mockMultipleNodesActionProvider.viewModel).navigateWithNavKey(
             SyncNewFolderNavKey(
                 remoteFolderHandle = mockFolderNode.id.longValue,
                 remoteFolderName = mockFolderNode.name,

@@ -60,7 +60,7 @@ fun ActiveTransferItem(
     progress: Float,
     speed: String?,
     isPaused: Boolean,
-    isOverQuota: Boolean,
+    hasIssues: Boolean,
     areTransfersPaused: Boolean,
     enableSwipeToDismiss: Boolean,
     onPlayPauseClicked: () -> Unit,
@@ -166,7 +166,7 @@ fun ActiveTransferItem(
                         LeadingIndicator(
                             modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_TYPE_ICON),
                             isDownload = isDownload,
-                            isOverQuota = isOverQuota,
+                            hasIssues = hasIssues,
                         )
                         MegaText(
                             text = subTitle,
@@ -190,7 +190,7 @@ fun ActiveTransferItem(
                             painter = rememberVectorPainter(if (isPaused) IconPack.Medium.Thin.Outline.Play else IconPack.Medium.Thin.Outline.Pause),
                             contentDescription = if (isPaused) stringResource(id = sharedR.string.transfers_section_action_play)
                             else stringResource(id = sharedR.string.transfers_section_action_pause),
-                            tint = if (areTransfersPaused) IconColor.Disabled else IconColor.Secondary,
+                            tint = if (areTransfersPaused || hasIssues) IconColor.Disabled else IconColor.Secondary,
                         )
                     }
                 } else {
@@ -205,7 +205,7 @@ fun ActiveTransferItem(
                     .fillMaxWidth()
                     .height(2.dp),
                 progressPercentage = progress * 100f,
-                supportColor = if (isOverQuota) SupportColor.Warning else SupportColor.Success
+                supportColor = if (hasIssues) SupportColor.Warning else SupportColor.Success
             )
         }
     }
@@ -238,7 +238,7 @@ private fun Preview(activeTransferUI: ActiveTransferUI) {
                 progress = progress,
                 speed = speed,
                 isPaused = isPaused,
-                isOverQuota = isOverQuota,
+                hasIssues = hasIssues,
                 areTransfersPaused = areTransfersPaused,
                 enableSwipeToDismiss = true,
                 isSelected = isSelected,
@@ -259,7 +259,7 @@ internal data class ActiveTransferUI(
     val progress: Float,
     val speed: String,
     val isPaused: Boolean,
-    val isOverQuota: Boolean,
+    val hasIssues: Boolean,
     val areTransfersPaused: Boolean,
     val isDraggable: Boolean = true,
     val isSelected: Boolean? = null,
@@ -287,7 +287,7 @@ private class ActiveTransferItemOrdinaryProvider :
                     progress = PROGRESS,
                     speed = if (isPaused) PAUSED else SPEED,
                     isPaused = isPaused,
-                    isOverQuota = false,
+                    hasIssues = false,
                     areTransfersPaused = false,
                 )
             }
@@ -309,7 +309,7 @@ private class ActiveTransferItemUnusualProvider :
                     progress = PROGRESS,
                     speed = if (areTransfersPaused) PAUSED else SPEED,
                     isPaused = false,
-                    isOverQuota = isOverQuota,
+                    hasIssues = isOverQuota,
                     areTransfersPaused = areTransfersPaused,
                     isDraggable = !isSelected,
                     isSelected = isSelected,

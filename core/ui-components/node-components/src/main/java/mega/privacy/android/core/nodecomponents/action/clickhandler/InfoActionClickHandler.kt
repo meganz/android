@@ -17,5 +17,7 @@ class InfoActionClickHandler @Inject constructor(
             context = provider.context,
             handle = node.id.longValue
         )
+
+        provider.viewModel.dismiss()
     }
 }

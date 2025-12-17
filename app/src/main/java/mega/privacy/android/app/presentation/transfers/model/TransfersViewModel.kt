@@ -244,7 +244,7 @@ class TransfersViewModel @AssistedInject constructor(
                 .skipUnstable(waitTimeToShowOffline, true) { it }
                 .collect { connected ->
                     _uiState.update { state ->
-                        state.copy(noConnection = !connected)
+                        state.copy(hasInternetConnection = connected)
                     }
                 }
         }
@@ -254,6 +254,9 @@ class TransfersViewModel @AssistedInject constructor(
      * Pause or resume a transfer by tag.
      */
     fun playOrPauseTransfer(tag: Int) {
+        if (!uiState.value.hasInternetConnection) {
+            return
+        }
         runCatching { uiState.value.activeTransfers.first { it.tag == tag }.isPaused }
             .getOrNull()?.let { isPaused ->
                 viewModelScope.launch {

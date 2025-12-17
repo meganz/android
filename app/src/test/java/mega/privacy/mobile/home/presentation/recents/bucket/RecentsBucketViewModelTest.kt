@@ -17,7 +17,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionBucketByIdUseCase
 import mega.privacy.mobile.home.presentation.recents.mapper.RecentsParentFolderNameMapper
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
@@ -44,7 +44,7 @@ class RecentsBucketViewModelTest {
     private val testTimestamp = 1234567890L
     private val testFileCount = 2
 
-    @BeforeEach
+    @BeforeAll
     fun setUp() {
         reset(
             getRecentActionBucketByIdUseCase,
@@ -83,7 +83,6 @@ class RecentsBucketViewModelTest {
             assertThat(state.isLoading).isFalse()
             assertThat(state.nodeUiItems).isEmpty()
             // Verify initial parentFolderName is set from args
-            assertThat(state.parentFolderName).isInstanceOf(LocalizedText.Literal::class.java)
             assertThat(state.parentFolderName).isEqualTo(LocalizedText.Literal(testFolderName))
             cancelAndIgnoreRemainingEvents()
         }

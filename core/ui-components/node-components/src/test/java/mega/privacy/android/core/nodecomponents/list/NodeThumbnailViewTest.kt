@@ -84,4 +84,131 @@ class NodeThumbnailViewTest {
             .assertWidthIsEqualTo(gridSize)
             .assertHeightIsEqualTo(gridSize)
     }
+
+    @Test
+    fun `test that error state shows placeholder for list layout`() {
+        setContent(
+            data = "invalid://url",
+            layoutType = ThumbnailLayoutType.List
+        )
+
+        composeTestRule.onNodeWithTag(NODE_THUMBNAIL_PLACEHOLDER_TAG)
+            .assertIsDisplayed()
+            .assertWidthIsEqualTo(listSize)
+            .assertHeightIsEqualTo(listSize)
+    }
+
+    @Test
+    fun `test that placeholder is not shown for MediaGrid when data is null`() {
+        setContent(
+            data = null,
+            layoutType = ThumbnailLayoutType.MediaGrid
+        )
+
+        composeTestRule.onNodeWithTag(NODE_THUMBNAIL_PLACEHOLDER_TAG)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that default image is shown for MediaGrid when error state`() {
+        setContent(
+            data = "invalid://url",
+            layoutType = ThumbnailLayoutType.MediaGrid
+        )
+
+        composeTestRule.onNodeWithTag(NODE_THUMBNAIL_PLACEHOLDER_TAG)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that placeholder is shown for Grid layout when loading`() {
+        setContent(
+            data = "https://example.com/image.jpg",
+            layoutType = ThumbnailLayoutType.Grid
+        )
+
+        composeTestRule.onNodeWithTag(NODE_THUMBNAIL_PLACEHOLDER_TAG)
+            .assertIsDisplayed()
+            .assertWidthIsEqualTo(gridSize)
+            .assertHeightIsEqualTo(gridSize)
+    }
+
+    @Test
+    fun `test that placeholder is shown for List layout when loading`() {
+        setContent(
+            data = "https://example.com/image.jpg",
+            layoutType = ThumbnailLayoutType.List
+        )
+
+        composeTestRule.onNodeWithTag(NODE_THUMBNAIL_PLACEHOLDER_TAG)
+            .assertIsDisplayed()
+            .assertWidthIsEqualTo(listSize)
+            .assertHeightIsEqualTo(listSize)
+    }
+
+    @Test
+    fun `test that shimmer is shown for MediaGrid when data is null`() {
+        setContent(
+            data = null,
+            layoutType = ThumbnailLayoutType.MediaGrid
+        )
+
+        composeTestRule.onNodeWithTag(NODE_THUMBNAIL_SHIMMER_TAG)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that shimmer is not shown for Grid layout when data is null`() {
+        setContent(
+            data = null,
+            layoutType = ThumbnailLayoutType.Grid
+        )
+
+        composeTestRule.onNodeWithTag(NODE_THUMBNAIL_SHIMMER_TAG)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that shimmer is not shown for List layout when data is null`() {
+        setContent(
+            data = null,
+            layoutType = ThumbnailLayoutType.List
+        )
+
+        composeTestRule.onNodeWithTag(NODE_THUMBNAIL_SHIMMER_TAG)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that shimmer is not shown for Grid layout when loading`() {
+        setContent(
+            data = "https://example.com/image.jpg",
+            layoutType = ThumbnailLayoutType.Grid
+        )
+
+        composeTestRule.onNodeWithTag(NODE_THUMBNAIL_SHIMMER_TAG)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that shimmer is not shown for List layout when loading`() {
+        setContent(
+            data = "https://example.com/image.jpg",
+            layoutType = ThumbnailLayoutType.List
+        )
+
+        composeTestRule.onNodeWithTag(NODE_THUMBNAIL_SHIMMER_TAG)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that shimmer is not shown for MediaGrid when error state`() {
+        setContent(
+            data = "invalid://url",
+            layoutType = ThumbnailLayoutType.MediaGrid
+        )
+
+        composeTestRule.onNodeWithTag(NODE_THUMBNAIL_SHIMMER_TAG)
+            .assertDoesNotExist()
+    }
 }

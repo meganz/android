@@ -15,6 +15,7 @@ class ManageLinkActionClickHandler @Inject constructor() : SingleNodeAction, Mul
             context = provider.context,
             node.id.longValue
         )
+        provider.viewModel.dismiss()
     }
 
     override fun handle(
@@ -27,5 +28,6 @@ class ManageLinkActionClickHandler @Inject constructor() : SingleNodeAction, Mul
             context = provider.context,
             *handles
         )
+        provider.viewModel.dismiss()
     }
 }

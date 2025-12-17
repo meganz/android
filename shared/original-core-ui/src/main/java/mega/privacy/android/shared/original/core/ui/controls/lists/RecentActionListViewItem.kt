@@ -77,7 +77,7 @@ fun RecentActionListViewItem(
                     onItemClick()
                 }
                 .padding(horizontal = 12.dp, vertical = 10.dp)
-                .alpha(1f.takeIf { !isSensitive } ?: 0.5f),
+                .alpha(if (isSensitive) 0.5f else 1f),
         ) {
             Image(
                 modifier = Modifier

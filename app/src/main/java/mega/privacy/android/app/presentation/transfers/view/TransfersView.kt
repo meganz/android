@@ -288,7 +288,7 @@ internal fun TransfersView(
                 pagerScrollEnabled = false,
                 fixedHeader = {
                     AnimatedVisibility(
-                        uiState.noConnection,
+                        !uiState.hasInternetConnection,
                         enter = enterPromptAnimation(),
                         exit = exitPromptAnimation(),
                     ) {
@@ -306,6 +306,7 @@ internal fun TransfersView(
                             activeTransfers = activeTransfers,
                             isTransferOverQuota = isTransferOverQuota,
                             isStorageOverQuota = isStorageOverQuota,
+                            hasInternetConnection = hasInternetConnection,
                             quotaWarning = quotaWarning,
                             areTransfersPaused = areTransfersPaused,
                             enableSwipeToDismiss = !isInSelectTransfersMode,

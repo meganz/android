@@ -227,6 +227,7 @@ class ActiveTransfersViewTest {
                     onCancelActiveTransfer = {},
                     onSetActiveTransferToCancel = {},
                     onUndoCancelActiveTransfer = {},
+                    hasInternetConnection = true,
                 )
             }
         }
