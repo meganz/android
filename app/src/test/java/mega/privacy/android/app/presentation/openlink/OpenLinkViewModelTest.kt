@@ -4,6 +4,7 @@ import android.net.Uri
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -13,6 +14,7 @@ import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.QueryResetPasswordLinkUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.link.DecodeLinkUseCase
+import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
@@ -51,6 +53,7 @@ class OpenLinkViewModelTest {
     private val queryResetPasswordLinkUseCase: QueryResetPasswordLinkUseCase = mock()
     private val applicationScope = CoroutineScope(extension.testDispatcher)
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val getSessionLinkUseCase: GetSessionLinkUseCase = mock()
 
     @BeforeEach
     fun setup() {
@@ -65,6 +68,7 @@ class OpenLinkViewModelTest {
             queryResetPasswordLinkUseCase = queryResetPasswordLinkUseCase,
             applicationScope = applicationScope,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getSessionLinkUseCase = getSessionLinkUseCase,
         )
         wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) } doReturn false
     }
@@ -292,6 +296,47 @@ class OpenLinkViewModelTest {
             underTest.uiState.test {
                 assertThat(expectMostRecentItem().resetPasswordLinkResult)
                     .isEqualTo(Result.failure<ResetPasswordLinkInfo>(exception))
+            }
+        }
+
+    @Test
+    fun `test that get link with session updates status with correct link if use case returns value`() =
+        runTest {
+            val link = "https://whatever"
+            val uri = mock<Uri> {
+                on { this.toString() } doReturn link
+            }
+            val sessionLink = "https://sessionLink"
+
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn false
+            whenever(decodeLinkUseCase(link)) doReturn link
+            whenever(getSessionLinkUseCase(link)) doReturn sessionLink
+
+            underTest.decodeUri(uri)
+            underTest.getLinkWithSession()
+
+            underTest.uiState.map { it.urlToOpen }.test {
+                assertThat(awaitItem()).isEqualTo(sessionLink)
+            }
+        }
+
+    @Test
+    fun `test that get link with session updates status with correct link if use case returns null`() =
+        runTest {
+            val link = "https://whatever"
+            val uri = mock<Uri> {
+                on { this.toString() } doReturn link
+            }
+
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn false
+            whenever(decodeLinkUseCase(link)) doReturn link
+            whenever(getSessionLinkUseCase(link)) doReturn null
+
+            underTest.decodeUri(uri)
+            underTest.getLinkWithSession()
+
+            underTest.uiState.map { it.urlToOpen }.test {
+                assertThat(awaitItem()).isEqualTo(link)
             }
         }
 

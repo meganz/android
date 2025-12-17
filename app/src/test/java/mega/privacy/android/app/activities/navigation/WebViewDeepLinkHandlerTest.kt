@@ -4,8 +4,12 @@ import android.net.Uri
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.RegexPatternType
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.DeepLinksAfterFetchNodesDialogNavKey
 import mega.privacy.android.navigation.destination.WebSiteNavKey
+import mega.privacy.android.shared.resources.R
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -16,6 +20,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 
@@ -25,18 +30,25 @@ class WebViewDeepLinkHandlerTest {
     private lateinit var underTest: WebViewDeepLinkHandler
 
     private val getSessionLinkUseCase = mock<GetSessionLinkUseCase>()
+    private val rootNodeExistsUseCase = mock<RootNodeExistsUseCase>()
+    private val snackbarEventQueue = mock<SnackbarEventQueue>()
 
     @BeforeAll
     fun setup() {
         underTest = WebViewDeepLinkHandler(
             getSessionLinkUseCase = getSessionLinkUseCase,
-            mock()
+            rootNodeExistsUseCase = rootNodeExistsUseCase,
+            snackbarEventQueue = snackbarEventQueue,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(getSessionLinkUseCase)
+        reset(
+            getSessionLinkUseCase,
+            rootNodeExistsUseCase,
+            snackbarEventQueue,
+        )
     }
 
     @ParameterizedTest
@@ -95,37 +107,79 @@ class WebViewDeepLinkHandlerTest {
 
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
-    fun `test that correct nav key is returned if link requires session`(
+    fun `test that correct nav key is returned if link requires session and root node does not exist`(
         isLoggedIn: Boolean,
     ) = runTest {
-        val uriString = "https://mega.app/whatever"
-        val sessionUriString = "https://mega.app/withSession"
-        val expected = WebSiteNavKey(sessionUriString)
+        val uriString = "https://mega.app/fm/whatever"
         val uri = mock<Uri> {
             on { this.toString() } doReturn uriString
         }
 
-        whenever(getSessionLinkUseCase(uriString)) doReturn sessionUriString
+        whenever(rootNodeExistsUseCase()) doReturn false
 
-        assertThat(underTest.getNavKeysInternal(uri, RegexPatternType.MEGA_LINK, isLoggedIn))
-            .containsExactly(expected)
+        val actual =
+            assertThat(underTest.getNavKeysInternal(uri, RegexPatternType.MEGA_LINK, isLoggedIn))
+
+        if (isLoggedIn) {
+            actual.containsExactly(
+                DeepLinksAfterFetchNodesDialogNavKey(
+                    deepLink = uriString,
+                    regexPatternType = RegexPatternType.MEGA_LINK
+                )
+            )
+        } else {
+            actual.isEmpty()
+            verify(snackbarEventQueue).queueMessage(R.string.general_alert_not_logged_in)
+        }
     }
 
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
-    fun `test that correct nav key is returned if getSessionLinkUseCase throws exception`(
+    fun `test that correct nav key is returned if link requires session and root node does exist`(
         isLoggedIn: Boolean,
     ) = runTest {
-        val uriString = "https://mega.app/whatever"
-        val expected = WebSiteNavKey(uriString)
+        val uriString = "https://mega.app/fm/whatever"
+        val sessionUriString = "https://mega.app/withSession"
         val uri = mock<Uri> {
             on { this.toString() } doReturn uriString
         }
 
+        whenever(rootNodeExistsUseCase()) doReturn true
+        whenever(getSessionLinkUseCase(uriString)) doReturn sessionUriString
+
+        val actual =
+            assertThat(underTest.getNavKeysInternal(uri, RegexPatternType.MEGA_LINK, isLoggedIn))
+
+        if (isLoggedIn) {
+            actual.containsExactly(WebSiteNavKey(sessionUriString))
+        } else {
+            actual.isEmpty()
+            verify(snackbarEventQueue).queueMessage(R.string.general_alert_not_logged_in)
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that correct nav key is returned if link requires session and getSessionLinkUseCase throws exception`(
+        isLoggedIn: Boolean,
+    ) = runTest {
+        val uriString = "https://mega.app/fm/whatever"
+        val uri = mock<Uri> {
+            on { this.toString() } doReturn uriString
+        }
+
+        whenever(rootNodeExistsUseCase()) doReturn true
         whenever(getSessionLinkUseCase(uriString)) doThrow RuntimeException()
 
-        assertThat(underTest.getNavKeysInternal(uri, RegexPatternType.MEGA_LINK, isLoggedIn))
-            .containsExactly(expected)
+        val actual =
+            assertThat(underTest.getNavKeysInternal(uri, RegexPatternType.MEGA_LINK, isLoggedIn))
+
+        if (isLoggedIn) {
+            actual.containsExactly(WebSiteNavKey(uriString))
+        } else {
+            actual.isEmpty()
+            verify(snackbarEventQueue).queueMessage(R.string.general_alert_not_logged_in)
+        }
     }
 
     @ParameterizedTest

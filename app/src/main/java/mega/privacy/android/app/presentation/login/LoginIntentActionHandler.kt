@@ -21,6 +21,7 @@ import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
+import mega.privacy.android.app.presentation.login.LoginActivity.Companion.ACTION_REFRESH_AND_OPEN_SESSION_LINK
 import mega.privacy.android.app.presentation.login.model.LoginIntentState
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.providers.FileProviderActivity
@@ -96,6 +97,10 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                             finish()
                         }
                         return@ReadyToFinish
+                    }
+
+                    ACTION_REFRESH_AND_OPEN_SESSION_LINK == intentAction -> {
+                        dataString?.let { viewModel.getLinkWithSession(it) }
                     }
                 }
             }

@@ -60,6 +60,7 @@ import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.FastLoginUseCase
 import mega.privacy.android.domain.usecase.login.FetchNodesUseCase
@@ -185,6 +186,7 @@ internal class LoginViewModelTest {
     private val monitorMiscLoadedFlow = MutableSharedFlow<Boolean>()
     private val getCookieSettingsUseCase = mock<GetCookieSettingsUseCase>()
     private val getUserDataUseCase: GetUserDataUseCase = mock()
+    private val getSessionLinkUseCase: GetSessionLinkUseCase = mock()
 
     @BeforeEach
     fun setUp() = runTest {
@@ -243,7 +245,8 @@ internal class LoginViewModelTest {
             getDomainNameUseCase = getDomainNameUseCase,
             monitorMiscLoadedUseCase = monitorMiscLoadedUseCase,
             getCookieSettingsUseCase = getCookieSettingsUseCase,
-            getUserDataUseCase = getUserDataUseCase
+            getUserDataUseCase = getUserDataUseCase,
+            getSessionLinkUseCase = getSessionLinkUseCase,
         )
     }
 
@@ -299,6 +302,7 @@ internal class LoginViewModelTest {
             getMiscFlagsUseCase,
             getDomainNameUseCase,
             monitorMiscLoadedUseCase,
+            getSessionLinkUseCase,
         )
     }
 
@@ -788,7 +792,7 @@ internal class LoginViewModelTest {
             underTest.state.test {
                 val item = awaitItem()
                 assertThat(item.miscFlagLoaded).isFalse()
-                assertThat(item.openRecoveryUrlEvent).isInstanceOf(
+                assertThat(item.openUrlEvent).isInstanceOf(
                     StateEventWithContentConsumed::class.java
                 )
                 underTest.onForgotPassword()
@@ -796,7 +800,7 @@ internal class LoginViewModelTest {
                 monitorMiscLoadedFlow.emit(true)
                 advanceUntilIdle()
                 assertThat(awaitItem().miscFlagLoaded).isTrue()
-                assertThat(awaitItem().openRecoveryUrlEvent).isInstanceOf(
+                assertThat(awaitItem().openUrlEvent).isInstanceOf(
                     StateEventWithContentTriggered::class.java
                 )
             }
@@ -825,6 +829,39 @@ internal class LoginViewModelTest {
                         )
                     )
                 )
+            }
+        }
+
+    @Test
+    fun `test that getLinkWithSession updates state correctly if use case returns value`() =
+        runTest {
+            val link = "https://whatever"
+            val sessionLink = "https://sessionLink"
+
+            whenever(getSessionLinkUseCase(link)) doReturn sessionLink
+
+            underTest.getLinkWithSession(link)
+            advanceUntilIdle()
+
+            underTest.state.map { it.openUrlEvent }.test {
+                val actual = (awaitItem() as? StateEventWithContentTriggered)?.content
+                assertThat(actual).isEqualTo(sessionLink)
+            }
+        }
+
+    @Test
+    fun `test that getLinkWithSession updates state correctly if use case returns null`() =
+        runTest {
+            val link = "https://whatever"
+
+            whenever(getSessionLinkUseCase(link)) doReturn null
+
+            underTest.getLinkWithSession(link)
+            advanceUntilIdle()
+
+            underTest.state.map { it.openUrlEvent }.test {
+                val actual = (awaitItem() as? StateEventWithContentTriggered)?.content
+                assertThat(actual).isEqualTo(link)
             }
         }
 

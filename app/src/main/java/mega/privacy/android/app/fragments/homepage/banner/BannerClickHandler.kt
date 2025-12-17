@@ -4,8 +4,10 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.net.toUri
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
+import mega.privacy.android.app.listeners.SessionTransferURLListener
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.achievements.AchievementsFeatureActivity
 import mega.privacy.android.app.presentation.settings.SettingsActivity
@@ -13,9 +15,10 @@ import mega.privacy.android.app.utils.Constants.MEGA_PASS_PACKAGE_NAME
 import mega.privacy.android.app.utils.Constants.MEGA_VPN_PACKAGE_NAME
 import mega.privacy.android.app.utils.ConstantsUrl.megaPwmUrl
 import mega.privacy.android.app.utils.ConstantsUrl.megaVpnUrl
-import mega.privacy.android.app.utils.LinksUtil
+import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.Companion.MEGA_APP_DOMAIN_NAME
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.Companion.MEGA_NZ_DOMAIN_NAME
+import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase.Companion.SESSION_STRING
 import mega.privacy.mobile.analytics.event.PwmSmartBannerItemSelectedEvent
 import mega.privacy.mobile.analytics.event.VpnSmartBannerItemSelectedEvent
 
@@ -36,7 +39,7 @@ class BannerClickHandler(private val fragment: HomepageFragment) :
             }
 
             matchesReferralUrl(link) -> {
-                LinksUtil.requiresTransferSession(context, link)
+                checkIfLinkRequiresTransferSession(context, link)
             }
 
             matchesSettingsUrl(link) -> {
@@ -59,6 +62,21 @@ class BannerClickHandler(private val fragment: HomepageFragment) :
 
             else -> {
                 context.launchUrl(link)
+            }
+        }
+    }
+
+    private fun checkIfLinkRequiresTransferSession(context: Context, url: String) {
+        if (url.contains(SESSION_STRING)) {
+            val start = url.indexOf(SESSION_STRING)
+            if (start != -1) {
+                val path = url.substring(start + SESSION_STRING.length);
+                if (!isTextEmpty(path)) {
+                    MegaApplication.getInstance().megaApi.getSessionTransferURL(
+                        path,
+                        SessionTransferURLListener(context)
+                    )
+                }
             }
         }
     }

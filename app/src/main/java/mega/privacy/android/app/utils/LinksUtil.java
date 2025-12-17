@@ -2,42 +2,15 @@ package mega.privacy.android.app.utils;
 
 import static mega.privacy.android.app.utils.Constants.HANDLE;
 import static mega.privacy.android.app.utils.Constants.HANDLE_LIST;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 
 import androidx.fragment.app.Fragment;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.getLink.GetLinkActivity;
-import mega.privacy.android.app.listeners.SessionTransferURLListener;
 
 public class LinksUtil {
-
-    private static final String REQUIRES_TRANSFER_SESSION = "fm/";
-
-    /**
-     * Checks if the link received requires transfer session.
-     *
-     * @param url link to check
-     * @return True if the link requires transfer session, false otherwise.
-     */
-    public static boolean requiresTransferSession(Context context, String url) {
-        if (url.contains(REQUIRES_TRANSFER_SESSION)) {
-            int start = url.indexOf(REQUIRES_TRANSFER_SESSION);
-            if (start != -1) {
-                String path = url.substring(start + REQUIRES_TRANSFER_SESSION.length());
-                if (!isTextEmpty(path)) {
-                    MegaApplication.getInstance().getMegaApi().getSessionTransferURL(path, new SessionTransferURLListener(context));
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
 
     /**
      * Splits the link from its decryption key and returns the link.

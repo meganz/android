@@ -16,6 +16,7 @@ import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.QueryResetPasswordLinkUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.link.DecodeLinkUseCase
+import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
@@ -40,6 +41,7 @@ class OpenLinkViewModel @Inject constructor(
     private val queryResetPasswordLinkUseCase: QueryResetPasswordLinkUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getSessionLinkUseCase: GetSessionLinkUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OpenLinkUiState())
@@ -171,6 +173,18 @@ class OpenLinkViewModel @Inject constructor(
     fun onResetPasswordLinkResultConsumed() {
         _uiState.update {
             it.copy(resetPasswordLinkResult = null)
+        }
+    }
+
+    fun getLinkWithSession() {
+        uiState.value.decodedUrl?.let { link ->
+            viewModelScope.launch {
+                val url = runCatching { getSessionLinkUseCase(link) }
+                    .onFailure { Timber.e(it) }
+                    .getOrNull() ?: link
+
+                _uiState.update { state -> state.copy(urlToOpen = url) }
+            }
         }
     }
 }

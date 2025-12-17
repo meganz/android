@@ -37,6 +37,7 @@ import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.login.LoginActivity.Companion.ACTION_REFRESH_AND_OPEN_SESSION_LINK
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.usecase.orientation.enableAdaptiveLayout
 import mega.privacy.android.app.utils.CallUtil
@@ -88,7 +89,6 @@ import mega.privacy.android.app.utils.Constants.VERIFY_CHANGE_MAIL_LINK_REGEXS
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.Constants.WEB_SESSION_LINK_REGEXS
 import mega.privacy.android.app.utils.ConstantsUrl.recoveryUrl
-import mega.privacy.android.app.utils.LinksUtil.requiresTransferSession
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util.matchRegexs
 import mega.privacy.android.app.utils.isURLSanitized
@@ -99,6 +99,7 @@ import mega.privacy.android.domain.usecase.GetUrlRegexPatternTypeUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.Companion.MEGA_APP_DOMAIN_NAME
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.Companion.MEGA_NZ_DOMAIN_NAME
+import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase.Companion.requiresSession
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.DeeplinkHandler
 import mega.privacy.android.navigation.MegaNavigator
@@ -253,6 +254,8 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                         finish()
                     }
                 }
+
+                urlToOpen?.let { url -> openWebLink(url) }
             }
         }
 
@@ -540,7 +543,11 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                         // Browser open the link which does not require app to handle
                         Timber.d("Browser open link: $url")
                         url?.let {
-                            checkIfRequiresTransferSession(it)
+                            checkIfRequiresTransferSession(
+                                isLoggedIn = true,
+                                needsRefreshSession = needsRefreshSession,
+                                url = it
+                            )
                         }
                     }
                 } else {
@@ -669,7 +676,11 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                 // Browser open the link which does not require app to handle
                 Timber.d("Browser open link: $url")
                 url?.let {
-                    checkIfRequiresTransferSession(it)
+                    checkIfRequiresTransferSession(
+                        isLoggedIn = isLoggedIn,
+                        needsRefreshSession = needsRefreshSession,
+                        url = it,
+                    )
                 }
             }
         }
@@ -795,8 +806,32 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
     /**
      * Check the url if requires transfer session, if yes open web link.
      */
-    private fun checkIfRequiresTransferSession(url: String) {
-        if (!requiresTransferSession(this, url)) {
+    private fun checkIfRequiresTransferSession(
+        isLoggedIn: Boolean,
+        needsRefreshSession: Boolean,
+        url: String,
+    ) {
+        if (url.requiresSession()) {
+            when {
+                !isLoggedIn -> {
+                    Timber.w("Not logged in")
+                    setError(getString(sharedR.string.general_alert_not_logged_in))
+                }
+
+                needsRefreshSession -> {
+                    LoginActivity.getIntent(
+                        context = this,
+                        action = ACTION_REFRESH_AND_OPEN_SESSION_LINK,
+                        link = url.toUri(),
+                    ).also { startActivity(it) }
+                    finish()
+                }
+
+                else -> {
+                    viewModel.getLinkWithSession()
+                }
+            }
+        } else {
             openWebLink(url)
         }
     }

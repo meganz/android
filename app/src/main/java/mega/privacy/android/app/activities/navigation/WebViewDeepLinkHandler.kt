@@ -3,41 +3,66 @@ package mega.privacy.android.app.activities.navigation
 import android.net.Uri
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.domain.entity.RegexPatternType
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase
+import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase.Companion.requiresSession
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.DeepLinksAfterFetchNodesDialogNavKey
 import mega.privacy.android.navigation.destination.WebSiteNavKey
+import mega.privacy.android.shared.resources.R
 import timber.log.Timber
 import javax.inject.Inject
 
 class WebViewDeepLinkHandler @Inject constructor(
     private val getSessionLinkUseCase: GetSessionLinkUseCase,
+    private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     snackbarEventQueue: SnackbarEventQueue,
 ) : DeepLinkHandler(snackbarEventQueue) {
 
     override suspend fun getNavKeys(
         uri: Uri,
         regexPatternType: RegexPatternType?,
-    ): List<NavKey>? = if (regexPatternType == RegexPatternType.EMAIL_VERIFY_LINK ||
-        regexPatternType == RegexPatternType.WEB_SESSION_LINK ||
-        regexPatternType == RegexPatternType.BUSINESS_INVITE_LINK ||
-        regexPatternType == RegexPatternType.MEGA_DROP_LINK ||
-        regexPatternType == RegexPatternType.MEGA_FILE_REQUEST_LINK ||
-        regexPatternType == RegexPatternType.REVERT_CHANGE_PASSWORD_LINK ||
-        regexPatternType == RegexPatternType.INSTALLER_DOWNLOAD_LINK ||
-        regexPatternType == RegexPatternType.MEGA_BLOG_LINK ||
-        regexPatternType == RegexPatternType.PURCHASE_LINK
-    ) {
-        listOf(WebSiteNavKey(uri.toString()))
-    } else {
-        runCatching { getSessionLinkUseCase(uri.toString()) }
-            .onFailure { Timber.w(it) }.getOrNull()?.let { sessionLink ->
-                listOf(WebSiteNavKey(sessionLink))
-            } ?: if (regexPatternType == RegexPatternType.MEGA_LINK) {
-            listOf(WebSiteNavKey(uri.toString()))
+        isLoggedIn: Boolean,
+    ): List<NavKey>? = when (regexPatternType) {
+        RegexPatternType.EMAIL_VERIFY_LINK,
+        RegexPatternType.WEB_SESSION_LINK,
+        RegexPatternType.BUSINESS_INVITE_LINK,
+        RegexPatternType.MEGA_DROP_LINK,
+        RegexPatternType.MEGA_FILE_REQUEST_LINK,
+        RegexPatternType.REVERT_CHANGE_PASSWORD_LINK,
+        RegexPatternType.INSTALLER_DOWNLOAD_LINK,
+        RegexPatternType.MEGA_BLOG_LINK,
+        RegexPatternType.PURCHASE_LINK,
+            -> listOf(WebSiteNavKey(uri.toString()))
+
+        RegexPatternType.MEGA_LINK -> if (uri.toString().requiresSession()) {
+            when {
+                !isLoggedIn -> {
+                    snackbarEventQueue.queueMessage(R.string.general_alert_not_logged_in)
+                    emptyList()
+                }
+
+                !rootNodeExistsUseCase() -> {
+                    listOf(
+                        DeepLinksAfterFetchNodesDialogNavKey(
+                            deepLink = uri.toString(),
+                            regexPatternType = RegexPatternType.MEGA_LINK
+                        )
+                    )
+                }
+
+                else -> runCatching { getSessionLinkUseCase(uri.toString()) }
+                    .onFailure { Timber.w(it) }
+                    .getOrNull()?.let { sessionLink ->
+                        listOf(WebSiteNavKey(sessionLink))
+                    } ?: listOf(WebSiteNavKey(uri.toString()))
+            }
         } else {
-            null
+            listOf(WebSiteNavKey(uri.toString()))
         }
+
+        else -> super.getNavKeys(uri, regexPatternType, isLoggedIn)
     }
 
     /**

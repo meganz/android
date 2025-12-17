@@ -78,8 +78,8 @@ fun LoginScreen(
         }
     }
 
-    EventEffect(uiState.openRecoveryUrlEvent, viewModel::onOpenRecoveryUrlEventConsumed) {
-        openRecoveryUrl(context, it)
+    EventEffect(uiState.openUrlEvent, viewModel::onOpenUrlEventConsumed) {
+        openUrl(context, it)
     }
 
     BackHandler {
@@ -213,7 +213,7 @@ private fun navigateToChangePassword(context: Context, link: String, value: Stri
     context.startActivity(intent)
 }
 
-private fun openRecoveryUrl(context: Context, url: String) {
+private fun openUrl(context: Context, url: String) {
     Timber.d("Open recovery url $url")
     context.launchUrl(url)
 }

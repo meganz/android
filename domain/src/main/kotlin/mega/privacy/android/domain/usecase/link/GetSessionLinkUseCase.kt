@@ -10,15 +10,13 @@ class GetSessionLinkUseCase @Inject constructor(
     private val getSessionTransferURLUseCase: GetSessionTransferURLUseCase,
 ) {
 
-    private val sessionString = "fm/"
-
     suspend operator fun invoke(link: String): String? =
-        if (link.contains(sessionString)) {
-            link.indexOf(sessionString).let { index ->
+        if (link.requiresSession()) {
+            link.indexOf(SESSION_STRING).let { index ->
                 if (index == -1) {
                     null
                 } else {
-                    link.substring(index + sessionString.length).takeIf { it.isNotEmpty() }
+                    link.substring(index + SESSION_STRING.length).takeIf { it.isNotEmpty() }
                         ?.let { path ->
                             runCatching { getSessionTransferURLUseCase(path) }.getOrNull()
                         }
@@ -27,4 +25,10 @@ class GetSessionLinkUseCase @Inject constructor(
         } else {
             null
         }
+
+    companion object {
+        const val SESSION_STRING = "fm/"
+
+        fun String.requiresSession() = contains(SESSION_STRING)
+    }
 }

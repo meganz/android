@@ -86,6 +86,7 @@ import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
 import mega.privacy.android.domain.usecase.login.FastLoginUseCase
@@ -182,6 +183,7 @@ class LoginViewModel @Inject constructor(
     private val getDomainNameUseCase: GetDomainNameUseCase,
     private val monitorMiscLoadedUseCase: MonitorMiscLoadedUseCase,
     private val getUserDataUseCase: GetUserDataUseCase,
+    private val getSessionLinkUseCase: GetSessionLinkUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -1347,7 +1349,7 @@ class LoginViewModel @Inject constructor(
 
                 recoveryUrlWithEmail(domain) + email
             }
-            _state.update { it.copy(openRecoveryUrlEvent = triggered(url)) }
+            _state.update { it.copy(openUrlEvent = triggered(url)) }
         }
     }
 
@@ -1356,18 +1358,28 @@ class LoginViewModel @Inject constructor(
             waitMiscFlagsLoaded()
             val domain = getDomainNameUseCase()
             val url = recoveryUrl(domain)
-            _state.update { it.copy(openRecoveryUrlEvent = triggered(url)) }
+            _state.update { it.copy(openUrlEvent = triggered(url)) }
         }
     }
 
-    fun onOpenRecoveryUrlEventConsumed() {
-        _state.update { it.copy(openRecoveryUrlEvent = consumed()) }
+    fun onOpenUrlEventConsumed() {
+        _state.update { it.copy(openUrlEvent = consumed()) }
     }
 
     private suspend fun waitMiscFlagsLoaded() {
         if (!_state.value.miscFlagLoaded) {
             getMiscFlagsUseCase()
             _state.first { it.miscFlagLoaded }
+        }
+    }
+
+    fun getLinkWithSession(link: String) {
+        viewModelScope.launch {
+            val url = runCatching { getSessionLinkUseCase(link) }
+                .onFailure { Timber.e(it) }
+                .getOrNull() ?: link
+
+            _state.update { it.copy(openUrlEvent = triggered(url)) }
         }
     }
 

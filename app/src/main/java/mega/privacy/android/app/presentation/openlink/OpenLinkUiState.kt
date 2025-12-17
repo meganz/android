@@ -25,4 +25,5 @@ data class OpenLinkUiState(
     val urlRedirectionEvent: Boolean = false,
     val resetPasswordLinkResult: Result<ResetPasswordLinkInfo>? = null,
     val navigateToSingleActivity: Boolean = false,
+    val urlToOpen: String? = null,
 )

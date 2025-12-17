@@ -59,7 +59,7 @@ import mega.privacy.android.domain.exception.LoginException
  * @property accountBlockedEvent
  * @property resendVerificationEmailEvent
  * @property checkRecoveryKeyEvent
- * @property openRecoveryUrlEvent
+ * @property openUrlEvent
  * @property miscFlagLoaded
  * @property shouldShowUpgradeAccount
  * @property recoveryKeyLink
@@ -105,7 +105,7 @@ data class LoginState(
     val accountBlockedEvent: StateEventWithContent<AccountBlockedUiState> = consumed(),
     val resendVerificationEmailEvent: StateEventWithContent<Boolean> = consumed(),
     val checkRecoveryKeyEvent: StateEventWithContent<Result<RkLink>> = consumed(),
-    val openRecoveryUrlEvent: StateEventWithContent<String> = consumed(),
+    val openUrlEvent: StateEventWithContent<String> = consumed(),
     val miscFlagLoaded: Boolean = false,
     val shouldShowUpgradeAccount: Boolean = false,
     val recoveryKeyLink: String? = null,
