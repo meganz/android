@@ -249,6 +249,7 @@ interface IconPackInterface {
                 val Menu01: ImageVector
                 val Phone01: ImageVector
                 val PlayCircle: ImageVector
+                val RectangleVideoStack: ImageVector
             }
         }
     }

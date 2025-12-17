@@ -7,7 +7,6 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -36,7 +35,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
-import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.tabs.MegaScrollableTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
@@ -80,6 +78,7 @@ import mega.privacy.android.feature.photos.model.MediaScreen
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabRoute
+import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistsTabRoute
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabActionUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabRoute
@@ -848,12 +847,9 @@ private fun MediaScreen.MediaContent(
             navigationHandler = navigationHandler
         )
 
-        //TODO: Implement Playlists Screens
-        else -> {
-            Box(modifier) {
-                MegaText("Playlists Screen - To be implemented")
-            }
-        }
+        MediaScreen.Playlists -> VideoPlaylistsTabRoute(
+            modifier = modifier
+        )
     }
 }
 

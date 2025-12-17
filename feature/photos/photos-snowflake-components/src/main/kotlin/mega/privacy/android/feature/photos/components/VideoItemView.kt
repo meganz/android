@@ -121,7 +121,7 @@ fun VideoItemView(
         if (showMenuButton) {
             MegaIcon(
                 imageVector = if (isSelected)
-                    IconPack.Medium.Thin.Outline.CheckCircle
+                    IconPack.Medium.Thin.Solid.CheckCircle
                 else
                     IconPack.Medium.Thin.Outline.MoreVertical,
                 tint = IconColor.Primary,

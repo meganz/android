@@ -143,6 +143,7 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinSolidLink01ImageVe
 import mega.privacy.android.icon.pack.vectors.createMediumThinSolidMenu01ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinSolidPhone01ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinSolidPlayCircleImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinSolidRectangleVideoStackImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineArrowDownCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineArrowDownImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineArrowUpImageVector
@@ -557,6 +558,9 @@ public object IconPack : IconPackInterface {
 
                 override val PlayCircle: ImageVector by lazy {
                         createMediumThinSolidPlayCircleImageVector() }
+
+                override val RectangleVideoStack: ImageVector by lazy {
+                        createMediumThinSolidRectangleVideoStackImageVector() }
             }
         }
     }
