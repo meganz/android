@@ -114,7 +114,8 @@ fun AlbumsTabScreen(
                 },
                 title = HighlightedText(album.title),
                 placeholder = placeholder,
-                errorPlaceholder = placeholder
+                errorPlaceholder = placeholder,
+                isExported = album.isExported
             )
         }
     }

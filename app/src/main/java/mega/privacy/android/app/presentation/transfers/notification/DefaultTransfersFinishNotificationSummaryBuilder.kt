@@ -10,9 +10,8 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.transfer.TransfersFinishNotificationSummaryBuilder
 import mega.privacy.android.data.worker.AbstractTransfersWorker.Companion.finalSummaryGroup
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import javax.inject.Inject
 
@@ -21,7 +20,7 @@ import javax.inject.Inject
  */
 class DefaultTransfersFinishNotificationSummaryBuilder @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val megaNavigator: MegaNavigator,
 ) : TransfersFinishNotificationSummaryBuilder {
 
     override suspend fun invoke(type: TransferType) =
@@ -39,7 +38,7 @@ class DefaultTransfersFinishNotificationSummaryBuilder @Inject constructor(
             .setGroupSummary(true)
             .setContentIntent(
                 TransfersActivity.getPendingIntentForTransfersSection(
-                    getFeatureFlagValueUseCase(AppFeatures.SingleActivity),
+                    megaNavigator,
                     context,
                     TransfersNavKey.Tab.Completed
                 )

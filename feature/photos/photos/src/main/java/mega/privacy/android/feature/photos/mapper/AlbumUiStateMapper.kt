@@ -24,11 +24,16 @@ class AlbumUiStateMapper @Inject constructor(
             is MediaAlbum.System -> album.id.albumName
             is MediaAlbum.User -> album.title
         }
+        val isExported = when (album) {
+            is MediaAlbum.User -> album.isExported
+            is MediaAlbum.System -> false
+        }
 
         return AlbumUiState(
             mediaAlbum = album,
             title = title,
-            cover = album.cover?.let { photoUiStateMapper(it) }
+            isExported = isExported,
+            cover = album.cover?.let { photoUiStateMapper(it) },
         )
     }
 }

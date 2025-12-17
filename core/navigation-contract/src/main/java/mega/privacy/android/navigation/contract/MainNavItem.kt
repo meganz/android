@@ -51,3 +51,13 @@ data class DefaultIconBadge(
     override val count = 1
 }
 
+fun Iterable<MainNavItem>.sortedByPreferredSlot(): List<MainNavItem> {
+    return sortedWith(
+        compareBy { navItem ->
+            when (val slot = navItem.preferredSlot) {
+                is PreferredSlot.Ordered -> slot.slot
+                is PreferredSlot.Last -> Int.MAX_VALUE
+            }
+        }
+    )
+}

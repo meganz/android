@@ -12,10 +12,7 @@ import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.GetNodesToAttachUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachContactsUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactHandleUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.feature_flags.AppFeatures
-import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
-import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.MegaNavigator
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -23,12 +20,9 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import org.mockito.kotlin.wheneverBlocking
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -38,8 +32,7 @@ class NodeAttachmentViewModelTest {
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase = mock()
     private val getContactHandleUseCase: GetContactHandleUseCase = mock()
     private val attachContactsUseCase: AttachContactsUseCase = mock()
-    private val navigationEventQueue = mock<NavigationEventQueue>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val megaNavigator = mock<MegaNavigator>()
 
     private lateinit var underTest: NodeAttachmentViewModel
 
@@ -51,10 +44,8 @@ class NodeAttachmentViewModelTest {
             get1On1ChatIdUseCase = get1On1ChatIdUseCase,
             getContactHandleUseCase = getContactHandleUseCase,
             attachContactsUseCase = attachContactsUseCase,
-            navigationEventQueue = navigationEventQueue,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            megaNavigator = megaNavigator,
         )
-        wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) } doReturn false
     }
 
     @BeforeEach
@@ -65,8 +56,7 @@ class NodeAttachmentViewModelTest {
             get1On1ChatIdUseCase,
             getContactHandleUseCase,
             attachContactsUseCase,
-            navigationEventQueue,
-            getFeatureFlagValueUseCase
+            megaNavigator
         )
     }
 
@@ -186,28 +176,6 @@ class NodeAttachmentViewModelTest {
                 assertThat((state.event as NodeAttachmentEvent.AttachNodeSuccess).chatIds).isEqualTo(
                     listOf(4L, 1L, 2L)
                 )
-            }
-        }
-
-    @Test
-    fun `test that navigate to chat emits to navigation event queue when SingleActivity feature flag is enabled`() =
-        runTest {
-            val chatId = 123L
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn true
-            underTest.navigateToChat(chatId)
-
-            verify(navigationEventQueue).emit(ChatNavKey(chatId, null))
-        }
-
-    @Test
-    fun `test that navigate to chat updates state with NavigateToChatLegacy event when SingleActivity feature flag is disabled`() =
-        runTest {
-            val chatId = 123L
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn false
-            underTest.navigateToChat(chatId)
-            underTest.uiState.test {
-                val state = awaitItem()
-                assertThat(state.event).isEqualTo(NodeAttachmentEvent.NavigateToChatLegacy(chatId))
             }
         }
 }

@@ -651,6 +651,14 @@ class GetUrlRegexPatternTypeUseCaseTest {
             "Invalid Reset Password Link - Wrong Domain",
             "https://mega.io/recover/abc123"
         ),
+        Arguments.of(
+            "Invalid Reset Password Link - Wrong Domain",
+            "https://mega.app/recovery"
+        ),
+        Arguments.of(
+            "Invalid Reset Password Link - Wrong Domain",
+            "https://mega.nz/recovery"
+        ),
     )
 
     private fun invalidPendingContactLinks(): Stream<Arguments> = Stream.of(

@@ -34,6 +34,8 @@ import mega.privacy.android.domain.entity.RegexPatternType.UPGRADE_PAGE_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.VERIFY_CHANGE_MAIL_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.WEB_SESSION_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.WHITELISTED_URL
+import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.Companion.MEGA_APP_DOMAIN_NAME
+import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.Companion.MEGA_NZ_DOMAIN_NAME
 import javax.inject.Inject
 
 /**
@@ -53,6 +55,16 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
         when {
             !isUrlSanitized(url) -> RESTRICTED
             isUrlWhitelistedUseCase(url) -> WHITELISTED_URL
+            isUrlMatchesRegexUseCase(url, EMAIL_VERIFY_LINK_REGEX) -> EMAIL_VERIFY_LINK
+            isUrlMatchesRegexUseCase(url, WEB_SESSION_LINK_REGEX) -> WEB_SESSION_LINK
+            isUrlMatchesRegexUseCase(url, BUSINESS_INVITE_LINK_REGEX) -> BUSINESS_INVITE_LINK
+            isUrlMatchesRegexUseCase(url, MEGA_DROP_LINK_REGEX) -> MEGA_DROP_LINK
+            isUrlMatchesRegexUseCase(url, MEGA_FILE_REQUEST_LINK_REGEXES) -> MEGA_FILE_REQUEST_LINK
+            isUrlMatchesRegexUseCase(url, INSTALLER_DOWNLOAD_LINK_REGEX) -> INSTALLER_DOWNLOAD_LINK
+            isUrlMatchesRegexUseCase(url, MEGA_BLOG_LINK_REGEX) -> MEGA_BLOG_LINK
+            isUrlMatchesRegexUseCase(url, REVERT_CHANGE_PASSWORD_LINK_REGEX)
+                -> REVERT_CHANGE_PASSWORD_LINK
+
             isUrlMatchesRegexUseCase(url, FILE_LINK_REGEX) -> FILE_LINK
             isUrlMatchesRegexUseCase(url, CONFIRMATION_LINK_REGEX) -> CONFIRMATION_LINK
             isUrlMatchesRegexUseCase(url, FOLDER_LINK_REGEX) -> FOLDER_LINK
@@ -64,21 +76,13 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             isUrlMatchesRegexUseCase(url, NEW_MESSAGE_CHAT_LINK_REGEX) -> NEW_MESSAGE_CHAT_LINK
             isUrlMatchesRegexUseCase(url, CANCEL_ACCOUNT_LINK_REGEX) -> CANCEL_ACCOUNT_LINK
             isUrlMatchesRegexUseCase(url, VERIFY_CHANGE_MAIL_LINK_REGEX) -> VERIFY_CHANGE_MAIL_LINK
-            isUrlMatchesRegexUseCase(url, RESET_PASSWORD_LINK_REGEX) -> RESET_PASSWORD_LINK
+            isUrlMatchesRegexUseCase(url, RESET_PASSWORD_LINK_REGEX) && !matchesRecoveryUrl(url)
+                -> RESET_PASSWORD_LINK
+
             isUrlMatchesRegexUseCase(url, PENDING_CONTACTS_LINK_REGEX) -> PENDING_CONTACTS_LINK
             isUrlMatchesRegexUseCase(url, HANDLE_LINK_REGEX) -> HANDLE_LINK
             isUrlMatchesRegexUseCase(url, CONTACT_LINK_REGEX) -> CONTACT_LINK
-            isUrlMatchesRegexUseCase(url, MEGA_DROP_LINK_REGEX) -> MEGA_DROP_LINK
-            isUrlMatchesRegexUseCase(url, MEGA_FILE_REQUEST_LINK_REGEXES) -> MEGA_FILE_REQUEST_LINK
-            isUrlMatchesRegexUseCase(url, MEGA_BLOG_LINK_REGEX) -> MEGA_BLOG_LINK
-            isUrlMatchesRegexUseCase(url, REVERT_CHANGE_PASSWORD_LINK_REGEX)
-                -> REVERT_CHANGE_PASSWORD_LINK
-
-            isUrlMatchesRegexUseCase(url, EMAIL_VERIFY_LINK_REGEX) -> EMAIL_VERIFY_LINK
-            isUrlMatchesRegexUseCase(url, WEB_SESSION_LINK_REGEX) -> WEB_SESSION_LINK
-            isUrlMatchesRegexUseCase(url, BUSINESS_INVITE_LINK_REGEX) -> BUSINESS_INVITE_LINK
             isUrlMatchesRegexUseCase(url, UPGRADE_PAGE_LINK_REGEX) -> UPGRADE_PAGE_LINK
-            isUrlMatchesRegexUseCase(url, INSTALLER_DOWNLOAD_LINK_REGEX) -> INSTALLER_DOWNLOAD_LINK
             isUrlMatchesRegexUseCase(url, PURCHASE_LINK_REGEX) -> PURCHASE_LINK
             isUrlMatchesRegexUseCase(url, UPGRADE_LINK_REGEX) -> UPGRADE_LINK
             isUrlMatchesRegexUseCase(url, ENABLE_CAMERA_UPLOADS_LINK_REGEX)
@@ -90,6 +94,18 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             isUrlMatchesRegexUseCase(url, MEGA_REGEX) -> MEGA_LINK
             else -> RESTRICTED
         }
+
+    /**
+     * Check if the provided url matches recovery url
+     */
+    private fun matchesRecoveryUrl(url: String?) =
+        url == recoveryUrl(MEGA_NZ_DOMAIN_NAME)
+                || url == recoveryUrl(MEGA_APP_DOMAIN_NAME)
+
+    /**
+     * Url for accessing account recovery page.
+     */
+    private fun recoveryUrl(domainName: String) = "https://$domainName/recovery"
 
     private fun isUrlSanitized(url: String?) =
         !url.isNullOrBlank() &&

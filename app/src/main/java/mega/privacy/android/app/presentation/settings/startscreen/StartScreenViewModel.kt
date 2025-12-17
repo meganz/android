@@ -24,8 +24,10 @@ import mega.privacy.android.domain.usecase.preference.MonitorStartScreenPreferen
 import mega.privacy.android.domain.usecase.preference.SetStartScreenPreferenceDestinationUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.android.navigation.contract.qualifier.DefaultStartScreen
+import mega.privacy.android.navigation.contract.sortedByPreferredSlot
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import javax.inject.Inject
 
@@ -52,7 +54,10 @@ class StartScreenViewModel @Inject constructor(
                     combine(
                         flow { emit(mainDestinations) }
                             .map { navItems ->
-                                navItems.map { startScreenDestinationOptionMapper(it) }
+                                navItems
+                                    .filter { it.preferredSlot !is PreferredSlot.Last }
+                                    .sortedByPreferredSlot()
+                                    .map { startScreenDestinationOptionMapper(it) }
                             },
                         monitorStartScreenPreferenceDestinationUseCase()
                             .map { screenPreferenceDestinationMapper(it) }

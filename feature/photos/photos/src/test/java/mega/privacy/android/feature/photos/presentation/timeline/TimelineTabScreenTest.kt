@@ -10,6 +10,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
+import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
+import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
+import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -55,12 +58,11 @@ class TimelineTabScreenTest {
         mediaCameraUploadUiState: MediaCameraUploadUiState = MediaCameraUploadUiState(),
         timelineFilterUiState: TimelineFilterUiState = TimelineFilterUiState(),
         showTimelineSortDialog: Boolean = false,
+        selectedTimePeriod: PhotoModificationTimePeriod = PhotoModificationTimePeriod.All,
         clearCameraUploadsMessage: () -> Unit = {},
         clearCameraUploadsCompletedMessage: () -> Unit = {},
-        onChangeCameraUploadsPermissions: () -> Unit = {},
-        clearCameraUploadsChangePermissionsMessage: () -> Unit = {},
         loadNextPage: () -> Unit = {},
-        onNavigateCameraUploadsSettings: () -> Unit = {},
+        onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit = {},
         setEnableCUPage: (Boolean) -> Unit = {},
         onGridSizeChange: (value: TimelineGridSize) -> Unit = {},
         onSortDialogDismissed: () -> Unit = {},
@@ -70,6 +72,9 @@ class TimelineTabScreenTest {
         onDismissEnableCameraUploadsBanner: () -> Unit = {},
         handleCameraUploadsPermissionsResult: () -> Unit = {},
         updateIsWarningBannerShown: (value: Boolean) -> Unit = {},
+        onTabsVisibilityChange: (shouldHide: Boolean) -> Unit = {},
+        onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit = {},
+        onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit = {},
     ) {
         setContent {
             TimelineTabScreen(
@@ -77,12 +82,11 @@ class TimelineTabScreenTest {
                 mediaCameraUploadUiState = mediaCameraUploadUiState,
                 timelineFilterUiState = timelineFilterUiState,
                 showTimelineSortDialog = showTimelineSortDialog,
+                selectedTimePeriod = selectedTimePeriod,
                 clearCameraUploadsMessage = clearCameraUploadsMessage,
                 clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
-                onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
-                clearCameraUploadsChangePermissionsMessage = clearCameraUploadsChangePermissionsMessage,
                 loadNextPage = loadNextPage,
-                onNavigateCameraUploadsSettings = onNavigateCameraUploadsSettings,
+                onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
                 setEnableCUPage = setEnableCUPage,
                 onGridSizeChange = onGridSizeChange,
                 onSortDialogDismissed = onSortDialogDismissed,
@@ -91,7 +95,10 @@ class TimelineTabScreenTest {
                 onPhotoSelected = onPhotoSelected,
                 onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
                 handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
-                updateIsWarningBannerShown = updateIsWarningBannerShown
+                updateIsWarningBannerShown = updateIsWarningBannerShown,
+                onTabsVisibilityChange = onTabsVisibilityChange,
+                onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
+                onPhotoTimePeriodSelected = onPhotoTimePeriodSelected
             )
         }
     }

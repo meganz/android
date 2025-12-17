@@ -1,6 +1,8 @@
 package mega.privacy.android.app.nav
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -85,9 +87,11 @@ import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.destination.AchievementNavKey
+import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.DeviceCenterNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
+import mega.privacy.android.navigation.destination.GetLinkNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
 import mega.privacy.android.navigation.destination.SearchNodeNavKey
@@ -99,6 +103,7 @@ import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.navigation.settings.SettingsNavigator
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -123,8 +128,8 @@ internal class MegaNavigatorImpl @Inject constructor(
 
     private fun navigateForSingleActivity(
         context: Context,
-        singleActivityDestination: NavKey,
-        legacyNavigation: () -> Unit,
+        singleActivityDestination: NavKey?,
+        legacyNavigation: suspend () -> Unit,
     ) {
         applicationScope.launch {
             runCatching { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) }
@@ -133,7 +138,7 @@ internal class MegaNavigatorImpl @Inject constructor(
                 }.onSuccess { singleActivity ->
                     if (singleActivity) {
                         launchMegaActivityIfNeeded(context)
-                        navigationQueue.emit(singleActivityDestination)
+                        singleActivityDestination?.let { navigationQueue.emit(it) }
                     } else {
                         legacyNavigation()
                     }
@@ -169,17 +174,29 @@ internal class MegaNavigatorImpl @Inject constructor(
         isOverQuota: Int?,
         flags: Int,
     ) {
-        val intent = getChatActivityIntent(
+        navigateForSingleActivity(
             context = context,
-            action = action,
-            link = link,
-            text = text,
-            chatId = chatId,
-            messageId = messageId,
-            isOverQuota = isOverQuota,
-            flags = flags
-        )
-        context.startActivity(intent)
+            singleActivityDestination = ChatNavKey(
+                chatId = chatId,
+                action = action,
+                link = link,
+                snackbarText = text,
+                messageId = messageId,
+                isOverQuota = isOverQuota,
+            )
+        ) {
+            val intent = getChatActivityIntent(
+                context = context,
+                action = action,
+                link = link,
+                text = text,
+                chatId = chatId,
+                messageId = messageId,
+                isOverQuota = isOverQuota,
+                flags = flags
+            )
+            context.startActivity(intent)
+        }
     }
 
     override fun openUpgradeAccount(context: Context, source: UpgradeAccountSource) {
@@ -207,9 +224,12 @@ internal class MegaNavigatorImpl @Inject constructor(
             putExtra(EXTRA_ACTION, action)
             text?.let { putExtra(Constants.SHOW_SNACKBAR, text) }
             putExtra(Constants.CHAT_ID, chatId)
-            messageId?.let { putExtra("ID_MSG", messageId) }
-            isOverQuota?.let { putExtra("IS_OVERQUOTA", isOverQuota) }
-            if (flags > 0) setFlags(flags)
+            messageId?.let { putExtra(Constants.ID_MSG, messageId) }
+            isOverQuota?.let { putExtra(Constants.IS_OVERQUOTA, isOverQuota) }
+            // Use setFlags for consistency with ChatHostDestination
+            if (flags > 0) {
+                setFlags(flags)
+            }
         }
         link?.let {
             intent.putExtra(EXTRA_LINK, it)
@@ -643,18 +663,26 @@ internal class MegaNavigatorImpl @Inject constructor(
         context.startActivity(textFileIntent)
     }
 
-    override fun openGetLinkActivity(context: Context, handle: Long) {
-        context.startActivity(
-            Intent(context, GetLinkActivity::class.java)
-                .putExtra(Constants.HANDLE, handle)
-        )
-    }
+    override fun openGetLinkActivity(context: Context, vararg handles: Long) {
+        if (handles.isEmpty()) {
+            Timber.e("openGetLinkActivity: No handles provided, aborting operation.")
+            return
+        }
 
-    override fun openGetLinkActivity(context: Context, handles: LongArray) {
-        context.startActivity(
-            Intent(context, GetLinkActivity::class.java)
-                .putExtra(Constants.HANDLE_LIST, handles)
-        )
+        val handlesList = handles.toList()
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = GetLinkNavKey(handles = handlesList)
+        ) {
+            val intent = Intent(context, GetLinkActivity::class.java).apply {
+                if (handles.size == 1) {
+                    putExtra(Constants.HANDLE, handles[0])
+                } else {
+                    putExtra(Constants.HANDLE_LIST, longArrayOf(*handles))
+                }
+            }
+            context.startActivity(intent)
+        }
     }
 
     override fun openFileInfoActivity(context: Context, handle: Long) {
@@ -844,29 +872,43 @@ internal class MegaNavigatorImpl @Inject constructor(
         action: String?,
         bundle: Bundle?,
         flags: Int?,
-        singleActivityDestination: NavKey,
+        singleActivityDestination: NavKey?,
+        onIntentCreated: (suspend (Intent) -> Unit)?,
     ) {
         navigateForSingleActivity(
             context = context,
-            singleActivityDestination = singleActivityDestination
+            singleActivityDestination = singleActivityDestination,
         ) {
-            navigateToManagerActivity(context, action, data, bundle, flags)
+            navigateToManagerActivity(context, action, data, bundle, flags, onIntentCreated)
         }
     }
 
+    override suspend fun getPendingIntentConsideringSingleActivity(
+        context: Context,
+        legacyActivityClass: Class<out Activity>,
+        createPendingIntent: (Intent) -> PendingIntent,
+        singleActivityPendingIntent: () -> PendingIntent,
+    ): PendingIntent = if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
+        singleActivityPendingIntent()
+    } else {
+        createPendingIntent(Intent(context, legacyActivityClass))
+    }
+
     @SuppressLint("ManagerActivityIntent")
-    private fun navigateToManagerActivity(
+    private suspend fun navigateToManagerActivity(
         context: Context,
         action: String?,
         data: Uri?,
         bundle: Bundle?,
         flags: Int? = null,
+        onIntentCreated: (suspend (Intent) -> Unit)? = null,
     ) {
         val intent = Intent(context, ManagerActivity::class.java)
         intent.action = action
         intent.data = data
         flags?.let { intent.flags = it }
         bundle?.let { intent.putExtras(it) }
+        onIntentCreated?.invoke(intent)
         context.startActivity(intent)
     }
 

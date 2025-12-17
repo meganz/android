@@ -18,14 +18,14 @@ import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.GetBandwidthOverQuotaDelayUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
+import mega.privacy.android.navigation.getPendingIntentConsideringSingleActivity
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaAccountDetails
 import javax.inject.Inject
@@ -39,7 +39,7 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
     private val accountInfoFacade: AccountInfoFacade,
     private val getBandwidthOverQuotaDelayUseCase: GetBandwidthOverQuotaDelayUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val megaNavigator: MegaNavigator,
 ) : OverQuotaNotificationBuilder {
 
     override suspend operator fun invoke(storageOverQuota: Boolean) = if (storageOverQuota) {
@@ -70,7 +70,7 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
             PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val clickPendingIntent = TransfersActivity.getPendingIntentForTransfersSection(
-            getFeatureFlagValueUseCase(AppFeatures.SingleActivity),
+            megaNavigator,
             context,
             TransfersNavKey.Tab.Active,
         )
@@ -102,22 +102,26 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
     private suspend fun storageOverQuotaNotification(): Notification = with(context) {
         val contentText = getString(R.string.download_show_info)
         val message = getString(R.string.overquota_alert_title)
-        val pendingIntent = if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-            MegaActivity.getPendingIntentWithExtraDestination(
-                context = applicationContext,
-                navKey = OverQuotaDialogNavKey(isOverQuota = true),
-            )
-        } else {
-            val intent = Intent(this, ManagerActivity::class.java)
-            intent.action = Constants.ACTION_OVERQUOTA_STORAGE
+        val pendingIntent =
+            megaNavigator.getPendingIntentConsideringSingleActivity<ManagerActivity>(
+            context = context,
+            createPendingIntent = { intent ->
+                intent.action = Constants.ACTION_OVERQUOTA_STORAGE
 
-            PendingIntent.getActivity(
-                applicationContext,
-                0,
-                intent,
-                PendingIntent.FLAG_IMMUTABLE
-            )
-        }
+                PendingIntent.getActivity(
+                    applicationContext,
+                    0,
+                    intent,
+                    PendingIntent.FLAG_IMMUTABLE
+                )
+            },
+            singleActivityPendingIntent = {
+                MegaActivity.getPendingIntentWithExtraDestination(
+                    context = applicationContext,
+                    navKey = OverQuotaDialogNavKey(isOverQuota = true),
+                )
+            }
+        )
         val builder = NotificationCompat.Builder(
             context,
             Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID,

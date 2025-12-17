@@ -13,7 +13,7 @@ import mega.privacy.android.domain.entity.resetpassword.ResetPasswordLinkInfo
  * @property logoutCompletedEvent true if logout is completed
  * @property urlRedirectionEvent true if url redirection is needed
  * @property resetPasswordLinkResult result of reset password link
- * @property deepLinkDestinationsAddedEvent true if needs to navigate to MegaActivity due to deep links already processed
+ * @property navigateToSingleActivity true if needs to navigate to MegaActivity with deep link pending to process
  */
 data class OpenLinkUiState(
     val isLoggedIn: Boolean? = null,
@@ -24,5 +24,5 @@ data class OpenLinkUiState(
     val logoutCompletedEvent: Boolean = false,
     val urlRedirectionEvent: Boolean = false,
     val resetPasswordLinkResult: Result<ResetPasswordLinkInfo>? = null,
-    val deepLinkDestinationsAddedEvent: Boolean = false,
+    val navigateToSingleActivity: Boolean = false,
 )

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.activities
 
-import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
@@ -9,15 +8,12 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.core.text.HtmlCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ASK_PERMISSIONS
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.overdisk.OverDiskQuotaPaywallViewModel
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.TimeUtils.DATE_LONG_FORMAT
@@ -25,8 +21,8 @@ import mega.privacy.android.app.utils.TimeUtils.formatDate
 import mega.privacy.android.app.utils.TimeUtils.getHumanizedTimeMs
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.ExtraConstant
+import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import timber.log.Timber
@@ -107,43 +103,40 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
 
             R.id.upgrade_button -> {
                 Timber.i("Starting upgrade process after Over Disk Quota Paywall")
-                lifecycleScope.launch {
-                    runCatching {
-                        if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-                            megaNavigator.openUpgradeAccount(
-                                this@OverDiskQuotaPaywallActivity,
-                                UpgradeAccountSource.MY_ACCOUNT_SCREEN, //Matches the call made from managerActivity
-                            )
-                        } else {
-                            val intent = Intent(applicationContext, ManagerActivity::class.java)
-                                .putExtra(ExtraConstant.EXTRA_UPGRADE_ACCOUNT, true)
-                                .putExtra(ExtraConstant.EXTRA_ACCOUNT_TYPE, proPlanNeeded)
-                            startActivity(intent)
-                        }
-                    }.onFailure {
-                        Timber.e(it)
-                    }
-                    finish()
+                runCatching {
+                    megaNavigator.openManagerActivity(
+                        context = this,
+                        bundle = Bundle().apply {
+                            putBoolean(ExtraConstant.EXTRA_UPGRADE_ACCOUNT, true)
+                            proPlanNeeded?.let { putInt(ExtraConstant.EXTRA_ACCOUNT_TYPE, it) }
+                        },
+                        singleActivityDestination = UpgradeAccountNavKey(
+                            source = UpgradeAccountSource.MY_ACCOUNT_SCREEN, //Matches the call made from managerActivity
+                        )
+                    )
+
+                }.onFailure {
+                    Timber.e(it)
                 }
+                finish()
             }
         }
     }
 
     private fun launchManagerActivity() {
-        globalScope.launch {
-            runCatching {
-                if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-                    megaNavigator.launchMegaActivityIfNeeded(this@OverDiskQuotaPaywallActivity)
-                    finish() //MegaActivity already handles ask permission logic
-                } else {
-                    val askPermissions = isFirstLaunchUseCase()
-                    val intent = Intent(applicationContext, ManagerActivity::class.java)
-                        .putExtra(EXTRA_ASK_PERMISSIONS, askPermissions)
-                    startActivity(intent)
-                }
-            }.onFailure {
-                Timber.e(it)
-            }
+        runCatching {
+            megaNavigator.openManagerActivity(
+                context = this,
+                onIntentCreated = {
+                    it.putExtra(
+                        EXTRA_ASK_PERMISSIONS,
+                        isFirstLaunchUseCase()
+                    )
+                },
+                singleActivityDestination = null //MegaActivity already handles ask permission logic
+            )
+        }.onFailure {
+            Timber.e(it)
         }
     }
 

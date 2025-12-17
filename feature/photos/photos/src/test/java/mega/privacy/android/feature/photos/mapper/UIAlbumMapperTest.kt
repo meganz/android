@@ -3,21 +3,15 @@ package mega.privacy.android.feature.photos.mapper
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
-import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumTitle
-import mega.privacy.android.feature.photos.presentation.albums.model.FavouriteSystemAlbum
-import mega.privacy.android.feature.photos.presentation.albums.model.GifSystemAlbum
-import mega.privacy.android.feature.photos.presentation.albums.model.RawSystemAlbum
-import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import mega.privacy.android.shared.resources.R as sharedResR
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -157,159 +151,6 @@ class UIAlbumMapperTest {
 
         assertThat(result.coverPhoto).isNull()
         assertThat(result.defaultCover).isNull()
-    }
-
-    @Test
-    fun `test that MediaAlbum System with FavouriteSystemAlbum is mapped correctly`() {
-        val mockFavouriteSystemAlbum = mock<FavouriteSystemAlbum>()
-        val albumName = "Favourites"
-        whenever(mockFavouriteSystemAlbum.albumName).thenReturn(albumName)
-        val cover = createPhoto(id = 10L, name = "fav_cover.jpg")
-
-        val mediaAlbum = MediaAlbum.System(
-            id = mockFavouriteSystemAlbum,
-            cover = cover
-        )
-
-        val result = underTest(mediaAlbum)
-
-        assertThat(result.id).isEqualTo(Album.FavouriteAlbum)
-        assertThat(result.title).isEqualTo(AlbumTitle.StringTitle(albumName))
-        assertThat(result.count).isEqualTo(0)
-        assertThat(result.imageCount).isEqualTo(0)
-        assertThat(result.videoCount).isEqualTo(0)
-        assertThat(result.coverPhoto).isEqualTo(cover)
-        assertThat(result.defaultCover).isEqualTo(cover)
-    }
-
-    @Test
-    fun `test that MediaAlbum System with GifSystemAlbum is mapped correctly`() {
-        val mockGifSystemAlbum = mock<GifSystemAlbum>()
-        val albumName = "GIFs"
-        whenever(mockGifSystemAlbum.albumName).thenReturn(albumName)
-        val cover = createPhoto(id = 11L, name = "gif_cover.gif")
-
-        val mediaAlbum = MediaAlbum.System(
-            id = mockGifSystemAlbum,
-            cover = cover
-        )
-
-        val result = underTest(mediaAlbum)
-
-        assertThat(result.id).isEqualTo(Album.GifAlbum)
-        assertThat(result.title).isEqualTo(AlbumTitle.StringTitle(albumName))
-        assertThat(result.count).isEqualTo(0)
-        assertThat(result.imageCount).isEqualTo(0)
-        assertThat(result.videoCount).isEqualTo(0)
-        assertThat(result.coverPhoto).isEqualTo(cover)
-        assertThat(result.defaultCover).isEqualTo(cover)
-    }
-
-    @Test
-    fun `test that MediaAlbum System with RawSystemAlbum is mapped correctly`() {
-        val mockRawSystemAlbum = mock<RawSystemAlbum>()
-        val albumName = "RAW"
-        whenever(mockRawSystemAlbum.albumName).thenReturn(albumName)
-
-        val mediaAlbum = MediaAlbum.System(
-            id = mockRawSystemAlbum,
-            cover = null
-        )
-
-        val result = underTest(mediaAlbum)
-
-        assertThat(result.id).isEqualTo(Album.RawAlbum)
-        assertThat(result.title).isEqualTo(AlbumTitle.StringTitle(albumName))
-        assertThat(result.count).isEqualTo(0)
-        assertThat(result.imageCount).isEqualTo(0)
-        assertThat(result.videoCount).isEqualTo(0)
-        assertThat(result.coverPhoto).isNull()
-        assertThat(result.defaultCover).isNull()
-    }
-
-    @Test
-    fun `test that MediaAlbum System with unknown SystemAlbum defaults to RawAlbum`() {
-        val unknownSystemAlbum = mock<mega.privacy.android.domain.entity.media.SystemAlbum>()
-        val albumName = "Unknown Album"
-        whenever(unknownSystemAlbum.albumName).thenReturn(albumName)
-
-        val mediaAlbum = MediaAlbum.System(
-            id = unknownSystemAlbum,
-            cover = null
-        )
-
-        val result = underTest(mediaAlbum)
-
-        assertThat(result.id).isEqualTo(Album.RawAlbum)
-        assertThat(result.title).isEqualTo(AlbumTitle.StringTitle(albumName))
-    }
-
-    @Test
-    fun `test that MediaAlbum User is mapped correctly`() {
-        val albumId = AlbumId(456L)
-        val title = "My Custom Album"
-        val creationTime = 3000L
-        val modificationTime = 4000L
-        val cover = createPhoto(id = 20L, name = "custom_cover.jpg")
-
-        val mediaAlbum = MediaAlbum.User(
-            id = albumId,
-            title = title,
-            creationTime = creationTime,
-            modificationTime = modificationTime,
-            isExported = true,
-            cover = cover
-        )
-
-        val result = underTest(mediaAlbum)
-
-        assertThat(result.title).isEqualTo(AlbumTitle.StringTitle(title))
-        assertThat(result.count).isEqualTo(0)
-        assertThat(result.imageCount).isEqualTo(0)
-        assertThat(result.videoCount).isEqualTo(0)
-        assertThat(result.coverPhoto).isEqualTo(cover)
-        assertThat(result.defaultCover).isEqualTo(cover)
-
-        val expectedUserAlbum = Album.UserAlbum(
-            id = albumId,
-            title = title,
-            cover = cover,
-            creationTime = creationTime,
-            modificationTime = modificationTime,
-            isExported = true
-        )
-        assertThat(result.id).isEqualTo(expectedUserAlbum)
-    }
-
-    @Test
-    fun `test that MediaAlbum User without cover is mapped correctly`() {
-        val albumId = AlbumId(789L)
-        val title = "Empty Album"
-
-        val mediaAlbum = MediaAlbum.User(
-            id = albumId,
-            title = title,
-            creationTime = 0L,
-            modificationTime = 0L,
-            isExported = false,
-            cover = null
-        )
-
-        val result = underTest(mediaAlbum)
-
-        assertThat(result.title).isEqualTo(AlbumTitle.StringTitle(title))
-        assertThat(result.coverPhoto).isNull()
-        assertThat(result.defaultCover).isNull()
-
-        val expectedUserAlbum = Album.UserAlbum(
-            id = albumId,
-            title = title,
-            cover = null,
-            creationTime = 0L,
-            modificationTime = 0L,
-            isExported = false
-        )
-        assertThat(result.id).isEqualTo(expectedUserAlbum)
     }
 
     private fun createPhoto(

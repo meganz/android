@@ -21,9 +21,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
 import mega.privacy.android.app.activities.contract.SendToChatActivityContract
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.qrcode.findActivity
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -93,7 +91,7 @@ private fun NodeAttachmentView(
                                 actionLabel = context.getString(R.string.action_see)
                             )
                             if (result == SnackbarResult.ActionPerformed) {
-                                viewModel.navigateToChat(chatId)
+                                viewModel.navigateToChat(chatId, context)
                                 context.findActivity()?.finish()
                             }
                         }
@@ -103,20 +101,6 @@ private fun NodeAttachmentView(
                             chatId
                         )
                     }
-                }
-
-                is NodeAttachmentEvent.NavigateToChatLegacy -> {
-                    context.startActivity(
-                        Intent(
-                            context,
-                            ManagerActivity::class.java
-                        ).apply {
-                            action = Constants.ACTION_CHAT_NOTIFICATION_MESSAGE
-                            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                            putExtra(Constants.CHAT_ID, event.chatId)
-                            putExtra(Constants.EXTRA_MOVE_TO_CHAT_SECTION, true)
-                        },
-                    )
                 }
             }
             viewModel.markEventHandled()

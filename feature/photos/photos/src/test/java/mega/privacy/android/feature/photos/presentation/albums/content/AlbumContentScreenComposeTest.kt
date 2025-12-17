@@ -686,6 +686,7 @@ class AlbumContentScreenComposeTest {
         return AlbumUiState(
             mediaAlbum = mediaAlbum,
             title = title,
+            isExported = false,
             cover = null
         )
     }

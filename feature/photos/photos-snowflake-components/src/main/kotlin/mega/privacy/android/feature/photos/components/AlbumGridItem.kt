@@ -41,7 +41,7 @@ fun AlbumGridItem(
     modifier: Modifier = Modifier,
     placeholder: Painter? = null,
     errorPlaceholder: Painter? = null,
-    isShared: Boolean = false,
+    isExported: Boolean = false,
 ) {
     Column(
         modifier = modifier
@@ -69,7 +69,7 @@ fun AlbumGridItem(
                 error = errorPlaceholder
             )
 
-            if (isShared) {
+            if (isExported) {
                 BoxSurface(
                     modifier = Modifier
                         .padding(4.dp)
@@ -110,7 +110,7 @@ private fun AlbumGridItemPreview() {
             modifier = Modifier.width(104.dp),
             title = HighlightedText("Album Title"),
             coverImage = null,
-            isShared = true,
+            isExported = true,
             errorPlaceholder = painterResource(mega.privacy.android.icon.pack.R.drawable.ic_add_to_album),
             placeholder = painterResource(mega.privacy.android.icon.pack.R.drawable.ic_add_to_album)
         )

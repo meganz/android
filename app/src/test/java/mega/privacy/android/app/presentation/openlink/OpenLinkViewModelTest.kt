@@ -1,29 +1,24 @@
 package mega.privacy.android.app.presentation.openlink
 
 import android.net.Uri
-import androidx.navigation3.runtime.NavKey
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.resetpassword.ResetPasswordLinkInfo
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.QueryResetPasswordLinkUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.link.DecodeLinkUseCase
-import mega.privacy.android.domain.usecase.link.GetDecodedUrlRegexPatternTypeUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
 import mega.privacy.android.feature_flags.AppFeatures
-import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
-import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -56,10 +51,6 @@ class OpenLinkViewModelTest {
     private val queryResetPasswordLinkUseCase: QueryResetPasswordLinkUseCase = mock()
     private val applicationScope = CoroutineScope(extension.testDispatcher)
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
-    private val getDecodedUrlRegexPatternTypeUseCase = mock<GetDecodedUrlRegexPatternTypeUseCase>()
-    private val deepLinkHandler = mock<DeepLinkHandler>()
-    private val deepLinkHandler2 = mock<DeepLinkHandler>()
-    private val navigationEventQueue = mock<NavigationEventQueue>()
 
     @BeforeEach
     fun setup() {
@@ -73,10 +64,7 @@ class OpenLinkViewModelTest {
             decodeLinkUseCase = decodeLinkUseCase,
             queryResetPasswordLinkUseCase = queryResetPasswordLinkUseCase,
             applicationScope = applicationScope,
-            deepLinkHandlers = listOf(deepLinkHandler, deepLinkHandler2),
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            navigationEventQueue = navigationEventQueue,
-            getDecodedUrlRegexPatternTypeUseCase = getDecodedUrlRegexPatternTypeUseCase,
         )
         wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) } doReturn false
     }
@@ -152,33 +140,6 @@ class OpenLinkViewModelTest {
             // Then
             underTest.uiState.test {
                 assertThat(expectMostRecentItem().decodedUrl).isEqualTo(decodedLink)
-            }
-        }
-
-    @Test
-    fun `test that navigationEventQueue is updated with the correct nav keys when single activity feature flag is true`() =
-        runTest {
-            val url = randomLink()
-            val uri = mock<Uri> {
-                on { toString() } doReturn url
-            }
-            val regexPatternType = RegexPatternType.FILE_LINK
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn true
-            whenever(getDecodedUrlRegexPatternTypeUseCase(url)) doReturn regexPatternType
-            whenever(getAccountCredentialsUseCase()) doReturn null
-            val navKey = mock<NavKey>()
-            val expected = listOf(navKey)
-            whenever(deepLinkHandler.getNavKeysInternal(uri, regexPatternType, false)) doReturn null
-            whenever(
-                deepLinkHandler2.getNavKeysInternal(uri, regexPatternType, false)
-            ) doReturn expected
-
-            underTest.decodeUri(uri)
-
-            verify(navigationEventQueue).emit(expected)
-
-            underTest.uiState.test {
-                assertThat(expectMostRecentItem().deepLinkDestinationsAddedEvent).isTrue()
             }
         }
 
@@ -345,7 +306,6 @@ class OpenLinkViewModelTest {
             getAccountCredentialsUseCase,
             getRootNodeUseCase,
             decodeLinkUseCase,
-            getDecodedUrlRegexPatternTypeUseCase
         )
     }
 

@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
@@ -46,73 +47,91 @@ private fun MyAccountWidgetShimmerView() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(all = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+            .padding(all = 12.dp), // Match the actual widget padding
+        verticalAlignment = Alignment.CenterVertically
     ) {
         // Avatar shimmer
-        Box(
+        Spacer(
             modifier = Modifier
                 .size(32.dp)
                 .clip(CircleShape)
-                .shimmerEffect(visible = true)
+                .shimmerEffect()
         )
 
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(12.dp))
+
         Column(
             modifier = Modifier.weight(1f)
         ) {
             // User name shimmer
             Box(
-                modifier = Modifier
-                    .width(120.dp)
-                    .height(16.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .shimmerEffect(visible = true)
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
+                contentAlignment = Alignment.CenterStart
+            ) {
+                MegaText(
+                    text = " ",
+                    style = AppTheme.typography.titleMedium,
+                    modifier = Modifier.height(24.dp)
+                )
+                Spacer(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .height(18.dp)
+                        .shimmerEffect()
+                )
+            }
 
             // Account type shimmer
             Box(
-                modifier = Modifier
-                    .width(80.dp)
-                    .height(14.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .shimmerEffect(visible = true)
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
+                contentAlignment = Alignment.CenterStart
+            ) {
+                MegaText(
+                    text = " ",
+                    style = AppTheme.typography.bodyMedium,
+                    modifier = Modifier.height(20.dp)
+                )
+                Spacer(
+                    modifier = Modifier
+                        .width(80.dp)
+                        .height(16.dp)
+                        .shimmerEffect()
+                )
+            }
 
             // Storage usage shimmer
             Box(
-                modifier = Modifier
-                    .width(100.dp)
-                    .height(12.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .shimmerEffect(visible = true)
-            )
+                contentAlignment = Alignment.CenterStart
+            ) {
+                MegaText(
+                    text = " ",
+                    style = AppTheme.typography.bodySmall,
+                    modifier = Modifier.height(20.dp)
+                )
+                Spacer(
+                    modifier = Modifier
+                        .width(100.dp)
+                        .height(14.dp)
+                        .shimmerEffect()
+                )
+            }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(2.dp))
 
             // Progress bar shimmer
-            Box(
+            Spacer(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(4.dp)
-                    .clip(RoundedCornerShape(2.dp))
-                    .shimmerEffect(visible = true)
+                    .shimmerEffect(RoundedCornerShape(2.dp))
             )
         }
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        // Chevron shimmer (smaller)
-        Box(
+        // Chevron shimmer
+        Spacer(
             modifier = Modifier
                 .size(16.dp)
-                .clip(RoundedCornerShape(2.dp))
-                .shimmerEffect(visible = true)
+                .shimmerEffect(RoundedCornerShape(4.dp))
         )
     }
 }
@@ -221,19 +240,35 @@ private fun MyAccountWidgetLoadingPreview() {
 
 @CombinedThemePreviews
 @Composable
-private fun MyAccountWidgetLoadedPreview() {
+private fun MyAccountWidgetShimmerLoadedPreview() {
     AndroidThemeForPreviews {
-        MyAccountWidget(
-            state = MyAccountWidgetUiState(
-                name = "John Doe",
-                accountTypeNameResource = android.R.string.ok, // Placeholder
-                usedStorage = 124470000000L,  // ~116 GB
-                totalStorage = 750000000000L,  // ~698 GB
-                usedStoragePercentage = 50,
-                storageQuotaLevel = QuotaLevel.Success,
-                isLoading = false
-            ),
-            onClick = {}
-        )
+        Box(
+        ) {
+            MyAccountWidget(
+                state = MyAccountWidgetUiState(
+                    name = "John Doe",
+                    accountTypeNameResource = android.R.string.ok, // Placeholder
+                    usedStorage = 124470000000L,  // ~116 GB
+                    totalStorage = 750000000000L,  // ~698 GB
+                    usedStoragePercentage = 50,
+                    storageQuotaLevel = QuotaLevel.Success,
+                    isLoading = true
+                ),
+                onClick = {}
+            )
+            MyAccountWidget(
+                state = MyAccountWidgetUiState(
+                    name = "John Doe",
+                    accountTypeNameResource = android.R.string.ok, // Placeholder
+                    usedStorage = 124470000000L,  // ~116 GB
+                    totalStorage = 750000000000L,  // ~698 GB
+                    usedStoragePercentage = 50,
+                    storageQuotaLevel = QuotaLevel.Success,
+                    isLoading = false
+                ),
+                onClick = {},
+                modifier = Modifier.alpha(0.1F)
+            )
+        }
     }
 }

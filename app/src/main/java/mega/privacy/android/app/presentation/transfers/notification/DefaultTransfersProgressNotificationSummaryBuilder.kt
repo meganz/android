@@ -1,8 +1,6 @@
 package mega.privacy.android.app.presentation.transfers.notification
 
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -12,9 +10,8 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.transfer.TransfersProgressNotificationSummaryBuilder
 import mega.privacy.android.data.worker.AbstractTransfersWorker.Companion.PROGRESS_SUMMARY_GROUP
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import javax.inject.Inject
 
@@ -23,7 +20,7 @@ import javax.inject.Inject
  */
 class DefaultTransfersProgressNotificationSummaryBuilder @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val megaNavigator: MegaNavigator,
 ) : TransfersProgressNotificationSummaryBuilder {
 
     override suspend fun invoke(type: TransferType) =
@@ -35,7 +32,7 @@ class DefaultTransfersProgressNotificationSummaryBuilder @Inject constructor(
             .setContentTitle(context.getString(R.string.download_preparing_files))
             .setContentIntent(
                 TransfersActivity.getPendingIntentForTransfersSection(
-                    singleActivity = getFeatureFlagValueUseCase(AppFeatures.SingleActivity),
+                    megaNavigator = megaNavigator,
                     context = context,
                     tab = TransfersNavKey.Tab.Active,
                 )

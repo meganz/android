@@ -233,7 +233,6 @@ class MediaCameraUploadViewModelTest {
                 val item = expectMostRecentItem()
                 assertThat(item.isCameraUploadsLimitedAccess).isTrue()
                 assertThat(item.isWarningBannerShown).isTrue()
-                assertThat(item.shouldTriggerMediaPermissionsDeniedLogic).isTrue()
             }
         }
 

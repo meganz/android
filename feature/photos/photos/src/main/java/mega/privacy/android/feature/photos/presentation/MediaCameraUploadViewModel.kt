@@ -3,7 +3,6 @@ package mega.privacy.android.feature.photos.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import de.palm.composestateevents.StateEvent
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -346,7 +345,6 @@ class MediaCameraUploadViewModel @Inject constructor(
         setCameraUploadsLimitedAccess(isLimitedAccess = !hasPermissions)
         setCameraUploadsWarningMenu(isVisible = !hasPermissions || shouldShowWarningMenu())
         updateIsWarningBannerShown(!hasPermissions || shouldShowWarningMenu())
-        setTriggerMediaPermissionsDeniedLogicState(shouldTrigger = !hasPermissions)
     }
 
     internal fun setCameraUploadsLimitedAccess(isLimitedAccess: Boolean) {
@@ -359,10 +357,6 @@ class MediaCameraUploadViewModel @Inject constructor(
 
     internal fun updateIsWarningBannerShown(isShown: Boolean) {
         _uiState.update { it.copy(isWarningBannerShown = isShown) }
-    }
-
-    internal fun setTriggerMediaPermissionsDeniedLogicState(shouldTrigger: Boolean) {
-        _uiState.update { it.copy(shouldTriggerMediaPermissionsDeniedLogic = shouldTrigger) }
     }
 
     internal fun setInitialPreferences() {
@@ -398,14 +392,6 @@ class MediaCameraUploadViewModel @Inject constructor(
 
     internal fun setCameraUploadsMessage(message: String) {
         _uiState.update { it.copy(cameraUploadsMessage = message) }
-    }
-
-    internal fun showCameraUploadsChangePermissionsMessage(show: Boolean) {
-        _uiState.update { it.copy(showCameraUploadsChangePermissionsMessage = show) }
-    }
-
-    internal fun updatePopBackFromCameraUploadsTransferScreenEvent(value: StateEvent) {
-        _uiState.update { it.copy(popBackFromCameraUploadsTransferScreenEvent = value) }
     }
 
     internal fun shouldEnableCUPage(mediaSource: FilterMediaSource, show: Boolean) {

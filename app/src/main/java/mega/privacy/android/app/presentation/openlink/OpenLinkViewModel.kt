@@ -16,15 +16,12 @@ import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.QueryResetPasswordLinkUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.link.DecodeLinkUseCase
-import mega.privacy.android.domain.usecase.link.GetDecodedUrlRegexPatternTypeUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
 import mega.privacy.android.feature_flags.AppFeatures
-import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
-import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -42,10 +39,7 @@ class OpenLinkViewModel @Inject constructor(
     private val decodeLinkUseCase: DecodeLinkUseCase,
     private val queryResetPasswordLinkUseCase: QueryResetPasswordLinkUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
-    private val deepLinkHandlers: List<@JvmSuppressWildcards DeepLinkHandler>,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val navigationEventQueue: NavigationEventQueue,
-    private val getDecodedUrlRegexPatternTypeUseCase: GetDecodedUrlRegexPatternTypeUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OpenLinkUiState())
@@ -63,7 +57,9 @@ class OpenLinkViewModel @Inject constructor(
     fun decodeUri(uri: Uri) {
         viewModelScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-                consumeDestination(uri)
+                _uiState.update {
+                    it.copy(navigateToSingleActivity = true)
+                }
             } else {
                 runCatching {
                     val accountCredentials = getAccountCredentials()
@@ -175,34 +171,6 @@ class OpenLinkViewModel @Inject constructor(
     fun onResetPasswordLinkResultConsumed() {
         _uiState.update {
             it.copy(resetPasswordLinkResult = null)
-        }
-    }
-
-    /**
-     * Consume the destination related to this Uri, if any, and updates the corresponding navigation action
-     *
-     * @param uri
-     */
-    private suspend fun consumeDestination(uri: Uri) {
-        val regexPatternType = getDecodedUrlRegexPatternTypeUseCase(uri.toString())
-        val isLoggedIn = getAccountCredentials() != null
-
-        deepLinkHandlers.firstNotNullOfOrNull { deepLinkHandler ->
-            deepLinkHandler.getNavKeysInternal(uri, regexPatternType, isLoggedIn)
-        }?.let { navKeys ->
-            if (navKeys.isNotEmpty()) {
-                navigationEventQueue.emit(navKeys)
-                navKeys.forEach {
-                    Timber.d("Adding NavKey from deep link: $it")
-                }
-            }
-
-            _uiState.update {
-                it.copy(deepLinkDestinationsAddedEvent = true)
-            }
-        } ?: run {
-            // This should not happen because WebViewDeepLinkHandler should handle all deep links defined in the manifest
-            Timber.e("Deep link not handled: $uri")
         }
     }
 }

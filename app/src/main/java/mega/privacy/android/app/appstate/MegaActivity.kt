@@ -1,5 +1,6 @@
 package mega.privacy.android.app.appstate
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -62,6 +63,7 @@ import mega.privacy.android.app.appstate.global.SnackbarEventsViewModel
 import mega.privacy.android.app.appstate.global.event.QueueEventViewModel
 import mega.privacy.android.app.appstate.global.model.GlobalState
 import mega.privacy.android.app.appstate.global.model.RefreshEvent
+import mega.privacy.android.app.appstate.global.model.RootNodeState
 import mega.privacy.android.app.appstate.global.util.show
 import mega.privacy.android.app.presence.SignalPresenceViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -79,6 +81,7 @@ import mega.privacy.android.app.presentation.security.check.PasscodeCheckViewMod
 import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackbarLifetimeController
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
@@ -86,6 +89,7 @@ import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.transparent.TransparentSceneStrategy
+import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import timber.log.Timber
 import javax.inject.Inject
@@ -129,13 +133,25 @@ class MegaActivity : ComponentActivity() {
         consumeIntentDestinations()
     }
 
-    private fun consumeActions() {
-        if (intent.action == Constants.ACTION_REFRESH) {
-            globalStateViewModel.refreshSession(RefreshEvent.Refresh)
-            intent.action = null
-        } else if (intent.action == Constants.ACTION_REFRESH_API_SERVER) {
-            globalStateViewModel.refreshSession(RefreshEvent.ChangeEnvironment)
-            intent.action = null
+    private suspend fun consumeActions() {
+        when (intent.action) {
+            Constants.ACTION_REFRESH -> {
+                globalStateViewModel.refreshSession(RefreshEvent.Refresh)
+                intent.action = null
+            }
+
+            Constants.ACTION_REFRESH_API_SERVER -> {
+                globalStateViewModel.refreshSession(RefreshEvent.ChangeEnvironment)
+                intent.action = null
+            }
+
+            ACTION_DEEP_LINKS -> {
+                intent.dataString?.let { data ->
+                    navigationEventQueue.emit(DeepLinksDialogNavKey(data))
+                    intent.action = null
+                    intent.data = null
+                }
+            }
         }
     }
 
@@ -153,6 +169,18 @@ class MegaActivity : ComponentActivity() {
                 Timber.d("NavKey from intent: $it")
             }
             navigationEventQueue.emit(navKeys)
+        }
+    }
+
+    @SuppressLint("UnsafeIntentLaunch")
+    private fun launchLastActivityIfNeeded(rootNodeState: RootNodeState) {
+        if (rootNodeState.exists && intent.extras?.containsKey(Constants.LAUNCH_INTENT) == true) {
+            intent?.parcelable<Intent>(Constants.LAUNCH_INTENT)?.let { originalIntent ->
+                if (originalIntent.component?.packageName == packageName) {
+                    startActivity(originalIntent)
+                }
+            }
+            intent.removeExtra(Constants.LAUNCH_INTENT)
         }
     }
 
@@ -221,6 +249,7 @@ class MegaActivity : ComponentActivity() {
 
                 LaunchedEffect(rootNodeState) {
                     navigationHandler.onRootNodeChange(rootNodeState)
+                    launchLastActivityIfNeeded(rootNodeState)
                 }
 
                 LaunchedEffect(passcodeState) {
@@ -345,7 +374,12 @@ class MegaActivity : ComponentActivity() {
                                 ) {
                                     when (it) {
                                         is NavigationQueueEvent -> {
-                                            navigationHandler.navigate(it.keys)
+                                            if (!it.isSingleTop
+                                                || navigationHandler.peekBackStack()
+                                                    .takeLast(it.keys.size) != it.keys
+                                            ) {
+                                                navigationHandler.navigate(it.keys)
+                                            }
                                         }
 
                                         is AppDialogEvent -> {
@@ -395,15 +429,15 @@ class MegaActivity : ComponentActivity() {
         /**
          * Get Intent to open this activity with Single top and clear top flags
          */
-        fun getIntent(context: Context, warningMessage: String? = null) = Intent(
-            context,
-            MegaActivity::class.java
-        ).apply {
-            warningMessage?.let {
+        fun getIntent(context: Context, action: String? = null, warningMessage: String? = null) =
+            Intent(
+                context,
+                MegaActivity::class.java
+            ).apply {
+                this.action = action
                 putExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE, warningMessage)
+                flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
             }
-            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }
 
         /**
          * Get a pending intent to open this activity with the specified warning message
@@ -454,16 +488,16 @@ class MegaActivity : ComponentActivity() {
             putParcelableArrayListExtra(EXTRA_NAV_KEYS, ArrayList(navKeys))
         }
 
-        private fun Intent.getDestinations(): List<NavKey>? {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        private fun Intent.getDestinations(): List<NavKey>? =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 getParcelableArrayListExtra(EXTRA_NAV_KEYS, NavKey::class.java)
             } else {
                 @Suppress("DEPRECATION")
                 getParcelableArrayListExtra(EXTRA_NAV_KEYS)
             }
-        }
 
         private const val EXTRA_NAV_KEYS = "navKeys"
+        internal const val ACTION_DEEP_LINKS = "deepLinks"
     }
 }
 

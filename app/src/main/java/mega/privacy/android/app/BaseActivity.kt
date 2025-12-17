@@ -901,14 +901,12 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      * Launches an intent to navigate to Upgrade Account screen.
      */
     open fun navigateToUpgradeAccount() {
-        lifecycleScope.launch {
-            megaNavigator.openManagerActivity(
-                context = this@BaseActivity,
-                action = ACTION_SHOW_UPGRADE_ACCOUNT,
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK,
-                singleActivityDestination = UpgradeAccountNavKey(source = UpgradeAccountSource.UNKNOWN)
-            )
-        }
+        megaNavigator.openManagerActivity(
+            context = this,
+            action = ACTION_SHOW_UPGRADE_ACCOUNT,
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK,
+            singleActivityDestination = UpgradeAccountNavKey(source = UpgradeAccountSource.UNKNOWN)
+        )
     }
 
     /**
@@ -1176,30 +1174,26 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      * Launches ManagerActivity intent to show over quota warning.
      */
     protected fun launchOverQuota() {
-        lifecycleScope.launch {
-            megaNavigator.openManagerActivity(
-                context = this@BaseActivity,
-                action = ACTION_OVERQUOTA_STORAGE,
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP,
-                singleActivityDestination = OverQuotaDialogNavKey(true)
-            )
-            finish()
-        }
+        megaNavigator.openManagerActivity(
+            context = this,
+            action = ACTION_OVERQUOTA_STORAGE,
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP,
+            singleActivityDestination = OverQuotaDialogNavKey(true)
+        )
+        finish()
     }
 
     /**
      * Launches ManagerActivity intent to show pre over quota warning.
      */
     protected fun launchPreOverQuota() {
-        lifecycleScope.launch {
-            megaNavigator.openManagerActivity(
-                context = this@BaseActivity,
-                action = ACTION_PRE_OVERQUOTA_STORAGE,
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP,
-                singleActivityDestination = OverQuotaDialogNavKey(false)
-            )
-            finish()
-        }
+        megaNavigator.openManagerActivity(
+            context = this@BaseActivity,
+            action = ACTION_PRE_OVERQUOTA_STORAGE,
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP,
+            singleActivityDestination = OverQuotaDialogNavKey(false)
+        )
+        finish()
     }
 
     /**

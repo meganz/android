@@ -20,7 +20,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.extensions.launchUrl
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.changepassword.view.ChangePasswordView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginActivity
@@ -35,6 +34,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.MyAccountNavKey
+import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaError
 import timber.log.Timber
@@ -160,27 +160,20 @@ class ChangePasswordActivity : PasscodeActivity() {
         viewModel.onPasswordReset()
     }
 
-    private fun navigateToHomeAfterPasswordChanged(errCode: Int? = MegaError.API_OK) =
-        lifecycleScope.launch {
-            val intent = if (viewModel.isFeatureFlagEnabled(AppFeatures.SingleActivity)) {
-                MegaActivity.getIntentWithExtraDestinations(
-                    this@ChangePasswordActivity,
-                    listOf(
-                        MyAccountNavKey(
-                            action = Constants.ACTION_PASS_CHANGED,
-                            resultCode = MegaError.API_OK
-                        )
-                    )
-                )
-            } else {
-                Intent(this@ChangePasswordActivity, ManagerActivity::class.java).apply {
-                    action = Constants.ACTION_PASS_CHANGED
-                    putExtra(Constants.RESULT, errCode)
-                }
-            }
-            startActivity(intent)
-            finish()
-        }
+    private fun navigateToHomeAfterPasswordChanged(errCode: Int? = MegaError.API_OK) {
+        megaNavigator.openManagerActivity(
+            context = this,
+            action = Constants.ACTION_PASS_CHANGED,
+            bundle = Bundle().apply {
+                errCode?.let { putInt(Constants.RESULT, it) }
+            },
+            singleActivityDestination = MyAccountNavKey(
+                action = Constants.ACTION_PASS_CHANGED,
+                resultCode = MegaError.API_OK
+            )
+        )
+        finish()
+    }
 
     private fun navigateAfterPasswordReset(isLoggedIn: Boolean, @StringRes errorCode: Int?) =
         lifecycleScope.launch {

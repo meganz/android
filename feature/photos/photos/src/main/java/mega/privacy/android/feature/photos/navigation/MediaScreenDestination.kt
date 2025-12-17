@@ -20,6 +20,7 @@ import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
+import mega.privacy.android.navigation.destination.LegacyPhotosSearchNavKey
 import mega.privacy.android.navigation.destination.MediaMainNavKey
 
 fun EntryProviderScope<NavKey>.mediaMainRoute(
@@ -27,6 +28,7 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
     setNavigationItemVisibility: (Boolean) -> Unit,
     photoSelectionResultFlow: (String) -> Flow<Long?>,
     timelineAddToAlbumResultFlow: (String) -> Flow<String?>,
+    mediaAlbumNavigationFlow: (String) -> Flow<Pair<Long?, String>?>,
     onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
     entry<MediaMainNavKey> {
@@ -34,6 +36,8 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
         val photoSelectionResult by photoSelectionResultFlow(LegacyPhotoSelectionNavKey.RESULT)
             .collectAsStateWithLifecycle(null)
         val timelineAddToAlbumResult by timelineAddToAlbumResultFlow(LegacyAddToAlbumActivityNavKey.ADD_TO_ALBUM_RESULT)
+            .collectAsStateWithLifecycle(null)
+        val mediaAlbumNavigationFlow by mediaAlbumNavigationFlow(LegacyPhotosSearchNavKey.RESULT)
             .collectAsStateWithLifecycle(null)
 
         LaunchedEffect(photoSelectionResult) {
@@ -56,6 +60,13 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
             }
         }
 
+        LaunchedEffect(mediaAlbumNavigationFlow) {
+            mediaAlbumNavigationFlow?.let { (id, type) ->
+                navigationHandler.navigate(AlbumContentNavKey(id = id, type = type))
+                navigationHandler.clearResult(LegacyPhotosSearchNavKey.RESULT)
+            }
+        }
+
         MediaMainRoute(
             navigationHandler = navigationHandler,
             navigateToAlbumContent = navigationHandler::navigate,
@@ -65,6 +76,7 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
             onTransfer = onTransfer,
             onNavigateToAddToAlbum = navigationHandler::navigate,
             onNavigateToCameraUploadsSettings = navigationHandler::navigate,
+            onNavigateToUpgradeAccount = navigationHandler::navigate,
         )
     }
 }

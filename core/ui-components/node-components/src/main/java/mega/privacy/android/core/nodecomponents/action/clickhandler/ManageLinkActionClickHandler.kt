@@ -13,7 +13,7 @@ class ManageLinkActionClickHandler @Inject constructor() : SingleNodeAction, Mul
     override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
         provider.megaNavigator.openGetLinkActivity(
             context = provider.context,
-            handle = node.id.longValue
+            node.id.longValue
         )
     }
 
@@ -25,7 +25,7 @@ class ManageLinkActionClickHandler @Inject constructor() : SingleNodeAction, Mul
         val handles = nodes.map { it.id.longValue }.toLongArray()
         provider.megaNavigator.openGetLinkActivity(
             context = provider.context,
-            handles = handles
+            *handles
         )
     }
 }

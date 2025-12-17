@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -15,6 +16,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionBucketByIdUseCase
+import mega.privacy.mobile.home.presentation.recents.mapper.RecentsParentFolderNameMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -34,6 +36,7 @@ class RecentsBucketViewModelTest {
 
     private val getRecentActionBucketByIdUseCase = mock<GetRecentActionBucketByIdUseCase>()
     private val nodeUiItemMapper = mock<NodeUiItemMapper>()
+    private val recentsParentFolderNameMapper = mock<RecentsParentFolderNameMapper>()
 
     private val testIdentifier = "test_bucket_identifier"
     private val testNodeSourceType = NodeSourceType.CLOUD_DRIVE
@@ -45,7 +48,8 @@ class RecentsBucketViewModelTest {
     fun setUp() {
         reset(
             getRecentActionBucketByIdUseCase,
-            nodeUiItemMapper
+            nodeUiItemMapper,
+            recentsParentFolderNameMapper
         )
     }
 
@@ -62,6 +66,7 @@ class RecentsBucketViewModelTest {
             args = args,
             getRecentActionBucketByIdUseCase = getRecentActionBucketByIdUseCase,
             nodeUiItemMapper = nodeUiItemMapper,
+            recentsParentFolderNameMapper = recentsParentFolderNameMapper,
         )
     }
 
@@ -77,6 +82,9 @@ class RecentsBucketViewModelTest {
             // After loading completes, isLoading should be false
             assertThat(state.isLoading).isFalse()
             assertThat(state.nodeUiItems).isEmpty()
+            // Verify initial parentFolderName is set from args
+            assertThat(state.parentFolderName).isInstanceOf(LocalizedText.Literal::class.java)
+            assertThat(state.parentFolderName).isEqualTo(LocalizedText.Literal(testFolderName))
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -96,8 +104,10 @@ class RecentsBucketViewModelTest {
 
         val nodeUiItem1 = createMockNodeUiItem(node1)
         val nodeUiItem2 = createMockNodeUiItem(node2)
+        val expectedParentFolderName = LocalizedText.Literal(bucketFolderName)
 
         whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(bucket)
+        whenever(recentsParentFolderNameMapper(any())).thenReturn(expectedParentFolderName)
         whenever(
             nodeUiItemMapper(
                 nodeList = any(),
@@ -122,7 +132,7 @@ class RecentsBucketViewModelTest {
             assertThat(state.nodeUiItems[1].node).isEqualTo(node2)
             assertThat(state.fileCount).isEqualTo(bucket.nodes.size)
             assertThat(state.timestamp).isEqualTo(bucket.timestamp)
-            assertThat(state.folderName).isEqualTo(bucket.parentFolderName)
+            assertThat(state.parentFolderName).isEqualTo(expectedParentFolderName)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -145,8 +155,10 @@ class RecentsBucketViewModelTest {
             val nodeUiItem1 = createMockNodeUiItem(node1)
             val nodeUiItem2 = createMockNodeUiItem(node2)
             val nodeUiItem3 = createMockNodeUiItem(node3)
+            val expectedParentFolderName = LocalizedText.Literal(bucketFolderName)
 
             whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(bucket)
+            whenever(recentsParentFolderNameMapper(any())).thenReturn(expectedParentFolderName)
             whenever(
                 nodeUiItemMapper(
                     nodeList = any(),
@@ -176,9 +188,8 @@ class RecentsBucketViewModelTest {
                 // Verify timestamp is set from bucket.timestamp
                 assertThat(state.timestamp).isEqualTo(bucket.timestamp)
                 assertThat(state.timestamp).isEqualTo(bucketTimestamp)
-                // Verify folderName is set from bucket.parentFolderName
-                assertThat(state.folderName).isEqualTo(bucket.parentFolderName)
-                assertThat(state.folderName).isEqualTo(bucketFolderName)
+                // Verify parentFolderName is set from mapper
+                assertThat(state.parentFolderName).isEqualTo(expectedParentFolderName)
                 cancelAndIgnoreRemainingEvents()
             }
         }

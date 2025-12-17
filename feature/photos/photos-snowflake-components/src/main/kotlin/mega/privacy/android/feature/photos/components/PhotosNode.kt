@@ -47,6 +47,7 @@ import mega.privacy.android.icon.pack.IconPack
 
 @Immutable
 sealed interface PhotosNodeThumbnailData {
+    data object Loading : PhotosNodeThumbnailData
 
     data class Placeholder(@DrawableRes val imageResId: Int) : PhotosNodeThumbnailData
 
@@ -123,6 +124,7 @@ private fun BasicPhotosNode(
         modifier = modifier
             .conditional(isSelected) {
                 Modifier
+                    .aspectRatio(1f)
                     .border(
                         width = 2.dp,
                         color = DSTokens.colors.border.strongSelected,
@@ -132,11 +134,21 @@ private fun BasicPhotosNode(
             }
     ) {
         when (thumbnailData) {
+            is PhotosNodeThumbnailData.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .background(DSTokens.colors.background.surface2)
+                        .fillMaxSize()
+                        .testTag(BASIC_PHOTOS_NODE_IMAGE_LOADING_TAG),
+                )
+            }
+
             is PhotosNodeThumbnailData.Placeholder -> {
                 Image(
                     modifier = Modifier
                         .height(172.dp)
                         .fillMaxWidth()
+                        .align(Alignment.Center)
                         .padding(vertical = 34.dp)
                         .testTag(BASIC_PHOTOS_NODE_IMAGE_THUMBNAIL_PLACEHOLDER_TAG),
                     painter = painterResource(thumbnailData.imageResId),
@@ -244,10 +256,25 @@ private fun BasicPhotosNodePreview(
     }
 }
 
+@CombinedThemePreviews
+@Composable
+private fun BasicPhotosNodeLoadingPreview(){
+    AndroidThemeForPreviews {
+        BasicPhotosNode(
+            modifier = Modifier.size(137.dp),
+            thumbnailData = PhotosNodeThumbnailData.Loading,
+            isSelected = false,
+            shouldShowFavourite = false
+        )
+    }
+}
+
 internal const val VIDEO_PHOTOS_NODE_DURATION_TEXT_TAG =
     "video_photos_node:text_duration"
 internal const val BASIC_PHOTOS_NODE_IMAGE_THUMBNAIL_PLACEHOLDER_TAG =
     "basic_photos_node:image_thumbnail_placeholder"
+internal const val BASIC_PHOTOS_NODE_IMAGE_LOADING_TAG =
+    "basic_photos_node:image_thumbnail_loading"
 internal const val BASIC_PHOTOS_NODE_IMAGE_THUMBNAIL_FILE_TAG =
     "basic_photos_node:image_thumbnail_file"
 internal const val BASIC_PHOTOS_NODE_FAVOURITE_ICON_TAG =

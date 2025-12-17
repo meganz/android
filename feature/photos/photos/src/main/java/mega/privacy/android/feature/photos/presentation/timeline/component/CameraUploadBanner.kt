@@ -61,6 +61,9 @@ internal fun CameraUploadsBanner(
     onDismissEnableCameraUploadsBanner: () -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
     onDismissWarningBanner: () -> Unit,
+    onNavigateToCameraUploadsSettings: () -> Unit,
+    onNavigateMobileDataSetting: () -> Unit,
+    onNavigateUpgradeScreen: () -> Unit,
 ) {
     when (bannerType) {
         CameraUploadsBannerType.EnableCameraUploads -> {
@@ -87,6 +90,30 @@ internal fun CameraUploadsBanner(
             }
         }
 
+        CameraUploadsBannerType.DeviceChargingNotMet -> {
+            if (shouldShowCUWarningBanner) {
+                DeviceChargingNotMetPausedBanner(
+                    onOpenSettingsClicked = onNavigateToCameraUploadsSettings
+                )
+            }
+        }
+
+        CameraUploadsBannerType.NetworkRequirementNotMet -> {
+            if (shouldShowCUWarningBanner) {
+                NetworkRequirementNotMetPausedBanner(
+                    onNavigateMobileDataSetting = onNavigateMobileDataSetting
+                )
+            }
+        }
+
+        CameraUploadsBannerType.FullStorage -> {
+            if (shouldShowCUWarningBanner) {
+                FullStorageBanner(
+                    onUpgradeClicked = onNavigateUpgradeScreen
+                )
+            }
+        }
+
         else -> {}
     }
 }
@@ -109,7 +136,7 @@ private fun CameraUploadsNoFullAccessBanner(
 }
 
 @Composable
-internal fun DeviceChargingNotMetPausedBanner(
+private fun DeviceChargingNotMetPausedBanner(
     onOpenSettingsClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -157,7 +184,7 @@ private fun LowBatteryPausedBanner(
 }
 
 @Composable
-fun NetworkRequirementNotMetPausedBanner(
+private fun NetworkRequirementNotMetPausedBanner(
     onNavigateMobileDataSetting: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -191,7 +218,7 @@ fun NetworkRequirementNotMetPausedBanner(
 }
 
 @Composable
-fun FullStorageBanner(
+private fun FullStorageBanner(
     onUpgradeClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -213,7 +240,7 @@ fun FullStorageBanner(
 }
 
 @Composable
-fun EnableCameraUploadsBanner(
+private fun EnableCameraUploadsBanner(
     onEnableCUClick: () -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
@@ -255,46 +282,6 @@ fun EnableCameraUploadsBanner(
                 contentDescription = "Camera uploads banner end icon",
                 tint = IconColor.Primary,
             )
-        }
-    )
-}
-
-@Composable
-fun CameraUploadsCheckingUploadsBanner(modifier: Modifier = Modifier) {
-    BasicCameraUploadsBanner(
-        modifier = modifier.testTag(TIMELINE_CAMERA_UPLOADS_CHECKING_UPLOADS_BANNER_TEST_TAG),
-        statusIcon = R.drawable.ic_cu_status_sync,
-        title = stringResource(sharedR.string.camera_uploads_banner_checking_uploads_text),
-        description = null
-    )
-}
-
-@Composable
-fun CameraUploadsPendingCountBanner(
-    count: Int,
-    isTransferScreenAvailable: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    BasicCameraUploadsBanner(
-        modifier = modifier
-            .clickable { onClick() }
-            .testTag(TIMELINE_CAMERA_UPLOADS_PENDING_COUNT_BANNER_TEST_TAG),
-        statusIcon = R.drawable.ic_cu_status_uploading,
-        title = stringResource(
-            sharedR.string.camera_uploads_banner_uploading_pending_count_text,
-            count
-        ),
-        description = null,
-        endIcon = {
-            if (isTransferScreenAvailable) {
-                MegaIcon(
-                    modifier = Modifier.size(24.dp),
-                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight),
-                    contentDescription = "Camera uploads banner end icon",
-                    tint = IconColor.Primary,
-                )
-            }
         }
     )
 }

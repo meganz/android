@@ -1,5 +1,6 @@
 package mega.privacy.android.app.components.session
 
+import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -18,6 +19,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.Constants
@@ -48,6 +50,7 @@ internal fun SessionContainer(
         viewModel.checkSdkSession(optimistic)
     }
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     when {
         !isSessionRequired || state.doesRootNodeExist == true ->
@@ -64,16 +67,28 @@ internal fun SessionContainer(
                 content()
             }
 
-        state.doesRootNodeExist == false -> navigateToLogin(shouldFinish)
+        state.doesRootNodeExist == false -> navigateToLogin(
+            context,
+            shouldFinish,
+            state.isSingleActivityEnabled
+        )
+
         state.doesRootNodeExist == null -> loadingView()
     }
 }
 
-@Composable
-private fun navigateToLogin(shouldFinish: Boolean) {
-    val context = LocalContext.current
+private fun navigateToLogin(
+    context: Context,
+    shouldFinish: Boolean,
+    isSingleActivityEnabled: Boolean,
+) {
     context.findActivity()?.let { activity ->
-        val intent = Intent(context, LoginActivity::class.java).apply {
+        val targetActivity = if (isSingleActivityEnabled) {
+            MegaActivity::class.java
+        } else {
+            LoginActivity::class.java
+        }
+        val intent = Intent(context, targetActivity).apply {
             if (shouldFinish) {
                 addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             }

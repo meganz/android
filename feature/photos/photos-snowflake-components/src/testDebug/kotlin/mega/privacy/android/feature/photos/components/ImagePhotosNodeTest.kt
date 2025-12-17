@@ -30,6 +30,16 @@ class ImagePhotosNodeTest {
     }
 
     @Test
+    fun `test that the loading skeleton is displayed when the thumbnail data is for loading state`() {
+        composeRuleScope {
+            val thumbnailData = PhotosNodeThumbnailData.Loading
+            setNode(thumbnailData = thumbnailData)
+
+            onNodeWithTag(BASIC_PHOTOS_NODE_IMAGE_LOADING_TAG).assertIsDisplayed()
+        }
+    }
+
+    @Test
     fun `test that the thumbnail with file path is displayed when the thumbnail data is for file`() {
         composeRuleScope {
             val thumbnailData = PhotosNodeThumbnailData.File(

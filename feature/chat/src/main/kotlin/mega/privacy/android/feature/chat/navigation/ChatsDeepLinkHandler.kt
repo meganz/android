@@ -23,8 +23,8 @@ import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.destination.DeepLinksAfterFetchNodesDialogNavKey
 import mega.privacy.android.navigation.destination.LegacyMeetingNavKey
-import mega.privacy.android.navigation.destination.LegacyOpenLinkAfterFetchNodes
 import mega.privacy.android.navigation.destination.LegacyWaitingRoomNavKey
 import mega.privacy.android.navigation.destination.MeetingNavKeyInfo
 import mega.privacy.android.navigation.destination.WaitingRoomNavKeyInfo
@@ -61,7 +61,12 @@ class ChatsDeepLinkHandler @Inject constructor(
         CHAT_LINK -> if (isLoggedIn
             && runCatching { rootNodeExistsUseCase() }.getOrDefault(false).not()
         ) {
-            listOf(LegacyOpenLinkAfterFetchNodes(uri.toString()))
+            listOf(
+                DeepLinksAfterFetchNodesDialogNavKey(
+                    deepLink = uri.toString(),
+                    regexPatternType = CHAT_LINK,
+                )
+            )
         } else {
             runCatching {
                 getChatLinkContentUseCase(uri.toString())

@@ -73,6 +73,7 @@ import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorLoggedOutFromAnotherLocationUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.ResendVerificationEmailUseCase
 import mega.privacy.android.domain.usecase.account.ResumeCreateAccountUseCase
 import mega.privacy.android.domain.usecase.account.SetLoggedOutFromAnotherLocationUseCase
@@ -91,7 +92,6 @@ import mega.privacy.android.domain.usecase.login.FastLoginUseCase
 import mega.privacy.android.domain.usecase.login.FetchNodesUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.GetLastRegisteredEmailUseCase
-import mega.privacy.android.domain.usecase.login.GetSessionUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutUseCase
 import mega.privacy.android.domain.usecase.login.LoginUseCase
 import mega.privacy.android.domain.usecase.login.LoginWith2FAUseCase
@@ -135,7 +135,7 @@ class LoginViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val resetChatSettingsUseCase: ResetChatSettingsUseCase,
     private val getAccountCredentialsUseCase: GetAccountCredentialsUseCase,
-    private val getSessionUseCase: GetSessionUseCase,
+    private val monitorUserCredentialsUseCase: MonitorUserCredentialsUseCase,
     private val hasPreferencesUseCase: HasPreferencesUseCase,
     private val hasCameraSyncEnabledUseCase: HasCameraSyncEnabledUseCase,
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
@@ -254,9 +254,9 @@ class LoginViewModel @Inject constructor(
                     if (session.isNullOrEmpty()) Constants.TOUR_FRAGMENT else Constants.LOGIN_FRAGMENT
                 }
 
-        savedStateHandle.get<String>(Constants.EMAIL)?.let { initialEmail ->
-            _state.update { state -> state.copy(initialEmail = initialEmail) }
-        }
+            savedStateHandle.get<String>(Constants.EMAIL)?.let { initialEmail ->
+                _state.update { state -> state.copy(initialEmail = initialEmail) }
+            }
 
             setPendingFragmentToShow(LoginScreen.entries.find { it.value == visibleFragment }
                 ?: LoginScreen.LoginScreen)
@@ -295,21 +295,28 @@ class LoginViewModel @Inject constructor(
     private fun setupInitialState() {
         viewModelScope.launch {
             merge(
-                flow { emit(getSessionUseCase()) }.map { session ->
+                monitorUserCredentialsUseCase().map { it?.session }.map { session ->
                     { state: LoginState ->
                         resumeTransfersForNotLoggedInInstance(session)
+                        if (state.intentState == null) {
 
-                        state.copy(
-                            intentState = LoginIntentState.ReadyForInitialSetup,
-                            accountSession = state.accountSession?.copy(session = session)
-                                ?: AccountSession(session = session),
-                            is2FAEnabled = false,
-                            isAccountConfirmed = false,
-                            pressedBackWhileLogin = false,
-                            isFirstTime = session == null,
-                            isAlreadyLoggedIn = session != null,
-                            isLoginRequired = session == null,
-                        )
+                            state.copy(
+                                intentState = LoginIntentState.ReadyForInitialSetup,
+                                accountSession = state.accountSession?.copy(session = session)
+                                    ?: AccountSession(session = session),
+                                is2FAEnabled = false,
+                                isAccountConfirmed = false,
+                                pressedBackWhileLogin = false,
+                                isFirstTime = session == null,
+                                isAlreadyLoggedIn = session != null,
+                                isLoginRequired = session == null,
+                            )
+                        } else {
+                            state.copy(
+                                accountSession = state.accountSession?.copy(session = session)
+                                    ?: AccountSession(session = session)
+                            )
+                        }
                     }
                 }.catch { Timber.e(it) },
                 flow { emit(rootNodeExistsUseCase()) }.map { exists ->
@@ -1124,7 +1131,7 @@ class LoginViewModel @Inject constructor(
      * Get session
      */
     private suspend fun getSession() =
-        runCatching { getSessionUseCase() }.getOrNull()
+        runCatching { monitorUserCredentialsUseCase().map { it?.session }.first() }.getOrNull()
 
     /**
      * Set temporal email

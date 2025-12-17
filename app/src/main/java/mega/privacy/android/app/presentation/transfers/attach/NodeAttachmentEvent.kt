@@ -33,9 +33,4 @@ sealed interface NodeAttachmentEvent {
      * @property chatIds
      */
     data class AttachNodeSuccess(val chatIds: List<Long>) : NodeAttachmentEvent
-
-    /**
-     * Event to navigate to chat with legacy navigation (only used if Single activity feature flag is false)
-     */
-    data class NavigateToChatLegacy(val chatId: Long) : NodeAttachmentEvent
 }

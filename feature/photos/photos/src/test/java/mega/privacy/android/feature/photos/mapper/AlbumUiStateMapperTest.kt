@@ -49,6 +49,7 @@ class AlbumUiStateMapperTest {
         val expected = AlbumUiState(
             mediaAlbum = mediaAlbum,
             title = albumName,
+            isExported = false,
             cover = null
         )
         assertThat(actual).isEqualTo(expected)
@@ -89,6 +90,7 @@ class AlbumUiStateMapperTest {
         val expected = AlbumUiState(
             mediaAlbum = mediaAlbum,
             title = albumName,
+            isExported = false,
             cover = photoUiState
         )
         assertThat(actual).isEqualTo(expected)
@@ -113,6 +115,7 @@ class AlbumUiStateMapperTest {
         val expected = AlbumUiState(
             mediaAlbum = mediaAlbum,
             title = title,
+            isExported = false,
             cover = null
         )
         assertThat(actual).isEqualTo(expected)
@@ -157,6 +160,7 @@ class AlbumUiStateMapperTest {
         val expected = AlbumUiState(
             mediaAlbum = mediaAlbum,
             title = title,
+            isExported = true,
             cover = photoUiState
         )
         assertThat(actual).isEqualTo(expected)

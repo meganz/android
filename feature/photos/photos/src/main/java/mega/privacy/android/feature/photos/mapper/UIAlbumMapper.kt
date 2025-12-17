@@ -40,40 +40,4 @@ class UIAlbumMapper @Inject constructor() {
             id = album,
         )
     }
-
-    @Deprecated("Temporary to support PhotosSearch")
-    operator fun invoke(album: MediaAlbum): UIAlbum {
-        return when (album) {
-            is MediaAlbum.System -> UIAlbum(
-                title = AlbumTitle.StringTitle(album.id.albumName),
-                count = 0,
-                imageCount = 0,
-                videoCount = 0,
-                coverPhoto = album.cover,
-                defaultCover = album.cover,
-                id = when (album.id) {
-                    is FavouriteSystemAlbum -> Album.FavouriteAlbum
-                    is GifSystemAlbum -> Album.GifAlbum
-                    else -> Album.RawAlbum
-                },
-            )
-
-            is MediaAlbum.User -> UIAlbum(
-                title = AlbumTitle.StringTitle(album.title),
-                count = 0,
-                imageCount = 0,
-                videoCount = 0,
-                coverPhoto = album.cover,
-                defaultCover = album.cover,
-                id = Album.UserAlbum(
-                    id = album.id,
-                    title = album.title,
-                    cover = album.cover,
-                    creationTime = album.creationTime,
-                    modificationTime = album.modificationTime,
-                    isExported = album.isExported
-                )
-            )
-        }
-    }
 }
