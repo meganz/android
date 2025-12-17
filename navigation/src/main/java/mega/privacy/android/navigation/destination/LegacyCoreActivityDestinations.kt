@@ -76,6 +76,19 @@ data class ChatListNavKey(
     val createNewChat: Boolean = false,
 ) : NavKey, Parcelable
 
+/**
+ * Navigation key for ManageChatHistoryActivity
+ *
+ * @param chatId Chat ID of the chat or meeting room (required)
+ * @param email Email of the current user (optional)
+ */
+@Serializable
+@Parcelize
+data class ManageChatHistoryNavKey(
+    val chatId: Long,
+    val email: String? = null,
+) : NavKey, Parcelable
+
 @Serializable
 data class AddContactToShareNavKey(
     val contactType: ContactType,

@@ -92,6 +92,7 @@ import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.DeviceCenterNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import mega.privacy.android.navigation.destination.GetLinkNavKey
+import mega.privacy.android.navigation.destination.ManageChatHistoryNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
 import mega.privacy.android.navigation.destination.SearchNodeNavKey
@@ -242,7 +243,13 @@ internal class MegaNavigatorImpl @Inject constructor(
         chatId: Long,
         email: String?,
     ) {
-        applicationScope.launch {
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = ManageChatHistoryNavKey(
+                chatId = chatId,
+                email = email,
+            )
+        ) {
             val intent = Intent(context, ManageChatHistoryActivity::class.java).apply {
                 putExtra(Constants.CHAT_ID, chatId)
                 email?.let { putExtra(Constants.EMAIL, it) }
