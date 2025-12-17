@@ -5,13 +5,10 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.NodeLocation
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.reset
-import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NodeLocationMapperTest {
@@ -24,17 +21,9 @@ class NodeLocationMapperTest {
     private val nodeHandle = 100L
     private val nodeParentHandle = 50L
 
-    private val getRootNode = mock<suspend () -> MegaNode?>()
-    private val getRubbishBinNode = mock<suspend () -> MegaNode?>()
-
     @BeforeAll
     fun setup() {
         underTest = NodeLocationMapper()
-    }
-
-    @BeforeEach
-    fun resetMocks() {
-        reset(getRootNode, getRubbishBinNode)
     }
 
     @Test
@@ -52,8 +41,8 @@ class NodeLocationMapperTest {
         val result = underTest(
             node = node,
             rootParent = rootParent,
-            getRootNode = getRootNode,
-            getRubbishBinNode = getRubbishBinNode,
+            getRootNode = { null },
+            getRubbishBinNode = { null },
         )
 
         assertThat(result).isEqualTo(NodeLocation.IncomingSharesRoot)
@@ -75,8 +64,8 @@ class NodeLocationMapperTest {
             val result = underTest(
                 node = node,
                 rootParent = rootParent,
-                getRootNode = getRootNode,
-                getRubbishBinNode = getRubbishBinNode,
+                getRootNode = { null },
+                getRubbishBinNode = { null },
             )
 
             assertThat(result).isEqualTo(NodeLocation.IncomingShares)
@@ -98,13 +87,11 @@ class NodeLocationMapperTest {
                 on { handle } doReturn rootNodeHandle
             }
 
-            whenever(getRootNode()).thenReturn(rootNode)
-
             val result = underTest(
                 node = node,
                 rootParent = rootParent,
-                getRootNode = getRootNode,
-                getRubbishBinNode = getRubbishBinNode,
+                getRootNode = { rootNode },
+                getRubbishBinNode = { null },
             )
 
             assertThat(result).isEqualTo(NodeLocation.CloudDriveRoot)
@@ -126,13 +113,11 @@ class NodeLocationMapperTest {
                 on { handle } doReturn rootNodeHandle
             }
 
-            whenever(getRootNode()).thenReturn(rootNode)
-
             val result = underTest(
                 node = node,
                 rootParent = rootParent,
-                getRootNode = getRootNode,
-                getRubbishBinNode = getRubbishBinNode,
+                getRootNode = { rootNode },
+                getRubbishBinNode = { null },
             )
 
             assertThat(result).isEqualTo(NodeLocation.CloudDrive)
@@ -154,14 +139,11 @@ class NodeLocationMapperTest {
                 on { handle } doReturn rubbishBinNodeHandle
             }
 
-            whenever(getRootNode()).thenReturn(null)
-            whenever(getRubbishBinNode()).thenReturn(rubbishBinNode)
-
             val result = underTest(
                 node = node,
                 rootParent = rootParent,
-                getRootNode = getRootNode,
-                getRubbishBinNode = getRubbishBinNode,
+                getRootNode = { null },
+                getRubbishBinNode = { rubbishBinNode },
             )
 
             assertThat(result).isEqualTo(NodeLocation.RubbishBinRoot)
@@ -183,14 +165,11 @@ class NodeLocationMapperTest {
                 on { handle } doReturn rubbishBinNodeHandle
             }
 
-            whenever(getRootNode()).thenReturn(null)
-            whenever(getRubbishBinNode()).thenReturn(rubbishBinNode)
-
             val result = underTest(
                 node = node,
                 rootParent = rootParent,
-                getRootNode = getRootNode,
-                getRubbishBinNode = getRubbishBinNode,
+                getRootNode = { null },
+                getRubbishBinNode = { rubbishBinNode },
             )
 
             assertThat(result).isEqualTo(NodeLocation.RubbishBin)
@@ -208,14 +187,11 @@ class NodeLocationMapperTest {
             on { handle } doReturn otherNodeHandle
         }
 
-        whenever(getRootNode()).thenReturn(null)
-        whenever(getRubbishBinNode()).thenReturn(null)
-
         val result = underTest(
             node = node,
             rootParent = rootParent,
-            getRootNode = getRootNode,
-            getRubbishBinNode = getRubbishBinNode,
+            getRootNode = { null },
+            getRubbishBinNode = { null },
         )
 
         assertThat(result).isEqualTo(NodeLocation.CloudDrive)
