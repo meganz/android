@@ -26,6 +26,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import de.palm.composestateevents.EventEffect
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.tabs.TabLayout
@@ -134,18 +135,12 @@ import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
-import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaEvent
-import nz.mega.sdk.MegaGlobalListenerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
-import nz.mega.sdk.MegaSet
-import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaUser
-import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -170,7 +165,7 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
-    MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener,
+    MegaChatRequestListenerInterface, View.OnClickListener,
     ActionNodeCallback, SnackbarShower {
 
     /**
@@ -427,7 +422,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }.getOrNull()
         }
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-        megaApi.addGlobalListener(this)
 
         createChatLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -660,6 +654,13 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             val state by viewModel.uiState.collectAsStateWithLifecycle()
 
             OriginalTheme(isDark = isDark) {
+                EventEffect(
+                    event = state.nodeUpdatedEvent,
+                    onConsumed = viewModel::consumeNodeUpdate
+                ) {
+                    handleNodeUpdates()
+                }
+
                 if (state.isUploadingScans && state.isScanUploadingAborted) {
                     DiscardScanUploadingWarningDialog(
                         hasMultipleScans = state.hasMultipleScans,
@@ -2202,29 +2203,8 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     }
 
-    override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>?) {
-
-    }
-
-    override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert>?) {
-        Timber.d("onUserAlertsUpdate")
-    }
-
-    override fun onEvent(api: MegaApiJava, event: MegaEvent?) {}
-
-    override fun onSetsUpdate(api: MegaApiJava, sets: ArrayList<MegaSet>?) {
-    }
-
-    override fun onSetElementsUpdate(
-        api: MegaApiJava,
-        elements: ArrayList<MegaSetElement>?,
-    ) {
-    }
-
-    override fun onGlobalSyncStateChanged(api: MegaApiJava) {}
-
-    override fun onNodesUpdate(api: MegaApiJava, updatedNodes: ArrayList<MegaNode>?) {
-        Timber.d("onNodesUpdate")
+    private fun handleNodeUpdates() {
+        Timber.d("handleNodeUpdates")
         cDriveExplorer?.let { cDriveExplorer ->
             if (cloudExplorerFragment != null) {
                 cDriveExplorer.lifecycleScope.launch {
@@ -2249,23 +2229,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     public override fun onDestroy() {
-        megaApi.removeGlobalListener(this)
         megaApi.removeRequestListener(this)
         megaChatApi.removeChatRequestListener(this)
         dismissAlertDialogIfExists(statusDialog)
         dismissAlertDialogIfExists(newFolderDialog)
         super.onDestroy()
-    }
-
-    override fun onAccountUpdate(api: MegaApiJava) {
-
-    }
-
-    override fun onContactRequestsUpdate(
-        api: MegaApiJava,
-        requests: ArrayList<MegaContactRequest>?,
-    ) {
-
     }
 
     /**

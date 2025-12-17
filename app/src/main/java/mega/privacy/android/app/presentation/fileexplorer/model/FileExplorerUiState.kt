@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.fileexplorer.model
 
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.document.DocumentEntity
@@ -16,6 +17,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * decides to back out of the process
  * @property shouldFinishScreen true if the File Explorer should be finished
  * @property isAskingForCollisionsResolution true if the app is asking for name collisions resolution, false otherwise.
+ * @property nodeUpdatedEvent event triggered when nodes have been updated
  */
 data class FileExplorerUiState(
     val uploadEvent: StateEventWithContent<TransferTriggerEvent.StartUpload> = consumed(),
@@ -25,6 +27,7 @@ data class FileExplorerUiState(
     val isScanUploadingAborted: Boolean = false,
     val shouldFinishScreen: Boolean = false,
     val isAskingForCollisionsResolution: Boolean = false,
+    val nodeUpdatedEvent: StateEvent = consumed,
 ) {
     /**
      * Documents associated by its uri value

@@ -35,6 +35,7 @@ import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -49,6 +50,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.file.GetDocumentsFromSharedUrisUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import timber.log.Timber
@@ -73,6 +75,7 @@ class FileExplorerViewModel @Inject constructor(
     private val getDocumentsFromSharedUrisUseCase: GetDocumentsFromSharedUrisUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val getFolderTypeByHandleUseCase: GetFolderTypeByHandleUseCase,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileExplorerUiState())
@@ -124,8 +127,8 @@ class FileExplorerViewModel @Inject constructor(
 
     val showHiddenItems: Boolean get() = _showHiddenItems
 
-
     init {
+        monitorNodeUpdates()
         viewModelScope.launch {
             combine(
                 savedStateHandle.getStateFlow(
@@ -595,4 +598,23 @@ class FileExplorerViewModel @Inject constructor(
     internal suspend fun getFolderType(handle: Long) = runCatching {
         getFolderTypeByHandleUseCase(handle)
     }.getOrNull()
+
+    /**
+     * Monitor node updates from the SDK
+     */
+    private fun monitorNodeUpdates() {
+        viewModelScope.launch {
+            monitorNodeUpdatesUseCase().collect { nodeUpdate ->
+                _uiState.update { it.copy(nodeUpdatedEvent = triggered) }
+            }
+        }
+    }
+
+    /**
+     * Consume node update event
+     * Should be called after the UI has handled the node update
+     */
+    fun consumeNodeUpdate() {
+        _uiState.update { it.copy(nodeUpdatedEvent = consumed) }
+    }
 }
