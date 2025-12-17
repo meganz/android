@@ -26,19 +26,7 @@ data class CloudDriveNavKey(
     val isNewFolder: Boolean = false,
     val highlightedNodeHandle: Long? = null,
     val highlightedNodeNames: List<String>? = null,
-) : NavKey, Parcelable {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is CloudDriveNavKey) return false
-        return nodeHandle == other.nodeHandle && nodeSourceType == other.nodeSourceType
-    }
-
-    override fun hashCode(): Int {
-        var result = nodeHandle.hashCode()
-        result = 31 * result + nodeSourceType.hashCode()
-        return result
-    }
-}
+) : NavKey, Parcelable
 
 /**
  * Shares route args

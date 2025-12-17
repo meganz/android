@@ -7,7 +7,7 @@ import javax.inject.Inject
 /**
  * Mapper to determine the node location for a node
  */
-class NodeLocationMapper @Inject constructor() {
+internal class NodeLocationMapper @Inject constructor() {
 
     /**
      * Determine the node location for a node

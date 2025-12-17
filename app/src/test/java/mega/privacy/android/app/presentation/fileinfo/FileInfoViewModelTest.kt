@@ -26,8 +26,8 @@ import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
-import mega.privacy.android.domain.entity.NodeLocation
 import mega.privacy.android.domain.entity.FolderTreeInfo
+import mega.privacy.android.domain.entity.NodeLocation
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
@@ -67,6 +67,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUs
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
@@ -97,6 +98,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -162,6 +164,7 @@ internal class FileInfoViewModelTest {
 
     private val previewFile: File = mock()
     private val getImageNodeByIdUseCase = mock<GetImageNodeByIdUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     @BeforeEach
     fun cleanUp() = runTest {
@@ -214,7 +217,8 @@ internal class FileInfoViewModelTest {
             isMasterBusinessAccountUseCase,
             isBusinessAccountActiveUseCase,
             monitorAccountDetailsUseCase,
-            getNodeLocationByIdUseCase
+            getNodeLocationByIdUseCase,
+            getFeatureFlagValueUseCase
         )
     }
 
@@ -262,7 +266,9 @@ internal class FileInfoViewModelTest {
             isMasterBusinessAccountUseCase = isMasterBusinessAccountUseCase,
             isBusinessAccountActiveUseCase = isBusinessAccountActiveUseCase,
             getNodeLocationByIdUseCase = getNodeLocationByIdUseCase,
-            iODispatcher = UnconfinedTestDispatcher()
+            iODispatcher = UnconfinedTestDispatcher(),
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
+
         )
     }
 
@@ -304,6 +310,9 @@ internal class FileInfoViewModelTest {
             )
         )
         whenever(monitorAccountDetailsUseCase()).thenReturn(emptyFlow())
+        getFeatureFlagValueUseCase.stub {
+            onBlocking { invoke(AppFeatures.SingleActivity) }.thenReturn(false)
+        }
     }
 
     @Test
@@ -1387,52 +1396,5 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test that getCurrentNodeParentId returns null when typedNode is not initialized`() {
         assertThat(underTest.getCurrentNodeParentId()).isNull()
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideNodeLocations")
-    fun `test that nodeLocation is updated when SingleActivity feature flag is enabled`(
-        location: NodeLocation,
-    ) = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(true)
-        whenever(getNodeLocationByIdUseCase(node.id)).thenReturn(location)
-
-        underTest.setNode(node.handle, true)
-
-        // Wait for state updates to complete
-        underTest.uiState.test {
-            // Skip initial state
-            awaitItem()
-            // Wait for the state with location
-            val state = awaitItem()
-            assertThat(state.nodeLocation).isEqualTo(location)
-        }
-    }
-
-    @Test
-    fun `test that nodeLocation is not updated when SingleActivity feature flag is disabled`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
-
-            underTest.setNode(node.handle, true)
-
-            underTest.uiState.test {
-                val state = awaitItem()
-                assertThat(state.nodeLocation).isNull()
-            }
-            verify(getNodeLocationByIdUseCase, times(0)).invoke(any())
-        }
-
-    @Test
-    fun `test that nodeLocation update handles errors gracefully`() = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(true)
-        whenever(getNodeLocationByIdUseCase(node.id)).thenThrow(RuntimeException("Error"))
-
-        underTest.setNode(node.handle, true)
-
-        underTest.uiState.test {
-            val state = awaitItem()
-            assertThat(state.nodeLocation).isNull()
-        }
     }
 }

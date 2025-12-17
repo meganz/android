@@ -927,18 +927,16 @@ class FileInfoViewModel @Inject constructor(
         viewModelScope.launch {
             // Only update location if SingleActivity feature flag is enabled
             val isSingleActivityEnabled = getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
-            if (!isSingleActivityEnabled) {
-                return@launch
-            }
-
-            runCatching {
-                getNodeLocationByIdUseCase(typedNode.id)
-            }.onSuccess { location ->
-                _uiState.update {
-                    it.copy(nodeLocation = location)
+            if (isSingleActivityEnabled) {
+                runCatching {
+                    getNodeLocationByIdUseCase(typedNode.id)
+                }.onSuccess { location ->
+                    _uiState.update {
+                        it.copy(nodeLocation = location)
+                    }
+                }.onFailure {
+                    Timber.e("Failed to get node location: $it")
                 }
-            }.onFailure {
-                Timber.e("Failed to get node location: $it")
             }
         }
     }

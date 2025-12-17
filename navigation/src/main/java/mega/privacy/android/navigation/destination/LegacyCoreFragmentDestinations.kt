@@ -7,17 +7,8 @@ import kotlinx.serialization.Serializable
 data class RubbishBinNavKey(
     val handle: Long? = null,
     val highlightedNodeHandle: Long? = null,
-) : NavKey {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is RubbishBinNavKey) return false
-        return handle == other.handle
-    }
+) : NavKey
 
-    override fun hashCode(): Int {
-        return handle?.hashCode() ?: 0
-    }
-}
 
 @Serializable
 data object NotificationsNavKey : NavKey

@@ -91,6 +91,7 @@ import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.transparent.TransparentSceneStrategy
 import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
+import mega.privacy.android.navigation.extensions.matches
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -374,9 +375,10 @@ class MegaActivity : ComponentActivity() {
                                 ) {
                                     when (it) {
                                         is NavigationQueueEvent -> {
-                                            if (!it.isSingleTop
-                                                || navigationHandler.peekBackStack()
-                                                    .takeLast(it.keys.size) != it.keys
+                                            if (!it.isSingleTop || !doBackStackKeysMatch(
+                                                    navigationHandler.peekBackStack(),
+                                                    it.keys
+                                                )
                                             ) {
                                                 navigationHandler.navigate(it.keys)
                                             }
@@ -422,6 +424,20 @@ class MegaActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    /**
+     * Checks if the last keys in the back stack match the provided navigation keys.
+     * @param backStack The current back stack of navigation keys
+     * @param keys The navigation keys to compare against
+     * @return true if the last keys in the back stack match the provided keys, false otherwise
+     */
+    private fun doBackStackKeysMatch(backStack: List<NavKey>, keys: List<NavKey>): Boolean {
+        val backStackKeys = backStack.takeLast(keys.size)
+        return backStackKeys.size == keys.size &&
+                backStackKeys.zip(keys).all { (backStackKey, navKey) ->
+                    backStackKey.matches(navKey)
+                }
     }
 
     companion object {
