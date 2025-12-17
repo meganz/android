@@ -128,7 +128,7 @@ internal fun PhotosSearchScreen(
                             },
                         )
                     }
-                } else if (state.albums.isEmpty() && !state.isSearchingAlbums && state.photos.isEmpty() && !state.isSearchingPhotos) {
+                } else if (state.legacyAlbums.isEmpty() && !state.isSearchingAlbums && state.photos.isEmpty() && !state.isSearchingPhotos) {
                     PhotosSearchEmptyState(
                         modifier = Modifier
                             .fillMaxSize()
@@ -143,7 +143,7 @@ internal fun PhotosSearchScreen(
                             .padding(paddingValues),
                         query = state.query,
                         photos = state.photos,
-                        albums = state.albums,
+                        albums = state.legacyAlbums,
                         accountType = state.accountType,
                         isBusinessAccountExpired = state.isBusinessAccountExpired,
                         onDownloadPhoto = photoDownloaderViewModel::downloadPhoto,

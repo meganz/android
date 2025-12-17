@@ -8,15 +8,17 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumTitle
+import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
+import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.shared.resources.R as sharedResR
 import org.junit.Rule
 import org.junit.Test
@@ -45,7 +47,7 @@ class MediaSearchScreenM3ComposeTest {
 
     private fun setComposeContent(
         state: PhotosSearchState,
-        onOpenAlbum: (Album) -> Unit = {},
+        onOpenAlbum: (AlbumContentNavKey) -> Unit = {},
         onOpenImagePreviewScreen: (Photo) -> Unit = {},
         onShowMoreMenu: (NodeId) -> Unit = {},
         onCloseScreen: () -> Unit = {},
@@ -143,7 +145,7 @@ class MediaSearchScreenM3ComposeTest {
             contentState = MediaContentState.NoResults,
             query = "nonexistent",
             photos = emptyList(),
-            albums = emptyList(),
+            legacyAlbums = emptyList(),
             isSearchingPhotos = false,
             isSearchingAlbums = false,
         )
@@ -165,7 +167,7 @@ class MediaSearchScreenM3ComposeTest {
             contentState = MediaContentState.SearchResults,
             query = "photo",
             photos = photos,
-            albums = emptyList(),
+            legacyAlbums = emptyList(),
         )
 
         setComposeContent(state)
@@ -214,7 +216,7 @@ class MediaSearchScreenM3ComposeTest {
             contentState = MediaContentState.SearchResults,
             query = "photo",
             photos = photos,
-            albums = emptyList(),
+            legacyAlbums = emptyList(),
         )
         val mockOnOpenImagePreviewScreen: (Photo) -> Unit = mock()
 
@@ -239,7 +241,7 @@ class MediaSearchScreenM3ComposeTest {
             photos = emptyList(),
             albums = albums,
         )
-        val mockOnOpenAlbum: (Album) -> Unit = mock()
+        val mockOnOpenAlbum: (AlbumContentNavKey) -> Unit = mock()
 
         setComposeContent(
             state = state,
@@ -317,7 +319,7 @@ class MediaSearchScreenM3ComposeTest {
             contentState = MediaContentState.SearchResults,
             query = "test",
             photos = photos,
-            albums = emptyList(),
+            legacyAlbums = emptyList(),
         )
 
         setComposeContent(state)
@@ -354,8 +356,8 @@ class MediaSearchScreenM3ComposeTest {
     private fun createMockUIAlbum(
         id: Long,
         title: String,
-    ): UIAlbum {
-        val album = Album.UserAlbum(
+    ): AlbumUiState {
+        val album = MediaAlbum.User(
             id = AlbumId(id),
             title = title,
             cover = null,
@@ -363,14 +365,11 @@ class MediaSearchScreenM3ComposeTest {
             modificationTime = 0L,
             isExported = false,
         )
-        return UIAlbum(
-            id = album,
-            title = AlbumTitle.StringTitle(title),
-            count = 0,
-            imageCount = 0,
-            videoCount = 0,
-            coverPhoto = null,
-            defaultCover = null,
+        return AlbumUiState(
+            mediaAlbum = album,
+            title = title,
+            isExported = false,
+            cover = null,
         )
     }
 }

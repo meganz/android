@@ -16,7 +16,6 @@ import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.media.MediaAlbum
-import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoResult
 import mega.privacy.android.domain.entity.photos.TimelinePhotosResult
@@ -27,16 +26,19 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.feature.photos.mapper.AlbumTitleStringMapper
-import mega.privacy.android.feature.photos.mapper.UIAlbumMapper
+import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumTitle
+import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import mega.privacy.android.feature.photos.provider.AlbumsDataProvider
+import mega.privacy.android.feature.photos.provider.PhotosCache
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import java.time.LocalDateTime
@@ -63,7 +65,7 @@ internal class PhotosSearchViewModelTest {
 
     private val albumsProvider: Lazy<Set<AlbumsDataProvider>> = Lazy { setOf(albumsDataProvider) }
 
-    private val uiAlbumMapper: UIAlbumMapper = mock()
+    private val albumUiStateMapper: AlbumUiStateMapper = mock()
 
     private val monitorTimelinePhotosUseCase: MonitorTimelinePhotosUseCase = mock()
 
@@ -83,9 +85,19 @@ internal class PhotosSearchViewModelTest {
     fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
 
+        // Reset PhotosCache before each test to prevent interference from previous tests
+        PhotosCache.updatePhotos(emptyList())
+        PhotosCache.updateAlbums(emptyList())
+
         wheneverBlocking { monitorShowHiddenItemsUseCase() }.thenReturn(flowOf(false))
         wheneverBlocking { monitorAccountDetailUseCase() }.thenReturn(flowOf(accountDetail))
         wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+    }
+
+    @After
+    fun tearDown() {
+        PhotosCache.updatePhotos(emptyList())
+        PhotosCache.updateAlbums(emptyList())
     }
 
     private fun initViewModel() {
@@ -99,7 +111,7 @@ internal class PhotosSearchViewModelTest {
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             albumsProvider = albumsProvider,
-            uiAlbumMapper = uiAlbumMapper,
+            albumUiStateMapper = albumUiStateMapper,
             monitorTimelinePhotosUseCase = lazyMonitorTimelinePhotosUseCase,
         )
     }
@@ -143,24 +155,156 @@ internal class PhotosSearchViewModelTest {
     }
 
     @Test
+    fun `test that photos are fetched from PhotosCache when feature flag is disabled`() = runTest {
+        val expectedPhoto = Photo.Image(
+            id = 1L,
+            albumPhotoId = null,
+            parentId = 0L,
+            name = "cached_photo.jpg",
+            isFavourite = false,
+            creationTime = LocalDateTime.now(),
+            modificationTime = LocalDateTime.now(),
+            thumbnailFilePath = null,
+            previewFilePath = null,
+            fileTypeInfo = StaticImageFileTypeInfo(
+                mimeType = "image/jpeg",
+                extension = "jpg",
+            ),
+            size = 1024L,
+            isTakenDown = false,
+            isSensitive = false,
+            isSensitiveInherited = false,
+        )
+        PhotosCache.updatePhotos(listOf(expectedPhoto))
+
+        whenever(retrievePhotosRecentQueriesUseCase()).thenReturn(listOf())
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        photosSearchViewModel.state.test {
+            val state = awaitItem()
+            assertThat(state.isSingleActivityEnabled).isFalse()
+            assertThat(state.photosSource).hasSize(1)
+            assertThat(state.photosSource.first()).isEqualTo(expectedPhoto)
+        }
+    }
+
+    @Test
+    fun `test that search returns legacyAlbums when feature flag is disabled`() = runTest {
+        val matchingAlbum = UIAlbum(
+            id = Album.FavouriteAlbum,
+            title = AlbumTitle.StringTitle("Favourites"),
+            count = 5,
+            imageCount = 3,
+            videoCount = 2,
+            coverPhoto = null,
+            defaultCover = null,
+        )
+        val nonMatchingAlbum = UIAlbum(
+            id = Album.GifAlbum,
+            title = AlbumTitle.StringTitle("GIFs"),
+            count = 10,
+            imageCount = 10,
+            videoCount = 0,
+            coverPhoto = null,
+            defaultCover = null,
+        )
+        PhotosCache.updateAlbums(listOf(matchingAlbum, nonMatchingAlbum))
+
+        whenever(retrievePhotosRecentQueriesUseCase()).thenReturn(listOf())
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+        whenever(albumTitleStringMapper(AlbumTitle.StringTitle("Favourites"))).thenReturn("Favourites")
+        whenever(albumTitleStringMapper(AlbumTitle.StringTitle("GIFs"))).thenReturn("GIFs")
+
+        initViewModel()
+        advanceUntilIdle()
+        photosSearchViewModel.search("Fav")
+        advanceUntilIdle()
+
+        photosSearchViewModel.state.test {
+            val state = awaitItem()
+            assertThat(state.isSingleActivityEnabled).isFalse()
+            assertThat(state.legacyAlbums).hasSize(1)
+            assertThat(state.legacyAlbums.first()).isEqualTo(matchingAlbum)
+        }
+    }
+
+    @Test
+    fun `test that search returns photos when feature flag is disabled`() = runTest {
+        val matchingPhoto = Photo.Image(
+            id = 1L,
+            albumPhotoId = null,
+            parentId = 0L,
+            name = "vacation_beach.jpg",
+            isFavourite = false,
+            creationTime = LocalDateTime.now(),
+            modificationTime = LocalDateTime.now(),
+            thumbnailFilePath = null,
+            previewFilePath = null,
+            fileTypeInfo = StaticImageFileTypeInfo(
+                mimeType = "image/jpeg",
+                extension = "jpg",
+            ),
+            size = 1024L,
+            isTakenDown = false,
+            isSensitive = false,
+            isSensitiveInherited = false,
+        )
+        val nonMatchingPhoto = Photo.Image(
+            id = 2L,
+            albumPhotoId = null,
+            parentId = 0L,
+            name = "mountain_trip.jpg",
+            isFavourite = false,
+            creationTime = LocalDateTime.now(),
+            modificationTime = LocalDateTime.now(),
+            thumbnailFilePath = null,
+            previewFilePath = null,
+            fileTypeInfo = StaticImageFileTypeInfo(
+                mimeType = "image/jpeg",
+                extension = "jpg",
+            ),
+            size = 2048L,
+            isTakenDown = false,
+            isSensitive = false,
+            isSensitiveInherited = false,
+        )
+        PhotosCache.updatePhotos(listOf(matchingPhoto, nonMatchingPhoto))
+
+        whenever(retrievePhotosRecentQueriesUseCase()).thenReturn(listOf())
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+
+        initViewModel()
+        advanceUntilIdle()
+        photosSearchViewModel.search("vacation")
+        advanceUntilIdle()
+
+        photosSearchViewModel.state.test {
+            val state = awaitItem()
+            assertThat(state.isSingleActivityEnabled).isFalse()
+            assertThat(state.photos).hasSize(1)
+            assertThat(state.photos.first()).isEqualTo(matchingPhoto)
+        }
+    }
+
+    @Test
     fun `test that albums are fetched from albumsProvider when feature flag is enabled`() =
         runTest {
-            val expectedUIAlbum = UIAlbum(
-                id = Album.FavouriteAlbum,
-                title = AlbumTitle.StringTitle("Favourites"),
-                count = 0,
-                imageCount = 0,
-                videoCount = 0,
-                coverPhoto = null,
-                defaultCover = null,
-            )
             val mediaAlbum = mock<MediaAlbum.System>()
+            val expectedAlbumUiState = AlbumUiState(
+                mediaAlbum = mediaAlbum,
+                title = "Favourites",
+                isExported = false,
+                cover = null,
+            )
 
             whenever(retrievePhotosRecentQueriesUseCase()).thenReturn(listOf())
             wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(true)
             whenever(albumsDataProvider.order).thenReturn(0)
             whenever(albumsDataProvider.monitorAlbums()).thenReturn(flowOf(listOf(mediaAlbum)))
-            whenever(uiAlbumMapper(mediaAlbum)).thenReturn(expectedUIAlbum)
+            whenever(albumUiStateMapper(mediaAlbum)).thenReturn(expectedAlbumUiState)
             whenever(monitorTimelinePhotosUseCase(any())).thenReturn(flowOf())
 
             initViewModel()
@@ -169,8 +313,8 @@ internal class PhotosSearchViewModelTest {
             photosSearchViewModel.state.test {
                 val state = awaitItem()
                 assertThat(state.isSingleActivityEnabled).isTrue()
-                assertThat(state.albumsSource).hasSize(1)
-                assertThat(state.albumsSource.first()).isEqualTo(expectedUIAlbum)
+                assertThat(state.albumSource).hasSize(1)
+                assertThat(state.albumSource.first()).isEqualTo(expectedAlbumUiState)
             }
         }
 
@@ -267,7 +411,7 @@ internal class PhotosSearchViewModelTest {
             photosSearchViewModel.state.test {
                 val state = awaitItem()
                 assertThat(state.query).isEqualTo("nonexistent")
-                assertThat(state.albums).isEmpty()
+                assertThat(state.legacyAlbums).isEmpty()
                 assertThat(state.photos).isEmpty()
                 assertThat(state.isSearchingAlbums).isFalse()
                 assertThat(state.isSearchingPhotos).isFalse()

@@ -26,6 +26,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.feature.photos.model.AlbumFlow
+import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
 import mega.privacy.android.navigation.destination.AlbumGetLinkNavKey
 import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
@@ -233,16 +234,30 @@ fun EntryProviderScope<NavKey>.legacySettingsCameraUploadsActivityNavKey(removeD
 
 fun EntryProviderScope<NavKey>.legacyPhotosSearch(
     removeDestination: () -> Unit,
+    returnResult: (String, Pair<Long?, String>?) -> Unit,
 ) {
     entry<LegacyPhotosSearchNavKey> {
         val context = LocalContext.current
+        val launcher = rememberLauncherForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+                val data = result.data
+                val id = data?.getLongExtra(PhotosSearchActivity.KEY_ALBUM_ID, -1L)
+                val type = data?.getStringExtra(PhotosSearchActivity.KEY_ALBUM_TYPE)
+                if (!type.isNullOrBlank()) {
+                    returnResult(LegacyPhotosSearchNavKey.RESULT, id to type)
+                } else {
+                    removeDestination()
+                }
+            } else {
+                removeDestination()
+            }
+        }
 
         LaunchedEffect(Unit) {
             val intent = Intent(context, PhotosSearchActivity::class.java)
-            context.startActivity(intent)
-
-            // Immediately pop this destination from the back stack
-            removeDestination()
+            launcher.launch(intent)
         }
     }
 }

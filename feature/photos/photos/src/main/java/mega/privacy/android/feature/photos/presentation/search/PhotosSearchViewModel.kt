@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.photos.Photo
@@ -27,7 +28,8 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.photos.MonitorTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.photos.mapper.AlbumTitleStringMapper
-import mega.privacy.android.feature.photos.mapper.UIAlbumMapper
+import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
+import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import mega.privacy.android.feature.photos.provider.AlbumsDataProvider
 import mega.privacy.android.feature.photos.provider.PhotosCache
@@ -46,7 +48,7 @@ class PhotosSearchViewModel @Inject constructor(
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val albumsProvider: Lazy<Set<@JvmSuppressWildcards AlbumsDataProvider>>,
-    private val uiAlbumMapper: UIAlbumMapper,
+    private val albumUiStateMapper: AlbumUiStateMapper,
     private val monitorTimelinePhotosUseCase: Lazy<MonitorTimelinePhotosUseCase>,
 ) : ViewModel() {
     private val _state: MutableStateFlow<PhotosSearchState> = MutableStateFlow(PhotosSearchState())
@@ -93,23 +95,31 @@ class PhotosSearchViewModel @Inject constructor(
     }
 
     private fun monitorAlbums(isSingleActivityEnabled: Boolean) {
-        val albumsFlow = if (isSingleActivityEnabled) {
-            createSingleActivityAlbumsFlow()
+        if (isSingleActivityEnabled) {
+            monitorAlbumsFlow()
+                .map { it.map(albumUiStateMapper::invoke) }
+                .onEach(::updateAlbumUi)
+                .launchIn(viewModelScope)
         } else {
             PhotosCache.albumsFlow
+                .onEach(::updateAlbums)
+                .launchIn(viewModelScope)
         }
-
-        albumsFlow
-            .onEach(::updateAlbums)
-            .launchIn(viewModelScope)
     }
 
-    private fun createSingleActivityAlbumsFlow() = combine(
+    private fun monitorAlbumsFlow() = combine(
         flows = albumsProvider.get()
             .sortedBy { it.order }
             .map { it.monitorAlbums() },
         transform = { albums -> albums.toList().flatten() }
-    ).map { albums -> albums.map(uiAlbumMapper::invoke) }
+    )
+
+    private fun updateAlbumUi(albums: List<AlbumUiState>) {
+        _state.update {
+            it.copy(albumSource = albums)
+        }
+        searchAlbums(query = _state.value.query)
+    }
 
     private fun monitorPhotos(isSingleActivityEnabled: Boolean) {
         val photosFlow = if (isSingleActivityEnabled) {
@@ -131,7 +141,7 @@ class PhotosSearchViewModel @Inject constructor(
 
     private fun updateAlbums(albums: List<UIAlbum>) {
         _state.update {
-            it.copy(albumsSource = albums)
+            it.copy(legacyAlbumSource = albums)
         }
         searchAlbums(query = _state.value.query)
     }
@@ -158,6 +168,7 @@ class PhotosSearchViewModel @Inject constructor(
                 query = query,
                 photos = it.photos.takeIf { query.isNotBlank() }.orEmpty(),
                 isSearchingPhotos = true,
+                legacyAlbums = it.legacyAlbums.takeIf { query.isNotBlank() }.orEmpty(),
                 albums = it.albums.takeIf { query.isNotBlank() }.orEmpty(),
                 isSearchingAlbums = true,
                 contentState = updateContentState()
@@ -168,21 +179,53 @@ class PhotosSearchViewModel @Inject constructor(
         searchPhotos(query)
     }
 
-    private fun searchAlbums(query: String) = viewModelScope.launch(defaultDispatcher) {
-        val albums = if (query.isBlank()) {
-            listOf()
-        } else {
-            _state.value.albumsSource.filter {
-                albumTitleStringMapper(it.title).contains(query, ignoreCase = true)
+    private fun searchAlbums(query: String) {
+        viewModelScope.launch(defaultDispatcher) {
+            when (state.value.isSingleActivityEnabled) {
+                true -> {
+                    val albums = if (query.isBlank()) {
+                        listOf()
+                    } else {
+                        _state.value.albumSource.filter {
+                            it.title.contains(query, ignoreCase = true)
+                        }
+                    }
+
+                    _state.update {
+                        it.copy(
+                            albums = albums,
+                            isSearchingAlbums = false,
+                            contentState = updateContentState()
+                        )
+                    }
+                }
+
+                false -> {
+                    searchLegacyAlbums(query)
+                }
+
+                else -> return@launch
             }
         }
+    }
 
-        _state.update {
-            it.copy(
-                albums = albums,
-                isSearchingAlbums = false,
-                contentState = updateContentState()
-            )
+    private suspend fun searchLegacyAlbums(query: String) {
+        withContext(defaultDispatcher) {
+            val albums = if (query.isBlank()) {
+                listOf()
+            } else {
+                _state.value.legacyAlbumSource.filter {
+                    albumTitleStringMapper(it.title).contains(query, ignoreCase = true)
+                }
+            }
+
+            _state.update {
+                it.copy(
+                    legacyAlbums = albums,
+                    isSearchingAlbums = false,
+                    contentState = updateContentState()
+                )
+            }
         }
     }
 
@@ -290,12 +333,18 @@ class PhotosSearchViewModel @Inject constructor(
             state.query.isBlank() && state.recentQueries.isEmpty() -> MediaContentState.WelcomeEmpty
             state.query.isBlank() -> MediaContentState.RecentQueries
 
-            state.albums.isEmpty()
+            isAlbumEmpty()
                     && !state.isSearchingAlbums
                     && state.photos.isEmpty()
                     && !state.isSearchingPhotos -> MediaContentState.NoResults
 
             else -> MediaContentState.SearchResults
         }
+    }
+
+    private fun isAlbumEmpty(): Boolean = when (state.value.isSingleActivityEnabled) {
+        true -> state.value.albums.isEmpty()
+        false -> state.value.legacyAlbums.isEmpty()
+        else -> true
     }
 }

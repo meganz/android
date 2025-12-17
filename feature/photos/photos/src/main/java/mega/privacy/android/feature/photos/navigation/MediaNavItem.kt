@@ -26,6 +26,7 @@ class MediaNavItem : MainNavItem {
                 setNavigationItemVisibility = navigationController::showNavigation,
                 photoSelectionResultFlow = navigationHandler::monitorResult,
                 timelineAddToAlbumResultFlow = navigationHandler::monitorResult,
+                mediaAlbumNavigationFlow = navigationHandler::monitorResult,
                 onTransfer = transferHandler::setTransferEvent,
             )
         }

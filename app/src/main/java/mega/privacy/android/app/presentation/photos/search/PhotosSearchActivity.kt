@@ -66,6 +66,7 @@ import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.feature.photos.presentation.search.MediaSearchScreenM3
 import mega.privacy.android.feature.photos.presentation.search.PhotosSearchViewModel
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
+import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -150,7 +151,7 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                             state = state,
                                             photoDownloaderViewModel = photoDownloaderViewModel,
                                             scaffoldState = scaffoldState,
-                                            onOpenAlbum = ::openAlbum,
+                                            onOpenAlbum = ::openLegacyAlbum,
                                             onOpenImagePreviewScreen = ::openImagePreview,
                                             onShowMoreMenu = { nodeId ->
                                                 val route =
@@ -267,7 +268,7 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
         startActivity(intent)
     }
 
-    private fun openAlbum(album: Album) {
+    private fun openLegacyAlbum(album: Album) {
         val data = Intent().apply {
             val bundle = bundleOf(
                 "type" to when (album) {
@@ -282,6 +283,19 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
                 "id" to if (album is UserAlbum) album.id.id else null,
             )
             putExtras(bundle)
+        }
+        setResult(RESULT_OK, data)
+        finish()
+    }
+
+    private fun openAlbum(album: AlbumContentNavKey) {
+        val data = Intent().apply {
+            putExtras(
+                bundleOf(
+                    KEY_ALBUM_ID to album.id,
+                    KEY_ALBUM_TYPE to album.type
+                )
+            )
         }
         setResult(RESULT_OK, data)
         finish()
@@ -313,5 +327,10 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
     override fun onPause() {
         photosSearchViewModel.saveQueries()
         super.onPause()
+    }
+
+    companion object {
+        const val KEY_ALBUM_ID = "key_album_id"
+        const val KEY_ALBUM_TYPE = "key_album_type"
     }
 }

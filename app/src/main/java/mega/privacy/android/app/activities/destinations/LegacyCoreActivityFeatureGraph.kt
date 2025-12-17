@@ -3,6 +3,7 @@ package mega.privacy.android.app.activities.destinations
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.getLink.navigation.getLinkLegacyDestination
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.mediaplayer.legacyMediaPlayerScreen
 import mega.privacy.android.app.meeting.activity.legacyMeetingScreen
@@ -11,7 +12,6 @@ import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.nav.MediaPlayerIntentMapper
 import mega.privacy.android.app.presentation.chat.navigation.chatLegacyDestination
 import mega.privacy.android.app.presentation.chat.navigation.chatListLegacyDestination
-import mega.privacy.android.app.getLink.navigation.getLinkLegacyDestination
 import mega.privacy.android.app.presentation.contact.navigation.contactsLegacyDestination
 import mega.privacy.android.app.presentation.filelink.legacyFileLinkScreen
 import mega.privacy.android.app.presentation.folderlink.legacyFolderLinkScreen
@@ -79,7 +79,7 @@ class LegacyCoreActivityFeatureGraph(
                 rtcAudioManagerGateway
             )
             legacyWaitingRoomScreen(navigationHandler::back, megaChatRequestHandler, chatManagement)
-            legacyPhotosSearch(navigationHandler::back)
+            legacyPhotosSearch(navigationHandler::back, navigationHandler::returnResult)
             legacySettingsCameraUploadsActivityNavKey(navigationHandler::back)
         }
 }

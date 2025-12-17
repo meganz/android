@@ -264,7 +264,9 @@ data class LegacyAddToAlbumActivityNavKey(
 }
 
 @Serializable
-data object LegacyPhotosSearchNavKey : NavKey
+data object LegacyPhotosSearchNavKey : NavKey {
+    const val RESULT = "LegacyPhotosSearchNavKey:key_result"
+}
 
 @Serializable
 data class LegacySettingsCameraUploadsActivityNavKey(

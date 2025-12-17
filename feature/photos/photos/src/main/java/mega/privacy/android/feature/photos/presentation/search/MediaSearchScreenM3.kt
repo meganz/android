@@ -53,15 +53,19 @@ import mega.android.core.ui.model.HighlightedText
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.components.AlbumGridItem
 import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
-import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
+import mega.privacy.android.feature.photos.extensions.downloadAsStateWithLifecycle
+import mega.privacy.android.feature.photos.presentation.albums.content.toAlbumContentNavKey
+import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -73,7 +77,7 @@ private typealias PhotoDownload =
 fun MediaSearchScreenM3(
     state: PhotosSearchState,
     photoDownloaderViewModel: PhotoDownloaderViewModel,
-    onOpenAlbum: (Album) -> Unit,
+    onOpenAlbum: (AlbumContentNavKey) -> Unit,
     onOpenImagePreviewScreen: (Photo) -> Unit,
     onShowMoreMenu: (NodeId) -> Unit,
     onCloseScreen: () -> Unit,
@@ -104,7 +108,9 @@ fun MediaSearchScreenM3(
                 state = state,
                 onDownloadPhoto = photoDownloaderViewModel::downloadPhoto,
                 onClickPhoto = onOpenImagePreviewScreen,
-                onClickAlbum = onOpenAlbum,
+                onClickAlbum = {
+                    onOpenAlbum(it.toAlbumContentNavKey())
+                },
                 onClickMenu = onShowMoreMenu,
                 onSelectQuery = { query ->
                     updateSelectedQuery(query)
@@ -165,7 +171,7 @@ private fun MediaSearchContent(
     state: PhotosSearchState,
     onDownloadPhoto: PhotoDownload,
     onClickPhoto: (Photo) -> Unit,
-    onClickAlbum: (Album) -> Unit,
+    onClickAlbum: (MediaAlbum) -> Unit,
     onClickMenu: (NodeId) -> Unit,
     onSelectQuery: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -287,12 +293,12 @@ private fun MediaSearchRecentQueries(
 private fun MediaSearchResults(
     query: String,
     photos: ImmutableList<Photo>,
-    albums: ImmutableList<UIAlbum>,
+    albums: ImmutableList<AlbumUiState>,
     accountType: AccountType?,
     isBusinessAccountExpired: Boolean,
     onDownloadPhoto: PhotoDownload,
     onClickPhoto: (Photo) -> Unit,
-    onClickAlbum: (Album) -> Unit,
+    onClickAlbum: (MediaAlbum) -> Unit,
     onClickMenu: (NodeId) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -325,10 +331,7 @@ private fun MediaSearchResults(
                 ) {
                     items(
                         count = albums.size,
-                        key = { index ->
-                            val album = albums[index]
-                            "${album.id}-${album.coverPhoto?.id}-${album.defaultCover?.id}"
-                        },
+                        key = { albums[it].mediaAlbum.hashCode() },
                     ) { index ->
                         val album = albums[index]
                         AlbumItem(
@@ -336,7 +339,6 @@ private fun MediaSearchResults(
                             album = album,
                             query = query,
                             placeholder = placeholder,
-                            onDownloadPhoto = onDownloadPhoto,
                             onClickAlbum = onClickAlbum,
                         )
                     }
@@ -382,31 +384,17 @@ private fun MediaSearchResults(
 
 @Composable
 private fun AlbumItem(
-    album: UIAlbum,
+    album: AlbumUiState,
     query: String,
     placeholder: Int,
-    onDownloadPhoto: PhotoDownload,
-    onClickAlbum: (Album) -> Unit,
+    onClickAlbum: (MediaAlbum) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
-    val albumCover = album.coverPhoto ?: album.defaultCover
-    val albumCoverData by produceState<String?>(
-        initialValue = null,
-        key1 = albumCover?.id,
-    ) {
-        albumCover?.let { photo ->
-            onDownloadPhoto(false, photo) { isSuccess ->
-                if (isSuccess) {
-                    value = photo.thumbnailFilePath
-                }
-            }
-        }
-    }
+    val downloadResult = album.cover?.downloadAsStateWithLifecycle(isPreview = false)
     val placeholderPainter = painterResource(placeholder)
     val title = remember(album.title, query) {
         HighlightedText(
-            full = album.title.getTitleString(context),
+            full = album.title,
             highlighted = query,
         )
     }
@@ -414,8 +402,11 @@ private fun AlbumItem(
     AlbumGridItem(
         modifier = modifier
             .width(104.dp)
-            .clickable { onClickAlbum(album.id) },
-        coverImage = albumCoverData,
+            .clickable { onClickAlbum(album.mediaAlbum) },
+        coverImage = when (val result = downloadResult?.value) {
+            is DownloadPhotoResult.Success -> result.thumbnailFilePath
+            else -> null
+        },
         title = title,
         placeholder = placeholderPainter,
         errorPlaceholder = placeholderPainter,
