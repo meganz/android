@@ -22,6 +22,9 @@ class FavouriteActionClickHandler @Inject constructor(
                 runCatching {
                     updateNodeFavoriteUseCase(nodeId = node.id, isFavorite = node.isFavourite.not())
                 }.onFailure { Timber.e("Error updating favourite node $it") }
+                    .onSuccess {
+                        provider.viewModel.dismiss()
+                    }
             }
         }
     }

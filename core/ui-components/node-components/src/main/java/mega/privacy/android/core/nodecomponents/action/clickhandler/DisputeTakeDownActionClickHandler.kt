@@ -15,6 +15,7 @@ class DisputeTakeDownActionClickHandler @Inject constructor(
 
     override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
         megaNavigator.launchUrl(provider.context, DISPUTE_URL)
+        provider.viewModel.dismiss()
     }
 
     override fun handle(
@@ -23,6 +24,7 @@ class DisputeTakeDownActionClickHandler @Inject constructor(
         provider: MultipleNodesActionProvider,
     ) {
         megaNavigator.launchUrl(provider.context, DISPUTE_URL)
+        provider.viewModel.dismiss()
     }
 
     companion object {

@@ -1,5 +1,6 @@
 package mega.privacy.android.core.nodecomponents.action
 
+import android.content.Context
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEvent
@@ -167,6 +168,7 @@ class NodeOptionsActionViewModelTest {
 
     private val mockNodeSelectionMenuItem = mock<NodeSelectionMenuItem<MenuActionWithIcon>>()
     private val mockNodeSelectionModeMenuItem = mock<NodeSelectionModeMenuItem>()
+    private val mockContext = mock<Context>()
 
     private fun initViewModel() {
         viewModel = NodeOptionsActionViewModel(
@@ -202,12 +204,17 @@ class NodeOptionsActionViewModelTest {
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
             checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
+            applicationContext = mockContext
         )
     }
 
     @BeforeEach
     fun setUpNodeSelectionModeTests() {
-        whenever(nodeMenuProviderRegistry.getSelectionModeOptions(any())).thenReturn(setOf(mockNodeSelectionMenuItem))
+        whenever(nodeMenuProviderRegistry.getSelectionModeOptions(any())).thenReturn(
+            setOf(
+                mockNodeSelectionMenuItem
+            )
+        )
         getRubbishNodeUseCase.stub {
             onBlocking { invoke() } doReturn mockRubbishNode
         }
@@ -628,7 +635,8 @@ class NodeOptionsActionViewModelTest {
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
-            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode
+            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
+            applicationContext = mockContext
         )
 
         val mockAction = mock<VersionsMenuAction>()
@@ -686,7 +694,8 @@ class NodeOptionsActionViewModelTest {
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
-            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode
+            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
+            applicationContext = mockContext
         )
 
         val mockAction = mock<MoveMenuAction>()
@@ -738,7 +747,8 @@ class NodeOptionsActionViewModelTest {
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
-            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode
+            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
+            applicationContext = mockContext
         )
 
         val mockAction = mock<VersionsMenuAction>()
@@ -782,7 +792,8 @@ class NodeOptionsActionViewModelTest {
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
-            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode
+            checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
+            applicationContext = mockContext
         )
 
         assertThrows<IllegalArgumentException> {

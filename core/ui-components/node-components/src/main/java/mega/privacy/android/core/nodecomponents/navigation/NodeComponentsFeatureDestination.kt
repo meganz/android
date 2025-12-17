@@ -26,7 +26,10 @@ class NodeComponentsFeatureDestination : FeatureDestination {
             cannotVerifyContactDialogM3(navigationHandler::back)
             leaveShareDialogM3(navigationHandler::back)
             shareFolderAccessDialogM3(navigationHandler::back)
-            nodeOptionsBottomSheet(navigationHandler, transferHandler::setTransferEvent)
+            nodeOptionsBottomSheet(
+                navigationHandler = navigationHandler,
+                returnResult = navigationHandler::returnResult
+            )
             changeLabelBottomSheetNavigation(navigationHandler::back)
             homeFabOptionsBottomSheetNavigation(
                 returnResult = navigationHandler::returnResult

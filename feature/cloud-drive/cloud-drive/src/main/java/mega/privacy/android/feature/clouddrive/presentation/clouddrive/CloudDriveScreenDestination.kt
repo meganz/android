@@ -9,8 +9,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import kotlinx.coroutines.flow.Flow
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsResult
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
@@ -22,6 +26,8 @@ fun EntryProviderScope<NavKey>.cloudDriveScreen(
     onBack: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     openSearch: (Long, NodeSourceType) -> Unit,
+    nodeResultFlow: (String) -> Flow<NodeOptionsBottomSheetResult?>,
+    clearResultFlow: (String) -> Unit,
 ) {
     entry<CloudDriveNavKey> { key ->
         val viewModel = hiltViewModel<CloudDriveViewModel, CloudDriveViewModel.Factory>(
@@ -31,8 +37,16 @@ fun EntryProviderScope<NavKey>.cloudDriveScreen(
         )
         val snackbarHostState = LocalSnackBarHostState.current
         val context = LocalContext.current
-
         var hasShownSnackbar by rememberSaveable { mutableStateOf(false) }
+        val nodeOptionsActionViewModel = hiltViewModel<NodeOptionsActionViewModel>()
+
+        HandleNodeOptionsResult(
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            onNavigate = navigationHandler::navigate,
+            onTransfer = onTransfer,
+            nodeResultFlow = nodeResultFlow,
+            clearResultFlow = clearResultFlow,
+        )
 
         LaunchedEffect(key.isNewFolder) {
             if (key.isNewFolder && !hasShownSnackbar) {
@@ -47,6 +61,7 @@ fun EntryProviderScope<NavKey>.cloudDriveScreen(
             onBack = onBack,
             onTransfer = onTransfer,
             openSearch = openSearch,
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel
         )
     }
 }

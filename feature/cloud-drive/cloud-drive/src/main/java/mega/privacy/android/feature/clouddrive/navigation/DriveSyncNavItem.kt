@@ -36,7 +36,9 @@ class DriveSyncNavItem : MainNavItem {
                             parentHandle = parentHandle
                         )
                     )
-                }
+                },
+                nodeResultFlow = navigationHandler::monitorResult,
+                clearResultFlow = navigationHandler::clearResult
             )
 
             cloudDriveScreen(
@@ -50,7 +52,9 @@ class DriveSyncNavItem : MainNavItem {
                             parentHandle = parentHandle
                         )
                     )
-                }
+                },
+                nodeResultFlow = navigationHandler::monitorResult,
+                clearResultFlow = navigationHandler::clearResult
             )
         }
 

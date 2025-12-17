@@ -39,7 +39,7 @@ internal fun rememberSingleNodeActionHandler(
     val versionsLauncher = rememberLauncherForActivityResult(
         contract = megaActivityResultContract.versionsFileActivityResultContract
     ) { result ->
-        result?.let { nodeOptionsActionViewModel.deleteVersionHistory(it) }
+        nodeOptionsActionViewModel.deleteVersionHistory(result)
     }
 
     val moveLauncher = rememberLauncherForActivityResult(

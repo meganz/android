@@ -184,7 +184,6 @@ internal fun DriveSyncScreen(
                         },
                         onSortNodes = cloudDriveViewModel::setCloudSortOrder,
                         nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-                        nodeActionHandler = nodeActionHandler,
                         modifier = modifier,
                     )
                 }

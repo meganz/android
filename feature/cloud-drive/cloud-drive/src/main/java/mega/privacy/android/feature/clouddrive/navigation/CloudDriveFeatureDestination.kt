@@ -32,7 +32,9 @@ class CloudDriveFeatureDestination : FeatureDestination {
                             parentHandle = parentHandle
                         )
                     )
-                }
+                },
+                nodeResultFlow = navigationHandler::monitorResult,
+                clearResultFlow = navigationHandler::clearResult
             )
 
             rubbishBin(navigationHandler, transferHandler)
@@ -66,7 +68,9 @@ class CloudDriveFeatureDestination : FeatureDestination {
                             parentHandle = parentHandle
                         )
                     )
-                }
+                },
+                nodeResultFlow = navigationHandler::monitorResult,
+                clearResultFlow = navigationHandler::clearResult
             )
 
             favouritesScreen(

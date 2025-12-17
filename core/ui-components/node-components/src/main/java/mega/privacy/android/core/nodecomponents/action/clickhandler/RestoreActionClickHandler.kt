@@ -65,6 +65,7 @@ class RestoreActionClickHandler @Inject constructor(
                         if (result.conflictNodes.isNotEmpty()) {
                             provider.coroutineScope.ensureActive()
                             provider.restoreLauncher.launch(ArrayList(result.conflictNodes.values))
+                            provider.viewModel.dismiss()
                         }
                         if (result.noConflictNodes.isNotEmpty()) {
                             val restoreResult = restoreNodesUseCase(result.noConflictNodes)
@@ -104,7 +105,7 @@ class RestoreActionClickHandler @Inject constructor(
             message = message,
             actionLabel = locateActionLabel,
             actionClick = {
-                provider.navigationHandler?.navigate(
+                provider.viewModel.navigateWithNavKey(
                     CloudDriveNavKey(
                         nodeHandle = destinationHandle,
                         highlightedNodeHandle = restoredNodeHandle,

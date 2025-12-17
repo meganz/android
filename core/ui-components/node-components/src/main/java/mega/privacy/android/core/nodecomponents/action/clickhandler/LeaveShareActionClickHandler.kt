@@ -7,7 +7,6 @@ import mega.privacy.android.core.nodecomponents.dialog.leaveshare.LeaveShareDial
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.LeaveShareMenuAction
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.navigation.contract.NavigationHandler
 import javax.inject.Inject
 
 class LeaveShareActionClickHandler @Inject constructor(
@@ -18,7 +17,7 @@ class LeaveShareActionClickHandler @Inject constructor(
     override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
         navigateToLeaveShareDialog(
             nodeHandles = listOf(node.id.longValue),
-            navigationHandler = provider.navigationHandler
+            navigationHandler = provider.viewModel::navigateWithNavKey
         )
     }
 
@@ -29,20 +28,18 @@ class LeaveShareActionClickHandler @Inject constructor(
     ) {
         navigateToLeaveShareDialog(
             nodeHandles = nodes.map { it.id.longValue },
-            navigationHandler = provider.navigationHandler
+            navigationHandler = provider.viewModel::navigateWithNavKey
         )
     }
 
     private fun navigateToLeaveShareDialog(
         nodeHandles: List<Long>,
-        navigationHandler: NavigationHandler?,
+        navigationHandler: (LeaveShareDialogNavKey) -> Unit,
     ) {
         runCatching {
             nodeHandlesToJsonMapper(nodeHandles)
         }.onSuccess {
-            navigationHandler?.navigate(
-                LeaveShareDialogNavKey(handles = it)
-            )
+            navigationHandler(LeaveShareDialogNavKey(handles = it))
         }
     }
 }

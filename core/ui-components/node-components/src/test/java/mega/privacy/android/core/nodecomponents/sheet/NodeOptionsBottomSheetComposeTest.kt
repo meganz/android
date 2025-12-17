@@ -111,7 +111,7 @@ class NodeOptionsBottomSheetComposeTest {
             NodeActionListTile(
                 menuAction = AvailableOfflineMenuAction(),
                 isDestructive = false,
-                onActionClicked = { handler.onDismiss() }
+                onActionClicked = {}
             )
         }
 
@@ -206,7 +206,7 @@ class NodeOptionsBottomSheetComposeTest {
                     NodeActionListTile(
                         menuAction = AvailableOfflineMenuAction(),
                         isDestructive = false,
-                        onActionClicked = { handler.onDismiss() }
+                        onActionClicked = {}
                     )
                 }
             }
@@ -256,7 +256,7 @@ class NodeOptionsBottomSheetComposeTest {
                     NodeActionListTile(
                         menuAction = AvailableOfflineMenuAction(),
                         isDestructive = false,
-                        onActionClicked = { handler.onDismiss() }
+                        onActionClicked = {}
                     )
                 }
             }
@@ -285,7 +285,7 @@ class NodeOptionsBottomSheetComposeTest {
             NodeActionListTile(
                 menuAction = AvailableOfflineMenuAction(),
                 isDestructive = false,
-                onActionClicked = { handler.onDismiss() }
+                onActionClicked = {}
             )
         }
 
@@ -312,7 +312,7 @@ class NodeOptionsBottomSheetComposeTest {
             NodeActionListTile(
                 menuAction = AvailableOfflineMenuAction(),
                 isDestructive = false,
-                onActionClicked = { handler.onDismiss() }
+                onActionClicked = {}
             )
         }
 
@@ -320,7 +320,7 @@ class NodeOptionsBottomSheetComposeTest {
             NodeActionListTile(
                 menuAction = AvailableOfflineMenuAction(),
                 isDestructive = false,
-                onActionClicked = { handler.onDismiss() }
+                onActionClicked = {}
             )
         }
 
@@ -349,7 +349,7 @@ class NodeOptionsBottomSheetComposeTest {
                     NodeActionListTile(
                         menuAction = AvailableOfflineMenuAction(),
                         isDestructive = false,
-                        onActionClicked = { handler.onDismiss() }
+                        onActionClicked = {}
                     )
                 }
             }

@@ -1,9 +1,12 @@
 package mega.privacy.android.core.nodecomponents.action
 
+import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
@@ -136,6 +139,7 @@ class NodeOptionsActionViewModel @Inject constructor(
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode,
+    @ApplicationContext private val applicationContext: Context,
 ) : ViewModel() {
 
     val uiState: StateFlow<NodeActionState>
@@ -278,13 +282,17 @@ class NodeOptionsActionViewModel @Inject constructor(
     /**
      * Delete version history of selected node
      */
-    fun deleteVersionHistory(it: Long) = applicationScope.launch {
-        val result = runCatching {
-            deleteNodeVersionsUseCase(NodeId(it))
+    fun deleteVersionHistory(nodeId: Long?) = applicationScope.launch {
+        nodeId?.let { long ->
+            val result = runCatching {
+                deleteNodeVersionsUseCase(NodeId(long))
+            }
+            versionHistoryRemoveMessageMapper(result.exceptionOrNull()).let {
+                snackbarEventQueue.queueMessage(it)
+            }
         }
-        versionHistoryRemoveMessageMapper(result.exceptionOrNull()).let {
-            snackbarEventQueue.queueMessage(it)
-        }
+
+        dismiss()
     }
 
     /**
@@ -409,6 +417,7 @@ class NodeOptionsActionViewModel @Inject constructor(
                 val message = nodeSendToChatMessageMapper(attachNodeRequest)
                 message?.let {
                     snackbarEventQueue.queueMessage(it)
+                    dismiss()
                 }
             }
         }
@@ -602,25 +611,23 @@ class NodeOptionsActionViewModel @Inject constructor(
                             updateNodeSensitiveUseCase(nodeId = node.id, isSensitive = isHidden)
                         }
                     }
-                    uiState.update { state ->
-                        state.copy(
-                            infoToShowEvent = triggered(
-                                if (isHidden) {
-                                    LocalizedText.PluralsRes(
-                                        resId = R.plurals.hidden_nodes_result_message,
-                                        quantity = selectedNodes.size,
-                                        formatArgs = listOf(selectedNodes.size)
-                                    )
-                                } else {
-                                    LocalizedText.PluralsRes(
-                                        resId = sharedResR.plurals.unhidden_nodes_result_message,
-                                        quantity = selectedNodes.size,
-                                        formatArgs = listOf(selectedNodes.size)
-                                    )
-                                }
-                            )
+
+                    val message = if (isHidden) {
+                        LocalizedText.PluralsRes(
+                            resId = R.plurals.hidden_nodes_result_message,
+                            quantity = selectedNodes.size,
+                            formatArgs = listOf(selectedNodes.size)
+                        )
+                    } else {
+                        LocalizedText.PluralsRes(
+                            resId = sharedResR.plurals.unhidden_nodes_result_message,
+                            quantity = selectedNodes.size,
+                            formatArgs = listOf(selectedNodes.size)
                         )
                     }
+
+                    snackbarEventQueue.queueMessage(message.get(applicationContext))
+                    dismiss()
                 }
             }.onFailure { Timber.e(it) }
         }
@@ -694,6 +701,7 @@ class NodeOptionsActionViewModel @Inject constructor(
     fun postMessage(message: String) {
         applicationScope.launch {
             snackbarEventQueue.queueMessage(message)
+            dismiss()
         }
     }
 
@@ -796,6 +804,30 @@ class NodeOptionsActionViewModel @Inject constructor(
                     actionClick = actionClick,
                 )
             )
+        }
+    }
+
+    fun navigateWithNavKey(navKey: NavKey) {
+        uiState.update {
+            it.copy(navigationEvent = triggered(navKey))
+        }
+    }
+
+    fun resetNavigationEvent() {
+        uiState.update {
+            it.copy(navigationEvent = consumed())
+        }
+    }
+
+    fun dismiss() {
+        uiState.update {
+            it.copy(dismissEvent = triggered)
+        }
+    }
+
+    fun resetDismiss() {
+        uiState.update {
+            it.copy(dismissEvent = consumed)
         }
     }
 }

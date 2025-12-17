@@ -18,6 +18,8 @@ class ManageShareFolderActionClickHandler @Inject constructor(
             handle = node.id.longValue,
             nodeName = node.name,
         )
+
+        provider.viewModel.dismiss()
     }
 }
 

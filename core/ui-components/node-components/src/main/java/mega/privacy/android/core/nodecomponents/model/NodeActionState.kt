@@ -1,5 +1,6 @@
 package mega.privacy.android.core.nodecomponents.model
 
+import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
@@ -45,4 +46,6 @@ data class NodeActionState(
     val shareFolderEvent: StateEventWithContent<List<Long>> = consumed(),
     val visibleActions: List<MenuActionWithIcon> = emptyList(),
     val availableActions: List<MenuActionWithIcon> = emptyList(),
+    val navigationEvent: StateEventWithContent<NavKey> = consumed(),
+    val dismissEvent: StateEvent = consumed,
 )

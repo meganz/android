@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -34,13 +33,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
-import mega.android.core.ui.components.sheets.MegaModalBottomSheet
-import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
-import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.NewFolderNodeDialog
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
 import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
@@ -50,7 +45,7 @@ import mega.privacy.android.core.nodecomponents.list.UnverifiedContactShareBanne
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeSortOption
-import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetRoute
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
@@ -58,8 +53,6 @@ import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
 import mega.privacy.android.core.nodecomponents.upload.rememberCaptureHandler
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
-import mega.privacy.android.core.sharedcomponents.node.rememberNodeId
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -98,12 +91,6 @@ internal fun CloudDriveContent(
     listState: LazyListState = rememberLazyListState(),
     gridState: LazyGridState = rememberLazyGridState(),
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
-    nodeActionHandler: NodeActionHandler = rememberNodeActionHandler(
-        navigationHandler = navigationHandler,
-        viewModel = nodeOptionsActionViewModel
-    ),
-    visibleParentNodeOptionId: NodeId? = null,
-    onDismissNodeOptionsBottomSheet: () -> Unit = {},
     onPrepareScanDocument: () -> Unit = {},
 ) {
     var showNewFolderDialog by remember { mutableStateOf(false) }
@@ -159,29 +146,11 @@ internal fun CloudDriveContent(
             }
         },
     )
-    var visibleNodeOptionId by rememberNodeId(null)
-    val nodeOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     var shouldShowSkeleton by remember { mutableStateOf(false) }
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
-
-    LaunchedEffect(visibleParentNodeOptionId) {
-        // Only update when not null to prevent hiding bottom sheet during configuration changes
-        // visibleNodeOptionId will retain value after configuration change
-        if (visibleParentNodeOptionId != null) {
-            visibleNodeOptionId = visibleParentNodeOptionId
-        }
-    }
-
-    LaunchedEffect(visibleNodeOptionId) {
-        if (visibleNodeOptionId != null) {
-            nodeOptionSheetState.show()
-        } else {
-            nodeOptionSheetState.hide()
-        }
-    }
 
     EventEffect(
         event = nodeActionState.downloadEvent,
@@ -299,7 +268,14 @@ internal fun CloudDriveContent(
                 isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
                 isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
                 showHiddenNodes = uiState.showHiddenNodes,
-                onMenuClicked = { visibleNodeOptionId = it.id },
+                onMenuClicked = {
+                    navigationHandler.navigate(
+                        NodeOptionsBottomSheetNavKey(
+                            nodeHandle = it.id.longValue,
+                            nodeSourceType = uiState.nodeSourceType
+                        )
+                    )
+                },
                 onItemClicked = { onAction(ItemClicked(it)) },
                 onLongClicked = { onAction(ItemLongClicked(it)) },
                 sortConfiguration = uiState.selectedSortConfiguration,
@@ -420,34 +396,6 @@ internal fun CloudDriveContent(
                     showNewTextFileDialog = false
                 }
             )
-        }
-
-        // Todo: We will remove this, and replace it with NavigationHandler
-        // Temporary solution to show node options bottom sheet, because navigation file
-        // is not yet implemented in node-components module.
-        visibleNodeOptionId?.let { nodeId ->
-            MegaModalBottomSheet(
-                modifier = Modifier.statusBarsPadding(),
-                sheetState = nodeOptionSheetState,
-                onDismissRequest = {
-                    visibleNodeOptionId = null
-                    onDismissNodeOptionsBottomSheet()
-                },
-                bottomSheetBackground = MegaModalBottomSheetBackground.Surface1
-            ) {
-                NodeOptionsBottomSheetRoute(
-                    navigationHandler = navigationHandler,
-                    onDismiss = {
-                        visibleNodeOptionId = null
-                        onDismissNodeOptionsBottomSheet()
-                    },
-                    nodeId = nodeId.longValue,
-                    nodeSourceType = uiState.nodeSourceType,
-                    onTransfer = onTransfer,
-                    actionHandler = nodeActionHandler,
-                    nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-                )
-            }
         }
 
         if (showSortBottomSheet) {

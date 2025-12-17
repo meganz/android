@@ -40,7 +40,7 @@ class DeletePermanentActionClickHandler @Inject constructor(
                 val handles = nodes.map { it.id.longValue }
                 runCatching { nodeHandlesToJsonMapper(handles) }
                     .onSuccess {
-                        provider.navigationHandler?.navigate(
+                        provider.viewModel.navigateWithNavKey(
                             MoveToRubbishOrDeleteDialogArgs(
                                 isInRubbish = true,
                                 nodeHandles = handles

@@ -20,7 +20,7 @@ class VerifyActionClickHandler @Inject constructor(
         provider.coroutineScope.launch {
             getNodeShareDataUseCase(node)?.let { data ->
                 if (data.isVerified.not() && data.isPending) {
-                    provider.navigationHandler?.navigate(
+                    provider.viewModel.navigateWithNavKey(
                         CannotVerifyContactDialogNavKey(data.user.orEmpty())
                     )
                 } else {
@@ -29,6 +29,7 @@ class VerifyActionClickHandler @Inject constructor(
                         email = data.user.orEmpty(),
                         isIncomingShares = node.isIncomingShare
                     )
+                    provider.viewModel.dismiss()
                 }
             }
         }

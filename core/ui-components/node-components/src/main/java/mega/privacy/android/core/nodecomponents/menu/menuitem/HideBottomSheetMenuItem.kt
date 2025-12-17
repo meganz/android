@@ -66,7 +66,6 @@ class HideBottomSheetMenuItem @Inject constructor(
                             .size(24.dp)
                             .clickable {
                                 handler.actionHandler(menuAction, selectedNode)
-                                handler.onDismiss()
                             },
                         tint = IconColor.Secondary
                     )

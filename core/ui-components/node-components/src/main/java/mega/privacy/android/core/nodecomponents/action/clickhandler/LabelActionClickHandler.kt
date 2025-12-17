@@ -11,6 +11,6 @@ class LabelActionClickHandler @Inject constructor() : SingleNodeAction {
     override fun canHandle(action: MenuAction): Boolean = action is LabelMenuAction
 
     override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
-        provider.navigationHandler?.navigate(ChangeLabelBottomSheet(node.id.longValue))
+        provider.viewModel.navigateWithNavKey(ChangeLabelBottomSheet(node.id.longValue))
     }
 }

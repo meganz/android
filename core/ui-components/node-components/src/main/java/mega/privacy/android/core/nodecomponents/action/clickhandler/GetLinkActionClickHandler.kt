@@ -18,6 +18,7 @@ class GetLinkActionClickHandler @Inject constructor(
             context = provider.context,
             node.id.longValue
         )
+        provider.viewModel.dismiss()
     }
 
     override fun handle(
@@ -29,5 +30,6 @@ class GetLinkActionClickHandler @Inject constructor(
             context = provider.context,
             *nodes.map { it.id.longValue }.toLongArray()
         )
+        provider.viewModel.dismiss()
     }
 }

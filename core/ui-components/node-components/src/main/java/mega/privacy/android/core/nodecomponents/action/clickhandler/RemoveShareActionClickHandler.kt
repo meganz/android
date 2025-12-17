@@ -32,7 +32,7 @@ class RemoveShareActionClickHandler @Inject constructor(
     private fun removeShares(nodeList: List<Long>, provider: NodeActionProvider) {
         runCatching { nodeHandlesToJsonMapper(nodeList) }
             .onSuccess { handles ->
-                provider.navigationHandler?.navigate(
+                provider.viewModel.navigateWithNavKey(
                     RemoveShareFolderDialogNavKey(nodes = handles)
                 )
             }.onFailure {

@@ -16,7 +16,7 @@ class SyncActionClickHandler @Inject constructor() : SingleNodeAction {
         node: TypedNode,
         provider: SingleNodeActionProvider,
     ) {
-        provider.navigationHandler?.navigate(
+        provider.viewModel.navigateWithNavKey(
             SyncNewFolderNavKey(
                 remoteFolderHandle = node.id.longValue,
                 remoteFolderName = node.name,
