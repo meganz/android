@@ -9,7 +9,6 @@ data class RubbishBinNavKey(
     val highlightedNodeHandle: Long? = null,
 ) : NavKey
 
-
 @Serializable
 data object NotificationsNavKey : NavKey
 
